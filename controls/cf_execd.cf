@@ -1,8 +1,9 @@
 ###############################################################################
 # This part is for cf-execd
 #
-# These body settings determine the behaviour of cf-execd, including scheduling
-# times and output capture to $(sys.workdir)/outputs and relay via email.
+# These body settings determine the behaviour of cf-execd,
+# including scheduling times and output capture to
+# $(sys.workdir)/outputs and relay via email.
 ###############################################################################
 
 body executor control
@@ -13,7 +14,7 @@ body executor control
 
       splaytime  => "1";
       mailto     => "root@$(def.domain)";
-      mailfrom   => "root@$(sys.host)\.$(def.domain)";
+      mailfrom   => "root@$(sys.host).$(def.domain)";
       smtpserver => "localhost";
 
       # Default:
@@ -22,8 +23,19 @@ body executor control
       #               "Min25", "Min30", "Min35", "Min40", "Min45",
       #               "Min50", "Min55" };
 
-    !windows::
+      # The full path and command to the executable run by default (overriding builtin).
+      # cf-twin needs its own safe environment because of the update mechanism
 
-      exec_command => "$(sys.cf_twin) -f $(sys.workdir)/inputs/update.cf ; $(sys.cf_agent)";
+    windows::
+      exec_command => "$(sys.cf_twin) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
+
+    hpux::
+      exec_command => "SHLIB_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent)";
+
+    aix::
+      exec_command => "LIBPATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent)";
+
+    !(windows|hpux|aix)::
+      exec_command => "LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
 }

@@ -1,8 +1,8 @@
 ###############################################################################
 # This part is for cf-serverd
 #
-# Server controls are mainly about determining access policy for the connection
-# protocol: i.e. access to the server itself.
+# General IP access policy for the connection protocol
+#  i.e. access to the server itself.
 # Access to specific files must be granted in addition.
 ###############################################################################
 
@@ -13,6 +13,11 @@ body server control
       denybadclocks         => "false";
 
       # By default deny all connections but the following:
+      allowconnects         => { "127.0.0.1" , "::1", @(def.acl) };
+      allowallconnects      => { "127.0.0.1" , "::1", @(def.acl) };
+      trustkeysfrom         => { "127.0.0.1" , "::1", @(def.acl) };
+
+      denybadclocks         => "false";
       ## List of hosts that may connect
       allowconnects         => { "127.0.0.1" , "::1", @(def.acl) };
       ## List of hosts that may have more than one connection established at the same time
@@ -22,13 +27,23 @@ body server control
 
       # List of hosts that don't need to verify identity with reverse DNS lookup
       # (deprecated now that key authentication is the norm)
-      skipverify            => { ".*\.$(def.domain)", "127.0.0.1" , "::1", @(def.acl) };
+      skipverify            => { ".*$(def.domain)", "127.0.0.1" , "::1", @(def.acl) };
 
       allowusers            => { "root" };
+
       maxconnections        => "100";
 
-    !windows::
-      cfruncommand => "$(sys.cf_twin) -f $(sys.workdir)/inputs/update.cf ; $(sys.cf_agent)";
+    windows::
+      cfruncommand => "$(sys.cf_twin) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
+
+    hpux::
+      cfruncommand => "/bin/sh -c \"SHLIB_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+
+    aix::
+      cfruncommand => "/bin/sh -c \"LIBPATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+
+    !(windows|hpux|aix)::
+      cfruncommand => "/bin/sh -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
 }
 
@@ -43,37 +58,96 @@ bundle server access_rules()
     any::
 
       "$(def.dir_masterfiles)"
-      handle => "server_access_rule_grant_access_policy",
+      handle => "server_access_grant_access_policy",
       comment => "Grant access to the policy updates",
-      admit => { ".*\.$(def.domain)", @(def.acl) };
+      admit => { ".*$(def.domain)", @(def.acl) };
+
+      "$(def.dir_software)"
+      handle => "server_access_grant_access_datafiles",
+      comment => "Grant access to software updates",
+      admit => { ".*$(def.domain)", @(def.acl) };
 
       "$(def.dir_bin)"
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
-      admit   => { ".*\.$(def.domain)", @(def.acl) };
+      admit => { ".*$(def.domain)", @(def.acl) };
 
       "$(def.dir_modules)"
       handle => "server_access_grant_access_modules",
       comment => "Grant access to modules directory",
-      admit   => { ".*\.$(def.domain)", @(def.acl) };
+      admit => { ".*$(def.domain)", @(def.acl) };
+
+      "/bin/sh"
+      handle => "server_access_grant_access_shell_cmd",
+      comment => "Grant access to shell for cfruncommand",
+      admit => { "$(sys.policy_hub)" };
+
+    !am_policy_hub::
+
+      "delta"
+      handle => "server_access_grant_delta_for_hosts",
+      comment => "Grant delta reporting query for the hub on the hosts",
+      resource_type => "query",
+      report_data_select => default_data_select_host,
+      admit => { "$(sys.policy_hub)" };
+
+      "full"
+      handle => "server_access_grant_full_for_hosts",
+      comment => "Grant full reporting query for the hub on the hosts",
+      resource_type => "query",
+      report_data_select => default_data_select_host,
+      admit => { "$(sys.policy_hub)" };
+
+    am_policy_hub::
+
+      "delta"
+      handle => "server_access_grant_delta_for_hub",
+      comment => "Grant delta reporting query for the hub on the policy server",
+      resource_type => "query",
+      report_data_select => default_data_select_policy_hub,
+      admit => { "$(sys.policy_hub)" };
+
+      "full"
+      handle => "server_access_grant_full_for_hub",
+      comment => "Grant full reporting query for the hub on the policy server",
+      resource_type => "query",
+      report_data_select => default_data_select_policy_hub,
+      admit => { "$(sys.policy_hub)" };
+
 
       # Uncomment the promise below to allow cf-runagent to
       # access cf-agent on Windows machines
       #
       #  "c:\program files\cfengine\bin\cf-agent.exe"
       #
-      #    handle => "server_access_rule_grant_access_cfagent_windows",
+      #    handle => "grant_access_policy_agent",
       #    comment => "Grant access to the agent (for cf-runagent)",
-      #    admit   => { ".*\.$(def.domain)", @(def.acl) };
+      #    admit   => { ".*$(def.domain)", @(def.acl) };
+
 
   roles:
 
       # Use roles to allow specific remote cf-runagent users to
       # define certain soft-classes when running cf-agent on this host
 
-    cfengine_3::
-
       ".*" authorize => { "root" };
 
 }
 
+body report_data_select default_data_select_host
+{
+      variables_include => { "sys..*", "mon..*" };
+      monitoring_include => { "cpu.*",
+                              "mem_total",
+                              "mem_free",
+                              "mem_cached",
+                              "mem_swap",
+                              "mem_freeswap",
+                              "loadavg",
+                              "diskfree" };
+}
+
+body report_data_select default_data_select_policy_hub
+{
+      variables_include => { "sys..*", "mon..*" };
+}

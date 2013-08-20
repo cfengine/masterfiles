@@ -1,8 +1,11 @@
 ###############################################################################
+#
 # This part is for cf-runagent
 #
-# The most important parameter here is the list of hosts that the agent will
-# poll for connections.
+# Settings describing the details of the fixed behavioural promises made
+# by cf-runagent. The most important parameter here is the list of hosts
+# that the agent will poll for connections.
+#
 ###############################################################################
 
 body runagent control

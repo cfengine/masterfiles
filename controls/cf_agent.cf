@@ -1,8 +1,10 @@
 ###############################################################################
+#
 # This part is for cf-agent
 #
-# Settings describing the details of the fixed behavioural promises made by
-# cf-agent.
+# Settings describing the details of the fixed behavioural promises made
+# by cf-agent
+#
 ###############################################################################
 
 body agent control
@@ -26,10 +28,17 @@ body agent control
       # Environment variables based on Distro
 
     debian::
+
       environment => {
                        "DEBIAN_FRONTEND=noninteractive",
-		       #                  "APT_LISTBUGS_FRONTEND=none",
-		       #                  "APT_LISTCHANGES_FRONTEND=none",
+                       # "APT_LISTBUGS_FRONTEND=none",
+                       # "APT_LISTCHANGES_FRONTEND=none",
       };
+
+      # Switch on tracking of promise valuation
+
+    any::
+
+      track_value => "true";
 
 }
