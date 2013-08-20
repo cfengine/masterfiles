@@ -17,57 +17,57 @@
 
 bundle agent cfe_internal_management
 {
- methods:
+  methods:
 
-  #
-  # CFEngine internals
-  #
+      #
+      # CFEngine internals
+      #
 
-  am_policy_hub::
+    am_policy_hub::
 
-   "hub" usebundle => cfe_internal_update_folders,
-            handle => "cfe_internal_management_update_folders",
-           comment => "Create empty directories for CFE self-upgrade";
+      "hub" usebundle => cfe_internal_update_folders,
+      handle => "cfe_internal_management_update_folders",
+      comment => "Create empty directories for CFE self-upgrade";
 
-#### cfengine_selinux() can be "fix" or "disable"
+      #### cfengine_selinux() can be "fix" or "disable"
 
-   "hub" usebundle => cfe_internal_selinux("fix"),
-            handle => "cfe_internal_management_fix_selinux",
-           comment => "Fix SELinux to be able to run Mission Portal and Mongo DB";
+      "hub" usebundle => cfe_internal_selinux("fix"),
+      handle => "cfe_internal_management_fix_selinux",
+      comment => "Fix SELinux to be able to run Mission Portal and Mongo DB";
 
-   "hub" usebundle => cfe_internal_webserver("on"),
-            handle => "cfe_internal_management_web_server",
-           comment => "Manage Apache Web server (on/off)";
+      "hub" usebundle => cfe_internal_webserver("on"),
+      handle => "cfe_internal_management_web_server",
+      comment => "Manage Apache Web server (on/off)";
 
-   "hub" usebundle => cfe_internal_setup_knowledge,
-            handle => "cfe_internal_management_setup_knowledge",
-           comment => "Manage CFE Knowledge Map";
+      "hub" usebundle => cfe_internal_setup_knowledge,
+      handle => "cfe_internal_management_setup_knowledge",
+      comment => "Manage CFE Knowledge Map";
 
-   "hub" usebundle => cfe_internal_rotate_mongod_log,
-            handle => "cfe_internal_management_rotate_mongod_log",
-           comment => "Rotate the mongod log";
+      "hub" usebundle => cfe_internal_rotate_mongod_log,
+      handle => "cfe_internal_management_rotate_mongod_log",
+      comment => "Rotate the mongod log";
 
-   "hub" usebundle => cfe_internal_hub_maintain,
-            handle => "cfe_internal_management_hub_maintain",
-           comment => "Start the hub maintenance process";
+      "hub" usebundle => cfe_internal_hub_maintain,
+      handle => "cfe_internal_management_hub_maintain",
+      comment => "Start the hub maintenance process";
 
-   "hub" usebundle => cfe_internal_apache_sudoer,
-            handle => "cfe_internal_management_apache_sudoer",
-           comment => "Permit Apache user to run passwordless sudo cf-runagent";
+      "hub" usebundle => cfe_internal_apache_sudoer,
+      handle => "cfe_internal_management_apache_sudoer",
+      comment => "Permit Apache user to run passwordless sudo cf-runagent";
 
-  any::
+    any::
 
-   "any" usebundle => cfe_internal_correct_cftwin,
-            handle => "cfe_internal_management_correct_cftwin",
-           comment => "Ensure cf-twin in good shape";
+      "any" usebundle => cfe_internal_correct_cftwin,
+      handle => "cfe_internal_management_correct_cftwin",
+      comment => "Ensure cf-twin in good shape";
 
-   "any" usebundle => cfe_internal_limit_robot_agents,
-            handle => "cfe_internal_management_limit_cfe_agents",
-           comment => "Manage CFE processes";
+      "any" usebundle => cfe_internal_limit_robot_agents,
+      handle => "cfe_internal_management_limit_cfe_agents",
+      comment => "Manage CFE processes";
 
-   "any" usebundle => cfe_internal_garbage_collection,
-            handle => "cfe_internal_management_garbage_collection",
-           comment => "Log rotate and tidy up CFE internal usage files";
+      "any" usebundle => cfe_internal_garbage_collection,
+      handle => "cfe_internal_management_garbage_collection",
+      comment => "Log rotate and tidy up CFE internal usage files";
 
 }
 
@@ -80,55 +80,55 @@ bundle agent cfe_internal_management
 
 bundle agent cfe_internal_limit_robot_agents
 {
- processes:
+  processes:
 
-  !windows::
+    !windows::
 
-   "bin/cf-execd"
+      "bin/cf-execd"
       process_count => check_execd("1"),
-            comment => "Check cf-execd process if exceed the number",
-             handle => "cfe_internal_limit_robot_agents_processes_check_cf_execd";
+      comment => "Check cf-execd process if exceed the number",
+      handle => "cfe_internal_limit_robot_agents_processes_check_cf_execd";
 
-   "bin/cf-monitord"
+      "bin/cf-monitord"
       process_count => check_monitord("1"),
-            comment => "Check cf-monitord process if exceed the number",
-             handle => "cfe_internal_limit_robot_agents_processes_check_cf_monitord";
-   
-   #
-   # Do not do this for cf-hub because cf-hub may have unlimited processes
-   #
+      comment => "Check cf-monitord process if exceed the number",
+      handle => "cfe_internal_limit_robot_agents_processes_check_cf_monitord";
+      
+      #
+      # Do not do this for cf-hub because cf-hub may have unlimited processes
+      #
 
-  something_wrong_execd::
+    something_wrong_execd::
 
-   "bin/cf-execd"
-            signals => { "term", "kill" },
+      "bin/cf-execd"
+      signals => { "term", "kill" },
       restart_class => "restart_execd",
-            comment => "When cf-execd comes undone then kill all and restart the process",
-             handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
+      comment => "When cf-execd comes undone then kill all and restart the process",
+      handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
 
-  something_wrong_monitord::
+    something_wrong_monitord::
 
-   "bin/cf-monitord"
-            signals => { "term", "kill" },
+      "bin/cf-monitord"
+      signals => { "term", "kill" },
       restart_class => "restart_monitord",
-            comment => "When cf-monitord comes undone then kill all and restart the process",
-             handle => "cfe_internal_limit_robot_agents_processes_kill_cf_monitord";
+      comment => "When cf-monitord comes undone then kill all and restart the process",
+      handle => "cfe_internal_limit_robot_agents_processes_kill_cf_monitord";
 
-#
+      #
 
- commands:
+  commands:
 
-  restart_execd::
+    restart_execd::
 
-   "$(sys.cf_execd)"
+      "$(sys.cf_execd)"
       comment => "Restart cf-execd process",
-       handle => "cfe_internal_limit_robot_agents_commands_restart_cf_execd";
+      handle => "cfe_internal_limit_robot_agents_commands_restart_cf_execd";
 
-  restart_monitord::
+    restart_monitord::
 
-   "$(sys.cf_monitord)"
+      "$(sys.cf_monitord)"
       comment => "Restart cf-monitord process",
-       handle => "cfe_internal_limit_robot_agents_commands_restart_cf_monitord";
+      handle => "cfe_internal_limit_robot_agents_commands_restart_cf_monitord";
 
 }
 
@@ -136,14 +136,14 @@ bundle agent cfe_internal_limit_robot_agents
 
 body process_count check_execd(n)
 {
-match_range => "0,$(n)";
-out_of_range_define => {"something_wrong_execd"};
+      match_range => "0,$(n)";
+      out_of_range_define => {"something_wrong_execd"};
 }
 
 body process_count check_monitord(n)
 {
-match_range => "0,$(n)";
-out_of_range_define => {"something_wrong_monitord"};
+      match_range => "0,$(n)";
+      out_of_range_define => {"something_wrong_monitord"};
 }
 
 ##################################################################
@@ -155,31 +155,31 @@ out_of_range_define => {"something_wrong_monitord"};
 
 bundle agent cfe_internal_correct_cftwin
 {
- files:
+  files:
 
-  windows::
+    windows::
 
-   "$(sys.workdir)\bin-twin"
-                comment => "Correct bin-twin directory, making it up-to-date syncing up with bin directory",
-                 handle => "cfe_internal_correct_cftwin_file_bintwin",
+      "$(sys.workdir)\bin-twin"
+      comment => "Correct bin-twin directory, making it up-to-date syncing up with bin directory",
+      handle => "cfe_internal_correct_cftwin_file_bintwin",
       move_obstructions => "true",
-              copy_from => local_dcp("$(sys.workdir)\bin"),
-           depth_search => recurse("inf");
+      copy_from => local_dcp("$(sys.workdir)\bin"),
+      depth_search => recurse("inf");
 
-  !windows::
+    !windows::
 
-   "/var/cfengine/lib-twin"
-                comment => "Correct lib-twin to be the same as lib, in case of dependency upgrade. This effect cf-twin's behaviour",
-                 handle => "cfe_internal_correct_cftwin_files_libtwin",
-                  perms => m("644"),
+      "/var/cfengine/lib-twin"
+      comment => "Correct lib-twin to be the same as lib, in case of dependency upgrade. This effect cf-twin's behaviour",
+      handle => "cfe_internal_correct_cftwin_files_libtwin",
+      perms => m("644"),
       move_obstructions => "true",
-              copy_from => local_cp_libtwin("/var/cfengine/lib"),
-           depth_search => recurse("inf");
+      copy_from => local_cp_libtwin("/var/cfengine/lib"),
+      depth_search => recurse("inf");
 
-   "/var/cfengine/bin/cf-twin"
-        comment => "Correct cf-twin to be the same as cf-agent, in case of dependency upgrade",
-         handle => "cfe_internal_correct_cftwin_files_cftwin",
-          perms => m("755"),
+      "/var/cfengine/bin/cf-twin"
+      comment => "Correct cf-twin to be the same as cf-agent, in case of dependency upgrade",
+      handle => "cfe_internal_correct_cftwin_files_cftwin",
+      perms => m("755"),
       copy_from => local_cp("/var/cfengine/bin/cf-agent");
 
 }
@@ -188,8 +188,8 @@ bundle agent cfe_internal_correct_cftwin
 
 body copy_from local_cp_libtwin(from)
 {
- source      => "$(from)";
- purge       => "true";
+      source      => "$(from)";
+      purge       => "true";
 }
 
 ##################################################################
@@ -201,74 +201,74 @@ body copy_from local_cp_libtwin(from)
 
 bundle agent cfe_internal_garbage_collection
 {
- files:
+  files:
 
-  Sunday::
+    Sunday::
 
-   "$(sys.workdir)/cf_repair.log" 
+      "$(sys.workdir)/cf_repair.log" 
       comment => "Rotate the promises repaired logs each week",
-       handle => "cfe_internal_garbage_collection_files_cf_repair_log",
-       rename => rotate("7"),
-       action => if_elapsed("10000");
+      handle => "cfe_internal_garbage_collection_files_cf_repair_log",
+      rename => rotate("7"),
+      action => if_elapsed("10000");
 
-   "$(sys.workdir)/cf_notkept.log" 
+      "$(sys.workdir)/cf_notkept.log" 
       comment => "Rotate the promises not kept logs each week",
-       handle => "cfe_internal_garbage_collection_files_cf_notkept_log",
-       rename => rotate("7"),
-       action => if_elapsed("10000");
+      handle => "cfe_internal_garbage_collection_files_cf_notkept_log",
+      rename => rotate("7"),
+      action => if_elapsed("10000");
 
-   "$(sys.workdir)/promise_summary.log" 
+      "$(sys.workdir)/promise_summary.log" 
       comment => "Rotate the promises not kept logs each week",
-       handle => "cfe_internal_garbage_collection_files_promise_log",
-       rename => rotate("7"),
-       action => if_elapsed("10000");
+      handle => "cfe_internal_garbage_collection_files_promise_log",
+      rename => rotate("7"),
+      action => if_elapsed("10000");
 
-   "$(sys.workdir)/state/cf_value.log" 
+      "$(sys.workdir)/state/cf_value.log" 
       comment => "Rotate the promises not kept logs each week",
-       handle => "cfe_internal_garbage_collection_files_cf_value_log",
-       rename => rotate("7"),
-       action => if_elapsed("10000");
+      handle => "cfe_internal_garbage_collection_files_cf_value_log",
+      rename => rotate("7"),
+      action => if_elapsed("10000");
 
-  any::
+    any::
 
-   "$(sys.workdir)/outputs" 
-           comment => "Garbage collection of any output files",
-            handle => "cfe_internal_garbage_collection_files_tidy_outputs",
-            delete => tidy,
-       file_select => days_old("7"),
+      "$(sys.workdir)/outputs" 
+      comment => "Garbage collection of any output files",
+      handle => "cfe_internal_garbage_collection_files_tidy_outputs",
+      delete => tidy,
+      file_select => days_old("7"),
       depth_search => recurse("inf");
 
-  # Other resources
-  !(darwin|windows)::
+      # Other resources
+    !(darwin|windows)::
 
-#   "/tmp"  # this is a symlink on Macs 
-#           comment => "Garbage collection of any temporary files",
-#            handle => "cfe_internal_garbage_collection_files_tidy_tmp",
-#            delete => tidy,
-#       file_select => days_old("3"),
-#      depth_search => recurse("inf");
+      #   "/tmp"  # this is a symlink on Macs 
+      #           comment => "Garbage collection of any temporary files",
+      #            handle => "cfe_internal_garbage_collection_files_tidy_tmp",
+      #            delete => tidy,
+      #       file_select => days_old("3"),
+      #      depth_search => recurse("inf");
 
-  debian::
-  
-   "/var/log/apache2/.*bz" 
-          comment => "Garbage collection of rotated log files",
-           handle => "cfe_internal_garbage_collection_files_tidy_bz",
-           delete => tidy,
+    debian::
+      
+      "/var/log/apache2/.*bz" 
+      comment => "Garbage collection of rotated log files",
+      handle => "cfe_internal_garbage_collection_files_tidy_bz",
+      delete => tidy,
       file_select => days_old("30");
 
 
-   "/var/log/apache2/.*gz" 
-          comment => "Garbage collection of rotated log files",
-           handle => "cfe_internal_garbage_collection_files_tidy_gz",
-           delete => tidy,
+      "/var/log/apache2/.*gz" 
+      comment => "Garbage collection of rotated log files",
+      handle => "cfe_internal_garbage_collection_files_tidy_gz",
+      delete => tidy,
       file_select => days_old("30");
 
- SuSE::
+    SuSE::
 
-   "/var/log/zypper.log"
+      "/var/log/zypper.log"
       comment => "Prevent the zypper log from choking the disk",
-       handle => "cfe_internal_garbage_collection_files_zypper_log",
-       rename => rotate("0"),
-       action => if_elapsed("10000");
+      handle => "cfe_internal_garbage_collection_files_zypper_log",
+      rename => rotate("0"),
+      action => if_elapsed("10000");
 
 }

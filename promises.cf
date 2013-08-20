@@ -30,14 +30,14 @@ body common control
 
                   # Design Center
                   # MARKER FOR CF-SKETCH INPUT INSERTION
-                    "sketches/meta/api-runfile.cf",
-                    @(cfsketch_g.inputs),
+                  "sketches/meta/api-runfile.cf",
+                  @(cfsketch_g.inputs),
 
                   # CFEngine internal processes for Mission Portal mostly
-                    "cfe_internal/CFE_cfengine.cf",
-                    "cfe_internal/CFE_hub_specific.cf",
-                    "cfe_internal/CFE_knowledge.cf",
-                    "cfe_internal/example_use_goals.cf",
+                  "cfe_internal/CFE_cfengine.cf",
+                  "cfe_internal/CFE_hub_specific.cf",
+                  "cfe_internal/CFE_knowledge.cf",
+                  "cfe_internal/example_use_goals.cf",
 
 		  # Control body for all CFEngine robot agents
 		  "controls/cf_agent.cf",
@@ -63,8 +63,8 @@ body common control
 
       version => "CFEngine Promises.cf 3.6.0";
 
-#   goal_categories => { "goals", "targets", "milestones" };
-#   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
+      #   goal_categories => { "goals", "targets", "milestones" };
+      #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 
 }
 

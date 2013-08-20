@@ -17,66 +17,66 @@
 
 bundle agent cfe_internal_update_processes
 {
- vars:
+  vars:
 
-  any::
+    any::
 
-   "agents_to_be_disabled"   slist => {   			    	     
-				     # CFEngine Enterprise version < 3.5 requires the use of cf_null if slist is empty
- 				     # if all clients and policy server version >= 3.5, cf_null can be removed
-   			    	      cf_null,                                                
-                                     },
-                          comment => "CFE processest to be terminated",
-                           handle => "cfe_internal_update_processes_vars_agents_to_be_disabled";
+      "agents_to_be_disabled"   slist => {   			    	     
+					   # CFEngine Enterprise version < 3.5 requires the use of cf_null if slist is empty
+ 					   # if all clients and policy server version >= 3.5, cf_null can be removed
+   			    		   cf_null,                                                
+      },
+      comment => "CFE processest to be terminated",
+      handle => "cfe_internal_update_processes_vars_agents_to_be_disabled";
 
-   "agents_to_be_enabled"    slist => {
-   			    	      #cf_null, (uncomment this line if empty for server/clients version < 3.5)
-                                      "cf-execd",
-                                      "cf-serverd", 
-                                      "cf-monitord", 
-                                     },
-                          comment => "CFE processest to be terminated",
-                           handle => "cfe_internal_update_processes_vars_agents_to_be_enable";
+      "agents_to_be_enabled"    slist => {
+   			    		   #cf_null, (uncomment this line if empty for server/clients version < 3.5)
+					   "cf-execd",
+					   "cf-serverd", 
+					   "cf-monitord", 
+      },
+      comment => "CFE processest to be terminated",
+      handle => "cfe_internal_update_processes_vars_agents_to_be_enable";
 
-   "all_agents" slist => { @(agents_to_be_enabled), @(agents_to_be_disabled) },
+      "all_agents" slist => { @(agents_to_be_enabled), @(agents_to_be_disabled) },
       comment => "CFE processest to be terminated",
       handle => "cfe_internal_update_processes_vars_all_agents";
 
-#
+      #
 
- methods:
+  methods:
 
-  am_policy_hub::
+    am_policy_hub::
 
-  "TAKING CARE CFE HUB PROCESSES"
-     usebundle => maintain_cfe_hub_process,
-       comment => "Call a bundle to maintian HUB processes",
-        handle => "cfe_internal_update_processes_methods_maintain_hub";
-    
-  !windows::
+      "TAKING CARE CFE HUB PROCESSES"
+      usebundle => maintain_cfe_hub_process,
+      comment => "Call a bundle to maintian HUB processes",
+      handle => "cfe_internal_update_processes_methods_maintain_hub";
+      
+    !windows::
 
-   "DISABLING CFE AGENTS"
+      "DISABLING CFE AGENTS"
       usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
-        comment => "Call a bundle to disable CFEngine given processes",
-         handle => "cfe_internal_update_processes_methods_disabling_cfe_agents";
+      comment => "Call a bundle to disable CFEngine given processes",
+      handle => "cfe_internal_update_processes_methods_disabling_cfe_agents";
 
-   "CHECKING FOR PERSISTENTLY DISABLED CFE AGENTS"
+      "CHECKING FOR PERSISTENTLY DISABLED CFE AGENTS"
       usebundle => disable_cfengine_agents($(all_agents)),
-     ifvarclass => canonify("persistent_disable_$(all_agents)"),
-        comment => "Call a bundle to disable CFEngine given processes iff persisten_disable_x is set",
-         handle => "cfe_internal_update_processes_methods_maybe_disabling_cfe_agents";
+      ifvarclass => canonify("persistent_disable_$(all_agents)"),
+      comment => "Call a bundle to disable CFEngine given processes iff persisten_disable_x is set",
+      handle => "cfe_internal_update_processes_methods_maybe_disabling_cfe_agents";
 
-   "ENABLING CFE AGENTS"
+      "ENABLING CFE AGENTS"
       usebundle => enable_cfengine_agents("$(agents_to_be_enabled)"),
-        comment => "Call a bundle to enable CFEngine given processes",
-         handle => "cfe_internal_update_processes_methods_enabling_cfe_agents";
+      comment => "Call a bundle to enable CFEngine given processes",
+      handle => "cfe_internal_update_processes_methods_enabling_cfe_agents";
 
-  windows::
+    windows::
 
-   "CFENGINE on Windows"
+      "CFENGINE on Windows"
       usebundle => maintain_cfe_windows,
-        comment => "Call a bundle to maintain CFEngine on Windows",
-         handle => "cfe_internal_update_processes_methods_maintain_windows";
+      comment => "Call a bundle to maintain CFEngine on Windows",
+      handle => "cfe_internal_update_processes_methods_maintain_windows";
 
 
   reports:
@@ -91,71 +91,71 @@ bundle agent cfe_internal_update_processes
 
 bundle agent maintain_cfe_hub_process
 {
- vars:
+  vars:
 
-  am_policy_hub::
+    am_policy_hub::
 
-   "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
-                comment => "Path to a policy file",
-                 handle => "cfe_internal_maintain_cfe_hub_process_vars_file_check";
+      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
+      comment => "Path to a policy file",
+      handle => "cfe_internal_maintain_cfe_hub_process_vars_file_check";
 
-#
+      #
 
- classes:
+  classes:
 
-  am_policy_hub::
+    am_policy_hub::
 
-   "files_ok" expression => fileexists("$(file_check)"),
-                 comment => "Check for /var/cfengine/inputs/promises.cf",
-                  handle => "cfe_internal_maintain_cfe_hub_process_classes_files_ok";
+      "files_ok" expression => fileexists("$(file_check)"),
+      comment => "Check for /var/cfengine/inputs/promises.cf",
+      handle => "cfe_internal_maintain_cfe_hub_process_classes_files_ok";
 
-#
+      #
 
- processes:
+  processes:
 
-  am_policy_hub::
+    am_policy_hub::
 
-   "$(sys.workdir)/bin/mongod"
+      "$(sys.workdir)/bin/mongod"
       restart_class => "start_mongod",
-            comment => "Monitor mongodb process",
-             handle => "cfe_internal_maintain_cfe_hub_process_processes_mongod",
-         ifvarclass => "nova|enterprise";
+      comment => "Monitor mongodb process",
+      handle => "cfe_internal_maintain_cfe_hub_process_processes_mongod",
+      ifvarclass => "nova|enterprise";
 
-  am_policy_hub.files_ok.!windows::
+    am_policy_hub.files_ok.!windows::
 
-   "cf-hub"      restart_class => "start_hub",
-                       comment => "Monitor cf-hub process",
-                        handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
-                    ifvarclass => "nova|enterprise";
+      "cf-hub"      restart_class => "start_hub",
+      comment => "Monitor cf-hub process",
+      handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
+      ifvarclass => "nova|enterprise";
 
-#
+      #
 
   files:
-  
-   !windows.am_policy_hub.start_mongod::
+      
+    !windows.am_policy_hub.start_mongod::
 
-   "$(sys.workdir)/state/mongod.lock"
+      "$(sys.workdir)/state/mongod.lock"
       comment => "Delete mongod.lock if mongod is not running",
-       handle => "cfe_internal_maintain_cfe_hub_process_files_delete_mongod_lock",
-       delete => u_tidy;
-       
-#
+      handle => "cfe_internal_maintain_cfe_hub_process_files_delete_mongod_lock",
+      delete => u_tidy;
+      
+      #
 
- commands:
+  commands:
 
-  !windows.am_policy_hub.start_mongod::
+    !windows.am_policy_hub.start_mongod::
 
-   "$(sys.workdir)/bin/mongod --dbpath $(cfe_internal_update_policy.mongodb_dir) --config $(cfe_internal_update_policy.mongodb_conf_file) > /dev/null < /dev/null 2>&1"
-       contain => u_in_shell,
-        action => u_mongod_bg,
-       comment => "Start mongod process",
-        handle => "cfe_internal_maintain_cfe_hub_process_commands_start_mongod";
+      "$(sys.workdir)/bin/mongod --dbpath $(cfe_internal_update_policy.mongodb_dir) --config $(cfe_internal_update_policy.mongodb_conf_file) > /dev/null < /dev/null 2>&1"
+      contain => u_in_shell,
+      action => u_mongod_bg,
+      comment => "Start mongod process",
+      handle => "cfe_internal_maintain_cfe_hub_process_commands_start_mongod";
 
-  !windows.am_policy_hub.start_hub::
+    !windows.am_policy_hub.start_hub::
 
-   "$(sys.cf_hub)"
+      "$(sys.cf_hub)"
       comment => "Start cf-hub process",
-       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf_hub";
+      handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf_hub";
 
 }
 
@@ -165,40 +165,40 @@ bundle agent maintain_cfe_hub_process
 
 bundle agent disable_cfengine_agents(process)
 {
- vars:
+  vars:
 
-  !windows::
+    !windows::
 
-   "cprocess"    string => canonify("$(process)"),
-                comment => "Canonify a given process",
-                 handle => "cfe_internal_disable_cfengine_agents_vars_cprocess";
+      "cprocess"    string => canonify("$(process)"),
+      comment => "Canonify a given process",
+      handle => "cfe_internal_disable_cfengine_agents_vars_cprocess";
 
-   "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
-                comment => "Path to a policy file",
-                 handle => "cfe_internal_disable_cfengine_agents_vars_file_check";
+      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
+      comment => "Path to a policy file",
+      handle => "cfe_internal_disable_cfengine_agents_vars_file_check";
 
-#
+      #
 
- classes:
+  classes:
 
-  !windows::
+    !windows::
 
-   "disable_$(cprocess)" expression => strcmp("$(process)","$(process)"),
-                            comment => "Create a class to disable a given process",
-                             handle => "cfe_internal_disable_cfengine_agents_classes_disable_process";
+      "disable_$(cprocess)" expression => strcmp("$(process)","$(process)"),
+      comment => "Create a class to disable a given process",
+      handle => "cfe_internal_disable_cfengine_agents_classes_disable_process";
 
-   "files_ok"         expression => fileexists("$(file_check)"),
-                         comment => "Check for /var/cfengine/inputs/promises.cf",
-                          handle => "cfe_internal_disable_cfengine_agents_classes_files_ok";
+      "files_ok"         expression => fileexists("$(file_check)"),
+      comment => "Check for /var/cfengine/inputs/promises.cf",
+      handle => "cfe_internal_disable_cfengine_agents_classes_files_ok";
 
-#
+      #
 
- processes:
- 
-   "$(sys.workdir)/bin/$(process)"
-         signals => { "term" },
-         comment => "Terminate cf-monitord",
-          handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
+  processes:
+      
+      "$(sys.workdir)/bin/$(process)"
+      signals => { "term" },
+      comment => "Terminate cf-monitord",
+      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
       ifvarclass => "disable_$(cprocess)";
 
 }
@@ -208,53 +208,53 @@ bundle agent disable_cfengine_agents(process)
 #
 bundle agent enable_cfengine_agents(process)
 {
- vars:
+  vars:
 
-  any::
+    any::
 
-   "cprocess"  string => canonify("$(process)"),
-              comment => "Canonify a given process",
-               handle => "cfe_internal_enable_cfengine_agents_vars_cprocess";
+      "cprocess"  string => canonify("$(process)"),
+      comment => "Canonify a given process",
+      handle => "cfe_internal_enable_cfengine_agents_vars_cprocess";
 
-   "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
-                comment => "Path to a policy file",
-                 handle => "cfe_internal_enable_cfengine_agents_vars_file_check";
+      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
+      comment => "Path to a policy file",
+      handle => "cfe_internal_enable_cfengine_agents_vars_file_check";
 
-#
+      #
 
- classes:
+  classes:
 
-  !windows::
+    !windows::
 
-   "enable_$(cprocess)" expression => "!persistent_disable_$(cprocess)",
-                           comment => "Create a class to enable a given process",
-                            handle => "cfe_internal_enable_cfengine_agents_classes_enable_process";
+      "enable_$(cprocess)" expression => "!persistent_disable_$(cprocess)",
+      comment => "Create a class to enable a given process",
+      handle => "cfe_internal_enable_cfengine_agents_classes_enable_process";
 
-   "files_ok"         expression => fileexists("$(file_check)"),
-                         comment => "Check for /var/cfengine/inputs/promises.cf",
-                          handle => "cfe_internal_enable_cfengine_agents_classes_files_ok";
+      "files_ok"         expression => fileexists("$(file_check)"),
+      comment => "Check for /var/cfengine/inputs/promises.cf",
+      handle => "cfe_internal_enable_cfengine_agents_classes_files_ok";
 
-#
+      #
 
- processes:
+  processes:
 
-  files_ok::
+    files_ok::
 
-   "$(sys.workdir)/bin/$(process)"
+      "$(sys.workdir)/bin/$(process)"
       restart_class => "restart_$(cprocess)",
-            comment => "Create a class to restart a process",
-             handle => "cfe_internal_enable_cfengine_agents_processes_restart_process",
-         ifvarclass => "enable_$(cprocess)";
+      comment => "Create a class to restart a process",
+      handle => "cfe_internal_enable_cfengine_agents_processes_restart_process",
+      ifvarclass => "enable_$(cprocess)";
 
-#
+      #
 
- commands:
+  commands:
 
-  !windows::
+    !windows::
 
-   "$(sys.$(cprocess))"
-         comment => "Restart a process",
-          handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
+      "$(sys.$(cprocess))"
+      comment => "Restart a process",
+      handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
       ifvarclass => "restart_$(cprocess)";
 
   reports:
@@ -276,68 +276,68 @@ bundle agent enable_cfengine_agents(process)
 
 bundle agent maintain_cfe_windows
 {
- vars:
+  vars:
 
-  windows::
+    windows::
 
-   "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
-                comment => "Path to a policy file",
-                 handle => "cfe_internal_maintain_cfe_windows_vars_file_check";
+      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
+      comment => "Path to a policy file",
+      handle => "cfe_internal_maintain_cfe_windows_vars_file_check";
 
-#
+      #
 
- classes:
+  classes:
 
-  windows::
+    windows::
 
-   "files_ok" expression => fileexists("$(file_check)"),
-                 comment => "Check for /var/cfengine/masterfiles/promises.cf",
-                  handle => "cfe_internal_maintain_cfe_windows_classes_files_ok";
+      "files_ok" expression => fileexists("$(file_check)"),
+      comment => "Check for /var/cfengine/masterfiles/promises.cf",
+      handle => "cfe_internal_maintain_cfe_windows_classes_files_ok";
 
-#
+      #
 
- processes:
+  processes:
 
-  files_ok::
+    files_ok::
 
-   "cf-serverd"  restart_class => "start_server",
-                       comment => "Monitor cf-serverd process",
-                        handle => "cfe_internal_maintain_cfe_windows_processes_cf_serverd";
+      "cf-serverd"  restart_class => "start_server",
+      comment => "Monitor cf-serverd process",
+      handle => "cfe_internal_maintain_cfe_windows_processes_cf_serverd";
 
-   "cf-monitord" restart_class => "start_monitor",
-                       comment => "Monitor cf-monitord process",
-                        handle => "cfe_internal_maintain_cfe_windows_processes_cf_monitord";
+      "cf-monitord" restart_class => "start_monitor",
+      comment => "Monitor cf-monitord process",
+      handle => "cfe_internal_maintain_cfe_windows_processes_cf_monitord";
 
-#
+      #
 
- services:
+  services:
 
-  files_ok.windows::
- 
-   "CfengineNovaExec"
+    files_ok.windows::
+      
+      "CfengineNovaExec"
       service_policy => "start",
       service_method => u_bootstart,
-             comment => "Start the executor windows service now and at boot time",
-              handle => "cfe_internal_maintain_cfe_windows_services_windows_executor";
+      comment => "Start the executor windows service now and at boot time",
+      handle => "cfe_internal_maintain_cfe_windows_services_windows_executor";
 
-#
+      #
 
- commands:
+  commands:
 
-  start_server::
+    start_server::
 
-   "$(sys.cf_serverd)"
-       action => u_ifwin_bg,
+      "$(sys.cf_serverd)"
+      action => u_ifwin_bg,
       comment => "Start cf-serverd process",
-       handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_serverd";
+      handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_serverd";
 
-  start_monitor|restart_monitor::
+    start_monitor|restart_monitor::
 
-   "$(sys.cf_monitord)"
-       action => u_ifwin_bg,
+      "$(sys.cf_monitord)"
+      action => u_ifwin_bg,
       comment => "Start cf-monitord process",
-       handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_monitord";
-   
+      handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_monitord";
+      
 }
 
 body classes u_clear_always(theclass)

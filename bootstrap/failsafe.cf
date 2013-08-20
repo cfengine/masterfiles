@@ -189,4 +189,4 @@ body copy_from u_cp(from)
       source          => "$(from)";
       compare         => "digest";
       "copy_backup"     => "false";
- }
+}
