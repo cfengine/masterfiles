@@ -4,7 +4,7 @@
 #
 #########################################################
 #########################################################
-# 
+#
 # update_policy
 # - Cfengine policy update (masterfiles -> inputs)
 #
@@ -15,8 +15,8 @@ bundle agent cfe_internal_update_policy
   vars:
 
     any::
-      
-      "inputs_dir"         string => translatepath("$(sys.workdir)/inputs"),
+
+      "inputs_dir"         string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
 
@@ -25,7 +25,7 @@ bundle agent cfe_internal_update_policy
       handle => "cfe_internal_update_policy_vars_ppkeys_file";
 
     windows::
-      
+
       "master_location"    string => "/var/cfengine/masterfiles",  # NB! NOT $(sys.workdir) on Windows !
       comment => "The master CFEngine policy directory on the policy host",
       handle => "cfe_internal_update_policy_vars_master_location_windows";
@@ -35,8 +35,8 @@ bundle agent cfe_internal_update_policy
       handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
     !windows::
-      
-      "master_location"    string => "$(sys.workdir)/masterfiles",
+
+      "master_location"    string => "$(sys.masterdir)",
       comment => "The master CFEngine policy directory on the policy host",
       handle => "cfe_internal_update_policy_vars_master_location";
 
@@ -45,7 +45,7 @@ bundle agent cfe_internal_update_policy
       handle => "cfe_internal_update_policy_vars_modules_dir";
 
     any::
-      
+
       "mongodb_dir"        string => "$(sys.workdir)/state",
       comment => "Directory where MongoDB files will be stored on hub - if changed: requires DB shutdown and move of files",
       handle => "cfe_internal_update_policy_mongodb_dir";
@@ -71,15 +71,15 @@ bundle agent cfe_internal_update_policy
   classes:
 
     any::
-      
+
       "have_ppkeys"   expression => fileexists("$(ppkeys_file)"),
       comment => "Check for /var/cfengine/ppkeys/localhost.pub",
       handle => "cfe_internal_update_policy_classes_have_ppkeys";
-      
+
       #
 
   commands:
-      
+
     !have_ppkeys::
 
       "$(sys.cf_key)"
@@ -134,7 +134,7 @@ bundle agent cfe_internal_update_policy
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
-      
+
     am_policy_hub|validated_updates_ready::  # policy hub should always put masterfiles in inputs in order to check new policy
 
       "$(inputs_dir)"
@@ -148,7 +148,7 @@ bundle agent cfe_internal_update_policy
 
     !windows::
 
-      "$(sys.workdir)/bin"
+      "$(sys.bindir)"
       comment => "Make sure cfengine binaries have right file permissions",
       handle => "cfe_internal_update_policy_files_sys_workdir_bin",
       perms => u_m("755"),
