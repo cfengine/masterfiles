@@ -7,7 +7,7 @@
 body common control
 {
       bundlesequence => { "cfe_internal_update" };
-      version => "Community Update.cf 3.4.1";
+      version => "Community Update.cf 3.6.0";
 }
 
 #############################################################################
@@ -24,7 +24,7 @@ bundle agent cfe_internal_update
 {
   vars:
 
-      "inputs_dir"         string => translatepath("$(sys.workdir)/inputs"),
+      "inputs_dir"         string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
       handle => "update_vars_inputs_dir";
 
@@ -40,7 +40,7 @@ bundle agent cfe_internal_update
       comment => "Path to a policy file",
       handle => "update_vars_file_check";
 
-      "master_location"    string => "/var/cfengine/masterfiles",
+      "master_location"    string => "$(sys.masterdir)",
       comment => "The master cfengine policy directory on the policy host",
       handle => "update_vars_master_location";
 
@@ -65,7 +65,7 @@ bundle agent cfe_internal_update
       handle => "update_classes_have_ppkeys";
 
       "files_ok"      expression => fileexists("$(file_check)"),
-      comment => "Check for /var/cfengine/masterfiles/promises.cf",
+      comment => "Check for $(sys.masterdir)/promises.cf",
       handle => "update_classes_files_ok";
 
       #
@@ -150,7 +150,7 @@ bundle agent cfe_internal_update
 
     !windows::
 
-      "$(sys.workdir)/bin"
+      "$(sys.bindir)"
       comment => "Make sure cfengine binaries have right file permissions",
       handle => "update_files_sys_workdir_bin",
       perms => u_m("755"),
@@ -168,7 +168,7 @@ bundle agent cfe_internal_update
       comment => "Create symlinks of CFE binaries in /usr/local/sbin",
       handle => canonify("update_files_sbin_$(agents)"),
       move_obstructions => "true",
-      link_from => u_ln_s("$(sys.workdir)/bin/$(agents)");
+      link_from => u_ln_s("$(sys.bindir)/$(agents)");
 
       "/usr/local/sbin/$(agents).cfsaved"
       comment => "Remove all .cfsaved file extension",
