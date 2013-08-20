@@ -1,0 +1,29 @@
+
+
+# environment common bundles
+
+
+# activation data
+bundle common cfsketch_g
+{
+  vars:
+      # Files that need to be loaded for the activated sketches and
+      # their dependencies.
+      "inputs" slist => { "cf_null" };
+}
+
+bundle agent cfsketch_run
+{
+  vars:
+
+
+
+  methods:
+    any::
+      "cfsketch_g" usebundle => "cfsketch_g";
+
+
+
+  reports:
+    cfengine::
+}

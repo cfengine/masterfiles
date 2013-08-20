@@ -1,0 +1,363 @@
+#########################################################
+#
+# a pre-defined template, update_policy.cf
+#
+#########################################################
+#########################################################
+# 
+# update_policy
+# - Cfengine policy update (masterfiles -> inputs)
+#
+#########################################################
+
+bundle agent cfe_internal_update_policy
+{
+ vars:
+
+  any::
+  
+   "inputs_dir"         string => translatepath("$(sys.workdir)/inputs"),
+                       comment => "Directory containing CFEngine policies",
+                        handle => "cfe_internal_update_policy_vars_inputs_dir";
+
+   "ppkeys_file"        string => translatepath("$(sys.workdir)/ppkeys/localhost.pub"),
+                       comment => "Path to public key file",
+                        handle => "cfe_internal_update_policy_vars_ppkeys_file";
+
+  windows::
+  
+   "master_location"    string => "/var/cfengine/masterfiles",  # NB! NOT $(sys.workdir) on Windows !
+                       comment => "The master CFEngine policy directory on the policy host",
+                        handle => "cfe_internal_update_policy_vars_master_location_windows";
+
+   "modules_dir"        string => "/var/cfengine/modules",      # NB! NOT $(sys.workdir) on Windows !
+                       comment => "Directory containing CFEngine modules",
+                        handle => "cfe_internal_update_policy_vars_modules_dir_windows";
+
+  !windows::
+                        
+   "master_location"    string => "$(sys.workdir)/masterfiles",
+                       comment => "The master CFEngine policy directory on the policy host",
+                        handle => "cfe_internal_update_policy_vars_master_location";
+
+   "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
+                       comment => "Directory containing CFEngine modules",
+                        handle => "cfe_internal_update_policy_vars_modules_dir";
+
+  any::
+  
+   "mongodb_dir"        string => "$(sys.workdir)/state",
+                       comment => "Directory where MongoDB files will be stored on hub - if changed: requires DB shutdown and move of files",
+                        handle => "cfe_internal_update_policy_mongodb_dir";
+
+   "mongodb_conf_file"  string => translatepath("$(inputs_dir)/update/mongod.conf"),
+                        comment => "Path to MongoDB configuration file",
+                        handle => "cfe_internal_update_policy_mongodb_conf_file";
+
+   "agents" slist => {
+                      "cf-agent",
+                      "cf-execd",
+                      "cf-key",
+                      "cf-monitord",
+                      "cf-promises",
+                      "cf-runagent",
+                      "cf-serverd",
+                     },
+            comment => "List of CFEngine binaries",
+             handle => "cfe_internal_update_policy_vars_agents";
+
+#
+
+ classes:
+
+  any::
+  
+   "have_ppkeys"   expression => fileexists("$(ppkeys_file)"),
+                      comment => "Check for /var/cfengine/ppkeys/localhost.pub",
+                       handle => "cfe_internal_update_policy_classes_have_ppkeys";
+                       
+#
+
+ commands:
+ 
+  !have_ppkeys::
+
+   "$(sys.cf_key)"
+      comment => "Generate cfengine encryption keys if necessary",
+       handle => "cfe_internal_update_policy_commands_generate_keys";
+
+######################### We don't need this on 3.5.0 ##########################
+#  am_policy_hub.update_report::
+#
+#   "$(sys.cf_promises) -r"
+#      contain => u_in_shell_and_silent,
+#      comment => "Generate config knowledge format after update",
+#       handle => "cfe_internal_update_policy_commands_run_cf_promises_r";
+################################################################################
+
+#
+
+ files:
+
+  am_policy_hub::
+
+   "$(cfe_internal_update_policy.mongodb_dir)/."
+        comment => "Ensure MongoDB database directory is created",
+         handle => "cfe_internal_update_policy_mongodb_dir_create",
+         create => "true";
+
+  !am_policy_hub::  # policy hub should not alter inputs/ uneccessary
+
+   "$(inputs_dir)/cf_promises_validated"
+        comment => "Check whether a validation stamp is available for a new policy update to reduce the distributed load",
+         handle => "cfe_internal_update_policy_check_valid_update",
+      copy_from => u_rcp("$(master_location)/cf_promises_validated","$(sys.policy_hub)"),
+         action => u_immediate,
+        classes => u_if_repaired("validated_updates_ready");
+
+  !am_policy_hub.!windows::
+
+   "$(modules_dir)"
+           comment => "Always update modules files on client side",
+            handle => "cfe_internal_update_policy_files_update_modules",
+         copy_from => u_rcp("$(modules_dir)","$(sys.policy_hub)"),
+      depth_search => u_recurse("inf"),
+             perms => u_m("755"),
+            action => u_immediate;
+
+  !am_policy_hub.windows::
+
+   "$(sys.workdir)\modules"
+           comment => "Always update modules files on client side (Windows)",
+            handle => "cfe_internal_update_policy_files_update_modules_windows",
+         copy_from => u_rcp("$(modules_dir)","$(sys.policy_hub)"),
+      depth_search => u_recurse("inf"),
+             perms => u_m("755"),
+            action => u_immediate;
+            
+  am_policy_hub|validated_updates_ready::  # policy hub should always put masterfiles in inputs in order to check new policy
+
+   "$(inputs_dir)"
+           comment => "Copy policy updates from master source on policy server if a new validation was acquired",
+            handle => "cfe_internal_update_policy_files_inputs_dir",
+         copy_from => u_rcp("$(master_location)","$(sys.policy_hub)"),
+      depth_search => u_recurse("inf"),
+      file_select  => u_input_files,
+            action => u_immediate,
+           classes => u_if_repaired("update_report");
+
+  !windows::
+
+   "$(sys.workdir)/bin"
+           comment => "Make sure cfengine binaries have right file permissions",
+            handle => "cfe_internal_update_policy_files_sys_workdir_bin",
+             perms => u_m("755"),
+      depth_search => u_recurse_basedir("inf"),
+            action => u_immediate;
+
+   "$(sys.workdir)/lib"
+           comment => "Make sure cfengine libraries have right file permissions",
+            handle => "cfe_internal_update_policy_files_sys_workdir_lib",
+             perms => u_shared_lib_perms,
+      depth_search => u_recurse_basedir("inf"),
+            action => u_immediate;
+
+   "/usr/local/sbin/$(agents)"
+                comment => "Create symlinks of CFE binaries in /usr/local/sbin",
+                 handle => canonify("cfe_internal_update_policy_files_sbin_$(agents)"),
+      move_obstructions => "true",
+              link_from => u_ln_s("$(sys.workdir)/bin/$(agents)");
+
+   "/usr/local/sbin/$(agents).cfsaved"
+      comment => "Remove all .cfsaved file extension",
+       handle => canonify("cfe_internal_update_policy_files_remove_$(agent)_cfsaved"),
+       delete => u_tidy;
+
+  am_policy_hub::
+
+   "$(master_location)/."
+           comment => "Make sure masterfiles folder has right file permissions",
+            handle => "cfe_internal_update_policy_files_sys_workdir_masterfiles",
+             perms => u_m("644"),
+      depth_search => u_recurse_basedir("inf"),
+            action => u_immediate;
+
+}
+
+#########################################################
+# Self-contained bodies from the lib to avoid dependencies
+#########################################################
+
+body perms u_m(p)
+{
+ mode  => "$(p)";
+}
+
+#########################################################
+
+body perms u_shared_lib_perms
+{
+ !hpux::
+   mode => "0644";
+ hpux::
+   mode => "0755"; # Mantis 1114, Redmine 1179
+}
+
+#########################################################
+
+body file_select u_cf3_files
+{
+ leaf_name => { "cf-.*" };
+ file_result => "leaf_name";
+}
+
+#########################################################
+
+body file_select u_input_files
+{
+ leaf_name => { ".*.cf",".*.dat",".*.txt", ".*.conf" };
+ file_result => "leaf_name";
+}
+
+#########################################################
+
+body copy_from u_rcp(from,server)
+{
+ source      => "$(from)";
+ compare     => "digest";
+ trustkey    => "false";
+
+!am_policy_hub::
+
+ servers => { "$(server)" };
+}
+
+#########################################################
+
+body copy_from u_cp(from)
+{
+ source  => "$(from)";
+ compare => "digest";
+}
+
+#########################################################
+
+body copy_from u_cp_nobck(from)
+{
+ source      => "$(from)";
+ compare     => "digest";
+ copy_backup => "false";
+}
+
+#########################################################
+
+body action u_immediate
+{
+ ifelapsed => "0";
+}
+
+#########################################################
+
+body depth_search u_recurse(d)
+{
+ depth => "$(d)";
+ exclude_dirs => { "\.svn", "\.git" };
+}
+
+#########################################################
+
+body depth_search u_recurse_basedir(d)
+{
+ include_basedir => "true";
+ depth => "$(d)";
+ exclude_dirs => { "\.svn", "\.git" };
+}
+
+#########################################################
+
+body classes u_if_repaired(x)
+{
+ promise_repaired => { "$(x)" };
+}
+
+#########################################################
+
+body classes u_if_repaired_then_cancel(y)
+{
+ cancel_repaired => { "$(y)" };
+}
+
+#########################################################
+
+body classes u_if_else(yes,no)
+{
+ promise_kept     => { "$(yes)" };
+ promise_repaired => { "$(yes)" };
+ repair_failed    => { "$(no)" };
+ repair_denied    => { "$(no)" };
+ repair_timeout   => { "$(no)" };
+}
+
+#########################################################
+
+body contain u_in_shell
+{
+ useshell => "true";
+}
+
+#########################################################
+
+body contain u_in_shell_and_silent
+{
+ useshell => "true";
+ no_output => "true";
+}
+
+#########################################################
+
+body action u_ifwin_bg
+{
+windows::
+ background => "true";
+}
+
+#########################################################
+
+body action u_mongod_bg
+{
+ background => "true";
+}
+
+#########################################################
+
+body service_method u_bootstart
+{
+ service_autostart_policy => "boot_time";
+}
+
+#########################################################
+
+body contain u_silent_in_dir(s)
+{
+ chdir => "$(s)";
+ no_output => "true";
+}
+
+#########################################################
+
+body link_from u_ln_s(x)
+{
+ link_type => "symlink";
+ source => "$(x)";
+ when_no_source => "force";
+}
+
+#########################################################
+
+body delete u_tidy
+{
+ dirlinks => "delete";
+ rmdirs   => "true";
+}
+
+#########################################################

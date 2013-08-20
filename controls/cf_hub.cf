@@ -1,0 +1,25 @@
+###############################################################################
+#
+# This part is for cf-hub  
+#
+# Settings describing the details of the fixed behavioural promises made 
+# by cf-monitord. The system defaults will be sufficient for most users.
+#
+###############################################################################
+
+body hub control
+
+{
+
+  am_policy_hub::
+
+  # export_zenoss => "/var/www/reports/summary.z";
+  # federation => { "host1", "host2" };
+  # exclude_hosts => { "192.168.12.21", "10.10", "10.12.*" };
+
+# cf-hub collects up reports from registered hosts every 5 minutes.
+
+  # hub_schedule => { "Min00", "Min30", "(Evening|Night).Min45_50" };
+  # port => "5308";
+
+}

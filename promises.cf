@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   promises.cf - Basic Policy for Community
+#   promises.cf - Basic Policy for CFEngine
 #
 ###############################################################################
 
@@ -9,25 +9,40 @@ body common control
 {
 
       bundlesequence => {
-			  # Common bundles first for best practice
-			  "def",
 
+			  # Common bundle first (Best Practice)
+			  "def",
+                          "cfe_internal_hub_vars",
 			  # Design Center
 			  "cfsketch_run",
 
-			  # Agent bundles from here
-			  "main",
+                          # Agent bundle
+                          "cfe_internal_management",   # See cfe_internal/CFE_cfengine.cf
+                          "service_catalogue",
+                          "example_use_goals",         # See cfe_internal/example_use_goals.cf
 
       };
 
       inputs => {
 
-		  # Global common bundles
+                  # File definition for global variables and classes
 		  "def.cf",
 
-		  # Control body for all agents
+                  # Design Center
+                  # MARKER FOR CF-SKETCH INPUT INSERTION
+                    "sketches/meta/api-runfile.cf",
+                    @(cfsketch_g.inputs),
+
+                  # CFEngine internal processes for Mission Portal mostly
+                    "cfe_internal/CFE_cfengine.cf",
+                    "cfe_internal/CFE_hub_specific.cf",
+                    "cfe_internal/CFE_knowledge.cf",
+                    "cfe_internal/example_use_goals.cf",
+
+		  # Control body for all CFEngine robot agents
 		  "controls/cf_agent.cf",
 		  "controls/cf_execd.cf",
+		  "controls/cf_hub.cf",
 		  "controls/cf_monitord.cf",
 		  "controls/cf_runagent.cf",
 		  "controls/cf_serverd.cf",
@@ -35,18 +50,25 @@ body common control
 		  # COPBL/Custom libraries.  Eventually this should use wildcards.
 		  @(cfengine_stdlib.inputs),
 
-		  # Design Center
-		  # MARKER FOR CF-SKETCH INPUT INSERTION
-		  "cf-sketch-runfile.cf",
+                  # Add update files to build Knowledge Map relationship
+                  "update/update_bins.cf",
+                  "update/update_policy.cf",
+                  "update/update_processes.cf",
 
-		  # User services from here
+                  # List of services here
 		  "services/init_msg.cf",
+                  "services/file_change.cf",
 
       };
 
-      version => "Community Promises.cf 3.4.0";
+      version => "CFEngine Promises.cf 3.6.0";
+
+#   goal_categories => { "goals", "targets", "milestones" };
+#   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 
 }
+
+
 
 bundle common cfengine_stdlib
 {
@@ -71,35 +93,47 @@ bundle common cfengine_stdlib
 
     !(cfengine_3_4||cfengine_3_5)::
       "inputs" slist => {
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/paths.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/common.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/commands.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/packages.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/files.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/services.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/processes.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/storage.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/databases.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/monitor.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/guest_environments.cf",
-                          "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/bundles.cf",
+                          "$(sys.local_libdir)/paths.cf",
+                          "$(sys.local_libdir)/common.cf",
+                          "$(sys.local_libdir)/commands.cf",
+                          "$(sys.local_libdir)/packages.cf",
+                          "$(sys.local_libdir)/files.cf",
+                          "$(sys.local_libdir)/services.cf",
+                          "$(sys.local_libdir)/processes.cf",
+                          "$(sys.local_libdir)/storage.cf",
+                          "$(sys.local_libdir)/databases.cf",
+                          "$(sys.local_libdir)/monitor.cf",
+                          "$(sys.local_libdir)/guest_environments.cf",
+                          "$(sys.local_libdir)/bundles.cf",
       };
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): defining inputs='$(inputs)'";
 }
 
 ###############################################################################
+#
+# bundle agent service_catalogue
+#  - general purposes of usage
+#
+###############################################################################
 
-bundle agent main
+bundle agent service_catalogue
 
-{
+{							 
 
   methods:
 
     any::
+
+      "security" -> { goal_infosec, goal_compliance }
+      comment => "Basic change management",
+      handle => "service_catalogue_change_management",
+      usebundle => change_management;
 
       "INIT MSG" usebundle => init_msg,
       comment => "Just a pre-defined policy bundled with the package",
       handle => "main_methods_any_init_msg";
 
 }
-
-###############################################################################

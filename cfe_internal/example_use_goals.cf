@@ -1,0 +1,50 @@
+###############################################################################
+#
+# bundle agent example_use_goals
+#  - Below is a collection of how goals can be used as promisees to document
+#    intent and stakeholders. The goals are defined in 
+#           /var/cfengine/share/KnowledgeBase/goals.cf
+#
+###############################################################################
+bundle agent example_use_goals
+{
+files:
+
+  exampleusegoals::
+
+   "/etc/passwd" -> { "goal_infosec", "security@example.com", "PCI", "STIGS" }
+     comment => "Check password file for permissions",
+      handle => "example_use_goals_files_etc_password",
+       perms => mog("644", "root", "root");
+
+   "/etc/shadow" -> { "goal_infosec", "security@example.com", "PCI", "STIGS" }
+     comment => "Check password file for permissions",
+      handle => "example_use_goals_files_etc_shadow",
+       perms => mog("600", "root", "root");
+
+   "/user/audit.log" -> { "goal_compliance", "goal_infosec", "audit@example.com", "PCI", "STIGS" }
+    comment => "Rotate the audit logs every week",
+     handle => "example_use_goals_files_user_auditlog",
+     rename => rotate(7),
+     action => if_elapsed("10000");
+
+commands:
+
+  help_desk::
+
+     "/bin/zendesk"  -> { "goal_customers", "help@example.com" }
+        comment => "Make sure the helpdesk is running",
+         handle => "example_use_goals_commands_bin_zendesk";
+
+  vmware_dev::
+    "/usr/bin/vmware-cmd -H <dev_server_IP> -U admin -P admin /vmfs/volumes/4fafd02bc-744a40987d-4as2-08asdfasd1dasdf/ubuntu-12.04-i386-devserver/ubuntu-12.04-i386-devserver.vmx start soft" -> { "goal_agility", "goal_efficiency", "goal_productive", "developers@example.com", "sysadmin@example.com", "devops" }
+      comment => "Make sure the development server is running",
+       handle => "example_use_goals_commands_vmware_dev_usr_bin_vmware_cmd";
+
+  vmware_test::
+    "/usr/bin/vmware-cmd -H <test_server_IP> -U admin -P admin /vmfs/volumes/4fafd02de-744a4098de-4a2s-08asdfasd1dasge/ubuntu-12.04-i386-testserver/ubuntu-12.04-i386-testserver.vmx start soft" -> { "goal_agility", "goal_efficiency", "goal_productive", "developers@example.com", "sysadmin@example.com",  "devops" }
+      comment => "Make sure the test server is running",
+       handle => "example_use_goals_commands_vmware_test_usr_bin_vmware_cmd";
+
+}
+
