@@ -47,6 +47,11 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+body file control
+{
+      inputs => { "paths.cf" };
+}
+
 ##--------------------------------------------------------------
 ## Packages promises
 ##--------------------------------------------------------------
@@ -83,6 +88,10 @@ body package_method zypper
 ##
 
 bundle common debian_knowledge
+# @depends paths.cf:paths
+# @brief common Debian knowledge bundle
+#
+# This common bundle has useful information about Debian.
 {
   vars:
       "apt_prefix" string => "/usr/bin/env DEBIAN_FRONTEND=noninteractive LC_ALL=C PATH=/bin:/sbin/:/usr/bin:/usr/sbin";
@@ -96,6 +105,13 @@ bundle common debian_knowledge
 }
 
 body package_method apt
+# @depends debian_knowledge
+# @brief APT installation package method
+#
+# This package method interacts with the APT package manager through `aptitude`.
+#
+# **Example:**
+# `packages: "mypackage" package_method => apt, package_policy => "add";`
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -146,6 +162,13 @@ body package_method apt
 #  4) aptitude provides little benefit
 #  5) have_aptitude is a hard class and thus cannot be unset
 body package_method apt_get
+# @depends debian_knowledge
+# @brief APT installation package method
+#
+# This package method interacts with the APT package manager through `apt-get`.
+#
+# **Example:**
+# `packages: "mypackage" package_method => apt_get, package_policy => "add";`
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -177,6 +200,14 @@ body package_method apt_get
 }
 
 body package_method apt_get_release(release)
+# @depends debian_knowledge
+# @brief APT installation package method
+# @params release specific release to use
+#
+# This package method interacts with the APT package manager through `apt-get` but sets a specific target release.
+#
+# **Example:**
+# `packages: "mypackage" package_method => apt_get_release("xyz"), package_policy => "add";`
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -210,6 +241,14 @@ body package_method apt_get_release(release)
 ##
 
 body package_method dpkg_version(repo)
+# @depends debian_knowledge
+# @brief dpkg installation package method
+# @params repo specific repo to use
+#
+# This package method interacts with `dpkg`.
+#
+# **Example:**
+# `packages: "mypackage" package_method => dpkg_version("xyz"), package_policy => "add";`
 {
       package_changes => "individual";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -881,9 +920,14 @@ body package_method pacman
 
 ##
 
-# Single bundle for all the similar managers simplifies promises
-
 body package_method generic
+# @depends debian_knowledge
+# @brief Generic installation package method
+#
+# This package method attempts to handle all platforms.
+#
+# **Example:**
+# `packages: "mypackage" package_method => generic, package_policy => "add";`
 {
     SuSE::
       package_changes => "bulk";
