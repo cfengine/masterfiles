@@ -111,7 +111,10 @@ body package_method apt
 # This package method interacts with the APT package manager through `aptitude`.
 #
 # **Example:**
-# `packages: "mypackage" package_method => apt, package_policy => "add";`
+# ```cf3
+# packages:
+#     "mypackage" package_method => apt, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -168,7 +171,10 @@ body package_method apt_get
 # This package method interacts with the APT package manager through `apt-get`.
 #
 # **Example:**
-# `packages: "mypackage" package_method => apt_get, package_policy => "add";`
+# ```cf3
+# packages:
+#     "mypackage" package_method => apt_get, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -207,7 +213,10 @@ body package_method apt_get_release(release)
 # This package method interacts with the APT package manager through `apt-get` but sets a specific target release.
 #
 # **Example:**
-# `packages: "mypackage" package_method => apt_get_release("xyz"), package_policy => "add";`
+# ```cf3
+# packages:
+#     "mypackage" package_method => apt_get_release("xyz"), package_policy => "add";
+# ```
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -248,7 +257,10 @@ body package_method dpkg_version(repo)
 # This package method interacts with `dpkg`.
 #
 # **Example:**
-# `packages: "mypackage" package_method => dpkg_version("xyz"), package_policy => "add";`
+# ```cf3
+# packages:
+#     "mypackage" package_method => dpkg_version("xyz"), package_policy => "add";
+# ```
 {
       package_changes => "individual";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
@@ -927,7 +939,10 @@ body package_method generic
 # This package method attempts to handle all platforms.
 #
 # **Example:**
-# `packages: "mypackage" package_method => generic, package_policy => "add";`
+# ```cf3
+# packages:
+#     "mypackage" package_method => generic, package_policy => "add";
+# ```
 {
     SuSE::
       package_changes => "bulk";
