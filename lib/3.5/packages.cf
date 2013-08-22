@@ -83,7 +83,7 @@ body package_method zypper
 ##
 
 bundle common debian_knowledge
-# @depends paths.cf:paths
+# @depends paths
 # @brief common Debian knowledge bundle
 #
 # This common bundle has useful information about Debian.
