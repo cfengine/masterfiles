@@ -283,7 +283,7 @@ body package_method u_generic(repo)
       # package_list_update_command => "/usr/bin/apt-get update";
       package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
 
-      package_list_name_regex    => "ii\s+([^\s]+).*";
+      package_list_name_regex    => "ii\s+([^\s:]+).*";
       # package_list_version_regex => "ii\s+[^\s]+\s+([^\s]+).*";
       package_list_version_regex => "ii\s+[^\s]+\s+(\d+\.\d+((\.|-)\d+)+).*";
 
