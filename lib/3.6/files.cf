@@ -518,16 +518,34 @@ bundle edit_line set_config_values(v)
       # Be careful if the index string contains funny chars
       "cindex[$(index)]" string => canonify("$(index)");
 
+      # Escape the value (had a problem with special characters and regex's)
+      "ev[$(index)]" string => escape("$($(v)[$(index)])");
+
+  classes:
+      # Check to see if this line exists
+      "line_exists_$(cindex[$(index)])" expression => regline("^\s*$(index)\s.*","$(edit.filename)");
+
+
   replace_patterns:
-      # If the line is there, maybe commented out, uncomment and replace with
+      # If the line is there with the wrong value, replace with
       # the correct value
-      "^\s*($(index)\s+(?!$($(v)[$(index)])$).*|# ?$(index)\s+.*)$"
-      comment => "Correct the value",
+      "^\s*$(index)\s+(?!$(ev[$(index)])$).*$"
+      comment => "Correct the value $(index)",
       replace_with => value("$(index) $($(v)[$(index)])"),
       classes => always("replace_attempted_$(cindex[$(index)])");
 
+  replace_patterns:
+      # If the line is commented out, uncomment and replace with
+      # the correct value
+      "^\s*#\s*$(index)\s+.*$"
+             comment => "Uncommented the value $(index)",
+        replace_with => value("$(index) $($(v)[$(index)])"),
+          ifvarclass => "!line_exists_$(cindex[$(index)]).!replace_attempted_$(cindex[$(index)])",
+             classes => always("uncommented_$(cindex[$(index)])");
+
   insert_lines:
       "$(index) $($(v)[$(index)])"
+         comment => "Insert the value $(index)",
       ifvarclass => "replace_attempted_$(cindex[$(index)])";
 
 }
