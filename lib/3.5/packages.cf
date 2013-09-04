@@ -77,6 +77,9 @@ bundle common debian_knowledge
       "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
       "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
 
+      "list_name_regex" string => ".i\s+([^\s]+).*";
+      "list_version_regex" string => ".i\s+[^\s]+\s+([^\s]+).*";
+
       "patch_name_regex" string => "^Inst\s+(\S+)\s+.*";
       "patch_version_regex" string => "^Inst\s+(\S+)\s+.*";
 }
@@ -139,8 +142,8 @@ body package_method apt
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
 
@@ -201,8 +204,8 @@ body package_method apt_get
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
 
@@ -244,8 +247,8 @@ body package_method apt_get_release(release)
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
 
@@ -294,8 +297,8 @@ body package_method dpkg_version(repo)
       package_list_update_command => "$(debian_knowledge.call_apt_get) update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
 
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
 
@@ -1016,8 +1019,8 @@ body package_method generic
     debian::
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";		# 4 hours
