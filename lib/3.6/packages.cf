@@ -99,6 +99,24 @@ bundle common redhat_knowledge
       "call_rpm" string => "$(paths.path[rpm])";
 
       "yum_options" string => "--quiet";
+
+      # used with rpm format 'i | repos | %{name} | %{version}-%{release} | %{arch}\n'
+
+      "rpm_name_regex" string => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
+      "rpm_version_regex" string => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s|]+).*";
+      "rpm_arch_regex" string => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
+
+      # used with rpm format '%{name} %{version}-%{release} %{arch}\n'
+
+      "rpm2_name_regex" string => "^(\S+?)\s\S+?\s\S+$";
+      "rpm2_version_regex" string => "^\S+?\s(\S+?)\s\S+$";
+      "rpm2_arch_regex" string => "^\S+?\s\S+?\s(\S+)$";
+
+      # used with rpm format '%{name}.%{arch} %{version}-%{release}\n'
+
+      "rpm3_name_regex" string => "([^.]+).*";
+      "rpm3_version_regex" string => "[^\s]\s+([^\s]+).*";
+      "rpm3_arch_regex" string => "[^.]+\.([^\s]+).*";
 }
 
 body package_method apt
@@ -328,9 +346,9 @@ body package_method rpm_version(repo)
       package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
-      package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s|]+).*";
-      package_list_arch_regex    => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm_arch_regex)";
 
       package_installed_regex => "i.*";
 
@@ -433,9 +451,9 @@ body package_method yum
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
       package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
-      package_list_name_regex    => "([^.]+).*";
-      package_list_version_regex => "[^\s]\s+([^\s]+).*";
-      package_list_arch_regex    => "[^.]+\.([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm3_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm3_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm3_arch_regex)";
 
       package_installed_regex => ".*";
       package_name_convention => "$(name)-$(version).$(arch)";
@@ -486,9 +504,9 @@ body package_method yum_rpm
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
       package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
-      package_list_name_regex    => "([^.]+).*";
-      package_list_version_regex => "[^\s]\s+([^\s]+).*";
-      package_list_arch_regex    => "[^.]+\.([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm3_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm3_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm3_arch_regex)";
 
       package_installed_regex => ".*";
       package_name_convention => "$(name)-$(version).$(arch)";
@@ -537,9 +555,9 @@ body package_method yum_rpm_enable_repo(repoid)
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
       package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
-      package_list_name_regex    => "^(\S+?)\s\S+?\s\S+$";
-      package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
-      package_list_arch_regex    => "^\S+?\s\S+?\s(\S+)$";
+      package_list_name_regex    => "$(redhat_knowledge.rpm2_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm2_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm2_arch_regex)";
 
       package_installed_regex => ".*";
       package_name_convention => "$(name)";
@@ -666,9 +684,9 @@ body package_method rpm_filebased(path)
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
 
-      package_list_name_regex => "^(\S+?)\s\S+?\s\S+$";
-      package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
-      package_list_arch_regex => "^\S+?\s\S+?\s(\S+)$";
+      package_list_name_regex    => "$(redhat_knowledge.rpm2_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm2_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm2_arch_regex)";
 
       package_installed_regex => ".*";
 
@@ -1002,9 +1020,9 @@ body package_method zypper
 
       package_patch_list_command => "/usr/bin/zypper patches";
       package_installed_regex => "i.*";
-      package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_arch_regex    => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm_arch_regex)";
 
       package_patch_installed_regex => ".*Installed.*|.*Not Applicable.*";
       package_patch_name_regex    => "[^|]+\|\s+([^\s]+).*";
@@ -1041,9 +1059,9 @@ body package_method generic
       package_list_update_ifelapsed => "0";
       package_patch_list_command => "/usr/bin/zypper patches";
       package_installed_regex => "i.*";
-      package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_arch_regex    => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm_arch_regex)";
       package_patch_installed_regex => ".*Installed.*|.*Not Applicable.*";
       package_patch_name_regex    => "[^|]+\|\s+([^\s]+).*";
       package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
@@ -1059,9 +1077,9 @@ body package_method generic
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
       package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
-      package_list_name_regex    => "([^.]+).*";
-      package_list_version_regex => "[^\s]\s+([^\s]+).*";
-      package_list_arch_regex    => "[^.]+\.([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm3_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm3_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm3_arch_regex)";
 
       package_installed_regex => ".*";
       package_name_convention => "$(name)-$(version).$(arch)";
