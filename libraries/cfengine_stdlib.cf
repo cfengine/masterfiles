@@ -1773,7 +1773,7 @@ body package_method apt
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
+      package_list_name_regex    => ".i\s+([^\s:]+).*";
       package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
@@ -1823,7 +1823,7 @@ body package_method apt_get
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
+      package_list_name_regex    => ".i\s+([^\s:]+).*";
       package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
@@ -1853,7 +1853,7 @@ body package_method apt_get_release(release)
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
+      package_list_name_regex    => ".i\s+([^\s:]+).*";
       package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
@@ -1890,7 +1890,7 @@ body package_method dpkg_version(repo)
       package_list_update_command => "$(debian_knowledge.call_apt_get) update";
       package_list_update_ifelapsed => "240";
 
-      package_list_name_regex    => ".i\s+([^\s]+).*";
+      package_list_name_regex    => ".i\s+([^\s:]+).*";
       package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
 
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
@@ -2619,7 +2619,7 @@ body package_method generic
     debian::
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
+      package_list_name_regex    => ".i\s+([^\s:]+).*";
       package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
