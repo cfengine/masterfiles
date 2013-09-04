@@ -65,20 +65,6 @@ bundle common common_knowledge
       "list_update_ifelapsed" string => "240";
 }
 
-bundle common redhat_knowledge
-# @depends paths
-# @brief common Redhat knowledge bundle
-#
-# This common bundle has useful information about Redhat.
-{
-  vars:
-      "call_yum" string => "$(paths.path[yum])";
-      "call_rpm" string => "$(paths.path[rpm])";
-
-      "yum_options" string => "--quiet";
-}
-
-
 bundle common debian_knowledge
 # @depends paths
 # @brief common Debian knowledge bundle
@@ -94,6 +80,22 @@ bundle common debian_knowledge
 
       "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
       "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
+
+      "patch_name_regex" string => "^Inst\s+(\S+)\s+.*";
+      "patch_version_regex" string => "^Inst\s+(\S+)\s+.*";
+}
+
+bundle common redhat_knowledge
+# @depends paths
+# @brief common Redhat knowledge bundle
+#
+# This common bundle has useful information about Redhat.
+{
+  vars:
+      "call_yum" string => "$(paths.path[yum])";
+      "call_rpm" string => "$(paths.path[rpm])";
+
+      "yum_options" string => "--quiet";
 }
 
 body package_method apt
@@ -132,8 +134,9 @@ body package_method apt
       package_noverify_regex => "(State: not installed|E: Unable to locate package .*)";
 
       package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     !have_aptitude::
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -145,8 +148,9 @@ body package_method apt
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
 }
 
@@ -188,8 +192,9 @@ body package_method apt_get
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -230,8 +235,9 @@ body package_method apt_get_release(release)
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -276,12 +282,14 @@ body package_method dpkg_version(repo)
 
     have_aptitude::
       package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
     !have_aptitude::
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     debian::
       package_add_command => "$(debian_knowledge.call_dpkg) --install";
@@ -1096,8 +1104,9 @@ body package_method generic
       package_noverify_regex => "(State: not installed|E: Unable to locate package .*)";
 
       package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     debian.!have_aptitude::
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -1109,8 +1118,9 @@ body package_method generic
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     freebsd::
       package_changes => "individual";

@@ -51,6 +51,36 @@
 ## Packages promises
 ##--------------------------------------------------------------
 
+bundle common common_knowledge
+# @brief common packages knowledge bundle
+#
+# This common bundle defines general things about platforms.
+{
+  vars:
+      "list_update_ifelapsed" string => "240";
+      "list_update_ifelapsed_now" string => "0";
+}
+
+bundle common debian_knowledge
+# @depends paths
+# @brief common Debian knowledge bundle
+#
+# This common bundle has useful information about Debian.
+{
+  vars:
+      "apt_prefix" string => "/usr/bin/env DEBIAN_FRONTEND=noninteractive LC_ALL=C PATH=/bin:/sbin/:/usr/bin:/usr/sbin";
+      "call_dpkg" string => "$(apt_prefix) $(paths.path[dpkg])";
+      "call_apt_get" string => "$(apt_prefix) $(paths.path[apt_get])";
+      "call_aptitude" string => "$(apt_prefix) $(paths.path[aptitude])";
+      "dpkg_options" string => "-o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef";
+
+      "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
+      "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
+
+      "patch_name_regex" string => "^Inst\s+(\S+)\s+.*";
+      "patch_version_regex" string => "^Inst\s+(\S+)\s+.*";
+}
+
 body package_method zypper
 
 {
@@ -60,7 +90,7 @@ body package_method zypper
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/zypper list-updates";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_list_command => "/usr/bin/zypper patches";
       package_installed_regex => "i.*";
@@ -82,23 +112,6 @@ body package_method zypper
 
 ##
 
-bundle common debian_knowledge
-# @depends paths
-# @brief common Debian knowledge bundle
-#
-# This common bundle has useful information about Debian.
-{
-  vars:
-      "apt_prefix" string => "/usr/bin/env DEBIAN_FRONTEND=noninteractive LC_ALL=C PATH=/bin:/sbin/:/usr/bin:/usr/sbin";
-      "call_dpkg" string => "$(apt_prefix) $(paths.path[dpkg])";
-      "call_apt_get" string => "$(apt_prefix) $(paths.path[apt_get])";
-      "call_aptitude" string => "$(apt_prefix) $(paths.path[aptitude])";
-      "dpkg_options" string => "-o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef";
-
-      "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
-      "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
-}
-
 body package_method apt
 # @depends debian_knowledge
 # @brief APT installation package method
@@ -119,7 +132,7 @@ body package_method apt
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -135,8 +148,9 @@ body package_method apt
       package_noverify_regex => "(State: not installed|E: Unable to locate package .*)";
 
       package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     !have_aptitude::
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -148,8 +162,9 @@ body package_method apt
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
 }
 
@@ -179,7 +194,7 @@ body package_method apt_get
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # Target a specific release, such as backports
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -191,8 +206,9 @@ body package_method apt_get
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -221,7 +237,7 @@ body package_method apt_get_release(release)
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # Target a specific release, such as backports
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes --target-release $(release) install";
@@ -233,8 +249,9 @@ body package_method apt_get_release(release)
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -262,7 +279,7 @@ body package_method dpkg_version(repo)
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "$(debian_knowledge.call_apt_get) update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_list_name_regex    => ".i\s+([^\s]+).*";
       package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
@@ -279,12 +296,14 @@ body package_method dpkg_version(repo)
 
     have_aptitude::
       package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
     !have_aptitude::
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     debian::
       package_add_command => "$(debian_knowledge.call_dpkg) --install";
@@ -307,7 +326,7 @@ body package_method rpm_version(repo)
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
       package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s|]+).*";
@@ -414,7 +433,7 @@ body package_method yum
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
@@ -457,7 +476,7 @@ body package_method yum_rpm
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
@@ -493,7 +512,7 @@ body package_method yum_rpm_enable_repo(repoid)
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
@@ -552,7 +571,7 @@ body package_method yum_group
 
       package_list_name_regex         =>  "a|i ([^\s]+) 1";
       package_list_update_command     =>  "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed   =>  "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
       package_list_version_regex      =>  "(1)";
       package_name_convention         =>  "$(name)";
       package_name_regex              =>  "(.*)";
@@ -600,7 +619,7 @@ body package_method rpm_filebased(path)
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # The rest is unchanged from Trond's yum_rpm body
       package_changes => "bulk";
@@ -655,7 +674,7 @@ body package_method ips
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/pkg refresh --full";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/usr/bin/pkg install --accept ";
       package_delete_command => "/usr/bin/pkg uninstall";
@@ -679,7 +698,7 @@ body package_method smartos
       package_installed_regex => ".*"; # all reported are installed
 
       package_list_update_command => "/opt/local/bin/pkgin -y update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/opt/local/bin/pkgin -y install";
 
@@ -699,7 +718,7 @@ body package_method opencsw
       package_installed_regex => ".*"; # all reported are installed
 
       package_list_update_command => "/opt/csw/bin/pkgutil -U";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/opt/csw/bin/pkgutil -yi";
 
@@ -893,7 +912,7 @@ body package_method emerge
       package_name_convention => "$(name)";
       package_list_update_command => "/bin/true";               # I prefer manual syncing
       #package_list_update_command => "/usr/bin/emerge --sync"; # if you like automatic
-      package_list_update_ifelapsed => "240";                   # should happen every 4 hours
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/usr/bin/emerge -q --quiet-build";
       package_delete_command => "/usr/bin/emerge --depclean";
@@ -913,7 +932,7 @@ body package_method pacman
       package_list_command => "/usr/bin/pacman -Q";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_list_name_regex    => "(.*)\s+.*";
       package_list_version_regex => ".*\s+(.*)";
@@ -944,7 +963,7 @@ body package_method generic
       package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/zypper list-updates";
-      package_list_update_ifelapsed => "0";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed_now)";
       package_patch_list_command => "/usr/bin/zypper patches";
       package_installed_regex => "i.*";
       package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s]+).*";
@@ -970,7 +989,7 @@ body package_method generic
       package_installed_regex => ".*";
       package_name_convention => "$(name)";
       package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "0";     # sometimes, caching is pretty disturbing
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed_now)";
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
@@ -989,7 +1008,7 @@ body package_method generic
       # package_list_arch_regex    => "[^.]+\.([^\s]+).*";
       # package_installed_regex => ".*(installed|\s+@).*";
       # package_name_convention => "$(name).$(arch)";
-      # package_list_update_ifelapsed => "240";
+      # package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
       # package_patch_installed_regex => "^\s.*";
       # package_patch_name_regex    => "([^.]+).*";
       # package_patch_version_regex => "[^\s]\s+([^\s]+).*";
@@ -1005,7 +1024,7 @@ body package_method generic
       package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
-      package_list_update_ifelapsed => "240";		# 4 hours
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";		# 4 hours
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -1021,8 +1040,9 @@ body package_method generic
       package_noverify_regex => "(State: not installed|E: Unable to locate package .*)";
 
       package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     debian.!have_aptitude::
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -1034,8 +1054,9 @@ body package_method generic
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     freebsd::
       package_changes => "individual";
@@ -1069,7 +1090,7 @@ body package_method generic
       package_name_convention => "$(name)";
       package_list_update_command => "/bin/true";               # I prefer manual syncing
       #package_list_update_command => "/usr/bin/emerge --sync"; # if you like automatic
-      package_list_update_ifelapsed => "240";                   # should happen every 4 hours
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/usr/bin/emerge -q --quiet-build";
       package_delete_command => "/usr/bin/emerge --depclean";
@@ -1085,7 +1106,7 @@ body package_method generic
       package_list_version_regex => ".*\s+(.*)";
       package_installed_regex => ".*";
       package_name_convention => "$(name)";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
       package_add_command => "/usr/bin/pacman -S --noconfirm --noprogressbar --needed";
       package_delete_command => "/usr/bin/pacman -Rs --noconfirm";
       package_update_command => "/usr/bin/pacman -S --noconfirm --noprogressbar --needed";
