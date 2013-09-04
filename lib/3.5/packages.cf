@@ -116,7 +116,16 @@ bundle common redhat_knowledge
 }
 
 body package_method zypper
-
+# @depends common_knowledge redhat_knowledge
+# @brief SuSE installation method
+#
+# This package method interacts with the SuSE Zypper package manager
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => zypper, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
 
@@ -353,6 +362,17 @@ body package_method dpkg_version(repo)
 ##
 
 body package_method rpm_version(repo)
+# @depends common_knowledge redhat_knowledge
+# @brief RPM direct installation method
+# @param repo the specific repository for `package_file_repositories`
+#
+# This package method interacts with the RPM package manager for a specific repo.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => rpm_version("myrepo"), package_policy => "add";
+# ```
 {
       package_changes => "individual";
 
@@ -442,12 +462,22 @@ body package_method msi_explicit(repo)
 
 ##
 
-# This package_method uses yum to install, update and list packages.
-#
-# It will use "rpm -e" to remove packages. Please note that if several packages
-# with the same name but varying versions or architectures are installed,
-# "rpm -e" will return an error and not delete any of them.
 body package_method yum
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM installation method
+#
+# This package method interacts with the Yum and RPM package managers.
+# It is inferior to the `yum_rpm` package method.
+#
+# It will use `rpm -e` to remove packages. Please note that if several packages
+# with the same name but varying versions or architectures are installed,
+# `rpm -e` will return an error and not delete any of them.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) list installed";
@@ -484,15 +514,25 @@ body package_method yum
 ##
 
 body package_method yum_rpm
-
-# Contributed by Trond Hasle Amundsen
-# More efficient package method for RPM-based systems - uses rpm
-# instead of yum to list installed packages
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM installation method
 #
-# It will use "rpm -e" to remove packages. Please note that if several packages
+# This package method interacts with the Yum and RPM package managers.
+#
+# Contributed by Trond Hasle Amundsen
+#
+# This is an efficient package method for RPM-based systems - uses `rpm`
+# instead of `yum` to list installed packages.
+#
+# It will use `rpm -e` to remove packages. Please note that if several packages
 # with the same name but varying versions or architectures are installed,
-# "rpm -e" will return an error and not delete any of them.
-
+# `rpm -e` will return an error and not delete any of them.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum_rpm, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
@@ -527,11 +567,23 @@ body package_method yum_rpm
 ##
 
 body package_method yum_rpm_enable_repo(repoid)
-
-# based on yum_rpm with addition to enable a repository for the install
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM repo-specific installation method
+# @param repoid the repository name as in `yum --enablerepo=???`
+#
+# This package method interacts with the RPM package manager for a specific repo.
+#
+# Based on yum_rpm with addition to enable a repository for the install.
+#
 # Sometimes repositories are configured but disabled by default. For example
 # this pacakge_method could be used when installing a package that exists in
 # the EPEL, which normally you do not want to install packages from.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum_rpm_enable_repo("myrepo"), package_policy => "add";
+# ```
 {
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
@@ -563,13 +615,22 @@ body package_method yum_rpm_enable_repo(repoid)
 ##
 
 body package_method yum_group
-
-# Makes use of the "groups of packages" feature of Yum possible. (yum groupinstall, groupremove)
+# @depends common_knowledge redhat_knowledge
+# @brief RPM direct installation method
 #
-# Groups must be specified by their groupids, available through yum grouplist -v (between parentheses)
+# Makes use of the "groups of packages" feature of Yum possible. (`yum
+# groupinstall`, `yum groupremove`)
+#
+# Groups must be specified by their groupids, available through `yum
+# grouplist -v` (between parentheses).  For example, below
+# `network-tools` is the groupid.
+# ```shell
 # $ yum grouplist -v|grep Networking|head -n 1
-#   Networking Tools (network-tools)       <--- network-tools is the groupid
+#   Networking Tools (network-tools)
+# ```
 #
+# **Example:**
+# ```cf3
 # Policies examples:
 #
 # -Install "web-server" group:
@@ -590,8 +651,7 @@ body package_method yum_group
 #   "$(groups)"
 #      package_policy   =>   "delete",
 #      package_method   =>   yum_group;
-#
-
+# ```
 {
       package_add_command             =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) groupinstall -y";
       package_changes                 =>  "bulk";
@@ -619,23 +679,22 @@ body package_method yum_group
 ##
 
 body package_method rpm_filebased(path)
-
+# @depends common_knowledge redhat_knowledge
+# @brief install packages from local filesystem-based RPM repository.
+# @param path the path to the local package repository
+#
 # Contributed by Aleksey Tsalolikhin. Written on 29-Feb-2012.
 # Based on yum_rpm body in COPBL by Trond Hasle Amundsen.
-# Purpose: install packages from local filesystem-based package repository.
-# Note: Specify the path to the local package repository in the argument.
-
-# Example of how to use it:
 #
-# {{{
+# **Example:**
+# ```cf3
 # packages:
-# "epel-release"
-# package_policy => "add",
-# package_version => "5-4",
-# package_architectures => { "noarch" },
-# package_method => rpm_filebased("/repo/RPMs");
-# }}}
-
+#     "epel-release"
+#     package_policy => "add",
+#     package_version => "5-4",
+#     package_architectures => { "noarch" },
+#     package_method => rpm_filebased("/repo/RPMs");
+# ```
 {
       package_file_repositories => { "$(path)" };
       # the above is an addition to Trond's yum_rpm body
@@ -699,6 +758,7 @@ body package_method rpm_filebased(path)
 #      package_version => "4.3.17_5.11-0.175.1.0.0.24.0";
 
 body package_method ips
+# @depends common_knowledge
 {
       package_changes => "bulk";
       package_list_command => "/usr/bin/pkg list -v --no-refresh";
@@ -723,6 +783,7 @@ body package_method ips
 # SmartOS (solaris 10 fork by Joyent) uses pkgin
 
 body package_method smartos
+# @depends common_knowledge
 {
       package_changes => "bulk";
       package_list_command => "/opt/local/bin/pkgin list";
@@ -743,6 +804,7 @@ body package_method smartos
 # OpenCSW (Solaris software packages)
 
 body package_method opencsw
+# @depends common_knowledge
 {
       package_changes => "bulk";
       package_list_command => "/opt/csw/bin/pkgutil -c";
@@ -765,6 +827,7 @@ body package_method opencsw
 # to see how to use this
 
 body package_method solaris (pkgname, spoolfile, adminfile)
+# @depends common_knowledge
 {
       package_changes => "individual";
       package_list_command => "/usr/bin/pkginfo -l";
@@ -937,6 +1000,7 @@ body package_method alpinelinux
 ##
 
 body package_method emerge
+# @depends common_knowledge
 {
       package_changes => "individual";
       package_list_command => "/bin/sh -c '/bin/ls -d /var/db/pkg/*/* | cut -c 13-'";
@@ -959,7 +1023,7 @@ body package_method emerge
 ##
 
 body package_method pacman
-
+# @depends common_knowledge
 {
       package_changes => "bulk";
 
@@ -981,7 +1045,7 @@ body package_method pacman
 ##
 
 body package_method generic
-# @depends debian_knowledge
+# @depends common_knowledge debian_knowledge redhat_knowledge
 # @brief Generic installation package method
 #
 # This package method attempts to handle all platforms.

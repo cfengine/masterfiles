@@ -444,7 +444,7 @@ body package_method yum
 # **Example:**
 # ```cf3
 # packages:
-#     "mypackage" package_method => yum_rpm, package_policy => "add";
+#     "mypackage" package_method => yum, package_policy => "add";
 # ```
 {
       package_changes => "bulk";
@@ -1008,7 +1008,16 @@ body package_method pacman
 }
 
 body package_method zypper
-# @depends common_knowledge
+# @depends common_knowledge redhat_knowledge
+# @brief SuSE installation method
+#
+# This package method interacts with the SuSE Zypper package manager
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => zypper, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
 
