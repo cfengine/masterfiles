@@ -322,7 +322,7 @@ body package_method rpm_version(repo)
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
@@ -428,7 +428,7 @@ body package_method yum
 {
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
       package_list_name_regex    => "([^.]+).*";
       package_list_version_regex => "[^\s]\s+([^\s]+).*";
@@ -441,7 +441,7 @@ body package_method yum
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
@@ -481,7 +481,7 @@ body package_method yum_rpm
 {
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
       package_list_name_regex    => "([^.]+).*";
       package_list_version_regex => "[^\s]\s+([^\s]+).*";
@@ -494,7 +494,7 @@ body package_method yum_rpm
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
@@ -532,7 +532,7 @@ body package_method yum_rpm_enable_repo(repoid)
 {
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
       package_list_name_regex    => "^(\S+?)\s\S+?\s\S+$";
       package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
@@ -542,7 +542,7 @@ body package_method yum_rpm_enable_repo(repoid)
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
@@ -606,10 +606,10 @@ body package_method yum_group
 
       # Generate a dpkg -l like listing, "i" means installed, "a" available, and a dummy version 1
       package_list_command            =>
-      "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\" || h==\"a\" {print h\" \"$0\" 1\"}'";
+      "$(redhat_knowledge.call_yum) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\" || h==\"a\" {print h\" \"$0\" 1\"}'";
 
       package_list_name_regex         =>  "a|i ([^\s]+) 1";
-      package_list_update_command     =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_list_update_command     =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed   =>  "$(common_knowledge.list_update_ifelapsed)";
       package_list_version_regex      =>  "(1)";
       package_name_convention         =>  "$(name)";
@@ -618,7 +618,7 @@ body package_method yum_group
       package_update_command          =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) groupupdate";
 
       # grep -x to only get full line matching
-      package_verify_command          => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\"|grep -qx";
+      package_verify_command          => "$(redhat_knowledge.call_yum) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\"|grep -qx";
 }
 
 ##
@@ -656,7 +656,7 @@ body package_method rpm_filebased(path)
       # CFEngine 3 Reference Manual
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # The rest is unchanged from Trond's yum_rpm body
@@ -1054,7 +1054,7 @@ body package_method generic
     redhat::
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
       package_list_name_regex    => "([^.]+).*";
       package_list_version_regex => "[^\s]\s+([^\s]+).*";
@@ -1067,7 +1067,7 @@ body package_method generic
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --quiet check-update";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
