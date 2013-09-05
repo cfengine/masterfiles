@@ -69,7 +69,7 @@ bundle agent cfe_internal_update_bins
 
     !nova_edition::
 
-      "upgrade_package_name"                 string => "cfengine3",
+      "upgrade_package_name"                 string => "cfengine-community",
       comment => "Name convention of Community package",
       handle => "cfe_internal_update_bins_vars_upgrade_package_name";
 
