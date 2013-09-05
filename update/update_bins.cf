@@ -49,26 +49,29 @@ bundle agent cfe_internal_update_bins
       comment => "Define a stop signal for *NIX system",
       handle => "cfe_internal_update_bins_vars_stop_signal_unix";
 
-    solarisx86|solaris::
+    nova_edition.(solarisx86|solaris)::
 
-      "novapkg"                 string => "CFEcfengine-nova",
+      "upgrade_package_name"                 string => "CFEcfengine-nova",
       comment => "Name convention of Nova package on Solaris",
-      handle => "cfe_internal_update_bins_vars_novapkg_solaris",
-      ifvarclass => "nova_edition";
+      handle => "cfe_internal_update_bins_vars_upgrade_package_name_solaris";
 
-    aix::
+    nova_edition.aix::
 
-      "novapkg"                 string => "cfengine.cfengine-nova",
+      "upgrade_package_name"                 string => "cfengine.cfengine-nova",
       comment => "Name convention of Nova package on AIX",
-      handle => "cfe_internal_update_bins_vars_novapkg_aix",
-      ifvarclass => "nova_edition";
+      handle => "cfe_internal_update_bins_vars_upgrade_package_name_aix";
 
-    !(solarisx86|solaris|aix)::
+    nova_edition::
 
-      "novapkg"                 string => "cfengine-nova",
+      "upgrade_package_name"                 string => "cfengine-nova",
       comment => "Name convention of Nova package for all but not Solaris",
-      handle => "cfe_internal_update_bins_vars_novapkg_not_solaris_aix",
-      ifvarclass => "nova_edition";
+      handle => "cfe_internal_update_bins_vars_upgrade_package_name_not_solaris_aix";
+
+    !nova_edition::
+
+      "upgrade_package_name"                 string => "cfengine3",
+      comment => "Name convention of Community package",
+      handle => "cfe_internal_update_bins_vars_upgrade_package_name";
 
     solaris.!sunos_i86pc::
 
@@ -132,54 +135,50 @@ bundle agent cfe_internal_update_bins
 
     stopped_cfprocs.!windows::
 
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version",
-      handle => "cfe_internal_update_bins_packages_nova_update_not_windows",
+      "$(upgrade_package_name)"
+      comment => "Update CFEngine package to a newer version",
+      handle => "cfe_internal_update_bins_packages_update_not_windows",
       package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
+      package_select => ">=",            # picks the newest available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9",         # Install new Nova anyway
+      package_version => "9.9.9",         # Install new anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     stopped_cfprocs.windows::
 
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version",
-      handle => "cfe_internal_update_bins_packages_nova_update_windows_only",
+      "$(upgrade_package_name)"
+      comment => "Update CFEngine package to a newer version",
+      handle => "cfe_internal_update_bins_packages_update_windows_only",
       package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
+      package_select => ">=",            # picks the newest available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9.9",       # Install new Nova anyway
+      package_version => "9.9.9.9",       # Install new anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.!windows::
 
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version (package is there)",
-      handle => "cfe_internal_update_bins_packages_nova_update_not_windows_pkg_there",
+      "$(upgrade_package_name)"
+      comment => "Update CFEngine package to a newer version (package is there)",
+      handle => "cfe_internal_update_bins_packages_update_not_windows_pkg_there",
       package_policy => "update",
       package_select => ">=",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
       package_version => "9.9.9",         # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.windows::
 
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version (package is there)",
-      handle => "cfe_internal_update_bins_packages_nova_update_windows_only_pkg_there",
+      "$(upgrade_package_name)"
+      comment => "Update CFEngine package to a newer version (package is there)",
+      handle => "cfe_internal_update_bins_packages_update_windows_only_pkg_there",
       package_policy => "update",
       package_select => ">=",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
       package_version => "9.9.9.9",       # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
       #
