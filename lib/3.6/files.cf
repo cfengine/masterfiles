@@ -520,19 +520,26 @@ bundle edit_line set_config_values(v)
 
       # Escape the value (had a problem with special characters and regex's)
       "ev[$(index)]" string => escape("$($(v)[$(index)])");
+      
+      # Do we have more than one line commented out?
+      "index_comment_matches_$(cindex[$(index)])" int => countlinesmatching("^\s*#\s*$(index)\s+.*$","$(edit.filename)");
+
 
   classes:
       # Check to see if this line exists
       "line_exists_$(cindex[$(index)])" expression => regline("^\s*$(index)\s.*","$(edit.filename)");
+
+      # if there's more than one comment, just add new (don't know who to use)
+      "multiple_comments_$(cindex[$(index)])" expression => isgreaterthan("index_comment_matches_$(cindex[$(index)])","1");
 
 
   replace_patterns:
       # If the line is there with the wrong value, replace with
       # the correct value
       "^\s*$(index)\s+(?!$(ev[$(index)])$).*$"
-      comment => "Correct the value $(index)",
+           comment => "Correct the value $(index)",
       replace_with => value("$(index) $($(v)[$(index)])"),
-      classes => always("replace_attempted_$(cindex[$(index)])");
+           classes => always("replace_attempted_$(cindex[$(index)])");
 
   replace_patterns:
       # If the line is commented out, uncomment and replace with
@@ -540,12 +547,16 @@ bundle edit_line set_config_values(v)
       "^\s*#\s*$(index)\s+.*$"
              comment => "Uncommented the value $(index)",
         replace_with => value("$(index) $($(v)[$(index)])"),
-          ifvarclass => "!line_exists_$(cindex[$(index)]).!replace_attempted_$(cindex[$(index)])",
+          ifvarclass => "!line_exists_$(cindex[$(index)]).!replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])",
              classes => always("uncommented_$(cindex[$(index)])");
 
   insert_lines:
+      # If the line doesn't exist, or there is more than one occurance
+      # of the LHS commented out, insert a new line and try to place it 
+      # after the commented LHS (keep new line with old comments)
       "$(index) $($(v)[$(index)])"
          comment => "Insert the value $(index)",
+        location => after("^\s*#\s*$(index)\s+.*$"),
       ifvarclass => "replace_attempted_$(cindex[$(index)])";
 
 }
