@@ -51,36 +51,15 @@
 ## Packages promises
 ##--------------------------------------------------------------
 
-body package_method zypper
-
+bundle common common_knowledge
+# @brief common packages knowledge bundle
+#
+# This common bundle defines general things about platforms.
 {
-      package_changes => "bulk";
-
-      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
-
-      # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/zypper list-updates";
-      package_list_update_ifelapsed => "240";
-
-      package_patch_list_command => "/usr/bin/zypper patches";
-      package_installed_regex => "i.*";
-      package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_arch_regex    => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
-
-      package_patch_installed_regex => ".*Installed.*|.*Not Applicable.*";
-      package_patch_name_regex    => "[^|]+\|\s+([^\s]+).*";
-      package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
-
-      package_name_convention => "$(name)";
-      package_add_command => "/usr/bin/zypper --non-interactive install";
-      package_delete_command => "/usr/bin/zypper --non-interactive remove --force-resolution";
-      package_update_command => "/usr/bin/zypper --non-interactive update";
-      package_patch_command => "/usr/bin/zypper --non-interactive patch$"; # $ means no args
-      package_verify_command => "/usr/bin/zypper --non-interactive verify$";
+  vars:
+      "list_update_ifelapsed" string => "240";
+      "list_update_ifelapsed_now" string => "0";
 }
-
-##
 
 bundle common debian_knowledge
 # @depends paths
@@ -97,7 +76,84 @@ bundle common debian_knowledge
 
       "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
       "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
+
+      "list_name_regex" string => ".i\s+([^\s:]+).*";
+      "list_version_regex" string => ".i\s+[^\s]+\s+([^\s]+).*";
+
+      "patch_name_regex" string => "^Inst\s+(\S+)\s+.*";
+      "patch_version_regex" string => "^Inst\s+(\S+)\s+.*";
 }
+
+bundle common redhat_knowledge
+# @depends paths
+# @brief common Redhat knowledge bundle
+#
+# This common bundle has useful information about Redhat.
+{
+  vars:
+      "call_yum" string => "$(paths.path[yum])";
+      "call_rpm" string => "$(paths.path[rpm])";
+
+      "yum_options" string => "--quiet";
+
+      # used with rpm format 'i | repos | %{name} | %{version}-%{release} | %{arch}\n'
+
+      "rpm_name_regex" string => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
+      "rpm_version_regex" string => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s|]+).*";
+      "rpm_arch_regex" string => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
+
+      # used with rpm format '%{name} %{version}-%{release} %{arch}\n'
+
+      "rpm2_name_regex" string => "^(\S+?)\s\S+?\s\S+$";
+      "rpm2_version_regex" string => "^\S+?\s(\S+?)\s\S+$";
+      "rpm2_arch_regex" string => "^\S+?\s\S+?\s(\S+)$";
+
+      # used with rpm format '%{name}.%{arch} %{version}-%{release}\n'
+
+      "rpm3_name_regex" string => "([^.]+).*";
+      "rpm3_version_regex" string => "[^\s]\s+([^\s]+).*";
+      "rpm3_arch_regex" string => "[^.]+\.([^\s]+).*";
+}
+
+body package_method zypper
+# @depends common_knowledge redhat_knowledge
+# @brief SuSE installation method
+#
+# This package method interacts with the SuSE Zypper package manager
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => zypper, package_policy => "add";
+# ```
+{
+      package_changes => "bulk";
+
+      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
+
+      # set it to "0" to avoid caching of list during upgrade
+      package_list_update_command => "/usr/bin/zypper list-updates";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      package_patch_list_command => "/usr/bin/zypper patches";
+      package_installed_regex => "i.*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm_arch_regex)";
+
+      package_patch_installed_regex => ".*Installed.*|.*Not Applicable.*";
+      package_patch_name_regex    => "[^|]+\|\s+([^\s]+).*";
+      package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
+
+      package_name_convention => "$(name)";
+      package_add_command => "/usr/bin/zypper --non-interactive install";
+      package_delete_command => "/usr/bin/zypper --non-interactive remove --force-resolution";
+      package_update_command => "/usr/bin/zypper --non-interactive update";
+      package_patch_command => "/usr/bin/zypper --non-interactive patch$"; # $ means no args
+      package_verify_command => "/usr/bin/zypper --non-interactive verify$";
+}
+
+##
 
 body package_method apt
 # @depends debian_knowledge
@@ -113,13 +169,13 @@ body package_method apt
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -127,16 +183,17 @@ body package_method apt
 
     have_aptitude::
       package_add_command => "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes install";
-      package_list_update_command => "/usr/bin/aptitude update";
+      package_list_update_command => "$(debian_knowledge.call_aptitude) update";
       package_delete_command => "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes -q remove";
       package_update_command =>  "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes install";
       package_patch_command =>  "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes install";
-      package_verify_command =>  "/usr/bin/aptitude show";
+      package_verify_command =>  "$(debian_knowledge.call_aptitude) show";
       package_noverify_regex => "(State: not installed|E: Unable to locate package .*)";
 
-      package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_list_command => "$(debian_knowledge.call_aptitude) --assume-yes --simulate --verbose full-upgrade";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     !have_aptitude::
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -148,8 +205,9 @@ body package_method apt
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
 }
 
@@ -173,13 +231,13 @@ body package_method apt_get
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # Target a specific release, such as backports
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -191,8 +249,9 @@ body package_method apt_get
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -215,13 +274,13 @@ body package_method apt_get_release(release)
 {
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # Target a specific release, such as backports
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes --target-release $(release) install";
@@ -233,8 +292,9 @@ body package_method apt_get_release(release)
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -262,10 +322,10 @@ body package_method dpkg_version(repo)
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "$(debian_knowledge.call_apt_get) update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
 
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
 
@@ -278,13 +338,15 @@ body package_method dpkg_version(repo)
       package_name_convention => "$(name)_$(version)_i386.deb";
 
     have_aptitude::
-      package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_list_command => "$(debian_knowledge.call_aptitude) --assume-yes --simulate --verbose full-upgrade";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
     !have_aptitude::
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     debian::
       package_add_command => "$(debian_knowledge.call_dpkg) --install";
@@ -300,18 +362,29 @@ body package_method dpkg_version(repo)
 ##
 
 body package_method rpm_version(repo)
+# @depends common_knowledge redhat_knowledge
+# @brief RPM direct installation method
+# @param repo the specific repository for `package_file_repositories`
+#
+# This package method interacts with the RPM package manager for a specific repo.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => rpm_version("myrepo"), package_policy => "add";
+# ```
 {
       package_changes => "individual";
 
-      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
-      package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s|]+).*";
-      package_list_arch_regex    => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm_arch_regex)";
 
       package_installed_regex => "i.*";
 
@@ -319,11 +392,11 @@ body package_method rpm_version(repo)
 
       package_name_convention => "$(name)-$(version).$(arch).rpm";
 
-      package_add_command => "/bin/rpm -ivh ";
-      package_update_command => "/bin/rpm -Uvh ";
-      package_patch_command => "/bin/rpm -Uvh ";
-      package_delete_command => "/bin/rpm -e --nodeps";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command => "$(redhat_knowledge.call_rpm) -ivh ";
+      package_update_command => "$(redhat_knowledge.call_rpm) -Uvh ";
+      package_patch_command => "$(redhat_knowledge.call_rpm) -Uvh ";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --nodeps";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
       package_noverify_regex => ".*[^\s].*";
 }
 
@@ -389,16 +462,26 @@ body package_method msi_explicit(repo)
 
 ##
 
-# This package_method uses yum to install, update and list packages.
-#
-# It will use "rpm -e" to remove packages. Please note that if several packages
-# with the same name but varying versions or architectures are installed,
-# "rpm -e" will return an error and not delete any of them.
 body package_method yum
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM installation method
+#
+# This package method interacts with the Yum and RPM package managers.
+# It is inferior to the `yum_rpm` package method.
+#
+# It will use `rpm -e` to remove packages. Please note that if several packages
+# with the same name but varying versions or architectures are installed,
+# `rpm -e` will return an error and not delete any of them.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
-      package_list_command => "/usr/bin/yum --quiet list installed";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
+      package_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) list installed";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
       # Remember to escape special characters like |
 
@@ -413,41 +496,51 @@ body package_method yum
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
 
-      package_add_command => "/usr/bin/yum -y install";
-      package_update_command => "/usr/bin/yum -y update";
-      package_patch_command => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y install";
+      package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_patch_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --nodeps";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
 }
 
 ##
 
 body package_method yum_rpm
-
-# Contributed by Trond Hasle Amundsen
-# More efficient package method for RPM-based systems - uses rpm
-# instead of yum to list installed packages
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM installation method
 #
-# It will use "rpm -e" to remove packages. Please note that if several packages
+# This package method interacts with the Yum and RPM package managers.
+#
+# Contributed by Trond Hasle Amundsen
+#
+# This is an efficient package method for RPM-based systems - uses `rpm`
+# instead of `yum` to list installed packages.
+#
+# It will use `rpm -e` to remove packages. Please note that if several packages
 # with the same name but varying versions or architectures are installed,
-# "rpm -e" will return an error and not delete any of them.
-
+# `rpm -e` will return an error and not delete any of them.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum_rpm, package_policy => "add";
+# ```
 {
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
-      package_list_name_regex    => "([^.]+).*";
-      package_list_version_regex => "[^\s]\s+([^\s]+).*";
-      package_list_arch_regex    => "[^.]+\.([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm3_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm3_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm3_arch_regex)";
 
       package_installed_regex => ".*";
       package_name_convention => "$(name)-$(version).$(arch)";
@@ -456,67 +549,88 @@ body package_method yum_rpm
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
 
-      package_add_command    => "/usr/bin/yum -y install";
-      package_update_command => "/usr/bin/yum -y update";
-      package_patch_command  => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command    => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y install";
+      package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --nodeps";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
 }
 
 ##
 
 body package_method yum_rpm_enable_repo(repoid)
-
-# based on yum_rpm with addition to enable a repository for the install
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM repo-specific installation method
+# @param repoid the repository name as in `yum --enablerepo=???`
+#
+# This package method interacts with the RPM package manager for a specific repo.
+#
+# Based on yum_rpm with addition to enable a repository for the install.
+#
 # Sometimes repositories are configured but disabled by default. For example
 # this pacakge_method could be used when installing a package that exists in
 # the EPEL, which normally you do not want to install packages from.
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum_rpm_enable_repo("myrepo"), package_policy => "add";
+# ```
 {
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
 
-      package_list_name_regex    => "^(\S+?)\s\S+?\s\S+$";
-      package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
-      package_list_arch_regex    => "^\S+?\s\S+?\s(\S+)$";
+      package_list_name_regex    => "$(redhat_knowledge.rpm2_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm2_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm2_arch_regex)";
 
       package_installed_regex => ".*";
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
 
-      package_add_command    => "/usr/bin/yum --enablerepo=$(repoid) -y install";
-      package_update_command => "/usr/bin/yum --enablerepo=$(repoid) -y update";
-      package_patch_command => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps --allmatches";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command    => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --enablerepo=$(repoid) -y install";
+      package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) --enablerepo=$(repoid) -y update";
+      package_patch_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --nodeps --allmatches";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
 }
 
 ##
 
 body package_method yum_group
-
-# Makes use of the "groups of packages" feature of Yum possible. (yum groupinstall, groupremove)
+# @depends common_knowledge redhat_knowledge
+# @brief RPM direct installation method
 #
-# Groups must be specified by their groupids, available through yum grouplist -v (between parentheses)
+# Makes use of the "groups of packages" feature of Yum possible. (`yum
+# groupinstall`, `yum groupremove`)
+#
+# Groups must be specified by their groupids, available through `yum
+# grouplist -v` (between parentheses).  For example, below
+# `network-tools` is the groupid.
+# ```shell
 # $ yum grouplist -v|grep Networking|head -n 1
-#   Networking Tools (network-tools)       <--- network-tools is the groupid
+#   Networking Tools (network-tools)
+# ```
 #
+# **Example:**
+# ```cf3
 # Policies examples:
 #
 # -Install "web-server" group:
@@ -537,57 +651,55 @@ body package_method yum_group
 #   "$(groups)"
 #      package_policy   =>   "delete",
 #      package_method   =>   yum_group;
-#
-
+# ```
 {
-      package_add_command             =>  "/usr/bin/yum groupinstall -y";
+      package_add_command             =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) groupinstall -y";
       package_changes                 =>  "bulk";
-      package_delete_command          =>  "/usr/bin/yum groupremove -y";
+      package_delete_command          =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) groupremove -y";
       package_delete_convention       =>  "$(name)";
       package_installed_regex         =>  "^i.*";
 
       # Generate a dpkg -l like listing, "i" means installed, "a" available, and a dummy version 1
       package_list_command            =>
-      "/usr/bin/yum grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\" || h==\"a\" {print h\" \"$0\" 1\"}'";
+      "$(redhat_knowledge.call_yum) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\" || h==\"a\" {print h\" \"$0\" 1\"}'";
 
       package_list_name_regex         =>  "a|i ([^\s]+) 1";
-      package_list_update_command     =>  "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed   =>  "240";
+      package_list_update_command     =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
       package_list_version_regex      =>  "(1)";
       package_name_convention         =>  "$(name)";
       package_name_regex              =>  "(.*)";
       package_noverify_returncode     =>  "0";
-      package_update_command          =>  "/usr/bin/yum groupupdate";
+      package_update_command          =>  "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) groupupdate";
 
       # grep -x to only get full line matching
-      package_verify_command          => "/usr/bin/yum grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\"|grep -qx";
+      package_verify_command          => "$(redhat_knowledge.call_yum) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\"|grep -qx";
 }
 
 ##
 
 body package_method rpm_filebased(path)
-
+# @depends common_knowledge redhat_knowledge
+# @brief install packages from local filesystem-based RPM repository.
+# @param path the path to the local package repository
+#
 # Contributed by Aleksey Tsalolikhin. Written on 29-Feb-2012.
 # Based on yum_rpm body in COPBL by Trond Hasle Amundsen.
-# Purpose: install packages from local filesystem-based package repository.
-# Note: Specify the path to the local package repository in the argument.
-
-# Example of how to use it:
 #
-# {{{
+# **Example:**
+# ```cf3
 # packages:
-# "epel-release"
-# package_policy => "add",
-# package_version => "5-4",
-# package_architectures => { "noarch" },
-# package_method => rpm_filebased("/repo/RPMs");
-# }}}
-
+#     "epel-release"
+#     package_policy => "add",
+#     package_version => "5-4",
+#     package_architectures => { "noarch" },
+#     package_method => rpm_filebased("/repo/RPMs");
+# ```
 {
       package_file_repositories => { "$(path)" };
       # the above is an addition to Trond's yum_rpm body
 
-      package_add_command => "/bin/rpm -ihv ";
+      package_add_command => "$(redhat_knowledge.call_rpm) -ihv ";
       # The above is a change from Trond's yum_rpm body, this makes the commands rpm only.
       # The reason I changed the install command from yum to rpm is yum will be default
       # refuse to install the epel-release RPM as it does not have the EPEL GPG key,
@@ -599,22 +711,22 @@ body package_method rpm_filebased(path)
       # CFEngine 3 Reference Manual
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       # The rest is unchanged from Trond's yum_rpm body
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
 
-      package_list_name_regex => "^(\S+?)\s\S+?\s\S+$";
-      package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
-      package_list_arch_regex => "^\S+?\s\S+?\s(\S+)$";
+      package_list_name_regex    => "$(redhat_knowledge.rpm2_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm2_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm2_arch_regex)";
 
       package_installed_regex => ".*";
 
 
-      package_delete_command => "/bin/rpm -e --allmatches";
-      package_verify_command => "/bin/rpm -V";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --allmatches";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
 }
 
 ##
@@ -646,6 +758,7 @@ body package_method rpm_filebased(path)
 #      package_version => "4.3.17_5.11-0.175.1.0.0.24.0";
 
 body package_method ips
+# @depends common_knowledge
 {
       package_changes => "bulk";
       package_list_command => "/usr/bin/pkg list -v --no-refresh";
@@ -655,7 +768,7 @@ body package_method ips
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/pkg refresh --full";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/usr/bin/pkg install --accept ";
       package_delete_command => "/usr/bin/pkg uninstall";
@@ -670,6 +783,7 @@ body package_method ips
 # SmartOS (solaris 10 fork by Joyent) uses pkgin
 
 body package_method smartos
+# @depends common_knowledge
 {
       package_changes => "bulk";
       package_list_command => "/opt/local/bin/pkgin list";
@@ -679,7 +793,7 @@ body package_method smartos
       package_installed_regex => ".*"; # all reported are installed
 
       package_list_update_command => "/opt/local/bin/pkgin -y update";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/opt/local/bin/pkgin -y install";
 
@@ -690,6 +804,7 @@ body package_method smartos
 # OpenCSW (Solaris software packages)
 
 body package_method opencsw
+# @depends common_knowledge
 {
       package_changes => "bulk";
       package_list_command => "/opt/csw/bin/pkgutil -c";
@@ -699,7 +814,7 @@ body package_method opencsw
       package_installed_regex => ".*"; # all reported are installed
 
       package_list_update_command => "/opt/csw/bin/pkgutil -U";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/opt/csw/bin/pkgutil -yi";
 
@@ -712,6 +827,7 @@ body package_method opencsw
 # to see how to use this
 
 body package_method solaris (pkgname, spoolfile, adminfile)
+# @depends common_knowledge
 {
       package_changes => "individual";
       package_list_command => "/usr/bin/pkginfo -l";
@@ -884,6 +1000,7 @@ body package_method alpinelinux
 ##
 
 body package_method emerge
+# @depends common_knowledge
 {
       package_changes => "individual";
       package_list_command => "/bin/sh -c '/bin/ls -d /var/db/pkg/*/* | cut -c 13-'";
@@ -893,7 +1010,7 @@ body package_method emerge
       package_name_convention => "$(name)";
       package_list_update_command => "/bin/true";               # I prefer manual syncing
       #package_list_update_command => "/usr/bin/emerge --sync"; # if you like automatic
-      package_list_update_ifelapsed => "240";                   # should happen every 4 hours
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/usr/bin/emerge -q --quiet-build";
       package_delete_command => "/usr/bin/emerge --depclean";
@@ -906,14 +1023,14 @@ body package_method emerge
 ##
 
 body package_method pacman
-
+# @depends common_knowledge
 {
       package_changes => "bulk";
 
       package_list_command => "/usr/bin/pacman -Q";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_list_name_regex    => "(.*)\s+.*";
       package_list_version_regex => ".*\s+(.*)";
@@ -928,7 +1045,7 @@ body package_method pacman
 ##
 
 body package_method generic
-# @depends debian_knowledge
+# @depends common_knowledge debian_knowledge redhat_knowledge
 # @brief Generic installation package method
 #
 # This package method attempts to handle all platforms.
@@ -941,15 +1058,15 @@ body package_method generic
 {
     SuSE::
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_command => "/usr/bin/zypper list-updates";
-      package_list_update_ifelapsed => "0";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed_now)";
       package_patch_list_command => "/usr/bin/zypper patches";
       package_installed_regex => "i.*";
-      package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
-      package_list_arch_regex    => "[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
+      package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm_arch_regex)";
       package_patch_installed_regex => ".*Installed.*|.*Not Applicable.*";
       package_patch_name_regex    => "[^|]+\|\s+([^\s]+).*";
       package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
@@ -962,50 +1079,33 @@ body package_method generic
 
     redhat::
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
-      package_list_name_regex    => "^(\S+?)\s\S+?\s\S+$";
-      package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
-      package_list_arch_regex    => "^\S+?\s\S+?\s(\S+)$";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm_arch_regex)";
       package_installed_regex => ".*";
       package_name_convention => "$(name)";
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
-      package_list_update_ifelapsed => "0";     # sometimes, caching is pretty disturbing
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed_now)";
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
-      package_add_command    => "/usr/bin/yum -y install";
-      package_update_command => "/usr/bin/yum -y update";
-      package_patch_command => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps --allmatches";
-      package_verify_command => "/bin/rpm -V";
-
-      # package_changes => "bulk";
-      # package_list_command => "/usr/bin/yum list installed";
-      # package_patch_list_command => "/usr/bin/yum check-update";
-      # package_list_name_regex    => "([^.]+).*";
-      # package_list_version_regex => "[^\s]\s+([^\s]+).*";
-      # package_list_arch_regex    => "[^.]+\.([^\s]+).*";
-      # package_installed_regex => ".*(installed|\s+@).*";
-      # package_name_convention => "$(name).$(arch)";
-      # package_list_update_ifelapsed => "240";
-      # package_patch_installed_regex => "^\s.*";
-      # package_patch_name_regex    => "([^.]+).*";
-      # package_patch_version_regex => "[^\s]\s+([^\s]+).*";
-      # package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
-      # package_add_command => "/usr/bin/yum -y install";
-      # package_delete_command => "/bin/rpm -e --nodeps";
-      # package_verify_command => "/bin/rpm -V";
+      package_add_command    => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y install";
+      package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_patch_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --nodeps --allmatches";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
 
     debian::
       package_changes => "bulk";
       package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex    => ".i\s+([^\s]+).*";
-      package_list_version_regex => ".i\s+[^\s]+\s+([^\s]+).*";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
-      package_list_update_ifelapsed => "240";		# 4 hours
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";		# 4 hours
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
@@ -1013,16 +1113,17 @@ body package_method generic
 
     debian.have_aptitude::
       package_add_command => "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes install";
-      package_list_update_command => "/usr/bin/aptitude update";
+      package_list_update_command => "$(debian_knowledge.call_aptitude) update";
       package_delete_command => "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes remove";
       package_update_command =>  "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes install";
       package_patch_command =>  "$(debian_knowledge.call_aptitude) $(debian_knowledge.dpkg_options) --assume-yes install";
-      package_verify_command =>  "/usr/bin/aptitude show";
+      package_verify_command =>  "$(debian_knowledge.call_aptitude) show";
       package_noverify_regex => "(State: not installed|E: Unable to locate package .*)";
 
-      package_patch_list_command => "/usr/bin/aptitude --assume-yes --simulate --verbose full-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_list_command => "$(debian_knowledge.call_aptitude) --assume-yes --simulate --verbose full-upgrade";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     debian.!have_aptitude::
       package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
@@ -1034,8 +1135,9 @@ body package_method generic
       package_noverify_returncode => "1";
 
       package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "^Inst\s+(\S+)\s+.*";
-      package_patch_version_regex => "^Inst\s+\S+\s+\[?\(?([^\],\s]+).*";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
 
     freebsd::
       package_changes => "individual";
@@ -1069,7 +1171,7 @@ body package_method generic
       package_name_convention => "$(name)";
       package_list_update_command => "/bin/true";               # I prefer manual syncing
       #package_list_update_command => "/usr/bin/emerge --sync"; # if you like automatic
-      package_list_update_ifelapsed => "240";                   # should happen every 4 hours
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
       package_add_command => "/usr/bin/emerge -q --quiet-build";
       package_delete_command => "/usr/bin/emerge --depclean";
@@ -1085,7 +1187,7 @@ body package_method generic
       package_list_version_regex => ".*\s+(.*)";
       package_installed_regex => ".*";
       package_name_convention => "$(name)";
-      package_list_update_ifelapsed => "240";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
       package_add_command => "/usr/bin/pacman -S --noconfirm --noprogressbar --needed";
       package_delete_command => "/usr/bin/pacman -Rs --noconfirm";
       package_update_command => "/usr/bin/pacman -S --noconfirm --noprogressbar --needed";

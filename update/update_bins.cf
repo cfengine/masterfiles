@@ -269,7 +269,7 @@ bundle common u_common_knowledge
 # @see common_knowledge
 {
   vars:
-      "list_update_ifelapsed" string => "0";
+      "list_update_ifelapsed_now" string => "0";
 }
 
 body package_method u_generic(repo)
@@ -281,9 +281,9 @@ body package_method u_generic(repo)
       package_list_command => "/usr/bin/dpkg -l";
 
       # package_list_update_command => "/usr/bin/apt-get update";
-      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed)0";
+      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
 
-      package_list_name_regex    => "ii\s+([^\s]+).*";
+      package_list_name_regex    => "ii\s+([^\s:]+).*";
       # package_list_version_regex => "ii\s+[^\s]+\s+([^\s]+).*";
       package_list_version_regex => "ii\s+[^\s]+\s+(\d+\.\d+((\.|-)\d+)+).*";
 
@@ -309,7 +309,7 @@ body package_method u_generic(repo)
 
       package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
 
-      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed)0";
+      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
 
       package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
       package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s|]+).*";
@@ -335,7 +335,7 @@ body package_method u_generic(repo)
     windows::
 
       package_changes => "individual";
-      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed)0";
+      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
       package_file_repositories  => { "$(repo)" };
 
       package_installed_regex    => ".*";
@@ -354,7 +354,7 @@ body package_method u_generic(repo)
       package_list_command => "/usr/sbin/pkg_info";
 
       package_list_update_command => "/usr/bin/true";
-      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed)0";
+      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
 
 
       package_list_name_regex    => "^(\S+)-(\d+\.?)+";
@@ -377,7 +377,7 @@ body package_method u_generic(repo)
       package_list_command => "/usr/sbin/pkg_info";
 
       package_list_update_command => "/usr/bin/true";
-      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed)0";
+      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
 
 
       package_list_name_regex    => "^(\S+)-(\d+\.?)+";
@@ -398,7 +398,7 @@ body package_method u_generic(repo)
       package_changes => "individual";
       package_list_command => "/usr/bin/pkginfo -l";
       package_list_update_command => "/usr/bin/true";
-      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed)0";
+      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
 
       package_multiline_start    => "\s*PKGINST:\s+[^\s]+";
       package_list_name_regex    => "\s*PKGINST:\s+([^\s]+)";
@@ -420,7 +420,7 @@ body package_method u_generic(repo)
       package_changes => "individual";
 
       package_list_update_command => "/usr/bin/true";
-      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed)0";
+      package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
 
       package_list_command       => "/usr/bin/lslpp -lc";
       package_list_name_regex    => "[^:]+:([^:]+):[^:]+:.*";
