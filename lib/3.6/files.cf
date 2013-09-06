@@ -541,7 +541,6 @@ bundle edit_line set_config_values(v)
       replace_with => value("$(index) $($(v)[$(index)])"),
            classes => always("replace_attempted_$(cindex[$(index)])");
 
-  replace_patterns:
       # If the line is commented out, uncomment and replace with
       # the correct value
       "^\s*#\s*$(index)\s+.*$"
