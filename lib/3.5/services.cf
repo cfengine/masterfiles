@@ -80,9 +80,11 @@ bundle agent standard_services(service,state)
  #
  #  1. Your init script basename = $(service)
  #  2. Your init script argument = $(state)
- #  3. Your init script lives in /etc/init.d/ or /etc/rc.d/
+ #  3. Your init script lives in /etc/init.d/ (for non-*bsd),
+ #     or /etc/rc.d/ (for *bsd)
  #  4. Your process regex pattern = \b$(service)\b
- #  5. You call the init as /etc/init.d/<script> <arg>
+ #  5. You call the init as /etc/init.d/<script> <arg> (for non-*bsd), 
+ #     or /etc/rc.d/<script> <arg> (for *bsd)
  #
  # b) If the 1st rule doesn't match, but rest does:
  #
@@ -92,7 +94,7 @@ bundle agent standard_services(service,state)
  #    "baseinit[www]" string => "httpd";
  #
  #   This would fire up init script /etc/init.d/httpd, instead of
- #   the default /etc/init.d/www
+ #   the default /etc/init.d/www. From /etc/rc.d/ if you're on *bsd system.
  #
  # c) If the 4th rule doesn't match, but rest does:
  #
@@ -114,11 +116,11 @@ bundle agent standard_services(service,state)
  #     "init[www]" string => "sysvinitd";
  #     "init[www]" string => "systemd";
  # 
- #   ^^ The above is not a valid syntax as you can only use one per
- #      init[] per service, but it shows all the currently supported ones.
+ #   ^^ The above is not a valid syntax as you can only use one init[]
+ #      per service, but it shows all the currently supported ones.
  #
  #     "sysvservice" == /(usr/)?sbin/service
- #     "stsvinitd"   == /etc/init.d/
+ #     "stsvinitd"   == /etc/init.d/ (non-*bsd) | /etc/rc.d/ (*bsd)
  #     "systemd"     == /bin/systemctl
  #
  # e) 2nd and 3rd rule matches, but rest doesn't:
