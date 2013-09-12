@@ -530,7 +530,7 @@ bundle edit_line set_config_values(v)
       "line_exists_$(cindex[$(index)])" expression => regline("^\s*$(index)\s.*","$(edit.filename)");
 
       # if there's more than one comment, just add new (don't know who to use)
-      "multiple_comments_$(cindex[$(index)])" expression => isgreaterthan("index_comment_matches_$(cindex[$(index)])","1");
+      "multiple_comments_$(cindex[$(index)])" expression => isgreaterthan("$(index_comment_matches_$(cindex[$(index)]))","1");
 
 
   replace_patterns:
@@ -539,6 +539,7 @@ bundle edit_line set_config_values(v)
       "^\s*$(index)\s+(?!$(ev[$(index)])$).*$"
            comment => "Correct the value $(index)",
       replace_with => value("$(index) $($(v)[$(index)])"),
+        ifvarclass => "uncommented_$(cindex[$(index)])|multiple_comments_$(cindex[$(index)])|line_exists_$(cindex[$(index)])",
            classes => always("replace_attempted_$(cindex[$(index)])");
 
       # If the line is commented out, uncomment and replace with
@@ -564,19 +565,6 @@ bundle edit_line set_config_values(v)
          comment => "Insert the value $(index)",
       ifvarclass => "replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])";
 
-
-# Debugging code -- problem with isgreaterthan:
-
-reports:
-  linux::
-    "Class defined ===> replace_attempted_$(cindex[$(index)])"
-      ifvarclass => "replace_attempted_$(cindex[$(index)])";
-
-    "Class defined ===> uncommented_$(cindex[$(index)])"
-      ifvarclass => "uncommented_$(cindex[$(index)])";
-
-    "Class defined ===> multiple_comments_$(cindex[$(index)]) found matches = $(index_comment_matches_$(cindex[$(index)]))"
-      ifvarclass => "multiple_comments_$(cindex[$(index)])";
 
 }
 
