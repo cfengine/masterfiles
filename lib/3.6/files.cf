@@ -564,6 +564,20 @@ bundle edit_line set_config_values(v)
          comment => "Insert the value $(index)",
       ifvarclass => "replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])";
 
+
+# Debugging code -- problem with isgreaterthan:
+
+reports:
+  linux::
+    "Class defined ===> replace_attempted_$(cindex[$(index)])"
+      ifvarclass => "replace_attempted_$(cindex[$(index)])";
+
+    "Class defined ===> uncommented_$(cindex[$(index)])"
+      ifvarclass => "uncommented_$(cindex[$(index)])";
+
+    "Class defined ===> multiple_comments_$(cindex[$(index)]) found matches = $(index_comment_matches_$(cindex[$(index)]))"
+      ifvarclass => "multiple_comments_$(cindex[$(index)])";
+
 }
 
 bundle edit_line set_config_values_matching(v,pat)
