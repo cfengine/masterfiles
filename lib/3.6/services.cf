@@ -39,7 +39,7 @@
 # the online docs
 #
 
-# For CFEngine Core: 3.5.1 to 3.5.x
+# For CFEngine Core: 3.6.0 to 3.6.x
 # Services bodies
 
 ###################################################
@@ -120,7 +120,7 @@ bundle agent standard_services(service,state)
  #      per service, but it shows all the currently supported ones.
  #
  #     "sysvservice" == /(usr/)?sbin/service
- #     "stsvinitd"   == /etc/init.d/ (non-*bsd) | /etc/rc.d/ (*bsd)
+ #     "sysvinitd"   == /etc/init.d/ (non-*bsd) | /etc/rc.d/ (*bsd)
  #     "systemd"     == /bin/systemctl
  #
  # e) 2nd and 3rd rule matches, but rest doesn't:
