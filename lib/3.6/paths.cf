@@ -188,6 +188,7 @@ bundle common paths
       "path[iptables]"      string => "/sbin/iptables";
       "path[iptables_save]" string => "/sbin/iptables-save";
       "path[ls]"            string => "/bin/ls";
+      "path[lsof]"          string => "/usr/sbin/lsof":
       "path[netstat]"       string => "/bin/netstat";
       "path[ping]"          string => "/usr/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
@@ -233,10 +234,11 @@ bundle common paths
       "path[find]"          string => "/usr/bin/find";
       "path[grep]"          string => "/bin/grep";
       "path[hostname]"      string => "/bin/hostname";
-      "path[ls]"            string => "/bin/ls";
       "path[init]"          string => "/sbin/init";
       "path[iptables]"      string => "/sbin/iptables";
       "path[iptables_save]" string => "/sbin/iptables-save";
+      "path[ls]"            string => "/bin/ls";
+      "path[lsof]"          string => "/usr/bin/lsof":
       "path[netstat]"       string => "/bin/netstat";
       "path[ping]"          string => "/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
