@@ -93,9 +93,19 @@ bundle agent cronjob(commands,user,hours,mins)
 
 }
 
-# this is a workaround for the issue that recurse_with_base precludes
-# a file from being deleted
+# recursively remove the file structure the depth of the recursion
+# name => name of the directory structure
 bundle agent rm_rf(name)
+{
+  methods:
+      "rm" usebundle => rm_rf_depth($(name),"inf");
+
+}
+
+# recursively remove the file structure specifying the depth of the cursion.
+#  name => name of the directory structure
+#  depth => depth of recursion
+bundle agent rm_rf_depth(name,depth)
 {
   classes:
       "isdir" expression => isdir($(name));
@@ -103,7 +113,7 @@ bundle agent rm_rf(name)
     isdir::
       "$(name)"
       file_select => all,
-      depth_search => recurse_with_base(999),
+      depth_search => recurse_with_base($(depth)),
       delete => tidy;
 
     !isdir::
