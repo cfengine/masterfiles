@@ -93,19 +93,37 @@ bundle agent cronjob(commands,user,hours,mins)
 
 }
 
-# recursively remove the file structure the depth of the recursion
-# name => name of the directory structure
 bundle agent rm_rf(name)
+# @brief recursively remove `name` to any depth, including base
+# @depends rm_rf_depth
+# @params name the file or directory name
+#
+# This bundle will remove `name` to any depth, including `name` itself.
+#
+# **Example:**
+# ```cf3
+# methods:
+#     "bye" usebundle => rm_rf("/var/tmp/oldstuff");
+# ```
 {
   methods:
       "rm" usebundle => rm_rf_depth($(name),"inf");
 
 }
 
-# recursively remove the file structure specifying the depth of the cursion.
-#  name => name of the directory structure
-#  depth => depth of recursion
 bundle agent rm_rf_depth(name,depth)
+# @brief recursively remove `name` to depth `depth`, including base
+# @depends recurse_with_base tidy all
+# @params name the file or directory name
+# @params depth how far to descend
+#
+# This bundle will remove `name` to depth `depth`, including `name` itself.
+#
+# **Example:**
+# ```cf3
+# methods:
+#     "bye" usebundle => rm_rf_depth("/var/tmp/oldstuff", "100");
+# ```
 {
   classes:
       "isdir" expression => isdir($(name));
