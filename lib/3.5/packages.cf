@@ -115,6 +115,71 @@ bundle common redhat_knowledge
       "rpm3_arch_regex" string => "[^.]+\.([^\s]+).*";
 }
 
+bundle common darwin_knowledge
+# @depends paths
+# @brief common Darwin / Mac OS X knowledge bundle
+#
+# This common bundle has useful information about Darwin / Mac OS X.
+{
+  vars:
+      "call_brew" string => "$(paths.path[brew])";
+      "call_sudo" string => "$(paths.path[sudo])";
+
+      # used with brew list --versions format '%{name} %{version}\n'
+
+      "brew_name_regex" string => "([\S]+)\s[\S]+";
+      "brew_version_regex" string => "[\S]+\s([\S]+)";
+}
+
+
+body package_method brew(user)
+# @depends common_knowledge darwin_knowledge
+# @brief Darwin/Mac OS X + Homebrew installation method
+#
+# Homebrew is a package manager for OS X -- http://brew.sh
+# Homebrew expects a regular (non-root) user to install packages. 
+# https://github.com/mxcl/homebrew/wiki/FAQ#why-does-homebrew-say-sudo-is-bad
+# As it seems CFEngine don't give the possibility to run package_add_command 
+# with a different user, we'll use sudo -u.
+#
+# Available commands : add, delete, (add)update (with package_version).
+#  
+# **Example:**
+# ```cf3
+# packages:
+#     "mypackage" package_method => brew("adminuser"), package_policy => "add";
+#     "uppackage" package_method => brew("adminuser"), package_policy => "update", package_version => "3.5.2";
+# ```
+{
+  
+      package_changes               => "bulk";
+      package_add_command           => "$(darwin_knowledge.call_sudo) -u $(user) $(darwin_knowledge.call_brew) install";
+      package_delete_command        => "$(darwin_knowledge.call_sudo) -u $(user) $(darwin_knowledge.call_brew) uninstall";
+      package_delete_convention     => "$(name)";
+      package_name_convention       => "$(name)";
+
+
+      # Homebrew can list only installed packages along versions.
+      # for a complete list of packages, we could use `brew search`, but there's no easy
+      # way to determine the version or wether it's installed.
+      package_installed_regex       => ".*";
+      package_list_command          => "$(darwin_knowledge.call_sudo) -u $(user) $(darwin_knowledge.call_brew) list --versions";
+      package_list_name_regex       => "$(darwin_knowledge.brew_name_regex)";
+      package_list_version_regex    => "$(darwin_knowledge.brew_version_regex)";
+      package_list_update_command   => "$(darwin_knowledge.call_sudo) -u $(user) $(darwin_knowledge.call_brew) update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+      
+      # brew list [package] will print the installed files and return 1 if not found.
+      package_verify_command        => "$(darwin_knowledge.call_sudo) -u $(user) $(darwin_knowledge.call_brew) list";
+      package_noverify_returncode   => "1";     
+
+      # remember to specify the package version
+      package_update_command        => "$(darwin_knowledge.call_sudo) -u $(user) $(darwin_knowledge.call_brew) upgrade"; 
+
+}
+
+
+
 body package_method zypper
 # @depends common_knowledge redhat_knowledge
 # @brief SuSE installation method
