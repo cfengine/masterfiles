@@ -54,6 +54,10 @@ bundle agent cfe_internal_management
       "hub" usebundle => cfe_internal_apache_sudoer,
       handle => "cfe_internal_management_apache_sudoer",
       comment => "Permit Apache user to run passwordless sudo cf-runagent";
+      
+      "hub" usebundle => cfe_internal_httpd_related,
+      handle => "cfe_internal_management_httpd_related",
+      comment => "To run MP on another TCP port (80 by default)";
 
     any::
 

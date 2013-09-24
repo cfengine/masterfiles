@@ -384,3 +384,96 @@ bundle agent cfe_internal_webserver(state)
       contain => in_shell;
       
 }
+
+##################################################################
+#
+# cfe_internal_httpd_related
+#  - to change default TCP (80) port of MP
+#
+##################################################################
+
+bundle agent cfe_internal_httpd_related
+{
+  vars:
+
+    am_policy_hub::
+
+      "tcp_port" string => "80",
+      comment => "TCP port that MP is using",
+      handle => "cfe_internal_httpd_related_vars_tcp_port";
+
+      #
+
+  files:
+
+    am_policy_hub::
+
+      "/var/cfengine/httpd/conf/httpd.conf" 
+      comment => "Change TCP port on CFEngine httpd configuration",
+      handle => "cfe_internal_httpd_related_files_httpd_conf",
+      edit_line => change_port("$(tcp_port)"),
+      classes => if_repaired("restart_cfe_httpd");
+
+      "/var/cfengine/httpd/htdocs/application/config/appsettings.php" 
+      comment => "Add TCP port to MP setting",
+      handle => "cfe_internal_httpd_related_files_appsettings_php",
+      edit_line => change_appsettings("$(tcp_port)");
+
+      #
+
+  commands:
+
+    restart_cfe_httpd::
+
+      "LD_LIBRARY_PATH=/var/cfengine/lib:$LD_LIBRARY_PATH /var/cfengine/httpd/bin/apachectl restart" 
+      comment => "Restart CFEngine httpd if there is a change on configuration",
+      handle => "cfe_internal_httpd_related_commands_apachectl_restart",
+      contain => in_shell;
+      
+}
+
+      #
+
+bundle edit_line change_port(p)
+{
+  replace_patterns:
+
+    any::
+
+      "^Listen(\s+)(?!$(p)).*" 
+      comment => "Match Listen line and replace",
+      handle => "cfe_internal_change_port_edit_line_listen_port",
+      replace_with => value("Listen $(p)");
+      
+}
+
+      #
+
+bundle edit_line change_appsettings(p)
+{
+  classes:
+
+    any::
+
+      "original_config" 
+      expression => strcmp("$(p)","80"),
+      comment => "If the port is 80 then create a class",
+      handle => "cfe_internal_change_appsettings_classes_port_80";
+
+      #
+
+  replace_patterns:
+
+    original_config::
+      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+\$_SERVER\['SERVER_NAME'\]\s+\.\s+'(?!/api).*" 
+      comment => "Match a line and replace",
+      handle => "cfe_internal_change_appsetting_replace_patterns_port_80",
+      replace_with => value("    $config['rest_server'] = $protocol . $_SERVER['SERVER_NAME'] . '/api';");
+
+    !original_config::
+      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+\$_SERVER\['SERVER_NAME'\]\s+\.\s+'(?!\:$(p)/api).*" 
+      comment => "Match a line and replace",
+      handle => "cfe_internal_change_appsetting_replace_patterns_not_port_80",
+      replace_with => value("    $config['rest_server'] = $protocol . $_SERVER['SERVER_NAME'] . ':$(p)/api';");
+      
+}
