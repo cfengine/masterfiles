@@ -188,7 +188,7 @@ bundle common paths
       "path[iptables]"      string => "/sbin/iptables";
       "path[iptables_save]" string => "/sbin/iptables-save";
       "path[ls]"            string => "/bin/ls";
-      "path[lsof]"          string => "/usr/sbin/lsof":
+      "path[lsof]"          string => "/usr/sbin/lsof";
       "path[netstat]"       string => "/bin/netstat";
       "path[ping]"          string => "/usr/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
@@ -211,6 +211,41 @@ bundle common paths
       "path[useradd]"   string => "/usr/sbin/useradd";
       "path[userdel]"   string => "/usr/sbin/userdel";
       "path[yum]"       string => "/usr/bin/yum";
+
+    darwin::
+      "path[awk]"           string => "/usr/bin/awk";
+      "path[bc]"            string => "/usr/bin/bc";
+      "path[cat]"           string => "/bin/cat";
+      "path[cksum]"         string => "/usr/bin/cksum";
+      "path[createrepo]"    string => "/usr/bin/createrepo";
+      "path[crontab]"       string => "/usr/bin/crontab";
+      "path[crontabs]"      string => "/usr/lib/cron/tabs";
+      "path[cut]"           string => "/usr/bin/cut";
+      "path[dc]"            string => "/usr/bin/dc";
+      "path[df]"            string => "/bin/df";
+      "path[diff]"          string => "/usr/bin/diff";
+      "path[dig]"           string => "/usr/bin/dig";
+      "path[domainname]"    string => "/bin/domainname";
+      "path[echo]"          string => "/bin/echo";
+      "path[egrep]"         string => "/usr/bin/egrep";
+      "path[find]"          string => "/usr/bin/find";
+      "path[grep]"          string => "/usr/bin/grep";
+      "path[hostname]"      string => "/bin/hostname";
+      "path[ls]"            string => "/bin/ls";
+      "path[lsof]"          string => "/usr/sbin/lsof";
+      "path[netstat]"       string => "/usr/sbin/netstat";
+      "path[ping]"          string => "/sbin/ping";
+      "path[perl]"          string => "/usr/bin/perl";
+      "path[printf]"        string => "/usr/bin/printf";
+      "path[sed]"           string => "/usr/bin/sed";
+      "path[sort]"          string => "/usr/bin/sort";
+      "path[sysctl]"        string => "/usr/sbin/sysctl";
+      "path[test]"          string => "/bin/test";
+      "path[tr]"            string => "/usr/bin/tr";
+
+      #
+      "path[brew]"           string => "/usr/local/bin/brew";
+      "path[sudo]"           string => "/usr/bin/sudo";
 
     debian::
 
@@ -238,7 +273,7 @@ bundle common paths
       "path[iptables]"      string => "/sbin/iptables";
       "path[iptables_save]" string => "/sbin/iptables-save";
       "path[ls]"            string => "/bin/ls";
-      "path[lsof]"          string => "/usr/bin/lsof":
+      "path[lsof]"          string => "/usr/bin/lsof";
       "path[netstat]"       string => "/bin/netstat";
       "path[ping]"          string => "/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
