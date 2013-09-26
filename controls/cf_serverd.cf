@@ -141,6 +141,8 @@ bundle server access_rules()
 body report_data_select default_data_select_host
 {
       variables_include => { "sys..*", "mon..*" };
+      variables_exclude => { "_.*" };
+      classes_exclude => { "_.*" };
       monitoring_include => { "cpu.*",
                               "mem_total",
                               "mem_free",
@@ -154,4 +156,6 @@ body report_data_select default_data_select_host
 body report_data_select default_data_select_policy_hub
 {
       variables_include => { "sys..*", "mon..*" };
+      variables_exclude => { "_.*" };
+      classes_exclude => { "_.*" };
 }
