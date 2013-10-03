@@ -73,6 +73,15 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_garbage_collection",
       comment => "Log rotate and tidy up CFE internal usage files";
 
+    cfengine_internal_rotate_logs::
+      # CFEngine generates internal log files that need to be rotated.
+      # Have a look at def.cf to enable rotation of these files
+      "rotate_promise_summary" usebundle => logrotate("@(def.cfe_log_files)", "1m", "10"),
+                               comment   => "Rotate log files once their size reach 1MB, keep 10 versions";
+
+      "rotate_outputs"         usebundle => prunedir("@(def.cfe_log_dirs)", "30"),
+                               comment   => "Delete outputs/* files older than 30 days";
+
 }
 
 ##################################################################
