@@ -1057,6 +1057,8 @@ body package_method pacman
       package_changes => "bulk";
 
       package_list_command => "/usr/bin/pacman -Q";
+      package_verify_command  => "/usr/bin/pacman -Q";
+      package_noverify_regex  => "error:\b.*\bwas not found";
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
@@ -1260,6 +1262,8 @@ body package_method generic
     archlinux::
       package_changes => "bulk";
       package_list_command => "/usr/bin/pacman -Q";
+      package_verify_command  => "/usr/bin/pacman -Q";
+      package_noverify_regex  => "error:\b.*\bwas not found";
       package_list_name_regex    => "(.*)\s+.*";
       package_list_version_regex => ".*\s+(.*)";
       package_installed_regex => ".*";
