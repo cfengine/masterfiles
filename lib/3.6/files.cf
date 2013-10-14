@@ -49,7 +49,7 @@
 
 body file control
 {
-      inputs => { "common.cf" };
+      inputs => { "$(sys.local_libdir)/common.cf" };
 }
 
 ###################################################
