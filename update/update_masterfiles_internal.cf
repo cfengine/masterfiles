@@ -1,0 +1,28 @@
+bundle agent update_from_repository
+{
+  vars:
+      "git" string => "/usr/bin/git";
+
+  commands:
+    am_policy_hub::
+
+      "$(git) fetch --all"
+      handle => "masterfiles_update_fetch",
+      contain => u_no_output;
+
+      "$(git) stash --include-untracked"
+      handle => "masterfiles_update_stash",
+      depends_on => { "masterfiles_update_fetch" },
+      contain => u_no_output;
+
+      "$(git) reset --hard origin/master"   # change to your branch
+      handle => "masterfiles_update_reset",
+      depends_on => { "masterfiles_update_stash" },
+      contain => u_no_output;
+}
+
+body contain u_no_output
+{
+      no_output => "true";
+      chdir => "$(sys.masterdir)";
+}
