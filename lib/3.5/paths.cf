@@ -60,6 +60,7 @@ bundle common paths
 
     any::
       "path[getfacl]"  string => "/usr/bin/getfacl";
+      "path[npm]"      string => "/usr/bin/npm";
 
     aix::
 
