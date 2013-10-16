@@ -14,7 +14,7 @@ installations and upgrades, and is used by CFEngine 3.6 and newer.
 * `controls`: configuration of components, e.g. the `cf-agent` or `cf-serverd`
 * `def.cf`: defaults you can and should configure
 * `lib`: main library directory.  You'll see `3.5` and `3.6` under it.
-* `libraries/cfengine_stdlib.cf`: old standard library (COPBL, used to be in https://github.com/cfengine/copl).  Do not use; only available for upgrading older clients.
+* `libraries/cfengine_stdlib.cf`: old standard library (COPBL, used to be in https://github.com/cfengine/copbl).  Do not use; only available for upgrading older clients.
 * `promises.cf`: main policy, you will need to configure this
 * `services`: your site's policies go here
 * `sketches`: Design Center installations use this; do not touch
@@ -22,4 +22,4 @@ installations and upgrades, and is used by CFEngine 3.6 and newer.
 
 ## Contributing
 
-Please see the [CONTRIBUTING.md](https://github.com/cfengine/core/blob/master/CONTRIBUTING.md) file.
+Please see the [CONTRIBUTING.md](https://github.com/cfengine/masterfiles/blob/master/CONTRIBUTING.md) file.
