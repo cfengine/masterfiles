@@ -135,6 +135,65 @@ bundle common darwin_knowledge
       "brew_version_regex" string => "[\S]+\s([\S]+)";
 }
 
+bundle common pip_knowledge
+# @depends paths
+# @brief Python `pip' knowledge bundle
+#
+# This common bundle has useful information about the Python `pip' package manager.
+{
+  vars:
+      "call_pip" string => "$(paths.path[pip])";
+
+      "pip_list_name_regex"    string => "^([[:alnum:]-_]+)\s\([\d.]+\)";
+      "pip_list_version_regex" string => "^[[:alnum:]-_]+\s\(([\d.]+)\)";
+      "pip_installed_regex"    string => "^([[:alnum:]-_]+\s\([\d.]+\))";
+}
+
+body package_method pip(flags)
+# @depends common_knowledge pip_knowledge
+# @brief Python `pip' package management
+#
+# `pip' is a package manager for Python
+# http://www.pip-installer.org/en/latest/
+#
+# Available commands : add, delete, (add)update, verify
+#
+# Note: "update" command preforms recursive upgrade (of dependencies) by
+# default. Set $flags to "--no-deps" to preform non-recursive upgrade.
+# http://www.pip-installer.org/en/latest/cookbook.html#non-recursive-upgrades
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "Django"              package_method => pip(""), package_policy => "add";
+#     "django-registration" package_method => pip(""), package_policy => "delete";
+#     "requests"            package_method => pip(""), package_policy => "verify";
+#
+# # Note: "Django" with a capital 'D' in the example above.
+# # Explicitly match the name of the package, capitalization does count!
+# # eg. pip search django | egrep "^Django\s+-"
+# #     Django - A high-level Python Web framework [..output trimmed..]
+# ```
+{
+      package_changes => "individual";
+
+      package_noverify_regex => "";
+
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      package_list_name_regex    => "$(pip_list_name_regex)";
+      package_list_version_regex => "$(pip_list_version_regex)";
+      package_installed_regex    => "$(pip_installed_regex)";
+
+      package_name_convention   => "$(name)";
+      package_delete_convention => "$(name)";
+
+      package_list_command   => "$(paths.path[pip]) list $(flags)";
+      package_verify_command => "$(paths.path[pip]) show $(flags)";
+      package_add_command    => "$(paths.path[pip]) install $(flags)";
+      package_delete_command => "$(paths.path[pip]) uninstall --yes $(flags)";
+      package_update_command => "$(paths.path[pip]) install --upgrade $(flags)";
+}
 
 body package_method brew(user)
 # @depends common_knowledge darwin_knowledge
