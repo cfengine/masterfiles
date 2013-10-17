@@ -743,9 +743,55 @@ bundle edit_line replace_or_add(pattern,line)
       ifvarclass => "replace_done_$(cline)";
 }
 
+bundle edit_line fstab_option_editor(method, mount, option)
+# @brief Add or remove /etc/fstab options for a mount
+# @params method `field_operation` to apply
+# @params mount the mount point
+# @params option the option to add or remove
+#
+# This bundle edits the options field of a mount.  The `method` is a
+# `field_operation` which can be `append`, `prepend`, `set`, `delete`,
+# or `alphanum`.  The option is OS-specific.
+#
+# **Example:**
+# ```cf3
+#  files:
+#      "/etc/fstab" edit_line => fstab_option_editor("delete", "/", "acl");
+#      "/etc/fstab" edit_line => fstab_option_editor("append", "/", "acl");
+# ```
+{
+   field_edits:
+      "(?!#)\S+\s+$(mount)\s.+"
+      edit_field => fstab_options($(option), $(method));
+}
+
 ##-------------------------------------------------------
 ## editing bodies
 ##-------------------------------------------------------
+
+body edit_field fstab_options(newval, method)
+# @brief Edit the options field in a fstab format
+# @params newval the new option
+# @params method `field_operation` to apply
+#
+# This body edits the options field in the fstab file format.  The
+# `method` is a `field_operation` which can be `append`, `prepend`,
+# `set`, `delete`, or `alphanum`.  The `newval` option is OS-specific.
+#
+# **Example:**
+# ```cf3
+#   # from the `fstab_options_editor`
+#   field_edits:
+#      "(?!#)\S+\s+$(mount)\s.+"
+#      edit_field => fstab_options($(option), $(method));
+# ```
+{
+      field_separator => "\s+";
+      select_field    => "4";
+      value_separator  => ",";
+      field_value     => "$(newval)";
+      field_operation => "$(method)";
+}
 
 body edit_field quoted_var(newval,method)
 {
@@ -783,6 +829,7 @@ body edit_field line(split,col,newval,method)
       extend_fields      => "true";
       allow_blank_fields => "true";
 }
+
 
 ##
 
