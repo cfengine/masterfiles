@@ -522,7 +522,7 @@ bundle edit_line set_config_values(v)
       "ev[$(index)]" string => escape("$($(v)[$(index)])");
 
       # Do we have more than one line commented out?
-      "index_comment_matches_$(cindex[$(index)])" int => countlinesmatching("^\s*#\s*$(index)\s+.*$","$(edit.filename)");
+      "index_comment_matches_$(cindex[$(index)])" int => countlinesmatching("^\s*#\s*($(index)\s+.*|$(index))$","$(edit.filename)");
 
 
   classes:
@@ -534,20 +534,20 @@ bundle edit_line set_config_values(v)
 
 
   replace_patterns:
-      # If the line is there with the wrong value, replace with
-      # the correct value
-      "^\s*($(index)\s+(?!$(ev[$(index)])$)|$(index)).*$"
-           comment => "Correct the value $(index)",
-      replace_with => value("$(index) $($(v)[$(index)])"),
-           classes => always("replace_attempted_$(cindex[$(index)])");
-
       # If the line is commented out, uncomment and replace with
       # the correct value
-      "^\s*#\s*$(index)\s+.*$"
+      "^\s*#\s*($(index)\s+.*|$(index))$"
              comment => "Uncommented the value $(index)",
         replace_with => value("$(index) $($(v)[$(index)])"),
           ifvarclass => "!line_exists_$(cindex[$(index)]).!replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])",
              classes => always("uncommented_$(cindex[$(index)])");
+      
+      # If the line is there with the wrong value, replace with
+      # the correct value
+      "^\s*($(index)\s+(?!$(ev[$(index)])$).*|$(index))$"
+           comment => "Correct the value $(index)",
+      replace_with => value("$(index) $($(v)[$(index)])"),
+           classes => always("replace_attempted_$(cindex[$(index)])");
 
   insert_lines:
       # If the line doesn't exist, or there is more than one occurance
@@ -563,6 +563,20 @@ bundle edit_line set_config_values(v)
       "$(index) $($(v)[$(index)])"
          comment => "Insert the value, marker doesn't exist $(index)",
       ifvarclass => "replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])";
+
+  reports:
+      linux::
+        "line exists $(cindex[$(index)])"
+          ifvarclass => "line_exists_$(cindex[$(index)])";
+
+        "multiple comments $(cindex[$(index)]), foung $(index_comment_matches_$(cindex[$(index)]))"
+          ifvarclass => "multiple_comments_$(cindex[$(index)])";
+
+        "replace attempted $(cindex[$(index)])"
+          ifvarclass => "replace_attempted_$(cindex[$(index)])";
+
+        "uncommented $(cindex[$(index)])"
+          ifvarclass => "uncommented_$(cindex[$(index)])";
 
 }
 
