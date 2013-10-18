@@ -550,7 +550,7 @@ bundle edit_line set_config_values(v)
       # after the commented LHS (keep new line with old comments)
       "$(index) $($(v)[$(index)])"
          comment => "Insert the value, marker exists $(index)",
-        location => after("^\s*#\s*$(index)\s+.*$"),
+        location => after("^\s*#\s*($(index)\s+.*|$(index))$"),
       ifvarclass => "replace_attempted_$(cindex[$(index)]).multiple_comments_$(cindex[$(index)])";
 
       # If the line doesn't exist and there are no occurances
