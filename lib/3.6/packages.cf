@@ -135,6 +135,104 @@ bundle common darwin_knowledge
       "brew_version_regex" string => "[\S]+\s([\S]+)";
 }
 
+bundle common npm_knowledge
+# @depends paths
+# @brief Node.js `npm' knowledge bundle
+#
+# This common bundle has useful information about the Node.js `npm' package manager.
+{
+  vars:
+      "call_npm" string => "$(paths.path[npm])";
+
+      "npm_list_name_regex"    string => "^[^ /]+ ([\w\d-._~]+)@[\d.]+";
+      "npm_list_version_regex" string => "^[^ /]+ [\w\d-._~]+@([\d.]+)";
+      "npm_installed_regex"    string => "^[^ /]+ ([\w\d-._~]+@[\d.]+)";
+}
+
+body package_method npm(dir)
+# @depends common_knowledge npm_knowledge
+# @brief Node.js `npm' local-mode package management
+#
+# `npm' is a package manager for Node.js
+# https://npmjs.org/package/npm
+#
+# $(dir) is the prefix path to ./node_modules/
+#
+# For the difference between local and global install see here:
+# https://npmjs.org/doc/cli/npm-install.html
+#
+# Available commands : add, delete, (add)update, verify
+#
+# **Example:**
+# ```cf3
+# vars:
+#     "dirs"    slist => { "/root/myproject", "/home/somedev/someproject" };
+#
+# packages:
+#     "express"              package_method => npm("$(dirs)"), package_policy => "add";
+#     "redis"                package_method => npm("$(dirs)"), package_policy => "delete";
+#     "mongoose-amqp-plugin" package_method => npm("$(dirs)"), package_policy => "verify";
+# ```
+{
+      package_changes => "individual";
+
+      package_noverify_regex => "";
+
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      package_list_name_regex    => "$(npm_knowledge.npm_list_name_regex)";
+      package_list_version_regex => "$(npm_knowledge.npm_list_version_regex)";
+      package_installed_regex    => "$(npm_knowledge.npm_installed_regex)";
+
+      package_name_convention   => "$(name)";
+      package_delete_convention => "$(name)";
+
+      package_list_command   => "$(npm_knowledge.call_npm) list --prefix $(dir)";
+      package_verify_command => "$(npm_knowledge.call_npm) list --prefix $(dir)";
+      package_add_command    => "$(npm_knowledge.call_npm) install --prefix $(dir)";
+      package_delete_command => "$(npm_knowledge.call_npm) remove --prefix $(dir)";
+      package_update_command => "$(npm_knowledge.call_npm) update --prefix $(dir)";
+}
+
+body package_method npm_g
+# @depends common_knowledge npm_knowledge
+# @brief Node.js `npm' global-mode package management
+#
+# `npm' is a package manager for Node.js
+# https://npmjs.org/package/npm
+#
+# For the difference between global and local install see here:
+# https://npmjs.org/doc/cli/npm-install.html
+#
+# Available commands : add, delete, (add)update, verify
+#
+# **Example:**
+# ```cf3
+# packages:
+#     "express"              package_method => npm_g, package_policy => "add";
+#     "redis"                package_method => npm_g, package_policy => "delete";
+#     "mongoose-amqp-plugin" package_method => npm_g, package_policy => "verify";
+# ```
+{
+      package_changes => "individual";
+
+      package_noverify_regex => "";
+
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      package_list_name_regex    => "$(npm_knowledge.npm_list_name_regex)";
+      package_list_version_regex => "$(npm_knowledge.npm_list_version_regex)";
+      package_installed_regex    => "$(npm_knowledge.npm_installed_regex)";
+
+      package_name_convention   => "$(name)";
+      package_delete_convention => "$(name)";
+
+      package_list_command   => "$(npm_knowledge.call_npm) list --global";
+      package_verify_command => "$(npm_knowledge.call_npm) list --global";
+      package_add_command    => "$(npm_knowledge.call_npm) install --global";
+      package_delete_command => "$(npm_knowledge.call_npm) remove --global";
+      package_update_command => "$(npm_knowledge.call_npm) update --global";
+}
 
 body package_method brew(user)
 # @depends common_knowledge darwin_knowledge
