@@ -527,7 +527,7 @@ bundle edit_line set_config_values(v)
 
   classes:
       # Check to see if this line exists
-      "line_exists_$(cindex[$(index)])" expression => regline("^\s*$(index)\s.*","$(edit.filename)");
+      "line_exists_$(cindex[$(index)])" expression => regline("^\s*($(index)\s.*|$(index))$","$(edit.filename)");
 
       # if there's more than one comment, just add new (don't know who to use)
       "multiple_comments_$(cindex[$(index)])" expression => isgreaterthan("$(index_comment_matches_$(cindex[$(index)]))","1");
