@@ -506,7 +506,7 @@ bundle edit_line set_variable_values(v)
 bundle edit_line set_config_values(v)
 
 # Sets the RHS of configuration items in the file of the form
-#   LHS RHS
+# LHS RHS
 # If the line is commented out with #, it gets uncommented first.
 # Adds a new line if none exists.
 # The argument is the fully-qualified name of an associative array containing v[LHS]="rhs"
@@ -520,7 +520,7 @@ bundle edit_line set_config_values(v)
 
       # Escape the value (had a problem with special characters and regex's)
       "ev[$(index)]" string => escape("$($(v)[$(index)])");
-      
+
       # Do we have more than one line commented out?
       "index_comment_matches_$(cindex[$(index)])" int => countlinesmatching("^\s*#\s*$(index)\s+.*$","$(edit.filename)");
 
@@ -536,10 +536,9 @@ bundle edit_line set_config_values(v)
   replace_patterns:
       # If the line is there with the wrong value, replace with
       # the correct value
-      "^\s*$(index)\s+(?!$(ev[$(index)])$).*$"
+      "^\s*($(index)\s+(?!$(ev[$(index)])$)|$(index)).*$"
            comment => "Correct the value $(index)",
       replace_with => value("$(index) $($(v)[$(index)])"),
-        ifvarclass => "uncommented_$(cindex[$(index)])|multiple_comments_$(cindex[$(index)])|line_exists_$(cindex[$(index)])",
            classes => always("replace_attempted_$(cindex[$(index)])");
 
       # If the line is commented out, uncomment and replace with
@@ -552,19 +551,18 @@ bundle edit_line set_config_values(v)
 
   insert_lines:
       # If the line doesn't exist, or there is more than one occurance
-      # of the LHS commented out, insert a new line and try to place it 
+      # of the LHS commented out, insert a new line and try to place it
       # after the commented LHS (keep new line with old comments)
       "$(index) $($(v)[$(index)])"
-         comment => "Insert the value $(index)",
+         comment => "Insert the value, marker exists $(index)",
         location => after("^\s*#\s*$(index)\s+.*$"),
       ifvarclass => "replace_attempted_$(cindex[$(index)]).multiple_comments_$(cindex[$(index)])";
-      
-      # If the line doesn't exist and there are no occurances 
+
+      # If the line doesn't exist and there are no occurances
       # of the LHS commented out, insert a new line at the eof
       "$(index) $($(v)[$(index)])"
-         comment => "Insert the value $(index)",
+         comment => "Insert the value, marker doesn't exist $(index)",
       ifvarclass => "replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])";
-
 
 }
 
