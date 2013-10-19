@@ -302,7 +302,6 @@ bundle common paths
       "path[update_rc_d]"         string => "/usr/sbin/update-rc.d";
       "path[useradd]"             string => "/usr/sbin/useradd";
 
-
     any::
       "all_paths"     slist => getindices("path");
       "$(all_paths)" string => "$(path[$(all_paths)])";

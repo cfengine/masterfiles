@@ -146,7 +146,6 @@ body action sample_rate(x)
 ## classes
 ##-------------------------------------------------------
 
-
 body classes if_repaired(x)
 {
       promise_repaired => { "$(x)" };
@@ -269,4 +268,3 @@ body classes always(x)
       repair_denied => { "$(x)" };
       repair_timeout => { "$(x)" };
 }
-

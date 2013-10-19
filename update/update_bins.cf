@@ -302,7 +302,6 @@ body package_method u_generic(repo)
       package_delete_command     => "/usr/bin/dpkg --purge";
       package_update_command     => "/usr/bin/dpkg --force-confdef --force-confnew --install";
 
-
     redhat|SuSE::
 
       package_changes => "individual";
@@ -346,7 +345,6 @@ body package_method u_generic(repo)
       package_update_command     => "\"$(sys.winsysdir)\msiexec.exe\" /qn /i";
       package_delete_command     => "\"$(sys.winsysdir)\msiexec.exe\" /qn /x";
 
-
     freebsd::
 
       package_changes => "individual";
@@ -355,7 +353,6 @@ body package_method u_generic(repo)
 
       package_list_update_command => "/usr/bin/true";
       package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
-
 
       package_list_name_regex    => "^(\S+)-(\d+\.?)+";
       package_list_version_regex => "^\S+-((\d+\.?)+\_\d)";
@@ -378,7 +375,6 @@ body package_method u_generic(repo)
 
       package_list_update_command => "/usr/bin/true";
       package_list_update_ifelapsed => "$(u_common_knowledge.list_update_ifelapsed_now)";
-
 
       package_list_name_regex    => "^(\S+)-(\d+\.?)+";
       package_list_version_regex => "^\S+-((\d+\.?)+\nb\d)";

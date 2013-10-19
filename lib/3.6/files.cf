@@ -830,7 +830,6 @@ body edit_field line(split,col,newval,method)
       allow_blank_fields => "true";
 }
 
-
 ##
 
 body replace_with value(x)
@@ -907,7 +906,6 @@ body location before(str)
       before_after => "before";
       select_line_matching => "$(str)";
 }
-
 
 ##-------------------------------------------------------
 ## replace_with

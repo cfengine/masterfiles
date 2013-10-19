@@ -1,7 +1,4 @@
-
-
 # environment common bundles
-
 
 # activation data
 bundle common cfsketch_g
@@ -16,13 +13,9 @@ bundle agent cfsketch_run
 {
   vars:
 
-
-
   methods:
     any::
       "cfsketch_g" usebundle => "cfsketch_g";
-
-
 
   reports:
     cfengine::

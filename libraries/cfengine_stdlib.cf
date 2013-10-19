@@ -748,8 +748,6 @@ bundle agent cronjob(commands,user,hours,mins)
 
 }
 
-
-
 ##-------------------------------------------------------
 ## editing bodies
 ##-------------------------------------------------------
@@ -867,7 +865,6 @@ body location before(str)
       before_after => "before";
       select_line_matching => "$(str)";
 }
-
 
 ##-------------------------------------------------------
 ## replace_with
@@ -1093,11 +1090,9 @@ body contain setuid_umask(uid, umask)
       umask => "$(umask)";
 }
 
-
 ##-------------------------------------------------------
 ## classes
 ##-------------------------------------------------------
-
 
 body classes if_repaired(x)
 {
@@ -1214,7 +1209,6 @@ body classes always(x)
 ###################################################
 # agent bundles
 ###################################################
-
 
 ##..................................................
 ## files promises
@@ -2238,7 +2232,6 @@ body package_method rpm_filebased(path)
 
       package_installed_regex => ".*";
 
-
       package_delete_command => "/bin/rpm -e --allmatches";
       package_verify_command => "/bin/rpm -V";
 }
@@ -2400,7 +2393,6 @@ body package_method freebsd
       package_installed_regex => ".*";
 
       package_name_convention => "$(name)-$(version)";
-
 
       package_add_command => "/usr/sbin/pkg_add -r";
       package_delete_command => "/usr/sbin/pkg_delete";
@@ -2736,7 +2728,6 @@ body mount nfs(server,source)
       mount_server => "$(server)";
       edit_fstab => "true";
 }
-
 
 ##
 
@@ -3434,7 +3425,6 @@ bundle agent standard_services(service,state)
       "stopcommand[snmpd]"    string => "/etc/init.d/snmpd stop";
       "pattern[snmpd]"        string => "/usr/sbin/snmpd";
 
-
       # METHODS that implement these ............................................
 
   classes:
@@ -3484,7 +3474,6 @@ bundle agent standard_services(service,state)
 
       comment => "Execute command to reload the $(service) service";
 }
-
 
 ##-------------------------------------------------------
 ## database promises
@@ -3548,7 +3537,6 @@ body environment_resources kvm(name, arch, cpu_count, mem_kb, disk_file)
 </domain>";
 }
 
-
 ####################################################
 ## monitor bodyparts
 ####################################################
@@ -3590,7 +3578,6 @@ body action sample_rate(x)
       ifelapsed => "$(x)";
       expireafter => "10";
 }
-
 
 bundle common paths
 # In addition to defining common paths, this bundle also defines context
@@ -3807,7 +3794,6 @@ bundle common paths
       "path[update_alternatives]" string => "/usr/bin/update-alternatives";
       "path[update_rc_d]"         string => "/usr/sbin/update-rc.d";
       "path[useradd]"             string => "/usr/sbin/useradd";
-
 
     any::
       "all_paths"     slist => getindices("path");

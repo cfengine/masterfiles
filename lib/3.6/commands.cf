@@ -47,7 +47,6 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
-
 ##-------------------------------------------------------
 ## contain
 ##-------------------------------------------------------
@@ -164,5 +163,3 @@ body contain setuid_umask(uid, umask)
       exec_owner => "$(uid)";
       umask => "$(umask)";
 }
-
-

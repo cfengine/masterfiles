@@ -118,7 +118,6 @@ bundle server access_rules()
       report_data_select => default_data_select_policy_hub,
       admit => { "$(sys.policy_hub)" };
 
-
       # Uncomment the promise below to allow cf-runagent to
       # access cf-agent on Windows machines
       #
@@ -127,7 +126,6 @@ bundle server access_rules()
       #    handle => "grant_access_policy_agent",
       #    comment => "Grant access to the agent (for cf-runagent)",
       #    admit   => { ".*$(def.domain)", @(def.acl) };
-
 
   roles:
 

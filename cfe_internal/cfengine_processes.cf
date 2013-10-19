@@ -1,6 +1,6 @@
 ##################################################################
 #
-# cfe_internal_processes 
+# cfe_internal_processes
 # - restart CFE processes by specific time (not in service)
 #
 ##################################################################
@@ -9,13 +9,13 @@ bundle agent cfe_internal_processes
 {
   vars:
 
-      "cf_components"   slist => { 
-				   "cf-key", 
-				   "cf-monitord", 
+      "cf_components"   slist => {
+				   "cf-key",
+				   "cf-monitord",
 				   "cf-promises",
-				   "cf-runagent", 
-				   "cf-serverd", 
-				   "cf-hub" 
+				   "cf-runagent",
+				   "cf-serverd",
+				   "cf-hub"
       },
       comment => "Define all cfengine robot agents",
       handle => "cfe_internal_processes_vars_cf_components";
@@ -46,7 +46,7 @@ bundle agent cfe_internal_processes
 
     restart_cf::
 
-      "$(cf_components)" 
+      "$(cf_components)"
 
       signals => { "$(stop_signal)" },
       comment => "Kill cfengine processes",
@@ -54,7 +54,7 @@ bundle agent cfe_internal_processes
 
     restart_cf.!windows::
 
-      "cf-execd"  
+      "cf-execd"
       signals => { "$(stop_signal)" },
       comment => "Kill cf-execd process on *NIX",
       handle => "cfe_internal_processes_stop_cf_execd";
@@ -90,7 +90,7 @@ bundle agent cfe_internal_processes
   reports:
 
     restart_cf::
-      
+
       "Reloaded configuration of all Cfengine components",
       comment => "Alert restarting message",
       handle => "cfe_internal_processes_reports";
@@ -99,7 +99,7 @@ bundle agent cfe_internal_processes
 
 ##################################################################
 #
-# cfe_internal_enable 
+# cfe_internal_enable
 # - start CFE agents when booting (not in service)
 #
 ##################################################################
@@ -119,7 +119,7 @@ bundle agent cfe_internal_enable
       "rc_conf[cfengine_enable]"  string => "\"YES\"",
       comment => "Define a variable to start cfengine at boot time",
       handle => "cfe_internal_enable_vars_rc_conf_netbsd";
-      
+
     linux::
 
       "rc_files"   slist => {
@@ -134,7 +134,7 @@ bundle agent cfe_internal_enable
       handle => "cfe_internal_enable_vars_rc_files";
 
       #
-      
+
   files:
 
     freebsd::
@@ -143,7 +143,7 @@ bundle agent cfe_internal_enable
       comment => "Ensure that the cfengine rc.d script is executable",
       handle => "cfe_internal_enable_files_cfengine3_sh_freebsd",
       perms => mog("755", "root", "wheel");
-      
+
       "/etc/rc.conf"
       comment => "cfengine libraries should be enabled in rc.conf if appropriate",
       handle => "cfe_internal_enable_files_rc_conf_freebsd_1",
@@ -181,7 +181,7 @@ bundle agent cfe_internal_enable
 
 ##################################################################
 #
-# cfe_internal_build_software_report 
+# cfe_internal_build_software_report
 # - force machines to have package promises to be able to generate
 #   software reports (not in service)
 #

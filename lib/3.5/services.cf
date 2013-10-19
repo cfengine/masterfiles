@@ -732,7 +732,6 @@ bundle agent standard_services(service,state)
       "stopcommand[omsa-dataeng]"    string => "/etc/init.d/dataeng stop";
       "pattern[omsa-dataeng]"        string => ".*dsm_sa_datamgr.*";
 
-
       # METHODS that implement these ............................................
 
   classes:
@@ -782,4 +781,3 @@ bundle agent standard_services(service,state)
 
       comment => "Execute command to reload the $(service) service";
 }
-

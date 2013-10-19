@@ -17,19 +17,18 @@ bundle agent change_management
       #                          "$(sys.windir)\important.txt",
       #                          "$(sys.windir)\important2.txt"
       #                          };
-      
+
       #  "watch_dirs" slist =>   {
       #                          "$(sys.workdir)\watch"
-      #                          };						  
+      #                          };
 
-      
     linux::
 
       "watch_files" slist =>  {
-				"/etc/passwd", 
-				"/etc/shadow", 
-				"/etc/group", 
-				"/etc/services" 
+				"/etc/passwd",
+				"/etc/shadow",
+				"/etc/group",
+				"/etc/services"
       },
       comment => "Define a list of files to be watched by cfengine",
       handle => "change_management_vars_watch_files";
@@ -46,14 +45,12 @@ bundle agent change_management
       comment => "Change detection on important files",
       handle => "change_management_files_watch_files",
       changes => diff;
-      
-      
+
       #   "$(watch_dirs)"  -> "goal_infosec"
       #      comment      => "Change detection on important directories",
       #      pathtype     => "literal",
       #      changes      => detect_all_change,
       #      depth_search => recurse("inf");
-
 
       #######################################################################
       # Redundant cross monitoring for strong `tripwire' ...............
@@ -65,6 +62,4 @@ bundle agent change_management
       #   copy_from => remote_cp("$(sys.workdir)/checksum_digests.db","$(neighbours)"),
       #      action => neighbourwatch("File hash changes observed on $(neighbours) (neighbourhood watch)");
 
-
 }
-

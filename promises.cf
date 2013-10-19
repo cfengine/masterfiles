@@ -67,8 +67,6 @@ body common control
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 }
 
-
-
 bundle common cfengine_stdlib
 {
   vars:
@@ -120,7 +118,7 @@ bundle common cfengine_stdlib
 
 bundle agent service_catalogue
 
-{							 
+{
 
   methods:
 

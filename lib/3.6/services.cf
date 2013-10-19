@@ -392,7 +392,6 @@ bundle agent standard_services(service,state)
       restart_class => "start_$(service)",
       ifvarclass => and(isvariable("pattern[$(service)]"));
 
-
       "$(default[pattern])" ->  { "@(stakeholders[$(service)])" }
 
       comment => "Verify that the service appears in the process table",
@@ -409,7 +408,6 @@ bundle agent standard_services(service,state)
       ifvarclass => and(isvariable("stopcommand[$(service)]"),
                         isvariable("pattern[$(service)]"));
 
-
       "$(default[pattern])" -> { "@(stakeholders[$(service)])" }
 
       comment => "Verify that the service does not appear in the process",
@@ -417,7 +415,6 @@ bundle agent standard_services(service,state)
       signals => { "term", "kill"},
       ifvarclass => and(isvariable("stopcommand[$(service)]"),
                         not(isvariable("pattern[$(service)]")));
-
 
       "$(pattern[$(service)])" -> { "@(stakeholders[$(service)])" }
 
@@ -428,7 +425,6 @@ bundle agent standard_services(service,state)
                         isvariable("baseinit[$(service)]"),
                         isvariable("pattern[$(service)]"),
                         "no_inits_set");
-
 
       "$(pattern[$(service)])" -> { "@(stakeholders[$(service)])" }
 
@@ -450,7 +446,6 @@ bundle agent standard_services(service,state)
                         isvariable("baseinit[$(service)]"),
                         not(isvariable("pattern[$(service)]")),
                         "no_inits_set");
-
 
       "$(default[pattern])" -> { "@(stakeholders[$(service)])" }
 
@@ -472,7 +467,6 @@ bundle agent standard_services(service,state)
                         not(isvariable("baseinit[$(service)]")),
                         isvariable("pattern[$(service)]"),
                         "no_inits_set");
-
 
       "$(pattern[$(service)])" -> { "@(stakeholders[$(service)])" }
 
@@ -494,7 +488,6 @@ bundle agent standard_services(service,state)
                         not(isvariable("baseinit[$(service)]")),
                         not(isvariable("pattern[$(service)]")),
                         "no_inits_set");
-
 
       "$(default[pattern])" -> { "@(stakeholders[$(service)])" }
 

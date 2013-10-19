@@ -78,7 +78,6 @@ bundle agent cfe_internal_update_processes
       comment => "Call a bundle to maintain CFEngine on Windows",
       handle => "cfe_internal_update_processes_methods_maintain_windows";
 
-
   reports:
       "The process $(all_agents) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it or move it to the agents_to_be_disabled list if you want it permanently disabled."
       ifvarclass => canonify("persistent_disable_$(all_agents)");

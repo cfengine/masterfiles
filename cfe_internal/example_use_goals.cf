@@ -2,7 +2,7 @@
 #
 # bundle agent example_use_goals
 #  - Below is a collection of how goals can be used as promisees to document
-#    intent and stakeholders. The goals are defined in 
+#    intent and stakeholders. The goals are defined in
 #           /var/cfengine/share/KnowledgeBase/goals.cf
 #
 ###############################################################################
@@ -47,4 +47,3 @@ bundle agent example_use_goals
       handle => "example_use_goals_commands_vmware_test_usr_bin_vmware_cmd";
 
 }
-

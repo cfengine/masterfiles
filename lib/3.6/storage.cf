@@ -69,7 +69,6 @@ body mount nfs(server,source)
       edit_fstab => "true";
 }
 
-
 ##
 
 body mount nfs_p(server,source,perm)
