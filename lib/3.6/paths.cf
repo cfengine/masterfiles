@@ -88,6 +88,52 @@ bundle common paths
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
 
+    archlinux::
+
+      "path[awk]"               string => "/usr/bin/awk";
+      "path[bc]"                string => "/usr/bin/bc";
+      "path[cat]"               string => "/usr/bin/cat";
+      "path[cksum]"             string => "/usr/bin/cksum";
+      "path[crontab]"           string => "/usr/bin/crontab";
+      "path[cut]"               string => "/usr/bin/cut";
+      "path[dc]"                string => "/usr/bin/dc";
+      "path[df]"                string => "/usr/bin/df";
+      "path[diff]"              string => "/usr/bin/diff";
+      "path[dig]"               string => "/usr/bin/dig";
+      "path[dmidecode]"         string => "/usr/bin/dmidecode";
+      "path[echo]"              string => "/usr/bin/echo";
+      "path[egrep]"             string => "/usr/bin/egrep";
+      "path[find]"              string => "/usr/bin/find";
+      "path[free]"              string => "/usr/bin/free";
+      "path[grep]"              string => "/usr/bin/grep";
+      "path[hostname]"          string => "/usr/bin/hostname";
+      "path[init]"              string => "/usr/bin/init";
+      "path[iptables]"          string => "/usr/bin/iptables";
+      "path[iptables_save]"     string => "/usr/bin/iptables-save";
+      "path[iptables_restore]"  string => "/usr/bin/iptables-restore";
+      "path[ls]"                string => "/usr/bin/ls";
+      "path[lsof]"              string => "/usr/bin/lsof";
+      "path[netstat]"           string => "/usr/bin/netstat";
+      "path[ping]"              string => "/usr/bin/ping";
+      "path[perl]"              string => "/usr/bin/perl";
+      "path[printf]"            string => "/usr/bin/printf";
+      "path[sed]"               string => "/usr/bin/sed";
+      "path[sort]"              string => "/usr/bin/sort";
+      "path[sysctl]"            string => "/usr/bin/sysctl";
+      "path[test]"              string => "/usr/bin/test";
+      "path[top]"               string => "/usr/bin/top";
+      "path[tr]"                string => "/usr/bin/tr";
+      #
+      "path[pacman]"            string => "/usr/bin/pacman";
+      "path[yaourt]"            string => "/usr/bin/yaourt";
+      "path[useradd]"           string => "/usr/bin/useradd";
+      "path[groupadd]"          string => "/usr/bin/groupadd";
+      "path[ip]"                string => "/usr/bin/ip";
+      "path[ifconfig]"          string => "/usr/bin/ifconfig";
+      "path[journalctl]"        string => "/usr/bin/journalctl";
+      "path[systemctl]"         string => "/usr/bin/systemctl";
+      "path[netctl]"            string => "/usr/bin/netctl";
+
     freebsd|netbsd::
 
       "path[awk]"      string => "/usr/bin/awk";
