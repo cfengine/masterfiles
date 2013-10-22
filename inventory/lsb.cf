@@ -4,28 +4,33 @@ bundle common inventory_lsb
 # This common bundle is for LSB inventory work.
 {
   classes:
-      "have_lsb" expression => fileexists($(lsb_exec));
+      "_have_lsb_exec" expression => fileexists($(lsb_exec));
+      "_inventory_lsb" and => { "!disable_lsb", "_have_lsb_exec" };
 
-    have_lsb::
-      "lsb_$(lsb_items[$(lsb_ikeys)][0])_$(lsb_items[$(lsb_ikeys)][1])" expression => "any";
+    _inventory_lsb::
+      "lsb_$(lsb[Distributor ID])_$(lsb[Release])" expression => "any";
 
   vars:
       "lsb_exec" string => "/usr/bin/lsb_release";
-    have_lsb::
-      "lsb_output" string => execresult("$(lsb_exec) -a", "noshell");
-      "lsb_dim" int => parsestringarrayidx(
-                                            "lsb_items",
-                                            $(lsb_output),
-                                            "\s*#[^\n]*",
-                                            "\s*:\s*",
-                                            "50",
-                                            "2000"
+    _inventory_lsb::
+      "_lsb_output" string => execresult("$(lsb_exec) -a", "noshell");
+      "_lsb_dim" int => parsestringarrayidx(
+                                             "lsb_items",
+                                             $(_lsb_output),
+                                             "\s*#[^\n]*",
+                                             "\s*:\s*",
+                                             "50",
+                                             "2000"
       );
 
-      "lsb_ikeys" slist => getindices("lsb_items");
+      "_lsb_ikeys" slist => getindices("lsb_items");
+
+      "lsb[$(lsb_items[$(_lsb_ikeys)][0])]" string => "$(lsb_items[$(_lsb_ikeys)][1])";
+      "lsb_keys" slist => getindices("lsb");
 
   reports:
-    inform_mode::
-      "$(this.bundle): read LSB key $(lsb_items[$(lsb_ikeys)][0]) = '$(lsb_items[$(lsb_ikeys)][1])'";
-      "$(this.bundle): read LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)])'";
+    verbose_mode._inventory_lsb::
+      "$(this.bundle): read LSB key $(lsb_items[$(_lsb_ikeys)][0]) = '$(lsb_items[$(_lsb_ikeys)][1])'";
+    inform_mode._inventory_lsb::
+      "$(this.bundle): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)])'";
 }

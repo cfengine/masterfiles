@@ -1,3 +1,21 @@
+bundle common inventory_control
+# @brief Inventory control bundle
+#
+# This common bundle is for controlling whether some inventory bundles
+# are disabled.
+{
+  classes:
+      "disable_inventory" expression => "!any";
+      # disable specific inventory modules here
+      "disable_lsb" expression => "disable_inventory";
+
+  reports:
+    verbose_mode.disable_inventory::
+      "$(this.bundle): All inventory modules disabled";
+    verbose_mode.!disable_lsb::
+      "$(this.bundle): LSB module enabled";
+}
+
 bundle common inventory_any
 # @brief Do inventory for any OS
 #
