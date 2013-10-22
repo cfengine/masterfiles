@@ -24,6 +24,7 @@ body common control
       };
 
       inputs => {
+                  @(inventory.inputs),
 
                   # File definition for global variables and classes
 		  "def.cf",
@@ -65,6 +66,24 @@ body common control
 
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
+}
+
+bundle common inventory
+# @brief Set up inventory inputs
+#
+# This bundle creates the inputs for inventory bundles.
+#
+# Inventory bundles are simply common bundles loaded before anything
+# else in promises.cf
+{
+  vars:
+      # This list is intended to grow as needed
+    debian::
+      "inputs" slist => { "inventory/any.cf", "inventory/debian.cf" };
+    redhat::
+      "inputs" slist => { "inventory/any.cf", "inventory/redhat.cf" };
+    !debian.!redhat::
+      "inputs" slist => { "inventory/any.cf", "inventory/generic.cf" };
 }
 
 bundle common cfengine_stdlib
