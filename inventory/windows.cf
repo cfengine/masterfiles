@@ -1,0 +1,6 @@
+bundle common inventory_windows
+# @brief Windows inventory bundle
+#
+# This common bundle is for Windows inventory work.
+{
+}

@@ -1,0 +1,31 @@
+bundle common inventory_lsb
+# @brief LSB inventory bundle
+#
+# This common bundle is for LSB inventory work.
+{
+  classes:
+      "have_lsb" expression => fileexists($(lsb_exec));
+
+    have_lsb::
+      "lsb_$(lsb_items[$(lsb_ikeys)][0])_$(lsb_items[$(lsb_ikeys)][1])" expression => "any";
+
+  vars:
+      "lsb_exec" string => "/usr/bin/lsb_release";
+    have_lsb::
+      "lsb_output" string => execresult("$(lsb_exec) -a", "noshell");
+      "lsb_dim" int => parsestringarrayidx(
+                                            "lsb_items",
+                                            $(lsb_output),
+                                            "\s*#[^\n]*",
+                                            "\s*:\s*",
+                                            "50",
+                                            "2000"
+      );
+
+      "lsb_ikeys" slist => getindices("lsb_items");
+
+  reports:
+    inform_mode::
+      "$(this.bundle): read LSB key $(lsb_items[$(lsb_ikeys)][0]) = '$(lsb_items[$(lsb_ikeys)][1])'";
+      "$(this.bundle): read LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)])'";
+}
