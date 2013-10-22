@@ -1,0 +1,7 @@
+bundle common inventory_generic
+# @brief Generic (unknown OS) inventory
+#
+# This common bundle is for unknown operating systems, not handled by
+# specific bundles.
+{
+}

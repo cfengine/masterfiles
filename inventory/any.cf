@@ -1,0 +1,7 @@
+bundle common inventory_any
+# @brief Do inventory for any OS
+#
+# This common bundle is for any OS work not handled by specific
+# bundles.
+{
+}
