@@ -1,7 +1,36 @@
+bundle common inventory_control
+# @brief Inventory control bundle
+#
+# This common bundle is for controlling whether some inventory bundles
+# are disabled.
+{
+  classes:
+      "disable_inventory" expression => "!any";
+      # disable specific inventory modules here
+      "disable_lsb" expression => "disable_inventory";
+
+  reports:
+    verbose_mode.disable_inventory::
+      "$(this.bundle): All inventory modules disabled";
+    verbose_mode.!disable_lsb::
+      "$(this.bundle): LSB module enabled";
+}
+
 bundle common inventory_any
 # @brief Do inventory for any OS
 #
 # This common bundle is for any OS work not handled by specific
 # bundles.
 {
+}
+
+body classes inventory_if_ok(x)
+# @brief if OK, define a local class x
+# @param x the class to define
+#
+# Define a bundle-local class `x` if the promise was kept or repaired.
+{
+      scope => "bundle";
+      promise_repaired => { "$(x)" };
+      promise_kept => { "$(x)" };
 }

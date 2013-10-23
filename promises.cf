@@ -79,11 +79,15 @@ bundle common inventory
   vars:
       # This list is intended to grow as needed
     debian::
-      "inputs" slist => { "inventory/any.cf", "inventory/debian.cf" };
+      "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/debian.cf" };
     redhat::
-      "inputs" slist => { "inventory/any.cf", "inventory/redhat.cf" };
-    !debian.!redhat::
-      "inputs" slist => { "inventory/any.cf", "inventory/generic.cf" };
+      "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
+    windows::
+      "inputs" slist => { "inventory/any.cf", "inventory/windows.cf" };
+    macos::
+      "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
+    !windows.!macos.!debian.!redhat::
+      "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
 }
 
 bundle common cfengine_stdlib

@@ -1,0 +1,46 @@
+bundle common inventory_lsb
+# @brief LSB inventory bundle
+#
+# This common bundle is for LSB inventory work.
+{
+  classes:
+      "_have_lsb_exec" expression => fileexists($(lsb_exec));
+      "_inventory_lsb" and => { "!disable_lsb", "_have_lsb_exec" };
+
+    _inventory_lsb::
+      "lsb_$(lsb[Distributor ID])" expression => "any";
+      "lsb_$(lsb[Distributor ID])_$(lsb[Release])" expression => "any";
+
+  vars:
+      "lsb_exec" string => "/usr/bin/lsb_release";
+    _inventory_lsb.!_ran_lsb::
+      "_lsb_output" string => execresult("$(lsb_exec) -a", "noshell"),
+      classes => inventory_if_ok("_ran_lsb");
+
+      "_lsb_dim" int => parsestringarrayidx(
+                                             "lsb_items",
+                                             $(_lsb_output),
+                                             "\s*#[^\n]*",
+                                             "\s*:\s*",
+                                             "50",
+                                             "2000"
+      );
+
+      "_lsb_ikeys" slist => getindices("lsb_items");
+
+      "lsb[$(lsb_items[$(_lsb_ikeys)][0])]" string => "$(lsb_items[$(_lsb_ikeys)][1])";
+      "lsb_keys" slist => getindices("lsb");
+
+      "os" string => canonify("$(lsb[Distributor ID])");
+      "release" string => "$(lsb[Release])";
+      "flavor" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])");
+      "flavour" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])");
+      "description" string => "$(lsb[Description])";
+
+  reports:
+    verbose_mode._inventory_lsb::
+      "$(this.bundle): read LSB key $(lsb_items[$(_lsb_ikeys)][0]) = '$(lsb_items[$(_lsb_ikeys)][1])'";
+    inform_mode._inventory_lsb::
+      "$(this.bundle): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)])'";
+      "$(this.bundle): OS = $(os), release = $(release), flavor = $(flavor), description = $(description)";
+}
