@@ -23,3 +23,14 @@ bundle common inventory_any
 # bundles.
 {
 }
+
+body classes inventory_if_ok(x)
+# @brief if OK, define a local class x
+# @param x the class to define
+#
+# Define a bundle-local class `x` if the promise was kept or repaired.
+{
+      scope => "bundle";
+      promise_repaired => { "$(x)" };
+      promise_kept => { "$(x)" };
+}
