@@ -13,6 +13,7 @@ installations and upgrades, and is used by CFEngine 3.6 and newer.
 * `cfe_internal`: internal CFEngine policies you shouldn't have to modify
 * `controls`: configuration of components, e.g. the `cf-agent` or `cf-serverd`
 * `def.cf`: defaults you can and should configure
+* `inventory`: inventory modules (loaded before anything else to discover facts about the system) live here.
 * `lib`: main library directory.  You'll see `3.5` and `3.6` under it.
 * `libraries/cfengine_stdlib.cf`: old standard library (COPBL, used to be in https://github.com/cfengine/copbl).  Do not use; only available for upgrading older clients.
 * `promises.cf`: main policy, you will need to configure this
