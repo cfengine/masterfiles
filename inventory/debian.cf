@@ -3,4 +3,7 @@ bundle common inventory_debian
 #
 # This common bundle is for Debian inventory work.
 {
+  classes:
+      "pure_debian" expression => "debian.!ubuntu";
+      "debian_derived" expression => "debian.!pure_debian";
 }
