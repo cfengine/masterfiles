@@ -65,7 +65,7 @@ bundle agent cfe_internal_update
       handle => "update_classes_have_ppkeys";
 
       "files_ok"      expression => fileexists("$(file_check)"),
-      comment => "Check for $(sys.masterdir)/promises.cf",
+      comment => "Check for $(sys.inputdir)/promises.cf because all components load from that directory.",
       handle => "update_classes_files_ok";
 
       #
