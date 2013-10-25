@@ -70,5 +70,8 @@ bundle common def
     ### Enable special features policies. Set to "any" to enable.
 
     # Internal CFEngine log files rotation
-    "cfengine_internal_rotate_logs" expression  =>  "!any";
+    "cfengine_internal_rotate_logs" expression => "!any";
+
+    # Transfer policies and binaries with encryption
+    "cfengine_internal_encrypt_transfers" expression => "!any";
 }
