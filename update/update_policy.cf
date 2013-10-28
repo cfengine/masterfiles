@@ -230,6 +230,9 @@ body copy_from u_rcp(from,server)
     !am_policy_hub::
 
       servers => { "$(server)" };
+
+    cfengine_internal_encrypt_transfers::
+      encrypt => "true";
 }
 
 #########################################################

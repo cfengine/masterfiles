@@ -68,6 +68,11 @@ bundle agent cfe_internal_update
       comment => "Check for $(sys.masterdir)/promises.cf",
       handle => "update_classes_files_ok";
 
+      # Transfer policies and binaries with encryption
+      # you can also request it from the command line with
+      # -Dcfengine_internal_encrypt_transfers
+      "cfengine_internal_encrypt_transfers" expression => "!any";
+
       #
 
   processes:
@@ -231,6 +236,9 @@ body copy_from u_rcp(from,server)
     !am_policy_hub::
 
       servers => { "$(server)" };
+
+    cfengine_internal_encrypt_transfers::
+      encrypt => "true";
 }
 
 #########################################################
