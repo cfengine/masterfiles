@@ -24,9 +24,25 @@ bundle agent cfe_internal_update
 {
   vars:
 
+    !(cfengine_3_5||cfengine_3_4)::
+      "master_location"    string => "$(sys.masterdir)",
+      comment => "The master cfengine policy directory on the policy host",
+      handle => "update_vars_master_location_new";
+
       "inputs_dir"         string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
-      handle => "update_vars_inputs_dir";
+      handle => "update_vars_inputs_dir_new";
+
+    cfengine_3_5||cfengine_3_4::
+      "master_location"    string => "$(sys.workdir)/masterfiles",
+      comment => "The master cfengine policy directory on the policy host",
+      handle => "update_vars_master_location_old";
+
+      "inputs_dir"         string => translatepath("$(sys.workdir)/inputs"),
+      comment => "Directory containing CFEngine policies",
+      handle => "update_vars_inputs_dir_old";
+
+    any::
 
       "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
       comment => "Directory containing CFEngine modules",
@@ -39,10 +55,6 @@ bundle agent cfe_internal_update
       "file_check"         string => translatepath("$(inputs_dir)/promises.cf"),
       comment => "Path to a policy file",
       handle => "update_vars_file_check";
-
-      "master_location"    string => "$(sys.masterdir)",
-      comment => "The master cfengine policy directory on the policy host",
-      handle => "update_vars_master_location";
 
       "agents" slist => {
 			  "cf-agent",
