@@ -1,1 +1,19 @@
 cf_promises_validated
+
+# acceptance tests
+tests/acceptance/*.log
+tests/acceptance/.succeeded
+tests/acceptance/workdir
+tests/acceptance/mock-package-manager
+tests/acceptance/mock-package-manager.exe
+tests/acceptance/xml-c14nize
+tests/acceptance//xml-c14nize.exe
+tests/acceptance/dnswrapper.so
+tests/*/*.xml
+tests/*/xml.tmp
+tests/*/xml_tmp_*
+tests/*/*.trs
+
+# copied from core
+tests/acceptance/default.cf.sub
+tests/acceptance/testall
