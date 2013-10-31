@@ -1,23 +1,30 @@
 #######################################################
 #
-# Test add a named versioned package
-#
+# Test add named package
+# 
 #######################################################
 
 body common control
 {
-    inputs => { 
-               "../default.cf.sub",
-               "../../../libraries/cfengine_stdlib.cf",
-              };
-    bundlesequence  => { default("$(this.promise_filename)") };
-    version => "1.0";
+      inputs => { 
+                 #"../default.cf.sub",
+                 #"../../../libraries/cfengine_stdlib.cf",
+                  "../../../lib/3.6/packages.cf",
+                  "../../../lib/3.6/paths.cf",
+                };
+      bundlesequence  => { "g", "init", "test", "check" };
+      version => "1.0";
 }
 
 
 
-
 #######################################################
+
+bundle common g
+{
+    vars: 
+        "name" string => "zip";      
+}
 
 bundle agent init
 {
@@ -28,28 +35,22 @@ bundle agent init
 
 bundle agent test
 {
-  vars:
-
-      debian::
-          "name" string => "zip";
-          "arch" string => "amd64";
-          "version" string => "3.0-7";
-      redhat::
-          "name" string => "zip";
-          "arch" string => "x86_64";
-          "version" string => "3.0-1.el6";
-          
-  
+    vars:
+        "name" string => "zip";
+ 
     packages:
-  
+        
+      
         debian::
-          "$(name)"
-          package_policy => "add",
-          package_method => named_apt_get,
-          classes => test_set_class("pass","fail");
-     
+        
+	    "$(name)"
+            package_policy => "add",
+            package_method => apt_get,
+            classes => test_set_class("pass","fail");
+            
         redhat::
-            "$(name)-$(version).$(arch)"
+        
+            "$(name)"
             package_policy => "add",
             package_method => yum_rpm,
             classes => test_set_class("pass","fail");
@@ -70,21 +71,21 @@ bundle agent check
 {
 
     classes:
-    
-        debian::
-            "has_pkg" not => returnszero("/usr/bin/apt-cache policy $(test.name) | /bin/grep -q none", "useshell");
-
+  
         redhat::
             "has_pkg" expression => returnszero("/bin/rpm -qa | grep -qw $(test.name)", "useshell");
             
+        debian::
+            "has_pkg" not => returnszero("/usr/bin/apt-cache policy $(test.name) | /bin/grep -q none", "useshell");
+      
         any::
             "ok" expression => "pass.!fail.has_pkg";
   
     reports:
-      ok::
-        "$(this.promise_filename) $(test.name)=$(test.version) installed Pass";
-      !ok::
-        "$(this.promise_filename) FAIL";
+        ok::
+            "$(this.promise_filename) $(test.name) Pass";
+        !ok::
+            "$(this.promise_filename) $(test.name) FAIL";
 }
 
 body classes succesfully_executed(class)
@@ -92,5 +93,4 @@ body classes succesfully_executed(class)
     kept_returncodes => { "0" };
     promise_kept => { "$(class)" };
 }
-
 
