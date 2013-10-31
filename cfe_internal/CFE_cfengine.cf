@@ -29,9 +29,9 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_update_folders",
       comment => "Create empty directories for CFE self-upgrade";
 
-      #### cfengine_selinux() can be "fix" or "disable"
+      #### cfengine_internal_selinux() can be "enabled" or "disabled"
 
-      "hub" usebundle => cfe_internal_selinux("fix"),
+      "hub" usebundle => cfe_internal_selinux("enabled"),
       handle => "cfe_internal_management_fix_selinux",
       comment => "Fix SELinux to be able to run Mission Portal and Mongo DB";
 
