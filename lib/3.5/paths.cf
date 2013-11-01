@@ -119,7 +119,6 @@ bundle common paths
       "path[printf]"            string => "/usr/bin/printf";
       "path[sed]"               string => "/usr/bin/sed";
       "path[sort]"              string => "/usr/bin/sort";
-      "path[sysctl]"            string => "/usr/bin/sysctl";
       "path[test]"              string => "/usr/bin/test";
       "path[top]"               string => "/usr/bin/top";
       "path[tr]"                string => "/usr/bin/tr";
@@ -157,7 +156,6 @@ bundle common paths
       "path[printf]"   string => "/usr/bin/printf";
       "path[sed]"      string => "/usr/bin/sed";
       "path[sort]"     string => "/usr/bin/sort";
-      "path[sysctl]"   string => "/sbin/sysctl";
       "path[tr]"       string => "/usr/bin/tr";
 
     openbsd::
@@ -244,7 +242,6 @@ bundle common paths
       "path[printf]"        string => "/usr/bin/printf";
       "path[sed]"           string => "/bin/sed";
       "path[sort]"          string => "/bin/sort";
-      "path[sysctl]"        string => "/sbin/sysctl";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
 
@@ -288,7 +285,6 @@ bundle common paths
       "path[printf]"        string => "/usr/bin/printf";
       "path[sed]"           string => "/usr/bin/sed";
       "path[sort]"          string => "/usr/bin/sort";
-      "path[sysctl]"        string => "/usr/sbin/sysctl";
       "path[test]"          string => "/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
 
@@ -329,7 +325,6 @@ bundle common paths
       "path[printf]"        string => "/usr/bin/printf";
       "path[sed]"           string => "/bin/sed";
       "path[sort]"          string => "/usr/bin/sort";
-      "path[sysctl]"        string => "/sbin/sysctl";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
 
@@ -348,6 +343,14 @@ bundle common paths
       "path[update_alternatives]" string => "/usr/bin/update-alternatives";
       "path[update_rc_d]"         string => "/usr/sbin/update-rc.d";
       "path[useradd]"             string => "/usr/sbin/useradd";
+
+    archlinux.darwin::
+
+      "path[sysctl]"        string => "/usr/bin/sysctl";
+
+    !(archlinux.darwin)::
+
+      "path[sysctl]"        string => "/sbin/sysctl";
 
     any::
       "all_paths"     slist => getindices("path");
