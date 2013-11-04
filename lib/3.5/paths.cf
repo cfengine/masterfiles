@@ -344,11 +344,11 @@ bundle common paths
       "path[update_rc_d]"         string => "/usr/sbin/update-rc.d";
       "path[useradd]"             string => "/usr/sbin/useradd";
 
-    archlinux.darwin::
+    archlinux||darwin::
 
       "path[sysctl]"        string => "/usr/bin/sysctl";
 
-    !(archlinux.darwin)::
+    !(archlinux||darwin)::
 
       "path[sysctl]"        string => "/sbin/sysctl";
 
