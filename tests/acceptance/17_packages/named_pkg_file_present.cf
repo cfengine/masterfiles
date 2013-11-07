@@ -30,6 +30,7 @@ bundle agent init
       "/usr/bin/apt-get purge zip";
     redhat::
       "/usr/bin/yum erase -y zip";
+      
 }
 
 #######################################################
@@ -50,13 +51,13 @@ bundle agent test
     packages:
     
         debian::
-        
+	    
             "$(name)"
             package_policy => "add",
             package_select => "==",
             package_version => "$(version)",
-            package_architectures => { "i386", "amd64" },
-            package_method => dpkg_version("./repo");
+            package_architectures => { "i386", "i686" },
+            package_method => dpkg_version("$(g.cwd)/repo");
             
         redhat::
         
@@ -65,7 +66,9 @@ bundle agent test
             package_select => "==",
             package_version => "$(version)",
             package_architectures => { "i386", "x86_64" },
-            package_method => dpkg_version("./repo");
+            package_method => dpkg_version("$(g.cwd)/repo");
+   
+            
               
 }
 

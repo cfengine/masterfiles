@@ -546,9 +546,15 @@ body package_method dpkg_version(repo)
 
     debian.x86_64::
       package_name_convention => "$(name)_$(version)_amd64.deb";
+      package_name_regex => "^([^_]+)";
+      package_version_regex => "^[^_]+_([^_]+)";
+      package_arch_regex => "^[^_]+_[^_]+_([^_]+)";
 
     debian.i686::
       package_name_convention => "$(name)_$(version)_i386.deb";
+      package_name_regex => "^([^_]+)";
+      package_version_regex => "^[^_]+_([^_]+)";
+      package_arch_regex => "^[^_]+_[^_]+_([^_]+)";
 
     have_aptitude::
       package_patch_list_command => "$(debian_knowledge.call_aptitude) --assume-yes --simulate --verbose full-upgrade";
