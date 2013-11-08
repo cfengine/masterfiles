@@ -352,6 +352,10 @@ bundle common paths
 
       "path[sysctl]"        string => "/sbin/sysctl";
 
+    darwin|freebsd|debian|ubuntu|redhat::
+
+      "path[logger]"        string => "/usr/bin/logger";
+
     any::
       "all_paths"     slist => getindices("path");
       "$(all_paths)" string => "$(path[$(all_paths)])";
