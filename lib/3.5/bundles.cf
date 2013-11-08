@@ -171,3 +171,54 @@ bundle agent prunedir(dir, max_days)
       file_select   => filetype_older_than("plain", "$(max_days)"),
       depth_search  => recurse("1");
 }
+
+bundle agent url_ping(host, method, port, uri)
+# @brief ping HOST:PORT/URI using METHOD
+# @params host the host name
+# @params method the HTTP method (HEAD or GET)
+# @params port the port number, e.g. 80
+# @params uri the URI, e.g. /path/to/resource
+#
+# This bundle will send a simple HTTP request and read 20 bytes back,
+# then compare them to `200 OK.*` (ignoring leading spaces).
+#
+# If the data matches, the global class "url_ok_HOST" will be set, where
+# HOST is the canonified host name, i.e. `canonify($(host))`
+#
+# **Example:**
+# ```cf3
+# methods:
+#     "check" usebundle => url_ping("cfengine.com", "HEAD", "80", "/bill/was/here");
+# reports:
+#   url_ok_cfengine_com::
+#     "CFEngine's web site is up";
+#   url_not_ok_cfengine_com::
+#     "CFEngine's web site *may* be down.  Or you're offline.";
+# ```
+{
+  vars:
+      "url_check" string => readtcp($(host),
+                                    $(port),
+                                    "$(method) $(uri) HTTP/1.1$(const.r)$(const.n)Host:$(host)$(const.r)$(const.n)$(const.r)$(const.n)",
+                                    20);
+
+      "chost" string => canonify($(host));
+
+  classes:
+      "url_ok_$(chost)"
+      scope => "namespace",
+      expression => regcmp("[^\n]*200 OK.*\n.*",
+                           $(url_check));
+
+      "url_not_ok_$(chost)"
+      scope => "namespace",
+      not => regcmp("[^\n]*200 OK.*\n.*",
+                           $(url_check));
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): $(method) $(host):$(port)/$(uri) got 200 OK"
+      ifvarclass => "url_ok_$(chost)";
+      "$(this.bundle): $(method) $(host):$(port)/$(uri) did *not* get 200 OK"
+      ifvarclass => "url_not_ok_$(chost)";
+}
