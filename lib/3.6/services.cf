@@ -372,6 +372,16 @@ bundle agent standard_services(service,state)
       "baseinit[omsa-dataeng]"    string => "dataeng";
       "pattern[omsa-dataeng]"     string => ".*dsm_sa_datamgr.*";
 
+    freebsd::
+
+      "pattern[ntpd]"       string => ".*ntpd.*";
+
+      "baseinit[ssh]"       string => "sshd";
+      "pattern[ssh]"        string => "/usr/sbin/sshd.*";
+
+      "baseinit[syslog]"    string => "syslogd";
+      "pattern[syslog]"     string => "/usr/sbin/syslogd.*";
+
   classes:
       # Set classes for each possible state after $(all_states)
       "$(all_states)" expression => strcmp($(all_states), $(state)),

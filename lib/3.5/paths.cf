@@ -62,6 +62,7 @@ bundle common paths
       "path[getfacl]"  string => "/usr/bin/getfacl";
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
+      "path[logger]"   string => "/usr/bin/logger";
 
     aix::
 
