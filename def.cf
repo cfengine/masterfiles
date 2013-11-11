@@ -33,6 +33,10 @@ bundle common def
       comment => "Define an acl for the machines to be granted accesses",
       handle => "common_def_vars_acl";
 
+      "input_name_patterns" slist => { ".*.cf",".*.dat",".*.txt", ".*.conf" },
+      comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
+      handle => "common_def_vars_input_name_patterns";
+
       # End change #
 
       "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
@@ -58,7 +62,12 @@ bundle common def
       # CFEngine own log files
       "cfe_log_files"    slist => {
                                     "$(sys.workdir)/cf3.$(sys.host).runlog",
-                                    "$(sys.workdir)/promise_summary.log"
+                                    "$(sys.workdir)/cf_notkept.log",
+                                    "$(sys.workdir)/cf_repair.log",
+                                    "$(sys.workdir)/httpd/logs/access_log",# Mission Portal
+                                    "$(sys.workdir)/httpd/logs/error_log", # Mission Portal
+                                    "$(sys.workdir)/promise_summary.log",
+                                    "$(sys.workdir)/state/cf_value.log",
                                   };
 
       "cfe_log_dirs"     slist => {

@@ -88,6 +88,10 @@ bundle common inventory
       "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
     !windows.!macos.!debian.!redhat::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): loading inventory module '$(inputs)'";
 }
 
 bundle common cfengine_stdlib

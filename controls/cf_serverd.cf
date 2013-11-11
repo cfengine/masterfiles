@@ -143,7 +143,7 @@ body report_data_select default_data_select_host
 # framework explicitly excludes these variables and classes from collection.
 {
       variables_include => { "sys..*", "mon..*" };
-      variables_exclude => { "_.*" };
+      variables_exclude => { "_.*", ".*\._.*" };
       classes_exclude => { "_.*" };
       monitoring_include => { "cpu.*",
                               "mem_total",
@@ -162,6 +162,6 @@ body report_data_select default_data_select_policy_hub
 # framework explicitly excludes these variables and classes from collection.
 {
       variables_include => { "sys..*", "mon..*" };
-      variables_exclude => { "_.*" };
+      variables_exclude => { "_.*", ".*\._.*" };
       classes_exclude => { "_.*" };
 }

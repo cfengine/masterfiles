@@ -215,7 +215,7 @@ body file_select u_cf3_files
 
 body file_select u_input_files
 {
-      leaf_name => { ".*.cf",".*.dat",".*.txt", ".*.conf" };
+      leaf_name => { @(def.input_name_patterns) };
       file_result => "leaf_name";
 }
 

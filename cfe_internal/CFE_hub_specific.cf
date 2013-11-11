@@ -62,6 +62,13 @@ bundle agent cfe_internal_update_folders
 			"debian_7_x86_64",
 			"windows_i686",
 			"windows_x86_64",
+      "sunos_5.8_sun4u",
+      "sunos_5.8_sun4v",
+      "sunos_5.9_sun4u",
+      "sunos_5.9_sun4v",
+      "sunos_5.10_sun4u",
+      "sunos_5.10_sun4v",
+      "sunos_5.10_i86pc",
       },
       comment => "Define a list for $(sys.flavour)_$(sys.arch) directories",
       handle => "cfe_internal_update_folders_vars_dirs";
@@ -201,11 +208,11 @@ bundle agent cfe_internal_selinux(condition)
       comment => "Install packages from the list",
       handle => "cfe_internal_selinux_classes_have_semanage";
 
-      "fix_selinux"        expression => strcmp("$(condition)","fix"),
+      "enable_selinux"        expression => strcmp("$(condition)","enabled"),
       comment => "Check to allow SELinux rules for Mission Portal to function",
-      handle => "cfe_internal_selinux_classes_fix_selinux";
+      handle => "cfe_internal_selinux_classes_enable_selinux";
 
-      "disable_selinux"    expression => strcmp("$(condition)","disable"),
+      "disable_selinux"    expression => strcmp("$(condition)","disabled"),
       comment => "Check to disable SELinux",
       handle => "cfe_internal_selinux_classes_disable_selinux";
 
@@ -239,7 +246,7 @@ bundle agent cfe_internal_selinux(condition)
 
   commands:
 
-    selinux_enforcing.fix_selinux.have_semanage::
+    selinux_enforcing.enable_selinux.have_semanage::
 
       "/usr/bin/chcon -R -h -t httpd_sys_content_t /var/cfengine/lib"
       comment => "Allow apache to load CFEngine shared libraries with SELinux on",
@@ -256,7 +263,7 @@ bundle agent cfe_internal_selinux(condition)
 
       # Allow httpd_can_network_connect so HTTPD will be able to talk with MongoDB
 
-    httpd_can_network_connect.fix_selinux::
+    httpd_can_network_connect.enable_selinux::
 
       "/usr/sbin/setsebool -P httpd_can_network_connect 1"
       comment => "SELinux allows HTTPD to use files on the host",

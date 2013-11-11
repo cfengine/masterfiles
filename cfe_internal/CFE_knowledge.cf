@@ -16,15 +16,6 @@
 
 bundle agent cfe_internal_setup_knowledge
 {
-  vars:
-
-    !windows.am_policy_hub::
-
-      "config_src"   string => "$(sys.workdir)/inputs",
-      comment => "Define a path for inputs directory",
-      handle => "cfe_internal_setup_knowledge_vars_config_src";
-
-      #
 
   classes:
 
