@@ -1,7 +1,7 @@
 Origin: CFEngine AS
 Label: testing1
-Suite: packages1
-Codename: special1
+Suite: package1
+Codename: package1
 Version: 12.04
 Architectures: i386 amd64 armel
 Components: main
@@ -9,8 +9,8 @@ Description: Custom debian package for testing package promises
 
 Origin: CFEngine AS
 Label: testing2
-Suite: packages2
-Codename: special2
+Suite: package2
+Codename: package2
 Version: 12.10
 Architectures: i386 amd64 armel
 Components: main
@@ -18,8 +18,8 @@ Description: Custom debian package for testing package promises
 
 Origin: CFEngine AS
 Label: testing3
-Suite: packages3
-Codename: special3
+Suite: package3
+Codename: package3
 Version: 13.04
 Architectures: i386 amd64 armel
 Components: main

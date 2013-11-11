@@ -1,0 +1,57 @@
+
+The debian package is already built. The general process
+for adding new ones is as follows:
+
+mkdir <name of package>
+cd <name of package>
+mkdir DEBIAN
+touch DEBIAN/control
+mkdir -p var/cfengine/bin
+
+create a simple c program.
+copy it to <name of package>/var/cfengine/bin
+
+add the following content to DEBIAN/control:
+
+Package: <name of package>
+Version: <version number> 
+Section: custom
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: size of binary
+Maintainer: cfengine.com
+Description: Do something spectacular
+
+
+cd ..
+
+dpkg-deb --build <name of package>
+
+rename the .deb file to <name of package>-<version number>_<architecture>.deb
+
+Now to create the package in a local repo, edit the repo/conf/distributions and add your package so that it has a unique
+set of parameters.
+
+Copy your .deb package into the repo directory and run the putinrepo.sh:
+
+./putinrepo/<package name>.debian
+
+This should add your package to the debian repo. Your cfengine acceptance test can now do something like:
+
+files:
+        debian::
+            "/etc/apt/sources.list.d/testdebian.list"
+            create => "true",
+            edit_line => append_if_no_line
+            ("deb file:///$(pwd)/repo package1 main");
+            
+package1 corresponds to the name chosen in the repo/conf/distributions file for the codename.
+
+This guide for creating debian repositories can be found here: 
+
+http://blog.schlomo.schapiro.org/2013/04/how-to-create-debianubuntu-repository.html
+
+
+
+

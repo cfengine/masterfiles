@@ -1,0 +1,39 @@
+Origin: CFEngine AS
+Label: testing2
+Suite: package2
+Codename: package2
+Version: 12.10
+Date: Mon, 11 Nov 2013 15:24:49 UTC
+Architectures: i386 amd64 armel
+Components: main
+Description: Custom debian package for testing package promises
+MD5Sum:
+ f68c4d10f5af575c9f19d9a5b45ebb67 442 main/binary-i386/Packages
+ 9bfb25fecfbdc40297026ae8bfb312ad 318 main/binary-i386/Packages.gz
+ 8a76c6fc0343fe2f0f2ac24436929d9a 168 main/binary-i386/Release
+ f68c4d10f5af575c9f19d9a5b45ebb67 442 main/binary-amd64/Packages
+ 9bfb25fecfbdc40297026ae8bfb312ad 318 main/binary-amd64/Packages.gz
+ 85b39e3432f3bc5a9a46c636893fa2b9 169 main/binary-amd64/Release
+ f68c4d10f5af575c9f19d9a5b45ebb67 442 main/binary-armel/Packages
+ 9bfb25fecfbdc40297026ae8bfb312ad 318 main/binary-armel/Packages.gz
+ 4b1ee871ef30d49a11183298974a7da6 169 main/binary-armel/Release
+SHA1:
+ fc9e333aa0fd6d56c9c127d64f2e991769bb610c 442 main/binary-i386/Packages
+ a6f7a95d810c29c22f1954058724d08c8e3e644a 318 main/binary-i386/Packages.gz
+ 36cb92a42e8cf47c5a0e25bbebb8ec8a5113a8be 168 main/binary-i386/Release
+ fc9e333aa0fd6d56c9c127d64f2e991769bb610c 442 main/binary-amd64/Packages
+ a6f7a95d810c29c22f1954058724d08c8e3e644a 318 main/binary-amd64/Packages.gz
+ 98a02c71b38454ee4dd8602904f0eeff97abf947 169 main/binary-amd64/Release
+ fc9e333aa0fd6d56c9c127d64f2e991769bb610c 442 main/binary-armel/Packages
+ a6f7a95d810c29c22f1954058724d08c8e3e644a 318 main/binary-armel/Packages.gz
+ 8232bf36b6dc8db364be86e0538cb708572d19c5 169 main/binary-armel/Release
+SHA256:
+ e61995532bc8ef030cc2f6d692ca0d15a59fd013b7fb3e60c02c9da2bf57326b 442 main/binary-i386/Packages
+ bd9da98f6b41cf622edec34eeb27eaeab3b65084d3c67abdf142b7dab428ce13 318 main/binary-i386/Packages.gz
+ b795cbbabd804d555b3582c303bb4b2fce67f634caace892c7954afa2c87979a 168 main/binary-i386/Release
+ e61995532bc8ef030cc2f6d692ca0d15a59fd013b7fb3e60c02c9da2bf57326b 442 main/binary-amd64/Packages
+ bd9da98f6b41cf622edec34eeb27eaeab3b65084d3c67abdf142b7dab428ce13 318 main/binary-amd64/Packages.gz
+ 648eb6e1c9e472d878b66b9d0e8d1a2440526613e66d56f3e078a1e709c03f85 169 main/binary-amd64/Release
+ e61995532bc8ef030cc2f6d692ca0d15a59fd013b7fb3e60c02c9da2bf57326b 442 main/binary-armel/Packages
+ bd9da98f6b41cf622edec34eeb27eaeab3b65084d3c67abdf142b7dab428ce13 318 main/binary-armel/Packages.gz
+ 15010dff24f4016195a04e4d2a9f8a17e35936cba1c92c922e73be7f9065841d 169 main/binary-armel/Release

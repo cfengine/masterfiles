@@ -23,12 +23,20 @@ body common control
 bundle common g
 {
     vars: 
-        "name" string => "zip";      
+        debian::
+            "name" string => "testdebianpackage";      
 }
 
 bundle agent init
 {
-  
+    files:
+        debian::
+            "/etc/apt/sources.list.d/testdebian.list"
+            create => "true",
+            edit_line => append_if_no_line
+            ("deb file:///$(pwd)/repo package1 main");
+         
+    
 }
 
 #######################################################
@@ -36,11 +44,11 @@ bundle agent init
 bundle agent test
 {
     vars:
-        "name" string => "zip";
+        debian::
+            "name" string => "testdebianpackage";
  
     packages:
-        
-      
+          
         debian::
         
 	    "$(name)"
