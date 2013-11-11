@@ -1,0 +1,10 @@
+Package: testdebianpackage
+Version: 1.0
+Section: custom
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: 7298
+Maintainer: cfengine.com
+Description: Print a string to the screen
+

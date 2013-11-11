@@ -1,0 +1,7 @@
+Archive: packages3
+Version: 13.04
+Component: main
+Origin: CFEngine AS
+Label: testing3
+Architecture: amd64
+Description: Custom debian package for testing package promises
