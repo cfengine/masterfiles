@@ -62,6 +62,7 @@ bundle common paths
       "path[getfacl]"  string => "/usr/bin/getfacl";
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
+      "path[logger]"   string => "/usr/bin/logger";
 
     aix::
 
@@ -351,10 +352,6 @@ bundle common paths
     !(archlinux||darwin)::
 
       "path[sysctl]"        string => "/sbin/sysctl";
-
-    darwin|freebsd|debian|ubuntu|redhat::
-
-        "path[logger]"      string => "/usr/bin/logger";
 
     any::
       "all_paths"     slist => getindices("path");
