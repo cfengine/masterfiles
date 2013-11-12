@@ -491,7 +491,7 @@ bundle edit_line set_variable_values(v)
 
       "\s*$(index)\s*=.*"
 
-      edit_field => col("=","2","$($(v)[$(index)])","set"),
+      edit_field => col("\s*$(index)\s*=","2","$($(v)[$(index)])","set"),
       classes => if_ok("$(cv)_$(cindex[$(index)])_in_file"),
       comment => "Match a line starting like key = something";
 
