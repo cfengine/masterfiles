@@ -1,15 +1,15 @@
-Package: testdebianpackage
+Package: testpackage
 Version: 1.0-0
 Architecture: all
 Essential: no
-Installed-Size: 7298
+Installed-Size: 1024
 Maintainer: cfengine.com
 Priority: optional
 Section: custom
-Filename: pool/main/t/testdebianpackage/testdebianpackage_1.0-0_all.deb
-Size: 3146
-SHA256: ee422c1c1917153d8135e9e0431f3553aa633bcb8bb35ebfb02ee608bbfe48ff
-SHA1: b4a4dc9b16405db4929539ead9c9625c6e9fabf1
-MD5sum: ef7b9dc8ae040d91fc5e31c50ae63d2e
-Description: Print a string to the screen
+Filename: pool/main/t/testpackage/testpackage_1.0-0_all.deb
+Size: 696
+SHA256: 67d840ccb311e4387917e5e3e50c89a1ee94e8ef1625dec6ab2ce5a580d88ea2
+SHA1: b06a80c0a381f52dc5e19227f95db26611644c1f
+MD5sum: 1a55c880576da3c75a20aaea5e54c458
+Description: Debian test package
 

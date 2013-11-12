@@ -1,10 +1,10 @@
-Package: testdebianpackage
+Package: testpackage
 Version: 1.0-0
 Section: custom
 Priority: optional
 Architecture: all
 Essential: no
-Installed-Size: 7298
+Installed-Size: 1024
 Maintainer: cfengine.com
-Description: Print a string to the screen
+Description: Debian test package
 

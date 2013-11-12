@@ -7,10 +7,12 @@
 body common control
 {
       inputs => { 
-                 #"../default.cf.sub",
-                 #"../../../libraries/cfengine_stdlib.cf",
-                  "../../../lib/3.6/packages.cf",
-                  "../../../lib/3.6/paths.cf",
+ #                "../default.cf.sub",
+ #                "../../libraries/cfengine_stdlib.cf",
+	          "../../../masterfiles/lib/3.6/packages.cf",
+	          "../../../masterfiles/lib/3.6/files.cf",
+                  "../../../masterfiles/lib/3.6/paths.cf",
+		  "../../../masterfiles/lib/3.6/common.cf",
                 };
       bundlesequence  => { "g", "init", "test", "check" };
       version => "1.0";
@@ -24,9 +26,12 @@ bundle common g
 {
     vars: 
         debian::
-            "name" string => "testdebianpackage";      
+            "name" string => "testpackage";      
 }
+body agent control {
+    default_repository => "/var/cfengine/backup";
 
+}
 bundle agent init
 {
     files:
@@ -34,7 +39,7 @@ bundle agent init
             "/etc/apt/sources.list.d/testdebian.list"
             create => "true",
             edit_line => append_if_no_line
-            ("deb file:///$(pwd)/repo package1 main");
+            ("deb file:///home/build/build/core/tests/acceptance/17_packages/repo package1 main");
          
     
 }
@@ -45,7 +50,7 @@ bundle agent test
 {
     vars:
         debian::
-            "name" string => "testdebianpackage";
+            "name" string => "testpackage";
  
     packages:
           

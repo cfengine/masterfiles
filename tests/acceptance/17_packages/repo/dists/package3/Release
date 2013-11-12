@@ -3,37 +3,37 @@ Label: testing3
 Suite: package3
 Codename: package3
 Version: 13.04
-Date: Mon, 11 Nov 2013 15:24:49 UTC
+Date: Tue, 12 Nov 2013 11:42:24 UTC
 Architectures: i386 amd64 armel
 Components: main
 Description: Custom debian package for testing package promises
 MD5Sum:
- f68c4d10f5af575c9f19d9a5b45ebb67 442 main/binary-i386/Packages
- 9bfb25fecfbdc40297026ae8bfb312ad 318 main/binary-i386/Packages.gz
+ 64eabd895c4fc5fdfb8daf1f9c476468 414 main/binary-i386/Packages
+ b06176c58634848f58808cec9e9b863a 308 main/binary-i386/Packages.gz
  9ac1a50de1d4d4288d414032865f59d9 168 main/binary-i386/Release
- f68c4d10f5af575c9f19d9a5b45ebb67 442 main/binary-amd64/Packages
- 9bfb25fecfbdc40297026ae8bfb312ad 318 main/binary-amd64/Packages.gz
+ 64eabd895c4fc5fdfb8daf1f9c476468 414 main/binary-amd64/Packages
+ b06176c58634848f58808cec9e9b863a 308 main/binary-amd64/Packages.gz
  a4996941167810492ae39a201742ba27 169 main/binary-amd64/Release
- f68c4d10f5af575c9f19d9a5b45ebb67 442 main/binary-armel/Packages
- 9bfb25fecfbdc40297026ae8bfb312ad 318 main/binary-armel/Packages.gz
+ 64eabd895c4fc5fdfb8daf1f9c476468 414 main/binary-armel/Packages
+ b06176c58634848f58808cec9e9b863a 308 main/binary-armel/Packages.gz
  12b3992dca631e4aa524a1688d6da67e 169 main/binary-armel/Release
 SHA1:
- fc9e333aa0fd6d56c9c127d64f2e991769bb610c 442 main/binary-i386/Packages
- a6f7a95d810c29c22f1954058724d08c8e3e644a 318 main/binary-i386/Packages.gz
+ 1e125f574d6fab11068ae5e281490332d049eed3 414 main/binary-i386/Packages
+ 96c51bd6d2d222d30f8989a6b67c616539212066 308 main/binary-i386/Packages.gz
  e1e958e965193d68eaaf12568378c066eb30802d 168 main/binary-i386/Release
- fc9e333aa0fd6d56c9c127d64f2e991769bb610c 442 main/binary-amd64/Packages
- a6f7a95d810c29c22f1954058724d08c8e3e644a 318 main/binary-amd64/Packages.gz
+ 1e125f574d6fab11068ae5e281490332d049eed3 414 main/binary-amd64/Packages
+ 96c51bd6d2d222d30f8989a6b67c616539212066 308 main/binary-amd64/Packages.gz
  ca0d44dcb8390c07e0125a7adc400aa0ee52afa0 169 main/binary-amd64/Release
- fc9e333aa0fd6d56c9c127d64f2e991769bb610c 442 main/binary-armel/Packages
- a6f7a95d810c29c22f1954058724d08c8e3e644a 318 main/binary-armel/Packages.gz
+ 1e125f574d6fab11068ae5e281490332d049eed3 414 main/binary-armel/Packages
+ 96c51bd6d2d222d30f8989a6b67c616539212066 308 main/binary-armel/Packages.gz
  6914af1f4d4f466c504669181ea244e0953fa356 169 main/binary-armel/Release
 SHA256:
- e61995532bc8ef030cc2f6d692ca0d15a59fd013b7fb3e60c02c9da2bf57326b 442 main/binary-i386/Packages
- bd9da98f6b41cf622edec34eeb27eaeab3b65084d3c67abdf142b7dab428ce13 318 main/binary-i386/Packages.gz
+ da052cd771de151daaaa0543b7e202de6dd05adf1a590b2a58f7062260416325 414 main/binary-i386/Packages
+ ad97350a0ba91efa7b94f1afc5ae9c3cc53132209508e4b81a72f783fdda3d21 308 main/binary-i386/Packages.gz
  52a841e35353254ecde34c5baa166c0c15bc97fbe092bfe9953c4d4221224e05 168 main/binary-i386/Release
- e61995532bc8ef030cc2f6d692ca0d15a59fd013b7fb3e60c02c9da2bf57326b 442 main/binary-amd64/Packages
- bd9da98f6b41cf622edec34eeb27eaeab3b65084d3c67abdf142b7dab428ce13 318 main/binary-amd64/Packages.gz
+ da052cd771de151daaaa0543b7e202de6dd05adf1a590b2a58f7062260416325 414 main/binary-amd64/Packages
+ ad97350a0ba91efa7b94f1afc5ae9c3cc53132209508e4b81a72f783fdda3d21 308 main/binary-amd64/Packages.gz
  62be248683bb79d999160411825eb53a3bb5df47e265bb4c19768018be416240 169 main/binary-amd64/Release
- e61995532bc8ef030cc2f6d692ca0d15a59fd013b7fb3e60c02c9da2bf57326b 442 main/binary-armel/Packages
- bd9da98f6b41cf622edec34eeb27eaeab3b65084d3c67abdf142b7dab428ce13 318 main/binary-armel/Packages.gz
+ da052cd771de151daaaa0543b7e202de6dd05adf1a590b2a58f7062260416325 414 main/binary-armel/Packages
+ ad97350a0ba91efa7b94f1afc5ae9c3cc53132209508e4b81a72f783fdda3d21 308 main/binary-armel/Packages.gz
  b2e7272282199e300e33751216530171a4e1cf464e0adb6026b00313d9665800 169 main/binary-armel/Release
