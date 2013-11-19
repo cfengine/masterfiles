@@ -372,6 +372,26 @@ bundle agent standard_services(service,state)
       "baseinit[omsa-dataeng]"    string => "dataeng";
       "pattern[omsa-dataeng]"     string => ".*dsm_sa_datamgr.*";
 
+    freebsd::
+
+      "startcommand[ntpd]"   string => "/etc/rc.d/ntpd start";
+      "restartcommand[ntpd]" string => "/etc/rc.d/ntpd restart";
+      "reloadcommand[ntpd]"  string => "/etc/rc.d/ntpd reload";
+      "stopcommand[ntpd]"    string => "/etc/rc.d/ntpd stop";
+      "pattern[ntpd]"        string => "/usr/sbin/ntpd.*";
+
+      "startcommand[ssh]"   string => "/etc/rc.d/sshd start";
+      "restartcommand[ssh]" string => "/etc/rc.d/sshd restart";
+      "reloadcommand[ssh]"  string => "/etc/rc.d/sshd reload";
+      "stopcommand[ssh]"    string => "/etc/rc.d/sshd stop";
+      "pattern[ssh]"        string => "/usr/sbin/sshd.*";
+
+      "startcommand[syslog]"   string => "/etc/rc.d/syslogd start";
+      "restartcommand[syslog]" string => "/etc/rc.d/syslogd restart";
+      "reloadcommand[syslog]"  string => "/etc/rc.d/syslogd reload";
+      "stopcommand[syslog]"    string => "/etc/rc.d/syslogd stop";
+      "pattern[syslog]"        string => "/usr/sbin/syslogd.*";
+
   classes:
       # Set classes for each possible state after $(all_states)
       "$(all_states)" expression => strcmp($(all_states), $(state)),
