@@ -86,14 +86,12 @@ bundle agent cfe_internal_update_policy
       comment => "Generate cfengine encryption keys if necessary",
       handle => "cfe_internal_update_policy_commands_generate_keys";
 
-      ######################### We don't need this on 3.5.0 ##########################
-      #  am_policy_hub.update_report::
-      #
-      #   "$(sys.cf_promises) -r"
-      #      contain => u_in_shell_and_silent,
-      #      comment => "Generate config knowledge format after update",
-      #       handle => "cfe_internal_update_policy_commands_run_cf_promises_r";
-      ################################################################################
+    am_policy_hub.update_report::
+
+      "$(sys.cf_promises) -r"
+         contain => u_in_shell_and_silent,
+         comment => "Generate config knowledge format after update",
+         handle => "cfe_internal_update_policy_commands_run_cf_promises_r";
 
       #
 
