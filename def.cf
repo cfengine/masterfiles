@@ -33,10 +33,6 @@ bundle common def
       comment => "Define an acl for the machines to be granted accesses",
       handle => "common_def_vars_acl";
 
-      "input_name_patterns" slist => { ".*.cf",".*.dat",".*.txt", ".*.conf" },
-      comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
-      handle => "common_def_vars_input_name_patterns";
-
       # End change #
 
       "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
