@@ -25,7 +25,7 @@ bundle agent test
       "rundir" string => dirname($(this.promise_filename));
 
   commands:
-      "$(sys.cf_agent) -n -f ../../promises.cf"
+      "$(sys.cf_promises) -c --eval-functions -f ../../promises.cf"
       classes => if_ok("agent_worked_all_right");
 }
 
