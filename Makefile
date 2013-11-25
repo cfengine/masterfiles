@@ -1,7 +1,7 @@
 PWD:=$(shell pwd)
 
 ifeq ($(CORE),)
-  CORE:=../
+  CORE:=../core/
 endif
 
 copy:
