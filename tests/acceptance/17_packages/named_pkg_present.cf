@@ -1,0 +1,109 @@
+#######################################################
+#
+# Test add named package
+# 
+#######################################################
+
+body common control
+{
+      inputs => { 
+ #                "../default.cf.sub",
+ #                "../../libraries/cfengine_stdlib.cf",
+	          "../../../masterfiles/lib/3.6/packages.cf",
+	          "../../../masterfiles/lib/3.6/files.cf",
+                  "../../../masterfiles/lib/3.6/paths.cf",
+		  "../../../masterfiles/lib/3.6/common.cf",
+                };
+      bundlesequence  => { "g", "init", "test", "check" };
+      version => "1.0";
+}
+
+
+
+#######################################################
+
+bundle common g
+{
+    vars: 
+        debian::
+            "name" string => "testpackage";      
+}
+body agent control {
+    default_repository => "/var/cfengine/backup";
+
+}
+bundle agent init
+{
+    files:
+        debian::
+            "/etc/apt/sources.list.d/testdebian.list"
+            create => "true",
+            edit_line => append_if_no_line
+            ("deb file:///home/build/build/core/tests/acceptance/17_packages/repo package1 main");
+         
+    
+}
+
+#######################################################
+
+bundle agent test
+{
+    vars:
+        debian::
+            "name" string => "testpackage";
+ 
+    packages:
+          
+        debian::
+        
+	    "$(name)"
+            package_policy => "add",
+            package_method => apt_get,
+            classes => test_set_class("pass","fail");
+            
+        redhat::
+        
+            "$(name)"
+            package_policy => "add",
+            package_method => yum_rpm,
+            classes => test_set_class("pass","fail");
+}
+
+
+
+body classes test_set_class(ok_class,notok_class)
+{
+    promise_kept => { "$(ok_class)" };
+    promise_repaired => { "$(ok_class)" };
+    repair_failed => { "$(notok_class)" };
+}
+
+#######################################################
+
+bundle agent check
+{
+
+    classes:
+  
+        redhat::
+            "has_pkg" expression => returnszero("/bin/rpm -qa | grep -qw $(test.name)", "useshell");
+            
+        debian::
+            "has_pkg" not => returnszero("/usr/bin/apt-cache policy $(test.name) | /bin/grep -q none", "useshell");
+      
+        any::
+            "ok" expression => "pass.!fail.has_pkg";
+  
+    reports:
+        ok::
+            "$(this.promise_filename) $(test.name) Pass";
+        !ok::
+            "$(this.promise_filename) $(test.name) FAIL";
+}
+
+body classes succesfully_executed(class)
+{
+    kept_returncodes => { "0" };
+    promise_kept => { "$(class)" };
+}
+
