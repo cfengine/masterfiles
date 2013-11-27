@@ -1,0 +1,3 @@
+To recreate the packages and repository structure in this directory,
+run the build-deb-repo or build-rpm-repo scripts on a Debian or Redhat
+host, respectively.

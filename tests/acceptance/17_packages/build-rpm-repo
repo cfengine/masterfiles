@@ -1,0 +1,25 @@
+#!/bin/sh
+
+if [ "$1" != "" ]; then
+    echo "Regenerate rpm packages and rpm repository."
+    echo "Requires the createrepo tool."
+    exit 1
+fi
+
+if [ $UID -ne 0 ]; then
+    echo "Must be root!"
+    exit 1
+fi
+
+set -e
+
+rm -rf rpm_repo
+mkdir rpm_repo
+
+cp test-package-installed.txt /usr/src/redhat/SOURCES
+for i in alpha beta charlie; do
+    rpmbuild -bb test-package-$i.spec
+    cp /usr/src/redhat/RPMS/x86_64/test-package-$i-1.0-1.x86_64.rpm rpm_repo
+done
+
+createrepo rpm_repo
