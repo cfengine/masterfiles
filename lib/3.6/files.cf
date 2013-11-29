@@ -203,16 +203,26 @@ bundle edit_line replace_line_end(start,end)
 ##
 
 bundle edit_line append_to_line_end(start,end)
+# @brief Append `end` to any lines beginning with `start`
+# @params start pattern to match lines of interest
+# @params end string to append to matched lines
 #
-# Lines starting with "$(start)" and not ending with "$(end)"
-# will get appended with "$(end)", whitespaces will be left unmodified.
-# For example, append_to_line_end("kernel", "vga=791") would replace
-# "kernel /boot/vmlinuz root=/dev/sda7"
+# `end` will be appended to all lines starting with `start` and not
+# already ending with `end`.  Whitespaces will be left unmodified.
+#
+# For example, `append_to_line_end("kernel", "vga=791")` would replace
+# `kernel /boot/vmlinuz root=/dev/sda7`
 # with
-# "kernel /boot/vmlinuz root=/dev/sda7 resume=/dev/sda9 vga=791"
+# `kernel /boot/vmlinuz root=/dev/sda7 vga=791`
 #
-# WARNING: Be careful not to have multiple promises matching the same line,
-#          which would result in the line growing indefinetively.
+# **WARNING**: Be careful not to have multiple promises matching the same line, which would result in the line growing indefinitely.
+#
+# **Example:**
+# ```cf3
+#  files:
+#      "/tmp/boot-options" edit_line => append_to_line_end("kernel", "vga=791");
+# ```
+#
 {
   field_edits:
 
