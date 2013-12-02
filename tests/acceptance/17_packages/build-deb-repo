@@ -1,10 +1,30 @@
 #!/bin/sh
 
-if [ "$1" != "" ]; then
-    echo "Regenerate debian packages and debian repository."
+
+ARCH=""
+PARCH=""
+
+if [ "$1" = "" ]; then
+    echo "Automatically detecting architecture."
+    PARCH=$(uname -m)
+        if [ "$PARCH" = "i386" ] || [ "$PARCH" = "i686" ]; then
+        ARCH="i386"
+        fi
+elif [ "$1" = "i386" ]; then
+    echo "Regenerating i386 debian packages and debian repository."
     echo "Requires the reprepro tool."
-    exit 1
+    ARCH="$1"
+elif [ "$1" = "amd64" ]; then
+    echo "Regenerating amd64 debian packages and debian repository."
+    echo "Requires the reprepro tool." 
+    ARCH="$1"
+else 
+    echo "Usage: build-deb-repo i386 | amd64"
+    exit 5
 fi
+
+
+
 
 set -e
 
@@ -13,10 +33,18 @@ rm -rf deb_repo/db
 rm -rf deb_repo/dists
 rm -rf deb_repo/pool
 
+
+
+       
 for i in alpha beta charlie; do
-    dpkg-deb -b test-package-${i}_1.0-1
-    mv -f test-package-${i}_1.0-1.deb deb_repo/test-package-${i}_1.0-1_amd64.deb
+    dpkg-deb -b test-package-${i}_1.0-1_"$ARCH"
+    dpkg-deb -b test-package-${i}_1.0-2_"$ARCH"
+    mv -f test-package-${i}_1.0-1.deb deb_repo/test-package-${i}_1.0-1_"$ARCH".deb
+    mv -f test-package-${i}_1.0-2.deb deb_repo/test-package-${i}_1.0-2_"$ARCH".deb
 done
+
+
+
 
 cd deb_repo
 for i in *.deb; do
