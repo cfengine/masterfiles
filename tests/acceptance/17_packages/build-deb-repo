@@ -10,6 +10,9 @@ if [ "$1" = "" ]; then
         if [ "$PARCH" = "i386" ] || [ "$PARCH" = "i686" ]; then
         ARCH="i386"
         fi
+        if [ "$PARCH" = "amd64" ] || [ "$PARCH" = "x86_64" ]; then
+        ARCH="amd64"
+        fi
 elif [ "$1" = "i386" ]; then
     echo "Regenerating i386 debian packages and debian repository."
     echo "Requires the reprepro tool."
@@ -39,8 +42,8 @@ rm -rf deb_repo/pool
 for i in alpha beta charlie; do
     dpkg-deb -b test-package-${i}_1.0-1_"$ARCH"
     dpkg-deb -b test-package-${i}_1.0-2_"$ARCH"
-    mv -f test-package-${i}_1.0-1.deb deb_repo/test-package-${i}_1.0-1_"$ARCH".deb
-    mv -f test-package-${i}_1.0-2.deb deb_repo/test-package-${i}_1.0-2_"$ARCH".deb
+    mv -f test-package-${i}_1.0-1_"$ARCH".deb deb_repo/test-package-${i}_1.0-1_"$ARCH".deb
+    mv -f test-package-${i}_1.0-2_"$ARCH".deb deb_repo/test-package-${i}_1.0-2_"$ARCH".deb
 done
 
 
