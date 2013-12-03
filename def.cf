@@ -79,4 +79,7 @@ bundle common def
 
     # Transfer policies and binaries with encryption
     "cfengine_internal_encrypt_transfers" expression => "!any";
+
+    # Purge policies that don't exist on the server side.
+    "cfengine_internal_purge_policies" expression => "!any";
 }
