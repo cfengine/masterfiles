@@ -38,11 +38,10 @@ echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
 
 for j in alpha beta charlie; do
  for k in 1 2; do
-   cp ./rpm_sources/test-package-$i-1.0-$k-"$ARCH"-installed.txt ~/rpmbuild/SOURCES
+   cp ./rpm_sources/test-package-$j-1.0-$k-"$ARCH"-rpm-installed.txt ~/rpmbuild/SOURCES
  done
 done
 
-cp test-package-installed.txt ~/rpmbuild/SOURCES
 
 for i in alpha beta charlie; do
     rpmbuild -bb   test-package-$i-1.0-1.spec

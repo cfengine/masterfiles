@@ -2,7 +2,6 @@ Summary: CFEngine Test Package Charlie
 Name: test-package-charlie
 Version: 1.0
 Release: 2
-Source: test-package-installed.txt
 License: MIT
 Group: Other
 Url: http://example.com
@@ -11,14 +10,25 @@ BuildRoot: %{_topdir}/BUILD/%{name}-%{version}-%{release}-buildroot
 AutoReqProv: no
 
 %description
-CFEngine Test Package Charlie
+CFEngine Test Package Beta
 
 %prep
-cp -f ${RPM_SOURCE_DIR}/test-package-installed.txt .
+
 
 %install
+%ifarch i386
+ARCH="i386"
+%else
+ARCH="x86_64"
+%endif
+export ARCH
+CWD=$(pwd)
+export CWD
+
 mkdir -p ${RPM_BUILD_ROOT}
-cp -f ${RPM_BUILD_DIR}/test-package-installed.txt ${RPM_BUILD_ROOT}/test-package-charlie-installed.txt
+echo $RPM_BUILD_DIR
+cp -f ~/rpmbuild/SOURCES/test-package-charlie-1.0-%{release}-"$ARCH"-rpm-installed.txt ${RPM_BUILD_ROOT}
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -26,4 +36,4 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %dir /
-/test-package-charlie-installed.txt
+/*.txt

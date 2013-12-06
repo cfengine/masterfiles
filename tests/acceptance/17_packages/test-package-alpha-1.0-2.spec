@@ -2,7 +2,6 @@ Summary: CFEngine Test Package Alpha
 Name: test-package-alpha
 Version: 1.0
 Release: 2
-Source: test-package-installed.txt
 License: MIT
 Group: Other
 Url: http://example.com
@@ -14,11 +13,22 @@ AutoReqProv: no
 CFEngine Test Package Alpha
 
 %prep
-cp -f ${RPM_SOURCE_DIR}/test-package-installed.txt .
+
 
 %install
+%ifarch i386
+ARCH="i386"
+%else
+ARCH="x86_64"
+%endif
+export ARCH
+CWD=$(pwd)
+export CWD
+
 mkdir -p ${RPM_BUILD_ROOT}
-cp -f ${RPM_BUILD_DIR}/test-package-installed.txt ${RPM_BUILD_ROOT}/test-package-alpha-installed.txt
+echo $RPM_BUILD_DIR
+cp -f ~/rpmbuild/SOURCES/test-package-alpha-1.0-%{release}-"$ARCH"-rpm-installed.txt ${RPM_BUILD_ROOT}
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -26,4 +36,4 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %dir /
-/test-package-alpha-installed.txt
+/*.txt
