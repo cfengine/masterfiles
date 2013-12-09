@@ -55,6 +55,6 @@ bundle common u_def
       # Update masterfiles from Git
       # you can also request it from the command line with
       # -Dcfengine_internal_masterfiles_update
-      "cfengine_internal_masterfiles_update" expression => "!any";
+      "cfengine_internal_masterfiles_update" expression => "am_policy_hub";
 
 }
