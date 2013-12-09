@@ -40,8 +40,8 @@ rm -rf deb_repo/pool
 
        
 for i in alpha beta charlie; do
-    dpkg-deb -b test-package-${i}_1.0-1_"$ARCH"
-    dpkg-deb -b test-package-${i}_1.0-2_"$ARCH"
+    fakeroot dpkg-deb -b test-package-${i}_1.0-1_"$ARCH"
+    fakeroot dpkg-deb -b test-package-${i}_1.0-2_"$ARCH"
     mv -f test-package-${i}_1.0-1_"$ARCH".deb deb_repo/test-package-${i}_1.0-1_"$ARCH".deb
     mv -f test-package-${i}_1.0-2_"$ARCH".deb deb_repo/test-package-${i}_1.0-2_"$ARCH".deb
 done
