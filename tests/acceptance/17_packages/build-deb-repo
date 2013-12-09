@@ -31,7 +31,7 @@ fi
 
 set -e
 
-rm -f deb_repo/*.deb
+rm -f deb_repo/*$ARCH*.deb
 rm -rf deb_repo/db
 rm -rf deb_repo/dists
 rm -rf deb_repo/pool
