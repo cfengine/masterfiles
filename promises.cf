@@ -9,8 +9,8 @@ body common control
 {
 
       bundlesequence => {
-
 			  # Common bundle first (Best Practice)
+                          @(inventory.bundles),
 			  "def",
                           "cfe_internal_hub_vars",
 			  # Design Center
@@ -81,14 +81,19 @@ bundle common inventory
       # This list is intended to grow as needed
     debian::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/debian.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_lsb", "inventory_debian" };
     redhat::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_lsb", "inventory_redhat" };
     windows::
       "inputs" slist => { "inventory/any.cf", "inventory/windows.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_windows" };
     macos::
       "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_macos" };
     !windows.!macos.!debian.!redhat::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_lsb", "inventory_generic" };
 
   reports:
     verbose_mode::

@@ -13,22 +13,13 @@ bundle common inventory_lsb
 
   vars:
       "lsb_exec" string => "/usr/bin/lsb_release";
-    _inventory_lsb.!_ran_lsb::
-      "_lsb_output" string => execresult("$(lsb_exec) -a", "noshell"),
-      classes => inventory_if_ok("_ran_lsb");
 
-      "_lsb_dim" int => parsestringarrayidx(
-                                             "lsb_items",
-                                             $(_lsb_output),
-                                             "\s*#[^\n]*",
-                                             "\s*:\s*",
-                                             "50",
-                                             "2000"
-      );
+    _inventory_lsb::
+      "lsb[Distributor ID]" string => execresult("$(lsb_exec) -i -s", "noshell");
+      "lsb[Release]" string => execresult("$(lsb_exec) -r -s", "noshell");
+      "lsb[Description]" string => execresult("$(lsb_exec) -d -s", "noshell");
+      "lsb[Codename]" string => execresult("$(lsb_exec) -c -s", "noshell");
 
-      "_lsb_ikeys" slist => getindices("lsb_items");
-
-      "lsb[$(lsb_items[$(_lsb_ikeys)][0])]" string => "$(lsb_items[$(_lsb_ikeys)][1])";
       "lsb_keys" slist => getindices("lsb");
 
       "os" string => canonify("$(lsb[Distributor ID])");
@@ -38,8 +29,6 @@ bundle common inventory_lsb
       "description" string => "$(lsb[Description])";
 
   reports:
-    verbose_mode._inventory_lsb::
-      "$(this.bundle): read LSB key $(lsb_items[$(_lsb_ikeys)][0]) = '$(lsb_items[$(_lsb_ikeys)][1])'";
     inform_mode._inventory_lsb::
       "$(this.bundle): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)])'";
       "$(this.bundle): OS = $(os), release = $(release), flavor = $(flavor), description = $(description)";
