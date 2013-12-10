@@ -23,7 +23,7 @@ checklog: copy
 	cd tests/acceptance && ./testall --agent=$(CORE)/cf-agent/cf-agent --cfpromises=$(CORE)/cf-promises/cf-promises --cfserverd=$(CORE)/cf-serverd/cf-serverd --cfkey=$(CORE)/cf-key/cf-key --printlog
 
 install:
-	for d in . controls inventory lib/3.5 lib/3.6 services sketches/meta update; do \
+	for d in . cfe_internal controls inventory lib/3.5 lib/3.6 services sketches/meta update; do \
 		$(INSTALL_DIR) $(DESTDIR)/$$d; \
 		for f in $$d/*.cf; do\
 			$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
