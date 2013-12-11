@@ -41,13 +41,16 @@ body server control
       cfruncommand => "$(sys.cf_twin) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
 
     hpux::
-      cfruncommand => "/bin/sh -c \"SHLIB_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"SHLIB_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     aix::
-      cfruncommand => "/bin/sh -c \"LIBPATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"LIBPATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
-    !(windows|hpux|aix)::
-      cfruncommand => "/bin/sh -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+    solaris::
+      cfruncommand => "$(def.cf_runagent_shell) -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
+
+    !(windows|hpux|aix|solaris)::
+      cfruncommand => "$(def.cf_runagent_shell) -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
 }
 
@@ -86,7 +89,7 @@ bundle server access_rules()
       comment => "Grant access to plugins directory",
       admit => { ".*$(def.domain)", @(def.acl) };
 
-      "/bin/sh"
+      "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
       admit => { "$(sys.policy_hub)" };
