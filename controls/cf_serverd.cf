@@ -81,6 +81,11 @@ bundle server access_rules()
       comment => "Grant access to modules directory",
       admit => { ".*$(def.domain)", @(def.acl) };
 
+      "$(def.dir_plugins)"
+      handle => "server_access_grant_access_plugins",
+      comment => "Grant access to plugins directory",
+      admit => { ".*$(def.domain)", @(def.acl) };
+
       "/bin/sh"
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",

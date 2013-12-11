@@ -45,6 +45,10 @@ bundle agent cfe_internal_update_policy
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
+      "plugins_dir"        string => "/var/cfengine/plugins",      # NB! NOT $(sys.workdir) on Windows !
+      comment => "Directory containing CFEngine plugins",
+      handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
+
     !windows.!(cfengine_3_5||cfengine_3_4)::
       "master_location"    string => "$(sys.masterdir)",
       comment => "The master CFEngine policy directory on the policy host",
@@ -59,6 +63,10 @@ bundle agent cfe_internal_update_policy
       "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir";
+
+      "plugins_dir"        string => translatepath("$(sys.workdir)/plugins"),
+      comment => "Directory containing CFEngine plugins",
+      handle => "cfe_internal_update_policy_vars_plugins_dir";
 
     any::
 
@@ -155,12 +163,28 @@ bundle agent cfe_internal_update_policy
       perms => u_m("755"),
       action => u_immediate;
 
+      "$(plugins_dir)"
+      comment => "Always update plugins files on client side",
+      handle => "cfe_internal_update_policy_files_update_plugins",
+      copy_from => u_rcp("$(plugins_dir)","$(sys.policy_hub)"),
+      depth_search => u_recurse("inf"),
+      perms => u_m("755"),
+      action => u_immediate;
+
     !am_policy_hub.windows::
 
       "$(sys.workdir)\modules"
       comment => "Always update modules files on client side (Windows)",
       handle => "cfe_internal_update_policy_files_update_modules_windows",
       copy_from => u_rcp("$(modules_dir)","$(sys.policy_hub)"),
+      depth_search => u_recurse("inf"),
+      perms => u_m("755"),
+      action => u_immediate;
+
+      "$(sys.workdir)\plugins"
+      comment => "Always update plugins files on client side (Windows)",
+      handle => "cfe_internal_update_policy_files_update_plugins_windows",
+      copy_from => u_rcp("$(plugins_dir)","$(sys.policy_hub)"),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
