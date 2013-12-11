@@ -55,6 +55,10 @@ bundle common def
       comment => "Define modules path",
       handle => "common_def_vars_dir_modules";
 
+      "dir_plugins"     string => translatepath("$(sys.workdir)/plugins"),
+      comment => "Define plugins path",
+      handle => "common_def_vars_dir_plugins";
+
       # CFEngine own log files
       "cfe_log_files"    slist => {
                                     "$(sys.workdir)/cf3.$(sys.host).runlog",
