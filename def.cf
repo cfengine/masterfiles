@@ -59,6 +59,20 @@ bundle common def
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";
 
+      solaris::
+      "cf_runagent_shell"
+        string  => "/usr/bin/sh",
+        comment => "Define path to shell used by cf-runagent",
+        handle  => "common_def_vars_solaris_cf_runagent_shell";
+
+      !(windows|solaris)::
+      "cf_runagent_shell"
+        string  => "/bin/sh",
+        comment => "Define path to shell used by cf-runagent",
+        handle  => "common_def_vars_cf_runagent_shell";
+
+      any::
+
       # CFEngine own log files
       "cfe_log_files"    slist => {
                                     "$(sys.workdir)/cf3.$(sys.host).runlog",
