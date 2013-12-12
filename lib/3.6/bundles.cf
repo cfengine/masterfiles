@@ -107,6 +107,7 @@ bundle agent rm_rf(name)
 # This bundle will remove `name` to any depth, including `name` itself.
 #
 # **Example:**
+#
 # ```cf3
 # methods:
 #     "bye" usebundle => rm_rf("/var/tmp/oldstuff");
@@ -126,6 +127,7 @@ bundle agent rm_rf_depth(name,depth)
 # This bundle will remove `name` to depth `depth`, including `name` itself.
 #
 # **Example:**
+#
 # ```cf3
 # methods:
 #     "bye" usebundle => rm_rf_depth("/var/tmp/oldstuff", "100");
@@ -150,6 +152,7 @@ bundle agent fileinfo(f)
 # @param f file or files to stat
 #
 # **Example:**
+#
 # ```cf3
 # bundle agent example
 # {
@@ -215,6 +218,7 @@ bundle agent logrotate(log_files, max_size, rotate_levels)
 # @param rotate_levels number of rotations to keep before overwriting the oldest one
 #
 # **Example:**
+#
 # ```cf3
 # bundle agent example
 # {
@@ -244,6 +248,7 @@ bundle agent prunedir(dir, max_days)
 # @param max_days maximum number of days old a files mtime is allowed to before deletion
 #
 # **Example:**
+#
 # ```cf3
 # bundle agent example
 # {
@@ -277,6 +282,7 @@ bundle agent url_ping(host, method, port, uri)
 # HOST is the canonified host name, i.e. `canonify($(host))`
 #
 # **Example:**
+#
 # ```cf3
 # methods:
 #     "check" usebundle => url_ping("cfengine.com", "HEAD", "80", "/bill/was/here");

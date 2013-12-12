@@ -224,6 +224,7 @@ bundle edit_line append_to_line_end(start,end)
 # **WARNING**: Be careful not to have multiple promises matching the same line, which would result in the line growing indefinitely.
 #
 # **Example:**
+#
 # ```cf3
 #  files:
 #      "/tmp/boot-options" edit_line => append_to_line_end("kernel", "vga=791");
@@ -770,6 +771,7 @@ bundle edit_line fstab_option_editor(method, mount, option)
 # or `alphanum`.  The option is OS-specific.
 #
 # **Example:**
+#
 # ```cf3
 #  files:
 #      "/etc/fstab" edit_line => fstab_option_editor("delete", "/", "acl");
@@ -795,6 +797,7 @@ body edit_field fstab_options(newval, method)
 # `set`, `delete`, or `alphanum`.  The `newval` option is OS-specific.
 #
 # **Example:**
+#
 # ```cf3
 #   # from the `fstab_options_editor`
 #   field_edits:

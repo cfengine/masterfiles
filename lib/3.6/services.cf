@@ -84,6 +84,7 @@ bundle agent standard_services(service,state)
 # does the needful to reach the desired state..
 #
 # **Example:**
+#
 # ```cf3
 # services:
 #     "ntp" service_policy => "start";
