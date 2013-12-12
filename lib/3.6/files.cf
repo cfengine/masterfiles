@@ -47,9 +47,15 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+bundle common files_common
+{
+  vars:
+      "inputs" slist => { "$(this.promise_dirname)/common.cf" };
+}
+
 body file control
 {
-      inputs => { "$(sys.local_libdir)/common.cf" };
+      inputs => { @(files_common.inputs) };
 }
 
 ###################################################
