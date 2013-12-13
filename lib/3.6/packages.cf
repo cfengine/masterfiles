@@ -48,12 +48,14 @@
 ###################################################
 
 bundle common packages_common
+# @ignore
 {
   vars:
       "inputs" slist => { "$(this.promise_dirname)/paths.cf" };
 }
 
 body file control
+# @ignore
 {
       inputs => { @(packages_common.inputs) };
 }
