@@ -74,8 +74,8 @@ bundle agent standard_services(service,state)
 # @brief Standard services bundle, used by CFEngine by default
 # @author CFEngine AS
 # @author Tero Kantonen <prkele@gmail.com>
-# @params service specific service to control
-# @params state desired state for that service
+# @param service specific service to control
+# @param state desired state for that service
 #
 # This bundle is used by CFEngine if you don't specify a services
 # handler explicitly.

@@ -102,7 +102,7 @@ bundle agent cronjob(commands,user,hours,mins)
 bundle agent rm_rf(name)
 # @brief recursively remove `name` to any depth, including base
 # @depends rm_rf_depth
-# @params name the file or directory name
+# @param name the file or directory name
 #
 # This bundle will remove `name` to any depth, including `name` itself.
 #
@@ -121,8 +121,8 @@ bundle agent rm_rf(name)
 bundle agent rm_rf_depth(name,depth)
 # @brief recursively remove `name` to depth `depth`, including base
 # @depends recurse_with_base tidy all
-# @params name the file or directory name
-# @params depth how far to descend
+# @param name the file or directory name
+# @param depth how far to descend
 #
 # This bundle will remove `name` to depth `depth`, including `name` itself.
 #
@@ -270,10 +270,10 @@ bundle agent prunedir(dir, max_days)
 
 bundle agent url_ping(host, method, port, uri)
 # @brief ping HOST:PORT/URI using METHOD
-# @params host the host name
-# @params method the HTTP method (HEAD or GET)
-# @params port the port number, e.g. 80
-# @params uri the URI, e.g. /path/to/resource
+# @param host the host name
+# @param method the HTTP method (HEAD or GET)
+# @param port the port number, e.g. 80
+# @param uri the URI, e.g. /path/to/resource
 #
 # This bundle will send a simple HTTP request and read 20 bytes back,
 # then compare them to `200 OK.*` (ignoring leading spaces).

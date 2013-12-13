@@ -486,7 +486,7 @@ body package_method apt_get
 body package_method apt_get_release(release)
 # @depends debian_knowledge
 # @brief APT installation package method
-# @params release specific release to use
+# @param release specific release to use
 #
 # This package method interacts with the APT package manager through `apt-get` but sets a specific target release.
 #
@@ -531,7 +531,7 @@ body package_method apt_get_release(release)
 body package_method dpkg_version(repo)
 # @depends debian_knowledge
 # @brief dpkg installation package method
-# @params repo specific repo to use
+# @param repo specific repo to use
 #
 # This package method interacts with `dpkg`.
 #
