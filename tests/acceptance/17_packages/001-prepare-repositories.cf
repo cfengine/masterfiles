@@ -15,9 +15,7 @@ body common control
 bundle common global
 {
   vars:
-    "testdir" string => dirname("$(this.promise_filename)");
-    "pwd" string => execresult("/bin/pwd", "noshell");
-    "cwd" string => "$(pwd)/$(testdir)";
+    "cwd" string => "$(this.promise_dirname)";
 }
 
 body contain useshell
