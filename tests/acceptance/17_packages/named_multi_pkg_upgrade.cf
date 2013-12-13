@@ -8,7 +8,7 @@ body common control
 {
     inputs => {
                "../default.cf.sub",
-               "../../../libraries/cfengine_stdlib.cf",
+               "../../../lib/3.6/packages.cf",
               };
     bundlesequence  => { default("$(this.promise_filename)") };
     version => "1.0";
@@ -28,7 +28,7 @@ bundle agent init
 
 	    "$(name)"
             package_policy => "add",
-            package_method => dpkg_version("deb_repo"),
+            package_method => dpkg_version("$(this.promise_filename)/deb_repo"),
             package_version => "1.0-1",
             package_select => "==",
             classes => test_set_class("pass","fail");
@@ -37,7 +37,7 @@ bundle agent init
 
             "$(name)"
             package_policy => "add",
-            package_method => rpm_version("rpm_repo"),
+            package_method => rpm_version("$(this.promise_filename)/rpm_repo"),
             package_version => "1.0-1",
             package_select => "==",
             classes => test_set_class("pass","fail");
@@ -54,14 +54,14 @@ bundle agent test
         debian::
 
             "$(name)"
-            package_policy => "add",
+            package_policy => "update",
             package_method => apt_get,
             classes => test_set_class("pass_$(name)","fail_$(name)");
 
         redhat::
 
             "$(name)"
-            package_policy => "add",
+            package_policy => "update",
             package_method => yum_rpm,
             classes => test_set_class("pass_$(name)","fail_$(name)");
 }

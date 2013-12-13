@@ -7,10 +7,10 @@
 body common control
 {
     inputs => {
+	       "../default.cf.sub",
                "../../../lib/3.6/packages.cf",
               };
-    # bundlesequence  => { "g", "G", default("$(this.promise_filename)") };
-    bundlesequence  => { "init", "test", "check" };
+    bundlesequence  => { default("$(this.promise_filename)") };
     version => "1.0";
     cache_system_functions => "no";
 }
@@ -46,14 +46,15 @@ bundle agent test
             package_select => "==",
             package_version => "$(version)",
             package_architectures => { "i386", "amd64" },
-            package_method => dpkg_version("/tmp");
+            package_method => dpkg_version("$(this.promise_dirname)/deb_repo");
         redhat::
             "$(name)"
             package_policy => "delete",
             package_select => "==",
             package_version => "$(version)",
             package_architectures => { "i386", "x86_64" },
-            package_method => rpm_version("/tmp");
+            package_method => rpm_version("$(this.promise_dirname)/rpm_repo");
+
 
 }
 
