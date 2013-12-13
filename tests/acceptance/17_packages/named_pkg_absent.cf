@@ -9,6 +9,7 @@ body common control
     inputs => {
                "../default.cf.sub",
                "../../../lib/3.6/packages.cf",
+               "packages-info.cf.sub",
               };
     bundlesequence  => { default("$(this.promise_filename)") };
     version => "1.0";
@@ -22,7 +23,7 @@ body common control
 bundle agent init
 {
     vars:
-        "name" slist => { "test-package-charlie" };
+        "name" slist => { "$(p.name[3])" };
 
     packages:
 
@@ -83,10 +84,11 @@ bundle agent check
             "not_has_pkg" not => returnszero("/bin/rpm -q $(test.name) > /dev/null", "useshell");
 
         any::
-            "not_has_file" not => fileexists("/test-package-charlie-installed.txt");
+            "not_has_file" not => fileexists("$(p.file[3][$(p.latest_version)])");
             "ok" expression => "pass.!fail.not_has_pkg.not_has_file";
 
     reports:
+        "$(p.file[3][$(p.latest_version)])";
         ok::
             "$(this.promise_filename) Pass";
         !ok::

@@ -10,6 +10,7 @@ body common control
                  #"../default.cf.sub",
                  #"../../../libraries/cfengine_stdlib.cf",
                   "../../../lib/3.6/packages.cf",
+                  "packages-info.cf.sub",
                 };
       bundlesequence  => { "init", "test", "check" };
       version => "1.0";
@@ -23,7 +24,7 @@ body common control
 bundle agent init
 {
     vars:
-        "name" string => "test-package-charlie";
+        "name" string => "$(p.name[3])";
 
     packages:
         "$(name)"
@@ -78,8 +79,9 @@ bundle agent check
             "has_pkg" expression => returnszero("dpkg -l | grep ' $(test.name) ' > /dev/null", "useshell");
 
         any::
-            "has_file" expression => fileexists("/test-package-charlie-installed.txt");
+            "has_file" expression => fileexists("$(p.file[3][$(p.latest_version)])");
             "ok" expression => "pass.!fail.has_pkg.has_file";
+
 
     reports:
         ok::

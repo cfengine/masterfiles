@@ -9,6 +9,7 @@ body common control
     inputs => {
                "../default.cf.sub",
                 "../../../lib/3.6/packages.cf",
+               "packages-info.cf.sub",
               };
     bundlesequence  => { default("$(this.promise_filename)") };
     version => "1.0";
@@ -22,10 +23,19 @@ body common control
 bundle agent init
 {
     vars:
-        "name"  slist => { "test-package-charlie","test-package-alpha","test-package-beta"};
+        "name" slist => { "$(p.name[3])","$(p.name[1])","$(p.name[2])"};
     packages:
-        "$(name)"
-        package_policy => "delete";
+        debian::
+
+	    "$(name)"
+            package_policy => "delete",
+            package_method => apt_get;
+
+        redhat::
+
+            "$(name)"
+            package_policy => "delete",
+            package_method => yum_rpm;
 }
 
 #######################################################
@@ -64,85 +74,38 @@ body classes test_set_class(ok_class,notok_class)
 
 bundle agent check
 {
-    vars:
-
-     any::
-
-      "name" slist => { @(init.name) };
-
-    methods:
-
-     any::
-
-      "CHECK TMP"   usebundle => checktmp("$(check.name)");
-      "CHECK FINAL" usebundle => checkfinal;
-
-}
-
-bundle agent checktmp(name)
-{
-    vars:
-
-     any::
-
-      "cname" string => canonify("$(name)");
-
     classes:
 
         debian::
 
-            "has_pkg_$(checktmp.cname)" expression => returnszero("dpkg -l | grep -q ' $(checktmp.name)'", "useshell");
+            "has_pkg_$(init.name)" expression => returnszero("dpkg -l | grep ' $(init.name) '", "useshell");
 
         redhat::
 
-            "has_pkg_$(checktmp.cname)" expression => returnszero("/bin/rpm -qa | grep -qw $(checktmp.name)", "useshell");
+            "has_pkg_$(init.name)" expression => returnszero("/bin/rpm -qa | grep -qw $(init.name)", "useshell");
 
         any::
-            "has_file_$(checktmp.cname)" expression => fileexists("/$(checktmp.name).txt");
-
-#            "has_file_test_package_charlie" expression => fileexists("/test-package-charlie-installed.txt");
-#            "has_file_test_package_alpha" expression => fileexists("/test-package-alpha-installed.txt");
-#            "has_file_test_package_beta" expression => fileexists("/test-package-beta-installed.txt");
+            "has_file_test_package_charlie" expression => fileexists("$(p.file[3][$(p.latest_version)])");
+            "has_file_test_package_alpha" expression => fileexists("$(p.file[1][$(p.latest_version)])");
+            "has_file_test_package_beta" expression => fileexists("$(p.file[2][$(p.latest_version)])");
 
             # Would be nice to test the pass_* and fail_* classes here, but CFEngine
             # doesn't set the classes properly when installing multiple new packages.
-#            "charlie_ok" and => { #"pass_test_package_charlie", "!fail_test_package_charlie",
-#                                  "has_pkg_test_package_charlie", "has_file_test_package_charlie" };
-#            "alpha_ok" and => { #"pass_test_package_alpha", "!fail_test_package_alpha",
-#                                "has_pkg_test_package_alpha", "has_file_test_package_alpha" };
-#            "beta_ok" and => { #"pass_test_package_beta", "!fail_test_package_beta",
-#                               "has_pkg_test_package_beta", "has_file_test_package_beta" };
-#            "ok" and => { "charlie_ok", "alpha_ok", "beta_ok" };
-
-             "$(cname)_ok" expression => "has_pkg_$(checktmp.cname)";
+            "charlie_ok" and => { #"pass_test_package_charlie", "!fail_test_package_charlie",
+                                  "has_pkg_test_package_charlie", "has_file_test_package_charlie" };
+            "alpha_ok" and => { #"pass_test_package_alpha", "!fail_test_package_alpha",
+                                "has_pkg_test_package_alpha", "has_file_test_package_alpha" };
+            "beta_ok" and => { #"pass_test_package_beta", "!fail_test_package_beta",
+                               "has_pkg_test_package_beta", "has_file_test_package_beta" };
+            "ok" and => { "charlie_ok", "alpha_ok", "beta_ok" };
 
     reports:
-     cfengine_3::
-      "$(cname) Pass" classes => my_if_repaired("$(cname)_pass"), ifvarclass => "$(cname)_ok";
 
-#        ok::
-#
-#            "$(this.promise_filename) Pass";
-#
-#       !ok::
-#
-#            "$(this.promise_filename) FAIL";
-}
+        ok::
 
-body classes my_if_repaired(class)
-{
- promise_repaired => { "$(class)" };
-}
+            "$(this.promise_filename) Pass";
 
-bundle agent checkfinal
-{
-    classes:
-     any::
-      "ok" and => { "test_package_charlie_pass","test_package_alpha_pass","test_package_beta_pass", };
+       !ok::
 
-    reports:
-     ok::
-      "$(this.promise_filename) ALL PASSSS!!!!!!!!!!!";
-     !ok::
-      "$(this.promise_filename) BUMMER!";
+            "$(this.promise_filename) FAIL";
 }
