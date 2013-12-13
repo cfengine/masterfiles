@@ -1,0 +1,38 @@
+bundle common p
+{
+  vars:
+    "packages" ilist => { 1, 2, 3 };
+    "versions" ilist => { 1, 2 };
+    "latest_version" int => "2";
+
+    "distinct_name[1]" string => "alpha";
+    "distinct_name[2]" string => "beta";
+    "distinct_name[3]" string => "charlie";
+
+    "name[1]" string => "test-package-$(distinct_name[1])";
+    "name[2]" string => "test-package-$(distinct_name[2])";
+    "name[3]" string => "test-package-$(distinct_name[3])";
+
+    redhat::
+      "ext" string => "rpm";
+    debian::
+      "ext" string => "deb";
+
+    redhat.64_bit::
+      "arch" string => "x86_64";
+    debian.64_bit::
+      "arch" string => "amd64";
+    32_bit::
+      "arch" string => "i386";
+
+    any::
+    "version[1]" string => "1.0-1";
+    "version[2]" string => "1.0-2";
+
+    "file[1][1]" string => "/$(name[1])_$(version[1])_$(arch)-$(ext)-installed.txt";
+    "file[1][2]" string => "/$(name[1])_$(version[2])_$(arch)-$(ext)-installed.txt";
+    "file[2][1]" string => "/$(name[2])_$(version[1])_$(arch)-$(ext)-installed.txt";
+    "file[2][2]" string => "/$(name[2])_$(version[2])_$(arch)-$(ext)-installed.txt";
+    "file[3][1]" string => "/$(name[3])_$(version[1])_$(arch)-$(ext)-installed.txt";
+    "file[3][2]" string => "/$(name[3])_$(version[2])_$(arch)-$(ext)-installed.txt";
+}
