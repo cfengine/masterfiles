@@ -38,7 +38,7 @@ rm -rf deb_repo/pool
 
 
 
-       
+
 for i in alpha beta charlie; do
     fakeroot dpkg-deb -b test-package-${i}_1.0-1_"$ARCH"
     fakeroot dpkg-deb -b test-package-${i}_1.0-2_"$ARCH"
