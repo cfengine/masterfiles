@@ -9,6 +9,7 @@ body common control
     inputs => {
                "../default.cf.sub",
                "../../../libraries/cfengine_stdlib.cf",
+               "packages-info.cf.sub",
               };
     bundlesequence  => { default("$(this.promise_filename)") };
     version => "1.0";
@@ -22,25 +23,19 @@ body common control
 bundle agent init
 {
     vars:
-        "name" slist => { "test-package-charlie","test-package-alpha","test-package-beta"};
+        "name" slist => { "$(p.name[3])","$(p.name[1])","$(p.name[2])"};
     packages:
         debian::
 
 	    "$(name)"
-            package_policy => "add",
-            package_method => dpkg_version("deb_repo"),
-            package_version => "1.0-1",
-            package_select => "==",
-            classes => test_set_class("pass","fail");
+            package_policy => "delete",
+            package_method => apt_get;
 
         redhat::
 
             "$(name)"
-            package_policy => "add",
-            package_method => rpm_version("rpm_repo"),
-            package_version => "1.0-1",
-            package_select => "==",
-            classes => test_set_class("pass","fail");
+            package_policy => "delete",
+            package_method => yum_rpm;
 }
 
 #######################################################
@@ -90,9 +85,9 @@ bundle agent check
             "has_pkg_$(init.name)" expression => returnszero("/bin/rpm -qa | grep -qw $(init.name)", "useshell");
 
         any::
-            "has_file_test_package_charlie" expression => fileexists("/test-package-charlie-installed.txt");
-            "has_file_test_package_alpha" expression => fileexists("/test-package-alpha-installed.txt");
-            "has_file_test_package_beta" expression => fileexists("/test-package-beta-installed.txt");
+            "has_file_test_package_charlie" expression => fileexists("$(p.file[3][$(p.latest_version)])");
+            "has_file_test_package_alpha" expression => fileexists("$(p.file[1][$(p.latest_version)])");
+            "has_file_test_package_beta" expression => fileexists("$(p.file[2][$(p.latest_version)])");
 
             # Would be nice to test the pass_* and fail_* classes here, but CFEngine
             # doesn't set the classes properly when installing multiple new packages.

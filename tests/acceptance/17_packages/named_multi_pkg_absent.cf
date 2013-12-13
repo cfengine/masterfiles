@@ -9,6 +9,7 @@ body common control
     inputs => {
              #  "../default.cf.sub",
 	       "../../../lib/3.6/packages.cf",
+               "packages-info.cf.sub",
               };
     #bundlesequence  => { default("$(this.promise_filename)") };
     bundlesequence => { "init", "test", "check" };
@@ -23,7 +24,7 @@ body common control
 bundle agent init
 {
     vars:
-        "name" slist => { "test-package-charlie","test-package-alpha","test-package-beta"};
+        "name" slist => { "$(p.name[3])","$(p.name[1])","$(p.name[2])"};
 
     packages:
 
@@ -91,9 +92,9 @@ bundle agent check
             "not_has_pkg_$(test.name)" not => returnszero("/bin/rpm -q $(test.name) > /dev/null", "useshell");
 
         any::
-            "not_has_file_test_package_charlie" not => fileexists("/test-package-charlie-installed.txt");
-            "not_has_file_test_package_alpha" not => fileexists("/test-package-alpha-installed.txt");
-            "not_has_file_test_package_beta" not => fileexists("/test-package-beta-installed.txt");
+            "not_has_file_test_package_charlie" not => fileexists("$(p.file[3][$(p.latest_version)])");
+            "not_has_file_test_package_alpha" not => fileexists("$(p.file[1][$(p.latest_version)])");
+            "not_has_file_test_package_beta" not => fileexists("$(p.file[2][$(p.latest_version)])");
             # Would be nice to test the pass_* and fail_* classes here, but CFEngine
             # doesn't set the classes properly when installing multiple new packages.
             "charlie_ok" and => { #"pass_test_package_charlie", "!fail_test_package_charlie",
