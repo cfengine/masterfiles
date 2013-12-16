@@ -110,6 +110,13 @@ bundle server access_rules()
       report_data_select => default_data_select_host,
       admit => { "$(sys.policy_hub)" };
 
+      "rebase"
+      handle => "server_access_grant_rebase_for_hosts",
+      comment => "Grant rebase reporting query for the hub on the hosts",
+      resource_type => "query",
+      report_data_select => default_data_select_host,
+      admit => { "$(sys.policy_hub)" };
+
     am_policy_hub::
 
       "delta"
@@ -122,6 +129,13 @@ bundle server access_rules()
       "full"
       handle => "server_access_grant_full_for_hub",
       comment => "Grant full reporting query for the hub on the policy server",
+      resource_type => "query",
+      report_data_select => default_data_select_policy_hub,
+      admit => { "$(sys.policy_hub)" };
+
+      "rebase"
+      handle => "server_access_grant_rebase_for_hub",
+      comment => "Grant rebase reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
       admit => { "$(sys.policy_hub)" };
