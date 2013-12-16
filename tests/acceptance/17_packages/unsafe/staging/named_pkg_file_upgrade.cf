@@ -7,11 +7,11 @@
 body common control
 {
     inputs => {
-               "../../../lib/3.6/packages.cf",
+               "../../default.cf.sub",
+               "../../../../lib/3.6/packages.cf",
                "packages-info.cf.sub",
               };
-    # bundlesequence  => { "g", "G", default("$(this.promise_filename)") };
-    bundlesequence  => { "init", "test", "check" };
+    bundlesequence  => { default("$(this.promise_filename)") };
     version => "1.0";
     cache_system_functions => "no";
 }
