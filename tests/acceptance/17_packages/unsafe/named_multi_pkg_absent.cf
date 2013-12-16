@@ -7,8 +7,8 @@
 body common control
 {
     inputs => {
-               "../default.cf.sub",
-	       "../../../lib/3.6/packages.cf",
+               "../../default.cf.sub",
+	           "../../../../lib/3.6/packages.cf",
                "packages-info.cf.sub",
               };
     bundlesequence  => { default("$(this.promise_filename)") };
