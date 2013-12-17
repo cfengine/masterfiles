@@ -29,6 +29,7 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_update_folders",
       comment => "Create empty directories for CFE self-upgrade";
 
+    am_policy_hub.enterprise::
       #### cfengine_internal_selinux() can be "enabled" or "disabled"
 
       "hub" usebundle => cfe_internal_selinux("enabled"),
