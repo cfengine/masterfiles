@@ -41,7 +41,7 @@ bundle agent init
             package_select => "==",
             package_version => "$(version)",
             package_architectures => { "$(arch)" },
-            package_method => dpkg_version;
+            package_method => dpkg_version("$(this.promise_dirname)/deb_repo");
 
         redhat::
             "$(name)"
@@ -49,7 +49,7 @@ bundle agent init
             package_select => "==",
             package_version => "$(version)",
             package_architectures => { "$(arch)" },
-            package_method => rpm_version;
+            package_method => rpm_version("$(this.promise_dirname)/rpm_repo");
 }
 
 #######################################################
