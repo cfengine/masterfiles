@@ -77,8 +77,8 @@ bundle common debian_knowledge
       "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
       "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
 
-      "list_name_regex" string => ".i\s+([^\s:]+).*";
-      "list_version_regex" string => ".i\s+[^\s]+\s+([^\s]+).*";
+      "list_name_regex" string => "^.i\s+([^\s:]+).*";
+      "list_version_regex" string => "^.i\s+[^\s]+\s+([^\s]+).*";
 
       "patch_name_regex" string => "^Inst\s+(\S+)\s+.*";
       "patch_version_regex" string => "^Inst\s+(\S+)\s+.*";
