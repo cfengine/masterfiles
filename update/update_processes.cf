@@ -221,7 +221,7 @@ bundle agent enable_cfengine_agents(process)
 
   processes:
 
-    files_ok::
+    !windows::
 
       "$(sys.bindir)/$(process)"
       restart_class => "restart_$(cprocess)",
