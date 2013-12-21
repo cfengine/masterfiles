@@ -63,12 +63,12 @@ bundle common inventory_dmidecode
                            "processor-frequency"
       };
       "decoder" string => "/usr/sbin/dmidecode";
-      "decoded[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
+      "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                                  "useshell"),
-      meta => { "inventory", "group=OS", "comment=$(dmivars) $(decoded[$(dmivars)])" };
+      meta => { "inventory", "group=OS", "comment=$(dmivars) $(dmi[$(dmivars)])" };
 
       "canonified_var[$(dmivars)]" string => canonify($(dmivars));
-      "canonified[$(dmivars)]" string => canonify("$(decoded[$(dmivars)])");
+      "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
 
   classes:
     !disable_dmidecode::
@@ -76,7 +76,7 @@ bundle common inventory_dmidecode
       expression => "any",
       meta => { "inventory",
                 "group=OS",
-                "derived-from=inventory_dmidecode.decoded[$(dmivars)]",
-                "comment=$(decoded[$(dmivars)])"
+                "derived-from=inventory_dmidecode.dmi[$(dmivars)]",
+                "comment=$(dmivars) $(dmi[$(dmivars)])"
       };
 }
