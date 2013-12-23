@@ -8,25 +8,44 @@ bundle common inventory_lsb
       "_inventory_lsb" and => { "!disable_lsb", "_have_lsb_exec" };
 
     _inventory_lsb::
-      "lsb_$(lsb[Distributor ID])" expression => "any";
-      "lsb_$(lsb[Distributor ID])_$(lsb[Release])" expression => "any";
+      "lsb_$(lsb[Distributor ID])" expression => "any",
+      meta => { "inventory", "group=OS", "comment=LSB Distributor ID" };
+
+      "lsb_$(lsb[Distributor ID])_$(lsb[Release])" expression => "any",
+      meta => { "inventory", "group=OS", "comment=LSB Distributor ID and Release" };
 
   vars:
       "lsb_exec" string => "/usr/bin/lsb_release";
 
     _inventory_lsb::
-      "lsb[Distributor ID]" string => execresult("$(lsb_exec) -i -s", "noshell");
-      "lsb[Release]" string => execresult("$(lsb_exec) -r -s", "noshell");
-      "lsb[Description]" string => execresult("$(lsb_exec) -d -s", "noshell");
-      "lsb[Codename]" string => execresult("$(lsb_exec) -c -s", "noshell");
+      "lsb[Distributor ID]" string => execresult("$(lsb_exec) -i -s", "noshell"),
+      meta => { "inventory", "group=OS", "comment=LSB Distributor ID" };
+
+      "lsb[Release]" string => execresult("$(lsb_exec) -r -s", "noshell"),
+      meta => { "inventory", "group=OS", "comment=LSB Release" };
+
+      "lsb[Description]" string => execresult("$(lsb_exec) -d -s", "noshell"),
+      meta => { "inventory", "group=OS", "comment=LSB Description" };
+
+      "lsb[Codename]" string => execresult("$(lsb_exec) -c -s", "noshell"),
+      meta => { "inventory", "group=OS", "comment=LSB Codename" };
 
       "lsb_keys" slist => getindices("lsb");
 
-      "os" string => canonify("$(lsb[Distributor ID])");
-      "release" string => "$(lsb[Release])";
-      "flavor" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])");
-      "flavour" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])");
-      "description" string => "$(lsb[Description])";
+      "os" string => canonify("$(lsb[Distributor ID])"),
+      meta => { "inventory", "group=OS", "comment=LSB-provided OS name" };
+
+      "release" string => "$(lsb[Release])",
+      meta => { "inventory", "group=OS", "comment=LSB-provided OS release" };
+
+      "flavor" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])"),
+      meta => { "inventory", "group=OS", "comment=LSB-provided OS flavor" };
+
+      "flavour" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])"),
+      meta => { "inventory", "group=OS", "comment=LSB-provided OS flavour" };
+
+      "description" string => "$(lsb[Description])",
+      meta => { "inventory", "group=OS", "comment=LSB-provided OS description" };
 
   reports:
     inform_mode._inventory_lsb::
