@@ -47,9 +47,17 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
-body file control
+bundle common packages_common
+# @ignore
 {
-      inputs => { "$(sys.local_libdir)/paths.cf" };
+  vars:
+      "inputs" slist => { "$(this.promise_dirname)/paths.cf" };
+}
+
+body file control
+# @ignore
+{
+      inputs => { @(packages_common.inputs) };
 }
 
 ##--------------------------------------------------------------
@@ -81,8 +89,8 @@ bundle common debian_knowledge
       "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
       "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
 
-      "list_name_regex" string => ".i\s+([^\s:]+).*";
-      "list_version_regex" string => ".i\s+[^\s]+\s+([^\s]+).*";
+      "list_name_regex" string => "^.i\s+([^\s:]+).*";
+      "list_version_regex" string => "^.i\s+[^\s]+\s+([^\s]+).*";
 
       "patch_name_regex" string => "^Inst\s+(\S+)\s+.*";
       "patch_version_regex" string => "^Inst\s+(\S+)\s+.*";
@@ -177,6 +185,7 @@ body package_method pip(flags)
 # http://www.pip-installer.org/en/latest/cookbook.html#non-recursive-upgrades
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "Django"              package_method => pip(""), package_policy => "add";
@@ -224,6 +233,7 @@ body package_method npm(dir)
 # Available commands : add, delete, (add)update, verify
 #
 # **Example:**
+#
 # ```cf3
 # vars:
 #     "dirs"    slist => { "/root/myproject", "/home/somedev/someproject" };
@@ -267,6 +277,7 @@ body package_method npm_g
 # Available commands : add, delete, (add)update, verify
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "express"              package_method => npm_g, package_policy => "add";
@@ -307,6 +318,7 @@ body package_method brew(user)
 # Available commands : add, delete, (add)update (with package_version).
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => brew("adminuser"), package_policy => "add";
@@ -346,6 +358,7 @@ body package_method apt
 # This package method interacts with the APT package manager through `aptitude`.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => apt, package_policy => "add";
@@ -406,6 +419,7 @@ body package_method apt_get
 # This package method interacts with the APT package manager through `apt-get`.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => apt_get, package_policy => "add";
@@ -443,11 +457,12 @@ body package_method apt_get
 body package_method apt_get_release(release)
 # @depends common_knowledge debian_knowledge
 # @brief APT installation package method
-# @params release specific release to use
+# @param release specific release to use
 #
 # This package method interacts with the APT package manager through `apt-get` but sets a specific target release.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => apt_get_release("xyz"), package_policy => "add";
@@ -487,11 +502,12 @@ body package_method apt_get_release(release)
 body package_method dpkg_version(repo)
 # @depends common_knowledge debian_knowledge
 # @brief dpkg installation package method
-# @params repo specific repo to use
+# @param repo specific repo to use
 #
 # This package method interacts with `dpkg`.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => dpkg_version("xyz"), package_policy => "add";
@@ -548,6 +564,7 @@ body package_method rpm_version(repo)
 # This package method interacts with the RPM package manager for a specific repo.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => rpm_version("myrepo"), package_policy => "add";
@@ -657,6 +674,7 @@ body package_method yum
 # `rpm -e` will return an error and not delete any of them.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => yum, package_policy => "add";
@@ -710,6 +728,7 @@ body package_method yum_rpm
 # `rpm -e` will return an error and not delete any of them.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => yum_rpm, package_policy => "add";
@@ -761,6 +780,7 @@ body package_method yum_rpm_enable_repo(repoid)
 # the EPEL, which normally you do not want to install packages from.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => yum_rpm_enable_repo("myrepo"), package_policy => "add";
@@ -811,6 +831,7 @@ body package_method yum_group
 # ```
 #
 # **Example:**
+#
 # ```cf3
 # Policies examples:
 #
@@ -868,6 +889,7 @@ body package_method rpm_filebased(path)
 # Based on yum_rpm body in COPBL by Trond Hasle Amundsen.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "epel-release"
@@ -1229,6 +1251,7 @@ body package_method zypper
 # This package method interacts with the SuSE Zypper package manager
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => zypper, package_policy => "add";
@@ -1270,6 +1293,7 @@ body package_method generic
 # contributed by Trond Hasle Amundsen.
 #
 # **Example:**
+#
 # ```cf3
 # packages:
 #     "mypackage" package_method => generic, package_policy => "add";

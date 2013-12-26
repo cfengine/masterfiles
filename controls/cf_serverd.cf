@@ -41,13 +41,16 @@ body server control
       cfruncommand => "$(sys.cf_twin) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
 
     hpux::
-      cfruncommand => "/bin/sh -c \"SHLIB_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"SHLIB_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     aix::
-      cfruncommand => "/bin/sh -c \"LIBPATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"LIBPATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
-    !(windows|hpux|aix)::
-      cfruncommand => "/bin/sh -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+    solaris::
+      cfruncommand => "$(def.cf_runagent_shell) -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
+
+    !(windows|hpux|aix|solaris)::
+      cfruncommand => "$(def.cf_runagent_shell) -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
 }
 
@@ -81,7 +84,12 @@ bundle server access_rules()
       comment => "Grant access to modules directory",
       admit => { ".*$(def.domain)", @(def.acl) };
 
-      "/bin/sh"
+      "$(def.dir_plugins)"
+      handle => "server_access_grant_access_plugins",
+      comment => "Grant access to plugins directory",
+      admit => { ".*$(def.domain)", @(def.acl) };
+
+      "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
       admit => { "$(sys.policy_hub)" };
@@ -102,6 +110,13 @@ bundle server access_rules()
       report_data_select => default_data_select_host,
       admit => { "$(sys.policy_hub)" };
 
+      "rebase"
+      handle => "server_access_grant_rebase_for_hosts",
+      comment => "Grant rebase reporting query for the hub on the hosts",
+      resource_type => "query",
+      report_data_select => default_data_select_host,
+      admit => { "$(sys.policy_hub)" };
+
     am_policy_hub::
 
       "delta"
@@ -114,6 +129,13 @@ bundle server access_rules()
       "full"
       handle => "server_access_grant_full_for_hub",
       comment => "Grant full reporting query for the hub on the policy server",
+      resource_type => "query",
+      report_data_select => default_data_select_policy_hub,
+      admit => { "$(sys.policy_hub)" };
+
+      "rebase"
+      handle => "server_access_grant_rebase_for_hub",
+      comment => "Grant rebase reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
       admit => { "$(sys.policy_hub)" };

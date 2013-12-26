@@ -172,10 +172,6 @@ bundle agent disable_cfengine_agents(process)
       comment => "Canonify a given process",
       handle => "cfe_internal_disable_cfengine_agents_vars_cprocess";
 
-      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
-      comment => "Path to a policy file",
-      handle => "cfe_internal_disable_cfengine_agents_vars_file_check";
-
       #
 
   classes:
@@ -185,10 +181,6 @@ bundle agent disable_cfengine_agents(process)
       "disable_$(cprocess)" expression => strcmp("$(process)","$(process)"),
       comment => "Create a class to disable a given process",
       handle => "cfe_internal_disable_cfengine_agents_classes_disable_process";
-
-      "files_ok"         expression => fileexists("$(file_check)"),
-      comment => "Check for /var/cfengine/inputs/promises.cf",
-      handle => "cfe_internal_disable_cfengine_agents_classes_files_ok";
 
       #
 
@@ -215,10 +207,6 @@ bundle agent enable_cfengine_agents(process)
       comment => "Canonify a given process",
       handle => "cfe_internal_enable_cfengine_agents_vars_cprocess";
 
-      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
-      comment => "Path to a policy file",
-      handle => "cfe_internal_enable_cfengine_agents_vars_file_check";
-
       #
 
   classes:
@@ -229,15 +217,11 @@ bundle agent enable_cfengine_agents(process)
       comment => "Create a class to enable a given process",
       handle => "cfe_internal_enable_cfengine_agents_classes_enable_process";
 
-      "files_ok"         expression => fileexists("$(file_check)"),
-      comment => "Check for /var/cfengine/inputs/promises.cf",
-      handle => "cfe_internal_enable_cfengine_agents_classes_files_ok";
-
       #
 
   processes:
 
-    files_ok::
+    !windows::
 
       "$(sys.bindir)/$(process)"
       restart_class => "restart_$(cprocess)",

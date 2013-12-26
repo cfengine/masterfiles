@@ -9,10 +9,17 @@ bundle common inventory_control
       # disable specific inventory modules here
       "disable_lsb" expression => "disable_inventory";
 
+      # by default don't run dmidecode every time
+      "disable_dmidecode" expression => "any";
+      # or you could make it conditional on the binary...
+      # "disable_dmidecode" expression => fileexists("/usr/sbin/dmidecode");
+
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
     verbose_mode.!disable_lsb::
+      "$(this.bundle): LSB module enabled";
+    verbose_mode.!disable_dmidecode::
       "$(this.bundle): LSB module enabled";
 }
 
@@ -24,13 +31,52 @@ bundle common inventory_any
 {
 }
 
-body classes inventory_if_ok(x)
-# @brief if OK, define a local class x
-# @param x the class to define
+bundle common inventory_dmidecode
+# @brief Do dmidecode-based inventory
 #
-# Define a bundle-local class `x` if the promise was kept or repaired.
+# This common bundle runs dmidecode
 {
-      scope => "bundle";
-      promise_repaired => { "$(x)" };
-      promise_kept => { "$(x)" };
+  vars:
+    !disable_dmidecode::
+      "dmivars" slist => {
+                           "bios-vendor",
+                           "bios-version",
+                           "bios-release-date",
+                           "system-manufacturer",
+                           "system-product-name",
+                           "system-version",
+                           "system-serial-number",
+                           "system-uuid",
+                           "baseboard-manufacturer",
+                           "baseboard-product-name",
+                           "baseboard-version",
+                           "baseboard-serial-number",
+                           "baseboard-asset-tag",
+                           "chassis-manufacturer",
+                           "chassis-type",
+                           "chassis-version",
+                           "chassis-serial-number",
+                           "chassis-asset-tag",
+                           "processor-family",
+                           "processor-manufacturer",
+                           "processor-version",
+                           "processor-frequency"
+      };
+      "decoder" string => "/usr/sbin/dmidecode";
+      "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
+                                                 "useshell"),
+      meta => { "inventory", "group=OS", "comment=$(dmivars) $(dmi[$(dmivars)])" };
+
+      "canonified_var[$(dmivars)]" string => canonify($(dmivars));
+      "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
+
+  classes:
+    !disable_dmidecode::
+      "dmidecode_$(canonified_var[$(dmivars)])_$(canonified[$(dmivars)])"
+      expression => "any",
+      meta => { "inventory",
+                "group=OS",
+                "derived-from=inventory_dmidecode.dmi[$(dmivars)]",
+                "comment=$(dmivars) $(dmi[$(dmivars)])"
+      };
 }

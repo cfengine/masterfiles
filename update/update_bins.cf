@@ -413,6 +413,7 @@ body package_method u_generic(repo)
       # Cfengine appends path to package and package name below, respectively
       package_add_command        => "/bin/sh $(repo)/add_scr $(repo)/admin_file";
       package_delete_command     => "/usr/sbin/pkgrm -n -a $(repo)/admin_file";
+      package_update_command     => "/bin/sh $(repo)/upg_scr $(repo)/admin_file";
 
     aix::
 

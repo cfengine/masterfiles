@@ -33,10 +33,6 @@ bundle common def
       comment => "Define an acl for the machines to be granted accesses",
       handle => "common_def_vars_acl";
 
-      "input_name_patterns" slist => { ".*.cf",".*.dat",".*.txt", ".*.conf" },
-      comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
-      handle => "common_def_vars_input_name_patterns";
-
       # End change #
 
       "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
@@ -58,6 +54,24 @@ bundle common def
       "dir_modules"     string => translatepath("$(sys.workdir)/modules"),
       comment => "Define modules path",
       handle => "common_def_vars_dir_modules";
+
+      "dir_plugins"     string => translatepath("$(sys.workdir)/plugins"),
+      comment => "Define plugins path",
+      handle => "common_def_vars_dir_plugins";
+
+      solaris::
+      "cf_runagent_shell"
+        string  => "/usr/bin/sh",
+        comment => "Define path to shell used by cf-runagent",
+        handle  => "common_def_vars_solaris_cf_runagent_shell";
+
+      !(windows|solaris)::
+      "cf_runagent_shell"
+        string  => "/bin/sh",
+        comment => "Define path to shell used by cf-runagent",
+        handle  => "common_def_vars_cf_runagent_shell";
+
+      any::
 
       # CFEngine own log files
       "cfe_log_files"    slist => {
@@ -83,4 +97,7 @@ bundle common def
 
     # Transfer policies and binaries with encryption
     "cfengine_internal_encrypt_transfers" expression => "!any";
+
+    # Purge policies that don't exist on the server side.
+    "cfengine_internal_purge_policies" expression => "!any";
 }
