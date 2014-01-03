@@ -20,7 +20,7 @@ bundle common inventory_control
     verbose_mode.!disable_lsb::
       "$(this.bundle): LSB module enabled";
     verbose_mode.!disable_dmidecode::
-      "$(this.bundle): LSB module enabled";
+      "$(this.bundle): dmidecode module enabled";
 }
 
 bundle common inventory_any
@@ -65,7 +65,7 @@ bundle common inventory_dmidecode
       "decoder" string => "/usr/sbin/dmidecode";
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                                  "useshell"),
-      meta => { "inventory", "group=OS", "comment=$(dmivars) $(dmi[$(dmivars)])" };
+      meta => { "inventory", "comment=$(dmivars)" };
 
       "canonified_var[$(dmivars)]" string => canonify($(dmivars));
       "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
