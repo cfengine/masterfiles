@@ -29,10 +29,6 @@ body server control
       ## List of hosts that we'll accept any key they present (open this only for bootstrapping)
       trustkeysfrom         => { "127.0.0.1" , "::1", @(def.acl) };
 
-      # List of hosts that don't need to verify identity with reverse DNS lookup
-      # (deprecated now that key authentication is the norm)
-      skipverify            => { ".*$(def.domain)", "127.0.0.1" , "::1", @(def.acl) };
-
       allowusers            => { "root" };
 
       maxconnections        => "100";
