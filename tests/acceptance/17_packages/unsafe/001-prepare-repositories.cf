@@ -1,0 +1,104 @@
+########################################################################
+#
+# Not really a test, but a preparation policy for running other package
+# tests. It sets up the required files for accessing our local package
+# repository.
+# It MUST run before the other tests in this directory.
+#
+########################################################################
+
+body common control
+{
+  bundlesequence => { "repositories", "signing_keys", "update", "check" };
+}
+
+bundle common global
+{
+  vars:
+    "cwd" string => "$(this.promise_dirname)";
+}
+
+body contain useshell
+{
+  useshell => "useshell";
+}
+
+bundle agent repositories
+{
+  vars:
+    redhat::
+      "repo_file" string => "/etc/yum.repos.d/test-repository.repo";
+    debian::
+      "repo_file" string => "/etc/apt/sources.list.d/testdebian.list";
+
+  files:
+    "$(repo_file)"
+      create => "true",
+      edit_line => repository,
+      edit_defaults => edit_defaults,
+      classes => if_successful("repo_ok");
+}
+
+bundle edit_line repository
+{
+  insert_lines:
+    redhat::
+      "[test-repository]";
+      "name=Test repository";
+      "baseurl=file://$(global.cwd)/rpm_repo";
+      "enabled=1";
+      "gpgcheck=0";
+    debian::
+      "deb file://$(global.cwd)/deb_repo package1 main";
+}
+
+body edit_defaults edit_defaults
+{
+  edit_backup => "false";
+  empty_file_before_editing => "true";
+}
+
+bundle agent signing_keys
+{
+  classes:
+    !debian::
+      "signing_keys_ok" expression => "any";
+
+  commands:
+    debian::
+      "gpg --no-default-keyring --keyring $(global.cwd)/gpg/pubring.gpg --export \
+       | gpg --no-default-keyring --primary-keyring /etc/apt/trusted.gpg --import"
+        contain => useshell,
+        classes => if_successful("signing_keys_ok");
+}
+
+bundle agent update
+{
+  commands:
+    redhat::
+      "yum makecache"
+        contain => useshell,
+        classes => if_successful("update_ok");
+    debian::
+      "apt-get update"
+        contain => useshell,
+        classes => if_successful("update_ok");
+}
+
+body classes if_successful(x)
+{
+  promise_repaired => { "$(x)" };
+  promise_kept     => { "$(x)" };
+}
+
+bundle agent check
+{
+  classes:
+    "everything_ok" and => { "repo_ok", "signing_keys_ok", "update_ok" };
+
+  reports:
+    everything_ok::
+      "$(this.promise_filename) Pass";
+    !everything_ok::
+      "$(this.promise_filename) FAIL";
+}

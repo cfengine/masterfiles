@@ -1,0 +1,59 @@
+#!/bin/sh
+
+
+ARCH=""
+PARCH=""
+
+if [ "$1" = "" ]; then
+    echo "Automatically detecting architecture."
+    PARCH=$(uname -m)
+        if [ "$PARCH" = "i386" ] || [ "$PARCH" = "i686" ]; then
+        ARCH="i386"
+        fi
+        if [ "$PARCH" = "amd64" ] || [ "$PARCH" = "x86_64" ]; then
+        ARCH="amd64"
+        fi
+elif [ "$1" = "i386" ]; then
+    echo "Regenerating i386 debian packages and debian repository."
+    echo "Requires the reprepro tool."
+    ARCH="$1"
+elif [ "$1" = "amd64" ]; then
+    echo "Regenerating amd64 debian packages and debian repository."
+    echo "Requires the reprepro tool." 
+    ARCH="$1"
+else 
+    echo "Usage: build-deb-repo i386 | amd64"
+    exit 5
+fi
+
+
+
+
+set -e
+
+rm -f deb_repo/*$ARCH*.deb
+rm -rf deb_repo/db
+rm -rf deb_repo/dists
+rm -rf deb_repo/pool
+
+
+
+
+for i in alpha beta charlie; do
+    fakeroot dpkg-deb -b test-package-${i}_1.0-1_"$ARCH"
+    fakeroot dpkg-deb -b test-package-${i}_1.0-2_"$ARCH"
+    mv -f test-package-${i}_1.0-1_"$ARCH".deb deb_repo/test-package-${i}_1.0-1_"$ARCH".deb
+    mv -f test-package-${i}_1.0-2_"$ARCH".deb deb_repo/test-package-${i}_1.0-2_"$ARCH".deb
+done
+
+
+
+
+cd deb_repo
+for i in *.deb; do
+    REPREPRO_BASE_DIR=`pwd` ../putinrepo.sh $i
+done
+
+for i in `find . -name Release`; do
+    gpg --detach-sign --armor --no-default-keyring --keyring ../gpg/pubring.gpg --secret-keyring ../gpg/secring.gpg --output $i.gpg $i
+done

@@ -1,0 +1,103 @@
+#######################################################
+#
+# Test remove named package
+#
+#######################################################
+
+body common control
+{
+    inputs => {
+               "../../default.cf.sub",
+               "../../../../lib/3.6/packages.cf",
+               "packages-info.cf.sub",
+              };
+    bundlesequence  => { default("$(this.promise_filename)") };
+    version => "1.0";
+    cache_system_functions => "no";
+}
+
+
+
+#######################################################
+
+bundle agent init
+{
+    vars:
+        "name" slist => { "$(p.name[3])" };
+
+    packages:
+
+
+        debian::
+
+	    "$(name)"
+            package_policy => "add",
+            package_method => apt_get;
+
+        redhat::
+
+            "$(name)"
+            package_policy => "add",
+            package_method => yum_rpm;
+}
+
+#######################################################
+
+bundle agent test
+{
+    vars:
+        "name" slist => { "$(init.name)" };
+
+    packages:
+
+        debian::
+            "$(name)"
+            package_policy => "delete",
+            package_method => apt_get,
+            classes => test_set_class("pass","fail");
+
+    redhat::
+        "$(name)"
+        package_policy => "delete",
+        package_method => yum_rpm,
+        classes => test_set_class("pass","fail");
+}
+
+
+
+body classes test_set_class(ok_class,notok_class)
+{
+    promise_kept => { "$(ok_class)" };
+    promise_repaired => { "$(ok_class)" };
+    repair_failed => { "$(notok_class)" };
+}
+
+#######################################################
+
+bundle agent check
+{
+
+    classes:
+        debian::
+            "not_has_pkg" not => returnszero("dpkg -l | grep ' $(test.name) ' > /dev/null", "useshell");
+        redhat::
+            "not_has_pkg" not => returnszero("/bin/rpm -q $(test.name) > /dev/null", "useshell");
+
+        any::
+            "not_has_file" not => fileexists("$(p.file[3][$(p.latest_version)])");
+            "ok" expression => "pass.!fail.not_has_pkg.not_has_file";
+
+    reports:
+        "$(p.file[3][$(p.latest_version)])";
+        ok::
+            "$(this.promise_filename) Pass";
+        !ok::
+            "$(this.promise_filename) FAIL";
+}
+
+body classes succesfully_executed(class)
+{
+    kept_returncodes => { "0" };
+    promise_kept => { "$(class)" };
+}
+
