@@ -459,7 +459,7 @@ body package_method apt_get
       package_list_name_regex => "$(debian_knowledge.list_name_regex)";
       package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
-      package_name_convention => "$(name)";
+      package_name_convention => "$(name)=$(version)";
 
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
