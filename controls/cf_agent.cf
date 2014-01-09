@@ -35,10 +35,4 @@ body agent control
                        # "APT_LISTCHANGES_FRONTEND=none",
       };
 
-      # Switch on tracking of promise valuation
-
-    any::
-
-      track_value => "true";
-
 }
