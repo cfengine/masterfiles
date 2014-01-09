@@ -1,0 +1,8 @@
+Origin: CFEngine AS
+Label: testing1
+Suite: package1
+Codename: package1
+Version: 10.04
+Architectures: i386 amd64 armel
+Components: main
+Description: Custom debian package for testing package promises

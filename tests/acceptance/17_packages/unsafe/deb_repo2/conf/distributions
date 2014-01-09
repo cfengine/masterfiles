@@ -1,7 +1,7 @@
 Origin: CFEngine AS
-Label: testing1
-Suite: package1
-Codename: package1
+Label: testing2
+Suite: package2
+Codename: package2
 Version: 12.04
 Architectures: i386 amd64 armel
 Components: main
