@@ -1,0 +1,7 @@
+Archive: package1
+Version: 10.04
+Component: main
+Origin: CFEngine AS
+Label: testing1
+Architecture: amd64
+Description: Custom debian package for testing package promises
