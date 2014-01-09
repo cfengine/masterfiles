@@ -49,7 +49,8 @@ bundle edit_line repository
       "enabled=1";
       "gpgcheck=0";
     debian::
-      "deb file://$(global.cwd)/deb_repo package1 main";
+      "deb file://$(global.cwd)/deb_repo1 package1 main";
+      "deb file://$(global.cwd)/deb_repo2 package2 main";
 }
 
 body edit_defaults edit_defaults
