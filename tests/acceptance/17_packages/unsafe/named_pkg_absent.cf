@@ -23,20 +23,20 @@ body common control
 bundle agent init
 {
     vars:
-        "name" slist => { "$(p.name[3])" };
+        "package_name" slist => { "$(p.name[3])" };
 
     packages:
 
 
         debian::
 
-	    "$(name)"
+	    "$(package_name)"
             package_policy => "add",
             package_method => apt_get;
 
         redhat::
 
-            "$(name)"
+            "$(package_name)"
             package_policy => "add",
             package_method => yum_rpm;
 }
@@ -46,18 +46,18 @@ bundle agent init
 bundle agent test
 {
     vars:
-        "name" slist => { "$(init.name)" };
+        "package_name" slist => { "$(init.package_name)" };
 
     packages:
 
         debian::
-            "$(name)"
+            "$(package_name)"
             package_policy => "delete",
             package_method => apt_get,
             classes => test_set_class("pass","fail");
 
     redhat::
-        "$(name)"
+        "$(package_name)"
         package_policy => "delete",
         package_method => yum_rpm,
         classes => test_set_class("pass","fail");
@@ -79,9 +79,9 @@ bundle agent check
 
     classes:
         debian::
-            "not_has_pkg" not => returnszero("dpkg -l | grep ' $(test.name) ' > /dev/null", "useshell");
+            "not_has_pkg" not => returnszero("dpkg -l | grep ' $(test.package_name) ' > /dev/null", "useshell");
         redhat::
-            "not_has_pkg" not => returnszero("/bin/rpm -q $(test.name) > /dev/null", "useshell");
+            "not_has_pkg" not => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
 
         any::
             "not_has_file" not => fileexists("$(p.file[3][$(p.latest_version)])");
