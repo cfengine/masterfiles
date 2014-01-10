@@ -1,0 +1,8 @@
+Origin: CFEngine AS
+Label: testing2
+Suite: package2
+Codename: package2
+Version: 12.04
+Architectures: i386 amd64 armel
+Components: main
+Description: Custom debian package for testing package promises

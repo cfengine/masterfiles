@@ -49,7 +49,7 @@ bundle agent test
             package_select => "==",
             package_version => "$(package_version)",
             package_architectures => { "i386", "amd64" },
-            package_method => dpkg_version("$(this.promise_dirname)/deb_repo");
+            package_method => dpkg_version("$(this.promise_dirname)/file_repo");
 
         redhat::
 

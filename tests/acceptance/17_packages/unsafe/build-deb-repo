@@ -31,29 +31,26 @@ fi
 
 set -e
 
-rm -f deb_repo/*$ARCH*.deb
-rm -rf deb_repo/db
-rm -rf deb_repo/dists
-rm -rf deb_repo/pool
+for repo in 1 2; do
+    rm -f deb_repo$repo/*$ARCH*.deb
+    rm -f file_repo/*1.0-${repo}_$ARCH*.deb
+    rm -rf deb_repo$repo/db
+    rm -rf deb_repo$repo/dists
+    rm -rf deb_repo$repo/pool
 
+    for i in alpha beta charlie; do
+        fakeroot dpkg-deb -b test-package-${i}_1.0-${repo}_"$ARCH"
+        cp -f test-package-${i}_1.0-${repo}_"$ARCH".deb file_repo/test-package-${i}_1.0-${repo}_"$ARCH".deb
+        mv -f test-package-${i}_1.0-${repo}_"$ARCH".deb deb_repo$repo/test-package-${i}_1.0-${repo}_"$ARCH".deb
+    done
 
+    cd deb_repo$repo
+    for i in *.deb; do
+        REPREPRO_BASE_DIR=`pwd` ../putinrepo.sh $i
+    done
 
-
-for i in alpha beta charlie; do
-    fakeroot dpkg-deb -b test-package-${i}_1.0-1_"$ARCH"
-    fakeroot dpkg-deb -b test-package-${i}_1.0-2_"$ARCH"
-    mv -f test-package-${i}_1.0-1_"$ARCH".deb deb_repo/test-package-${i}_1.0-1_"$ARCH".deb
-    mv -f test-package-${i}_1.0-2_"$ARCH".deb deb_repo/test-package-${i}_1.0-2_"$ARCH".deb
-done
-
-
-
-
-cd deb_repo
-for i in *.deb; do
-    REPREPRO_BASE_DIR=`pwd` ../putinrepo.sh $i
-done
-
-for i in `find . -name Release`; do
-    gpg --detach-sign --armor --no-default-keyring --keyring ../gpg/pubring.gpg --secret-keyring ../gpg/secring.gpg --output $i.gpg $i
+    for i in `find . -name Release`; do
+        gpg --detach-sign --armor --no-default-keyring --keyring ../gpg/pubring.gpg --secret-keyring ../gpg/secring.gpg --output $i.gpg $i
+    done
+    cd ..
 done
