@@ -64,6 +64,7 @@ body contain in_dir(dir)
 # @param dir directory to change into
 #
 # **Example:**
+# 
 # ```cf3
 #  commands:
 #    "/bin/pwd"
@@ -80,6 +81,7 @@ body contain in_dir_shell(dir)
 # @param dir directory to change into
 #
 # **Example:**
+# 
 # ```cf3
 #  commands:
 #    "/bin/pwd | /bin/cat"
@@ -95,7 +97,9 @@ body contain in_dir_shell(dir)
 body contain silent_in_dir(dir)
 # @brief run command after switching to directory and suppress output
 # @param dir directory to change into
+#
 # **Example:**
+#
 # ```cf3
 #    "/bin/pwd"
 #      contain => silent_in_dir("/tmp");
@@ -109,7 +113,9 @@ body contain silent_in_dir(dir)
 
 body contain in_shell
 # @brief run command in shell
+#
 # **Example:**
+#
 # ```cf3
 #  commands:
 #    "/bin/pwd | /bin/cat"
@@ -136,6 +142,7 @@ body contain in_shell_and_silent
 # @brief run command in shell and suppress output
 #
 # **Example:**
+# 
 # ```cf3
 #  commands:
 #    "/bin/pwd | /bin/cat"
@@ -152,7 +159,9 @@ body contain in_shell_and_silent
 body contain in_dir_shell_and_silent(dir)
 # @brief run command in shell after switching to 'dir' and suppress output
 # @param dir directory to change into
+#
 # **Example:**
+#
 # ```cf3
 #  commands:
 #    "/bin/pwd | /bin/cat"
@@ -173,6 +182,7 @@ body contain setuid(owner)
 # @param owner username or uid to run command as
 #
 # **Example:**
+#
 # ```cf3
 #  commands:
 #    "/usr/bin/id"
@@ -189,7 +199,9 @@ body contain setuid(owner)
 body contain setuid_sh(owner)
 # @brief run command as specified user in shell
 # @param owner username or uid to run command as
+#
 # **Example:**
+# 
 # ```cf3
 #  commands:
 #    "/usr/bin/id | /bin/cat"
@@ -232,20 +244,22 @@ body contain jail(owner,jail_root,dir)
 
 body contain setuid_umask(owner, umask)
 # @brief run command as specified user with umask
+#
+# ||                     || Files              | Directories        ||
+# | Valid Values | Umask | Octal |  Symbolic   | Octal | Symbolic    |
+# |--------------|-------|-------|-------------|-------|-------------|
+# | 0            | 000   | 666   | (rw-rw-rw-) | 777   | (rwxrwxrwx) |
+# | 002          | 002   | 664   | (rw-rw-r--) | 775   | (rwxrwxr-x) |
+# | 22, 022      | 022   | 644   | (rw-r--r--) | 755   | (rwxr-xr-x) |
+# | 27, 027      | 027   | 640   | (rw-r-----) | 750   | (rwxr-x---) |
+# | 77, 077      | 077   | 600   | (rw-------) | 700   | (rwx------) |
+# | 72, 072      | 072 	 | 604   | (rw----r--) | 705   | (rwx---r-x) |
+# 
 # @param owner username or uid to run command as
 # @param umask controls permissions of created files and directories
-#################################################################
-#                      | Files               | Directories       #
-##################################################################
-# Valid Values | Umask | Octal   Symbolic    | Octal   Symbolic  #
-###############+#######+#####################+####################
-# 0            | 000   | 666     (rw-rw-rw-) | 777     (rwxrwxrwx)
-# 002          | 002   | 664     (rw-rw-r--) | 775     (rwxrwxr-x)
-# 22, 022      | 022   | 644     (rw-r--r--) | 755     (rwxr-xr-x)
-# 27, 027      | 027   | 640     (rw-r-----) | 750     (rwxr-x---)
-# 77, 077      | 077   | 600     (rw-------) | 700     (rwx------)
-# 72, 072      | 072 	 | 604     (rw----r--) | 705   	 (rwx---r-x)
+#
 # **Example:**
+# 
 # ```cf3
 #  commands:
 #    "/usr/bin/git pull"
