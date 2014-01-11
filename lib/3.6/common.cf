@@ -130,7 +130,7 @@ body action immediate
 
 body action policy(p)
 # @brief Set the `action_policy` to `p`
-# @param The action policy
+# @param p The action policy
 {
       action_policy => "$(p)";
 }
@@ -159,6 +159,7 @@ body action log_verbose
 body action sample_rate(x)
 # @brief Evaluate the promise every `x` minutes, 
 # A repair-attempt is cancelled after 10 minutes
+# @param x The time in minutes between promise evaluation
 {
       ifelapsed => "$(x)";
       expireafter => "10";
@@ -180,7 +181,7 @@ body classes if_repaired(x)
 body classes if_else(yes,no)
 # @brief Define the classes `yes` or `no` depending on promise outcome
 # @param yes The name of the class that should be defined if the promise is kept or repaired
-# @param no The name o fthe lcass that should be defined if the promise could not be repaired
+# @param no The name of the class that should be defined if the promise could not be repaired
 {
       promise_kept     => { "$(yes)" };
       promise_repaired => { "$(yes)" };
@@ -193,8 +194,12 @@ body classes if_else(yes,no)
 
 body classes cf2_if_else(yes,no)
 # @brief Define the classes `yes` or `no`, depending on promise outcome
+#
 # A version of `if_else` that matches CFEngine2 semantics. Neither class is set if the promise
 # does not require any repair.
+#
+# @param yes The name of the class that should be defined if the promise is repaired
+# @param no The name of the class that should be defind if teh promise could not be repaired
 {
       promise_repaired => { "$(yes)" };
       repair_failed    => { "$(no)" };
@@ -217,7 +222,7 @@ body classes if_notkept(x)
 
 body classes if_ok(x)
 # @brief Define the class `x` if the promise is kept or could be repaired
-# @param The name of the class that should be defined
+# @param x The name of the class that should be defined
 {
       promise_repaired => { "$(x)" };
       promise_kept => { "$(x)" };
@@ -239,7 +244,7 @@ body classes cmd_repair(code,cl)
 # @brief Define the class `cl` if an external command in a `commands`, `file` or `packages`
 # promise is executed with return code `code`
 # @param code The return codes that indicate a successful repair
-# @cl The name of the class that should be defined
+# @param cl The name of the class that should be defined
 #
 # **See also:** `repaired_returncodes`
 {
