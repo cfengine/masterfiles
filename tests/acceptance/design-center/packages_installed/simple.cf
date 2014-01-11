@@ -1,0 +1,55 @@
+# Test a namespaced input inclusion
+
+body common control
+{
+      inputs => { "../../default.cf.sub", '../../../../$(sys.local_libdir)/packages.cf', '../../../../$(sys.local_libdir)/files.cf', $(g.sketch), $(g.library1) };
+      bundlesequence => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+bundle common g
+{
+  vars:
+      "sketch" string => "$(this.promise_dirname)/main";
+      "library1" string => "$(this.promise_dirname)/dclib";
+}
+
+body package_method my_generic
+{
+      package_changes               => "bulk";
+      package_add_command           => "$(G.perl) -I";
+      package_delete_command        => "$(G.perl) -I";
+      package_delete_convention     => "$(name)";
+      package_name_convention       => "$(name)";
+      package_installed_regex       => ".*";
+      package_list_command          => "$(G.perl) -I";
+      package_list_name_regex       => ".*";
+      package_list_version_regex    => ".*";
+      package_list_update_command   => "$(G.perl) -I";
+      package_list_update_ifelapsed => "$(G.perl) -I";
+      package_verify_command        => "$(G.perl) -I";
+      package_noverify_returncode   => "1";
+      package_update_command        => "$(G.perl) -I";
+}
+
+bundle agent init
+{
+  vars:
+      "dummy" string => "dummy";
+}
+
+bundle agent test
+{
+}
+
+bundle agent check
+{
+  classes:
+      "ok" expression => "any";
+
+  reports:
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}
