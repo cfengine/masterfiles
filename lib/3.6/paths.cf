@@ -51,9 +51,10 @@ bundle common paths
 # @brief Defines an array `path` with common paths to standard binaries,
 # and classes for defined and existing paths.
 # 
-# If the current platforms knows the binary XYZ should be present,
+# If the current platform knows that binary XYZ should be present,
 # `_stdlib_has_path_XYZ` is defined. Furthermore, if XYZ is actually present
-# (i.e. the binary exists), `_stdlib_path_exists_XYZ` is defined.
+# (i.e. the binary exists) in the expected location, `_stdlib_path_exists_XYZ` is
+# defined.
 #
 # **Example:**
 #
@@ -63,7 +64,7 @@ bundle common paths
 # commands:
 #   _stdlib_path_exists_sed::
 #      “$(path[sed])”
-#        args => “-i ’s/^M// $(filename)”
+#        args => “-i 's/^M//' $(filename)”
 # }
 # ```
 {
