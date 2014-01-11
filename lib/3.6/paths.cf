@@ -48,9 +48,24 @@
 ###################################################
 
 bundle common paths
-# In addition to defining common paths, this bundle also defines context
-# classes for paths that are defined (_stdlib_has_path_xxx) and paths that
-# exist (_stdlib_path_exists_xxx)
+# @brief Defines an array `path` with common paths to standard binaries,
+# and classes for defined and existing paths.
+# 
+# If the current platforms knows the binary XYZ should be present,
+# `_stdlib_has_path_XYZ` is defined. Furthermore, if XYZ is actually present
+# (i.e. the binary exists), `_stdlib_path_exists_XYZ` is defined.
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent repair_newlines(filename)
+# {
+# commands:
+#   _stdlib_path_exists_sed::
+#      “$(path[sed])”
+#        args => “-i ’s/^M// $(filename)”
+# }
+# ```
 {
   vars:
 

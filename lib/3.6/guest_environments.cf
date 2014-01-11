@@ -52,6 +52,30 @@
 ##-------------------------------------------------------
 
 body environment_resources kvm(name, arch, cpu_count, mem_kb, disk_file)
+# @brief An `environment_resources` body for a KVM virtual machine.
+#
+# The `env_spec` attribute is set to a KVM XML specification.
+#
+# @param name The name of the virtual machine
+# @param arch The architecture
+# @param cpu_count The number of CPUs the virtual machine should have
+# @param mem_kb The amount of RAM in kilobyte
+# @param disk_file The file on the host system for the virtual machine's harddrive
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent manage_vm
+# {
+# guest_environments:
+#   am_vm_host::
+#     "db_server"
+#       environment_host      => atlas,
+#       environment_type      => "kvm",
+#       environment_state     => "create",
+#       environment_resources => kvm("PSQL1, "x86_64", "4", "4096", "/var/lib/libvirt/images/psql1.iso")
+# }
+# ```
 {
       env_spec =>
       "<domain type='kvm'>

@@ -79,6 +79,8 @@ bundle agent feature_test
 }
 
 body classes feature_cancel(x)
+# @ignore
+# Used internally by bundle `feature`
 {
       cancel_kept => { "$(x)" };
       cancel_repaired => { "$(x)" };
