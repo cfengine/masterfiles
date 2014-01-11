@@ -245,8 +245,8 @@ body contain jail(owner,jail_root,dir)
 body contain setuid_umask(owner, umask)
 # @brief run command as specified user with umask
 #
-# ||                     || Files              | Directories        ||
-# | Valid Values | Umask | Octal |  Symbolic   | Octal | Symbolic    |
+# 
+# | Valid Values | Umask | Octal (files) |  Symbolic (files)  | Octal (dirs) | Symbolic (dirs) |
 # |--------------|-------|-------|-------------|-------|-------------|
 # | 0            | 000   | 666   | (rw-rw-rw-) | 777   | (rwxrwxrwx) |
 # | 002          | 002   | 664   | (rw-rw-r--) | 775   | (rwxrwxr-x) |
