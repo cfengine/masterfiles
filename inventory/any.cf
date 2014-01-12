@@ -14,6 +14,9 @@ bundle common inventory_control
       # or you could make it conditional on the binary...
       # "disable_dmidecode" expression => fileexists("/usr/sbin/dmidecode");
 
+      # by default run the package inventory refresh every time
+      "disable_package_refresh" expression => "!any";
+
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
@@ -21,6 +24,8 @@ bundle common inventory_control
       "$(this.bundle): LSB module enabled";
     verbose_mode.!disable_dmidecode::
       "$(this.bundle): dmidecode module enabled";
+    verbose_mode.!disable_package_refresh::
+      "$(this.bundle): package_refresh module enabled";
 }
 
 bundle common inventory_any
@@ -79,4 +84,37 @@ bundle common inventory_dmidecode
                 "derived-from=inventory_dmidecode.dmi[$(dmivars)]",
                 "comment=$(dmivars) $(dmi[$(dmivars)])"
       };
+}
+
+bundle agent inventory_autorun
+# @brief Autorun some inventory bundles
+#
+# This agent bundle runs any others explicitly.  It will use
+# bundlesmatching() when CFEngine 3.5 and earlier are no longer
+# supported.
+{
+  methods:
+      "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
+      handle => "cfe_internal_autorun_packages_refresh";
+}
+
+bundle agent cfe_autorun_inventory_packages
+# @brief Package inventory auto-refresh
+#
+# This bundle is for refreshing the package inventory.  It runs on
+# startup, unless disabled.  Other package methods can be added below.
+{
+  packages:
+    debian::
+      "cfe_internal_non_existing_package"
+        package_policy => "add",
+        package_method => dpkg_version("/");
+    redhat::
+      "cfe_internal_non_existing_package"
+        package_policy => "add",
+        package_method => rpm_version("/");
+    !redhat.!debian::
+      "cfe_internal_non_existing_package"
+        package_policy => "add",
+        package_method => generic;
 }
