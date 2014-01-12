@@ -39,11 +39,17 @@ bundle agent repositories
       edit_defaults => edit_defaults,
       classes => if_successful("repo_ok");
 
+    # Remove original sources so that we don't hammer the distro servers.
     debian::
-      # Remove original sources so that we don't hammer debian's servers.
       "/etc/apt/sources.list"
         delete => tidy;
       "/etc/apt/sources.list.d"
+        delete => tidy,
+        depth_search => recurse("inf"),
+        file_select => not_test_source;
+
+    redhat::
+      "/etc/yum.repos.d"
         delete => tidy,
         depth_search => recurse("inf"),
         file_select => not_test_source;
