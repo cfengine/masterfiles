@@ -94,7 +94,7 @@ body match_value line_match_value(line_match, extract_regex)
 #
 # **See also:** `select_line_matching`, `extraction_regex`
 #
-# ** Example:**
+# **Example:**
 #
 # ```cf3
 # bundle monitor example
@@ -111,6 +111,7 @@ body match_value line_match_value(line_match, extract_regex)
 #	       units => "kB",
 #	       match_value => line_match_value(".*cf-serverd.*", "$(regex_vsz)");
 # }
+# ```
 {
       select_line_matching => "$(line_match)";
       extraction_regex => "$(extract_regex)";
