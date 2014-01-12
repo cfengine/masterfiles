@@ -9,6 +9,7 @@
 
 body common control
 {
+  inputs => { "../../../../lib/3.6/files.cf" };
   bundlesequence => { "repositories", "signing_keys", "update", "check" };
 }
 
@@ -37,6 +38,21 @@ bundle agent repositories
       edit_line => repository,
       edit_defaults => edit_defaults,
       classes => if_successful("repo_ok");
+
+    debian::
+      # Remove original sources so that we don't hammer debian's servers.
+      "/etc/apt/sources.list"
+        delete => tidy;
+      "/etc/apt/sources.list.d"
+        delete => tidy,
+        depth_search => recurse("inf"),
+        file_select => not_test_source;
+}
+
+body file_select not_test_source
+{
+  file_result => "!path_name";
+  path_name => { "$(repositories.repo_file)" };
 }
 
 bundle edit_line repository
