@@ -52,6 +52,9 @@
 ##-------------------------------------------------------
 
 body service_method bootstart
+# @brief Start the service and all its dependencies at boot time
+#
+# **See also:** `service_autostart_policy`, `service_dependence_chain`
 {
       service_autostart_policy => "boot_time";
       service_dependence_chain => "start_parent_services";
@@ -62,6 +65,12 @@ body service_method bootstart
 ##
 
 body service_method force_deps
+# @brief Start all dependendencies when this service starts, and stop all
+# dependent services when this service stops.
+#
+# The service does not get automatically started.
+#
+# **See also:** `service_autostart_policy`, `service_dependence_chain`
 {
       service_dependence_chain => "all_related";
     windows::
@@ -97,31 +106,35 @@ bundle agent standard_services(service,state)
 # a) The zeroconf mode; If the new service matches these rules,
 #    you don't need to add anything to the standard_services:
 #
-#  1. Your init script basename = $(service)
-#  2. Your init script argument = $(state)
-#  3. Your init script lives in /etc/init.d/ (for non-*bsd),
-#     or /etc/rc.d/ (for *bsd)
-#  4. Your process regex pattern = \b$(service)\b
-#  5. You call the init as /etc/init.d/<script> <arg> (for non-*bsd),
-#     or /etc/rc.d/<script> <arg> (for *bsd)
+#  1. Your init script basename = `$(service)`
+#  2. Your init script argument = `$(state)`
+#  3. Your init script lives in `/etc/init.d/` (for non-*bsd),
+#     or `/etc/rc.d/` (for *bsd)
+#  4. Your process regex pattern = `\b$(service)\b`
+#  5. You call the init as `/etc/init.d/<script> <arg>` (for non-*bsd),
+#     or `/etc/rc.d/<script> <arg>` (for *bsd)
 #
 # b) If the 1st rule doesn't match, but rest does:
 #
-#   Use the "baseinit[$(service)]" array to point towards your
+#   Use the `baseinit[$(service)]` array to point towards your
 #   init script's basename. For example:
 #
+# ```cf3
 #    "baseinit[www]" string => "httpd";
+# ```
 #
-#   This would fire up init script /etc/init.d/httpd, instead of
-#   the default /etc/init.d/www. From /etc/rc.d/ if you're on *bsd system.
+#   This would fire up init script `/etc/init.d/httpd`, instead of
+#   the default `/etc/init.d/www`. From `/etc/rc.d/` if you're on *bsd system.
 #
 # c) If the 4th rule doesn't match, but rest does:
 #
-#   Use the "pattern[$(service)]" array to specify your own
+#   Use the `pattern[$(service)]` array to specify your own
 #   regex match. It's advisable to use conservative regex so
 #   there's less chance of getting a mismatch.
 #
+# ```cf3
 #    "pattern[www]" string => ".*httpd.*";
+# ```
 #
 #   Instead of matching the default '\bwww\b', this now matches
 #   your given string,
@@ -129,60 +142,71 @@ bundle agent standard_services(service,state)
 # d) 5th rule doesn't match:
 #
 #   If you can specify the init system used.
-#    Currently supported: sysvinitd, sysvservice, systemd
+#    Currently supported: `sysvinitd`, `sysvservice`, `systemd`
 #
+# ```cf3
 #     "init[www]" string => "sysvservice";
 #     "init[www]" string => "sysvinitd";
 #     "init[www]" string => "systemd";
+# ```
 #
-#   ^^ The above is not a valid syntax as you can only use one init[]
+#   ^^ The above is not a valid syntax as you can only use one `init[]`
 #      per service, but it shows all the currently supported ones.
 #
+# ```cf3
 #     "sysvservice" == /(usr/)?sbin/service
 #     "sysvinitd"   == /etc/init.d/ (non-*bsd) | /etc/rc.d/ (*bsd)
 #     "systemd"     == /bin/systemctl
+# ```
 #
 # e) 2nd and 3rd rule matches, but rest doesn't:
 #
-#   Use a combination of the "pattern[]", "baseinit[]" and "init[]",
+#   Use a combination of the `pattern[]`, `baseinit[]` and `init[]`,
 #   to fill your need.
 #
+# ```cf3
 #     "baseinit[www]" string => "httpd";
 #     "pattern[www]"  string => ".*httpd.*";
 #     "init[www]"     string => "sysvservice";
+# ```
 #
 # f) As a fallback, if none of the above rules match, you can also
-#    define exactly what you need for each $(state).
+#    define exactly what you need for each `$(state)`.
 #
+# ```cf3
 #    "startcommand[rhnsd]"   string => "/sbin/service rhnsd start";
 #    "restartcommand[rhnsd]" string => "/sbin/service rhnsd restart";
 #    "reloadcommand[rhnsd]"  string => "/sbin/service rhnsd reload";
 #    "stopcommand[rhnsd]"    string => "/sbin/service rhnsd stop";
 #    "pattern[rhnsd]"        string => "rhnsd";
+# ```
 #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# ---
 #
-# If *any* of the "(re)?(start|load|stop)command" variables are set for
-# your service, they take *priority* in case there's conflict of intent
+# If *any* of the `(re)?(start|load|stop)command` variables are set for
+# your service, they take _priority_ in case there's conflict of intent
 # with other data.
 #
 # Say you'd have the following service definition:
 #
+# ```cf3
 #    "startcommand[qwerty]"   string => "/sbin/service qwerty start";
 #    "stopcommand[qwerty]"    string => "/sbin/service qwerty stop";
 #    "pattern[qwerty]"        string => ".*qwerty.*";
 #    "baseinit[qwerty]"       string => "asdfgh"
 #    "init[qwerty]"           string => "systemd";
+# ```
 #
-# There's a conflict of intent now. As the ~command definitions takes
-# priority, this kind of service config for "qwerty" would execute the
+# There's a conflict of intent now. As the `~command` definitions takes
+# priority, this kind of service config for `qwerty` would execute the
 # following commands:
 #
+# ```
 #   start:   "/sbin/service qwerty start"
 #   stop:    "/sbin/service qwerty stop"
 #   restart: "/bin/systemctl asdfgh restart"
 #   reload:  "/bin/systemctl asdfgh reload"
-#
+# ```
 {
   vars:
       "all_states" slist => { "start", "restart", "reload", "stop" };
