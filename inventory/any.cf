@@ -1,33 +1,3 @@
-bundle common inventory_control
-# @brief Inventory control bundle
-#
-# This common bundle is for controlling whether some inventory bundles
-# are disabled.
-{
-  classes:
-      "disable_inventory" expression => "!any";
-      # disable specific inventory modules here
-      "disable_lsb" expression => "disable_inventory";
-
-      # by default don't run dmidecode every time
-      "disable_dmidecode" expression => "any";
-      # or you could make it conditional on the binary...
-      # "disable_dmidecode" expression => fileexists("/usr/sbin/dmidecode");
-
-      # by default run the package inventory refresh every time
-      "disable_package_refresh" expression => "!any";
-
-  reports:
-    verbose_mode.disable_inventory::
-      "$(this.bundle): All inventory modules disabled";
-    verbose_mode.!disable_lsb::
-      "$(this.bundle): LSB module enabled";
-    verbose_mode.!disable_dmidecode::
-      "$(this.bundle): dmidecode module enabled";
-    verbose_mode.!disable_package_refresh::
-      "$(this.bundle): package_refresh module enabled";
-}
-
 bundle common inventory_any
 # @brief Do inventory for any OS
 #
@@ -42,7 +12,7 @@ bundle common inventory_dmidecode
 # This common bundle runs dmidecode
 {
   vars:
-    !disable_dmidecode::
+    !disable_inventory_dmidecode::
       "dmivars" slist => {
                            "bios-vendor",
                            "bios-version",
@@ -76,7 +46,7 @@ bundle common inventory_dmidecode
       "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
 
   classes:
-    !disable_dmidecode::
+    !disable_inventory_dmidecode::
       "dmidecode_$(canonified_var[$(dmivars)])_$(canonified[$(dmivars)])"
       expression => "any",
       meta => { "inventory",
@@ -95,7 +65,10 @@ bundle agent inventory_autorun
 {
   methods:
       "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
-      handle => "cfe_internal_autorun_packages_refresh";
+      handle => "cfe_internal_autorun_inventory_packages";
+
+      "cmdb" usebundle => cfe_autorun_inventory_cmdb(),
+      handle => "cfe_internal_autorun_inventory_cmdb";
 }
 
 bundle agent cfe_autorun_inventory_packages
@@ -105,7 +78,7 @@ bundle agent cfe_autorun_inventory_packages
 # startup, unless disabled.  Other package methods can be added below.
 {
   packages:
-    debian::
+    !disable_inventory_package_refresh.debian::
       "cfe_internal_non_existing_package"
         package_policy => "add",
         package_method => apt_get;
@@ -117,4 +90,83 @@ bundle agent cfe_autorun_inventory_packages
       "cfe_internal_non_existing_package"
         package_policy => "add",
         package_method => generic;
+}
+
+bundle agent cfe_autorun_inventory_cmdb
+# @brief Copy and load the CMDB inventory
+#
+# This bundle is for refreshing the CMDB inventory.  It copies the
+# file me.json from the server, then loads it to create variables and
+# classes.
+{
+  vars:
+      "cmdb_dir" string => "$(sys.workdir)/cmdb",
+      meta => { "cmdb", "comment=CMDB directory location" };
+
+      "cmdb_file" string => "$(cmdb_dir)/me.json",
+      meta => { "cmdb", "comment=CMDB file location" };
+
+  files:
+    !disable_inventory_cmdb::
+      "$(cmdb_file)"
+      copy_from => inventory_cmdb_copy_from,
+      classes => inventory_scoped_classes_generic("bundle", "cmdb_file");
+
+  methods:
+    cmdb_file_ok::
+      "load CMDB file" usebundle => inventory_cmdb_load($(cmdb_file));
+}
+
+bundle agent inventory_cmdb_load(file)
+# @brief Load the CMDB inventory
+#
+# This bundle is for loading the CMDB inventory.
+{
+  classes:
+      "have_cmdb_data" expression => isvariable("cmdb");
+
+  vars:
+      "cmdb" data => readjson($(file), "999999");
+      "cmdb_string" string => format("%S", cmdb);
+      "keys" slist => getindices(cmdb);
+      "$(keys)" string => "$(cmdb[$(keys)])";
+
+  reports:
+    inform_mode.have_cmdb_data::
+      "$(this.bundle): Got CMDB data from $(file): $(cmdb_string)";
+    verbose_mode.have_cmdb_data::
+      "$(this.bundle): Got CMDB key = $(keys), CMDB value = $($(keys))";
+    inform_mode.!have_cmdb_data::
+      "$(this.bundle): Could not read the CMDB data from $(file)";
+}
+
+body copy_from inventory_cmdb_copy_from
+# @brief Copy from the CMDB source
+{
+    !cfe_inventory_cmdb_override_file::
+      source      => "me.json";
+      servers     => { "$(sys.policy_hub)" };
+    cfe_inventory_cmdb_override_file::
+      source      => "$(sys.inputdir)/me.json";
+    any::
+      compare     => "digest";
+      encrypt     => "true";
+      verify      => "true";
+}
+
+body classes inventory_scoped_classes_generic(scope, x)
+# @brief Define `x` prefixed/suffixed with promise outcome
+# **See also:** `scope`
+#
+# @param scope The scope in which the class should be defined
+# @param x The unique part of the classes to be defined
+#
+# Copy of `scoped_classes_generic`, which see.
+{
+      scope => "$(scope)";
+      promise_repaired => { "promise_repaired_$(x)", "$(x)_repaired", "$(x)_ok", "$(x)_reached" };
+      repair_failed => { "repair_failed_$(x)", "$(x)_failed", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
+      repair_denied => { "repair_denied_$(x)", "$(x)_denied", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
+      repair_timeout => { "repair_timeout_$(x)", "$(x)_timeout", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
+      promise_kept => { "promise_kept_$(x)", "$(x)_kept", "$(x)_ok", "$(x)_not_repaired", "$(x)_reached" };
 }

@@ -101,3 +101,38 @@ bundle common def
     # Purge policies that don't exist on the server side.
     "cfengine_internal_purge_policies" expression => "!any";
 }
+
+bundle common inventory_control
+# @brief Inventory control bundle
+#
+# This common bundle is for controlling whether some inventory bundles
+# are disabled.
+{
+  classes:
+      "disable_inventory" expression => "!any";
+      # disable specific inventory modules here
+      "disable_inventory_lsb" expression => "disable_inventory";
+
+      # by default don't run dmidecode every time
+      "disable_inventory_dmidecode" expression => "any";
+      # or you could make it conditional on the binary...
+      # "disable_inventory_dmidecode" expression => fileexists("/usr/sbin/dmidecode");
+
+      # by default run the package inventory refresh every time
+      "disable_inventory_package_refresh" expression => "!any";
+
+      # by default don't run the CMDB integration every time
+      "disable_inventory_cmdb" expression => "any";
+
+  reports:
+    verbose_mode.disable_inventory::
+      "$(this.bundle): All inventory modules disabled";
+    verbose_mode.!disable_inventory_lsb::
+      "$(this.bundle): LSB module enabled";
+    verbose_mode.!disable_inventory_dmidecode::
+      "$(this.bundle): dmidecode module enabled";
+    verbose_mode.!disable_inventory_package_refresh::
+      "$(this.bundle): package_refresh module enabled";
+    verbose_mode.!disable_inventory_cmdb::
+      "$(this.bundle): CMDB module enabled";
+}
