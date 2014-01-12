@@ -65,11 +65,21 @@ body file control
 ###################################################
 
 bundle agent cronjob(commands,user,hours,mins)
-
-# For adding lines to crontab for a user
+# @brief Defines a cron job for `user`
+#
+# Adds a line to crontab, if necessary.
+# 
+# @param commands The commands that should be run
+# @param user The owner of crontab
+# @param hours The hours at which the job should run
+# @param mins The minutes at which the job should run
+#
+# **Example:**
+#
+# ```cf3
 # methods:
 #  "cron" usebundle => cronjob("/bin/ls","mark","*","5,10");
-
+# ```
 {
   vars:
     SuSE::
