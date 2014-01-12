@@ -104,8 +104,11 @@ bundle common cfengine_stdlib
 {
   vars:
     cfengine_3_4::
+      # This is the standard library for CFEngine 3.4 and earlier
+      # (only 3.4 is explicitly supported)
       "inputs" slist => { "libraries/cfengine_stdlib.cf" };
     cfengine_3_5::
+      # 3.5 doesn't have "body file control" so all the includes are listed here
       "inputs" slist => {
                           "lib/3.5/paths.cf",
                           "lib/3.5/common.cf",
@@ -122,20 +125,8 @@ bundle common cfengine_stdlib
       };
 
     !(cfengine_3_4||cfengine_3_5)::
-      "inputs" slist => {
-                          "$(sys.local_libdir)/paths.cf",
-                          "$(sys.local_libdir)/common.cf",
-                          "$(sys.local_libdir)/commands.cf",
-                          "$(sys.local_libdir)/packages.cf",
-                          "$(sys.local_libdir)/files.cf",
-                          "$(sys.local_libdir)/services.cf",
-                          "$(sys.local_libdir)/processes.cf",
-                          "$(sys.local_libdir)/storage.cf",
-                          "$(sys.local_libdir)/databases.cf",
-                          "$(sys.local_libdir)/monitor.cf",
-                          "$(sys.local_libdir)/guest_environments.cf",
-                          "$(sys.local_libdir)/bundles.cf",
-      };
+      # CFEngine 3.6 and higher can include through a secondary file
+      "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
 
   reports:
     verbose_mode::
