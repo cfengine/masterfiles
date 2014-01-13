@@ -37,7 +37,8 @@ bundle common inventory_dmidecode
                            "processor-version",
                            "processor-frequency"
       };
-      "decoder" string => "/usr/sbin/dmidecode";
+
+      "decoder" string => "$(inventory_control.dmidecoder)";
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                                  "useshell"),
       meta => { "inventory", "comment=$(dmivars)" };

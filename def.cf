@@ -108,20 +108,35 @@ bundle common inventory_control
 # This common bundle is for controlling whether some inventory bundles
 # are disabled.
 {
+  vars:
+      "dmidecoder" string => "/usr/sbin/dmidecode";
+      "lsb_exec" string => "/usr/bin/lsb_release";
+
   classes:
+      # setting this disables all the inventory modules except package_refresh
       "disable_inventory" expression => "!any";
-      # disable specific inventory modules here
-      "disable_inventory_lsb" expression => "disable_inventory";
 
-      # by default don't run dmidecode every time
-      "disable_inventory_dmidecode" expression => "any";
-      # or you could make it conditional on the binary...
-      # "disable_inventory_dmidecode" expression => fileexists("/usr/sbin/dmidecode");
+      # disable specific inventory modules below
 
-      # by default run the package inventory refresh every time
+      # by default disable the LSB inventory if the general inventory
+      # is disabled or the binary is missing.  Note that the LSB
+      # binary is typically not very fast.
+      "_have_lsb_exec" expression => fileexists($(lsb_exec));
+      "disable_inventory_lsb" or => { "disable_inventory", "!_have_lsb_exec" };
+
+      # by default disable the dmidecode inventory if the general
+      # inventory is disabled or the binary does not exist.  Note that
+      # typically this is a very fast binary.
+      "_have_dmidecoder_exec" expression => fileexists($(dmidecoder));
+      "disable_inventory_dmidecode" or => { "disable_inventory",
+                                            "!_have_dmidecoder_exec" };
+
+      # by default run the package inventory refresh every time, even
+      # if disable_inventory is set
       "disable_inventory_package_refresh" expression => "!any";
 
-      # by default don't run the CMDB integration every time
+      # by default don't run the CMDB integration every time, even if
+      # disable_inventory is not set
       "disable_inventory_cmdb" expression => "any";
 
   reports:
