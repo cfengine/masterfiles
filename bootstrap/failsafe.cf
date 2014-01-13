@@ -52,7 +52,7 @@ bundle agent cfe_internal_update
       classes => repaired("got_policy");
 
     windows::
-      "$(sys.workdir)\\inputs"
+      "$(sys.inputdir)"
       handle => "cfe_internal_bootstrap_update_files_sys_workdir_inputs_windows",
       copy_from => u_scp("$(sys.masterdir)"),
       depth_search => u_recurse("inf"),
@@ -137,8 +137,8 @@ bundle agent cfe_internal_update
       handle => "cfe_internal_bootstrap_update_reports_failed_to_start_execd";
     !executor_started.have_promises_cf::
       "You are running a hard-coded failsafe. Please use the following command instead.
-    - 3.0.0: $(sys.cf_agent) -f $(sys.workdir)/inputs/failsafe/failsafe.cf
-    - 3.0.1: $(sys.cf_agent) -f $(sys.workdir)/inputs/update.cf"
+    - 3.0.0: $(sys.cf_agent) -f $(sys.inputdir)/failsafe/failsafe.cf
+    - 3.0.1: $(sys.cf_agent) -f $(sys.inputdir)/update.cf"
       handle => "cfe_internal_bootstrap_update_reports_run_another_failsafe_instead";
 }
 
