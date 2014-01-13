@@ -1105,14 +1105,16 @@ body package_method freebsd
 # @brief FreeBSD pkg_add installation package method
 #
 # This package method interacts with FreeBSD pkg_add to install from remote 
-# repositories. Note that this method does not work with pkgng!
+# repositories.
 #
 # **Example:**
+# NOTE: Do not use this method on pkgng systems! It will appear to operate 
+# normally but is highly likely to break your package system.
 #
 # ```cf3
 # Policies examples:
 #
-# -Install "perl5" from a non-default repository:
+# -To install "perl5" from a non-default repository:
 # ----------------------------
 #
 # vars:
@@ -1122,7 +1124,6 @@ body package_method freebsd
 #     package_policy   =>  "add",
 #     package_method   =>  freebsd;
 #
-# NOTE: This method does not support pkgng and should not be used on pkgng systems.
 # ```
 
 {
@@ -1152,6 +1153,12 @@ body package_method freebsd_portmaster
 #
 # This package method interacts with portmaster to build and install packages.
 #
+# Note that you must use the complete package name as it appears in 
+# /usr/ports/*/name, such as 'perl5.14' rather than 'perl5'.
+# Repositories are hard-coded to /usr/ports; alternate locations are 
+# unsupported at this time.
+# This method supports both pkg_* and pkgng systems.
+#
 # **Example:**
 #
 # ```cf3
@@ -1161,11 +1168,7 @@ body package_method freebsd_portmaster
 #     package_policy   =>  "add",
 #     package_method   =>  freebsd_portmaster;
 #
-# Note that you must use the complete package name as it appears in 
-# /usr/ports/*/name, such as 'perl5.14' rather than 'perl5'.
-# Repositories are hard-coded to /usr/ports; alternate locations are 
-# unsupported at this time.
-# This method supports both pkg_* and pkgng systems.
+
 # ```
 {
       package_changes => "individual";
