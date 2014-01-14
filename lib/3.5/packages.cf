@@ -1111,12 +1111,9 @@ body package_method freebsd
 # NOTE: Do not use this method on pkgng systems! It will appear to operate 
 # normally but is highly likely to break your package system.
 #
+# This example installs "perl5" from a non-default repository:
+#
 # ```cf3
-# Policies examples:
-#
-# -To install "perl5" from a non-default repository:
-# ----------------------------
-#
 # vars:
 #   environment => { "PACKAGESITE=http://repo.example.com/private/8_STABLE/" };
 # packages:
@@ -1125,7 +1122,6 @@ body package_method freebsd
 #     package_method   =>  freebsd;
 #
 # ```
-
 {
       package_changes => "individual";
 
@@ -1168,7 +1164,6 @@ body package_method freebsd_portmaster
 #     package_policy   =>  "add",
 #     package_method   =>  freebsd_portmaster;
 #
-
 # ```
 {
       package_changes => "individual";
