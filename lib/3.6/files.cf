@@ -65,6 +65,10 @@ body file control
 ###################################################
 
 bundle edit_line insert_lines(lines)
+# @brief Append `lines` if they don't exist in the file
+# @param lines The lines to be appended
+#
+# **See also:** `insert_lines` in edit_line
 {
   insert_lines:
 
@@ -75,6 +79,9 @@ bundle edit_line insert_lines(lines)
 ##
 
 bundle edit_line insert_file(templatefile)
+# @brief Reads the lines from `templatefile` and inserts those into the
+# file being edited.
+# @param templatefile The name of the file from which to import lines.
 {
   insert_lines:
 
@@ -86,9 +93,9 @@ bundle edit_line insert_file(templatefile)
 ##
 
 bundle edit_line comment_lines_matching(regex,comment)
-
-# Comment lines of a file matching a regex
-
+# @brief Comment lines in the file that matching an [anchored] regex
+# @param regex Anchored regex that the entire line needs to match
+# @param comment A string that is prepended to matching lines
 {
   replace_patterns:
 
@@ -101,10 +108,10 @@ bundle edit_line comment_lines_matching(regex,comment)
 ##
 
 bundle edit_line uncomment_lines_matching(regex,comment)
-
-# Uncomment lines of a file where the regex matches
-# the text after the comment string
-
+# @brief Uncomment lines of the file where the regex matches
+# the entire text after the comment string
+# @param regex The regex that lines need to match after `comment`
+# @param comment The prefix of the line that is removed
 {
   replace_patterns:
 
@@ -117,9 +124,9 @@ bundle edit_line uncomment_lines_matching(regex,comment)
 ##
 
 bundle edit_line comment_lines_containing(regex,comment)
-
-# Comment lines of a file containing a regex
-
+# @brief Comment lines of the file matching a regex
+# @param regex A regex that a part of the line needs to match
+# @param comment A string that is prepended to matching lines
 {
   replace_patterns:
 
@@ -132,10 +139,10 @@ bundle edit_line comment_lines_containing(regex,comment)
 ##
 
 bundle edit_line uncomment_lines_containing(regex,comment)
-
-# Uncomment lines of a file where the regex matches
-# the text after the comment string
-
+# @brief Uncomment lines of the file where the regex matches
+# parts of the text after the comment string
+# @param regex The regex that lines need to match after `comment`
+# @param comment The prefix of the line that is removed
 {
   replace_patterns:
 
@@ -148,6 +155,8 @@ bundle edit_line uncomment_lines_containing(regex,comment)
 ##
 
 bundle edit_line delete_lines_matching(regex)
+# @brief Delete lines matching a regular expression
+# @param regex The regular expression that the lines need to match
 {
   delete_lines:
 
@@ -159,6 +168,8 @@ bundle edit_line delete_lines_matching(regex)
 ##
 
 bundle edit_line warn_lines_matching(regex)
+# @brief Warn about lines matching a regular expression
+# @param regex The regular expression that the lines need to match
 {
   delete_lines:
 
@@ -171,6 +182,8 @@ bundle edit_line warn_lines_matching(regex)
 ##
 
 bundle edit_line append_if_no_line(str)
+# @ignore
+# This duplicates the insert_lines bundle
 {
   insert_lines:
 
@@ -182,6 +195,8 @@ bundle edit_line append_if_no_line(str)
 ##
 
 bundle edit_line append_if_no_lines(list)
+# @ignore
+# This duplicates the insert_lines bundle
 {
   insert_lines:
 
@@ -193,13 +208,19 @@ bundle edit_line append_if_no_lines(list)
 ##
 
 bundle edit_line replace_line_end(start,end)
+# @brief Give lines starting with `start` the ending given in `end`
 #
-# Lines starting with "$(start)" will get the ending given in "$(end)",
-# whitespaces will be left unmodified.
-# For example, replace_line_end("ftp", "2121/tcp") would replace
-# "ftp             21/tcp"
+# Whitespaces will be left unmodified. For example,
+# `replace_line_end("ftp", "2121/tcp")` would replace
+#
+# `"ftp             21/tcp"`
+#
 # with
-# "ftp             2121/tcp"
+# 
+# `"ftp             2121/tcp"`
+#
+# @param start The string lines have to start with
+# @param end The string lines should end with
 {
   field_edits:
 
@@ -212,19 +233,22 @@ bundle edit_line replace_line_end(start,end)
 
 bundle edit_line append_to_line_end(start,end)
 # @brief Append `end` to any lines beginning with `start`
-# @param start pattern to match lines of interest
-# @param end string to append to matched lines
 #
 # `end` will be appended to all lines starting with `start` and not
 # already ending with `end`.  Whitespaces will be left unmodified.
 #
 # For example, `append_to_line_end("kernel", "vga=791")` would replace
 # `kernel /boot/vmlinuz root=/dev/sda7`
+#
 # with
+#
 # `kernel /boot/vmlinuz root=/dev/sda7 vga=791`
 #
 # **WARNING**: Be careful not to have multiple promises matching the same line, which would result in the line growing indefinitely.
 #
+# @param start pattern to match lines of interest
+# @param end string to append to matched lines
+# 
 # **Example:**
 #
 # ```cf3
@@ -243,8 +267,10 @@ bundle edit_line append_to_line_end(start,end)
 ##
 
 bundle edit_line regex_replace(find,replace)
+# @brief Find exactly a regular expression and replace exactly the match with a string.
 # You can think of this like a PCRE powered sed.
-# Find exactly a regular expression and replace exactly the match with a string.
+# @param find The regular expression
+# @param replace The replacement string
 {
   replace_patterns:
 
@@ -256,10 +282,14 @@ bundle edit_line regex_replace(find,replace)
 ##
 
 bundle edit_line resolvconf(search,list)
-
-# search is the search domains with space
-# list is an slist of nameserver addresses
-
+# @brief Adds search domains and name servers to the system
+# resolver configuration.
+# 
+# Use this bundle to modify `resolv.conf`. Existing entries for
+# `search` and `nameserver` are replaced.
+# 
+# @param search The search domains with space
+# @param list An slist of nameserver addresses
 {
   delete_lines:
 
@@ -275,9 +305,14 @@ bundle edit_line resolvconf(search,list)
 ##
 
 bundle edit_line resolvconf_o(search,list,options)
-
-# search is the search domains with space
-# list is an slist of nameserver addresses
+# @brief Adds search domains, name servers and options to the system
+# resolver configuration.
+# 
+# Use this bundle to modify `resolv.conf`. Existing entries for
+# `search`, `nameserver` and `options` are replaced.
+# 
+# @param search The search domains with space
+# @param list An slist of nameserver addresses
 # options is an slist of variables to modify the resolver
 
 {
@@ -297,37 +332,19 @@ bundle edit_line resolvconf_o(search,list,options)
 ##
 
 bundle edit_line manage_variable_values_ini(tab, sectionName)
-
-# Sets the RHS of configuration items in the file of the form
-# LHS=RHS
-# If the line is commented out with #, it gets uncommented first.
+# @brief Sets the RHS of configuration items in the file of the form
+# `LHS=RHS`
+# 
+# If the line is commented out with `#`, it gets uncommented first.
 # Adds a new line if none exists.
-# Removes any variable value pairs not defined for the ini section
-# The argument is an associative array containing tab[SectionName][LHS]="RHS"
-# don't change value when the RHS is dontchange
-
-# Based on set_variable_values_ini
-# Added delete lines section to empty out undefined variable values for INI section
-
-# CAUTION : for it to work nicely, you should use CFEngine with the commit n°3229
-# otherwise you may risk a segfault
-
-#
-# If you are running 3.2.1 or earlier or more specifically git commit # or
-# earlier you can use this to work around the segfault bug.
-# vars:
-#     "$(file)"
-#         edit_line => append_if_no_line("[#EOF#]"),
-#         create => "true",
-#         comment => "Work around bug<bug#here> where eof did not mean end
-#                     of section and thus cannot select a region. This promise
-#                     should be placed before your call to this bundle";
-#      "$(file)"
-#         edit_line   => manage_variable_values_ini("context.array", "SectionName"),
-#         create => "true",
-#         comment     => "Set the variale values only in the specified ini region";
-#
-
+# Removes any variable value pairs not defined for the ini section.
+# 
+# @param tab An associative array containing `tab[sectionName][LHS]="RHS"`.
+# The value is not changed when the `RHS` is "dontchange"
+# @param sectionName The section in the file within which values should be
+# modified
+# 
+# **See also:** `set_variable_values_ini()`
 {
   vars:
       "index" slist => getindices("$(tab)[$(sectionName)]");
@@ -373,36 +390,18 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
 ##
 
 bundle edit_line set_variable_values_ini(tab, sectionName)
-
-# Sets the RHS of configuration items in the file of the form
-# LHS=RHS
-# If the line is commented out with #, it gets uncommented first.
+# @brief Sets the RHS of configuration items in the file of the form
+# `LHS=RHS`
+# 
+# If the line is commented out with `#`, it gets uncommented first.
 # Adds a new line if none exists.
-# The argument is an associative array containing tab[SectionName][LHS]="RHS"
-# don't change value when the RHS is dontchange
-
-# Based on set_variable_values from cfengine_stdlib.cf, modified to
-# use section to define were to write, and to handle commented-out lines.
-
-# CAUTION : for it to work nicely, you should use CFEngine with the commit n°3229
-# otherwise you may risk a segfault
-
-#
-# If you are running 3.2.1 or earlier or more specifically git commit # or
-# earlier you can use this to work around the segfault bug.
-# vars:
-#     "$(file)"
-#         edit_line => append_if_no_line("[#EOF#]"),
-#         create => "true",
-#         comment => "Work around bug<bug#here> where eof did not mean end
-#                     of section and thus cannot select a region. This promise
-#                     should be placed before your call to this bundle";
-#      "$(file)"
-#         edit_line   => set_variable_values_ini("context.array", "SectionName"),
-#         create => "true",
-#         comment     => "Set the variale values only in the specified ini region";
-#
-
+# 
+# @param tab An associative array containing `tab[sectionName][LHS]="RHS"`.
+# The value is not changed when the `RHS` is "dontchange"
+# @param sectionName The section in the file within which values should be
+# modified
+# 
+# **See also:** `set_variable_values_ini()`
 {
   vars:
       "index" slist => getindices("$(tab)[$(sectionName)]");
@@ -441,20 +440,31 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 }
 
 bundle edit_line set_quoted_values(v)
+# @brief Sets the RHS of variables in shell-like files of the form:
+# 
+# ```
+#      LHS="RHS"
+# ```
+# 
+# Adds a new line if no LHS exists, and replaces RHS values if one does exist.
+# If the line is commented out with #, it gets uncommented first.
+#
+# @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
+# 
+# **Example:**
+#
+# ```cf3
+#     vars:
+#        "stuff[lhs-1]" string => "rhs1";
+#        "stuff[lhs-2]" string => "rhs2";
+# 
+#     files:
+#        "myfile"
+#          edit_line => set_quoted_values(stuff)
+# ```
+#
+# **See also:** `set_variable_values()`
 {
-      # Sets the RHS of variables in shell-like files
-      #   that is:
-      #      LHS="RHS"
-      # Adds a new line if no LHS exists
-      # repairs RHS values if one does exist
-      # If the line is commented out with #, it gets uncommented first.
-      #
-      # To use:
-      #   1) Define an array, where the keys are the LHS and the values are the RHS
-      #        "stuff[lhs-1]" string => "rhs1";
-      #        "stuff[lhs-2]" string => "rhs2";
-      #   2) The parameter passed to the edit_line promise is the fully qualified
-      #      name of the array (i.e., "bundlename.stuff") WITHOUT any "$" or "@"
 
   vars:
       "index" slist => getindices("$(v)");
@@ -482,18 +492,30 @@ bundle edit_line set_quoted_values(v)
 ##
 
 bundle edit_line set_variable_values(v)
-
-# Sets the RHS of variables in the file of the form
-#   LHS = RHS
-# Adds a new line if no LHS exists, repairs RHS values if one does exist
+# @brief Sets the RHS of variables in files of the form:
+# 
+# ```
+#      LHS=RHS
+# ```
+# 
+# Adds a new line if no LHS exists, and replaces RHS values if one does exist.
+# If the line is commented out with #, it gets uncommented first.
 #
-# To use:
-#   1) Define an array, where the keys are the LHS and the values are the RHS
+# @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
+# 
+# **Example:**
+#
+# ```cf3
+#     vars:
 #        "stuff[lhs-1]" string => "rhs1";
 #        "stuff[lhs-2]" string => "rhs2";
-#   2) The parameter passed to the edit_line promise is the fully qualified
-#      name of the array (i.e., "bundlename.stuff") WITHOUT any "$" or "@"
-
+# 
+#     files:
+#        "myfile"
+#          edit_line => set_quoted_values(stuff)
+# ```
+#
+# **See also:** `set_quoted_values()`
 {
   vars:
 
@@ -523,13 +545,16 @@ bundle edit_line set_variable_values(v)
 }
 
 bundle edit_line set_config_values(v)
-
-# Sets the RHS of configuration items in the file of the form
+# @brief Sets the RHS of configuration items in the file of the form:
+#
+# ```
 #   LHS RHS
-# If the line is commented out with #, it gets uncommented first.
+# ```
+# 
+# If the line is commented out with `#`, it gets uncommented first. 
 # Adds a new line if none exists.
-# The argument is the fully-qualified name of an associative array containing v[LHS]="rhs"
-
+#
+# @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
 {
   vars:
       "index" slist => getindices("$(v)");
@@ -552,14 +577,17 @@ bundle edit_line set_config_values(v)
 }
 
 bundle edit_line set_config_values_matching(v,pat)
-
-# Sets the RHS of configuration items in the file of the form
+# @brief Sets the RHS of configuration items in the file of the form
+#
+# ```
 #   LHS RHS
-# If the line is commented out with #, it gets uncommented first.
+# ```
+# 
+# If the line is commented out with `#`, it gets uncommented first.
 # Adds a new line if none exists.
-# Only elements of "v" that match the regex "pat" are used
-# The argument is the fully-qualified name of an associative array containing v[LHS]="rhs"
-
+# 
+# @param v the fully-qualified name of an associative array containing v[LHS]="rhs"
+# @param pat Only elements of `v` that match the regex `pat` are use
 {
   vars:
       "allparams" slist => getindices("$(v)");
@@ -585,10 +613,9 @@ bundle edit_line set_config_values_matching(v,pat)
 ##
 
 bundle edit_line maintain_key_values(v,sep)
-
+# @brief Sets the RHS of configuration items with an giving separator
+# 
 # Contributed by David Lee
-# Purpose: Sets the RHS of configuration items with an giving separator
-
 {
   vars:
       "index" slist => getindices("$(v)");
@@ -621,10 +648,11 @@ bundle edit_line maintain_key_values(v,sep)
 ##
 
 bundle edit_line append_users_starting(v)
-
-# For adding to /etc/passwd or etc/shadow, needs
-# an array v[username] string => "line..."
-
+# @brief For adding to `/etc/passwd` or `etc/shadow`
+# @param v An array `v[username] string => "line..."`
+#
+# **Note:** To manage local users with CFEngine 3.6 and later,
+# consider making `users` promises instead of modifying system files.
 {
   vars:
 
@@ -646,10 +674,11 @@ bundle edit_line append_users_starting(v)
 ##
 
 bundle edit_line append_groups_starting(v)
-
-# For adding groups to /etc/group, needs
-# an array v[groupname] string => "line..."
-
+# @brief For adding groups to `/etc/group`
+# @param v An array `v[groupname] string => "line..."`
+#
+# **Note:** To manage local users with CFEngine 3.6 and later,
+# consider making `users` promises instead of modifying system files.
 {
   vars:
 
@@ -672,10 +701,11 @@ bundle edit_line append_groups_starting(v)
 ##
 
 bundle edit_line set_colon_field(key,field,val)
-
-# Set the value of field number "field" of the
-# line whose first field is "key", in a colon-separated file.
-
+# @brief Set the value of field number `field` of the line whose
+# first field is `key` to the value `val`, in a colon-separated file.
+# @param key The value the first field has to match
+# @param field The field to be modified
+# @param val The new value of `field`
 {
   field_edits:
 
@@ -688,10 +718,14 @@ bundle edit_line set_colon_field(key,field,val)
 ##
 
 bundle edit_line set_user_field(user,field,val)
-
-# Set the value of field number "field" in
-# a :-field formatted file like /etc/passwd
-
+# @brief Set the value of field number "field" in a `:-field`
+# formatted file like `/etc/passwd`
+# @param user The user to be modified
+# @param field The field that should be modified
+# @param val THe value for `field`
+#
+# **Note:** To manage local users with CFEngine 3.6 and later,
+# consider making `users` promises instead of modifying system files.
 {
   field_edits:
 
@@ -704,10 +738,14 @@ bundle edit_line set_user_field(user,field,val)
 ##
 
 bundle edit_line append_user_field(group,field,allusers)
-
-# For adding users to to a file like /etc/group
-# at field position "field", comma separated subfields
-
+# @brief For adding users to to a file like `/etc/group`
+# at field position `field`, comma separated subfields
+# @param group The group to be modified
+# @param field The field where users should be added
+# @param allusers The list of users to add to `field`
+# 
+# **Note:** To manage local users with CFEngine 3.6 and later,
+# consider making `users` promises instead of modifying system files.
 {
   vars:
 
@@ -724,10 +762,8 @@ bundle edit_line append_user_field(group,field,allusers)
 ##
 
 bundle edit_line expand_template(templatefile)
-
-# Read in the named text file and expand $(var)
-# inside the file
-
+# @brief Read in the named text file and expand `$(var)` inside the file
+# @param templatefile The name of the file
 {
   insert_lines:
 
@@ -739,13 +775,15 @@ bundle edit_line expand_template(templatefile)
 }
 
 bundle edit_line replace_or_add(pattern,line)
-
-# Replace a pattern in a file with a single line.
+# @brief Replace a pattern in a file with a single line.
+# 
 # If the pattern is not found, add the line to the file.
+# 
+# @param pattern The pattern that should be replaced
 # The pattern must match the whole line (it is automatically
 # anchored to the start and end of the line) to avoid
 # ambiguity.
-
+# @param line The line with which to replace matches of `pattern`
 {
   vars:
       "cline" string => canonify("$(line)");
@@ -763,14 +801,15 @@ bundle edit_line replace_or_add(pattern,line)
 }
 
 bundle edit_line fstab_option_editor(method, mount, option)
-# @brief Add or remove /etc/fstab options for a mount
-# @param method `field_operation` to apply
-# @param mount the mount point
-# @param option the option to add or remove
+# @brief Add or remove `/etc/fstab` options for a mount
 #
 # This bundle edits the options field of a mount.  The `method` is a
 # `field_operation` which can be `append`, `prepend`, `set`, `delete`,
 # or `alphanum`.  The option is OS-specific.
+# 
+# @param method `field_operation` to apply
+# @param mount the mount point
+# @param option the option to add or remove
 #
 # **Example:**
 #
