@@ -1126,7 +1126,6 @@ body package_method freebsd
 #     package_method   =>  freebsd;
 #
 # ```
-
 {
       package_changes => "individual";
 
@@ -1169,7 +1168,6 @@ body package_method freebsd_portmaster
 #     package_policy   =>  "add",
 #     package_method   =>  freebsd_portmaster;
 #
-
 # ```
 {
       package_changes => "individual";
