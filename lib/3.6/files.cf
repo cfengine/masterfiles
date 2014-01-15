@@ -68,7 +68,8 @@ bundle edit_line insert_lines(lines)
 # @brief Append `lines` if they don't exist in the file
 # @param lines The lines to be appended
 #
-# **See also:** `insert_lines` in edit_line
+# **See also:** [`insert_lines`][insert_lines] in
+# [`edit_line`][bundle edit_line]
 {
   insert_lines:
 
