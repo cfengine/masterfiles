@@ -110,14 +110,14 @@ bundle agent cfe_internal_update_bins
 
   processes:
 
-    bin_newpkg::
+    bin_newpkg.!bin_update_success::
 
       "$(cf_components)" signals => { "$(stop_signal)" },
       comment => "Stop cfengine running processes before binary update",
       handle => "cfe_internal_update_bins_processes_stop_cfengine",
       classes => u_if_repaired("stopped_cfprocs");
 
-    bin_newpkg.!windows::
+    bin_newpkg.!bin_update_success.!windows::
 
       "cf-execd"  signals => { "$(stop_signal)" },
       comment => "Stop cf-execd running process before binary update",
