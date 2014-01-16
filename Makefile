@@ -3,6 +3,9 @@ PWD:=$(shell pwd)
 ifeq ($(CORE),)
   CORE:=$(PWD)/../core/
 endif
+ifeq ($(ENTERPRISE),)
+  ENTERPRISE:=$(PWD)/../enterprise/
+endif
 
 ifeq ($(DESTDIR),)
   DESTDIR:=/var/cfengine/masterfiles
@@ -12,15 +15,21 @@ INSTALL = /usr/bin/install
 INSTALL_DATA = ${INSTALL} -m 600
 INSTALL_DIR = ${INSTALL} -m 750 -d
 
+ENV_FILE:=$(PWD)/tests/acceptance/testall.env
+
 copy:
 	cp $(CORE)/tests/acceptance/default.cf.sub tests/acceptance
-	cp $(CORE)/tests/acceptance/testall tests/acceptance
 
-check: copy
-	cd tests/acceptance && ./testall --agent=$(CORE)/cf-agent/cf-agent --cfpromises=$(CORE)/cf-promises/cf-promises --cfserverd=$(CORE)/cf-serverd/cf-serverd --cfkey=$(CORE)/cf-key/cf-key
+env:
+	echo export CORE=\"$(CORE)\" > $(ENV_FILE)
+	echo export ENTERPRISE=\"$(ENTERPRISE)\" >> $(ENV_FILE)
+	echo export CFENGINE_TEST_OVERRIDE_EXTENSION_LIBRARY_DIR=\"$(ENTERPRISE)/enterprise-plugin/.libs\" >> $(ENV_FILE)
 
-checklog: copy
-	cd tests/acceptance && ./testall --agent=$(CORE)/cf-agent/cf-agent --cfpromises=$(CORE)/cf-promises/cf-promises --cfserverd=$(CORE)/cf-serverd/cf-serverd --cfkey=$(CORE)/cf-key/cf-key --printlog
+check: copy env
+	cd tests/acceptance && ./testall
+
+checklog: copy env
+	cd tests/acceptance && ./testall --printlog
 
 install:
 	for d in . cfe_internal controls inventory lib/3.5 lib/3.6 services sketches/meta update; do \

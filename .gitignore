@@ -16,4 +16,3 @@ tests/*/*.trs
 
 # copied from core
 tests/acceptance/default.cf.sub
-tests/acceptance/testall
