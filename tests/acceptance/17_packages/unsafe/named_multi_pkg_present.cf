@@ -22,20 +22,8 @@ body common control
 
 bundle agent init
 {
-    vars:
-        "package_name" slist => { "$(p.name[3])","$(p.name[1])","$(p.name[2])"};
-    packages:
-        debian::
-
-	    "$(package_name)"
-            package_policy => "delete",
-            package_method => apt_get;
-
-        redhat::
-
-            "$(package_name)"
-            package_policy => "delete",
-            package_method => yum_rpm;
+  methods:
+    "clear_packages" usebundle => clear_packages;
 }
 
 #######################################################
@@ -43,7 +31,7 @@ bundle agent init
 bundle agent test
 {
     vars:
-        "package_name" slist => { @(init.package_name) };
+        "package_name" slist => { "$(p.name[3])","$(p.name[1])","$(p.name[2])"};
     packages:
 
         debian::
@@ -78,11 +66,11 @@ bundle agent check
 
         debian::
 
-            "has_pkg_$(init.package_name)" expression => returnszero("dpkg -l | grep ' $(init.package_name) '", "useshell");
+            "has_pkg_$(test.package_name)" expression => returnszero("dpkg -l | grep ' $(test.package_name) '", "useshell");
 
         redhat::
 
-            "has_pkg_$(init.package_name)" expression => returnszero("/bin/rpm -qa | grep -qw $(init.package_name)", "useshell");
+            "has_pkg_$(test.package_name)" expression => returnszero("/bin/rpm -qa | grep -qw $(test.package_name)", "useshell");
 
         any::
             "has_file_test_package_charlie" expression => fileexists("$(p.file[3][$(p.latest_version)])");

@@ -9,7 +9,7 @@
 
 body common control
 {
-      inputs => { "./packages-info.cf.sub", "../../default.cf.sub", "../../../../libraries/cfengine_stdlib.cf" };
+      inputs => { "./packages-info.cf.sub", "../../default.cf.sub", "../../../../lib/3.6/packages.cf" };
       bundlesequence  => { default("$(this.promise_filename)") };
       version => "1.0";
 }
@@ -18,26 +18,16 @@ body common control
 
 bundle agent init
 {
+  methods:
+    "clear_packages" usebundle => clear_packages;
 }
 
 #######################################################
 
 bundle agent test
 {
-  vars:
-      "package_name" string => "$(p.name[1])";
-      "package_version" string => "$(p.version[1])";
-
-  packages:
-    debian::
-      "$(package_name)"
-        package_policy => "add",
-        package_method => apt_get;
-
-    redhat::
-      "$(package_name)"
-        package_policy => "add",
-        package_method => yum_rpm;
+  methods:
+    "install_package" usebundle => install_package("$(p.name[1])", "$(p.version[1])");
 }
 
 #######################################################

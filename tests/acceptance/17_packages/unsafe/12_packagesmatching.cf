@@ -28,8 +28,6 @@ bundle agent init
 {
   vars:
       "package_name" string => "$(p.name[1])";
-      "package_version" string => "$(p.version[$(p.latest_version)])";
-      "package_arch" string => "$(p.arch)";
 }
 
 #######################################################
@@ -47,15 +45,27 @@ bundle agent check
 {
   classes:
     any::
-      "ok" expression => strcmp("$(test.all_packages[0])", "$(init.package_version)");
+      "function_ok" expression => strcmp("$(test.all_packages[0])", "$(init.package_name)");
+      "file1_ok" expression => fileexists("$(sys.workdir)/state/software_packages.csv");
+      "file2_ok" expression => fileexists("$(sys.workdir)/state/software_patches_avail.csv");
+      "file1_size_ok" not => strcmp(filestat("$(sys.workdir)/state/software_packages.csv", "size"), "0");
+      "file2_size_ok" not => strcmp(filestat("$(sys.workdir)/state/software_patches_avail.csv", "size"), "0");
+
+      "ok" and => { "function_ok", "file1_ok", "file2_ok", "file1_size_ok", "file2_size_ok" };
 
   reports:
     DEBUG::
-      "package count check '$(test.all_packages[0])' != '$(init.package_version)'"
-      ifvarclass => "!ok";
-
-      "package count check '$(test.all_packages[0])' == '$(init.package_version)'"
-      ifvarclass => "ok";
+      "packagesmatching: $(test.all_packages[0])";
+    DEBUG.!function_ok::
+      "function_ok not set";
+    DEBUG.!file1_ok::
+      "file1_ok not set";
+    DEBUG.!file2_ok::
+      "file2_ok not set";
+    DEBUG.!file1_size_ok::
+      "file1_size_ok not set";
+    DEBUG.!file2_size_ok::
+      "file2_size_ok not set";
 
     ok::
       "$(this.promise_filename) Pass";
