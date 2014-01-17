@@ -159,6 +159,10 @@ body process_count check_monitord(n)
 
 bundle agent cfe_internal_correct_cftwin
 {
+
+  vars:
+    "folder_inside_lib_to_drop" slist => {"git-core"};
+    
   files:
 
     windows::
@@ -178,7 +182,7 @@ bundle agent cfe_internal_correct_cftwin
       perms => m("644"),
       move_obstructions => "true",
       copy_from => local_cp_libtwin("/var/cfengine/lib"),
-      depth_search => recurse("inf");
+      depth_search => recurse_ignore("inf","@(folder_inside_lib_to_drop)");
 
       "/var/cfengine/bin/cf-twin"
       comment => "Correct cf-twin to be the same as cf-agent, in case of dependency upgrade",
