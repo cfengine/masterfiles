@@ -23,12 +23,8 @@ body common control
 
 bundle agent init
 {
-    vars:
-        "package_name" string => "$(p.name[3])";
-
-    packages:
-        "$(package_name)"
-        package_policy => "delete";
+  methods:
+    "clear_packages" usebundle => clear_packages;
 }
 
 #######################################################
@@ -36,7 +32,7 @@ bundle agent init
 bundle agent test
 {
     vars:
-        "package_name" string => "$(init.package_name)";
+        "package_name" string => "$(p.name[3])";
 
       debian::
           "package_arch" string => "amd64";

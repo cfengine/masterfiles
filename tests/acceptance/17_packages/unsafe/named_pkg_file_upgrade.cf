@@ -20,27 +20,8 @@ body common control
 
 bundle agent init
 {
-    vars:
-        "package_name" string => "$(p.name[3])";
-
-    packages:
-        debian::
-
-	    "$(package_name)"
-            package_policy => "add",
-            package_method => dpkg_version("$(this.promise_dirname)/deb_repo"),
-            package_version => "$(p.version[1])",
-            package_select => "==",
-            classes => test_set_class("pass","fail");
-
-        redhat::
-
-            "$(package_name)"
-            package_policy => "add",
-            package_method => rpm_version("$(this.promise_dirname)/rpm_repo"),
-            package_version => "$(p.version[1])",
-            package_select => "==",
-            classes => test_set_class("pass","fail");
+  methods:
+    "install_package" usebundle => install_package("$(p.name[3])", "$(p.version[1])");
 }
 
 #######################################################
@@ -59,25 +40,23 @@ bundle agent test
         debian::
 
             "$(package_name)"
-            package_policy => "add",
+            package_policy => "addupdate",
             package_select => "==",
             package_version => "$(package_version)",
-            package_architectures => { "i386", "amd64" },
-            package_method => dpkg_version("$(this.promise_dirname)/file_repo");
+            package_architectures => { "$(p.arch)" },
+            package_method => dpkg_version("$(this.promise_dirname)/file_repo"),
+            classes => test_set_class("pass", "fail");
 
         redhat::
 
             "$(package_name)"
-            package_policy => "add",
+            package_policy => "addupdate",
             package_select => "==",
             package_version => "$(package_version)",
-            package_architectures => { "i386", "x86_64" },
-            package_method => rpm_version("$(this.promise_dirname)//rpm_repo");
-
-
-
+            package_architectures => { "$(p.arch)" },
+            package_method => rpm_version("$(this.promise_dirname)//rpm_repo"),
+            classes => test_set_class("pass", "fail");
 }
-
 
 
 body classes test_set_class(ok_class,notok_class)
