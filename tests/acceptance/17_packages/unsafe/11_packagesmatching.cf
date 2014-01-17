@@ -9,7 +9,7 @@
 
 body common control
 {
-      inputs => { "./packages-info.cf.sub", "../../default.cf.sub", "../../../../libraries/cfengine_stdlib.cf" };
+      inputs => { "./packages-info.cf.sub", "../../default.cf.sub", "../../../../lib/3.6/packages.cf" };
       bundlesequence  => { default("$(this.promise_filename)") };
       version => "1.0";
 }

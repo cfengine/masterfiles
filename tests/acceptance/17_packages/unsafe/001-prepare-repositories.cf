@@ -85,7 +85,9 @@ bundle agent signing_keys
 {
   classes:
     !debian::
-      "signing_keys_ok" expression => "any";
+      "signing_keys_ok"
+        expression => "any",
+        scope => "namespace";
 
   commands:
     debian::

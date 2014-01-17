@@ -29,10 +29,36 @@ bundle common p
     "version[1]" string => "1.0-1";
     "version[2]" string => "1.0-2";
 
-    "file[1][1]" string => "/$(name[1])_$(version[1])_$(arch)-$(ext)-installed.txt";
-    "file[1][2]" string => "/$(name[1])_$(version[2])_$(arch)-$(ext)-installed.txt";
-    "file[2][1]" string => "/$(name[2])_$(version[1])_$(arch)-$(ext)-installed.txt";
-    "file[2][2]" string => "/$(name[2])_$(version[2])_$(arch)-$(ext)-installed.txt";
-    "file[3][1]" string => "/$(name[3])_$(version[1])_$(arch)-$(ext)-installed.txt";
-    "file[3][2]" string => "/$(name[3])_$(version[2])_$(arch)-$(ext)-installed.txt";
+    debian::
+      "file[1][1]" string => "/$(name[1])_$(version[1])_$(arch)-$(ext)-installed.txt";
+      "file[1][2]" string => "/$(name[1])_$(version[2])_$(arch)-$(ext)-installed.txt";
+      "file[2][1]" string => "/$(name[2])_$(version[1])_$(arch)-$(ext)-installed.txt";
+      "file[2][2]" string => "/$(name[2])_$(version[2])_$(arch)-$(ext)-installed.txt";
+      "file[3][1]" string => "/$(name[3])_$(version[1])_$(arch)-$(ext)-installed.txt";
+      "file[3][2]" string => "/$(name[3])_$(version[2])_$(arch)-$(ext)-installed.txt";
+    redhat::
+      "file[1][1]" string => "/$(name[1])-$(version[1])-$(arch)-$(ext)-installed.txt";
+      "file[1][2]" string => "/$(name[1])-$(version[2])-$(arch)-$(ext)-installed.txt";
+      "file[2][1]" string => "/$(name[2])-$(version[1])-$(arch)-$(ext)-installed.txt";
+      "file[2][2]" string => "/$(name[2])-$(version[2])-$(arch)-$(ext)-installed.txt";
+      "file[3][1]" string => "/$(name[3])-$(version[1])-$(arch)-$(ext)-installed.txt";
+      "file[3][2]" string => "/$(name[3])-$(version[2])-$(arch)-$(ext)-installed.txt";
+}
+
+bundle agent clear_packages
+{
+  commands:
+    redhat::
+     "$(paths.path[rpm]) -e --allmatches $(p.name[$(p.packages)])";
+    debian::
+     "$(paths.path[dpkg]) --purge $(p.name[$(p.packages)])";
+}
+
+bundle agent install_package(package_name, package_version)
+{
+  commands:
+    redhat::
+     "$(paths.path[rpm]) -U --force $(this.promise_dirname)/rpm_repo/$(package_name)-$(package_version).$(p.arch).rpm";
+    debian::
+     "$(paths.path[dpkg]) -i $(this.promise_dirname)/file_repo/$(package_name)_$(package_version)_$(p.arch).deb";
 }
