@@ -698,7 +698,6 @@ body package_method yum
       package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
@@ -752,7 +751,6 @@ body package_method yum_rpm
       package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
@@ -801,7 +799,6 @@ body package_method yum_rpm_enable_repo(repoid)
       package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
@@ -1339,7 +1336,6 @@ body package_method generic
       package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
