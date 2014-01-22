@@ -42,6 +42,47 @@ bundle common inventory_mtab
       "$(this.bundle): we have a $(mounts[$(idx)][2]) mount under $(mounts[$(idx)][1])";
 }
 
+bundle common inventory_fstab
+# @brief Do fstab inventory
+#
+# The fstab format is simple: each line looks like this format:
+# `/dev/sda1 / auto noatime 0 1` (in order: `DEV MOUNTPOINT FSTYPE
+# OPTIONS DUMP-FREQ PASS`).  Note the FSTYPE is not known from the
+# fstab.
+#
+# Solaris has 'MOUNTDEV FSCKDEV MOUNTPOINT FSTYPE PASS MOUNT-AD-BOOT
+# OPTIONS' but is not supported here.  Contributions welcome.
+{
+  vars:
+    !disable_inventory_fstab::
+      "mount_count" int =>  readstringarrayidx("mounts",
+                                               $(sys.fstab),
+                                               "\s*#[^\n]*",
+                                               "\s+",
+                                               500,
+                                               50000);
+
+      "idx" slist => getindices("mounts");
+
+  classes:
+    !disable_inventory_fstab::
+      # define classes like have_fs_ext4__var for a ext4 /var entry
+      "have_fs_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
+      expression => "any";
+
+      # define classes like have__var for a /var entry
+      "have_fs_$(mounts[$(idx)][1])"
+      expression => "any";
+
+      # define classes like have_fs_ext4 if there is a ext4 entry
+      "have_fs_$(mounts[$(idx)][2])"
+      expression => "any";
+
+  reports:
+    !disable_inventory_fstab.verbose_mode::
+      "$(this.bundle): we have a $(mounts[$(idx)][2]) fstab entry under $(mounts[$(idx)][1])";
+}
+
 bundle common inventory_dmidecode
 # @brief Do dmidecode-based inventory
 #

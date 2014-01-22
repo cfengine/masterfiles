@@ -152,6 +152,13 @@ bundle common inventory_control
       "disable_inventory_mtab" or => { "disable_inventory",
                                        "_have_no_mtab" };
 
+      # by default disable the fstab inventory if the general
+      # inventory is disabled or $(sys.fstab) is missing.  Note that
+      # this is very fast.
+      "_have_no_fstab" not => fileexists($(sys.fstab));
+      "disable_inventory_fstab" or => { "disable_inventory",
+                                       "_have_no_fstab" };
+
       # by default don't run the CMDB integration every time, even if
       # disable_inventory is not set
       "disable_inventory_cmdb" expression => "any";
