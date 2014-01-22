@@ -6,6 +6,132 @@ bundle common inventory_any
 {
 }
 
+bundle common inventory_proc
+# @brief Do procfs inventory
+#
+# This bundle will parse these /proc files: consoles, cpuinfo,
+# meminfo, modules, partitions, uptime, version, vmstat.  There are
+# some general patterns you can follow to extend it for other /proc
+# items of interest.
+#
+# Contributions welcome.  /proc/net and /proc/sys in general are of
+# wide interest, if you're looking for something fun.  For instance,
+# the network interfaces could be extracted here without calling
+# `ifconfig`.
+{
+  vars:
+      "basefiles" slist => { "consoles", "cpuinfo", "meminfo", "modules", "partitions", "uptime", "version", "vmstat" };
+      "files[$(basefiles)]" string => "$(inventory_control.proc)/$(basefiles)";
+
+    !disable_inventory_proc._have_proc_consoles::
+      "console_count" int =>  readstringarrayidx("consoles",
+                                                 "$(files[consoles])",
+                                                 "\s*#[^\n]*",
+                                                 "\s+",
+                                                 500,
+                                                 50000);
+
+      "console_idx" slist => getindices("consoles");
+
+    !disable_inventory_proc._have_proc_modules::
+      "module_count" int =>  readstringarrayidx("modules",
+                                                "$(files[modules])",
+                                                "\s*#[^\n]*",
+                                                "\s+",
+                                                2500,
+                                                250000);
+
+      "module_idx" slist => getindices("modules");
+
+    !disable_inventory_proc._have_proc_cpuinfo::
+      # this will extract all the keys in one bunch, so you won't get
+      # detailed info for processor 0 for example
+      "cpuinfo_count" int =>  readstringarrayidx("cpuinfo_array",
+                                                 "$(files[cpuinfo])",
+                                                 "\s*#[^\n]*",
+                                                 "\s*:\s*",
+                                                 500,
+                                                 50000);
+
+      "cpuinfo_idx" slist => getindices("cpuinfo_array");
+      "cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])]" string => "$(cpuinfo_array[$(cpuinfo_idx)][1])";
+      "cpuinfo_keys" slist => getindices("cpuinfo");
+
+    !disable_inventory_proc._have_proc_meminfo::
+      # note you'll get units like "400 kB"
+      "meminfo_count" int =>  readstringarrayidx("meminfo_array",
+                                                 "$(files[meminfo])",
+                                                 "\s*#[^\n]*",
+                                                 "\s*:\s*",
+                                                 500,
+                                                 50000);
+
+      "meminfo_idx" slist => getindices("meminfo_array");
+      "meminfo[$(meminfo_array[$(meminfo_idx)][0])]" string => "$(meminfo_array[$(meminfo_idx)][1])";
+      "meminfo_keys" slist => getindices("meminfo");
+
+    !disable_inventory_proc._have_proc_partitions::
+      "partitions_count" int =>  readstringarrayidx("partitions_array",
+                                                    "$(files[partitions])",
+                                                    "major[^\n]*",
+                                                    "\s+",
+                                                    500,
+                                                    50000);
+
+      "partitions_idx" slist => getindices("partitions_array");
+      "partitions[$(partitions_array[$(partitions_idx)][4])]" string => "$(partitions_array[$(partitions_idx)][3])";
+      "partitions_keys" slist => getindices("partitions");
+
+    !disable_inventory_proc._have_proc_uptime::
+      "uptimes" rlist => readreallist("$(files[uptime])","#.*","\s+",10,400);
+      "uptime" string => nth(uptimes, 0);
+
+    !disable_inventory_proc._have_proc_version::
+      "version" string => readfile("$(files[version])", 2048);
+
+    !disable_inventory_proc._have_proc_vmstat::
+      "vmstat_count" int =>  readstringarrayidx("vmstat_array",
+                                                 "$(files[vmstat])",
+                                                 "\s*#[^\n]*",
+                                                 "\s+",
+                                                 2500,
+                                                 250000);
+
+      "vmstat_idx" slist => getindices("vmstat_array");
+      "vmstat[$(vmstat_array[$(vmstat_idx)][0])]" string => "$(vmstat_array[$(vmstat_idx)][1])";
+      "vmstat_keys" slist => getindices("vmstat");
+
+  classes:
+    !disable_inventory_proc::
+      "_have_proc_$(basefiles)" expression => fileexists("$(files[$(basefiles)])");
+
+    !disable_inventory_proc._have_proc_consoles::
+      "have_console_$(consoles[$(console_idx)][0])"
+      expression => "any";
+
+    !disable_inventory_proc._have_proc_modules::
+      "have_module_$(modules[$(module_idx)][0])"
+      expression => "any";
+
+  reports:
+    !disable_inventory_proc._have_proc_consoles.verbose_mode::
+      "$(this.bundle): we have console $(consoles[$(console_idx)][0])";
+    !disable_inventory_proc._have_proc_modules.verbose_mode::
+      "$(this.bundle): we have module $(modules[$(module_idx)][0])";
+    !disable_inventory_proc._have_proc_cpuinfo.verbose_mode::
+      "$(this.bundle): we have cpuinfo $(cpuinfo_keys) = $(cpuinfo[$(cpuinfo_keys)])";
+    !disable_inventory_proc._have_proc_meminfo.verbose_mode::
+      "$(this.bundle): we have meminfo $(meminfo_keys) = $(meminfo[$(meminfo_keys)])";
+    !disable_inventory_proc._have_proc_partitions.verbose_mode::
+      "$(this.bundle): we have partitions $(partitions_keys) with $(partitions[$(partitions_keys)]) blocks";
+    !disable_inventory_proc._have_proc_uptime.verbose_mode::
+      "$(this.bundle): we have uptime $(uptime) seconds";
+    !disable_inventory_proc._have_proc_version.verbose_mode::
+      "$(this.bundle): we have kernel version '$(version)'";
+    !disable_inventory_proc._have_proc_vmstat.verbose_mode::
+      "$(this.bundle): we have vmstat $(vmstat_keys) = $(vmstat[$(vmstat_keys)])";
+}
+
 bundle common inventory_mtab
 # @brief Do mtab inventory
 #

@@ -160,6 +160,13 @@ bundle common inventory_control
       "disable_inventory_fstab" or => { "disable_inventory",
                                        "_have_no_fstab" };
 
+      # by default disable the proc inventory if the general
+      # inventory is disabled or /proc is missing.  Note that
+      # this is typically fast.
+      "_have_no_proc" not => isdir($(proc));
+      "disable_inventory_fstab" or => { "disable_inventory",
+                                       "_have_no_proc" };
+
       # by default don't run the CMDB integration every time, even if
       # disable_inventory is not set
       "disable_inventory_cmdb" expression => "any";
@@ -177,6 +184,8 @@ bundle common inventory_control
       "$(this.bundle): mtab module enabled";
     verbose_mode.!disable_inventory_fstab::
       "$(this.bundle): fstab module enabled";
+    verbose_mode.!disable_inventory_proc::
+      "$(this.bundle): proc module enabled";
     verbose_mode.!disable_inventory_package_refresh::
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
