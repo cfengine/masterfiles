@@ -12,7 +12,6 @@ bundle common inventory_dmidecode
 # This common bundle runs dmidecode
 {
   vars:
-    !disable_inventory_dmidecode::
       "dmivars" slist => {
                            "bios-vendor",
                            "bios-version",
@@ -47,7 +46,6 @@ bundle common inventory_dmidecode
       "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
 
   classes:
-    !disable_inventory_dmidecode::
       "dmidecode_$(canonified_var[$(dmivars)])_$(canonified[$(dmivars)])"
       expression => "any",
       meta => { "inventory",
@@ -65,11 +63,13 @@ bundle agent inventory_autorun
 # supported.
 {
   methods:
-      "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
-      handle => "cfe_internal_autorun_inventory_packages";
-
+    !disable_inventory_dmidecode::
       "cmdb" usebundle => cfe_autorun_inventory_cmdb(),
       handle => "cfe_internal_autorun_inventory_cmdb";
+
+    !disable_inventory_package_refresh::
+      "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
+      handle => "cfe_internal_autorun_inventory_packages";
 }
 
 bundle agent cfe_autorun_inventory_packages
@@ -79,7 +79,7 @@ bundle agent cfe_autorun_inventory_packages
 # startup, unless disabled.  Other package methods can be added below.
 {
   packages:
-    !disable_inventory_package_refresh.debian::
+    debian::
       "cfe_internal_non_existing_package"
         package_policy => "add",
         package_method => apt_get;
