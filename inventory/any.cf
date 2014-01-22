@@ -67,9 +67,25 @@ bundle agent inventory_autorun
       "cmdb" usebundle => cfe_autorun_inventory_cmdb(),
       handle => "cfe_internal_autorun_inventory_cmdb";
 
+    !disable_inventory_LLDP::
+      "LLDP" usebundle => cfe_autorun_inventory_LLDP(),
+      handle => "cfe_internal_autorun_inventory_LLDP";
+
     !disable_inventory_package_refresh::
       "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
       handle => "cfe_internal_autorun_inventory_packages";
+}
+
+bundle agent cfe_autorun_inventory_LLDP
+# @brief Do LLDP-based inventory
+#
+# This common bundle runs lldpctl to discover information.  See
+# http://vincentbernat.github.io/lldpd/ to run this yourself for
+# testing, and your Friendly Network Admin may be of help too.
+{
+  commands:
+      "$(inventory_control.lldpctl_exec) | perl -n -e 'my ($k, $v) = m/([^=]+)=(.*)/; $k =~ s/\W/_/g; print \"=$k=$v\";"
+      module => "true";
 }
 
 bundle agent cfe_autorun_inventory_packages
@@ -177,4 +193,12 @@ body classes inventory_scoped_classes_generic(scope, x)
       repair_denied => { "repair_denied_$(x)", "$(x)_denied", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
       repair_timeout => { "repair_timeout_$(x)", "$(x)_timeout", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
       promise_kept => { "promise_kept_$(x)", "$(x)_kept", "$(x)_ok", "$(x)_not_repaired", "$(x)_reached" };
+}
+
+body contain inventory_in_shell
+# @brief run command in shell
+#
+# Copy of `in_shell`, which see.
+{
+      useshell => "true"; # canonical "useshell" but this is backwards-compatible
 }
