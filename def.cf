@@ -112,6 +112,7 @@ bundle common inventory_control
       "dmidecoder" string => "/usr/sbin/dmidecode";
       "lldpctl_exec" string => "/usr/bin/lldpctl";
       "lsb_exec" string => "/usr/bin/lsb_release";
+      "mtab" string => "/etc/mtab";
 
   classes:
       # setting this disables all the inventory modules except package_refresh
@@ -122,26 +123,34 @@ bundle common inventory_control
       # by default disable the LSB inventory if the general inventory
       # is disabled or the binary is missing.  Note that the LSB
       # binary is typically not very fast.
-      "_have_lsb_exec" expression => fileexists($(lsb_exec));
-      "disable_inventory_lsb" or => { "disable_inventory", "!_have_lsb_exec" };
+      "_have_no_lsb_exec" not => fileexists($(lsb_exec));
+      "disable_inventory_lsb" or => { "disable_inventory", "_have_no_lsb_exec" };
 
       # by default disable the dmidecode inventory if the general
       # inventory is disabled or the binary does not exist.  Note that
       # typically this is a very fast binary.
-      "_have_dmidecoder_exec" expression => fileexists($(dmidecoder));
+      "_have_no_dmidecoder_exec" not => fileexists($(dmidecoder));
       "disable_inventory_dmidecode" or => { "disable_inventory",
-                                            "!_have_dmidecoder_exec" };
+                                            "_have_no_dmidecoder_exec" };
 
       # by default disable the LLDP inventory if the general inventory
       # is disabled or the binary does not exist.  Note that typically
       # this is a reasonably fast binary but still may require network
       # I/O.
-      "_have_lldpctl_exec" expression => fileexists($(lldpctl_exec));
+      "_have_no_lldpctl_exec" not => fileexists($(lldpctl_exec));
       "disable_inventory_LLDP" or => { "disable_inventory",
-                                       "!_have_lldpctl_exec" };
+                                       "_have_no_lldpctl_exec" };
+
       # by default run the package inventory refresh every time, even
       # if disable_inventory is set
       "disable_inventory_package_refresh" expression => "!any";
+
+      # by default disable the mtab inventory if the general inventory
+      # is disabled or $(mtab) is missing.  Note that this is very
+      # fast.
+      "_have_no_mtab" not => fileexists($(mtab));
+      "disable_inventory_mtab" or => { "disable_inventory",
+                                       "_have_no_mtab" };
 
       # by default don't run the CMDB integration every time, even if
       # disable_inventory is not set

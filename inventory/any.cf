@@ -6,6 +6,42 @@ bundle common inventory_any
 {
 }
 
+bundle common inventory_mtab
+# @brief Do mtab inventory
+#
+# The mtab format is simple: each line looks like this format:
+# `/dev/sda1 / ext4 rw,noatime,data=ordered 0 0` (in order: `DEV
+# MOUNTPOINT FSTYPE OPTIONS DUMP-FREQ PASS`).  Some older Unices have
+# a different format and it's really not portable, so enable this only
+# if you know you want it.  It's very handy if you want to check if a
+# file system is mounted.
+{
+  vars:
+    !disable_inventory_mtab::
+      "mount_count" int =>  readstringarrayidx("mounts",
+                                               $(inventory_control.mtab),
+                                               "\s*#[^\n]*",
+                                               "\s+",
+                                               500,
+                                               50000);
+
+      "idx" slist => getindices("mounts");
+
+  classes:
+    !disable_inventory_mtab::
+      # define classes like have_mount_ext4__var for a ext4 /var mount
+      "have_mount_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
+      expression => "any";
+
+      # define classes like have_mount_ext4 if there is a ext4 mount
+      "have_mount_$(mounts[$(idx)][2])"
+      expression => "any";
+
+  reports:
+    !disable_inventory_mtab.verbose_mode::
+      "$(this.bundle): we have a $(mounts[$(idx)][2]) mount under $(mounts[$(idx)][1])";
+}
+
 bundle common inventory_dmidecode
 # @brief Do dmidecode-based inventory
 #
@@ -58,9 +94,9 @@ bundle common inventory_dmidecode
 bundle agent inventory_autorun
 # @brief Autorun some inventory bundles
 #
-# This agent bundle runs any others explicitly.  It will use
-# bundlesmatching() when CFEngine 3.5 and earlier are no longer
-# supported.
+# This agent bundle runs other "autorun" inventory agent bundles
+# explicitly.  It will use bundlesmatching() when CFEngine 3.5 and
+# earlier are no longer supported.
 {
   methods:
     !disable_inventory_dmidecode::
@@ -79,7 +115,7 @@ bundle agent inventory_autorun
 bundle agent cfe_autorun_inventory_LLDP
 # @brief Do LLDP-based inventory
 #
-# This common bundle runs lldpctl to discover information.  See
+# This agent bundle runs lldpctl to discover information.  See
 # http://vincentbernat.github.io/lldpd/ to run this yourself for
 # testing, and your Friendly Network Admin may be of help too.
 {
