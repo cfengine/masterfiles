@@ -113,6 +113,7 @@ bundle common inventory_control
       "lldpctl_exec" string => "/usr/bin/lldpctl";
       "lsb_exec" string => "/usr/bin/lsb_release";
       "mtab" string => "/etc/mtab";
+      "proc" string => "/proc";
 
   classes:
       # setting this disables all the inventory modules except package_refresh
@@ -172,6 +173,10 @@ bundle common inventory_control
       "$(this.bundle): dmidecode module enabled";
     verbose_mode.!disable_inventory_LLDP::
       "$(this.bundle): LLDP module enabled";
+    verbose_mode.!disable_inventory_mtab::
+      "$(this.bundle): mtab module enabled";
+    verbose_mode.!disable_inventory_fstab::
+      "$(this.bundle): fstab module enabled";
     verbose_mode.!disable_inventory_package_refresh::
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
