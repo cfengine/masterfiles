@@ -4,8 +4,7 @@ bundle common inventory_lsb
 # This common bundle is for LSB inventory work.
 {
   classes:
-      "_have_lsb_exec" expression => fileexists($(lsb_exec));
-      "_inventory_lsb" and => { "!disable_lsb", "_have_lsb_exec" };
+      "_inventory_lsb" not => "disable_inventory_dmidecode";
 
     _inventory_lsb::
       "lsb_$(lsb[Distributor ID])" expression => "any",
@@ -15,7 +14,7 @@ bundle common inventory_lsb
       meta => { "inventory", "group=OS", "comment=LSB Distributor ID and Release" };
 
   vars:
-      "lsb_exec" string => "/usr/bin/lsb_release";
+      "lsb_exec" string => "$(inventory_control.lsb_exec)";
 
     _inventory_lsb::
       "lsb[Distributor ID]" string => execresult("$(lsb_exec) -i -s", "noshell"),

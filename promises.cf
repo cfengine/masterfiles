@@ -10,24 +10,25 @@ body common control
 
       bundlesequence => {
 			  # Common bundle first (Best Practice)
+                          inventory_control,
                           @(inventory.bundles),
-			  "def",
-                          "cfe_internal_hub_vars",
+			  def,
+                          cfe_internal_hub_vars,
 			  # Design Center
-			  "cfsketch_run",
+			  cfsketch_run,
 
                           # Agent bundle
-                          "cfe_internal_management",   # See cfe_internal/CFE_cfengine.cf
-                          "service_catalogue",
-                          "example_use_goals",         # See cfe_internal/example_use_goals.cf
+                          cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
+                          service_catalogue,
+                          example_use_goals,         # See cfe_internal/example_use_goals.cf
 
       };
 
       inputs => {
-                  @(inventory.inputs),
-
                   # File definition for global variables and classes
-		  "def.cf",
+                  "def.cf",
+
+                  @(inventory.inputs),
 
                   # Design Center
                   # MARKER FOR CF-SKETCH INPUT INSERTION
