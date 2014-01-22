@@ -132,18 +132,18 @@ bundle agent inventory_cmdb_load(file)
       "cmdb" data => readjson($(file), "999999");
       "cmdb_string" string => format("%S", cmdb);
 
-      "vkeys" slist => getindices("cmdb[variables]");
-      "$(vkeys)" string => nth("cmdb[variables]", $(vkeys));
+      "bkeys" slist => getindices("cmdb[vars]");
+      "vkeys_$(bkeys)" slist => getindices("cmdb[vars][$(bkeys)]");
+      "$(vkeys_$(bkeys))" string => nth("cmdb[vars][$(bkeys)]", $(vkeys));
 
       "ckeys" slist => getindices("cmdb[classes]");
-      "$(ckeys)" string => nth("cmdb[classes]", $(ckeys));
 
   reports:
     inform_mode.have_cmdb_data::
       "$(this.bundle): Got CMDB data from $(file): $(cmdb_string)";
     verbose_mode.have_cmdb_data::
-      "$(this.bundle): Got CMDB key = $(vkeys), CMDB value = $($(vkeys))";
-      "$(this.bundle): Got CMDB class = $(ckeys), CMDB value = $($(ckeys))";
+      "$(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))";
+      "$(this.bundle): Got CMDB class = $(ckeys)";
     inform_mode.!have_cmdb_data::
       "$(this.bundle): Could not read the CMDB data from $(file)";
 }
