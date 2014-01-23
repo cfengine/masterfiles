@@ -1,4 +1,4 @@
-cf_promises_validated
+cf_promises_*
 
 # acceptance tests
 tests/acceptance/*.log
