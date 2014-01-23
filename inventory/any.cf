@@ -300,16 +300,23 @@ bundle agent cfe_autorun_inventory_packages
   packages:
     debian::
       "cfe_internal_non_existing_package"
-        package_policy => "add",
-        package_method => apt_get;
+      package_policy => "add",
+      package_method => apt_get;
+
     redhat::
       "cfe_internal_non_existing_package"
-        package_policy => "add",
-        package_method => yum_rpm;
-    !redhat.!debian::
+      package_policy => "add",
+      package_method => yum_rpm;
+
+    gentoo::
       "cfe_internal_non_existing_package"
-        package_policy => "add",
-        package_method => generic;
+      package_policy => "add",
+      package_method => emerge;
+
+    !redhat.!debian.!gentoo::
+      "cfe_internal_non_existing_package"
+      package_policy => "add",
+      package_method => generic;
 }
 
 bundle agent cfe_autorun_inventory_cmdb
