@@ -103,13 +103,13 @@ body match_value line_match_value(line_match, extract_regex)
 #      "regex_vsz" string => "root\s+[0-9]+\s+[0-9]+\s+[0-9]+\s+[0-9.]+\s+[0-9.]+\s+([0-9]+).*";
 #    measurements:
 #      "/var/cfengine/state/cf_procs"
-#	       handle => "cf_serverd_vsz",
-#	       comment => "Tracking the memory consumption of a process can help us identify possible memory leaks",
-#	       stream_type => "file",
-#	       data_type => "int",
-#	       history_type => "weekly",
-#	       units => "kB",
-#	       match_value => line_match_value(".*cf-serverd.*", "$(regex_vsz)");
+#              handle => "cf_serverd_vsz",
+#              comment => "Tracking the memory consumption of a process can help us identify possible memory leaks",
+#              stream_type => "file",
+#              data_type => "int",
+#              history_type => "weekly",
+#              units => "kB",
+#              match_value => line_match_value(".*cf-serverd.*", "$(regex_vsz)");
 # }
 # ```
 {

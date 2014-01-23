@@ -217,7 +217,7 @@ bundle edit_line replace_line_end(start,end)
 # `"ftp             21/tcp"`
 #
 # with
-# 
+#
 # `"ftp             2121/tcp"`
 #
 # @param start The string lines have to start with
@@ -249,7 +249,7 @@ bundle edit_line append_to_line_end(start,end)
 #
 # @param start pattern to match lines of interest
 # @param end string to append to matched lines
-# 
+#
 # **Example:**
 #
 # ```cf3
@@ -285,10 +285,10 @@ bundle edit_line regex_replace(find,replace)
 bundle edit_line resolvconf(search,list)
 # @brief Adds search domains and name servers to the system
 # resolver configuration.
-# 
+#
 # Use this bundle to modify `resolv.conf`. Existing entries for
 # `search` and `nameserver` are replaced.
-# 
+#
 # @param search The search domains with space
 # @param list An slist of nameserver addresses
 {
@@ -308,10 +308,10 @@ bundle edit_line resolvconf(search,list)
 bundle edit_line resolvconf_o(search,list,options)
 # @brief Adds search domains, name servers and options to the system
 # resolver configuration.
-# 
+#
 # Use this bundle to modify `resolv.conf`. Existing entries for
 # `search`, `nameserver` and `options` are replaced.
-# 
+#
 # @param search The search domains with space
 # @param list An slist of nameserver addresses
 # options is an slist of variables to modify the resolver
@@ -335,16 +335,16 @@ bundle edit_line resolvconf_o(search,list,options)
 bundle edit_line manage_variable_values_ini(tab, sectionName)
 # @brief Sets the RHS of configuration items in the file of the form
 # `LHS=RHS`
-# 
+#
 # If the line is commented out with `#`, it gets uncommented first.
 # Adds a new line if none exists.
 # Removes any variable value pairs not defined for the ini section.
-# 
+#
 # @param tab An associative array containing `tab[sectionName][LHS]="RHS"`.
 # The value is not changed when the `RHS` is "dontchange"
 # @param sectionName The section in the file within which values should be
 # modified
-# 
+#
 # **See also:** `set_variable_values_ini()`
 {
   vars:
@@ -393,15 +393,15 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
 bundle edit_line set_variable_values_ini(tab, sectionName)
 # @brief Sets the RHS of configuration items in the file of the form
 # `LHS=RHS`
-# 
+#
 # If the line is commented out with `#`, it gets uncommented first.
 # Adds a new line if none exists.
-# 
+#
 # @param tab An associative array containing `tab[sectionName][LHS]="RHS"`.
 # The value is not changed when the `RHS` is "dontchange"
 # @param sectionName The section in the file within which values should be
 # modified
-# 
+#
 # **See also:** `set_variable_values_ini()`
 {
   vars:
@@ -442,23 +442,23 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
 bundle edit_line set_quoted_values(v)
 # @brief Sets the RHS of variables in shell-like files of the form:
-# 
+#
 # ```
 #      LHS="RHS"
 # ```
-# 
+#
 # Adds a new line if no LHS exists, and replaces RHS values if one does exist.
 # If the line is commented out with #, it gets uncommented first.
 #
 # @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
-# 
+#
 # **Example:**
 #
 # ```cf3
 #     vars:
 #        "stuff[lhs-1]" string => "rhs1";
 #        "stuff[lhs-2]" string => "rhs2";
-# 
+#
 #     files:
 #        "myfile"
 #          edit_line => set_quoted_values(stuff)
@@ -494,23 +494,23 @@ bundle edit_line set_quoted_values(v)
 
 bundle edit_line set_variable_values(v)
 # @brief Sets the RHS of variables in files of the form:
-# 
+#
 # ```
 #      LHS=RHS
 # ```
-# 
+#
 # Adds a new line if no LHS exists, and replaces RHS values if one does exist.
 # If the line is commented out with #, it gets uncommented first.
 #
 # @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
-# 
+#
 # **Example:**
 #
 # ```cf3
 #     vars:
 #        "stuff[lhs-1]" string => "rhs1";
 #        "stuff[lhs-2]" string => "rhs2";
-# 
+#
 #     files:
 #        "myfile"
 #          edit_line => set_quoted_values(stuff)
@@ -551,8 +551,8 @@ bundle edit_line set_config_values(v)
 # ```
 #   LHS RHS
 # ```
-# 
-# If the line is commented out with `#`, it gets uncommented first. 
+#
+# If the line is commented out with `#`, it gets uncommented first.
 # Adds a new line if none exists.
 #
 # @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
@@ -583,10 +583,10 @@ bundle edit_line set_config_values_matching(v,pat)
 # ```
 #   LHS RHS
 # ```
-# 
+#
 # If the line is commented out with `#`, it gets uncommented first.
 # Adds a new line if none exists.
-# 
+#
 # @param v the fully-qualified name of an associative array containing v[LHS]="rhs"
 # @param pat Only elements of `v` that match the regex `pat` are use
 {
@@ -615,7 +615,7 @@ bundle edit_line set_config_values_matching(v,pat)
 
 bundle edit_line maintain_key_values(v,sep)
 # @brief Sets the RHS of configuration items with an giving separator
-# 
+#
 # Contributed by David Lee
 {
   vars:
@@ -744,7 +744,7 @@ bundle edit_line append_user_field(group,field,allusers)
 # @param group The group to be modified
 # @param field The field where users should be added
 # @param allusers The list of users to add to `field`
-# 
+#
 # **Note:** To manage local users with CFEngine 3.6 and later,
 # consider making `users` promises instead of modifying system files.
 {
@@ -777,9 +777,9 @@ bundle edit_line expand_template(templatefile)
 
 bundle edit_line replace_or_add(pattern,line)
 # @brief Replace a pattern in a file with a single line.
-# 
+#
 # If the pattern is not found, add the line to the file.
-# 
+#
 # @param pattern The pattern that should be replaced
 # The pattern must match the whole line (it is automatically
 # anchored to the start and end of the line) to avoid
@@ -807,7 +807,7 @@ bundle edit_line fstab_option_editor(method, mount, option)
 # This bundle edits the options field of a mount.  The `method` is a
 # `field_operation` which can be `append`, `prepend`, `set`, `delete`,
 # or `alphanum`.  The option is OS-specific.
-# 
+#
 # @param method `field_operation` to apply
 # @param mount the mount point
 # @param option the option to add or remove

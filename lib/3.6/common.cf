@@ -157,7 +157,7 @@ body action log_verbose
 ##
 
 body action sample_rate(x)
-# @brief Evaluate the promise every `x` minutes, 
+# @brief Evaluate the promise every `x` minutes,
 # A repair-attempt is cancelled after 10 minutes
 # @param x The time in minutes between promise evaluation
 {
