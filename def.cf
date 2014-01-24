@@ -30,7 +30,7 @@ bundle common def
                            #  "217.77.34.18",
                            #  "217.77.34.19",
       },
-      comment => "Define an acl for the machines to be granted accesses",
+      comment => "Define an acl for IPs and netmasks to be granted accesses",
       handle => "common_def_vars_acl";
 
       # End change #
