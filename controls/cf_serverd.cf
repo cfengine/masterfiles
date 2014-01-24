@@ -63,32 +63,38 @@ bundle server access_rules()
       "$(def.dir_masterfiles)"
       handle => "server_access_grant_access_policy",
       comment => "Grant access to the policy updates",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "$(def.dir_software)"
       handle => "server_access_grant_access_datafiles",
       comment => "Grant access to software updates",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "$(def.dir_bin)"
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "$(def.dir_modules)"
       handle => "server_access_grant_access_modules",
       comment => "Grant access to modules directory",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "$(def.dir_plugins)"
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
-      admit => { "$(sys.policy_hub)" };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
     !am_policy_hub::
 
@@ -97,21 +103,24 @@ bundle server access_rules()
       comment => "Grant delta reporting query for the hub on the hosts",
       resource_type => "query",
       report_data_select => default_data_select_host,
-      admit => { "$(sys.policy_hub)" };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "full"
       handle => "server_access_grant_full_for_hosts",
       comment => "Grant full reporting query for the hub on the hosts",
       resource_type => "query",
       report_data_select => default_data_select_host,
-      admit => { "$(sys.policy_hub)" };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "rebase"
       handle => "server_access_grant_rebase_for_hosts",
       comment => "Grant rebase reporting query for the hub on the hosts",
       resource_type => "query",
       report_data_select => default_data_select_host,
-      admit => { "$(sys.policy_hub)" };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
     am_policy_hub::
 
@@ -120,21 +129,24 @@ bundle server access_rules()
       comment => "Grant delta reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
-      admit => { "$(sys.policy_hub)" };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "full"
       handle => "server_access_grant_full_for_hub",
       comment => "Grant full reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
-      admit => { "$(sys.policy_hub)" };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       "rebase"
       handle => "server_access_grant_rebase_for_hub",
       comment => "Grant rebase reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
-      admit => { "$(sys.policy_hub)" };
+      admit_hostnames => { ".*$(def.domain)" },
+      admit_ips => { @(def.acl) };
 
       # Uncomment the promise below to allow cf-runagent to
       # access cf-agent on Windows machines
@@ -143,7 +155,8 @@ bundle server access_rules()
       #
       #    handle => "grant_access_policy_agent",
       #    comment => "Grant access to the agent (for cf-runagent)",
-      #    admit   => { ".*$(def.domain)", @(def.acl) };
+      #    admit_hostnames => { ".*$(def.domain)" },
+      #    admit_ips => { @(def.acl) };
 
   roles:
 
