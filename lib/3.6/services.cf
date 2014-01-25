@@ -407,6 +407,14 @@ bundle agent standard_services(service,state)
       "baseinit[syslog]"    string => "syslogd";
       "pattern[syslog]"     string => "/usr/sbin/syslogd.*";
 
+      "baseinit[crond]"     string => "cron";
+      "pattern[crond]"      string => "/usr/sbin/cron.*";
+
+      "baseinit[snmpd]"     string => "bsnmpd";
+      "pattern[snmpd]"      string => "/usr/sbin/bsnmpd.*";
+
+      "pattern[newsyslog]"  string => "/usr/sbin/newsyslog.*";
+
   classes:
       # Set classes for each possible state after $(all_states)
       "$(all_states)" expression => strcmp($(all_states), $(state)),

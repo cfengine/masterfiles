@@ -752,6 +752,22 @@ bundle agent standard_services(service,state)
       "stopcommand[syslog]"    string => "/etc/rc.d/syslogd stop";
       "pattern[syslog]"        string => "/usr/sbin/syslogd.*";
 
+      "startcommand[crond]"   string => "/etc/rc.d/cron start";
+      "restartcommand[crond]" string => "/etc/rc.d/cron restart";
+      "stopcommand[crond]"    string => "/etc/rc.d/cron stop";
+      "pattern[crond]"        string => "/usr/sbin/cron.*";
+
+      "startcommand[snmpd]"   string => "/etc/rc.d/bsnmpd start";
+      "restartcommand[snmpd]" string => "/etc/rc.d/bsnmpd restart";
+      "stopcommand[snmpd]"    string => "/etc/rc.d/bsnmpd stop";
+      "pattern[snmpd]"        string => "/usr/sbin/bsnmpd.*";
+
+      "startcommand[newsyslog]"   string => "/etc/rc.d/newsyslog start";
+      "restartcommand[newsyslog]" string => "/etc/rc.d/newsyslog restart";
+      "reloadcommand[newsyslog]"  string => "/etc/rc.d/newsyslog reload";
+      "stopcommand[newsyslog]"    string => "/etc/rc.d/newsyslog stop";
+      "pattern[newsyslog]"        string => "/usr/sbin/newsyslog.*";
+
       # METHODS that implement these ............................................
 
   classes:
