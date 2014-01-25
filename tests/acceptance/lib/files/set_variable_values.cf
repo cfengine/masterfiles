@@ -1,0 +1,53 @@
+#######################################################
+#
+# Test bundle set_config_values
+#
+#######################################################
+
+body common control
+{
+      inputs => { '../../default.cf.sub', '../../../../$(sys.local_libdir)/files.cf' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent init
+{
+  files:
+      "$(G.testfile).expected"
+      copy_from => local_cp("$(this.promise_filename).finish");
+      "$(G.testfile).actual"
+      copy_from => local_cp("$(this.promise_filename).start");
+}
+
+#######################################################
+
+bundle agent test
+{
+  vars:
+      "config[use chroot]" string => "maybe";
+      # should uncomment the existing line
+      "config[pid file]" string => "/tmp/rsyncd.pid";
+       # should insert a new line at the end, this is missing
+      "config[fake setting]" string => "anything";
+      # should uncomment the line and edit the value
+      "config[read only]" string => ".* maybe";
+      # blanks should be OK
+      "config[blank option]" string => "";
+
+  files:
+      "$(G.testfile).actual"
+      edit_line => set_variable_values("test.config");
+}
+
+#######################################################
+
+bundle agent check
+{
+  methods:
+      "any" usebundle => default_check_diff("$(G.testfile).actual",
+                                            "$(G.testfile).expected",
+                                            "$(this.promise_filename)");
+}
