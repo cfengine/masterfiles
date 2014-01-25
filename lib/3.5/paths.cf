@@ -158,6 +158,7 @@ bundle common paths
       "path[sed]"      string => "/usr/bin/sed";
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
+      "path[realpath]" string => "/bin/realpath";
 
     openbsd::
 
@@ -245,6 +246,7 @@ bundle common paths
       "path[sort]"          string => "/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
+      "path[realpath]"      string => "/usr/bin/realpath";
 
       #
       "path[chkconfig]" string => "/sbin/chkconfig";
@@ -328,6 +330,7 @@ bundle common paths
       "path[sort]"          string => "/usr/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
+      "path[realpath]"      string => "/usr/bin/realpath";
 
       #
       "path[apt_cache]"           string => "/usr/bin/apt-cache";
