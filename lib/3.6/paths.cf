@@ -78,7 +78,6 @@ bundle common paths
       "path[getfacl]"  string => "/usr/bin/getfacl";
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
-      "path[logger]"   string => "/usr/bin/logger";
 
     aix::
 
@@ -206,6 +205,7 @@ bundle common paths
       "path[bc]"       string => "/usr/bin/bc";
       "path[cat]"      string => "/usr/bin/cat";
       "path[cksum]"    string => "/usr/bin/cksum";
+      "path[crontab]"  string => "/usr/bin/crontab";
       "path[crontabs]" string => "/var/spool/cron/crontabs";
       "path[cut]"      string => "/usr/bin/cut";
       "path[dc]"       string => "/usr/bin/dc";
@@ -227,6 +227,17 @@ bundle common paths
       #
       "path[svcs]"     string => "/usr/bin/svcs";
       "path[svcadm]"   string => "/usr/sbin/svcadm";
+      "path[svccfg]"   string => "/usr/sbin/svccfg";
+      "path[netadm]"   string => "/usr/sbin/netadm";
+      "path[dladm]"    string => "/usr/sbin/dladm";
+      "path[ipadm]"    string => "/usr/sbin/ipadm";
+      "path[logger]"   string => "/usr/bin/logger";
+      "path[pkg]"      string => "/usr/bin/pkg";
+      "path[pkginfo]"  string => "/usr/bin/pkginfo";
+      "path[pkgadd]"   string => "/usr/sbin/pkgadd";
+      "path[pkgrm]"    string => "/usr/sbin/pkgrm";
+      "path[zoneadm]"  string => "/usr/sbin/zoneadm";
+      "path[zonecfg]"  string => "/usr/sbin/zonecfg";
 
     redhat::
 
@@ -370,6 +381,61 @@ bundle common paths
     !(archlinux||darwin)::
 
       "path[sysctl]"        string => "/sbin/sysctl";
+
+    !(SuSE||SUSE||suse)::
+      "path[logger]"        string => "/usr/bin/logger"; 
+
+    SuSE||SUSE||suse::
+
+      "path[awk]"           string => "/usr/bin/awk";
+      "path[bc]"            string => "/usr/bin/bc";
+      "path[cat]"           string => "/bin/cat";
+      "path[cksum]"         string => "/usr/bin/cksum";
+      "path[createrepo]"    string => "/usr/bin/createrepo";
+      "path[crontab]"       string => "/usr/bin/crontab";
+      "path[crontabs]"      string => "/var/spool/cron/tabs";
+      "path[cut]"           string => "/usr/bin/cut";
+      "path[dc]"            string => "/usr/bin/dc";
+      "path[df]"            string => "/bin/df";
+      "path[diff]"          string => "/usr/bin/diff";
+      "path[dig]"           string => "/usr/bin/dig";
+      "path[dmidecode]"     string => "/usr/sbin/dmidecode";
+      "path[domainname]"    string => "/bin/domainname";
+      "path[echo]"          string => "/bin/echo";
+      "path[egrep]"         string => "/usr/bin/egrep";
+      "path[find]"          string => "/usr/bin/find";
+      "path[free]"          string => "/usr/bin/free";
+      "path[grep]"          string => "/usr/bin/grep";
+      "path[hostname]"      string => "/bin/hostname";
+      "path[init]"          string => "/sbin/init";
+      "path[iptables]"      string => "/usr/sbin/iptables";
+      "path[iptables_save]" string => "/usr/sbin/iptables-save";
+      "path[ls]"            string => "/bin/ls";
+      "path[lsof]"          string => "/usr/bin/lsof";
+      "path[netstat]"       string => "/bin/netstat";
+      "path[nologin]"       string => "/sbin/nologin";
+      "path[ping]"          string => "/bin/ping";
+      "path[perl]"          string => "/usr/bin/perl";
+      "path[printf]"        string => "/usr/bin/printf";
+      "path[sed]"           string => "/bin/sed";
+      "path[sort]"          string => "/usr/bin/sort";
+      "path[test]"          string => "/usr/bin/test";
+      "path[tr]"            string => "/usr/bin/tr";
+      "path[logger]"        string => "/bin/logger";
+
+      #
+      "path[chkconfig]"     string => "/sbin/chkconfig";
+      "path[groupadd]"      string => "/usr/sbin/groupadd";
+      "path[groupdel]"      string => "/usr/sbin/groupdel";
+      "path[groupmod]"      string => "/usr/sbin/groupmod";
+      "path[ifconfig]"      string => "/sbin/ifconfig";
+      "path[ip]"            string => "/sbin/ip";
+      "path[rpm]"           string => "/bin/rpm";
+      "path[service]"       string => "/sbin/service";
+      "path[useradd]"       string => "/usr/sbin/useradd";
+      "path[userdel]"       string => "/usr/sbin/userdel";
+      "path[usermod]"       string => "/usr/sbin/usermod";
+      "path[zypper]"        string => "/usr/bin/zypper";
 
     any::
       "all_paths"     slist => getindices("path");
