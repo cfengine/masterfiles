@@ -466,6 +466,14 @@ bundle edit_line set_quoted_values(v)
 #
 # **See also:** `set_variable_values()`
 {
+  meta:
+      "tags"
+      slist =>
+      {
+        "deprecated=3.6.0",
+        "deprecation-reason=Generic reimplementation",
+        "replaced-by=set_line_based"
+      };
 
   vars:
       "index" slist => getindices("$(v)");
@@ -518,6 +526,15 @@ bundle edit_line set_variable_values(v)
 #
 # **See also:** `set_quoted_values()`
 {
+  meta:
+      "tags"
+      slist =>
+      {
+        "deprecated=3.6.0",
+        "deprecation-reason=Generic reimplementation",
+        "replaced-by=set_line_based"
+      };
+
   vars:
 
       "index" slist => getindices("$(v)");
@@ -558,6 +575,15 @@ bundle edit_line set_config_values(v)
 #
 # @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
 {
+  meta:
+      "tags"
+      slist =>
+      {
+        "deprecated=3.6.0",
+        "deprecation-reason=Generic reimplementation",
+        "replaced-by=set_line_based"
+      };
+
   vars:
       "index" slist => getindices("$(v)");
 
@@ -612,6 +638,111 @@ bundle edit_line set_config_values(v)
 
 }
 
+bundle edit_line set_line_based(v, sep, bp, kp, cp)
+# @brief Sets the RHS of configuration items in the file of the form:
+#
+# ```
+#   LHS$(sep)RHS
+# ```
+#
+# Example usage for `x=y` lines (e.g. rsyncd.conf):
+#
+# ```cf3
+# "myfile"
+# edit_line => set_line_based("test.config", "=", "\s*=\s*", ".*", "\s*#\s*");
+# ```
+#
+# Example usage for `x y` lines (e.g. sshd_config):
+#
+# ```cf3
+# "myfile"
+# edit_line => set_line_based("test.config", " ", "\s+", ".*", "\s*#\s*");
+# ```
+#
+# If the line is commented out with `$(cp)`, it gets uncommented first.
+#
+# Adds a new line if none exists or if more than one commented-out
+# possible matches exist.
+#
+# Originally `set_config_values` by Ed King.
+#
+# @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
+# @param sep The separator to insert, e.g. ` ` for space-separated
+# @param bp The key-value separation regex, e.g. `\s+` for space-separated
+# @param kp The keys to select from v, use `.*` for all
+# @param cp The comment pattern from line-start, e.g. `\s*#\s*`
+{
+  meta:
+      "tags"
+      slist =>
+      {
+        "replaces=set_config_values",
+        "replaces=set_config_values_matching",
+        "replaces=set_variable_values",
+        "replaces=set_quoted_values",
+        "replaces=maintain_key_values",
+      };
+
+  vars:
+      "vkeys" slist => getindices("$(v)");
+      "i" slist => grep($(kp), vkeys);
+
+      # Be careful if the index string contains funny chars
+      "ci[$(i)]" string => canonify("$(i)");
+
+      # Escape the value (had a problem with special characters and regex's)
+      "ev[$(i)]" string => escape("$($(v)[$(i)])");
+
+      # Do we have more than one line commented out?
+      "comment_matches_$(ci[$(i)])"
+      int => countlinesmatching("^$(cp)($(i)$(bp).*|$(i))$",
+                                $(edit.filename));
+
+
+  classes:
+      # Check to see if this line exists
+      "exists_$(ci[$(i)])"
+      expression => regline("^\s*($(i)$(bp).*|$(i))$",
+                            $(edit.filename));
+
+      # if there's more than one comment, just add new (don't know who to use)
+      "multiple_comments_$(ci[$(i)])"
+      expression => isgreaterthan("$(comment_matches_$(ci[$(i)]))",
+                                  "1");
+
+
+  replace_patterns:
+      # If the line is commented out, uncomment and replace with
+      # the correct value
+      "^$(cp)($(i)$(bp).*|$(i))$"
+             comment => "Uncommented the value $(i)",
+        replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
+          ifvarclass => "!exists_$(ci[$(i)]).!replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)])",
+             classes => always("uncommented_$(ci[$(i)])");
+
+      # If the line is there with the wrong value, replace with
+      # the correct value
+      "^\s*($(i)$(bp)(?!$(ev[$(i)])$).*|$(i))$"
+           comment => "Correct the value $(i)",
+      replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
+           classes => always("replace_attempted_$(ci[$(i)])");
+
+  insert_lines:
+      # If the line doesn't exist, or there is more than one occurance
+      # of the LHS commented out, insert a new line and try to place it
+      # after the commented LHS (keep new line with old comments)
+      "$(i)$(sep)$($(v)[$(i)])"
+         comment => "Insert the value, marker exists $(i)",
+        location => after("^$(cp)($(i)$(bp).*|$(i))$"),
+      ifvarclass => "replace_attempted_$(ci[$(i)]).multiple_comments_$(ci[$(i)])";
+
+      # If the line doesn't exist and there are no occurances
+      # of the LHS commented out, insert a new line at the eof
+      "$(i)$(sep)$($(v)[$(i)])"
+         comment => "Insert the value, marker doesn't exist $(i)",
+      ifvarclass => "replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)])";
+}
+
 bundle edit_line set_config_values_matching(v,pat)
 # @brief Sets the RHS of configuration items in the file of the form
 #
@@ -625,6 +756,15 @@ bundle edit_line set_config_values_matching(v,pat)
 # @param v the fully-qualified name of an associative array containing v[LHS]="rhs"
 # @param pat Only elements of `v` that match the regex `pat` are use
 {
+  meta:
+      "tags"
+      slist =>
+      {
+        "deprecated=3.6.0",
+        "deprecation-reason=Generic reimplementation",
+        "replaced-by=set_line_based"
+      };
+
   vars:
       "allparams" slist => getindices("$(v)");
       "index"     slist => grep("$(pat)", "allparams");
@@ -653,6 +793,15 @@ bundle edit_line maintain_key_values(v,sep)
 #
 # Contributed by David Lee
 {
+  meta:
+      "tags"
+      slist =>
+      {
+        "deprecated=3.6.0",
+        "deprecation-reason=Generic reimplementation",
+        "replaced-by=set_line_based"
+      };
+
   vars:
       "index" slist => getindices("$(v)");
       # Be careful if the index string contains funny chars
