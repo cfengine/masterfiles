@@ -1724,13 +1724,13 @@ body package_method zypper
 {
       package_changes => "bulk";
 
-      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
+      package_list_command => "$(paths.path[rpm]) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/zypper list-updates";
+      package_list_update_command => "$(paths.path[zypper]) list-updates";
       package_list_update_ifelapsed => "240";
 
-      package_patch_list_command => "/usr/bin/zypper patches";
+      package_patch_list_command => "$(paths.path[zypper]) patches";
       package_installed_regex => "i.*";
       package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s]+).*";
       package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
@@ -1741,11 +1741,11 @@ body package_method zypper
       package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
 
       package_name_convention => "$(name)";
-      package_add_command => "/usr/bin/zypper --non-interactive install";
-      package_delete_command => "/usr/bin/zypper --non-interactive remove --force-resolution";
-      package_update_command => "/usr/bin/zypper --non-interactive update";
-      package_patch_command => "/usr/bin/zypper --non-interactive patch$"; # $ means no args
-      package_verify_command => "/usr/bin/zypper --non-interactive verify$";
+      package_add_command => "$(paths.path[zypper]) --non-interactive install";
+      package_delete_command => "$(paths.path[zypper]) --non-interactive remove --force-resolution";
+      package_update_command => "$(paths.path[zypper]) --non-interactive update";
+      package_patch_command => "$(paths.path[zypper]) --non-interactive patch$"; # $ means no args
+      package_verify_command => "$(paths.path[zypper]) --non-interactive verify$";
 }
 
 ##
@@ -1923,10 +1923,10 @@ body package_method rpm_version(repo)
 {
       package_changes => "individual";
 
-      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
+      package_list_command => "$(paths.path[rpm]) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
+      package_list_update_command => "$(paths.path[yum]) --quiet check-update";
       package_list_update_ifelapsed => "240";
 
       package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s|]+).*";
@@ -1939,11 +1939,11 @@ body package_method rpm_version(repo)
 
       package_name_convention => "$(name)-$(version).$(arch).rpm";
 
-      package_add_command => "/bin/rpm -ivh ";
-      package_update_command => "/bin/rpm -Uvh ";
-      package_patch_command => "/bin/rpm -Uvh ";
-      package_delete_command => "/bin/rpm -e --nodeps";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command => "$(paths.path[rpm]) -ivh ";
+      package_update_command => "$(paths.path[rpm]) -Uvh ";
+      package_patch_command => "$(paths.path[rpm]) -Uvh ";
+      package_delete_command => "$(paths.path[rpm]) -e --nodeps";
+      package_verify_command => "$(paths.path[rpm]) -V";
       package_noverify_regex => ".*[^\s].*";
 }
 
@@ -2017,8 +2017,8 @@ body package_method msi_explicit(repo)
 body package_method yum
 {
       package_changes => "bulk";
-      package_list_command => "/usr/bin/yum --quiet list installed";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
+      package_list_command => "$(paths.path[yum]) --quiet list installed";
+      package_patch_list_command => "$(paths.path[yum]) --quiet check-update";
 
       # Remember to escape special characters like |
 
@@ -2033,7 +2033,7 @@ body package_method yum
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
+      package_list_update_command => "$(paths.path[yum]) --quiet check-update";
       package_list_update_ifelapsed => "240";
 
       package_patch_installed_regex => "^\s.*";
@@ -2041,11 +2041,11 @@ body package_method yum
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
 
-      package_add_command => "/usr/bin/yum -y install";
-      package_update_command => "/usr/bin/yum -y update";
-      package_patch_command => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command => "$(paths.path[yum]) -y install";
+      package_update_command => "$(paths.path[yum]) -y update";
+      package_patch_command => "$(paths.path[yum]) -y update";
+      package_delete_command => "$(paths.path[rpm]) -e --nodeps";
+      package_verify_command => "$(paths.path[rpm]) -V";
 }
 
 ##
@@ -2062,8 +2062,8 @@ body package_method yum_rpm
 
 {
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
+      package_list_command => "$(paths.path[rpm]) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
+      package_patch_list_command => "$(paths.path[yum]) --quiet check-update";
 
       package_list_name_regex    => "([^.]+).*";
       package_list_version_regex => "[^\s]\s+([^\s]+).*";
@@ -2076,7 +2076,7 @@ body package_method yum_rpm
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
+      package_list_update_command => "$(paths.path[yum]) --quiet check-update";
       package_list_update_ifelapsed => "240";
 
       package_patch_installed_regex => "^\s.*";
@@ -2084,11 +2084,11 @@ body package_method yum_rpm
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
 
-      package_add_command    => "/usr/bin/yum -y install";
-      package_update_command => "/usr/bin/yum -y update";
-      package_patch_command  => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command    => "$(paths.path[yum]) -y install";
+      package_update_command => "$(paths.path[yum]) -y update";
+      package_patch_command  => "$(paths.path[yum]) -y update";
+      package_delete_command => "$(paths.path[rpm]) -e --nodeps";
+      package_verify_command => "$(paths.path[rpm]) -V";
 }
 
 ##
@@ -2101,8 +2101,8 @@ body package_method yum_rpm_enable_repo(repoid)
 # the EPEL, which normally you do not want to install packages from.
 {
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
+      package_list_command => "$(paths.path[rpm]) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
+      package_patch_list_command => "$(paths.path[yum]) --quiet check-update";
 
       package_list_name_regex    => "^(\S+?)\s\S+?\s\S+$";
       package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
@@ -2112,7 +2112,7 @@ body package_method yum_rpm_enable_repo(repoid)
       package_name_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
+      package_list_update_command => "$(paths.path[yum]) --quiet check-update";
       package_list_update_ifelapsed => "240";
 
       package_patch_installed_regex => "^\s.*";
@@ -2120,11 +2120,11 @@ body package_method yum_rpm_enable_repo(repoid)
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
 
-      package_add_command    => "/usr/bin/yum --enablerepo=$(repoid) -y install";
-      package_update_command => "/usr/bin/yum --enablerepo=$(repoid) -y update";
-      package_patch_command => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps --allmatches";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command    => "$(paths.path[yum]) --enablerepo=$(repoid) -y install";
+      package_update_command => "$(paths.path[yum]) --enablerepo=$(repoid) -y update";
+      package_patch_command => "$(paths.path[yum]) -y update";
+      package_delete_command => "$(paths.path[rpm]) -e --nodeps --allmatches";
+      package_verify_command => "$(paths.path[rpm]) -V";
 }
 
 ##
@@ -2160,27 +2160,27 @@ body package_method yum_group
 #
 
 {
-      package_add_command             =>  "/usr/bin/yum groupinstall -y";
+      package_add_command             =>  "$(paths.path[yum]) groupinstall -y";
       package_changes                 =>  "bulk";
-      package_delete_command          =>  "/usr/bin/yum groupremove -y";
+      package_delete_command          =>  "$(paths.path[yum]) groupremove -y";
       package_delete_convention       =>  "$(name)";
       package_installed_regex         =>  "^i.*";
 
       # Generate a dpkg -l like listing, "i" means installed, "a" available, and a dummy version 1
       package_list_command            =>
-      "/usr/bin/yum grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\" || h==\"a\" {print h\" \"$0\" 1\"}'";
+      "$(paths.path[yum]) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\" || h==\"a\" {print h\" \"$0\" 1\"}'";
 
       package_list_name_regex         =>  "a|i ([^\s]+) 1";
-      package_list_update_command     =>  "/usr/bin/yum --quiet check-update";
+      package_list_update_command     =>  "$(paths.path[yum]) --quiet check-update";
       package_list_update_ifelapsed   =>  "240";
       package_list_version_regex      =>  "(1)";
       package_name_convention         =>  "$(name)";
       package_name_regex              =>  "(.*)";
       package_noverify_returncode     =>  "0";
-      package_update_command          =>  "/usr/bin/yum groupupdate";
+      package_update_command          =>  "$(paths.path[yum]) groupupdate";
 
       # grep -x to only get full line matching
-      package_verify_command          => "/usr/bin/yum grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\"|grep -qx";
+      package_verify_command          => "$(paths.path[yum]) grouplist -v|awk '$0 ~ /^Done$/ {next} {sub(/.*\(/, \"\");sub(/\).*/, \"\")} /Available/ {h=\"a\";next} /Installed/ {h=\"i\";next} h==\"i\"|grep -qx";
 }
 
 ##
@@ -2207,7 +2207,7 @@ body package_method rpm_filebased(path)
       package_file_repositories => { "$(path)" };
       # the above is an addition to Trond's yum_rpm body
 
-      package_add_command => "/bin/rpm -ihv ";
+      package_add_command => "$(paths.path[rpm]) -ihv ";
       # The above is a change from Trond's yum_rpm body, this makes the commands rpm only.
       # The reason I changed the install command from yum to rpm is yum will be default
       # refuse to install the epel-release RPM as it does not have the EPEL GPG key,
@@ -2219,12 +2219,12 @@ body package_method rpm_filebased(path)
       # CFEngine 3 Reference Manual
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
+      package_list_update_command => "$(paths.path[yum]) --quiet check-update";
       package_list_update_ifelapsed => "240";
 
       # The rest is unchanged from Trond's yum_rpm body
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
+      package_list_command => "$(paths.path[rpm]) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
 
       package_list_name_regex => "^(\S+?)\s\S+?\s\S+$";
       package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
@@ -2232,8 +2232,8 @@ body package_method rpm_filebased(path)
 
       package_installed_regex => ".*";
 
-      package_delete_command => "/bin/rpm -e --allmatches";
-      package_verify_command => "/bin/rpm -V";
+      package_delete_command => "$(paths.path[rpm]) -e --allmatches";
+      package_verify_command => "$(paths.path[rpm]) -V";
 }
 
 ##
@@ -2267,20 +2267,20 @@ body package_method rpm_filebased(path)
 body package_method ips
 {
       package_changes => "bulk";
-      package_list_command => "/usr/bin/pkg list -v --no-refresh";
+      package_list_command => "$(paths.path[pkg]) list -v --no-refresh";
       package_list_name_regex    => "pkg://.+?(?<=/)([^\s]+)@.*$";
       package_list_version_regex => "[^\s]+@([^\s]+):.*";
       package_installed_regex => ".*(i..)"; # all reported are installed
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/pkg refresh --full";
+      package_list_update_command => "$(paths.path[pkg]) refresh --full";
       package_list_update_ifelapsed => "240";
 
-      package_add_command => "/usr/bin/pkg install --accept ";
-      package_delete_command => "/usr/bin/pkg uninstall";
-      package_update_command =>  "/usr/bin/pkg install --accept";
-      package_patch_command =>  "/usr/bin/pkg install --accept";
-      package_verify_command =>  "/usr/bin/pkg list -a -v --no-refresh";
+      package_add_command => "$(paths.path[pkg]) install --accept ";
+      package_delete_command => "$(paths.path[pkg]) uninstall";
+      package_update_command =>  "$(paths.path[pkg]) install --accept";
+      package_patch_command =>  "$(paths.path[pkg]) install --accept";
+      package_verify_command =>  "$(paths.path[pkg]) list -a -v --no-refresh";
       package_noverify_regex => "(.*---|pkg list: no packages matching .* installed)";
 }
 
@@ -2333,15 +2333,15 @@ body package_method opencsw
 body package_method solaris (pkgname, spoolfile, adminfile)
 {
       package_changes => "individual";
-      package_list_command => "/usr/bin/pkginfo -l";
+      package_list_command => "$(paths.path[pkginfo]) -l";
       package_multiline_start    =>  "\s*PKGINST:\s+[^\s]+.*";
       package_list_name_regex    => "\s*PKGINST:\s+([^\s]+).*";
       package_list_version_regex => "\s*VERSION:\s+([^\s]+).*";
       package_list_arch_regex    => "\s*ARCH:\s+([^\s]+)";
       package_installed_regex => "\s*STATUS:\s*(completely|partially)\s+installed.*";
       package_name_convention => "$(name)";
-      package_add_command => "/usr/sbin/pkgadd -n -a /tmp/$(adminfile) -d /tmp/$(spoolfile)";
-      package_delete_command => "/usr/sbin/pkgrm -n -a /tmp/$(adminfile)";
+      package_add_command => "$(paths.path[pkgadd]) -n -a /tmp/$(adminfile) -d /tmp/$(spoolfile)";
+      package_delete_command => "$(paths.path[pkgrm]) -n -a /tmp/$(adminfile)";
 }
 
 ##
@@ -2553,11 +2553,11 @@ body package_method generic
 {
     SuSE::
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
+      package_list_command => "$(paths.path[rpm]) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/zypper list-updates";
+      package_list_update_command => "$(paths.path[zypper]) list-updates";
       package_list_update_ifelapsed => "0";
-      package_patch_list_command => "/usr/bin/zypper patches";
+      package_patch_list_command => "$(paths.path[zypper]) patches";
       package_installed_regex => "i.*";
       package_list_name_regex    => "[^|]+\|[^|]+\|\s+([^\s]+).*";
       package_list_version_regex => "[^|]+\|[^|]+\|[^|]+\|\s+([^\s]+).*";
@@ -2566,36 +2566,36 @@ body package_method generic
       package_patch_name_regex    => "[^|]+\|\s+([^\s]+).*";
       package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
       package_name_convention => "$(name)";
-      package_add_command => "/usr/bin/zypper --non-interactive install";
-      package_delete_command => "/usr/bin/zypper --non-interactive remove --force-resolution";
-      package_update_command => "/usr/bin/zypper --non-interactive update";
-      package_patch_command => "/usr/bin/zypper --non-interactive patch$"; # $ means no args
-      package_verify_command => "/usr/bin/zypper --non-interactive verify$";
+      package_add_command => "$(paths.path[zypper]) --non-interactive install";
+      package_delete_command => "$(paths.path[zypper]) --non-interactive remove --force-resolution";
+      package_update_command => "$(paths.path[zypper]) --non-interactive update";
+      package_patch_command => "$(paths.path[zypper]) --non-interactive patch$"; # $ means no args
+      package_verify_command => "$(paths.path[zypper]) --non-interactive verify$";
 
     redhat::
       package_changes => "bulk";
-      package_list_command => "/bin/rpm -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
-      package_patch_list_command => "/usr/bin/yum --quiet check-update";
+      package_list_command => "$(paths.path[rpm]) -qa --qf '%{name} %{version}-%{release} %{arch}\n'";
+      package_patch_list_command => "$(paths.path[yum]) --quiet check-update";
       package_list_name_regex    => "^(\S+?)\s\S+?\s\S+$";
       package_list_version_regex => "^\S+?\s(\S+?)\s\S+$";
       package_list_arch_regex    => "^\S+?\s\S+?\s(\S+)$";
       package_installed_regex => ".*";
       package_name_convention => "$(name)";
-      package_list_update_command => "/usr/bin/yum --quiet check-update";
+      package_list_update_command => "$(paths.path[yum]) --quiet check-update";
       package_list_update_ifelapsed => "0";     # sometimes, caching is pretty disturbing
       package_patch_installed_regex => "^\s.*";
       package_patch_name_regex    => "([^.]+).*";
       package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
-      package_add_command    => "/usr/bin/yum -y install";
-      package_update_command => "/usr/bin/yum -y update";
-      package_patch_command => "/usr/bin/yum -y update";
-      package_delete_command => "/bin/rpm -e --nodeps --allmatches";
-      package_verify_command => "/bin/rpm -V";
+      package_add_command    => "$(paths.path[yum]) -y install";
+      package_update_command => "$(paths.path[yum]) -y update";
+      package_patch_command => "$(paths.path[yum]) -y update";
+      package_delete_command => "$(paths.path[rpm]) -e --nodeps --allmatches";
+      package_verify_command => "$(paths.path[rpm]) -V";
 
       # package_changes => "bulk";
-      # package_list_command => "/usr/bin/yum list installed";
-      # package_patch_list_command => "/usr/bin/yum check-update";
+      # package_list_command => "$(paths.path[yum]) list installed";
+      # package_patch_list_command => "$(paths.path[yum]) check-update";
       # package_list_name_regex    => "([^.]+).*";
       # package_list_version_regex => "[^\s]\s+([^\s]+).*";
       # package_list_arch_regex    => "[^.]+\.([^\s]+).*";
@@ -2606,9 +2606,9 @@ body package_method generic
       # package_patch_name_regex    => "([^.]+).*";
       # package_patch_version_regex => "[^\s]\s+([^\s]+).*";
       # package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
-      # package_add_command => "/usr/bin/yum -y install";
-      # package_delete_command => "/bin/rpm -e --nodeps";
-      # package_verify_command => "/bin/rpm -V";
+      # package_add_command => "$(paths.path[yum]) -y install";
+      # package_delete_command => "$(paths.path[rpm]) -e --nodeps";
+      # package_verify_command => "$(paths.path[rpm]) -V";
 
     debian::
       package_changes => "bulk";
@@ -3794,6 +3794,56 @@ bundle common paths
       "path[update_alternatives]" string => "/usr/bin/update-alternatives";
       "path[update_rc_d]"         string => "/usr/sbin/update-rc.d";
       "path[useradd]"             string => "/usr/sbin/useradd";
+
+    SuSE||SUSE||suse::
+
+      "path[awk]"              string => "/usr/bin/awk";
+      "path[bundle common]"    string => "/usr/bin/bundle common";
+      "path[cat]"              string => "/bin/cat";
+      "path[cksum]"            string => "/usr/bin/cksum";
+      "path[createrepo]"       string => "/usr/bin/createrepo";
+      "path[crontab]"          string => "/usr/bin/crontab";
+      "path[crontabs]"         string => "/vars:/spool/cron/tabs";
+      "path[cut]"              string => "/usr/bin/cut";
+      "path[dc]"               string => "/usr/bin/dc";
+      "path[df]"               string => "/bin/df";
+      "path[diff]"             string => "/usr/bin/diff";
+      "path[dig]"              string => "/usr/bin/dig";
+      "path[domainname]"       string => "/bin/domainname";
+      "path[echo]"             string => "/bin/echo";
+      "path[egrep]"            string => "/usr/bin/egrep";
+      "path[find]"             string => "/usr/bin/find";
+      "path[free]"             string => "/usr/bin/free";
+      "path[grep]"             string => "/usr/bin/grep";
+      "path[hostname]"         string => "/bin/hostname";
+      "path[init]"             string => "/sbin/init";
+      "path[iptables]"         string => "/usr/sbin/iptables";
+      "path[iptables_save]"    string => "/usr/sbin/iptables-save";
+      "path[ls]"               string => "/bin/ls";
+      "path[lsof]"             string => "/usr/bin/lsof";
+      "path[netstat]"          string => "/bin/netstat";
+      "path[ping]"             string => "/bin/ping";
+      "path[perl]"             string => "/usr/bin/perl";
+      "path[printf]"           string => "/usr/bin/printf";
+      "path[sed]"              string => "/bin/sed";
+      "path[sort]"             string => "/usr/bin/sort";
+      "path[test]"             string => "/usr/bin/test";
+      "path[tr]"               string => "/usr/bin/tr";
+
+      #
+      "path[chkconfig]"        string => "/sbin/chkconfig";
+      "path[groupadd]"         string => "/usr/sbin/groupadd";
+      "path[groupdel]"         string => "/usr/sbin/groupdel";
+      "path[groupmod]"         string => "/usr/sbin/groupmod";
+      "path[ifconfig]"         string => "/sbin/ifconfig";
+      "path[ip]"               string => "/sbin/ip";
+      "path[rpm]"              string => "/bin/rpm";
+      "path[service]"          string => "/sbin/service";
+      "path[useradd]"          string => "/usr/sbin/useradd";
+      "path[userdel]"          string => "/usr/sbin/userdel";
+      "path[usermod]"          string => "/usr/sbin/usermod";
+      "path[zypper]"           string => "/usr/bin/zypper";
+      "path[logger]"           string => "/usr/bin/logger";
 
     any::
       "all_paths"     slist => getindices("path");

@@ -957,23 +957,24 @@ body package_method rpm_filebased(path)
 #      package_version => "4.3.17_5.11-0.175.1.0.0.24.0";
 
 body package_method ips
+# @depends paths
 # @depends common_knowledge
 {
       package_changes => "bulk";
-      package_list_command => "/usr/bin/pkg list -v --no-refresh";
+      package_list_command => "$(paths.path[pkg]) list -v --no-refresh";
       package_list_name_regex    => "pkg://.+?(?<=/)([^\s]+)@.*$";
       package_list_version_regex => "[^\s]+@([^\s]+):.*";
       package_installed_regex => ".*(i..)"; # all reported are installed
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/pkg refresh --full";
+      package_list_update_command => "$(paths.path[pkg]) refresh --full";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_add_command => "/usr/bin/pkg install --accept ";
-      package_delete_command => "/usr/bin/pkg uninstall";
-      package_update_command =>  "/usr/bin/pkg install --accept";
-      package_patch_command =>  "/usr/bin/pkg install --accept";
-      package_verify_command =>  "/usr/bin/pkg list -a -v --no-refresh";
+      package_add_command => "$(paths.path[pkg]) install --accept ";
+      package_delete_command => "$(paths.path[pkg]) uninstall";
+      package_update_command =>  "$(paths.path[pkg]) install --accept";
+      package_patch_command =>  "$(paths.path[pkg]) install --accept";
+      package_verify_command =>  "$(paths.path[pkg]) list -a -v --no-refresh";
       package_noverify_regex => "(.*---|pkg list: no packages matching .* installed)";
 }
 
@@ -1026,17 +1027,18 @@ body package_method opencsw
 # to see how to use this
 
 body package_method solaris (pkgname, spoolfile, adminfile)
+# @depends paths
 {
       package_changes => "individual";
-      package_list_command => "/usr/bin/pkginfo -l";
+      package_list_command => "$(paths.path[pkginfo]) -l";
       package_multiline_start    =>  "\s*PKGINST:\s+[^\s]+.*";
       package_list_name_regex    => "\s*PKGINST:\s+([^\s]+).*";
       package_list_version_regex => "\s*VERSION:\s+([^\s]+).*";
       package_list_arch_regex    => "\s*ARCH:\s+([^\s]+)";
       package_installed_regex => "\s*STATUS:\s*(completely|partially)\s+installed.*";
       package_name_convention => "$(name)";
-      package_add_command => "/usr/sbin/pkgadd -n -a /tmp/$(adminfile) -d /tmp/$(spoolfile)";
-      package_delete_command => "/usr/sbin/pkgrm -n -a /tmp/$(adminfile)";
+      package_add_command => "$(paths.path[pkgadd]) -n -a /tmp/$(adminfile) -d /tmp/$(spoolfile)";
+      package_delete_command => "$(paths.path[pkgrm]) -n -a /tmp/$(adminfile)";
 }
 
 ##
@@ -1242,6 +1244,7 @@ body package_method pacman
 }
 
 body package_method zypper
+# @depends paths
 # @depends common_knowledge redhat_knowledge
 # @brief SuSE installation method
 #
@@ -1256,13 +1259,13 @@ body package_method zypper
 {
       package_changes => "bulk";
 
-      package_list_command => "/bin/rpm -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
+      package_list_command => "$(paths.path[rpm]) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/zypper list-updates";
+      package_list_update_command => "$(paths.path[zypper]) list-updates";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
-      package_patch_list_command => "/usr/bin/zypper patches";
+      package_patch_list_command => "$(paths.path[zypper]) patches";
       package_installed_regex => "i.*";
       package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
       package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
@@ -1273,14 +1276,15 @@ body package_method zypper
       package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
 
       package_name_convention => "$(name)";
-      package_add_command => "/usr/bin/zypper --non-interactive install";
-      package_delete_command => "/usr/bin/zypper --non-interactive remove --force-resolution";
-      package_update_command => "/usr/bin/zypper --non-interactive update";
-      package_patch_command => "/usr/bin/zypper --non-interactive patch$"; # $ means no args
-      package_verify_command => "/usr/bin/zypper --non-interactive verify$";
+      package_add_command => "$(paths.path[zypper]) --non-interactive install";
+      package_delete_command => "$(paths.path[zypper]) --non-interactive remove --force-resolution";
+      package_update_command => "$(paths.path[zypper]) --non-interactive update";
+      package_patch_command => "$(paths.path[zypper]) --non-interactive patch$"; # $ means no args
+      package_verify_command => "$(paths.path[zypper]) --non-interactive verify$";
 }
 
 body package_method generic
+# @depends paths
 # @depends common_knowledge debian_knowledge redhat_knowledge
 # @brief Generic installation package method
 #
@@ -1300,9 +1304,9 @@ body package_method generic
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "/usr/bin/zypper list-updates";
+      package_list_update_command => "$(paths.path[zypper]) list-updates";
       package_list_update_ifelapsed => "0";
-      package_patch_list_command => "/usr/bin/zypper patches";
+      package_patch_list_command => "$(paths.path[zypper]) patches";
       package_installed_regex => "i.*";
       package_list_name_regex    => "$(redhat_knowledge.rpm_name_regex)";
       package_list_version_regex => "$(redhat_knowledge.rpm_version_regex)";
@@ -1311,11 +1315,11 @@ body package_method generic
       package_patch_name_regex    => "[^|]+\|\s+([^\s]+).*";
       package_patch_version_regex => "[^|]+\|[^|]+\|\s+([^\s]+).*";
       package_name_convention => "$(name)";
-      package_add_command => "/usr/bin/zypper --non-interactive install";
-      package_delete_command => "/usr/bin/zypper --non-interactive remove --force-resolution";
-      package_update_command => "/usr/bin/zypper --non-interactive update";
-      package_patch_command => "/usr/bin/zypper --non-interactive patch$"; # $ means no args
-      package_verify_command => "/usr/bin/zypper --non-interactive verify$";
+      package_add_command => "$(paths.path[zypper]) --non-interactive install";
+      package_delete_command => "$(paths.path[zypper]) --non-interactive remove --force-resolution";
+      package_update_command => "$(paths.path[zypper]) --non-interactive update";
+      package_patch_command => "$(paths.path[zypper]) --non-interactive patch$"; # $ means no args
+      package_verify_command => "$(paths.path[zypper]) --non-interactive verify$";
 
     redhat::
       package_changes => "bulk";
