@@ -1269,6 +1269,20 @@ body package_method alpinelinux
 
 body package_method emerge
 # @depends common_knowledge
+# @brief Gentoo emerge package installation method
+#
+# This package method interacts with emerge to build and install packages.
+#
+# **Example:**
+#
+# ```cf3
+#
+# packages:
+#   "zsh"
+#     package_policy   =>  "add",
+#     package_method   =>  emerge;
+#
+# ```
 {
       package_changes => "individual";
       package_list_command => "/bin/sh -c '/bin/ls -d /var/db/pkg/*/* | cut -c 13-'";
