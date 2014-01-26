@@ -1253,6 +1253,20 @@ body package_method freebsd_portmaster
 ##
 
 body package_method alpinelinux
+# @brief Alpine Linux apk package installation method
+#
+# This package method interacts with apk to manage packages.
+#
+# **Example:**
+#
+# ```cf3
+#
+# packages:
+#   "vim"
+#     package_policy   =>  "add",
+#     package_method   =>  alpinelinux;
+#
+# ```
 {
       package_changes => "bulk";
       package_list_command => "/sbin/apk info -v";
