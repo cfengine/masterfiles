@@ -984,6 +984,7 @@ body package_method rpm_filebased(path)
 #      package_version => "4.3.17_5.11-0.175.1.0.0.24.0";
 
 body package_method ips
+# @depends paths
 # @depends common_knowledge
 {
       package_changes => "bulk";
@@ -1053,6 +1054,7 @@ body package_method opencsw
 # to see how to use this
 
 body package_method solaris (pkgname, spoolfile, adminfile)
+# @depends paths
 # @depends common_knowledge
 {
       package_changes => "individual";
@@ -1272,6 +1274,7 @@ body package_method pacman
 ##
 
 body package_method generic
+# @depends paths
 # @depends common_knowledge debian_knowledge redhat_knowledge
 # @brief Generic installation package method
 #
