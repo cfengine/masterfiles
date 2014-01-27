@@ -215,6 +215,7 @@ bundle common inventory_dmidecode
 # This common bundle runs dmidecode
 {
   vars:
+    !disable_inventory_dmidecode::
       "dmivars" slist => {
                            "bios-vendor",
                            "bios-version",
@@ -249,6 +250,7 @@ bundle common inventory_dmidecode
       "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
 
   classes:
+    !disable_inventory_dmidecode::
       "dmidecode_$(canonified_var[$(dmivars)])_$(canonified[$(dmivars)])"
       expression => "any",
       meta => { "inventory",
