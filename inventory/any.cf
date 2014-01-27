@@ -329,10 +329,12 @@ bundle agent cfe_autorun_inventory_cmdb
 {
   vars:
       "cmdb_dir" string => "$(sys.workdir)/cmdb",
-      meta => { "cmdb", "comment=CMDB directory location" };
+      comment => "CMDB directory location",
+      meta => { "cmdb" };
 
       "cmdb_file" string => "$(cmdb_dir)/me.json",
-      meta => { "cmdb", "comment=CMDB file location" };
+      comment => "CMDB file location",
+      meta => { "cmdb" };
 
   files:
     !disable_inventory_cmdb::

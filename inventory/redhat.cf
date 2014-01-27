@@ -5,7 +5,10 @@ bundle common inventory_redhat
 {
   classes:
       "pure_redhat" expression => "redhat.!centos",
-      meta => { "inventory", "group=none", "comment=pure Red Hat" };
+      comment => "pure Red Hat",
+      meta => { "inventory", "group=none" };
+
       "redhat_derived" expression => "redhat.!pure_redhat",
-      meta => { "inventory", "group=none", "comment=derived from Red Hat" };
+      comment => "derived from Red Hat",
+      meta => { "inventory", "group=none" };
 }

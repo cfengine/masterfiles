@@ -5,7 +5,10 @@ bundle common inventory_debian
 {
   classes:
       "pure_debian" expression => "debian.!ubuntu",
+      comment => "pure Debian",
       meta => { "inventory", "group=none" };
+
       "debian_derived" expression => "debian.!pure_debian",
+      comment => "derived from Debian",
       meta => { "inventory", "group=none" };
 }
