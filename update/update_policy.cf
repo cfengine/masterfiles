@@ -232,7 +232,7 @@ bundle agent cfe_internal_update_policy
       "$(master_location)/."
       comment => "Make sure masterfiles folder has right file permissions",
       handle => "cfe_internal_update_policy_files_sys_workdir_masterfiles",
-      perms => u_m("644"),
+      perms => u_m($(u_def.masterfiles_perms_mode)),
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 

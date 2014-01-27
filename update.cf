@@ -42,6 +42,11 @@ bundle common u_def
       comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
       handle => "common_def_vars_input_name_patterns";
 
+      # the permissions for your masterfiles, which will propagate to inputs
+      "masterfiles_perms_mode" string => "644",
+      handle => "common_def_vars_masterfiles_perms_mode";
+
+
   classes:
       # Transfer policies and binaries with encryption
       # you can also request it from the command line with
