@@ -4,8 +4,11 @@ bundle common inventory_redhat
 # This common bundle is for Red Hat Linux inventory work.
 {
   classes:
-      "pure_redhat" expression => "redhat.!centos",
-      meta => { "inventory", "group=OS", "comment=pure Red Hat" };
+      "redhat_pure" expression => "redhat.!centos",
+      comment => "pure Red Hat",
+      meta => { "inventory", "group=none" };
+
       "redhat_derived" expression => "redhat.!pure_redhat",
-      meta => { "inventory", "group=OS", "comment=derived from Red Hat" };
+      comment => "derived from Red Hat",
+      meta => { "inventory", "group=none" };
 }

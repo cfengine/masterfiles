@@ -244,7 +244,7 @@ bundle common inventory_dmidecode
       "decoder" string => "$(inventory_control.dmidecoder)";
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                                  "useshell"),
-      meta => { "inventory", "comment=$(dmivars)" };
+      meta => { "inventory", "group=none" };
 
       "canonified_var[$(dmivars)]" string => canonify($(dmivars));
       "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
@@ -254,9 +254,8 @@ bundle common inventory_dmidecode
       "dmidecode_$(canonified_var[$(dmivars)])_$(canonified[$(dmivars)])"
       expression => "any",
       meta => { "inventory",
-                "group=OS",
-                "derived-from=inventory_dmidecode.dmi[$(dmivars)]",
-                "comment=$(dmivars) $(dmi[$(dmivars)])"
+                "group=none",
+                "derived-from=inventory_dmidecode.dmi[$(dmivars)]"
       };
 }
 
@@ -330,10 +329,12 @@ bundle agent cfe_autorun_inventory_cmdb
 {
   vars:
       "cmdb_dir" string => "$(sys.workdir)/cmdb",
-      meta => { "cmdb", "comment=CMDB directory location" };
+      comment => "CMDB directory location",
+      meta => { "cmdb" };
 
       "cmdb_file" string => "$(cmdb_dir)/me.json",
-      meta => { "cmdb", "comment=CMDB file location" };
+      comment => "CMDB file location",
+      meta => { "cmdb" };
 
   files:
     !disable_inventory_cmdb::
