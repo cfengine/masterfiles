@@ -77,24 +77,30 @@ bundle common inventory
 #
 # Inventory bundles are simply common bundles loaded before anything
 # else in promises.cf
+#
+# Tested to work properly against 3.5.x
 {
   vars:
       # This list is intended to grow as needed
-    debian::
+    !(cfengine_3_4||cfengine_3_5).debian::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/debian.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_debian" };
-    redhat::
+    !(cfengine_3_4||cfengine_3_5).redhat::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_redhat" };
-    windows::
+    !(cfengine_3_4||cfengine_3_5).windows::
       "inputs" slist => { "inventory/any.cf", "inventory/windows.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_windows" };
-    macos::
+    !(cfengine_3_4||cfengine_3_5).macos::
       "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos" };
-    !windows.!macos.!debian.!redhat::
+    !(cfengine_3_4||cfengine_3_5).!windows.!macos.!debian.!redhat::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_generic" };
+
+    (cfengine_3_4||cfengine_3_5)::
+      "inputs" slist => { cf_null };
+      "bundles" slist => { cf_null };
 
   reports:
     verbose_mode::
