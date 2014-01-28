@@ -60,6 +60,10 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_httpd_related",
       comment => "To run MP on another TCP port (80 by default)";
 
+      "hub" usebundle => cfe_internal_php_runalerts,
+      handle => "cfe_internal_management_php_runalerts",
+      comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
+
     any::
 
       "any" usebundle => cfe_internal_correct_cftwin,
