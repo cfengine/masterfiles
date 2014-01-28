@@ -483,3 +483,149 @@ bundle edit_line change_appsettings(p)
       replace_with => value("    $config['rest_server'] = $protocol . $_SERVER['SERVER_NAME'] . ':$(p)/api';");
 
 }
+
+##################################################################
+#
+# cfe_internal_php_runalerts
+#  - Bundle status need to be updated and displayed on MP. We do it
+# by running php binary with some parameters. cfe_internal_php_runalerts
+# is a bundle to create a shell script on the fly and keep running
+# the command by a specific interval (every 60s by default)
+#
+##################################################################
+
+bundle agent cfe_internal_php_runalerts
+{
+  vars:
+
+    any::
+
+      "runalerts_script" string => "/var/cfengine/bin/bundle_status_script.sh",
+      comment => "location of php runalerts script",
+      handle => "cfe_internal_php_runalerts_vars_runalerts_script";
+
+      "runalerts_stampfiles_dir" string => "/var/cfengine/httpd/php",
+      comment => "location of runalerts stamp file directory",
+      handle => "cfe_internal_php_runalerts_var_runalerts_stampfiles_dir";
+
+      "sleep_time" string => "60",
+      comment => "how often that php_runalerts will run in every seconds",
+      handle => "cfe_internal_php_runalerts_vars_sleep_time";
+
+      "stale_time" string => "10",
+      comment => "if script does not function in minutes, restart the script",
+      handle => "cfe_internal_php_runalerts_vars_stale_time";
+
+      "sql[name]"        string => "sql",
+      comment => "name of query type - sql",
+      handle => "cfe_internal_php_runalerts_vars_sql_name";
+      "sql[limit]"       string => "300",
+      comment => "query limit of sql",
+      handle => "cfe_internal_php_runalerts_vars_sql_limit";
+      "sql[running]"     string => "20",
+      comment => "how many query at a time of sql",
+      handle => "cfe_internal_php_runalerts_vars_sql_running";
+
+      "sketch[name]"     string => "sketch",
+      comment => "name of query type - sketch",
+      handle => "cfe_internal_php_runalerts_vars_sketch_name";
+      "sketch[limit]"    string => "300",
+      comment => "query limit of sketch",
+      handle => "cfe_internal_php_runalerts_vars_sketch_limit";
+      "sketch[running]"  string => "10",
+      comment => "how many query at a time of sketch",
+      handle => "cfe_internal_php_runalerts_vars_sketch_running";
+
+      #
+
+  files:
+
+    any::
+
+      "$(runalerts_script)"
+      comment => "create php run alerts script",
+      handle => "cfe_internal_php_runalerts_files_create_php_runalerts_script",
+      create => "true",
+      perms => mog("0755","root","root"),
+      edit_defaults => empty,
+      edit_line => my_php_runalerts_script("sql","sketch","$(runalerts_stampfiles_dir)","$(sleep_time)");
+
+      "$(runalerts_stampfiles_dir)/runalerts_.*"
+      comment => "sanity check for the run alerts script. if not, restart it.",
+      handle => "cfe_internal_php_runalerts_files_status_check",
+      delete => tidy,
+      file_select => mins_old("$(stale_time)"),
+      classes => if_repaired("kill_script");
+
+      #
+
+  processes:
+
+    kill_script::
+    
+      "$(runalerts_script)"
+      comment => "kill the php runalerts script because it is stale for some reason",
+      handle => "cfe_internal_php_runalerts_process_kill_php_runalerts_script",
+      signals => { "term" },
+      classes => if_repaired("run_script");
+
+    any::
+
+      "$(runalerts_script)"
+      comment => "check if the php runalerts script is running or not",
+      handle => "cfe_internal_php_runalerts_process_check_php_runalerts_script",
+      restart_class => "run_script";
+
+      #
+
+  commands:
+
+    run_script::
+
+      "$(runalerts_script) > /dev/null < /dev/null 2>&1 &"
+      comment => "to run php alerts script",
+      handle => "cfe_internal_php_runalerts_commands_run_php_runalerts_script",
+      contain => in_shell,
+      action => cfe_internal_bg;
+
+}
+
+      #
+
+body action cfe_internal_bg
+{
+ background => "true";
+}
+
+      #
+
+body file_select mins_old(mins)
+{
+ mtime       => irange(0,ago(0,0,0,0,"$(mins)",0));
+ file_result => "mtime";
+}
+
+      #
+
+bundle edit_line my_php_runalerts_script(v1,v2,sdir,stime)
+{
+  insert_lines:
+
+    any::
+
+      "#!/bin/bash
+
+while true; do
+  touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sql[name])
+ if [ -f /var/cfengine/httpd/php/runalerts_$(cfe_internal_php_runalerts.sql[name]) ]; then
+  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php alerts_cli runalerts $(cfe_internal_php_runalerts.sql[limit]) $(cfe_internal_php_runalerts.sql[running]) $(cfe_internal_php_runalerts.sql[name]) >/dev/null 2>&1
+ fi
+  touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sketch[name])
+ if [ -f /var/cfengine/httpd/php/runalerts_$(cfe_internal_php_runalerts.sketch[name]) ]; then
+  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php alerts_cli runalerts $(cfe_internal_php_runalerts.sketch[limit]) $(cfe_internal_php_runalerts.sketch[running]) $(cfe_internal_php_runalerts.sketch[name]) >/dev/null 2>&1
+ fi
+ sleep $(stime)
+done"
+      comment => "contents inside php runalerts script",
+      handle => "my_php_runalerts_script_insert_lines_php_runalerts_script";
+}
