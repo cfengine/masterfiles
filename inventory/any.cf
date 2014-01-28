@@ -216,47 +216,56 @@ bundle common inventory_dmidecode
 {
   vars:
     !disable_inventory_dmidecode::
-      "dmivars" slist => {
-                           "bios-vendor",
-                           "bios-version",
-                           "bios-release-date",
-                           "system-manufacturer",
-                           "system-product-name",
-                           "system-version",
-                           "system-serial-number",
-                           "system-uuid",
-                           "baseboard-manufacturer",
-                           "baseboard-product-name",
-                           "baseboard-version",
-                           "baseboard-serial-number",
-                           "baseboard-asset-tag",
-                           "chassis-manufacturer",
-                           "chassis-type",
-                           "chassis-version",
-                           "chassis-serial-number",
-                           "chassis-asset-tag",
-                           "processor-family",
-                           "processor-manufacturer",
-                           "processor-version",
-                           "processor-frequency"
-      };
+      "dmidefs" data => parsejson('
+{
+  "bios-vendor": "BIOS vendor",
+  "bios-version": "BIOS version",
+  "system-serial-number": "System serial number",
+  "system-manufacturer": "System manufacturer",
+  "system-version": "System version",
+  "processor-version": "CPU model"
+}');
+
+      # other dmidecode variables you may want:
+      # baseboard-asset-tag
+      # baseboard-manufacturer
+      # baseboard-product-name
+      # baseboard-serial-number
+      # baseboard-version
+      # bios-release-date
+      # chassis-asset-tag
+      # chassis-manufacturer
+      # chassis-serial-number
+      # chassis-type
+      # chassis-version
+      # processor-family
+      # processor-frequency
+      # processor-manufacturer
+      # system-product-name
+      # system-uuid
+
+      "dmivars" slist => getindices(dmidefs);
 
       "decoder" string => "$(inventory_control.dmidecoder)";
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
-                                                 "useshell"),
-      meta => { "inventory", "group=none" };
+                                             "useshell"),
+      meta => { "inventory", "group=$(dmidefs[$(dmivars)])" };
 
-      "canonified_var[$(dmivars)]" string => canonify($(dmivars));
-      "canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
+      "_canonified_var[$(dmivars)]" string => canonify($(dmivars));
+      "_canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
 
   classes:
     !disable_inventory_dmidecode::
-      "dmidecode_$(canonified_var[$(dmivars)])_$(canonified[$(dmivars)])"
+      "dmidecode_$(_canonified_var[$(dmivars)])_$(_canonified[$(dmivars)])"
       expression => "any",
       meta => { "inventory",
                 "group=none",
                 "derived-from=inventory_dmidecode.dmi[$(dmivars)]"
       };
+
+  reports:
+    inform_mode.!disable_inventory_dmidecode::
+      "$(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
 }
 
 bundle agent inventory_autorun
