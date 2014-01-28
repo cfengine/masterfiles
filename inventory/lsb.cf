@@ -4,7 +4,7 @@ bundle common inventory_lsb
 # This common bundle is for LSB inventory work.
 {
   classes:
-      "_inventory_lsb" not => "disable_inventory_dmidecode";
+      "_inventory_lsb" not => "disable_inventory_lsb";
 
     _inventory_lsb::
       "lsb_$(lsb[Distributor ID])" expression => "any",
