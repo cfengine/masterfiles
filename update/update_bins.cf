@@ -106,6 +106,38 @@ bundle agent cfe_internal_update_bins
       comment => "Name convention of package arch for other system except Solaris and *BSD",
       handle => "cfe_internal_update_bins_vars_pkgarch_not_solaris_bsd_debian_aix_redhat_32b";
 
+      # Due to bugs in earlier versions of CFEngine, select package attributes
+      # based on version.
+    !windows.(cfengine_3_4|cfengine_3_3|cfengine_3_2|cfengine_3_1)::
+      "package_version" string => "9.9.9",
+      comment => "Version string used in package comparison.",
+      handle => "cfe_internal_update_bins_vars_package_version_pre_cfengine_3_5";
+
+    windows.(cfengine_3_4|cfengine_3_3|cfengine_3_2|cfengine_3_1)::
+      "package_version" string => "9.9.9.9",
+      comment => "Version string used in package comparison.",
+      handle => "cfe_internal_update_bins_vars_package_version_pre_cfengine_3_5";
+
+    !windows.(cfengine_3_5_0|cfengine_3_5_1|cfengine_3_5_2)::
+      "package_version" string => "needs-to-be-set-manually",
+      comment => "Version string used in package comparison.",
+      handle => "cfe_internal_update_bins_vars_package_version_broken_cfengine_3_5";
+
+    windows.(cfengine_3_5_0|cfengine_3_5_1|cfengine_3_5_2)::
+      "package_version" string => "needs-to-be-set-manually",
+      comment => "Version string used in package comparison.",
+      handle => "cfe_internal_update_bins_vars_package_version_broken_cfengine_3_5";
+
+    !windows.!cfengine_3_4.!cfengine_3_3.!cfengine_3_2.!cfengine_3_1.!cfengine_3_5_0.!cfengine_3_5_1.!cfengine_3_5_2::
+      "package_version" string => "1.0.0",
+      comment => "Version string used in package comparison.",
+      handle => "cfe_internal_update_bins_vars_package_version_post_cfengine_3_5_2";
+
+    windows.!cfengine_3_4.!cfengine_3_3.!cfengine_3_2.!cfengine_3_1.!cfengine_3_5_0.!cfengine_3_5_1.!cfengine_3_5_2::
+      "package_version" string => "1.0.0.0",
+      comment => "Version string used in package comparison.",
+      handle => "cfe_internal_update_bins_vars_package_version_post_cfengine_3_5_2";
+
       #
 
   processes:
@@ -130,7 +162,7 @@ bundle agent cfe_internal_update_bins
 
       # update packages after all CFEngine have been killed
 
-    stopped_cfprocs.!windows::
+    stopped_cfprocs::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version",
@@ -138,25 +170,12 @@ bundle agent cfe_internal_update_bins
       package_policy => "update",
       package_select => ">=",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9",         # Install new Nova anyway
+      package_version => "$(package_version)",
       package_method => u_generic( "$(local_software_dir)" ),
       ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    stopped_cfprocs.windows::
-
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version",
-      handle => "cfe_internal_update_bins_packages_nova_update_windows_only",
-      package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
-      package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9.9",       # Install new Nova anyway
-      package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
-      classes => u_if_else("bin_update_success", "bin_update_fail");
-
-    !am_policy_hub.!windows::
+    !am_policy_hub::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
@@ -164,20 +183,7 @@ bundle agent cfe_internal_update_bins
       package_policy => "update",
       package_select => ">=",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9",         # Install new Nova anyway
-      package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
-      classes => u_if_else("bin_update_success", "bin_update_fail");
-
-    !am_policy_hub.windows::
-
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version (package is there)",
-      handle => "cfe_internal_update_bins_packages_nova_update_windows_only_pkg_there",
-      package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
-      package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9.9",       # Install new Nova anyway
+      package_version => "$(package_version)",
       package_method => u_generic( "$(local_software_dir)" ),
       ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
@@ -226,7 +232,12 @@ bundle agent cfe_internal_update_bins
 
   reports:
 
-    bin_newpkg::
+    bin_newpkg.(cfengine_3_5_0|cfengine_3_5_1|cfengine_3_5_2)::
+      "An update for Cfengine binaries is downloaded, but a known issue in this version prevents installation. Manual intervention is necessary. Please see the Known Issues section of the CFEngine documentation, or contact CFEngine support."
+      comment => "Alert a message that installation needs manual intervention",
+      handle => "cfe_internal_update_bins_reports_manual_installation";
+
+    bin_newpkg.!cfengine_3_5_0.!cfengine_3_5_1.!cfengine_3_5_2::
 
       "An update for Cfengine binaries is downloaded, installing..."
       comment => "Alert a message during installation",
