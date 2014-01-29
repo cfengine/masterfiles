@@ -126,8 +126,16 @@ bundle agent cfe_internal_setup_knowledge
       "$(cfe_internal_hub_vars.docroot)/api"
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/api (writing exported reports PDF/CSV)",
       handle => "cfe_internal_setup_knowledge_files_doc_root_api",
+      file_select => cfe_internal_exclude_sh_scripts,
       depth_search => recurse_basedir("inf"),
       perms => mog("0644","apache","apache");
+
+      "$(cfe_internal_hub_vars.docroot)/api/dc-scripts"
+      comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/api/dc-scripts (execute git push/pull)",
+      handle => "cfe_internal_setup_knowledge_files_doc_root_api_dc_scripts",
+      file_select => cfe_internal_sh_scripts,
+      depth_search => recurse_basedir("inf"),
+      perms => mog("0700","apache","apache");
 
       "$(cfe_internal_hub_vars.docroot)/sql_lite/."
       comment => "Create a directory sql_lite for analytic to be working",
@@ -242,4 +250,16 @@ body process_count check_process(in,out)
       match_range => "1,1";
       in_range_define => { "$(in)" };
       out_of_range_define => { "$(out)" };
+}
+
+body file_select cfe_internal_exclude_sh_scripts
+{
+  leaf_name => { ".*\.sh" };
+  file_result => "!leaf_name";
+}
+
+body file_select cfe_internal_sh_scripts
+{
+  leaf_name => { ".*\.sh" };
+  file_result => "leaf_name";
 }
