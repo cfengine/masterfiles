@@ -1,28 +1,86 @@
 bundle agent cfe_internal_update_from_repository
 {
-  vars:
-      "git" string => "/usr/bin/git";
+  methods:
+    am_policy_hub.cfengine_internal_masterfiles_update::
+      "Update staged masterfiles from VCS"
+        usebundle => cfe_internal_masterfiles_stage,
+        handle => "cfe_internal_update_from_repository_methods_masterfiles_fetch",
+        comment => "Grab the latest updates from upstream VCS repo before deploying masterfiles";
 
+      "Deploy staged masterfiles"
+        usebundle => cfe_internal_masterfiles_deploy_from_stage,
+        handle => "cfe_internal_update_from_repository_methods_masterfiles_deploy_from_stage",
+        comment => "Deploy the most recent masterfiles";
+}
+
+bundle agent cfe_internal_masterfiles_stage
+{
   commands:
     am_policy_hub.cfengine_internal_masterfiles_update::
 
-      "$(git) fetch --all"
-      handle => "masterfiles_update_fetch",
-      contain => u_no_output;
+      "$(u_def.dc_scripts)/pre-fetch.sh"
+      handle => "masterfiles_update_pre_fetch",
+      contain => u_cfe_internal_no_output_as_cfe_apache;
 
-      "$(git) stash --include-untracked"
-      handle => "masterfiles_update_stash",
-      depends_on => { "masterfiles_update_fetch" },
-      contain => u_no_output;
-
-      "$(git) reset --hard origin/master"   # change to your branch
-      handle => "masterfiles_update_reset",
-      depends_on => { "masterfiles_update_stash" },
-      contain => u_no_output;
+      "$(u_def.dc_scripts)/masterfiles-stage.sh"
+      args => "GIT",
+      handle => "masterfiles_update_stage",
+      contain => u_cfe_internal_no_output;
 }
 
-body contain u_no_output
+bundle agent cfe_internal_masterfiles_deploy_from_stage
+{
+  files:
+    am_policy_hub.cfengine_internal_masterfiles_update::
+      # Check this for bad side effects. Concerned about wiping out
+      # masterfiles/cf_promises_validated every 5 minutes causing it to be
+      # regenerated and all clients to update at each agent execution
+      # also maybe we should check the stage area for sanity before deploying masterfiles, what if the staging directory is empty?
+      "$(sys.workdir)/masterfiles/."
+        copy_from => u_cfe_internal_local_sync_dcp($(u_def.masterfiles_staging_tmp)),
+        depth_search => u_cfe_internal_recurse("inf"),
+        file_select => u_cfe_internal_exclude_cf_markers,
+        perms => u_cfe_internal_mog("600", "root", "root");
+}
+
+body contain u_cfe_internal_no_output
 {
       no_output => "true";
       chdir => "$(sys.masterdir)";
+}
+
+body contain u_cfe_internal_no_output_as_cfe_apache
+{
+      exec_owner => "$(u_def.cf_apache_user)";
+      exec_group => "$(u_def.cf_apache_group)";
+      no_output => "true";
+      chdir => "$(sys.masterdir)";
+}
+
+body file_select u_cfe_internal_exclude_cf_markers
+{
+  leaf_name => { "cf_promises_validated", "cf_promises_release_id" };
+  file_result => "!leaf_name";
+}
+
+body copy_from u_cfe_internal_local_sync_dcp(from)
+{
+      source      => "$(from)";
+      purge       => "true";
+      preserve    => "true";
+      compare     => "digest";
+      type_check  => "false";
+}
+
+body depth_search u_cfe_internal_recurse(d)
+{
+  depth => "$(d)";
+  xdev => "true";
+}
+
+body perms u_cfe_internal_mog(mode,user,group)
+{
+      owners => { "$(user)" };
+      groups => { "$(group)" };
+      mode   => "$(mode)";
 }
