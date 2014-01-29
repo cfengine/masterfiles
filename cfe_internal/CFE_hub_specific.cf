@@ -342,7 +342,7 @@ bundle edit_line apache_sudoer
 
     linux::
 
-      "apache ALL=(ALL) NOPASSWD:/var/cfengine/bin/cf-runagent *"
+      "$(def.cf_apache_user) ALL=(ALL) NOPASSWD:/var/cfengine/bin/cf-runagent *"
       comment => "Add Apache user to run passwordless sudo cf-runagent",
       handle => "apache_sudoer_insert_lines";
 

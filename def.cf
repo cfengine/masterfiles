@@ -59,6 +59,14 @@ bundle common def
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";
 
+      "cf_apache_user" string => "apache",
+      comment => "User that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_apache_user";
+
+      "cf_apache_group" string => "apache",
+      comment => "Group that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_apache_group";
+
       solaris::
       "cf_runagent_shell"
         string  => "/usr/bin/sh",

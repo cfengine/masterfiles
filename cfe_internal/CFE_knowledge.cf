@@ -63,7 +63,7 @@ bundle agent cfe_internal_setup_knowledge
       "$(cfe_internal_hub_vars.docroot)/.htaccess"
       comment => "Correct up htaccess file in doc root",
       handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
-      perms => mog("0644","apache","apache"),
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group)),
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI/Apache-htaccess");
 
       "$(cfe_internal_hub_vars.docroot)/hub/."
@@ -71,35 +71,35 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_files_doc_root_hub",
       create => "true",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0755","apache","apache");
+      perms => mog("0755",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/scripts/."
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/scripts",
       handle => "cfe_internal_setup_knowledge_files_doc_root_scripts",
       create => "true",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644","apache","apache");
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/tmp/."
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/tmp (temp files to email)",
       handle => "cfe_internal_setup_knowledge_files_doc_root_tmp",
       create => "true",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644","apache","apache");
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/application/logs/."
       comment => "Make sure log folder has been created and has right permisions",
       handle => "cfe_internal_setup_knowledge_files_doc_root_application_logs",
       create => "true",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644","apache","apache");
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/rest"
       comment => "Put REST api to webroot directory",
       handle => "cfe_internal_setup_knowledge_files_workdir_rest",
       copy_from => no_backup_cp("$(sys.workdir)/share/rest"),
       depth_search => recurse_basedir("inf"),
-      perms => mo("0644","apache");
+      perms => mo("0644",$(def.cf_apache_user));
 
       "$(cfe_internal_hub_vars.docroot)/rest/.htaccess"
       comment => "Create HTACCESS file for REST",
@@ -107,7 +107,7 @@ bundle agent cfe_internal_setup_knowledge
       create => "true",
       edit_line => rest_htaccess,
       edit_defaults => empty,
-      perms => mog("0644","apache","apache");
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/application"
       comment => "Ensure permissions to all directiories in application to 755",
@@ -128,25 +128,25 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_files_doc_root_api",
       file_select => cfe_internal_exclude_sh_scripts,
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644","apache","apache");
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/api/dc-scripts"
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/api/dc-scripts (execute git push/pull)",
       handle => "cfe_internal_setup_knowledge_files_doc_root_api_dc_scripts",
       file_select => cfe_internal_sh_scripts,
       depth_search => recurse_basedir("inf"),
-      perms => mog("0700","apache","apache");
+      perms => mog("0700",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/sql_lite/."
       comment => "Create a directory sql_lite for analytic to be working",
       handle => "cfe_internal_setup_knowledge_files_doc_root_sql_lite",
       create => "true",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644","apache","apache");
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/tmp/."
       create => "true",
-      perms => mog("0644","apache","apache"),
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group)),
       depth_search => recurse_basedir("inf"),
       comment => "Create tmp directories for httpd internal use",
       handle => "cfe_internal_setup_knowledge_files_tmp_dir";
