@@ -46,6 +46,20 @@ bundle common u_def
       "masterfiles_perms_mode" string => "644",
       handle => "common_def_vars_masterfiles_perms_mode";
 
+      "dc_scripts" string => "/var/cfengine/httpd/htdocs/api/dc-scripts",
+      comment => "Directory where design center scripts are located on Enterprise Hub";
+
+      "masterfiles_staging_tmp" string => "/opt/cfengine/masterfiles_staging_tmp",
+      handle => "common_u_def_vars_masterfiles_staging_tmp",
+      comment => "Directory where most recent VCS changes are staged before final deployment to masterfiles";
+
+      "cf_apache_user" string => "apache",
+      handle => "common_u_def_vars_cf_apache_user",
+      comment => "User that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_user";
+
+      "cf_apache_group" string => "apache",
+      handle => "common_u_def_vars_cf_apache_group",
+      comment => "Group that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_group";
 
   classes:
       # Transfer policies and binaries with encryption
@@ -59,8 +73,9 @@ bundle common u_def
       "cfengine_internal_purge_policies" expression => "!any";
 
       # Update masterfiles from Git
+      # Enabled for enterprise users by default
       # you can also request it from the command line with
       # -Dcfengine_internal_masterfiles_update
-      "cfengine_internal_masterfiles_update" expression => "!any";
+      "cfengine_internal_masterfiles_update" expression => "enterprise";
 
 }
