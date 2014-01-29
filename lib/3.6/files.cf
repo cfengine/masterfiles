@@ -1402,6 +1402,18 @@ body perms owner(user)
       owners => { "$(user)" };
 }
 
+body perms sysm(mode)
+{
+      mode   => "$(mode)";
+      owners => { "root" };
+
+    freebsd::
+      groups => { "wheel" };
+
+    linux::
+      groups => { "root" };
+}
+
 ##-------------------------------------------------------
 ## ACLS (extended Unix perms)
 ##-------------------------------------------------------
