@@ -1403,6 +1403,15 @@ body perms owner(user)
 }
 
 body perms system_owned(mode)
+# @brief Set the file owner and group to the system default
+# @param mode the access permission in octal format
+#
+# **Example:**
+#
+# ```cf3
+# files:
+#     "/etc/passwd" perms => system_owned("0644");
+# ```
 {
       mode   => "$(mode)";
       owners => { "root" };
