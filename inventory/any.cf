@@ -311,7 +311,7 @@ bundle agent cfe_autorun_inventory_packages
     debian::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => apt_get;
+      package_method => apt_get_noupdate;
 
     redhat::
       "cfe_internal_non_existing_package"
