@@ -20,6 +20,8 @@ bundle agent cfe_internal_update_bins
 
   vars:
 
+    enterprise::
+
       "cf_components"       slist => { "cf-key", "cf-monitord", "cf-promises",
                                        "cf-runagent", "cf-serverd", "cf-hub", },
       comment => "Define cfengine robot agents",
@@ -37,70 +39,70 @@ bundle agent cfe_internal_update_bins
       comment => "Local directory to store update log for this host",
       handle => "cfe_internal_update_bins_vars_local_update_log_dir";
 
-    windows::
+    windows.enterprise::
 
       "stop_signal"              string => "kill",
       comment => "Define a stop signal for Windows",
       handle => "cfe_internal_update_bins_vars_stop_signal_windows";
 
-    !windows::
+    !windows.enterprise::
 
       "stop_signal"              string => "term",
       comment => "Define a stop signal for *NIX system",
       handle => "cfe_internal_update_bins_vars_stop_signal_unix";
 
-    solarisx86|solaris::
+    (solarisx86|solaris).enterprise::
 
       "novapkg"                 string => "CFEcfengine-nova",
       comment => "Name convention of Nova package on Solaris",
       handle => "cfe_internal_update_bins_vars_novapkg_solaris",
       ifvarclass => "nova_edition";
 
-    aix::
+    aix.enterprise::
 
       "novapkg"                 string => "cfengine.cfengine-nova",
       comment => "Name convention of Nova package on AIX",
       handle => "cfe_internal_update_bins_vars_novapkg_aix",
       ifvarclass => "nova_edition";
 
-    !(solarisx86|solaris|aix)::
+    !(solarisx86|solaris|aix).enterprise::
 
       "novapkg"                 string => "cfengine-nova",
       comment => "Name convention of Nova package for all but not Solaris",
       handle => "cfe_internal_update_bins_vars_novapkg_not_solaris_aix",
       ifvarclass => "nova_edition";
 
-    solaris.!sunos_i86pc::
+    solaris.!sunos_i86pc.enterprise::
 
       "pkgarch"                 string => "sparc",
       comment => "Name convention of package arch on Solaris",
       handle => "cfe_internal_update_bins_vars_pkgarch_solaris";
 
-    solarisx86::
+    solarisx86.enterprise::
 
       "pkgarch"                 string => "i386",
       comment => "Name convention of package arch on Solaris",
       handle => "cfe_internal_update_bins_vars_pkgarch_solarisx86";
 
-    redhat.i686::
+    redhat.i686.enterprise::
 
       "pkgarch"                 string => "i386",
       comment => "Name convention of package arch on 32-bit RHEL",
       handle => "cfe_internal_update_bins_vars_pkgarch_redhat_32b";
 
-    redhat.x86_64::
+    redhat.x86_64.enterprise::
 
       "pkgarch"                 string => "$(sys.arch)",
       comment => "Name convention of package arch on 64-bit RHEL",
       handle => "cfe_internal_update_bins_vars_pkgarch_redhat_64b";
 
-    freebsd|netbsd|debian|aix::
+    (freebsd|netbsd|debian|aix).enterprise::
 
       "pkgarch"                 string => "*",
       comment => "Name convention of package arch on *BSD/Debian",
       handle => "cfe_internal_update_bins_vars_pkgarch_bsd_debian_aix";
 
-    !(solarisx86|solaris|freebsd|netbsd|debian|aix|redhat)::
+    !(solarisx86|solaris|freebsd|netbsd|debian|aix|redhat).enterprise::
 
       "pkgarch"                 string => "$(sys.arch)",
       comment => "Name convention of package arch for other system except Solaris and *BSD",
@@ -110,14 +112,14 @@ bundle agent cfe_internal_update_bins
 
   processes:
 
-    bin_newpkg.!bin_update_success::
+    bin_newpkg.!bin_update_success.enterprise::
 
       "$(cf_components)" signals => { "$(stop_signal)" },
       comment => "Stop cfengine running processes before binary update",
       handle => "cfe_internal_update_bins_processes_stop_cfengine",
       classes => u_if_repaired("stopped_cfprocs");
 
-    bin_newpkg.!bin_update_success.!windows::
+    bin_newpkg.!bin_update_success.!windows.enterprise::
 
       "cf-execd"  signals => { "$(stop_signal)" },
       comment => "Stop cf-execd running process before binary update",
@@ -130,7 +132,7 @@ bundle agent cfe_internal_update_bins
 
       # update packages after all CFEngine have been killed
 
-    stopped_cfprocs.!windows::
+    stopped_cfprocs.!windows.enterprise::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version",
@@ -143,7 +145,7 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    stopped_cfprocs.windows::
+    stopped_cfprocs.windows.enterprise::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version",
@@ -156,7 +158,7 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    !am_policy_hub.!windows::
+    !am_policy_hub.!windows.enterprise::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
@@ -169,7 +171,7 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    !am_policy_hub.windows::
+    !am_policy_hub.windows.enterprise::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
@@ -186,14 +188,14 @@ bundle agent cfe_internal_update_bins
 
   files:
 
-    any::
+    enterprise::
 
       "$(local_update_log_dir)/$(sys.nova_version)_is_running"
       comment => "Create an empty file about a version that is running",
       handle => "cfe_internal_update_bins_files_version_is_running",
       create => "true";
 
-    !am_policy_hub::
+    !am_policy_hub.enterprise::
 
       "$(local_software_dir)"
       comment => "Copy binary updates from master source on policy server",
@@ -203,7 +205,7 @@ bundle agent cfe_internal_update_bins
       action => u_immediate,
       classes => u_if_repaired("bin_newpkg");
 
-    bin_update_success::
+    bin_update_success.enterprise::
 
       "$(local_update_log_dir)/upgraded_binary_from_$(sys.nova_version)"
       comment => "Create an empty file after successfully upgrade the binary",
@@ -214,7 +216,7 @@ bundle agent cfe_internal_update_bins
 
   services:
 
-    bin_newpkg.windows::
+    bin_newpkg.windows.enterprise::
 
       "CfengineNovaExec"
       service_policy => "stop",
@@ -226,19 +228,19 @@ bundle agent cfe_internal_update_bins
 
   reports:
 
-    bin_newpkg::
+    bin_newpkg.enterprise::
 
       "An update for Cfengine binaries is downloaded, installing..."
       comment => "Alert a message during installation",
       handle => "cfe_internal_update_bins_reports_installation";
 
-    bin_update_success::
+    bin_update_success.enterprise::
 
       "Successfully installed Cfengine binaries"
       comment => "Alert a message when an update finishes",
       handle => "cfe_internal_update_bins_reports_finish";
 
-    bin_update_fail::
+    bin_update_fail.enterprise::
 
       "Failed updating Cfengine binaries, should revert to old version"
       comment => "Alert a message if an update failed",
@@ -274,6 +276,8 @@ bundle common u_common_knowledge
   vars:
       "list_update_ifelapsed_now" string => "0";
 }
+
+################################################################################
 
 body package_method u_generic(repo)
 {
