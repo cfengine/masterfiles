@@ -233,6 +233,7 @@ bundle common paths
       "path[createrepo]"    string => "/usr/bin/createrepo";
       "path[crontab]"       string => "/usr/bin/crontab";
       "path[crontabs]"      string => "/var/spool/cron";
+      "path[curl]"          string => "/usr/bin/curl";
       "path[cut]"           string => "/bin/cut";
       "path[dc]"            string => "/usr/bin/dc";
       "path[df]"            string => "/bin/df";
@@ -250,12 +251,14 @@ bundle common paths
       "path[ls]"            string => "/bin/ls";
       "path[lsof]"          string => "/usr/sbin/lsof";
       "path[netstat]"       string => "/bin/netstat";
+      "path[nologin]"       string => "/sbin/nologin";
       "path[ping]"          string => "/usr/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
       "path[printf]"        string => "/usr/bin/printf";
       "path[sed]"           string => "/bin/sed";
       "path[sort]"          string => "/bin/sort";
       "path[test]"          string => "/usr/bin/test";
+      "path[wget]"          string => "/usr/bin/wget";
       "path[tr]"            string => "/usr/bin/tr";
       "path[realpath]"      string => "/usr/bin/realpath";
 
@@ -316,6 +319,7 @@ bundle common paths
       "path[createrepo]"    string => "/usr/bin/createrepo";
       "path[crontab]"       string => "/usr/bin/crontab";
       "path[crontabs]"      string => "/var/spool/cron/crontabs";
+      "path[curl]"          string => "/usr/bin/curl";
       "path[cut]"           string => "/usr/bin/cut";
       "path[dc]"            string => "/usr/bin/dc";
       "path[df]"            string => "/bin/df";
@@ -334,6 +338,7 @@ bundle common paths
       "path[ls]"            string => "/bin/ls";
       "path[lsof]"          string => "/usr/bin/lsof";
       "path[netstat]"       string => "/bin/netstat";
+      "path[nologin]"       string => "/usr/sbin/nologin";
       "path[ping]"          string => "/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
       "path[printf]"        string => "/usr/bin/printf";
@@ -341,6 +346,7 @@ bundle common paths
       "path[sort]"          string => "/usr/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
+      "path[wget]"          string => "/usr/bin/wget";
       "path[realpath]"      string => "/usr/bin/realpath";
 
       #
@@ -398,6 +404,7 @@ bundle common paths
       "path[ls]"            string => "/bin/ls";
       "path[lsof]"          string => "/usr/bin/lsof";
       "path[netstat]"       string => "/bin/netstat";
+      "path[nologin]"       string => "/sbin/nologin";
       "path[ping]"          string => "/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
       "path[printf]"        string => "/usr/bin/printf";
