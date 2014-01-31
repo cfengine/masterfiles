@@ -249,6 +249,7 @@ bundle common paths
       "path[createrepo]"    string => "/usr/bin/createrepo";
       "path[crontab]"       string => "/usr/bin/crontab";
       "path[crontabs]"      string => "/var/spool/cron";
+      "path[curl]"          string => "/usr/bin/curl";
       "path[cut]"           string => "/bin/cut";
       "path[dc]"            string => "/usr/bin/dc";
       "path[df]"            string => "/bin/df";
@@ -274,6 +275,7 @@ bundle common paths
       "path[sort]"          string => "/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
+      "path[wget]"          string => "/usr/bin/wget";
       "path[realpath]"      string => "/usr/bin/realpath";
 
       #
@@ -333,6 +335,7 @@ bundle common paths
       "path[createrepo]"    string => "/usr/bin/createrepo";
       "path[crontab]"       string => "/usr/bin/crontab";
       "path[crontabs]"      string => "/var/spool/cron/crontabs";
+      "path[curl]"          string => "/usr/bin/curl";
       "path[cut]"           string => "/usr/bin/cut";
       "path[dc]"            string => "/usr/bin/dc";
       "path[df]"            string => "/bin/df";
@@ -359,6 +362,7 @@ bundle common paths
       "path[sort]"          string => "/usr/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
+      "path[wget]"          string => "/usr/bin/wget";
       "path[realpath]"      string => "/usr/bin/realpath";
 
       #
