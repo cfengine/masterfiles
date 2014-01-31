@@ -40,40 +40,33 @@
 #
 
 # For CFEngine Core: 3.6.0 to 3.6.x
-# Main COPBL include file
+# Users bodies
 
 ###################################################
 # If you find CFEngine useful, please consider    #
 # purchasing a commercial version of the software.#
 ###################################################
 
-bundle common stdlib_common
-# @ignore
+body password plaintext_password(text)
+# @brief Sets the plaintext password for the user to `text`
+# @param text the plain text version of the password
+#
+# **Note:** Don't use that unless you really have no choice
+#
+# **See also:** `hashed_password()`
 {
-  vars:
-      "inputs" slist => {
-                          "$(this.promise_dirname)/paths.cf",
-                          "$(this.promise_dirname)/common.cf",
-                          "$(this.promise_dirname)/commands.cf",
-                          "$(this.promise_dirname)/packages.cf",
-                          "$(this.promise_dirname)/files.cf",
-                          "$(this.promise_dirname)/services.cf",
-                          "$(this.promise_dirname)/processes.cf",
-                          "$(this.promise_dirname)/storage.cf",
-                          "$(this.promise_dirname)/databases.cf",
-                          "$(this.promise_dirname)/users.cf",
-                          "$(this.promise_dirname)/monitor.cf",
-                          "$(this.promise_dirname)/guest_environments.cf",
-                          "$(this.promise_dirname)/bundles.cf",
-      };
-
-  reports:
-    verbose_mode::
-      "$(this.bundle): adding COPBL stdlib inputs='$(inputs)'";
+    format => "plaintext";
+    data => $(text);
 }
 
-body file control
-# @ignore
+body password hashed_password(hash)
+# @brief Sets the hashed password for the user to `hash`
+# @param hash the hashed representation of the password
+#
+# The hashing method is up to the platform.
+#
+# **See also:** `plaintext_password()`
 {
-      inputs => { @(stdlib_common.inputs) };
+    format => "hash";
+    data => $(hash);
 }
