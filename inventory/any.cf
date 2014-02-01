@@ -316,7 +316,7 @@ bundle agent cfe_autorun_inventory_packages
     redhat::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => yum_rpm;
+      package_method => yum_rpm_noupdate;
 
     gentoo::
       "cfe_internal_non_existing_package"
