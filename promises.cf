@@ -31,7 +31,6 @@ body common control
                   @(inventory.inputs),
 
                   # Design Center
-                  # MARKER FOR CF-SKETCH INPUT INSERTION
                   "sketches/meta/api-runfile.cf",
                   @(cfsketch_g.inputs),
 
