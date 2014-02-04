@@ -269,3 +269,33 @@ body contain setuid_umask(owner, umask)
       exec_owner => "$(owner)";
       umask => "$(umask)";
 }
+
+body contain setuid_gid_umask(uid, gid, umask)
+# @brief run command as specified user with umask
+#
+#
+# | Valid Values | Umask | Octal (files) |  Symbolic (files)  | Octal (dirs) | Symbolic (dirs) |
+# |--------------|-------|-------|-------------|-------|-------------|
+# | `0`          | `000` | `666` | `(rw-rw-rw-)` | `777` | `(rwxrwxrwx)` |
+# | `002`        | `002` | `664` | `(rw-rw-r--)` | `775` | `(rwxrwxr-x)` |
+# | `22`, `022`  | `022` | `644` | `(rw-r--r--)` | `755` | `(rwxr-xr-x)` |
+# | `27`, `027`  | `027` | `640` | `(rw-r-----)` | `750` | `(rwxr-x---)` |
+# | `77`, `077`  | `077` | `600` | `(rw-------)` | `700` | `(rwx------)` |
+# | `72`, `072`  | `072` | `604` | `(rw----r--)` | `705` | `(rwx---r-x)` |
+#
+# @param uid username or uid to run command as
+# @param gid group name or gid to run command as
+# @param umask controls permissions of created files and directories
+#
+# **Example:**
+#
+# ```cf3
+#  commands:
+#    "/usr/bin/git pull"
+#      contain => setuid_gid_umask("git", "minions", "022");
+# ```
+{
+      exec_owner => "$(uid)";
+      exec_group => "$(uid)";
+      umask => "$(umask)";
+}
