@@ -23,7 +23,6 @@ bundle agent cfe_internal_masterfiles_stage
       contain => u_cfe_internal_no_output_as_cfe_apache;
 
       "$(u_def.dc_scripts)/masterfiles-stage.sh"
-      args => "GIT",
       handle => "masterfiles_update_stage",
       contain => u_cfe_internal_no_output;
 }
