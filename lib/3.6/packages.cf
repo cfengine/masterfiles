@@ -1177,11 +1177,11 @@ body package_method freebsd
 # @depends common_knowledge
 # @brief FreeBSD pkg_add installation package method
 #
-# This package method interacts with FreeBSD pkg_add to install from remote 
+# This package method interacts with FreeBSD pkg_add to install from remote
 # repositories.
 #
 # **Example:**
-# NOTE: Do not use this method on pkgng systems! It will appear to operate 
+# NOTE: Do not use this method on pkgng systems! It will appear to operate
 # normally but is highly likely to break your package system.
 #
 # This example installs "perl5" from a non-default repository:
@@ -1225,9 +1225,9 @@ body package_method freebsd_portmaster
 #
 # This package method interacts with portmaster to build and install packages.
 #
-# Note that you must use the complete package name as it appears in 
+# Note that you must use the complete package name as it appears in
 # /usr/ports/*/name, such as 'perl5.14' rather than 'perl5'.
-# Repositories are hard-coded to /usr/ports; alternate locations are 
+# Repositories are hard-coded to /usr/ports; alternate locations are
 # unsupported at this time.
 # This method supports both pkg_* and pkgng systems.
 #
@@ -1618,4 +1618,249 @@ body package_method generic
       package_update_command => "/usr/bin/pacman -S --noconfirm --noprogressbar --needed";
 }
 
-##
+## Useful bundles ##
+
+bundle agent cfe_package_ensure_absent(package)
+# @depends cfe_package_ensure
+# @brief Ensure package is absent
+# @param packages the packages to remove
+#
+# This package method will remove `package`, using
+# `cfe_package_ensure`.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#     "nozip" usebundle => cfe_package_ensure_absent("zip");
+# ```
+{
+  methods:
+      "ensure" usebundle => cfe_package_ensure($(package), "delete");
+}
+
+bundle agent cfe_package_ensure_present(package)
+# @depends cfe_package_ensure
+# @brief Ensure package is present
+# @param package the packages to install
+#
+# This package method will install `package`, using
+# `cfe_package_ensure`.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#     "pleasezip" usebundle => cfe_package_ensure_present("zip");
+# ```
+{
+  methods:
+      "ensure" usebundle => cfe_package_ensure($(package), "add");
+}
+
+bundle agent cfe_package_ensure_upgrade(package)
+# @depends cfe_package_ensure
+# @brief Ensure package is present and updated
+# @param package the package to add/update
+#
+# This package method will add or update `package`, using
+# `cfe_package_ensure`.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#     "upgradezip" usebundle => cfe_package_ensure_upgrade("zip");
+# ```
+{
+  methods:
+      "ensure" usebundle => cfe_package_ensure($(package), "addupdate");
+}
+
+bundle agent cfe_package_ensure(package_name, desired)
+# @depends apt_get yum_rpm generic
+# @brief Ensure `package_name` has the `desired` state
+# @param package_name the packages to ensure
+# @param desired the desired `package_policy`, add or delete or ...
+#
+# This package method will add or delete `packages` with
+# `package_policy` set to `desired`.
+#
+# On Debian, it will use `apt_get`.  On Red Hat, `yum_rpm`.
+# Otherwise, `generic`.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#     "nozip" usebundle => cfe_package_ensure("zip", "delete");
+#     "pleasezip" usebundle => cfe_package_ensure("zip", "add");
+# ```
+{
+
+  packages:
+
+    debian::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_method => apt_get;
+
+
+    redhat::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_method => yum_rpm;
+
+    !debian.!redhat::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_method => generic;
+}
+
+bundle agent cfe_package_named_ensure_present(packageorfile, select, package_version, package_arch)
+# @depends cfe_package_ensure_named
+# @brief Ensure package is present
+# @param packageorfile the package or full filename to add
+# @param select the `package_select` method
+# @param package_version the `package_version` desired
+# @param package_arch a string determining the `package_architectures` desired
+#
+# This package method will add `packageorfile` as a package or file,
+# using `cfe_package_ensure_full`.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "addfilezip"
+#      usebundle => cfe_package_named_file_ensure_present("/mydir/zip",
+#                                                         "==",
+#                                                         "3.0-7",
+#                                                         ifelse("debian", "amd64",
+#                                                                "x86_64"));
+# ```
+{
+  methods:
+      "ensure" usebundle => cfe_package_ensure_named($(package), "add", $(select), $(package_version), $(package_arch));
+}
+
+bundle agent cfe_package_named_ensure_upgrade(packageorfile, select, package_version, package_arch)
+# @depends cfe_package_ensure_named
+# @brief Ensure package is added or updated
+# @param packageorfile the package or full filename to add or update
+# @param select the `package_select` method
+# @param package_version the `package_version` desired
+# @param package_arch a string determining the `package_architectures` desired
+#
+# This package method will add or update `packageorfile` as a package
+# or file, using `cfe_package_ensure_full`.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "upgradefilezip"
+#      usebundle => cfe_package_named_file_ensure_upgrade("/mydir/zip",
+#                                                         "==",
+#                                                         "3.0-7",
+#                                                         ifelse("debian", "amd64",
+#                                                                "x86_64"));
+#      "upgradezip"
+#      usebundle => cfe_package_named_file_ensure_upgrade("/mydir/zip",
+#                                                         "==",
+#                                                         "3.0-7",
+#                                                         ifelse("debian", "amd64",
+#                                                                "x86_64"));
+# ```
+{
+  methods:
+      "ensure" usebundle => cfe_package_ensure_named($(packageorfile), "addupdate", $(select), $(package_version), $(package_arch));
+}
+
+bundle agent cfe_package_ensure_named(package_name, desired, select, package_version, package_arch)
+# @depends apt_get yum_rpm generic dpkg_version rpm_version
+# @brief Ensure `package_name` has the `desired` state
+# @param package_name the packages to ensure (can be files)
+# @param desired the desired `package_policy`, add or delete or addupdate
+# @param select the `package_select` method
+# @param package_version the desired `package_version`
+# @param package_arch the desired package architecture
+#
+# This package method will manage `packages` with `package_policy` set
+# to `desired`, using `select`, `package_version`, and `package_arch`.
+#
+# If `package_name` is **not** a file name: on Debian, it will use
+# `apt_get`.  On Red Hat, `yum_rpm`.  Otherwise, `generic`.
+#
+# If `package_name` **is** a file name, it will use `dpkg_version` or
+# `rpm_version` from the file's directory.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "ensure" usebundle => cfe_package_ensure_named("zsh", "add", "==", "1.2.3", "amd64");
+#      "ensure" usebundle => cfe_package_ensure_named("/mydir/package.deb", "add", "==", "9.8.7", "amd64");
+#      "ensure" usebundle => cfe_package_ensure_named("tcsh", "delete", ">=", "2.3.4", "x86_64");
+# ```
+{
+  classes:
+      "filebased" expression => fileexists($(package_name));
+
+  vars:
+    filebased::
+      "package_basename" string => lastnode($(package_name), "/");
+      "dir" string => dirname($(package_name));
+
+  packages:
+
+    debian.!filebased::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_select => $(select),
+      package_version => $(package_version),
+      package_architectures => { $(package_arch) },
+      package_method => apt_get;
+
+
+    debian.filebased::
+
+      "$(package_basename)"
+      package_policy => $(desired),
+      package_select => $(select),
+      package_version => $(package_version),
+      package_architectures => { $(package_arch) },
+      package_method => dpkg_version($(dir));
+
+    redhat.!filebased::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_select => $(select),
+      package_version => $(package_version),
+      package_architectures => { $(package_arch) },
+      package_method => yum_rpm;
+
+    redhat.filebased::
+
+      "$(package_basename)"
+      package_policy => $(desired),
+      package_select => $(select),
+      package_version => $(package_version),
+      package_architectures => { $(package_arch) },
+      package_method => rpm_version($(dir));
+
+    !filebased.!debian.!redhat::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_method => generic;
+
+  reports:
+    (inform_mode||verbose_mode).filebased.!debian.!redhat::
+      "$(this.bundle): sorry, can't do file-based installs on $(sys.os)";
+}
