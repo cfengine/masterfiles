@@ -9,11 +9,11 @@ bundle common inventory_lsb
     _inventory_lsb::
       "lsb_$(lsb[Distributor ID])" expression => "any",
       comment => "LSB Distributor ID",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "lsb_$(lsb[Distributor ID])_$(lsb[Release])" expression => "any",
       comment => "LSB Distributor ID and Release",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
   vars:
       "lsb_exec" string => "$(inventory_control.lsb_exec)";
@@ -21,37 +21,37 @@ bundle common inventory_lsb
     _inventory_lsb::
       "lsb[Distributor ID]" string => execresult("$(lsb_exec) -i -s", "noshell"),
       comment => "LSB Distributor ID",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "lsb[Release]" string => execresult("$(lsb_exec) -r -s", "noshell"),
       comment => "LSB Release",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "lsb[Description]" string => execresult("$(lsb_exec) -d -s", "noshell"),
       comment => "LSB Description",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "lsb[Codename]" string => execresult("$(lsb_exec) -c -s", "noshell"),
       comment => "LSB Codename",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "lsb_keys" slist => getindices("lsb");
 
       "os" string => canonify("$(lsb[Distributor ID])"),
       comment => "LSB-provided OS name",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "release" string => "$(lsb[Release])",
       comment => "LSB-provided OS release",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "flavor" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])"),
       comment => "LSB-provided OS flavor",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "description" string => "$(lsb[Description])",
       comment => "LSB-provided OS description",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
   reports:
     inform_mode._inventory_lsb::
