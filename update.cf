@@ -53,11 +53,11 @@ bundle common u_def
       handle => "common_u_def_vars_masterfiles_staging_tmp",
       comment => "Directory where most recent VCS changes are staged before final deployment to masterfiles";
 
-      "cf_apache_user" string => "apache",
+      "cf_apache_user" string => "cfapache",
       handle => "common_u_def_vars_cf_apache_user",
       comment => "User that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_user";
 
-      "cf_apache_group" string => "apache",
+      "cf_apache_group" string => "cfapache",
       handle => "common_u_def_vars_cf_apache_group",
       comment => "Group that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_group";
 
