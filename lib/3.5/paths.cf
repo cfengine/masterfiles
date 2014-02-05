@@ -428,6 +428,18 @@ bundle common paths
       "path[usermod]"       string => "/usr/sbin/usermod";
       "path[zypper]"        string => "/usr/bin/zypper";
 
+    linux|solaris::
+
+      "path[shadow]"       string => "/etc/shadow";
+
+    freebsd|openbsd|netbsd|darwin::
+
+      "path[shadow]"       string => "/etc/master.passwd";
+
+    aix::
+
+      "path[shadow]"       string => "/etc/security/passwd";
+
     any::
       "all_paths"     slist => getindices("path");
       "$(all_paths)" string => "$(path[$(all_paths)])";
