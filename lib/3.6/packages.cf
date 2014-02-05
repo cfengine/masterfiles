@@ -941,7 +941,7 @@ body package_method yum_group
 # grouplist -v` (between parentheses).  For example, below
 # `network-tools` is the groupid.
 # 
-# ```shell
+# ```console
 # $ yum grouplist -v|grep Networking|head -n 1
 #   Networking Tools (network-tools)
 # ```
