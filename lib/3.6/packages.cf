@@ -673,6 +673,7 @@ body package_method windows_feature
 
 body package_method msi_implicit(repo)
 # @brief Windows MSI method
+# @param repo The package file repository
 # 
 # Uses the whole file name as promiser, e.g. "7-Zip-4.50-x86_64.msi".
 # The name, version and arch is then deduced from the promiser.
@@ -700,6 +701,7 @@ body package_method msi_implicit(repo)
 
 body package_method msi_explicit(repo)
 # @brief Windows MSI method
+# @param repo The package file repository
 # 
 # Uses software name as promiser, e.g. "7-Zip", and explicitly
 # specify any `package_version` and `package_arch`.
@@ -1142,13 +1144,17 @@ body package_method opencsw
       package_update_command =>  "/opt/csw/bin/pkgutil -yu";
 }
 
-body package_method solaris (pkgname, spoolfile, adminfile)
+body package_method solaris(pkgname, spoolfile, adminfile)
 # @depends paths
 # @brief Package method for old Solaris package system
 #
+# @param pkgname Not used
+# @param spoolfile The spool file, located in `/tmp`
+# @param adminfile The admin file, located in `/tmp`
+#
 # The older solaris package system is poorly designed, with too many different
 # names to track. See the example in tests/units/unit_package_solaris.cf
-# to see how to use this
+# to see how to use this.
 {
       package_changes => "individual";
       package_list_command => "$(paths.path[pkginfo]) -l";
@@ -1643,7 +1649,7 @@ body package_method generic
 bundle agent cfe_package_ensure_absent(package)
 # @depends cfe_package_ensure
 # @brief Ensure package is absent
-# @param packages the packages to remove
+# @param package the packages to remove
 #
 # This package method will remove `package`, using
 # `cfe_package_ensure`.
