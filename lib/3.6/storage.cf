@@ -52,6 +52,13 @@
 ##-------------------------------------------------------
 
 body volume min_free_space(free)
+# @brief Warn if the storage doesn't have at least `free` free space.
+#
+# A warnings is also generated if the storage is smaller than 10K or as
+# less than 2 file entries.
+#
+# @param free Absolute or percentage minimum disk space that should be
+# available before warning
 {
       check_foreign  => "false";
       freespace      => "$(free)";
@@ -62,6 +69,14 @@ body volume min_free_space(free)
 ##
 
 body mount nfs(server,source)
+# @brief Mounts the storage at `source` on `server` via nfs protocol.
+#
+# Also modifies the file system table.
+#
+# @param server Hostname or IP of remote server
+# @param source Path of remote file system to mount
+#
+# **See also:** `nfs_p()`, `unmount()`
 {
       mount_type => "nfs";
       mount_source => "$(source)";
@@ -72,6 +87,15 @@ body mount nfs(server,source)
 ##
 
 body mount nfs_p(server,source,perm)
+# @brief Mounts the storage via nfs, with `perm` passed as options to mount.
+#
+# Also modifies the file system table.
+#
+# @param server Hostname or IP of remote server
+# @param source Path of remote file system to mount
+# @param perm A list of options that's passed to the mount command
+#
+# **See also:** `nfs`, `unmount()`
 {
       mount_type => "nfs";
       mount_source => "$(source)";
@@ -83,6 +107,11 @@ body mount nfs_p(server,source,perm)
 ##
 
 body mount unmount
+# @brief Unmounts the nfs storage.
+#
+# Also modifies the file system table.
+#
+# **See also:** `nfs()`, `nfs_p()`
 {
       mount_type => "nfs";
       edit_fstab => "true";
