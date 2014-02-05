@@ -59,15 +59,23 @@ bundle common def
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";
 
-      "cf_apache_user" string => ifelse("cfengine_3_4|cfengine_3_5", "apache",
-                                        "cfapache"),
+    cfengine_3_4|cfengine_3_5::
+      "cf_apache_user" string => "apache",
       comment => "User that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_user";
 
-      "cf_apache_group" string => ifelse("cfengine_3_4|cfengine_3_5", "apache",
-                                        "cfapache"),
+      "cf_apache_group" string => "apache",
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_group";
+
+    !cfengine_3_4.!cfengine_3_5::
+      "cf_apache_user" string => "cfapache",
+      comment => "User that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_user";
+
+      "cf_apache_group" string => "cfapache",
+      comment => "Group that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_group";
 
       solaris::
       "cf_runagent_shell"
