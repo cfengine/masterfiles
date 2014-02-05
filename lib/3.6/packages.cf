@@ -180,6 +180,8 @@ body package_method pip(flags)
 #
 # Available commands : add, delete, (add)update, verify
 #
+# @param flags The command line parameter passed to `pip`
+#
 # Note: "update" command preforms recursive upgrade (of dependencies) by
 # default. Set $flags to "--no-deps" to preform non-recursive upgrade.
 # http://www.pip-installer.org/en/latest/cookbook.html#non-recursive-upgrades
@@ -192,10 +194,14 @@ body package_method pip(flags)
 #     "django-registration" package_method => pip(""), package_policy => "delete";
 #     "requests"            package_method => pip(""), package_policy => "verify";
 #
-# # Note: "Django" with a capital 'D' in the example above.
-# # Explicitly match the name of the package, capitalization does count!
-# # eg. pip search django | egrep "^Django\s+-"
-# #     Django - A high-level Python Web framework [..output trimmed..]
+# ```
+# 
+# **Note:** "Django" with a capital 'D' in the example above.
+# Explicitly match the name of the package, capitalization does count!
+#
+# ```console
+#     $ pip search django | egrep "^Django\s+-"
+#     Django - A high-level Python Web framework [..output trimmed..]
 # ```
 {
       package_changes => "individual";
@@ -225,12 +231,12 @@ body package_method npm(dir)
 # `npm' is a package manager for Node.js
 # https://npmjs.org/package/npm
 #
-# $(dir) is the prefix path to ./node_modules/
+# Available commands : add, delete, (add)update, verify
 #
 # For the difference between local and global install see here:
 # https://npmjs.org/doc/cli/npm-install.html
 #
-# Available commands : add, delete, (add)update, verify
+# @param dir The prefix path to ./node_modules/
 #
 # **Example:**
 #
@@ -271,10 +277,10 @@ body package_method npm_g
 # `npm' is a package manager for Node.js
 # https://npmjs.org/package/npm
 #
+# Available commands : add, delete, (add)update, verify
+#
 # For the difference between global and local install see here:
 # https://npmjs.org/doc/cli/npm-install.html
-#
-# Available commands : add, delete, (add)update, verify
 #
 # **Example:**
 #
@@ -310,12 +316,15 @@ body package_method brew(user)
 # @brief Darwin/Mac OS X + Homebrew installation method
 #
 # Homebrew is a package manager for OS X -- http://brew.sh
-# Homebrew expects a regular (non-root) user to install packages.
-# https://github.com/mxcl/homebrew/wiki/FAQ#why-does-homebrew-say-sudo-is-bad
-# As it seems CFEngine don't give the possibility to run package_add_command
-# with a different user, we'll use sudo -u.
 #
 # Available commands : add, delete, (add)update (with package_version).
+#
+# @param user The user under which to run the commands 
+#
+# Homebrew expects a regular (non-root) user to install packages.
+# https://github.com/mxcl/homebrew/wiki/FAQ#why-does-homebrew-say-sudo-is-bad
+# As CFEngine doesn't give the possibility to run package_add_command
+# with a different user, this body uses sudo -u.
 #
 # **Example:**
 #
@@ -454,6 +463,8 @@ body package_method apt_get
 
 }
 
+# This is a great use case for CFEngine body inheritance.
+
 body package_method apt_get_noupdate
 # @depends debian_knowledge
 # @brief APT installation package method without updates
@@ -464,8 +475,6 @@ body package_method apt_get_noupdate
 # to install packages, as APT may decide.
 #
 # It doesn't work to use a class.
-#
-# This is a great use case for CFEngine body inheritance.
 #
 # **Example:**
 #
@@ -644,6 +653,7 @@ body package_method rpm_version(repo)
 ##
 
 body package_method windows_feature
+# @brief Method for managing Windows features
 {
       package_changes => "individual";
 
@@ -662,8 +672,12 @@ body package_method windows_feature
 ##
 
 body package_method msi_implicit(repo)
-# Use whole file name as promiser, e.g. "7-Zip-4.50-x86_64.msi",
-# the name, version and arch is then deduced from the promiser
+# @brief Windows MSI method
+# 
+# Uses the whole file name as promiser, e.g. "7-Zip-4.50-x86_64.msi".
+# The name, version and arch is then deduced from the promiser.
+#
+# **See also:** `msi_explicit()`
 {
       package_changes => "individual";
       package_file_repositories => { "$(repo)" };
@@ -685,8 +699,12 @@ body package_method msi_implicit(repo)
 ##
 
 body package_method msi_explicit(repo)
-# use software name as promiser, e.g. "7-Zip", and explicitly
-# specify any package_version and package_arch
+# @brief Windows MSI method
+# 
+# Uses software name as promiser, e.g. "7-Zip", and explicitly
+# specify any `package_version` and `package_arch`.
+#
+# **See also:** `msi_implicit()`
 {
       package_changes => "individual";
       package_file_repositories => { "$(repo)" };
@@ -708,7 +726,7 @@ body package_method yum
 # @brief Yum+RPM installation method
 #
 # This package method interacts with the Yum and RPM package managers.
-# It is a copy of `yum_rpm`, which was contributed by Trond Hasle
+# It is a copy of `yum_rpm()`, which was contributed by Trond Hasle
 # Amundsen.  The old `yum` package method has been removed.
 #
 # This is an efficient package method for RPM-based systems - uses `rpm`
@@ -807,6 +825,9 @@ body package_method yum_rpm
       package_verify_command => "$(redhat_knowledge.call_rpm) -V";
 }
 
+# This is a great use case for CFEngine body inheritance.
+# It doesn't work to use a class.
+
 body package_method yum_rpm_noupdate
 # @depends common_knowledge redhat_knowledge
 # @brief Yum+RPM installation method without updates
@@ -819,12 +840,8 @@ body package_method yum_rpm_noupdate
 # instead of `yum` to list installed packages.
 #
 # It will never run "yum update" but is otherwise exactly like the
-# `yum_rpm` package method and *may* use the network to install
+# `yum_rpm()` package method and *may* use the network to install
 # packages, as Yum may decide.
-#
-# It doesn't work to use a class.
-#
-# This is a great use case for CFEngine body inheritance.
 #
 # It will use `rpm -e` to remove packages. Please note that if several
 # packages with the same name but varying versions or architectures
@@ -872,7 +889,7 @@ body package_method yum_rpm_enable_repo(repoid)
 #
 # This package method interacts with the RPM package manager for a specific repo.
 #
-# Based on yum_rpm with addition to enable a repository for the install.
+# Based on `yum_rpm()` with addition to enable a repository for the install.
 #
 # Sometimes repositories are configured but disabled by default. For example
 # this pacakge_method could be used when installing a package that exists in
@@ -923,6 +940,7 @@ body package_method yum_group
 # Groups must be specified by their groupids, available through `yum
 # grouplist -v` (between parentheses).  For example, below
 # `network-tools` is the groupid.
+# 
 # ```shell
 # $ yum grouplist -v|grep Networking|head -n 1
 #   Networking Tools (network-tools)
@@ -984,7 +1002,7 @@ body package_method rpm_filebased(path)
 # @param path the path to the local package repository
 #
 # Contributed by Aleksey Tsalolikhin. Written on 29-Feb-2012.
-# Based on yum_rpm body in COPBL by Trond Hasle Amundsen.
+# Based on `yum_rpm()` body by Trond Hasle Amundsen.
 #
 # **Example:**
 #
@@ -1031,16 +1049,20 @@ body package_method rpm_filebased(path)
 
 ##
 
-# OpenSolaris based systems (Solaris 11, Illumos, etc) use the much better
-# Image Package System.
+body package_method ips
+# @depends paths
+# @depends common_knowledge
+# @brief Image Package System method, used by OpenSolaris based systems (Solaris 11, Illumos, etc)
 #
 # A note about Solaris 11.1 versioning format:
 #
+# ```
 # $ pkg list -v --no-refresh zsh
 # FMRI                                                                         IFO
 # pkg://solaris/shell/zsh@4.3.17,5.11-0.175.1.0.0.24.0:20120904T174236Z        i--
 # name--------- |<----->| |/________________________\|
 # version---------------- |\                        /|
+# ```
 #
 # Notice that the publisher and timestamp aren't used. And that the package
 # version then must have the commas replaced by underscores.
@@ -1051,15 +1073,14 @@ body package_method rpm_filebased(path)
 #     4.3.17_5.11-0.175.1.0.0.24.0
 #
 # Therefore, a properly formatted package promise looks like this:
+#
+# ```cf3
 #    "shell/zsh"
 #      package_policy  => "addupdate",
 #      package_method  => ips,
 #      package_select  => ">=",
 #      package_version => "4.3.17_5.11-0.175.1.0.0.24.0";
-
-body package_method ips
-# @depends paths
-# @depends common_knowledge
+# ```
 {
       package_changes => "bulk";
       package_list_command => "$(paths.path[pkg]) list -v --no-refresh";
@@ -1081,10 +1102,9 @@ body package_method ips
 
 ##
 
-# SmartOS (solaris 10 fork by Joyent) uses pkgin
-
 body package_method smartos
 # @depends common_knowledge
+# @brief pkgin method for SmartOS (solaris 10 fork by Joyent)
 {
       package_changes => "bulk";
       package_list_command => "/opt/local/bin/pkgin list";
@@ -1102,10 +1122,9 @@ body package_method smartos
       package_update_command =>  "/opt/local/bin/pkgin upgrade";
 }
 
-# OpenCSW (Solaris software packages)
-
 body package_method opencsw
 # @depends common_knowledge
+# @brief OpenCSW (Solaris software packages) method
 {
       package_changes => "bulk";
       package_list_command => "/opt/csw/bin/pkgutil -c";
@@ -1123,12 +1142,13 @@ body package_method opencsw
       package_update_command =>  "/opt/csw/bin/pkgutil -yu";
 }
 
+body package_method solaris (pkgname, spoolfile, adminfile)
+# @depends paths
+# @brief Package method for old Solaris package system
+#
 # The older solaris package system is poorly designed, with too many different
 # names to track. See the example in tests/units/unit_package_solaris.cf
 # to see how to use this
-
-body package_method solaris (pkgname, spoolfile, adminfile)
-# @depends paths
 {
       package_changes => "individual";
       package_list_command => "$(paths.path[pkginfo]) -l";
@@ -1144,11 +1164,10 @@ body package_method solaris (pkgname, spoolfile, adminfile)
 
 ##
 
-#
-# The following bundle is part of a package setup for solaris, see unit examples
-#
-
 bundle edit_line create_solaris_admin_file
+# @brief The following bundle is part of a package setup for solaris
+#
+# See unit examples.
 {
   insert_lines:
 
@@ -1396,6 +1415,7 @@ body package_method emerge
 
 body package_method pacman
 # @depends common_knowledge
+# @brief Arch Linux pacman package management method
 {
       package_changes => "bulk";
 
@@ -1463,7 +1483,7 @@ body package_method generic
 #
 # This package method attempts to handle all platforms.
 #
-# The Redhat section is a verbatim insertion of `yum_rpm`, which was
+# The Redhat section is a verbatim insertion of `yum_rpm()`, which was
 # contributed by Trond Hasle Amundsen.
 #
 # **Example:**
