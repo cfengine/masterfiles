@@ -6,9 +6,9 @@ bundle common inventory_debian
   classes:
       "debian_pure" expression => "debian.!ubuntu",
       comment => "pure Debian",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 
       "debian_derived" expression => "debian.!pure_debian",
       comment => "derived from Debian",
-      meta => { "inventory", "group=none" };
+      meta => { "inventory", "attribute_name=none" };
 }
