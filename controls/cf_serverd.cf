@@ -17,11 +17,6 @@ body server control
       denybadclocks         => "false";
 
       # By default deny all connections but the following:
-      allowconnects         => { "127.0.0.1" , "::1", @(def.acl) };
-      allowallconnects      => { "127.0.0.1" , "::1", @(def.acl) };
-      trustkeysfrom         => { "127.0.0.1" , "::1", @(def.acl) };
-
-      denybadclocks         => "false";
       ## List of hosts that may connect
       allowconnects         => { "127.0.0.1" , "::1", @(def.acl) };
       ## List of hosts that may have more than one connection established at the same time
