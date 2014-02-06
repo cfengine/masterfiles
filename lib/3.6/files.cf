@@ -1514,7 +1514,7 @@ body acl ntfs(acl)
 #
 # This body requires CFEngine Enterprise.
 #
-# #@param acl The aces to be set
+# @param acl The aces to be set
 {
       acl_type => "ntfs";
       acl_method => "overwrite";
@@ -1735,7 +1735,7 @@ body file_select older_than(years, months, days, hours, minutes, seconds)
 # @param days Number of days
 # @param hours Number of hours
 # @param minutes Number of minutes
-# @seconds seconds Number of seconds
+# @param seconds Number of seconds
 # 
 # Generic older_than selection body, aimed to have a common definition handy
 # for every case possible.
