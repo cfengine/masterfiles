@@ -327,7 +327,7 @@ bundle edit_line resolvconf_o(search,list,options)
 #
 # @param search The search domains with space
 # @param list An slist of nameserver addresses
-# options is an slist of variables to modify the resolver
+# @param options is an slist of variables to modify the resolver
 
 {
   delete_lines:
