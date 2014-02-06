@@ -1326,6 +1326,8 @@ body copy_from perms_cp(from)
 
 body copy_from backup_local_cp(from)
 # @brief Copy a local file and  keep a backup of old versions.
+#
+# @param from The path to the source file.
 {
       source      => "$(from)";
       copy_backup => "timestamp";
@@ -1335,6 +1337,8 @@ body copy_from backup_local_cp(from)
 
 body copy_from seed_cp(from)
 # @brief Copy a local file if the file does not already exist, i.e. seed the placement
+#
+# @param from The path to the source file.
 {
       source      => "$(from)";
       compare     => "exists";
@@ -1343,7 +1347,10 @@ body copy_from seed_cp(from)
 ##
 
 body copy_from sync_cp(from,server)
-# @brief Copy a local file if the promiser does not already exist, i.e. seed the placement
+# @brief Download a file if the local copy does not already exist, i.e. seed the placement
+#
+# @param from The location of the file on the remote server
+# @param server The hostname or IP of the server from which to download
 {
       servers     => { "$(server)" };
       source      => "$(from)";
@@ -1356,6 +1363,8 @@ body copy_from sync_cp(from,server)
 
 body copy_from no_backup_cp(from)
 # @brief Copy a local file and don't make any backup of the previous version
+#
+# @param from The path to the source file.
 {
       source      => "$(from)";
       copy_backup => "false";
@@ -1366,6 +1375,8 @@ body copy_from no_backup_cp(from)
 body copy_from no_backup_dcp(from)
 # @brief Copy a local file if contents have changed, and don't make any backup
 # of the previous version
+#
+# @param from The path to the source file.
 {
       source      => "$(from)";
       copy_backup => "false";
@@ -1375,8 +1386,11 @@ body copy_from no_backup_dcp(from)
 ##
 
 body copy_from no_backup_rcp(from,server)
-# @brief Copy a local file if it's newer than the promiser, and don't make any
+# @brief Download a file if it's newer than the local copy, and don't make any
 # backup of the previous version
+#
+# @param from The location of the file on the remote server
+# @param server The hostname or IP of the server from which to download
 {
       servers     => { "$(server)" };
       source      => "$(from)";
@@ -1391,7 +1405,7 @@ body copy_from no_backup_rcp(from,server)
 body link_from ln_s(x)
 # @brief Create a symbolink link to `x`
 # The link is created even if the source of the link does not exist.
-# @param The source of the link
+# @param x The source of the link
 {
       link_type => "symlink";
       source => "$(x)";
@@ -1479,6 +1493,8 @@ body acl access_generic(acl)
 # 
 # Default/inherited ACLs are left unchanged. This body is
 # applicable for both files and directories on all platforms.
+#
+# @param acl The aces to be set
 {
       acl_method => "overwrite";
       aces => { "@(acl)" };
@@ -1494,9 +1510,11 @@ body acl access_generic(acl)
 
 body acl ntfs(acl)
 # @brief Set the `aces` on NTFS file systems, and overwrite
-# default/inherited ACLs.
+# existing ACLs.
 #
 # This body requires CFEngine Enterprise.
+#
+# #@param acl The aces to be set
 {
       acl_type => "ntfs";
       acl_method => "overwrite";
@@ -1507,7 +1525,7 @@ body acl ntfs(acl)
 
 body acl strict
 # @brief Limit file access via ACLs to users with administrator privileges,
-# overwriting default and inherited ACLs.
+# overwriting existing ACLs.
 # 
 # **Note:** May need to take ownership of file/dir to be sure no-one else is 
 # allowed access.
@@ -1560,6 +1578,8 @@ body depth_search recurse_with_base(d)
 # @brief Search files and directories recursively up to the specified
 # depth, starting from the base directory and including directories on
 # other devices.
+#
+# @param d The maximum search depth
 {
       depth => "$(d)";
       xdev  => "true";
@@ -1601,7 +1621,7 @@ body rename rotate(level)
 
 body rename to(file)
 # @brief Rename the file to `file`
-# @param The new name of the file
+# @param file The new name of the file
 {
       newname => "$(file)";
 }
@@ -1613,7 +1633,7 @@ body rename to(file)
 body file_select name_age(name,days)
 # @brief Select files that have a matching `name` and have not been modified for at least `days`
 # @param name A regex that matches the file name
-# @param days The number of days the file's `mtime` has to exceed
+# @param days Number of days
 {
       leaf_name   => { "$(name)" };
       mtime       => irange(0,ago(0,0,"$(days)",0,0,0));
@@ -1624,7 +1644,7 @@ body file_select name_age(name,days)
 
 body file_select days_old(days)
 # @brief Select files that have not been modified for at least `days`
-# @param days The number of days the file's `mtime` has to exceed
+# @param days Number of days
 {
       mtime       => irange(0,ago(0,0,"$(days)",0,0,0));
       file_result => "mtime";
@@ -1710,6 +1730,13 @@ body file_select all
 
 body file_select older_than(years, months, days, hours, minutes, seconds)
 # @brief Select files older than the date-time specified
+# @param years Number of years
+# @param months Number of months
+# @param days Number of days
+# @param hours Number of hours
+# @param minutes Number of minutes
+# @seconds seconds Number of seconds
+# 
 # Generic older_than selection body, aimed to have a common definition handy
 # for every case possible.
 {
@@ -1722,8 +1749,11 @@ body file_select older_than(years, months, days, hours, minutes, seconds)
 body file_select filetype_older_than(filetype, days)
 # @brief Select files of specified type older than specified number of days
 #
+# @param filetype File type to select
+# @param days Number of days
+#
 # This body only takes a single filetype, see `filetypes_older_than()`
-# if you want to select more than one type of file
+# if you want to select more than one type of file.
 {
       file_types => { "$(filetype)" };
       mtime      => irange(0,ago(0,0,"$(days)",0,0,0));
@@ -1736,6 +1766,9 @@ body file_select filetypes_older_than(filetypes, days)
 # @brief Select files of specified types older than specified number of days
 # 
 # This body only takes a list of filetypes
+# 
+# @param filetypes A list of file types
+# @param days Number of days
 #
 # **See also:** `filetype_older_than()`
 {
