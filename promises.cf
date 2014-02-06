@@ -42,8 +42,8 @@ body common control
                   "cfe_internal/CFE_knowledge.cf",
                   "cfe_internal/example_use_goals.cf",
 
-		             # Control body for all CFEngine robot agents
-                   @(cfengine_controls.inputs),
+                # Control body for all CFEngine robot agents
+                  @(cfengine_controls.inputs),
 
                  # COPBL/Custom libraries.  Eventually this should use wildcards.
                   @(cfengine_stdlib.inputs),
