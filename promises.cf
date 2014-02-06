@@ -9,15 +9,16 @@ body common control
 {
 
       bundlesequence => {
-			  # Common bundle first (Best Practice)
+                        # Common bundle first (Best Practice)
                           inventory_control,
                           @(inventory.bundles),
-			  def,
+                          def,
                           cfe_internal_hub_vars,
-			  # Design Center
-			  cfsketch_run,
+                          
+                         # Design Center
+                          cfsketch_run,
 
-                          # Agent bundle
+                         # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
                           service_catalogue,
                           example_use_goals,         # See cfe_internal/example_use_goals.cf
@@ -25,40 +26,36 @@ body common control
       };
 
       inputs => {
-                  # File definition for global variables and classes
+                 # File definition for global variables and classes
                   "def.cf",
 
+                # Inventory policy
                   @(inventory.inputs),
 
-                  # Design Center
+                 # Design Center
                   "sketches/meta/api-runfile.cf",
                   @(cfsketch_g.inputs),
 
-                  # CFEngine internal processes for Mission Portal mostly
+                 # CFEngine internal processes for Mission Portal mostly
                   "cfe_internal/CFE_cfengine.cf",
                   "cfe_internal/CFE_hub_specific.cf",
                   "cfe_internal/CFE_knowledge.cf",
                   "cfe_internal/example_use_goals.cf",
 
-		  # Control body for all CFEngine robot agents
-		  "controls/cf_agent.cf",
-		  "controls/cf_execd.cf",
-		  "controls/cf_hub.cf",
-		  "controls/cf_monitord.cf",
-		  "controls/cf_runagent.cf",
-		  "controls/cf_serverd.cf",
+		             # Control body for all CFEngine robot agents
+                   @(cfengine_controls.inputs),
 
-		  # COPBL/Custom libraries.  Eventually this should use wildcards.
-		  @(cfengine_stdlib.inputs),
+                 # COPBL/Custom libraries.  Eventually this should use wildcards.
+                  @(cfengine_stdlib.inputs),
 
-                  # Add update files to build Knowledge Map relationship
+                 # Add update files to build Knowledge Map relationship
                   "update/update_bins.cf",
                   "update/update_masterfiles_internal.cf",
                   "update/update_policy.cf",
                   "update/update_processes.cf",
 
-                  # List of services here
-		  "services/init_msg.cf",
+                # List of services here
+                  "services/init_msg.cf",
                   "services/file_change.cf",
 
       };
@@ -68,6 +65,8 @@ body common control
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 }
+
+      #
 
 bundle common inventory
 # @brief Set up inventory inputs
@@ -106,6 +105,8 @@ bundle common inventory
       "$(this.bundle): loading inventory module '$(inputs)'";
 }
 
+      #
+
 bundle common cfengine_stdlib
 {
   vars:
@@ -137,6 +138,40 @@ bundle common cfengine_stdlib
   reports:
     verbose_mode::
       "$(this.bundle): defining inputs='$(inputs)'";
+}
+
+      #
+
+bundle common cfengine_controls
+{
+  vars:
+    cfengine_3_4::
+      # This is control body for CFEngine 3.4 and earlier
+      # server control seems to be a bit problem here
+      # (only 3.4 is explicitly supported)
+      "inputs" slist => { 
+                          "controls/cf_agent.cf",
+                          "controls/cf_execd.cf",
+                          "controls/cf_hub.cf",
+                          "controls/cf_monitord.cf",
+                          "controls/cf_runagent.cf",
+                          "controls/3.4/cf_serverd.cf",
+      };
+
+    !cfengine_3_4::
+      # 3.5 and higher are fine with a standard version
+      "inputs" slist => {
+                          "controls/cf_agent.cf",
+                          "controls/cf_execd.cf",
+                          "controls/cf_hub.cf",
+                          "controls/cf_monitord.cf",
+                          "controls/cf_runagent.cf",
+                          "controls/cf_serverd.cf",
+      };
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): defining inputs='$(inputs)'";  
 }
 
 ###############################################################################
