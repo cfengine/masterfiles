@@ -17,3 +17,6 @@ tests/*/*.trs
 
 # copied from core
 tests/acceptance/default.cf.sub
+
+# ignore vim dotfiles
+.*.sw[po]
