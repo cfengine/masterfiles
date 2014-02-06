@@ -192,6 +192,7 @@ bundle common paths
       "path[cksum]"    string => "/usr/bin/cksum";
       "path[crontab]"  string => "/usr/bin/crontab";
       "path[crontabs]" string => "/var/spool/cron/crontabs";
+      "path[curl]"     string => "/usr/bin/curl";
       "path[cut]"      string => "/usr/bin/cut";
       "path[dc]"       string => "/usr/bin/dc";
       "path[df]"       string => "/usr/bin/df";
@@ -209,6 +210,7 @@ bundle common paths
       "path[sed]"      string => "/usr/bin/sed";
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
+      "path[wget]"     string => "/usr/bin/wget";
       #
       "path[svcs]"     string => "/usr/bin/svcs";
       "path[svcadm]"   string => "/usr/sbin/svcadm";
@@ -216,7 +218,6 @@ bundle common paths
       "path[netadm]"   string => "/usr/sbin/netadm";
       "path[dladm]"    string => "/usr/sbin/dladm";
       "path[ipadm]"    string => "/usr/sbin/ipadm";
-      "path[logger]"   string => "/usr/bin/logger";
       "path[pkg]"      string => "/usr/bin/pkg";
       "path[pkginfo]"  string => "/usr/bin/pkginfo";
       "path[pkgadd]"   string => "/usr/sbin/pkgadd";
@@ -385,6 +386,7 @@ bundle common paths
       "path[createrepo]"    string => "/usr/bin/createrepo";
       "path[crontab]"       string => "/usr/bin/crontab";
       "path[crontabs]"      string => "/var/spool/cron/tabs";
+      "path[curl]"          string => "/usr/bin/curl";
       "path[cut]"           string => "/usr/bin/cut";
       "path[dc]"            string => "/usr/bin/dc";
       "path[df]"            string => "/bin/df";
@@ -413,6 +415,7 @@ bundle common paths
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
       "path[logger]"        string => "/bin/logger";
+      "path[wget]"          string => "/usr/bin/wget";
 
       #
       "path[chkconfig]"     string => "/sbin/chkconfig";
