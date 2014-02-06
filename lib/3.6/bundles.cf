@@ -382,3 +382,179 @@ bundle agent url_ping(host, method, port, uri)
       "$(this.bundle): $(method) $(host):$(port)/$(uri) did *not* get 200 OK"
       ifvarclass => "url_not_ok_$(chost)";
 }
+
+bundle agent git_init(repo_path)
+# @brief initializes a new git repository if it does not already exist
+# @depends git
+# @param repo_path absolute path of where to initialize a git repository
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent my_git_repositories
+# {
+#   vars:
+#     "basedir"  string => "/var/git";
+#     "repos"    slist  => { "myrepo", "myproject", "myPlugForMoreHaskell" };
+#
+#   files:
+#     "$(basedir)/$(repos)/."
+#       create => "true";
+#
+#   methods:
+#     "git_init" usebundle => git_init("$(basedir)/$(repos)");
+# }
+# ```
+{
+  classes:
+    "ok_norepo" not => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_norepo::
+      "git_init"  usebundle => git("$(repo_path)", "init", "");
+}
+
+bundle agent git_add(repo_path, file)
+# @brief adds files to the supplied repository's index
+# @depends git
+# @param repo_path absolute path to a git repository 
+# @param file a file to stage in the index
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent add_files_to_git_index
+# {
+#   vars:
+#     "repo"  string => "/var/git/myrepo";
+#     "files" slist  => { "fileA", "fileB", "fileC" };
+#
+#   methods:
+#     "git_add" usebundle => git_add("$(repo)", "$(files)");
+# }
+# ```
+{
+  classes:
+    "ok_repo" expression => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_repo::
+      "git_add" usebundle => git("$(repo_path)", "add", "$(file)");
+}
+
+bundle agent git_checkout(repo_path, branch)
+# @brief checks out an existing branch in the supplied git repository
+# @depends git
+# @param repo_path absolute path to a git repository
+# @param branch the name of an existing git branch to checkout
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent git_checkout_some_existing_branch
+# {
+#   vars:
+#     "repo"   string => "/var/git/myrepo";
+#     "branch" string => "dev/some-topic-branch";
+#
+#   methods:
+#     "git_checkout" usebundle => git_checkout("$(repo)", "$(branch)");
+# }
+# ```
+{
+  classes:
+    "ok_repo" expression => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_repo::
+      "git_checkout" usebundle => git("$(repo_path)", "checkout", "$(branch)");
+}
+
+bundle agent git_checkout_new_branch(repo_path, new_branch)
+# @brief checks out and creates a new branch in the supplied git repository
+# @depends git
+# @param repo_path absolute path to a git repository
+# @param new_branch the name of the git branch to create and checkout
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent git_checkout_new_branches
+# {
+#   vars:
+#     "repo[myrepo]"    string => "/var/git/myrepo";
+#     "branch[myrepo]"  string => "dev/some-new-topic-branch";
+#
+#     "repo[myproject]"   string => "/var/git/myproject";
+#     "branch[myproject]" string => "dev/another-new-topic-branch";
+#
+#     "repo_names"        slist => getindices("repo");
+#
+#   methods:
+#     "git_checkout_new_branch" usebundle => git_checkout_new_branch("$(repo[$(repo_names)])", "$(branch[$(repo_names)])");
+# }
+# ```
+{
+  classes:
+    "ok_repo" expression => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_repo::
+      "git_checkout" usebundle => git("$(repo_path)", "checkout -b", "$(branch)");
+}
+
+bundle agent git_commit(repo_path, message)
+# @brief executes a commit to the specificed git repository
+# @depends git
+# @param repo_path absolute path to a git repository 
+# @param message the message to associate to the commmit
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent make_git_commit
+# {
+#   vars:
+#     "repo"  string => "/var/git/myrepo";
+#     "msg"   string => "dituri added some bundles for common git operations";
+#
+#   methods:
+#     "git_commit" usebundle => git_commit("$(repo)", "$(msg)");
+# }
+# ```
+{
+  classes:
+    "ok_repo" expression => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_repo::
+      "git_commit" usebundle => git("$(repo_path)", "commit", '-m "$(message)"');
+}
+
+bundle agent git(repo_path, subcmd, args)
+# @brief generic interface to git
+# @param repo_path absolute path to a new or existing git repository 
+# @param subcmd any valid git sub-command
+# @param args a single string of arguments to pass
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent git_rm_files_from_staging
+# {
+#   vars:
+#     "repo"        string => "/var/git/myrepo";
+#     "git_cmd"     string => "reset --soft";
+#     "files"       slist  => { "fileA", "fileB", "fileC" };
+#
+#   methods:
+#     "git_reset" usebundle => git("$(repo)", "$(git_cmd)", "HEAD -- $(files)");
+# }
+# ```
+{
+  commands:
+    "$(paths.path[git])"
+      args => "$(subcmd) $(args)",
+      contain => in_dir("$(repo_path)");
+}
+
