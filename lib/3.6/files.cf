@@ -1154,6 +1154,8 @@ body select_region INI_section(x)
 ##-------------------------------------------------------
 
 body edit_defaults std_defs
+# @brief Standard definitions for `edit_defaults`
+# Don't empty the file before editing starts and don't make a backup.
 {
       empty_file_before_editing => "false";
       edit_backup => "false";
@@ -1163,6 +1165,9 @@ body edit_defaults std_defs
 ##
 
 body edit_defaults empty
+# @brief Empty the file before editing
+#
+# No backup is made
 {
       empty_file_before_editing => "true";
       edit_backup => "false";
@@ -1172,6 +1177,7 @@ body edit_defaults empty
 ##
 
 body edit_defaults no_backup
+# @brief Don't make a backup of the file before editing
 {
       edit_backup => "false";
 }
@@ -1179,6 +1185,7 @@ body edit_defaults no_backup
 ##
 
 body edit_defaults backup_timestamp
+# @brief Make a timestamped backup of the file before editing
 {
       empty_file_before_editing => "false";
       edit_backup => "timestamp";
@@ -1190,6 +1197,7 @@ body edit_defaults backup_timestamp
 ##-------------------------------------------------------
 
 body location start
+# @brief Editing occurs before the matched line
 {
       before_after => "before";
 }
@@ -1197,6 +1205,8 @@ body location start
 ##
 
 body location after(str)
+# @brief Editing occurs after the line matching `str`
+# @param str Regular expression matching the file line location
 {
       before_after => "after";
       select_line_matching => "$(str)";
@@ -1205,6 +1215,8 @@ body location after(str)
 ##
 
 body location before(str)
+# @brief Editing occurs before the line matching `str`
+# @param str Regular expression matching the file line location
 {
       before_after => "before";
       select_line_matching => "$(str)";
@@ -1217,6 +1229,8 @@ body location before(str)
 ##
 
 body replace_with comment(c)
+# @brief Comment all lines matching the pattern by preprending `c`
+# @param c The prefix that comments out lines
 {
       replace_value => "$(c) $(match.1)";
       occurrences => "all";
@@ -1225,6 +1239,8 @@ body replace_with comment(c)
 ##
 
 body replace_with uncomment
+# @brief Uncomment all lines matching the pattern by removing
+# anything outside the matching string
 {
       replace_value => "$(match.1)";
       occurrences => "all";
@@ -1235,6 +1251,13 @@ body replace_with uncomment
 ##-------------------------------------------------------
 
 body copy_from secure_cp(from,server)
+# @brief Download a file from a remote server over an encrypted channel
+#
+# Only copy the file if it is different from the local copy, and verify
+# that the copy is correct.
+# 
+# @param from The location of the file on the remote server
+# @param server The hostname or IP of the server from which to download
 {
       source      => "$(from)";
       servers     => { "$(server)" };
@@ -1246,6 +1269,10 @@ body copy_from secure_cp(from,server)
 ##
 
 body copy_from remote_cp(from,server)
+# @brief Download a file from a remote server.
+#
+# @param from The location of the file on the remote server
+# @param server The hostname or IP of the server from which to download
 {
       servers     => { "$(server)" };
       source      => "$(from)";
@@ -1255,6 +1282,10 @@ body copy_from remote_cp(from,server)
 ##
 
 body copy_from remote_dcp(from,server)
+# @brief Download a file from a remote server if it is different from the local copy.
+#
+# @param from The location of the file on the remote server
+# @param server The hostname or IP of the server from which to download
 {
       servers     => { "$(server)" };
       source      => "$(from)";
@@ -1264,6 +1295,9 @@ body copy_from remote_dcp(from,server)
 ##
 
 body copy_from local_cp(from)
+# @brief Copy a local file.
+#
+# @param from The path to the source file.
 {
       source      => "$(from)";
 }
@@ -1271,6 +1305,9 @@ body copy_from local_cp(from)
 ##
 
 body copy_from local_dcp(from)
+# @brief Copy a local file if it is different from the existing copy.
+#
+# @param from The path to the source file.
 {
       source      => "$(from)";
       compare     => "digest";
@@ -1279,13 +1316,16 @@ body copy_from local_dcp(from)
 ##
 
 body copy_from perms_cp(from)
+# @brief Copy a local file and preserve file permissions on the local copy.
+#
+# @param from The path to the source file.
 {
       source      => "$(from)";
       preserve    => "true";
 }
 
 body copy_from backup_local_cp(from)
-# Local copy, keeping a backup of old versions
+# @brief Copy a local file and  keep a backup of old versions.
 {
       source      => "$(from)";
       copy_backup => "timestamp";
@@ -1293,9 +1333,8 @@ body copy_from backup_local_cp(from)
 
 ##
 
-# Copy only if the file does not already exist, i.e. seed the placement
-
 body copy_from seed_cp(from)
+# @brief Copy a local file if the file does not already exist, i.e. seed the placement
 {
       source      => "$(from)";
       compare     => "exists";
@@ -1304,6 +1343,7 @@ body copy_from seed_cp(from)
 ##
 
 body copy_from sync_cp(from,server)
+# @brief Copy a local file if the promiser does not already exist, i.e. seed the placement
 {
       servers     => { "$(server)" };
       source      => "$(from)";
@@ -1315,6 +1355,7 @@ body copy_from sync_cp(from,server)
 ##
 
 body copy_from no_backup_cp(from)
+# @brief Copy a local file and don't make any backup of the previous version
 {
       source      => "$(from)";
       copy_backup => "false";
@@ -1323,6 +1364,8 @@ body copy_from no_backup_cp(from)
 ##
 
 body copy_from no_backup_dcp(from)
+# @brief Copy a local file if contents have changed, and don't make any backup
+# of the previous version
 {
       source      => "$(from)";
       copy_backup => "false";
@@ -1332,6 +1375,8 @@ body copy_from no_backup_dcp(from)
 ##
 
 body copy_from no_backup_rcp(from,server)
+# @brief Copy a local file if it's newer than the promiser, and don't make any
+# backup of the previous version
 {
       servers     => { "$(server)" };
       source      => "$(from)";
