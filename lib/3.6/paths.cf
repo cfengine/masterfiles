@@ -76,6 +76,7 @@ bundle common paths
 
     any::
       "path[getfacl]"  string => "/usr/bin/getfacl";
+      "path[git]"      string => "/usr/bin/git";
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
 

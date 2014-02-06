@@ -382,3 +382,42 @@ bundle agent url_ping(host, method, port, uri)
       "$(this.bundle): $(method) $(host):$(port)/$(uri) did *not* get 200 OK"
       ifvarclass => "url_not_ok_$(chost)";
 }
+
+bundle agent git_init(repo_path)
+{
+  classes:
+    "ok_norepo" not => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_norepo::
+      "git_init"  usebundle => git("$(repo_path)", "init", "");
+}
+
+bundle agent git_add(repo_path, file)
+{
+  classes:
+    "ok_repo" expression => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_repo::
+      "git_add" usebundle => git("$(repo_path)", "add", "$(file)");
+}
+
+bundle agent git_commit(repo_path, message)
+{
+  classes:
+    "ok_repo" expression => fileexists("$(repo_path)/.git");
+
+  methods:
+    ok_repo::
+      "git_commit" usebundle => git("$(repo_path)", "commit", "-m $(message)");
+}
+
+bundle agent git(repo_path, subcmd, args)
+{
+  commands:
+    "$(paths.path[git])"
+      args => "$(subcmd) $(args)",
+      contain => in_dir("$(repo_path)");
+}
+
