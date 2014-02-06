@@ -831,6 +831,7 @@ bundle edit_line set_config_values_matching(v,pat)
 ##
 
 bundle edit_line maintain_key_values(v,sep)
+# @ignore
 # @brief Sets the RHS of configuration items with an giving separator
 #
 # Contributed by David Lee
@@ -1100,6 +1101,9 @@ body edit_field fstab_options(newval, method)
 }
 
 body edit_field quoted_var(newval,method)
+# @brief Edit the quoted value of the matching line
+# @param newval The new value
+# @param method The method by which to edit the field
 {
       field_separator => "\"";
       select_field    => "2";
@@ -1113,6 +1117,11 @@ body edit_field quoted_var(newval,method)
 ##
 
 body edit_field col(split,col,newval,method)
+# @brief Edit tabluar data with comma-separated sub-values
+# @param split The separator that defines columns
+# @param col The (1-based) index of the value to change
+# @param newval The new value
+# @param method The method by which to edit the field
 {
       field_separator    => "$(split)";
       select_field       => "$(col)";
@@ -1126,6 +1135,11 @@ body edit_field col(split,col,newval,method)
 ##
 
 body edit_field line(split,col,newval,method)
+# @brief Edit tabular data with space-separated sub-values
+# @param split The separator that defines columns
+# @param col The (1-based) index of the value to change
+# @param newval The new value
+# @param method The method by which to edit the field
 {
       field_separator    => "$(split)";
       select_field       => "$(col)";
@@ -1139,6 +1153,8 @@ body edit_field line(split,col,newval,method)
 ##
 
 body replace_with value(x)
+# @brief Replace matching lines
+# @param x The replacement string
 {
       replace_value => "$(x)";
       occurrences => "all";
@@ -1147,6 +1163,8 @@ body replace_with value(x)
 ##
 
 body select_region INI_section(x)
+# @brief Restrict the `edit_line` promise to the lines in section `[x]`
+# @param x The name of the section in an INI-like configuration file
 {
       select_start => "\[$(x)\]\s*";
       select_end => "\[.*\]\s*";
