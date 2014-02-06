@@ -384,6 +384,27 @@ bundle agent url_ping(host, method, port, uri)
 }
 
 bundle agent git_init(repo_path)
+# @brief initializes a new git repository if it does not already exist
+# @depends git
+# @param repo_path absolute path of where to initialize a git repository 
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent initialize_git_repositories 
+# {
+#   vars:
+#     "basedir"  string => "/var/git";
+#     "repos"    slist  => { "a", "b", "c" };
+#
+#   files:
+#     "$(basedir)/$(repos)/."
+#       create => "true";
+#
+#   methods:
+#     "git_init" usebundle => git_init("$(basedir)/$(repos)");
+# }
+# ```
 {
   classes:
     "ok_norepo" not => fileexists("$(repo_path)/.git");
@@ -394,6 +415,24 @@ bundle agent git_init(repo_path)
 }
 
 bundle agent git_add(repo_path, file)
+# @brief adds files to the supplied repository's index
+# @depends git
+# @param repo_path absolute path to a git repository 
+# @param file a file to stage in the index
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent add_files_to_git_index
+# {
+#   vars:
+#     "repo"  string => "/var/git/a";
+#     "files" slist  => { "a", "b", "c" };
+#
+#   methods:
+#     "git_add" usebundle => git_add("$(repo)", "$(files)");
+# }
+# ```
 {
   classes:
     "ok_repo" expression => fileexists("$(repo_path)/.git");
@@ -404,6 +443,25 @@ bundle agent git_add(repo_path, file)
 }
 
 bundle agent git_commit(repo_path, message)
+# @brief executes a commit to the specificed git repository
+# @depends git
+# @param repo_path absolute path to a git repository 
+# @param message the message to associate to the commmit
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent make_git_commit
+# {
+#   vars:
+#     "repo"  string => "/var/git/a";
+#     "now"   string => strftime("localtime", "%F %T", now());
+#     "msg"   string => "dituri gave back to the community on $(now)";
+#
+#   methods:
+#     "git_commit" usebundle => git_commit("$(repo)", "$(msg)");
+# }
+# ```
 {
   classes:
     "ok_repo" expression => fileexists("$(repo_path)/.git");
@@ -414,6 +472,27 @@ bundle agent git_commit(repo_path, message)
 }
 
 bundle agent git(repo_path, subcmd, args)
+# @brief generic interface to git
+# @param repo_path absolute path to a new or existing git repository 
+# @param subcmd any valid git sub-command
+# @param args a single string of arguments to pass
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent git_diff
+# {
+#   vars:
+#     "repo"        string => "/var/git/cfengine/masterfiles";
+#     "git_cmd"     string => "--no-pager diff";
+#     "commit[old]" string => "HEAD~1";
+#     "commit[new]" string => "HEAD~5";
+#     "args"        string => "$(commit[old]) $(commit[new])";
+#
+#   methods:
+#     "git_diff" usebundle => git("$(repo)", "$(git_cmd)", "$(args)");
+# }
+# ```
 {
   commands:
     "$(paths.path[git])"
