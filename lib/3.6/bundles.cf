@@ -410,7 +410,7 @@ bundle agent git_commit(repo_path, message)
 
   methods:
     ok_repo::
-      "git_commit" usebundle => git("$(repo_path)", "commit", "-m $(message)");
+      "git_commit" usebundle => git("$(repo_path)", "commit", '-m "$(message)"');
 }
 
 bundle agent git(repo_path, subcmd, args)
