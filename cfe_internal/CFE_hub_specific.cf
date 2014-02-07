@@ -500,7 +500,7 @@ bundle agent cfe_internal_php_runalerts
 
     any::
 
-      "runalerts_script" string => "/var/cfengine/bin/bundle_status_script.sh",
+      "runalerts_script" string => "/var/cfengine/bin/runalerts.sh",
       comment => "location of php runalerts script",
       handle => "cfe_internal_php_runalerts_vars_runalerts_script";
 
