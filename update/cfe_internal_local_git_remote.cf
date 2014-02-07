@@ -1,0 +1,48 @@
+bundle agent cfe_internal_local_git_remote
+{
+  classes:
+      "have_params_sh"
+      expression => fileexists("$(u_def.DCWORKFLOW)/dc-scripts/params.sh"),
+      comment => "This file contains information about remote
+                  repositories as configured in Mission Portal.
+                  This file not existing indicates that it is a fresh
+                  install as params.sh only created when a remote exists.";
+
+      "have_local_git_remote"
+      expression => fileexists("$(u_def.local_masterfiles_git)/HEAD");
+
+  files:
+    have_local_git_remote::
+      "$(u_def.local_masterfiles_git)/."
+      handle => "cfe_internal_local_git_remote_files_have_local_git_remote_masterfiles_git_perms",
+      perms => u_cfe_internal_mog("700", $(u_def.cf_apache_user), $(u_def.cf_apache_group)),
+      depth_search => u_cfe_internal_recurse("inf"),
+      comment => "
+Apache needs the ability to write to this repository in order to
+support sketch activation deployments from Mission Portal";
+
+  commands:
+    !have_params_sh::
+      "$(u_def.cf_git)"
+      args => "clone -b CF_WORKING_BRANCH $(u_def.DCWORKFLOW)/masterfiles_staging --bare $(u_def.local_masterfiles_git)",
+      comment => "We need to have a remote git repo configured for best OOTB experience",
+      classes => u_if_repaired("made_local_git_remote_clone");
+
+    made_local_git_remote_clone::
+      "$(u_def.cf_git)"
+      args => "branch -M CF_WORKING_BRANCH master",
+      contain => u_silent_in_dir( $(u_def.local_masterfiles_git) ),
+      comment => "
+Lets not confuse people by having our upstream repository have a
+master branch that isn't named master";
+
+      "/usr/bin/perl $(u_def.dc_scripts)/dc-workspace-settings.pl"
+      -> { "Redmine#4390" }
+      args => "http://admin:admin@127.0.0.1:80/api/dc/workspace/settings $(u_def.local_masterfiles_git) master default-user 'The Git Workflow' $(sys.workdir)/share/NovaBase/initial_id_rsa",
+      args => "call Mission portal api to configure git remote";
+
+  reports:
+    inform_mode.made_local_git_remote_clone::
+      "$(this.bundle): created the Git clone $(u_def.local_masterfiles_git)";
+
+}

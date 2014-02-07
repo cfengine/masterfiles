@@ -1,7 +1,7 @@
 bundle agent cfe_internal_update_from_repository
 {
   methods:
-    am_policy_hub.cfengine_internal_masterfiles_update::
+    am_policy_hub::
       "Update staged masterfiles from VCS"
         usebundle => cfe_internal_masterfiles_stage,
         handle => "cfe_internal_update_from_repository_methods_masterfiles_fetch",
