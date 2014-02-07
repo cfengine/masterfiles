@@ -182,8 +182,8 @@ bundle edit_line warn_lines_matching(regex)
 
 ##
 
-# temporarily adding the "dc_" prefix
-bundle edit_line dc_prepend_if_no_line(string)
+# temporarily adding the "_dc_" prefix
+bundle edit_line _dc_prepend_if_no_line(string)
 # @brief Prepend `string` if it doesn't exist in the file
 # @param string The string to be prepended
 #
@@ -454,8 +454,8 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
 }
 
-# temporarily adding the "dc_" prefix
-bundle edit_line dc_insert_ini_section(name, config)
+# temporarily adding the "_dc_" prefix
+bundle edit_line _dc_insert_ini_section(name, config)
 # @brief Inserts a INI section with content
 #
 # ```
@@ -1028,8 +1028,8 @@ bundle edit_line replace_or_add(pattern,line)
       ifvarclass => "replace_done_$(cline)";
 }
 
-# temporarily adding the "dc_" prefix
-bundle edit_line dc_converge(marker, lines)
+# temporarily adding the "_dc_" prefix
+bundle edit_line _dc_converge(marker, lines)
 # @brief Converge `lines` marked with `marker`
 #
 # Any content marked with `marker` is removed, then `lines` are
