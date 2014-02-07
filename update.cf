@@ -43,7 +43,7 @@ bundle common u_def
       handle => "common_def_vars_input_name_patterns";
 
       # the permissions for your masterfiles, which will propagate to inputs
-      "masterfiles_perms_mode" string => "644",
+      "masterfiles_perms_mode" string => "0600",
       handle => "common_def_vars_masterfiles_perms_mode";
 
       "dc_scripts" string => "/var/cfengine/httpd/htdocs/api/dc-scripts",
