@@ -270,8 +270,8 @@ body contain setuid_umask(owner, umask)
       umask => "$(umask)";
 }
 
-# temporarily adding the "dc_" prefix
-body contain dc_setuid_gid_umask(uid, gid, umask)
+# temporarily adding the "_dc_" prefix
+body contain _dc_setuid_gid_umask(uid, gid, umask)
 # @brief run command as specified user with umask
 #
 #
