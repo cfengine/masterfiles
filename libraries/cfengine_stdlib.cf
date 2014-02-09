@@ -1017,7 +1017,6 @@ body contain in_shell
 body contain in_shell_bg
 {
       useshell => "true"; # canonical "useshell" but this is backwards-compatible
-      background => "true";
 }
 
 ##
