@@ -134,7 +134,6 @@ body contain in_shell_bg
 # background attribute.
 {
       useshell => "true"; # canonical "useshell" but this is backwards-compatible
-      background => "true";
 }
 
 ##
