@@ -1,0 +1,52 @@
+bundle agent cfe_internal_local_git_remote
+{
+  classes:
+    "have_params_sh"
+      expression => fileexists("$(u_def.DCWORKFLOW)/dc-scripts/params.sh"),
+      comment => "This file contains information about remote
+                  repositories as configured in Mission Portal.
+                  This file not existing indicates that it is a fresh
+                  install as params.sh only created when a remote exists.";
+
+    "have_local_git_remote"
+      expression => fileexists("$(u_def.local_masterfiles_git)/HEAD");
+
+  files:
+    have_local_git_remote::
+      "$(u_def.local_masterfiles_git)/."
+        handle => "cfe_internal_local_git_remote_files_have_local_git_remote_masterfiles_git_perms",
+        perms => u_cfe_internal_mog("700", $(u_def.cf_apache_user), $(u_def.cf_apache_group)),
+        depth_search => u_cfe_internal_recurse("inf"),
+        comment => "Apache needs the ability to write to this
+                    repository in order to support sketch activation
+                    deployments from Mission Portal";
+
+  commands:
+    !have_params_sh::
+      # TODO: Review this logic
+      # This sets off an interesting chain of events for an OOTB setup
+      # 1) initalize local bare repository (our upstream) based off of the
+      #    CF_WORKING_BRANCH of masterfiles_staging
+      # 2) Rename the CF_WORKING_BRANCH in the bare repo to 'master' since
+      #    thats 'normal'
+      # 3) Call API to inform Mission Portal of our "upstream" repository
+      #    NOTE: Currently a and b are conflated in a move operation Redmine: #4266
+      #    a) masterfiles_staging is backed up
+      #    b) masterfiles_staging is deleted
+      #    c) masterfles_staging is re-creaded by cloning our 'upstream'
+      #       repository
+      #    d) a new CF_WORKING_BRANCH is created as a staging area
+      #
+      "$(u_def.cf_git)"
+        args => "clone -b CF_WORKING_BRANCH $(u_def.DCWORKFLOW)/masterfiles_staging --bare $(u_def.local_masterfiles_git)",
+        comment => "We need to have a remote git repo configured for best OOTB experience";
+
+      "$(u_def.cf_git)"
+        args => "branch -M CF_WORKING_BRANCH master",
+        contain => u_silent_in_dir( $(u_def.local_masterfiles_git) ),
+        comment => "Lets not confuse people by having our upstream repository have a master
+                    branch that isn't named master";
+
+      "/bin/echo" -> { "Redmine: #4390" }
+        args => "call Mission portal api to configure git remote";
+}
