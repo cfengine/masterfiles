@@ -39,7 +39,7 @@ bundle agent cfe_internal_masterfiles_deploy_from_stage
         copy_from => u_cfe_internal_local_sync_dcp($(u_def.masterfiles_staging_tmp)),
         depth_search => u_cfe_internal_recurse("inf"),
         file_select => u_cfe_internal_exclude_cf_markers,
-        perms => u_cfe_internal_mog("600", "root", "root");
+        perms => u_cfe_internal_mog($(u_def.masterfiles_perms_mode), "root", "root");
 }
 
 body contain u_cfe_internal_no_output
