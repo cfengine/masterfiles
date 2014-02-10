@@ -12,7 +12,7 @@ bundle agent cfe_internal_local_git_remote
       expression => fileexists("$(u_def.local_masterfiles_git)/HEAD");
 
   files:
-    made_local_git_remote::
+    made_local_git_remote_clone::
       "$(u_def.local_masterfiles_git)/."
       handle => "cfe_internal_local_git_remote_files_have_local_git_remote_masterfiles_git_perms",
       perms => u_cfe_internal_mog("700", $(u_def.cf_apache_user), $(u_def.cf_apache_group)),
