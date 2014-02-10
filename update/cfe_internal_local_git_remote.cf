@@ -39,7 +39,7 @@ master branch that isn't named master";
       "/usr/bin/perl $(u_def.dc_scripts)/dc-workspace-settings.pl"
       -> { "Redmine#4390" }
       args => "http://admin:admin@127.0.0.1:80/api/dc/workspace/settings $(u_def.local_masterfiles_git) master default-user 'The Git Workflow' $(sys.workdir)/share/NovaBase/initial_id_rsa",
-      args => "call Mission portal api to configure git remote";
+      comment => "call Mission portal api to configure git remote";
 
   reports:
     inform_mode.made_local_git_remote_clone::
