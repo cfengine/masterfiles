@@ -8,7 +8,7 @@ body common control
 {
       bundlesequence => {
                           "u_def",
-                          "cfe_internal_update_from_repository",
+                          "cfe_internal_dc_workflow",
                           "cfe_internal_update_policy",
                           "cfe_internal_update_processes",
                           "cfe_internal_update_bins"
@@ -18,7 +18,9 @@ body common control
 
       inputs => {
                   "update/update_bins.cf",
-                  "update/update_masterfiles_internal.cf",
+                  "update/cfe_internal_dc_workflow.cf",
+                  "update/cfe_internal_local_git_remote.cf",
+                  "update/cfe_internal_update_from_repository.cf",
                   "update/update_policy.cf",
                   "update/update_processes.cf"
       };
@@ -49,7 +51,20 @@ bundle common u_def
       "dc_scripts" string => "/var/cfengine/httpd/htdocs/api/dc-scripts",
       comment => "Directory where design center scripts are located on Enterprise Hub";
 
-      "masterfiles_staging_tmp" string => "/opt/cfengine/masterfiles_staging_tmp",
+      "DCWORKFLOW" string => "/opt/cfengine",
+      comment => "Directory where DC Workflow related things are stored";
+
+      "masterfiles_staging" string => "$(DCWORKFLOW)/masterfiles_staging",
+      comment => "Directory where Mission Portal Design Center
+                  activations are staged for commit to upstream repository";
+
+      "local_masterfiles_git" string => "$(DCWORKFLOW)/masterfiles.git",
+      comment => "Local bare git repository, serves as OOTB upstream repo";
+
+      "cf_git" string => "$(sys.workdir)/bin/git",
+      comment => "Path to git binary installed with CFEngine Enterprise";
+
+      "masterfiles_staging_tmp" string => "$(DCWORKFLOW)/masterfiles_staging_tmp",
       handle => "common_u_def_vars_masterfiles_staging_tmp",
       comment => "Directory where most recent VCS changes are staged before final deployment to masterfiles";
 
