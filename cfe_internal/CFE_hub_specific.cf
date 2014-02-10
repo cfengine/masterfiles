@@ -618,11 +618,11 @@ bundle edit_line my_php_runalerts_script(v1,v2,sdir,stime)
 while true; do
   touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sql[name])
  if [ -f /var/cfengine/httpd/php/runalerts_$(cfe_internal_php_runalerts.sql[name]) ]; then
-  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php alerts_cli runalerts $(cfe_internal_php_runalerts.sql[limit]) $(cfe_internal_php_runalerts.sql[running]) $(cfe_internal_php_runalerts.sql[name]) >/dev/null 2>&1
+  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sql[limit]) $(cfe_internal_php_runalerts.sql[running]) $(cfe_internal_php_runalerts.sql[name]) >/dev/null 2>&1
  fi
   touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sketch[name])
  if [ -f /var/cfengine/httpd/php/runalerts_$(cfe_internal_php_runalerts.sketch[name]) ]; then
-  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php alerts_cli runalerts $(cfe_internal_php_runalerts.sketch[limit]) $(cfe_internal_php_runalerts.sketch[running]) $(cfe_internal_php_runalerts.sketch[name]) >/dev/null 2>&1
+  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sketch[limit]) $(cfe_internal_php_runalerts.sketch[running]) $(cfe_internal_php_runalerts.sketch[name]) >/dev/null 2>&1
  fi
  sleep $(stime)
 done"
