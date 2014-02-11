@@ -1,16 +1,5 @@
 bundle agent cfe_internal_local_git_remote
 {
-  classes:
-      "have_params_sh"
-      expression => fileexists("$(u_def.DCWORKFLOW)/dc-scripts/params.sh"),
-      comment => "This file contains information about remote
-                  repositories as configured in Mission Portal.
-                  This file not existing indicates that it is a fresh
-                  install as params.sh only created when a remote exists.";
-
-      "have_local_git_remote"
-      expression => fileexists("$(u_def.local_masterfiles_git)/HEAD");
-
   files:
       "$(u_def.local_masterfiles_git)/."
       handle => "cfe_internal_local_git_remote_files_have_local_git_remote_masterfiles_git_perms",
@@ -24,32 +13,9 @@ support sketch activation deployments from Mission Portal",
       classes => u_if_else("did_perms_local_git_remote_clone",
                            "failed_perms_local_git_remote_clone");
 
-  commands:
-    !have_params_sh.!have_local_git_remote::
-      "$(u_def.cf_git)"
-      args => "clone -b CF_WORKING_BRANCH $(u_def.DCWORKFLOW)/masterfiles_staging --bare $(u_def.local_masterfiles_git)",
-      comment => "We need to have a remote git repo configured for best OOTB experience",
-      classes => u_if_repaired("made_local_git_remote_clone");
-
-    made_local_git_remote_clone::
-      "$(u_def.cf_git)"
-      args => "branch -M CF_WORKING_BRANCH master",
-      contain => u_silent_in_dir( $(u_def.local_masterfiles_git) ),
-      comment => "
-Lets not confuse people by having our upstream repository have a
-master branch that isn't named master";
-
-    !have_params_sh.did_perms_local_git_remote_clone::
-      # avoid race condition
-      "/bin/chown -R $(u_def.cf_apache_user):$(u_def.cf_apache_group) $(u_def.local_masterfiles_git); /usr/bin/perl $(u_def.dc_scripts)/dc-workspace-settings.pl"
-      -> { "Redmine#4390" }
-      contain => u_in_shell,
-      args => "$(u_def.api_url)/api/dc/workspace/settings $(u_def.local_masterfiles_git) master default-user 'The Git Workflow' $(sys.workdir)/share/NovaBase/initial_id_rsa",
-      comment => "call Mission portal api to configure git remote";
-
   reports:
-    inform_mode.made_local_git_remote_clone::
-      "$(this.bundle): created the Git clone $(u_def.local_masterfiles_git)";
     inform_mode.did_perms_local_git_remote_clone::
       "$(this.bundle): set the permissions of the Git clone $(u_def.local_masterfiles_git)";
+    inform_mode.failed_perms_local_git_remote_clone::
+      "$(this.bundle): failed to set the permissions of the Git clone $(u_def.local_masterfiles_git)";
 }
