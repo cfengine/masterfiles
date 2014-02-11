@@ -249,6 +249,14 @@ body perms u_m(p)
 
 #########################################################
 
+body perms u_mo(p,o)
+{
+      mode   => "$(p)";
+      owners => {"$(o)"};
+}
+
+#########################################################
+
 body perms u_shared_lib_perms
 {
     !hpux::
@@ -371,6 +379,15 @@ body contain u_in_shell_and_silent
 {
       useshell => "true";
       no_output => "true";
+}
+
+########################################################""
+
+body contain u_postgres{
+  useshell   => "useshell";
+  exec_owner => "postgres";
+  chdir      => "/tmp";
+  no_output  => "true";
 }
 
 #########################################################
