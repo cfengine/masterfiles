@@ -12,7 +12,6 @@ bundle agent cfe_internal_local_git_remote
       expression => fileexists("$(u_def.local_masterfiles_git)/HEAD");
 
   files:
-    made_local_git_remote_clone::
       "$(u_def.local_masterfiles_git)/."
       handle => "cfe_internal_local_git_remote_files_have_local_git_remote_masterfiles_git_perms",
       perms => u_cfe_internal_mog($(u_def.masterfiles_perms_mode),
@@ -22,10 +21,10 @@ bundle agent cfe_internal_local_git_remote
       comment => "
 Apache needs the ability to write to this repository in order to
 support sketch activation deployments from Mission Portal",
-      classes => u_if_repaired("did_perms_local_git_remote_clone");
+      classes => u_if_else("did_perms_local_git_remote_clone", "failed_perms_local_git_remote_clone");
 
   commands:
-    !have_params_sh::
+    !have_params_sh.!have_local_git_remote::
       "$(u_def.cf_git)"
       args => "clone -b CF_WORKING_BRANCH $(u_def.DCWORKFLOW)/masterfiles_staging --bare $(u_def.local_masterfiles_git)",
       comment => "We need to have a remote git repo configured for best OOTB experience",
@@ -39,7 +38,7 @@ support sketch activation deployments from Mission Portal",
 Lets not confuse people by having our upstream repository have a
 master branch that isn't named master";
 
-    did_perms_local_git_remote_clone::
+    !have_params_sh.did_perms_local_git_remote_clone::
       "/usr/bin/perl $(u_def.dc_scripts)/dc-workspace-settings.pl"
       -> { "Redmine#4390" }
       args => "$(u_def.api_url)/api/dc/workspace/settings $(u_def.local_masterfiles_git) master default-user 'The Git Workflow' $(sys.workdir)/share/NovaBase/initial_id_rsa",
@@ -50,5 +49,4 @@ master branch that isn't named master";
       "$(this.bundle): created the Git clone $(u_def.local_masterfiles_git)";
     inform_mode.did_perms_local_git_remote_clone::
       "$(this.bundle): set the permissions of the Git clone $(u_def.local_masterfiles_git)";
-
 }
