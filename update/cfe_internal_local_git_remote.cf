@@ -13,37 +13,37 @@ bundle agent cfe_internal_local_git_remote
 
   files:
       "$(u_def.local_masterfiles_git)/."
-      handle => "cfe_internal_local_git_remote_files_have_local_git_remote_masterfiles_git_perms",
-      perms => u_cfe_internal_mog($(u_def.masterfiles_perms_mode),
-                                  $(u_def.cf_apache_user),
-                                  $(u_def.cf_apache_group)),
+      handle       => "cfe_internal_local_git_remote_files_have_local_git_remote_masterfiles_git_perms",
+      perms        => u_cfe_internal_mog($(u_def.masterfiles_perms_mode),
+                                         $(u_def.cf_apache_user),
+                                         $(u_def.cf_apache_group)),
       depth_search => u_cfe_internal_recurse("inf"),
-      comment => "
-Apache needs the ability to write to this repository in order to
-support sketch activation deployments from Mission Portal",
-      classes => u_if_else("did_perms_local_git_remote_clone",
-                           "failed_perms_local_git_remote_clone");
+      comment      => "Apache needs the ability to write to this repository in order to
+                       support sketch activation deployments from Mission Portal",
+      classes      => u_if_else("did_perms_local_git_remote_clone",
+                                "failed_perms_local_git_remote_clone");
 
   commands:
     !have_params_sh.!have_local_git_remote::
       "$(u_def.cf_git)"
-      args => "clone -b CF_WORKING_BRANCH $(u_def.DCWORKFLOW)/masterfiles_staging --bare $(u_def.local_masterfiles_git)",
+      handle  => "cfe_internal_local_git_remote_commands_need_local_masterfiles_git",
+      args    => "clone -b CF_WORKING_BRANCH $(u_def.DCWORKFLOW)/masterfiles_staging --bare $(u_def.local_masterfiles_git)",
       comment => "We need to have a remote git repo configured for best OOTB experience",
       classes => u_if_repaired("made_local_git_remote_clone");
 
     made_local_git_remote_clone::
       "$(u_def.cf_git)"
-      args => "branch -M CF_WORKING_BRANCH master",
+      handle  => "cfe_internal_local_git_remote_commands_repaired_local_masterfiles_git_presence",
+      args    => "branch -M CF_WORKING_BRANCH master",
       contain => u_silent_in_dir( $(u_def.local_masterfiles_git) ),
-      comment => "
-Lets not confuse people by having our upstream repository have a
-master branch that isn't named master";
+      comment => "Lets not confuse people by having our upstream repository have a
+                  master branch that isn't named master";
 
     !have_params_sh.did_perms_local_git_remote_clone::
-      "/usr/bin/perl $(u_def.dc_scripts)/dc-workspace-settings.pl"
-      -> { "Redmine#4390" }
-      args => "$(u_def.api_url)/api/dc/workspace/settings $(u_def.local_masterfiles_git) master default-user 'The Git Workflow' $(sys.workdir)/share/NovaBase/initial_id_rsa",
-      comment => "call Mission portal api to configure git remote";
+      "/usr/bin/perl" -> { "Redmine#4390" }
+      handle  => "cfe_internal_local_git_remote_commands_checked_masterfiles_git_perms_mp_remote_vcs",
+      args    => "$(u_def.dc_scripts)/dc-workspace-settings.pl $(u_def.api_url)/api/dc/workspace/settings $(u_def.local_masterfiles_git) master default-user 'The Git Workflow' $(sys.workdir)/share/NovaBase/initial_id_rsa",
+      comment => "Mission portal needs to be configured with a remote repository for OOTB experience.";
 
   reports:
     inform_mode.made_local_git_remote_clone::
