@@ -21,7 +21,8 @@ bundle agent cfe_internal_local_git_remote
       comment => "
 Apache needs the ability to write to this repository in order to
 support sketch activation deployments from Mission Portal",
-      classes => u_if_else("did_perms_local_git_remote_clone", "failed_perms_local_git_remote_clone");
+      classes => u_if_else("did_perms_local_git_remote_clone",
+                           "failed_perms_local_git_remote_clone");
 
   commands:
     !have_params_sh.!have_local_git_remote::
