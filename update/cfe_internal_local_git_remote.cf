@@ -40,8 +40,10 @@ Lets not confuse people by having our upstream repository have a
 master branch that isn't named master";
 
     !have_params_sh.did_perms_local_git_remote_clone::
-      "/usr/bin/perl $(u_def.dc_scripts)/dc-workspace-settings.pl"
+      # avoid race condition
+      "/bin/chown -R $(u_def.cf_apache_user):$(u_def.cf_apache_group) $(u_def.local_masterfiles_git); /usr/bin/perl $(u_def.dc_scripts)/dc-workspace-settings.pl"
       -> { "Redmine#4390" }
+      contain => u_in_shell,
       args => "$(u_def.api_url)/api/dc/workspace/settings $(u_def.local_masterfiles_git) master default-user 'The Git Workflow' $(sys.workdir)/share/NovaBase/initial_id_rsa",
       comment => "call Mission portal api to configure git remote";
 
