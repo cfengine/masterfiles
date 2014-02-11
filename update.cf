@@ -54,7 +54,7 @@ bundle common u_def
       "DCWORKFLOW" string => "/opt/cfengine",
       comment => "Directory where DC Workflow related things are stored";
 
-      "api_url" string => readfile("$(DCWORKFLOW)/admin/default_url", 1024);
+      "api_url" string => readfile("$(DCWORKFLOW)/userworkdir/admin/default_url", 1024);
 
       "masterfiles_staging" string => "$(DCWORKFLOW)/masterfiles_staging",
       comment => "Directory where Mission Portal Design Center
