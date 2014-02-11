@@ -120,8 +120,26 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_mongod",
       ifvarclass => "nova|enterprise";
 
-    am_policy_hub.files_ok.!windows::
+   am_policy_hub.!(cfengine_3_4||cfengine_3_5)::
+      "$(sys.bindir)/redis-server"
+      restart_class => "start_redis_server",
+      comment => "Monitor redis-server process",
+      handle => "cfe_internal_maintain_cfe_hub_process_processes_redis",
+      ifvarclass => "nova|enterprise";
 
+      "$(sys.bindir)/postgres"
+      restart_class => "start_postgres_server",
+      comment => "Monitor postgres process",
+      handle => "cfe_internal_maintain_cfe_hub_process_processes_postgres",
+      ifvarclass => "nova|enterprise";
+
+      "$(sys.bindir)/cf-consumer"
+      restart_class => "start_cf_consumer",
+      comment => "Monitor cf-consumer process",
+      handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_consumer",
+      ifvarclass => "nova|enterprise";
+
+    am_policy_hub.files_ok.!windows::
       "cf-hub"      restart_class => "start_hub",
       comment => "Monitor cf-hub process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
@@ -130,6 +148,12 @@ bundle agent maintain_cfe_hub_process
       #
 
   files:
+
+      "/var/log/postgresql.log"
+      comment => "Ensure postgres.log file is there with right permissions",
+      handle => "cfe_internal_maintain_cfe_hub_process_files_create_postgresql_log",
+      create => "true",
+      perms => u_mo("0644","postgres");
 
     !windows.am_policy_hub.start_mongod::
 
@@ -149,6 +173,24 @@ bundle agent maintain_cfe_hub_process
       action => u_mongod_bg,
       comment => "Start mongod process",
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_mongod";
+
+    !windows.am_policy_hub.start_redis_server::
+
+     "$(sys.bindir)/redis-server $(sys.workdir)/redis.conf"
+      contain => u_in_shell,
+      comment => "Start redis process",
+      handle => "cfe_internal_maintain_cfe_hub_process_commands_start_redis";
+
+    !windows.am_policy_hub.start_postgres_server::
+     "$(sys.bindir)/pg_ctl -D $(sys.workdir)/state/pg/data -l /var/log/postgresql.log start"
+      contain => u_in_shell,
+      comment => "Start postgres process",
+      handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
+
+    !windows.am_policy_hub.start_cf_consumer::
+     "$(sys.bindir)/cf-consumer"
+      comment => "Start cf-consumer process",
+      handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf-consumer";
 
     !windows.am_policy_hub.start_hub::
 
