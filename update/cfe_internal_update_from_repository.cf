@@ -7,6 +7,16 @@ bundle agent cfe_internal_update_from_repository
         handle => "cfe_internal_update_from_repository_methods_masterfiles_fetch",
         comment => "Grab the latest updates from upstream VCS repo before deploying masterfiles";
 
+      "Copy the cf_promises_validated"
+        usebundle => cfe_internal_masterfiles_preserve_validated,
+        handle => "cfe_internal_update_from_repository_methods_masterfiles_preserve_validated",
+        comment => "Preserve the cf_promises_validated.  It's OK if it's old.";
+
+      "Generate the cf_promises_release_id"
+        usebundle => cfe_internal_masterfiles_generate_release_id,
+        handle => "cfe_internal_update_from_repository_methods_masterfiles_generate_release_id",
+        comment => "Generate the cf_promises_release_id";
+
       "Deploy staged masterfiles"
         usebundle => cfe_internal_masterfiles_deploy_from_stage,
         handle => "cfe_internal_update_from_repository_methods_masterfiles_deploy_from_stage",
@@ -27,6 +37,46 @@ bundle agent cfe_internal_masterfiles_stage
       contain => u_cfe_internal_no_output;
 }
 
+bundle agent cfe_internal_masterfiles_generate_release_id
+{
+  vars:
+      "release_id" string => execresult("cd $(u_def.masterfiles_staging_tmp); $(sys.bindir)/git show-ref -s refs/heads/CF_WORKING_BRANCH", "useshell");
+
+    have_release_sha::
+      "release_id_json" string => '{
+  "releaseId": "$(release_id)"
+}';
+
+  classes:
+      "have_release_sha" expression => regcmp("[0-9a-fA-F]+", $(release_id));
+
+  files:
+    have_release_sha::
+      "$(u_def.masterfiles_staging_tmp)/cf_promises_release_id"
+      create => "true",
+      edit_line => u_insert_lines($(release_id_json)),
+      edit_defaults => u_empty;
+}
+
+bundle edit_line u_insert_lines(lines)
+{
+  insert_lines:
+      "$(lines)";
+}
+
+body edit_defaults u_empty
+{
+      empty_file_before_editing => "true";
+      edit_backup => "false";
+}
+
+bundle agent cfe_internal_masterfiles_preserve_validated
+{
+  files:
+      "$(u_def.masterfiles_staging_tmp)/cf_promises_validated"
+      copy_from => u_cfe_internal_local_sync_dcp("$(sys.workdir)/masterfiles/cf_promises_validated");
+}
+
 bundle agent cfe_internal_masterfiles_deploy_from_stage
 {
   files:
@@ -38,7 +88,6 @@ bundle agent cfe_internal_masterfiles_deploy_from_stage
       "$(sys.workdir)/masterfiles/."
         copy_from => u_cfe_internal_local_sync_dcp($(u_def.masterfiles_staging_tmp)),
         depth_search => u_cfe_internal_recurse("inf"),
-        file_select => u_cfe_internal_exclude_cf_markers,
         perms => u_cfe_internal_mog($(u_def.masterfiles_perms_mode), "root", "root");
 }
 
@@ -54,12 +103,6 @@ body contain u_cfe_internal_no_output_as_cfe_apache
       exec_group => "$(u_def.cf_apache_group)";
       no_output => "true";
       chdir => "$(sys.masterdir)";
-}
-
-body file_select u_cfe_internal_exclude_cf_markers
-{
-  leaf_name => { "cf_promises_validated", "cf_promises_release_id" };
-  file_result => "!leaf_name";
 }
 
 body copy_from u_cfe_internal_local_sync_dcp(from)
