@@ -56,7 +56,7 @@ bundle agent cfe_internal_setup_knowledge
 
       "$(cfe_internal_hub_vars.docroot)/."
       comment => "Ensure that there is always a doc root directory",
-      handle => "cfe_internal_setup_knowledge_files_create_doc_root,
+      handle => "cfe_internal_setup_knowledge_files_create_doc_root",
       create => "true";
 
       "$(cfe_internal_hub_vars.docroot)"
