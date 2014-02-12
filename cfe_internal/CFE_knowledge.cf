@@ -54,11 +54,22 @@ bundle agent cfe_internal_setup_knowledge
 
     !windows.am_policy_hub.mongod_started::
 
+      "$(cfe_internal_hub_vars.docroot)/."
+      comment => "Ensure that there is always a doc root directory",
+      handle => "cfe_internal_setup_knowledge_files_create_doc_root,
+      create => "true";
+
       "$(cfe_internal_hub_vars.docroot)"
       comment => "Copy the basic knowledge base configuration from the installation to doc root",
       handle => "cfe_internal_setup_knowledge_files_doc_root_1",
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI"),
       depth_search => recurse("inf");
+
+      "$(cfe_internal_hub_vars.docroot)"
+      comment => "All files in there should be at least 0644",
+      handle => "cfe_internal_setup_knowledge_files_doc_root_2",
+      perms => m("0644"),
+      depth_search => recurse_exclude("inf");   # see exclude dirs in recurse_exclude() body
 
       "$(cfe_internal_hub_vars.docroot)/.htaccess"
       comment => "Correct up htaccess file in doc root",
@@ -221,10 +232,10 @@ body depth_search recurse_basedir(d)
 
 ############################################################################
 
-body depth_search recurse_exclude(d,folder1,folder2)
+body depth_search recurse_exclude(d)
 {
       depth => "$(d)";
-      exclude_dirs => { ".*$(folder1)$", "$(folder2)", "hub" , "graphs", "scripts", "tmp", "logs", "api", "sql_lite" };
+      exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "sql_lite", "rest", "application" };
 }
 
 ############################################################################
