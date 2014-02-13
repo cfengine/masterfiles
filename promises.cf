@@ -14,7 +14,7 @@ body common control
                           @(inventory.bundles),
                           def,
                           cfe_internal_hub_vars,
-                          
+
                          # Design Center
                           cfsketch_run,
 
@@ -42,11 +42,14 @@ body common control
                   "cfe_internal/CFE_knowledge.cf",
                   "cfe_internal/example_use_goals.cf",
 
-                # Control body for all CFEngine robot agents
+                 # Control body for all CFEngine robot agents
                   @(cfengine_controls.inputs),
 
                  # COPBL/Custom libraries.  Eventually this should use wildcards.
                   @(cfengine_stdlib.inputs),
+
+                 # Reports
+                  @(cfengine_reports.inputs),
 
                  # Add update files to build Knowledge Map relationship
                   "update/update_bins.cf",
@@ -151,7 +154,7 @@ bundle common cfengine_controls
       # This is control body for CFEngine 3.4 and earlier
       # server control seems to be a bit problem here
       # (only 3.4 is explicitly supported)
-      "inputs" slist => { 
+      "inputs" slist => {
                           "controls/cf_agent.cf",
                           "controls/cf_execd.cf",
                           "controls/cf_hub.cf",
@@ -173,9 +176,24 @@ bundle common cfengine_controls
 
   reports:
     verbose_mode::
-      "$(this.bundle): defining inputs='$(inputs)'";  
+      "$(this.bundle): defining inputs='$(inputs)'";
 }
 
+bundle common cfengine_reports
+{
+  vars:
+    (cfengine_3_4||cfengine_3_5)::
+      "inputs" slist => { cf_null };
+
+    !(cfengine_3_4||cfengine_3_5)::
+      "inputs" slist => {
+                          "reports/host_info_report.cf",
+      };
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): defining inputs='$(inputs)'";
+}
 ###############################################################################
 #
 # bundle agent service_catalogue
