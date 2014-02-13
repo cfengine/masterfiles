@@ -176,13 +176,13 @@ bundle agent maintain_cfe_hub_process
 
     !windows.am_policy_hub.start_redis_server::
 
-     "$(sys.bindir)/redis-server $(sys.workdir)/redis.conf"
+     "$(sys.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)"
       contain => u_in_shell,
       comment => "Start redis process",
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_redis";
 
     !windows.am_policy_hub.start_postgres_server::
-     "$(sys.bindir)/pg_ctl -D $(sys.workdir)/state/pg/data -l /var/log/postgresql.log start"
+     "$(sys.bindir)/pg_ctl -D $(cfe_internal_update_policy.postgresdb_dir) -l $(cfe_internal_update_policy.postgresdb_log) start"
       contain => u_postgres,
       comment => "Start postgres process",
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
