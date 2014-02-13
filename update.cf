@@ -39,7 +39,7 @@ body agent control
 bundle common u_def
 {
   vars:
-      "input_name_patterns" slist => { ".*.cf",".*.dat",".*.txt", ".*.conf",
+      "input_name_patterns" slist => { ".*.cf",".*.dat",".*.txt", ".*.conf", ".*.mustache",
                                        "cf_promises_release_id" },
       comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
       handle => "common_def_vars_input_name_patterns";

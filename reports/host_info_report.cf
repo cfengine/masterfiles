@@ -1,0 +1,34 @@
+bundle agent host_info_report
+# @brief Generates a short high level summary of the executing host information
+#
+# **Example:**
+# `cf-agent -b host_info_report`
+{
+  vars:
+    "host_info_report_template"
+      string => "/$(this.promise_dirname)/../templates/$(this.bundle).mustache",
+      comment => "Where the report template is found";
+
+    "host_info_report_txt"
+      string => "/$(sys.workdir)/reports/$(this.bundle).txt",
+      comment => "Where the host info report should be generated";
+
+    "installed_packages"
+      data => packagesmatching(".*", ".*", ".*", ".*");
+
+
+  files:
+    "$(host_info_report_txt)"
+      create => "true",
+      edit_template => "$(host_info_report_template)",
+      handle => "host_info_report_files_host_info_report_txt",
+      classes => scoped_classes_generic("bundle", "host_info_report_txt"),
+      template_method => "mustache";
+
+  reports:
+    host_info_report_txt_repaired::
+      "Host info report generated and avilable at $(host_info_report_txt)";
+
+    host_info_report_txt_not_ok::
+      "There was a problem generating your host info report at $(host_info_report_txt)";
+}
