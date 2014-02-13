@@ -82,9 +82,21 @@ bundle agent cfe_internal_update_policy
       comment => "Directory where MongoDB files will be stored on hub - if changed: requires DB shutdown and move of files",
       handle => "cfe_internal_update_policy_mongodb_dir";
 
-      "mongodb_conf_file"  string => translatepath("$(inputs_dir)/update/mongod.conf"),
+      "postgresdb_dir"        string => "$(sys.workdir)/state/pg/data",
+      comment => "Directory where Postgres database files will be stored on hub -",
+      handle => "cfe_internal_update_policy_postgresdb_dir";
+
+      "postgresdb_log"        string => "/var/log/postgresql.log",
+      comment => "File where Postgres database files will be logging -",
+      handle => "cfe_internal_update_policy_postgresdb_log_file";
+
+      "mongodb_conf_file"  string => translatepath("$(sys.workdir)/config/mongod.conf"),
       comment => "Path to MongoDB configuration file",
       handle => "cfe_internal_update_policy_mongodb_conf_file";
+
+      "redis_conf_file"  string => translatepath("$(sys.workdir)/config/redis.conf"),
+      comment => "Path to Redis configuration file",
+      handle => "cfe_internal_update_policy_redis_conf_file";
 
       "agents" slist => {
 			  "cf-agent",
