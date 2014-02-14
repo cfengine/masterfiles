@@ -1,22 +1,17 @@
 bundle agent cfe_internal_update_from_repository
 {
   methods:
-    am_policy_hub::
+    am_policy_hub.cfengine_internal_masterfiles_update::
       "Update staged masterfiles from VCS"
         usebundle => cfe_internal_masterfiles_stage,
         handle => "cfe_internal_update_from_repository_methods_masterfiles_fetch",
         comment => "Grab the latest updates from upstream VCS repo before deploying masterfiles";
 
-      "Copy the cf_promises_validated"
-        usebundle => cfe_internal_masterfiles_preserve_validated,
-        handle => "cfe_internal_update_from_repository_methods_masterfiles_preserve_validated",
-        comment => "Preserve the cf_promises_validated.  It's OK if it's old.";
+      "Tag the staged masterfiles for release"
+        usebundle => cfe_internal_masterfiles_tag_stage_release,
+        handle => "cfe_internal_update_from_repository_methods_masterfiles_tag_stage_release";
 
-      "Generate the cf_promises_release_id"
-        usebundle => cfe_internal_masterfiles_generate_release_id,
-        handle => "cfe_internal_update_from_repository_methods_masterfiles_generate_release_id",
-        comment => "Generate the cf_promises_release_id";
-
+    _cfe_have_tagged_staged_masterfiles::
       "Deploy staged masterfiles"
         usebundle => cfe_internal_masterfiles_deploy_from_stage,
         handle => "cfe_internal_update_from_repository_methods_masterfiles_deploy_from_stage",
@@ -26,8 +21,6 @@ bundle agent cfe_internal_update_from_repository
 bundle agent cfe_internal_masterfiles_stage
 {
   commands:
-    am_policy_hub.cfengine_internal_masterfiles_update::
-
       "$(u_def.dc_scripts)/pre-fetch.sh"
       handle => "masterfiles_update_pre_fetch",
       contain => u_cfe_internal_no_output_as_cfe_apache;
@@ -37,54 +30,18 @@ bundle agent cfe_internal_masterfiles_stage
       contain => u_cfe_internal_no_output;
 }
 
-bundle agent cfe_internal_masterfiles_generate_release_id
+bundle agent cfe_internal_masterfiles_tag_stage_release
 {
-  vars:
-      "release_id" string => execresult("cd $(u_def.masterfiles_staging_tmp); $(sys.bindir)/git show-ref -s refs/heads/CF_WORKING_BRANCH", "useshell");
-
-    have_release_sha::
-      "release_id_json" string => '{
-  "releaseId": "$(release_id)"
-}';
-
   classes:
-      "have_release_sha" expression => regcmp("[0-9a-fA-F]+", $(release_id));
-
-  files:
-    have_release_sha::
-      "$(u_def.masterfiles_staging_tmp)/cf_promises_release_id"
-      create => "true",
-      edit_line => u_insert_lines($(release_id_json)),
-      edit_defaults => u_empty;
-}
-
-bundle edit_line u_insert_lines(lines)
-{
-  insert_lines:
-      "$(lines)";
-}
-
-body edit_defaults u_empty
-{
-      empty_file_before_editing => "true";
-      edit_backup => "false";
-}
-
-bundle agent cfe_internal_masterfiles_preserve_validated
-{
-  files:
-      "$(u_def.masterfiles_staging_tmp)/cf_promises_validated"
-      copy_from => u_cfe_internal_local_sync_dcp("$(sys.workdir)/masterfiles/cf_promises_validated");
+      "_cfe_have_tagged_staged_masterfiles"
+      expression => returnszero("$(sys.cf_promises) -T $(u_def.masterfiles_staging_tmp)", "noshell"),
+      scope => "namespace";
 }
 
 bundle agent cfe_internal_masterfiles_deploy_from_stage
 {
   files:
-    am_policy_hub.cfengine_internal_masterfiles_update::
-      # Check this for bad side effects. Concerned about wiping out
-      # masterfiles/cf_promises_validated every 5 minutes causing it to be
-      # regenerated and all clients to update at each agent execution
-      # also maybe we should check the stage area for sanity before deploying masterfiles, what if the staging directory is empty?
+      # we should check the stage area for sanity before deploying masterfiles, what if the staging directory is empty?
       "$(sys.workdir)/masterfiles/."
         copy_from => u_cfe_internal_local_sync_dcp($(u_def.masterfiles_staging_tmp)),
         depth_search => u_cfe_internal_recurse("inf"),
