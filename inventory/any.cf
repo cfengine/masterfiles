@@ -17,6 +17,19 @@ bundle common inventory_listening_ports
       meta => { "inventory", "attribute_name=Ports listening" };
 }
 
+bundle common inventory_memory
+# @brief Inventory the memory totals (Enterprise only)
+#
+# This bundle uses `mon.val_mem_total` and is always enabled by
+# default, as it runs instantly and has no side effects.  It's only
+# useful in CFEngine Enterprise.
+{
+  vars:
+    enterprise::
+      "total" string => "$(mon.val_mem_total)"
+      meta => { "inventory", "attribute_name=Memory size" };
+}
+
 bundle common inventory_proc
 # @brief Do procfs inventory
 #
