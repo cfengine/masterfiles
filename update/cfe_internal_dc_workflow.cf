@@ -4,11 +4,13 @@ bundle agent cfe_internal_dc_workflow
     am_policy_hub.enterprise::
       "Local Git Repository"
         usebundle => cfe_internal_local_git_remote,
+        handle => "cfe_internal_dc_workflow_methods_local_git_repo",
         comment => "Local git repository for OOTB Enterprise functionality";
 
     am_policy_hub.enterprise.cfengine_internal_masterfiles_update::
       "Masterfiles from VCS"
         usebundle => cfe_internal_update_from_repository,
+        handle => "cfe_internal_dc_workflow_methods_masterfiles_from_vcs",
         comment => "Update masterfiles from upstream VCS automatically
                     for best OOTB Enterprise experience";
 }
