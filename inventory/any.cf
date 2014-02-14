@@ -6,6 +6,17 @@ bundle common inventory_any
 {
 }
 
+bundle common inventory_listening_ports
+# @brief Inventory the listening ports
+#
+# This bundle uses `mon.listening_ports` and is always enabled by
+# default, as it runs instantly and has no side effects.
+{
+  vars:
+      "ports" slist => { @(mon.listening_ports) },
+      meta => { "inventory", "attribute_name=Ports listening" };
+}
+
 bundle common inventory_proc
 # @brief Do procfs inventory
 #
