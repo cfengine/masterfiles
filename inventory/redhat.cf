@@ -8,7 +8,7 @@ bundle common inventory_redhat
       comment => "pure Red Hat",
       meta => { "inventory", "attribute_name=none" };
 
-      "redhat_derived" expression => "redhat.!pure_redhat",
+      "redhat_derived" expression => "redhat.!redhat_pure",
       comment => "derived from Red Hat",
       meta => { "inventory", "attribute_name=none" };
 }
