@@ -6,55 +6,70 @@ bundle common inventory_lsb
   classes:
       "_inventory_lsb" not => "disable_inventory_lsb";
 
-    _inventory_lsb::
-      "lsb_$(lsb[Distributor ID])" expression => "any",
+      "_inventory_lsb_found" expression => regcmp("^[1-9][0-9]*$", $(dim));
+
+    _inventory_lsb_found::
+      "lsb_$(os)" expression => "any",
       comment => "LSB Distributor ID",
+      depends_on => { "inventory_lsb_os" },
       meta => { "inventory", "attribute_name=none" };
 
-      "lsb_$(lsb[Distributor ID])_$(lsb[Release])" expression => "any",
+      "lsb_$(os)_$(release)" expression => "any",
       comment => "LSB Distributor ID and Release",
+      depends_on => { "inventory_lsb_os", "inventory_lsb_release" },
+      meta => { "inventory", "attribute_name=none" };
+
+      "lsb_$(os)_$(codename)" expression => "any",
+      comment => "LSB Distributor ID and Codename",
+      depends_on => { "inventory_lsb_os", "inventory_lsb_codename" },
       meta => { "inventory", "attribute_name=none" };
 
   vars:
       "lsb_exec" string => "$(inventory_control.lsb_exec)";
 
     _inventory_lsb::
-      "lsb[Distributor ID]" string => execresult("$(lsb_exec) -i -s", "noshell"),
-      comment => "LSB Distributor ID",
-      meta => { "inventory", "attribute_name=none" };
+      "data" string => execresult("$(lsb_exec) -a", "noshell");
+      "dim" int => parsestringarray(
+                                     "lsb",
+                                     $(data),
+                                     "\s*#[^\n]*",
+                                     "\s*:\s+",
+                                     "15",
+                                     "4095"
+      );
 
-      "lsb[Release]" string => execresult("$(lsb_exec) -r -s", "noshell"),
-      comment => "LSB Release",
-      meta => { "inventory", "attribute_name=none" };
-
-      "lsb[Description]" string => execresult("$(lsb_exec) -d -s", "noshell"),
-      comment => "LSB Description",
-      meta => { "inventory", "attribute_name=none" };
-
-      "lsb[Codename]" string => execresult("$(lsb_exec) -c -s", "noshell"),
-      comment => "LSB Codename",
-      meta => { "inventory", "attribute_name=none" };
-
+    _inventory_lsb_found::
       "lsb_keys" slist => getindices("lsb");
 
-      "os" string => canonify("$(lsb[Distributor ID])"),
+      "os" string => canonify("$(lsb[Distributor ID][1])"),
+      handle => "inventory_lsb_os",
       comment => "LSB-provided OS name",
       meta => { "inventory", "attribute_name=none" };
 
-      "release" string => "$(lsb[Release])",
+      "codename" string => canonify("$(lsb[Codename][1])"),
+      handle => "inventory_lsb_codename",
+      comment => "LSB-provided OS code name",
+      meta => { "inventory", "attribute_name=none" };
+
+      "release" string => "$(lsb[Release][1])",
+      handle => "inventory_lsb_release",
       comment => "LSB-provided OS release",
       meta => { "inventory", "attribute_name=none" };
 
-      "flavor" string => canonify("$(lsb[Distributor ID])_$(lsb[Release])"),
+      "flavor" string => canonify("$(lsb[Distributor ID][1])_$(lsb[Release][1])"),
+      handle => "inventory_lsb_flavor",
       comment => "LSB-provided OS flavor",
       meta => { "inventory", "attribute_name=none" };
 
-      "description" string => "$(lsb[Description])",
+      "description" string => "$(lsb[Description][1])",
+      handle => "inventory_lsb_description",
       comment => "LSB-provided OS description",
       meta => { "inventory", "attribute_name=none" };
 
   reports:
-    inform_mode._inventory_lsb::
-      "$(this.bundle): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)])'";
-      "$(this.bundle): OS = $(os), release = $(release), flavor = $(flavor), description = $(description)";
+    inform_mode._inventory_lsb_found::
+      "$(this.bundle): OS = $(os), codename = $(codename), release = $(release), flavor = $(flavor), description = $(description)";
+    verbose_mode._inventory_lsb_found::
+      "$(this.bundle): got $(dim) LSB keys";
+      "$(this.bundle): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)][1])'";
 }
