@@ -32,9 +32,15 @@ checklog: copy env
 	cd tests/acceptance && ./testall --printlog
 
 install:
-	for d in . cfe_internal controls inventory libraries lib/3.5 lib/3.6 reports services sketches/meta templates update; do \
+	for d in . cfe_internal controls inventory libraries lib/3.5 lib/3.6 reports services sketches/meta update; do \
 		$(INSTALL_DIR) $(DESTDIR)/$$d; \
-		for f in $$d/*.cf $$d/*.mustache; do\
+		for f in $$d/*.cf; do\
+			$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
+		done; \
+	done;
+	for d in templates; do \
+		$(INSTALL_DIR) $(DESTDIR)/$$d; \
+		for f in $$d/*.mustache; do\
 			$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
 		done; \
 	done;
