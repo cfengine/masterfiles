@@ -8,7 +8,7 @@ bundle common inventory_debian
       comment => "pure Debian",
       meta => { "inventory", "attribute_name=none" };
 
-      "debian_derived" expression => "debian.!pure_debian",
+      "debian_derived" expression => "debian.!debian_pure",
       comment => "derived from Debian",
       meta => { "inventory", "attribute_name=none" };
 }
