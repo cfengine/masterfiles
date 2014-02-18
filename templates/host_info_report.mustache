@@ -11,7 +11,7 @@ Os: {{vars.sys.os}}
 Release: {{vars.sys.release}}
 Flavor: {{vars.sys.flavor}}
 Version: {{vars.sys.version}}
-Uptime: {{vars.sys.uptime}}
+Uptime: {{vars.sys.uptime}} minutes
 
 ## Hardware
 No. CPUs: {{vars.sys.cpus}}
@@ -21,9 +21,13 @@ No. CPUs: {{vars.sys.cpus}}
 {{! Redmine:4506 https://cfengine.com/dev/issues/4506 }}
 IPv4 TCP Ports listening: {{#vars.mon.listening_tcp4_ports}}{{.}},{{/vars.mon.listening_tcp4_ports}}
 
+{{#classes.show_software}}
 {{! Redmine:4507 https://cfengine.com/dev/issues/4507 }}
+## Software
+{{#vars.host_info_report.installed_packages}}
+{{.}}
+{{/vars.host_info_report.installed_packages}}
+{{/classes.show_software}}
 
 
 {{! Redmine:4508 https://cfengine.com/dev/issues/4508 }}
-
-
