@@ -324,9 +324,19 @@ bundle agent cfe_internal_hub_maintain
 
 bundle agent cfe_internal_apache_sudoer
 {
-  files:
+  classes:
 
     linux::
+
+      "sudoers_exists" expression => fileexists("/etc/sudoers"),
+      comment => "Check if there is /etc/sudoers",
+      handle => "cfe_internal_apache_sudoer_vars_linux_sudoers_exists";
+
+      #
+
+  files:
+
+    sudoers_exists::
 
       "/etc/sudoers"
       comment => "Permit Apache user to run passwordless sudo cf-runagent",
