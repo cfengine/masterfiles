@@ -1,31 +1,36 @@
-bundle common inventory_lsb
+bundle agent inventory_lsb
 # @brief LSB inventory bundle
 #
 # This common bundle is for LSB inventory work.
 {
   classes:
+      "have_lsb" expression => fileexists($(lsb_exec));
+
       "_inventory_lsb_found" expression => regcmp("^[1-9][0-9]*$", $(dim));
 
     _inventory_lsb_found::
       "lsb_$(os)" expression => "any",
       comment => "LSB Distributor ID",
       depends_on => { "inventory_lsb_os" },
+      scope => "namespace",
       meta => { "inventory", "attribute_name=none" };
 
       "lsb_$(os)_$(release)" expression => "any",
       comment => "LSB Distributor ID and Release",
       depends_on => { "inventory_lsb_os", "inventory_lsb_release" },
+      scope => "namespace",
       meta => { "inventory", "attribute_name=none" };
 
       "lsb_$(os)_$(codename)" expression => "any",
       comment => "LSB Distributor ID and Codename",
       depends_on => { "inventory_lsb_os", "inventory_lsb_codename" },
+      scope => "namespace",
       meta => { "inventory", "attribute_name=none" };
 
   vars:
       "lsb_exec" string => "$(inventory_control.lsb_exec)";
 
-    !disable_inventory_lsb::
+    have_lsb::
       "data" string => execresult("$(lsb_exec) -a", "noshell");
       "dim" int => parsestringarray(
                                      "lsb",
