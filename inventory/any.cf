@@ -6,7 +6,51 @@ bundle common inventory_any
 {
 }
 
-bundle common inventory_listening_ports
+bundle agent inventory_autorun
+# @brief Autorun some inventory bundles
+#
+# This agent bundle runs other "autorun" inventory agent bundles
+# explicitly.  It will use bundlesmatching() when CFEngine 3.5 and
+# earlier are no longer supported.
+{
+  methods:
+    !disable_inventory_cmdb::
+      "cmdb" usebundle => cfe_autorun_inventory_cmdb(),
+      handle => "cfe_internal_autorun_inventory_cmdb";
+
+    !disable_inventory_LLDP::
+      "LLDP" usebundle => cfe_autorun_inventory_LLDP(),
+      handle => "cfe_internal_autorun_inventory_LLDP";
+
+    !disable_inventory_package_refresh::
+      "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
+      handle => "cfe_internal_autorun_inventory_packages";
+
+    !disable_inventory_proc::
+      "proc" usebundle => cfe_autorun_inventory_proc(),
+      handle => "cfe_internal_autorun_inventory_proc";
+
+    !disable_inventory_fstab::
+      "fstab" usebundle => cfe_autorun_inventory_fstab(),
+      handle => "cfe_internal_autorun_inventory_fstab";
+
+    !disable_inventory_mtab::
+      "mtab" usebundle => cfe_autorun_inventory_mtab(),
+      handle => "cfe_internal_autorun_inventory_mtab";
+
+    !disable_inventory_dmidecode::
+      "dmidecode" usebundle => cfe_autorun_inventory_dmidecode(),
+      handle => "cfe_internal_autorun_inventory_dmidecode";
+
+    any::
+      "listening ports" usebundle => cfe_autorun_inventory_listening_ports(),
+      handle => "cfe_internal_autorun_listening_ports";
+
+      "memory" usebundle => cfe_autorun_inventory_memory(),
+      handle => "cfe_internal_autorun_memory";
+}
+
+bundle agent cfe_autorun_inventory_listening_ports
 # @brief Inventory the listening ports
 #
 # This bundle uses `mon.listening_ports` and is always enabled by
@@ -17,7 +61,7 @@ bundle common inventory_listening_ports
       meta => { "inventory", "attribute_name=Ports listening" };
 }
 
-bundle common inventory_memory
+bundle agent cfe_autorun_inventory_memory
 # @brief Inventory the memory totals (Enterprise only)
 #
 # This bundle uses `mon.val_mem_total` and is always enabled by
@@ -30,7 +74,7 @@ bundle common inventory_memory
       meta => { "inventory", "attribute_name=Memory size" };
 }
 
-bundle common inventory_proc
+bundle agent cfe_autorun_inventory_proc
 # @brief Do procfs inventory
 #
 # This bundle will parse these /proc files: consoles, cpuinfo,
@@ -47,7 +91,7 @@ bundle common inventory_proc
       "basefiles" slist => { "consoles", "cpuinfo", "meminfo", "modules", "partitions", "uptime", "version", "vmstat" };
       "files[$(basefiles)]" string => "$(inventory_control.proc)/$(basefiles)";
 
-    !disable_inventory_proc._have_proc_consoles::
+    _have_proc_consoles::
       "console_count" int =>  readstringarrayidx("consoles",
                                                  "$(files[consoles])",
                                                  "\s*#[^\n]*",
@@ -57,7 +101,7 @@ bundle common inventory_proc
 
       "console_idx" slist => getindices("consoles");
 
-    !disable_inventory_proc._have_proc_modules::
+    _have_proc_modules::
       "module_count" int =>  readstringarrayidx("modules",
                                                 "$(files[modules])",
                                                 "\s*#[^\n]*",
@@ -67,7 +111,7 @@ bundle common inventory_proc
 
       "module_idx" slist => getindices("modules");
 
-    !disable_inventory_proc._have_proc_cpuinfo::
+    _have_proc_cpuinfo::
       # this will extract all the keys in one bunch, so you won't get
       # detailed info for processor 0 for example
       "cpuinfo_count" int =>  readstringarrayidx("cpuinfo_array",
@@ -81,7 +125,7 @@ bundle common inventory_proc
       "cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])]" string => "$(cpuinfo_array[$(cpuinfo_idx)][1])";
       "cpuinfo_keys" slist => getindices("cpuinfo");
 
-    !disable_inventory_proc._have_proc_meminfo::
+    _have_proc_meminfo::
       # note you'll get units like "400 kB"
       "meminfo_count" int =>  readstringarrayidx("meminfo_array",
                                                  "$(files[meminfo])",
@@ -94,7 +138,7 @@ bundle common inventory_proc
       "meminfo[$(meminfo_array[$(meminfo_idx)][0])]" string => "$(meminfo_array[$(meminfo_idx)][1])";
       "meminfo_keys" slist => getindices("meminfo");
 
-    !disable_inventory_proc._have_proc_partitions::
+    _have_proc_partitions::
       "partitions_count" int =>  readstringarrayidx("partitions_array",
                                                     "$(files[partitions])",
                                                     "major[^\n]*",
@@ -106,14 +150,14 @@ bundle common inventory_proc
       "partitions[$(partitions_array[$(partitions_idx)][4])]" string => "$(partitions_array[$(partitions_idx)][3])";
       "partitions_keys" slist => getindices("partitions");
 
-    !disable_inventory_proc._have_proc_uptime::
+    _have_proc_uptime::
       "uptimes" rlist => readreallist("$(files[uptime])","#.*","\s+",10,400);
       "uptime" string => nth(uptimes, 0);
 
-    !disable_inventory_proc._have_proc_version::
+    _have_proc_version::
       "version" string => readfile("$(files[version])", 2048);
 
-    !disable_inventory_proc._have_proc_vmstat::
+    _have_proc_vmstat::
       "vmstat_count" int =>  readstringarrayidx("vmstat_array",
                                                  "$(files[vmstat])",
                                                  "\s*#[^\n]*",
@@ -126,37 +170,42 @@ bundle common inventory_proc
       "vmstat_keys" slist => getindices("vmstat");
 
   classes:
-    !disable_inventory_proc::
-      "_have_proc_$(basefiles)" expression => fileexists("$(files[$(basefiles)])");
+      "have_proc" expression => isdir($(inventory_control.proc));
 
-    !disable_inventory_proc._have_proc_consoles::
+    have_proc::
+      "_have_proc_$(basefiles)"
+      expression => fileexists("$(files[$(basefiles)])");
+
+    _have_proc_consoles::
       "have_console_$(consoles[$(console_idx)][0])"
-      expression => "any";
+      expression => "any",
+      scope => "namespace";
 
-    !disable_inventory_proc._have_proc_modules::
+    _have_proc_modules::
       "have_module_$(modules[$(module_idx)][0])"
-      expression => "any";
+      expression => "any",
+      scope => "namespace";
 
   reports:
-    !disable_inventory_proc._have_proc_consoles.verbose_mode::
+    _have_proc_consoles.verbose_mode::
       "$(this.bundle): we have console $(consoles[$(console_idx)][0])";
-    !disable_inventory_proc._have_proc_modules.verbose_mode::
+    _have_proc_modules.verbose_mode::
       "$(this.bundle): we have module $(modules[$(module_idx)][0])";
-    !disable_inventory_proc._have_proc_cpuinfo.verbose_mode::
+    _have_proc_cpuinfo.verbose_mode::
       "$(this.bundle): we have cpuinfo $(cpuinfo_keys) = $(cpuinfo[$(cpuinfo_keys)])";
-    !disable_inventory_proc._have_proc_meminfo.verbose_mode::
+    _have_proc_meminfo.verbose_mode::
       "$(this.bundle): we have meminfo $(meminfo_keys) = $(meminfo[$(meminfo_keys)])";
-    !disable_inventory_proc._have_proc_partitions.verbose_mode::
+    _have_proc_partitions.verbose_mode::
       "$(this.bundle): we have partitions $(partitions_keys) with $(partitions[$(partitions_keys)]) blocks";
-    !disable_inventory_proc._have_proc_uptime.verbose_mode::
+    _have_proc_uptime.verbose_mode::
       "$(this.bundle): we have uptime $(uptime) seconds";
-    !disable_inventory_proc._have_proc_version.verbose_mode::
+    _have_proc_version.verbose_mode::
       "$(this.bundle): we have kernel version '$(version)'";
-    !disable_inventory_proc._have_proc_vmstat.verbose_mode::
+    _have_proc_vmstat.verbose_mode::
       "$(this.bundle): we have vmstat $(vmstat_keys) = $(vmstat[$(vmstat_keys)])";
 }
 
-bundle common inventory_mtab
+bundle agent cfe_autorun_inventory_mtab
 # @brief Do mtab inventory
 #
 # The mtab format is simple: each line looks like this format:
@@ -167,7 +216,7 @@ bundle common inventory_mtab
 # file system is mounted.
 {
   vars:
-    !disable_inventory_mtab::
+    have_mtab::
       "mount_count" int =>  readstringarrayidx("mounts",
                                                $(inventory_control.mtab),
                                                "\s*#[^\n]*",
@@ -178,21 +227,24 @@ bundle common inventory_mtab
       "idx" slist => getindices("mounts");
 
   classes:
-    !disable_inventory_mtab::
+      "have_mtab" expression => fileexists($(inventory_control.mtab));
+
       # define classes like have_mount_ext4__var for a ext4 /var mount
       "have_mount_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
-      expression => "any";
+      expression => "any",
+      scope => "namespace";
 
       # define classes like have_mount_ext4 if there is a ext4 mount
       "have_mount_$(mounts[$(idx)][2])"
-      expression => "any";
+      expression => "any",
+      scope => "namespace";
 
   reports:
-    !disable_inventory_mtab.verbose_mode::
+    verbose_mode::
       "$(this.bundle): we have a $(mounts[$(idx)][2]) mount under $(mounts[$(idx)][1])";
 }
 
-bundle common inventory_fstab
+bundle agent cfe_autorun_inventory_fstab
 # @brief Do fstab inventory
 #
 # The fstab format is simple: each line looks like this format:
@@ -204,7 +256,7 @@ bundle common inventory_fstab
 # OPTIONS' but is not supported here.  Contributions welcome.
 {
   vars:
-    !disable_inventory_fstab::
+    have_fstab::
       "mount_count" int =>  readstringarrayidx("mounts",
                                                $(sys.fstab),
                                                "\s*#[^\n]*",
@@ -215,31 +267,34 @@ bundle common inventory_fstab
       "idx" slist => getindices("mounts");
 
   classes:
-    !disable_inventory_fstab::
+      "have_fstab" expression => fileexists($(sys.fstab));
+
       # define classes like have_fs_ext4__var for a ext4 /var entry
       "have_fs_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
-      expression => "any";
+      expression => "any",
+      scope => "namespace";
 
       # define classes like have__var for a /var entry
       "have_fs_$(mounts[$(idx)][1])"
-      expression => "any";
+      expression => "any",
+      scope => "namespace";
 
       # define classes like have_fs_ext4 if there is a ext4 entry
       "have_fs_$(mounts[$(idx)][2])"
-      expression => "any";
+      expression => "any",
+      scope => "namespace";
 
   reports:
-    !disable_inventory_fstab.verbose_mode::
+    verbose_mode::
       "$(this.bundle): we have a $(mounts[$(idx)][2]) fstab entry under $(mounts[$(idx)][1])";
 }
 
-bundle common inventory_dmidecode
+bundle agent cfe_autorun_inventory_dmidecode
 # @brief Do dmidecode-based inventory
 #
 # This common bundle runs dmidecode
 {
   vars:
-    !disable_inventory_dmidecode::
       "dmidefs" data => parsejson('
 {
   "bios-vendor": "BIOS vendor",
@@ -270,6 +325,7 @@ bundle common inventory_dmidecode
 
       "dmivars" slist => getindices(dmidefs);
 
+    have_dmidecode::
       "decoder" string => "$(inventory_control.dmidecoder)";
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                              "useshell"),
@@ -279,38 +335,19 @@ bundle common inventory_dmidecode
       "_canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
 
   classes:
-    !disable_inventory_dmidecode::
+      "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
+
       "dmidecode_$(_canonified_var[$(dmivars)])_$(_canonified[$(dmivars)])"
       expression => "any",
       meta => { "inventory",
                 "attribute_name=none",
                 "derived-from=inventory_dmidecode.dmi[$(dmivars)]"
-      };
+      },
+      scope => "namespace";
 
   reports:
-    inform_mode.!disable_inventory_dmidecode::
+    inform_mode::
       "$(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
-}
-
-bundle agent inventory_autorun
-# @brief Autorun some inventory bundles
-#
-# This agent bundle runs other "autorun" inventory agent bundles
-# explicitly.  It will use bundlesmatching() when CFEngine 3.5 and
-# earlier are no longer supported.
-{
-  methods:
-    !disable_inventory_dmidecode::
-      "cmdb" usebundle => cfe_autorun_inventory_cmdb(),
-      handle => "cfe_internal_autorun_inventory_cmdb";
-
-    !disable_inventory_LLDP::
-      "LLDP" usebundle => cfe_autorun_inventory_LLDP(),
-      handle => "cfe_internal_autorun_inventory_LLDP";
-
-    !disable_inventory_package_refresh::
-      "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
-      handle => "cfe_internal_autorun_inventory_packages";
 }
 
 bundle agent cfe_autorun_inventory_LLDP
@@ -320,7 +357,11 @@ bundle agent cfe_autorun_inventory_LLDP
 # http://vincentbernat.github.io/lldpd/ to run this yourself for
 # testing, and your Friendly Network Admin may be of help too.
 {
+  classes:
+      "disable_inventory_LLDP" not => fileexists($(inventory_control.lldpctl_exec));
+
   commands:
+    !disable_inventory_LLDP::
       "$(inventory_control.lldpctl_exec) | perl -n -e 'my ($k, $v) = m/([^=]+)=(.*)/; $k =~ s/\W/_/g; print \"=$k=$v\";"
       module => "true";
 }
@@ -370,7 +411,6 @@ bundle agent cfe_autorun_inventory_cmdb
       meta => { "cmdb" };
 
   files:
-    !disable_inventory_cmdb::
       "$(cmdb_file)"
       copy_from => inventory_cmdb_copy_from,
       classes => inventory_scoped_classes_generic("bundle", "cmdb_file");
