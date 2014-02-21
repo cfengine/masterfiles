@@ -109,7 +109,8 @@ bundle common def
                                   };
 
       "cfe_log_dirs"     slist => {
-                                    "$(sys.workdir)/outputs"
+                                    "$(sys.workdir)/outputs",
+                                    "$(sys.workdir)/reports",
                                   };
 
   classes:
