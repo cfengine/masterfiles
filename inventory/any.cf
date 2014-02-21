@@ -26,7 +26,7 @@ bundle common inventory_memory
 {
   vars:
     enterprise::
-      "total" string => "$(mon.val_mem_total)",
+      "total" string => "$(mon.value_mem_total)",
       meta => { "inventory", "attribute_name=Memory size" };
 }
 
