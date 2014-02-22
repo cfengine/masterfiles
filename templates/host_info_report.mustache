@@ -5,6 +5,12 @@ Generated: {{vars.sys.date}}
 Fully Qualified Hostname: {{vars.sys.fqhost}}
 Host ID: {{vars.sys.key_digest}}
 
+## CFEngine
+Version: CFEngine {{#classes.enterprise}}Enterprise{{/classes.enterprise}} {{vars.sys.cf_version}}
+Policy Release ID: {{vars.host_info_report.cf_promises_release_id_releaseId}}
+Policy Last Validated: {{vars.host_info_report.cf_promises_validated_timestamp_formatted}}
+Last Agent Run: {{vars.host_info_report.last_agent_run}}
+
 ## OS
 Architecture: {{vars.sys.arch}}
 Os: {{vars.sys.os}}
