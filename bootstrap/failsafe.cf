@@ -1,4 +1,6 @@
 ################################################################################
+## CFEngine Bootstrap / Failsafe Policy ########################################
+################################################################################
 # THIS FILE REPRESENTS A FALL-BACK SOLUTION FOR THE PRIMARY FAILSAFE FILE.
 # IF THE PRIMARY FAILSAFE/UPDATE LOSES FUNCTIONALITY DUE TO MODIFICATIONS MADE
 # BY THE USER, CFENGINE WILL RECOVER BY USING THIS FALL-BACK BOOTSTRAPPED FILE.
@@ -44,14 +46,14 @@ bundle agent cfe_internal_update
 
   files:
 
-    !windows::
+    !windows.have_ppkeys::
       "$(sys.inputdir)"
       handle => "cfe_internal_bootstrap_update_files_sys_workdir_inputs_not_windows",
       copy_from => u_scp("$(sys.masterdir)"),
       depth_search => u_recurse("inf"),
       classes => repaired("got_policy");
 
-    windows::
+    windows.have_ppkeys::
       "$(sys.inputdir)"
       handle => "cfe_internal_bootstrap_update_files_sys_workdir_inputs_windows",
       copy_from => u_scp("$(sys.masterdir)"),
@@ -113,7 +115,7 @@ bundle agent cfe_internal_update
     got_policy::
       "Updated local policy from policy server"
       handle => "cfe_internal_bootstrap_update_reports_got_policy";
-    !got_policy.!have_promises_cf::
+    !got_policy.!have_promises_cf.have_ppkeys::
       "Failed to copy policy from policy server at $(sys.policy_hub):$(sys.masterdir)
        Please check
        * cf-serverd is running on $(sys.policy_hub)
@@ -126,19 +128,18 @@ bundle agent cfe_internal_update
     server_started::
       "Started the server"
       handle => "cfe_internal_bootstrap_update_reports_started_serverd";
-    am_policy_hub.!server_started.!have_promises_cf::
+    am_policy_hub.!server_started.!have_promises_cf.have_ppkeys::
       "Failed to start the server"
       handle => "cfe_internal_bootstrap_update_reports_failed_to_start_serverd";
     executor_started::
       "Started the scheduler"
       handle => "cfe_internal_bootstrap_update_reports_started_execd";
-    !executor_started.!have_promises_cf::
+    !executor_started.!have_promises_cf.have_ppkeys::
       "Did not start the scheduler"
       handle => "cfe_internal_bootstrap_update_reports_failed_to_start_execd";
     !executor_started.have_promises_cf::
       "You are running a hard-coded failsafe. Please use the following command instead.
-    - 3.0.0: $(sys.cf_agent) -f $(sys.inputdir)/failsafe/failsafe.cf
-    - 3.0.1: $(sys.cf_agent) -f $(sys.inputdir)/update.cf"
+        $(sys.cf_agent) -f $(sys.inputdir)/update.cf"
       handle => "cfe_internal_bootstrap_update_reports_run_another_failsafe_instead";
 }
 
@@ -170,7 +171,7 @@ body action u_background
 body depth_search u_recurse(d)
 {
       depth => "$(d)";
-      exclude_dirs => { "\\.svn", "\\.git" };
+      exclude_dirs => { "\.svn", "\.git" };
 }
 ############################################
 body service_method bootstart
@@ -188,5 +189,5 @@ body copy_from u_cp(from)
 {
       source          => "$(from)";
       compare         => "digest";
-      "copy_backup"     => "false";
+      copy_backup     => "false";
 }
