@@ -4,7 +4,22 @@ bundle agent host_info_report
 # **Example:**
 # `cf-agent -b host_info_report`
 {
+  classes:
+    "have_$(cfengine_info_files)"
+      expression => filesexist("$(sys.masterdir)/$(cfengine_info_files)"),
+      handle => "host_info_report_classes_have_cfengien_info_file",
+      comment => "We need to know if we have the files, because if we try to
+                  read them when they don't exist we get error messages.";
   vars:
+
+    any::
+    "cfengine_info_files"
+      handle => "host_info_report_vars_cfengine_info_files",
+      slist => { "cf_promises_validated", "cf_promises_release_id" },
+      comment => "These files are required for CFEngine related information,
+		  and if we try to read them when they don't exist we get ugly
+                  error messages";
+
     "host_info_report_template"
       string => "$(this.promise_dirname)/../templates/$(this.bundle).mustache",
       comment => "Where the report template is found";
@@ -16,6 +31,7 @@ bundle agent host_info_report
     "installed_packages"
       data => packagesmatching(".*", ".*", ".*", ".*");
 
+    have_cf_promises_validated::
     "cf_promises_validated"
       data => readjson("$(sys.masterdir)/cf_promises_validated", 1K);
 
@@ -26,16 +42,19 @@ bundle agent host_info_report
       string => strftime("localtime", "%F %T %Z", $(cf_promises_validated_timestamp)),
       comment => "It's useful to know when policy was last updated and verified";
 
-    "last_agent_run"
-      string => strftime("localtime", "%F %T %Z", filestat("$(sys.workdir)/outputs/previous", "mtime"));
-
+    have_cf_promises_release_id::
     "cf_promises_release_id"
       data => readjson("$(sys.inputdir)/cf_promises_release_id", 1K);
 
     "cf_promises_release_id_releaseId"
       string => "$(cf_promises_release_id[releaseId])";
+
+    any::
+    "last_agent_run"
+      string => strftime("localtime", "%F %T %Z", filestat("$(sys.workdir)/outputs/previous", "mtime"));
+
     "printable"
-      string => format("%S", cf_promises_release_id);
+      string => format("%S", installed_packages);
 
   files:
     "$(host_info_report_txt)"
