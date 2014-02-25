@@ -20,7 +20,7 @@ bundle common cfe_internal_hub_vars
 
     linux::
 
-      "docroot" string => "/var/cfengine/httpd/htdocs",
+      "docroot" string => "$(sys.workdir)/httpd/htdocs",
       comment => "Root directory of Enterprise Web interface",
       handle => "cfe_internal_hub_vars_docroot";
 
@@ -663,7 +663,7 @@ bundle agent cfe_internal_truncate_events
 {
   commands:
    Hr05.Min00_05::
-    "/var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks truncate_events"
+    "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks truncate_events"
      comment => "Turncate all the pending notifications if there is any",
      handle  => "cfe_internal_truncate_event_mp";
 }
