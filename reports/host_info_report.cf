@@ -77,6 +77,11 @@ bundle agent host_info_report_cfengine
                   calculated locally.";
 
   vars:
+      # doesn't work :( # "interface_flags" slist => maparray("$(this.k): IP $(sys.ipv4[$(this.k)]), flags $(this.v)", "sys.interface_flags");
+      "interface_flags" slist => maparray("$(this.k): $(this.v)", "sys.interface_flags");
+      "interface_ips" slist => maparray("$(this.k): IPv4 $(this.v)", "sys.ipv4");
+      "interface_info_unsorted" slist => { @(interface_flags), @(interface_ips) };
+      "interface_info" slist => sort(interface_info_unsorted, "lex");
 
     any::
       "cfengine_info_files"
