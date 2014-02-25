@@ -68,6 +68,10 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
 
+      "hub" usebundle => cfe_internal_turncate_events,
+      handle => "cfe_internal_turncate_events",
+      comment => "To run CFE turncate to pending ";
+
     any::
 
       "any" usebundle => cfe_internal_correct_cftwin,
