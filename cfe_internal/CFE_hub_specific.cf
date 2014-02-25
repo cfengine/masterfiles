@@ -669,11 +669,11 @@ bundle agent cfe_internal_create_cf_null
 #
 #####################################################################
 
-bundle agent cfe_internal_turncate_events
+bundle agent cfe_internal_truncate_events
 {
   commands:
-   Hr05::
+   Hr05.Min00_05::
     "/var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks truncate_events"
      comment => "Turncate all the pending notifications if there is any",
-     handle  => "cfe_internal_turncate_event_mp";
+     handle  => "cfe_internal_truncate_event_mp";
 }
