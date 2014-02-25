@@ -29,7 +29,7 @@ IPv4 TCP Ports listening: {{#vars.mon.listening_tcp4_ports}}{{.}},{{/vars.mon.li
 {{#classes.show_software}}
 {{! Redmine:4507 https://cfengine.com/dev/issues/4507 }}
 ## Software
-{{#vars.host_info_report.installed_packages}}
-{{.}}
-{{/vars.host_info_report.installed_packages}}
+{{#vars.host_info_report_software.packages}}
+[{{method}}] {{name}}: version {{version}}, arch {{arch}}
+{{/vars.host_info_report_software.packages}}
 {{/classes.show_software}}
