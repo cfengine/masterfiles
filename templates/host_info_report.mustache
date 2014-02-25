@@ -7,9 +7,9 @@ Host ID: {{vars.sys.key_digest}}
 
 ## CFEngine
 Version: CFEngine {{#classes.enterprise}}Enterprise{{/classes.enterprise}} {{vars.sys.cf_version}}
-Policy Release ID: {{vars.host_info_report.cf_promises_release_id_releaseId}}
-Policy Last Validated: {{vars.host_info_report.cf_promises_validated_timestamp_formatted}}
-Last Agent Run: {{vars.host_info_report.last_agent_run}}
+Last Agent Run: {{vars.host_info_report_cfengine.last_agent_run}}
+Policy Release ID: {{vars.host_info_report_cfengine.cf_promises_release_id.releaseId}}
+Policy Last Updated: {{vars.host_info_report_cfengine.cf_promises_validated_timestamp_formatted}}
 
 ## OS
 Architecture: {{vars.sys.arch}}
@@ -26,7 +26,6 @@ No. CPUs: {{vars.sys.cpus}}
 ## Network
 {{! Redmine:4506 https://cfengine.com/dev/issues/4506 }}
 IPv4 TCP Ports listening: {{#vars.mon.listening_tcp4_ports}}{{.}},{{/vars.mon.listening_tcp4_ports}}
-
 {{#classes.show_software}}
 {{! Redmine:4507 https://cfengine.com/dev/issues/4507 }}
 ## Software
@@ -34,6 +33,3 @@ IPv4 TCP Ports listening: {{#vars.mon.listening_tcp4_ports}}{{.}},{{/vars.mon.li
 {{.}}
 {{/vars.host_info_report.installed_packages}}
 {{/classes.show_software}}
-
-
-{{! Redmine:4508 https://cfengine.com/dev/issues/4508 }}
