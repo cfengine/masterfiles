@@ -37,21 +37,21 @@ bundle agent host_info_report_software
 # @brief Collect information about software installed
 {
   vars:
-      "package_state"
+      "packages"
         data => packagesmatching(".*", ".*", ".*", ".*"),
         comment => "Get information about all packages currently on system";
 
-      "packages"
+      "package_names"
         slist => getindices("package_state[name]");
 
     DEBUG::
       "printable"
-        string => format("%S", package_state);
+        string => format("%S", packages);
 
   reports:
     DEBUG::
       "$(printable)";
-      "$(packages)";
+      "$(package_names)";
 }
 
 bundle agent host_info_report_cfengine
