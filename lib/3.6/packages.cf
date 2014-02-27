@@ -827,6 +827,61 @@ body package_method yum_rpm
       package_verify_command => "$(redhat_knowledge.call_rpm) -V";
 }
 
+##
+
+body package_method yum_rpm_specific
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM installation method
+#
+# This package method interacts with the Yum and RPM package managers.
+#
+# To be used where the required package name is supplied without a version
+# and architecture and when adding a '-' to end of the supplied name would match
+# the first part of other packages and result in those being installed too.
+#
+# This is an efficient package method for RPM-based systems - uses `rpm`
+# instead of `yum` to list installed packages.
+#
+# It will use `rpm -e` to remove packages. Please note that if several packages
+# with the same name but varying versions or architectures are installed,
+# `rpm -e` will return an error and not delete any of them.
+#
+# **Example:**
+#
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum_rpm_specific, package_policy => "add";
+# ```
+{
+      package_changes => "bulk";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+
+      package_list_name_regex    => "$(redhat_knowledge.rpm3_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm3_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm3_arch_regex)";
+
+      package_installed_regex => ".*";
+      package_name_convention => "$(name)";
+
+      # just give the package name to rpm to delete, otherwise it gets "name.*" (from package_name_convention above)
+      package_delete_convention => "$(name)";
+
+      # set it to "0" to avoid caching of list during upgrade
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      package_patch_name_regex    => "([^.]+).*";
+      package_patch_version_regex => "[^\s]\s+([^\s]+).*";
+      package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
+
+      package_add_command    => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y install";
+      package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --nodeps";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
+}
+
 # This is a great use case for CFEngine body inheritance.
 # It doesn't work to use a class.
 
