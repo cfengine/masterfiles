@@ -88,7 +88,7 @@ bundle agent cfe_autorun_inventory_proc
 # `ifconfig`.
 {
   vars:
-      "basefiles" slist => { "consoles", "cpuinfo", "meminfo", "modules", "partitions", "uptime", "version", "vmstat" };
+      "basefiles" slist => { "consoles", "cpuinfo", "modules", "partitions", "uptime", "version" };
       "files[$(basefiles)]" string => "$(inventory_control.proc)/$(basefiles)";
 
     _have_proc_consoles::
@@ -125,19 +125,6 @@ bundle agent cfe_autorun_inventory_proc
       "cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])]" string => "$(cpuinfo_array[$(cpuinfo_idx)][1])";
       "cpuinfo_keys" slist => getindices("cpuinfo");
 
-    _have_proc_meminfo::
-      # note you'll get units like "400 kB"
-      "meminfo_count" int =>  readstringarrayidx("meminfo_array",
-                                                 "$(files[meminfo])",
-                                                 "\s*#[^\n]*",
-                                                 "\s*:\s*",
-                                                 500,
-                                                 50000);
-
-      "meminfo_idx" slist => getindices("meminfo_array");
-      "meminfo[$(meminfo_array[$(meminfo_idx)][0])]" string => "$(meminfo_array[$(meminfo_idx)][1])";
-      "meminfo_keys" slist => getindices("meminfo");
-
     _have_proc_partitions::
       "partitions_count" int =>  readstringarrayidx("partitions_array",
                                                     "$(files[partitions])",
@@ -156,18 +143,6 @@ bundle agent cfe_autorun_inventory_proc
 
     _have_proc_version::
       "version" string => readfile("$(files[version])", 2048);
-
-    _have_proc_vmstat::
-      "vmstat_count" int =>  readstringarrayidx("vmstat_array",
-                                                 "$(files[vmstat])",
-                                                 "\s*#[^\n]*",
-                                                 "\s+",
-                                                 2500,
-                                                 250000);
-
-      "vmstat_idx" slist => getindices("vmstat_array");
-      "vmstat[$(vmstat_array[$(vmstat_idx)][0])]" string => "$(vmstat_array[$(vmstat_idx)][1])";
-      "vmstat_keys" slist => getindices("vmstat");
 
   classes:
       "have_proc" expression => isdir($(inventory_control.proc));
@@ -193,16 +168,12 @@ bundle agent cfe_autorun_inventory_proc
       "$(this.bundle): we have module $(modules[$(module_idx)][0])";
     _have_proc_cpuinfo.verbose_mode::
       "$(this.bundle): we have cpuinfo $(cpuinfo_keys) = $(cpuinfo[$(cpuinfo_keys)])";
-    _have_proc_meminfo.verbose_mode::
-      "$(this.bundle): we have meminfo $(meminfo_keys) = $(meminfo[$(meminfo_keys)])";
     _have_proc_partitions.verbose_mode::
       "$(this.bundle): we have partitions $(partitions_keys) with $(partitions[$(partitions_keys)]) blocks";
     _have_proc_uptime.verbose_mode::
       "$(this.bundle): we have uptime $(uptime) seconds";
     _have_proc_version.verbose_mode::
       "$(this.bundle): we have kernel version '$(version)'";
-    _have_proc_vmstat.verbose_mode::
-      "$(this.bundle): we have vmstat $(vmstat_keys) = $(vmstat[$(vmstat_keys)])";
 }
 
 bundle agent cfe_autorun_inventory_mtab
