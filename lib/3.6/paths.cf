@@ -80,6 +80,9 @@ bundle common paths
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
 
+    linux::
+      "path[lsattr]"        string => "/usr/bin/lsattr"
+
     aix::
 
       "path[awk]"      string => "/usr/bin/awk";
