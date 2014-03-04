@@ -29,10 +29,6 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_update_folders",
       comment => "Create empty directories for CFE self-upgrade";
 
-      "hub" usebundle => cfe_internal_create_cf_null,
-      handle => "cfe_internal_management_create_cf_null",
-      comment => "Create a dummy cf_null file in masterfiles directory to ensure that 3.4 clients will be working";
-
     am_policy_hub.enterprise::
       #### cfengine_internal_selinux() can be "enabled" or "disabled"
 
