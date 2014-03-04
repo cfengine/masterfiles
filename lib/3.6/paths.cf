@@ -81,7 +81,7 @@ bundle common paths
       "path[pip]"      string => "/usr/bin/pip";
 
     linux::
-      "path[lsattr]"        string => "/usr/bin/lsattr"
+      "path[lsattr]"        string => "/usr/bin/lsattr";
 
     aix::
 
