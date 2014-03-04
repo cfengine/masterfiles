@@ -640,28 +640,6 @@ done"
       handle => "my_php_runalerts_script_insert_lines_php_runalerts_script";
 }
 
-##################################################################
-#
-# cfe_internal_create_cf_null
-# - To be backward compat with 3.4 clients, masterfiles/cf_null has
-# to exists. Otherwise 3.4 robot agents will complain.
-#
-##################################################################
-
-bundle agent cfe_internal_create_cf_null
-{
-  files:
-    
-    # On 3.6 class only because 3.4 will not be supported when 3.7 is released
-    
-    cfengine_3_6::
-
-      "$(sys.workdir)/masterfiles/cf_null"
-      comment => "to create cf_null file in masterfiles directory",
-      handle => "cfe_internal_create_cf_null_in_masterfiles",
-      create => "true";
-}
-
 #####################################################################
 #
 #cfe_internal_turncate_events
