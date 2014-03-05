@@ -5,13 +5,14 @@ bundle common p
     "versions" ilist => { 1, 2 };
     "latest_version" int => "2";
 
+    "base_name" string => "test-package";
     "distinct_name[1]" string => "alpha";
     "distinct_name[2]" string => "beta";
     "distinct_name[3]" string => "charlie";
 
-    "name[1]" string => "test-package-$(distinct_name[1])";
-    "name[2]" string => "test-package-$(distinct_name[2])";
-    "name[3]" string => "test-package-$(distinct_name[3])";
+    "name[1]" string => "$(base_name)-$(distinct_name[1])";
+    "name[2]" string => "$(base_name)-$(distinct_name[2])";
+    "name[3]" string => "$(base_name)-$(distinct_name[3])";
 
     redhat::
       "ext" string => "rpm";
