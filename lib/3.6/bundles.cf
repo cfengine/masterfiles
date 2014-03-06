@@ -258,15 +258,19 @@ bundle agent probabilistic_usebundle(probability, bundlename)
 # @param bundlename the bundle to activate based on the probability
 #
 # **Example:**
-# ```cf3
-#  methods:
-#    "Toss Coin"
-#      usebundle => probabilistic_usebundle("50", "heads"),
-#      comment => "Call bundle heads ~ 50% of the time";
 #
-#    "Trick Coin"
-#      usebundle => probabilistic_usebundle("75", "heads"),
-#      comment => "Call bundle heads ~ 75% of the time";
+# ```cf3
+# bundle agent example
+# {
+#    methods:
+#      "Toss Coin"
+#        usebundle => probabilistic_usebundle("50", "heads"),
+#        comment => "Call bundle heads ~ 50% of the time";
+#
+#      "Trick Coin"
+#        usebundle => probabilistic_usebundle("75", "heads"),
+#        comment => "Call bundle heads ~ 75% of the time";
+# }
 # ```
 {
   classes:
