@@ -487,7 +487,7 @@ bundle agent git_init(repo_path)
 bundle agent git_add(repo_path, file)
 # @brief adds files to the supplied repository's index
 # @depends git
-# @param repo_path absolute path to a git repository 
+# @param repo_path absolute path to a git repository
 # @param file a file to stage in the index
 #
 # **Example:**
@@ -576,7 +576,7 @@ bundle agent git_checkout_new_branch(repo_path, new_branch)
 bundle agent git_commit(repo_path, message)
 # @brief executes a commit to the specificed git repository
 # @depends git
-# @param repo_path absolute path to a git repository 
+# @param repo_path absolute path to a git repository
 # @param message the message to associate to the commmit
 #
 # **Example:**
@@ -603,7 +603,7 @@ bundle agent git_commit(repo_path, message)
 
 bundle agent git(repo_path, subcmd, args)
 # @brief generic interface to git
-# @param repo_path absolute path to a new or existing git repository 
+# @param repo_path absolute path to a new or existing git repository
 # @param subcmd any valid git sub-command
 # @param args a single string of arguments to pass
 #
@@ -628,3 +628,45 @@ bundle agent git(repo_path, subcmd, args)
       contain => in_dir("$(repo_path)");
 }
 
+bundle agent cmerge(varlist)
+# @brief bundle to merge many data containers into one
+# @param varlist a list of variable names (**MUST** be a list)
+#
+# The result will be in `cmerge.all`.  You can also use
+# `cmerge.all_str` for a string version of the merged containers.
+#
+# If you merge a key-value map into an array or vice versa, the map
+# always wins.  So this example will result in a key-value map even
+# though `cmerge.all` starts as an array.
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent run
+# {
+#   vars:
+#       # the "mymerge" tag is user-defined
+#       "a"       data  => parsejson('{ "a": "1" }'), meta => { "mymerge" };
+#       "b"       data  => parsejson('{ "b": "2" }'), meta => { "mymerge" };
+#       "c"       data  => parsejson('{ "c": "3" }'), meta => { "mymerge" };
+#       "d"       data  => parsejson('{ "d": "4" }'), meta => { "mymerge" };
+#
+#       # you can list them explicitly: "default:run.a" through "default:run.d"
+#       "todo"    slist => variablesmatching(".*", "mymerge");
+#
+#       # you can use cmerge.all_str, but this is how you access the result
+#       "merged_str" string => format("%S", "cmerge.all");
+#
+#   methods:
+#       "go" usebundle => cmerge(@(todo)); # a, b, c, d
+#
+#   reports:
+#       "merged = $(cmerge.all_str)";
+# }
+# ```
+{
+  vars:
+      "all" data => parsejson('[]');
+      "all" data => mergedata(all, $(varlist)); # iterates!
+      "all_str" string => format("%S", all);
+}
