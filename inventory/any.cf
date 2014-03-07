@@ -78,7 +78,7 @@ bundle agent cfe_autorun_inventory_proc
 # @brief Do procfs inventory
 #
 # This bundle will parse these /proc files: consoles, cpuinfo,
-# meminfo, modules, partitions, uptime, version, vmstat.  There are
+# meminfo, modules, partitions, version, vmstat.  There are
 # some general patterns you can follow to extend it for other /proc
 # items of interest.
 #
@@ -88,7 +88,7 @@ bundle agent cfe_autorun_inventory_proc
 # `ifconfig`.
 {
   vars:
-      "basefiles" slist => { "consoles", "cpuinfo", "modules", "partitions", "uptime", "version" };
+      "basefiles" slist => { "consoles", "cpuinfo", "modules", "partitions", "version" };
       "files[$(basefiles)]" string => "$(inventory_control.proc)/$(basefiles)";
 
     _have_proc_consoles::
@@ -137,10 +137,6 @@ bundle agent cfe_autorun_inventory_proc
       "partitions[$(partitions_array[$(partitions_idx)][4])]" string => "$(partitions_array[$(partitions_idx)][3])";
       "partitions_keys" slist => getindices("partitions");
 
-    _have_proc_uptime::
-      "uptimes" rlist => readreallist("$(files[uptime])","#.*","\s+",10,400);
-      "uptime" string => nth(uptimes, 0);
-
     _have_proc_version::
       "version" string => readfile("$(files[version])", 2048);
 
@@ -170,8 +166,6 @@ bundle agent cfe_autorun_inventory_proc
       "$(this.bundle): we have cpuinfo $(cpuinfo_keys) = $(cpuinfo[$(cpuinfo_keys)])";
     _have_proc_partitions.verbose_mode::
       "$(this.bundle): we have partitions $(partitions_keys) with $(partitions[$(partitions_keys)]) blocks";
-    _have_proc_uptime.verbose_mode::
-      "$(this.bundle): we have uptime $(uptime) seconds";
     _have_proc_version.verbose_mode::
       "$(this.bundle): we have kernel version '$(version)'";
 }
