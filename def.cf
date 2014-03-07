@@ -106,6 +106,7 @@ bundle common def
                                     "$(sys.workdir)/httpd/logs/error_log", # Mission Portal
                                     "$(sys.workdir)/promise_summary.log",
                                     "$(sys.workdir)/state/cf_value.log",
+                                    "$(sys.workdir)/outputs/dc-scripts.log",
                                   };
 
       "cfe_log_dirs"     slist => {
