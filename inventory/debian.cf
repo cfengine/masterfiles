@@ -12,6 +12,11 @@ bundle common inventory_debian
      "lsb_release_info" string => readfile("/etc/lsb-release","256"),
       comment => "Read more OS info" ;
 
+    has_etc_linuxmint_info::
+      "linuxmint_info"  string => readfile("/etc/linuxmint/info","1024"),
+      comment => "Read Linux Mint specific info" ;
+
+
   classes:
     any::
       "debian_derived_evaluated" or => { "has_os_release","has_lsb_release" } ;
@@ -33,8 +38,14 @@ bundle common inventory_debian
 
     linuxmint.has_lsb_release::
       "lmde"
-      expression => regcmp('(?ms).*^DISTRIB_DESCRIPTION="LMDE.*', "$(os_release_info)"),
+      expression => regcmp('(?ms).*^DISTRIB_DESCRIPTION="LMDE.*', "$(lsb_release_info)"),
       comment => "this is a Linux Mint Debian Edition" ;
+
+    linuxmint.has_etc_linuxmint_info::
+      "lmde"
+      expression => regcmp('(?ms).*^DESCRIPTION="LMDE.*',"$(linuxmint_info)"),
+      comment => "this is a Linux Mint Debian Edition" ;
+
 
     debian_derived_evaluated::
       "debian_pure" expression => "debian.!(ubuntu|linuxmint)",
@@ -52,5 +63,9 @@ bundle common inventory_debian
 
       "has_lsb_release" expression => fileexists("/etc/lsb-release"),
       comment => "Check if we can get more info from /etc/lsb-release",
+      meta => { "inventory", "attribute_name=none" };
+
+      "has_etc_linuxmint_info" expression => fileexists("/etc/linuxmint/info"),
+      comment => "If this is a Linux Mint system, this *could* be available",
       meta => { "inventory", "attribute_name=none" };
 }
