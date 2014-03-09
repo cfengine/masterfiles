@@ -14,7 +14,7 @@ body executor control
 
       splaytime  => "1";
       mailto     => "root@$(def.domain)";
-      mailfrom   => "root@$(sys.host).$(def.domain)";
+      mailfrom   => "root@$(sys.fqhost)";
       smtpserver => "localhost";
 
       # Default:
