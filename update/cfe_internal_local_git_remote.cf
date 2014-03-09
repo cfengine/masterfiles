@@ -19,3 +19,16 @@ support sketch activation deployments from Mission Portal",
     inform_mode.failed_perms_local_git_remote_clone::
       "$(this.bundle): failed to set the permissions of the Git clone $(u_def.local_masterfiles_git)";
 }
+
+body depth_search u_cfe_internal_recurse(d)
+{
+  depth => "$(d)";
+  xdev => "true";
+}
+
+body perms u_cfe_internal_mog(mode,user,group)
+{
+      owners => { "$(user)" };
+      groups => { "$(group)" };
+      mode   => "$(mode)";
+}

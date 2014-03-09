@@ -29,10 +29,6 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_update_folders",
       comment => "Create empty directories for CFE self-upgrade";
 
-      "hub" usebundle => cfe_internal_create_cf_null,
-      handle => "cfe_internal_management_create_cf_null",
-      comment => "Create a dummy cf_null file in masterfiles directory to ensure that 3.4 clients will be working";
-
     am_policy_hub.enterprise::
       #### cfengine_internal_selinux() can be "enabled" or "disabled"
 
@@ -67,6 +63,10 @@ bundle agent cfe_internal_management
       "hub" usebundle => cfe_internal_php_runalerts,
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
+
+      "hub" usebundle => cfe_internal_truncate_events,
+      handle => "cfe_internal_truncate_events",
+      comment => "To run CFE truncate to pending";
 
     any::
 

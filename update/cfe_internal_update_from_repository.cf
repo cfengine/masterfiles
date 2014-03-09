@@ -6,80 +6,11 @@ bundle agent cfe_internal_update_from_repository
         usebundle => cfe_internal_masterfiles_stage,
         handle => "cfe_internal_update_from_repository_methods_masterfiles_fetch",
         comment => "Grab the latest updates from upstream VCS repo before deploying masterfiles";
-
-      "Tag the staged masterfiles for release"
-        usebundle => cfe_internal_masterfiles_tag_stage_release,
-        handle => "cfe_internal_update_from_repository_methods_masterfiles_tag_stage_release";
-
-    _cfe_have_tagged_staged_masterfiles::
-      "Deploy staged masterfiles"
-        usebundle => cfe_internal_masterfiles_deploy_from_stage,
-        handle => "cfe_internal_update_from_repository_methods_masterfiles_deploy_from_stage",
-        comment => "Deploy the most recent masterfiles";
 }
 
 bundle agent cfe_internal_masterfiles_stage
 {
   commands:
-      "$(u_def.dc_scripts)/pre-fetch.sh"
-      handle => "masterfiles_update_pre_fetch",
-      contain => u_cfe_internal_no_output_as_cfe_apache;
-
       "$(u_def.dc_scripts)/masterfiles-stage.sh"
-      handle => "masterfiles_update_stage",
-      contain => u_cfe_internal_no_output;
-}
-
-bundle agent cfe_internal_masterfiles_tag_stage_release
-{
-  classes:
-      "_cfe_have_tagged_staged_masterfiles"
-      expression => returnszero("$(sys.cf_promises) -T $(u_def.masterfiles_staging_tmp)", "noshell"),
-      scope => "namespace";
-}
-
-bundle agent cfe_internal_masterfiles_deploy_from_stage
-{
-  files:
-      # we should check the stage area for sanity before deploying masterfiles, what if the staging directory is empty?
-      "$(sys.workdir)/masterfiles/."
-        copy_from => u_cfe_internal_local_sync_dcp($(u_def.masterfiles_staging_tmp)),
-        depth_search => u_cfe_internal_recurse("inf"),
-        perms => u_cfe_internal_mog($(u_def.masterfiles_perms_mode), "root", "root");
-}
-
-body contain u_cfe_internal_no_output
-{
-      no_output => "true";
-      chdir => "$(sys.masterdir)";
-}
-
-body contain u_cfe_internal_no_output_as_cfe_apache
-{
-      exec_owner => "$(u_def.cf_apache_user)";
-      exec_group => "$(u_def.cf_apache_group)";
-      no_output => "true";
-      chdir => "$(sys.masterdir)";
-}
-
-body copy_from u_cfe_internal_local_sync_dcp(from)
-{
-      source      => "$(from)";
-      purge       => "true";
-      preserve    => "true";
-      compare     => "digest";
-      type_check  => "false";
-}
-
-body depth_search u_cfe_internal_recurse(d)
-{
-  depth => "$(d)";
-  xdev => "true";
-}
-
-body perms u_cfe_internal_mog(mode,user,group)
-{
-      owners => { "$(user)" };
-      groups => { "$(group)" };
-      mode   => "$(mode)";
+      handle => "masterfiles_update_stage";
 }

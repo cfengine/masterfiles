@@ -64,10 +64,6 @@ bundle common u_def
       "cf_git" string => "$(sys.workdir)/bin/git",
       comment => "Path to git binary installed with CFEngine Enterprise";
 
-      "masterfiles_staging_tmp" string => "$(DCWORKFLOW)/masterfiles_staging_tmp",
-      handle => "common_u_def_vars_masterfiles_staging_tmp",
-      comment => "Directory where most recent VCS changes are staged before final deployment to masterfiles";
-
     cfengine_3_4|cfengine_3_5::
       "cf_apache_user" string => "apache",
       handle => "common_u_def_vars_cf_apache_user",

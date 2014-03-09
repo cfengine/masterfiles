@@ -38,3 +38,9 @@ install:
 			$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
 		done; \
 	done;
+	for d in templates; do \
+		$(INSTALL_DIR) $(DESTDIR)/$$d; \
+		for f in $$d/*.mustache; do\
+			$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
+		done; \
+	done;

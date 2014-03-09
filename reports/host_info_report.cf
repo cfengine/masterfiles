@@ -6,29 +6,142 @@ bundle agent host_info_report
 {
   vars:
     "host_info_report_template"
-      string => "/$(this.promise_dirname)/../templates/$(this.bundle).mustache",
+      handle  => "host_info_report_vars_host_info_report_template",
+      string  => "$(this.promise_dirname)/../templates/$(this.bundle).mustache",
       comment => "Where the report template is found";
 
-    "host_info_report_txt"
-      string => "/$(sys.workdir)/reports/$(this.bundle).txt",
+    "host_info_report_output"
+      handle  => "host_info_report_vars_host_info_report_output",
+      string  => "$(sys.workdir)/reports/$(this.bundle).txt",
       comment => "Where the host info report should be generated";
 
-    "installed_packages"
-      data => packagesmatching(".*", ".*", ".*", ".*");
+  methods:
+    show_software::
+      "Software"
+        handle    => "host_info_report_methods_software",
+        usebundle => host_info_report_software,
+        comment   => "Collect information about software installed";
 
+    any::
+      "CFEngine"
+        handle    => "host_info_report_methods_cfengine",
+        usebundle => host_info_report_cfengine,
+        comment   => "Collect information about CFEngine";
 
+      "Render"
+        usebundle => host_info_report_render_txt,
+        comment   => "Render the host info report in plain text";
+}
+
+bundle agent host_info_report_software
+# @brief Collect information about software installed
+{
+  vars:
+      "packages"
+        data => packagesmatching(".*", ".*", ".*", ".*"),
+        comment => "Get information about all packages currently on system";
+
+      "package_names"
+        slist => getindices("package_state[name]");
+
+    DEBUG::
+      "printable"
+        string => format("%S", packages);
+
+  reports:
+    DEBUG::
+      "$(printable)";
+      "$(package_names)";
+}
+
+bundle agent host_info_report_cfengine
+# @brief Collect information about CFEngine
+{
+  classes:
+    "have_masterdir_cf_promises_validated"
+      expression => fileexists("$(sys.masterdir)/cf_promises_validated"),
+      handle => "host_info_report_cfengine_classes_have_masterdir_cf_promises_validated",
+      comment => "We need to know if we have the files, because if we try to
+                  read them when they don't exist we get error messages. Look
+                  in masterdir because we are interested in the last time when
+                  policy was changed and validated (indicating when a policy
+                  release was received). ";
+
+    "have_inputdir_cf_promises_release_id"
+      expression => fileexists("$(sys.inputdir)/cf_promises_release_id"),
+      handle => "host_info_report_cfengine_classes_have_masterdir_cf_promises_release_id",
+      comment => "We need to know if we have the files, because if we try to
+                  read them when they don't exist we get error messages. Look
+                  in inputdir because we are interested in the current policy
+                  release id as determined on the policyserver, not as
+                  calculated locally.";
+
+  vars:
+      # doesn't work :( # "interface_flags" slist => maparray("$(this.k): IP $(sys.ipv4[$(this.k)]), flags $(this.v)", "sys.interface_flags");
+      "interface_flags" slist => maparray("$(this.k): $(this.v)", "sys.interface_flags");
+      "interface_ips" slist => maparray("$(this.k): IPv4 $(this.v)", "sys.ipv4");
+      "interface_info_unsorted" slist => { @(interface_flags), @(interface_ips) };
+      "interface_info" slist => sort(interface_info_unsorted, "lex");
+
+    any::
+      "cfengine_info_files"
+        handle => "host_info_report_vars_cfengine_info_files",
+        slist => { "cf_promises_validated", "cf_promises_release_id" },
+        comment => "These files are required for CFEngine related information,
+                    and if we try to read them when they don't exist we get
+                    ugly error messages";
+
+    have_masterdir_cf_promises_validated::
+      "cf_promises_validated"
+        data => readjson("$(sys.masterdir)/cf_promises_validated", 1K),
+        comment => "This contains information about the last time policy was
+                    updated and subsequently validated, it indicates when
+                    policy was last updated from the policy server.";
+
+      "cf_promises_validated_timestamp_formatted"
+        string => strftime("localtime", "%F %T %Z", $(cf_promises_validated[timestamp])),
+        comment => "It's useful to display when policy was last updated and
+                    verified, in a human readable format.";
+
+    have_inputdir_cf_promises_release_id::
+      "cf_promises_release_id"
+        data => readjson("$(sys.inputdir)/cf_promises_release_id", 1K);
+
+    any::
+      "last_agent_run"
+        string => strftime("localtime", "%F %T %Z", filestat("$(sys.workdir)/outputs/previous", "mtime"));
+
+    DEBUG::
+      "printable"
+        string => format("%S", cf_promises_release_id);
+
+  reports:
+    DEBUG::
+      "$(printable)";
+
+  reports:
+    DEBUG.have_masterdir_cf_promises_validated::
+      "I have cf_promises_validated";
+
+    DEBUG.have_inputdir_cf_promises_release_id::
+      "I have a policy release ID";
+}
+
+bundle agent host_info_report_render_txt
+# @brief Generates a report with the collected information
+{
   files:
-    "$(host_info_report_txt)"
+    "$(host_info_report.host_info_report_output)"
       create => "true",
-      edit_template => "$(host_info_report_template)",
-      handle => "host_info_report_files_host_info_report_txt",
-      classes => scoped_classes_generic("bundle", "host_info_report_txt"),
+      edit_template => "$(host_info_report.host_info_report_template)",
+      handle => "host_info_report_files_host_info_report_output",
+      classes => scoped_classes_generic("bundle", "host_info_report_output"),
       template_method => "mustache";
 
   reports:
-    host_info_report_txt_repaired::
-      "Host info report generated and avilable at $(host_info_report_txt)";
+    host_info_report_output_repaired::
+      "Host info report generated and avilable at '$(host_info_report.host_info_report_output)'";
 
-    host_info_report_txt_not_ok::
-      "There was a problem generating your host info report at $(host_info_report_txt)";
+    host_info_report_output_not_ok::
+      "There was a problem generating your host info report at '$(host_info_report.host_info_report_output)'";
 }
