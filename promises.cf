@@ -121,20 +121,7 @@ bundle common cfengine_stdlib
       "inputs" slist => { "libraries/cfengine_stdlib.cf" };
     cfengine_3_5::
       # 3.5 doesn't have "body file control" so all the includes are listed here
-      "inputs" slist => {
-                          "lib/3.5/paths.cf",
-                          "lib/3.5/common.cf",
-                          "lib/3.5/commands.cf",
-                          "lib/3.5/packages.cf",
-                          "lib/3.5/files.cf",
-                          "lib/3.5/services.cf",
-                          "lib/3.5/processes.cf",
-                          "lib/3.5/storage.cf",
-                          "lib/3.5/databases.cf",
-                          "lib/3.5/monitor.cf",
-                          "lib/3.5/guest_environments.cf",
-                          "lib/3.5/bundles.cf",
-      };
+      "inputs" slist => { "lib/3.5/stdlib.cf", @(stdlib_common.inputs) };
 
     !(cfengine_3_4||cfengine_3_5)::
       # CFEngine 3.6 and higher can include through a secondary file
