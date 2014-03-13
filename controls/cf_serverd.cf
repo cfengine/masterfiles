@@ -155,9 +155,8 @@ body report_data_select default_data_select_host
 # reporting value) should be prefixed with an underscore. By default the policy
 # framework explicitly excludes these variables and classes from collection.
 {
-      variables_include => { "sys..*", "mon..*" };
-      variables_exclude => { "_.*", ".*\._.*" };
-      classes_exclude => { "_.*" };
+      metatags_include => { "inventory",
+                            "monitoring" };
       monitoring_include => { "cpu.*",
                               "mem_total",
                               "mem_free",
@@ -174,7 +173,7 @@ body report_data_select default_data_select_policy_hub
 # reporting value) should be prefixed with an underscore. By default the policy
 # framework explicitly excludes these variables and classes from collection.
 {
-      variables_include => { "sys..*", "mon..*" };
-      variables_exclude => { "_.*", ".*\._.*" };
-      classes_exclude => { "_.*" };
+      metatags_include => { "inventory",
+                            "monitoring" };
+
 }
