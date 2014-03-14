@@ -82,6 +82,7 @@ bundle common paths
 
     linux::
       "path[lsattr]"        string => "/usr/bin/lsattr";
+      "path[tar]"           string => "/bin/tar";
 
     aix::
 
