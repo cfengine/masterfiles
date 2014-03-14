@@ -96,25 +96,34 @@ bundle common def
         handle  => "common_def_vars_cf_runagent_shell";
 
     enterprise::
-      "cfe_enterprise_log_files"    slist => {
-                                               "$(sys.workdir)/outputs/dc-scripts.log",
+      "cfe_enterprise_generic_log_files"    slist => {
                                                "$(sys.workdir)/cf_notkept.log",
                                                "$(sys.workdir)/cf_repair.log",
                                                "$(sys.workdir)/state/cf_value.log",
-                                               "$(sys.workdir)/httpd/logs/access_log",# Mission Portal
-                                               "$(sys.workdir)/httpd/logs/error_log", # Mission Portal
-      };
+      	};
+      
+    enterprise.am_policy_hub::
+      "cfe_enterprise_hub_log_files" slist => {						
+						"$(sys.workdir)/outputs/dc-scripts.log",
+						"$(sys.workdir)/httpd/logs/access_log", # Mission Portal
+						"$(sys.workdir)/httpd/logs/error_log", # Mission Portal
+	};
+
+    enterprise.!am_policy_hub::
+      "cfe_enterprise_hub_log_files" slist => { };
 
     !enterprise::
-      "cfe_enterprise_log_files"    slist => { };
+      "cfe_enterprise_generic_log_files" slist => { };
+      "cfe_enterprise_hub_log_files"     slist => { };
 
     any::
       # CFEngine's own log files
       "cfe_log_files"    slist => {
-                                    "$(sys.workdir)/cf3.$(sys.host).runlog",
-                                    "$(sys.workdir)/promise_summary.log",
-                                    @(cfe_enterprise_log_files),
-                                  };
+				    "$(sys.workdir)/cf3.$(sys.host).runlog",
+				    "$(sys.workdir)/promise_summary.log",
+				    @(cfe_enterprise_generic_log_files),
+				    @(cfe_enterprise_hub_log_files),
+				  };
 
       "cfe_log_dirs"     slist => {
                                     "$(sys.workdir)/outputs",
