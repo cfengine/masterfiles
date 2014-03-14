@@ -24,6 +24,8 @@ body common control
                   "update/update_policy.cf",
                   "update/update_processes.cf"
       };
+
+      protocol_version => "latest";
 }
 
 #############################################################################

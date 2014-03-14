@@ -69,6 +69,13 @@ body common control
 
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
+
+      # Connection protocol to use for all outgoing connections
+      # values: "1" or "classic" for classic CFEngine protocol
+      #         "2" or "latest" for new TLS encapsulated protocol
+      # If this option is missing, it defaults to "classic". It may be
+      # overridden by the "protocol_version" option in body copy_from.
+      protocol_version => "latest";
 }
 
       #
