@@ -208,6 +208,22 @@ bundle edit_line append_if_no_line(str)
 
 ##
 
+bundle edit_line prepend_if_no_line(string)
+# @brief Prepend `string` if it doesn't exist in the file
+# @param string The string to be prepended
+#
+# **See also:** [`insert_lines`][insert_lines] in
+# [`edit_line`][bundle edit_line]
+{
+  insert_lines:
+
+      "$(string)"
+      location => start,
+      comment => "Prepend a line to the file if it doesn't already exist";
+}
+
+##
+
 bundle edit_line append_if_no_lines(list)
 # @ignore
 # This duplicates the insert_lines bundle
