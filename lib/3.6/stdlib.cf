@@ -65,6 +65,7 @@ bundle common stdlib_common
                           "$(this.promise_dirname)/monitor.cf",
                           "$(this.promise_dirname)/guest_environments.cf",
                           "$(this.promise_dirname)/bundles.cf",
+                          "$(this.promise_dirname)/reports.cf",
       };
 
   reports:

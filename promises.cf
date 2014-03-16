@@ -134,6 +134,7 @@ bundle common cfengine_stdlib
                           "lib/3.5/monitor.cf",
                           "lib/3.5/guest_environments.cf",
                           "lib/3.5/bundles.cf",
+                          "lib/3.5/reports.cf",
       };
 
     !(cfengine_3_4||cfengine_3_5)::
