@@ -51,7 +51,8 @@ bundle common bundles_common
 # @ignore
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/files.cf" };
+      "inputs" slist => { "$(this.promise_dirname)/files.cf",
+                          "$(this.promise_dirname)/commands.cf" };
 }
 
 body file control
