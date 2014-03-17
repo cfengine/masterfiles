@@ -341,7 +341,7 @@ bundle agent cfe_internal_apache_sudoer
       "/etc/sudoers"
       comment => "Permit Apache user to run passwordless sudo cf-runagent",
       handle => "cfe_internal_apache_sudoer_files_etc_sudoer",
-      edit_line => apache_sudoer;
+      edit_line => "apache_sudoer";
 }
 
 #
