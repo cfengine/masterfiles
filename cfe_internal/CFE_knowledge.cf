@@ -116,7 +116,7 @@ bundle agent cfe_internal_setup_knowledge
       comment => "Create HTACCESS file for REST",
       handle => "cfe_internal_setup_knowledge_files_rest_htaccess",
       create => "true",
-      edit_line => rest_htaccess,
+      edit_line => "rest_htaccess",
       edit_defaults => empty,
       perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
