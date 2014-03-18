@@ -3,12 +3,97 @@ bundle common inventory_debian
 #
 # This common bundle is for Debian inventory work.
 {
+  vars:
+    has_os_release::
+      "os_release_info" string => readfile("/etc/os-release","256"),
+      comment => "Read more OS info" ;
+
+    has_lsb_release::
+      "lsb_release_info" string => readfile("/etc/lsb-release","256"),
+      comment => "Read more OS info" ;
+
+    has_etc_linuxmint_info::
+      "linuxmint_info"  string => readfile("/etc/linuxmint/info","1024"),
+      comment => "Read Linux Mint specific info" ;
+
+      "lm_info_count"
+      int => parsestringarray("mint_info", # array to populate
+                              "$(linuxmint_info)", # data to parse
+                              "\s*#[^\n]*",        # comments
+                              "=",                 # split
+                              100,                 # maxentries
+                              2048) ;              # maxbytes
+
+      "mint_release" string  => "$(mint_info[RELEASE][1])" ;
+      "mint_codename" string => "$(mint_info[CODENAME][1])" ;
+
   classes:
-      "debian_pure" expression => "debian.!ubuntu",
+    any::
+      "debian_derived_evaluated"
+      scope => "bundle",
+      or => { "has_os_release", "has_lsb_release", "has_etc_linuxmint_info" } ;
+
+      "linuxmint"
+      expression => "has_etc_linuxmint_info",
+      comment => "this is a Linux Mint system, of some sort",
+      meta => { "inventory", "attribute_name=none" } ;
+
+    has_lsb_release::
+      "linuxmint"
+      expression => regcmp("(?ms).*^DISTRIB_ID=LinuxMint$.*", "$(lsb_release_info)"),
+      comment => "this is a Linux Mint system, of some sort",
+      meta => { "inventory", "attribute_name=none" } ;
+
+    linuxmint.has_os_release::
+      "lmde"
+      expression => regcmp('(?ms).*^NAME="Linux Mint LMDE"$.*', "$(os_release_info)"),
+      comment => "this is a Linux Mint Debian Edition",
+      meta => { "inventory", "attribute_name=none", "derived-from=inventory_debian.os_release_info" } ;
+
+    linuxmint.has_lsb_release::
+      "lmde"
+      expression => regcmp('(?ms).*^DISTRIB_DESCRIPTION="LMDE.*', "$(lsb_release_info)"),
+      comment => "this is a Linux Mint Debian Edition",
+      meta => { "inventory", "attribute_name=none", "derived-from=inventory_debian.lsb_release_info" } ;
+
+    has_etc_linuxmint_info::
+      "lmde"
+      expression => regcmp('(?ms).*^DESCRIPTION="LMDE.*',"$(linuxmint_info)"),
+      comment => "this is a Linux Mint Debian Edition",
+      meta => { "inventory", "attribute_name=none", "derived-from=inventory_debian.linuxmint_info" } ;
+
+    debian_derived_evaluated.has_etc_linuxmint_info.!lmde::
+      # These need to be evaluated only after debian_derived_evaluated is defined
+      # to ensure that the mint_info array has been evaluated as well.
+      # Failing to do that will create meaningless classes
+      # On non-LMDE Mint systems, this will create classes like, e.g.:
+      # linuxmint_14, nadia, linuxmint_nadia
+      "linuxmint_$(mint_release)"  expression => "any",
+      meta => { "inventory", "attribute_name=none" } ;
+
+      "$(mint_codename)"           expression => "any",
+      meta => { "inventory", "attribute_name=none" } ;
+
+      "linuxmint_$(mint_codename)" expression => "any",
+      meta => { "inventory", "attribute_name=none" } ;
+
+    debian_derived_evaluated::
+      "debian_pure" expression => "debian.!(ubuntu|linuxmint)",
       comment => "pure Debian",
       meta => { "inventory", "attribute_name=none" };
 
       "debian_derived" expression => "debian.!debian_pure",
       comment => "derived from Debian",
       meta => { "inventory", "attribute_name=none" };
+
+    any::
+      "has_os_release" expression => fileexists("/etc/os-release"),
+      comment => "Check if we can get more info from /etc/os-release";
+
+      "has_lsb_release" expression => fileexists("/etc/lsb-release"),
+      comment => "Check if we can get more info from /etc/lsb-release";
+
+      "has_etc_linuxmint_info" expression => fileexists("/etc/linuxmint/info"),
+      comment => "If this is a Linux Mint system, this *could* be available";
+
 }
