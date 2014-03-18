@@ -185,16 +185,25 @@ bundle agent cfe_internal_setup_knowledge
       comment => "Initialise mongo phpcfengine",
       handle => "cfe_internal_setup_knowledge_commands_mongo_exportjs";
 
+      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/ootb_reports.js"
+      contain => silent_in_dir("$(sys.workdir)"),
+      comment => "Initialise mongo phpcfengine ootb reports",
+      handle => "cfe_internal_setup_knowledge_commands_mongo_ootb_reportsjs";
+
+      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/ootb_alerts.js"
+      contain => silent_in_dir("$(sys.workdir)"),
+      comment => "Initialise mongo phpcfengine ootb alerts",
+      handle => "cfe_internal_setup_knowledge_commands_mongo_ootb_alertsjs";
+
+      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/variables_dictionary.js"
+      contain => silent_in_dir("$(sys.workdir)"),
+      comment => "Initialise mongo phpcfengine inventory variables",
+      handle => "cfe_internal_setup_knowledge_commands_mongo_variables_dictionaryjs";
+
       "$(sys.workdir)/bin/mongo --quiet cfreport $(sys.workdir)/share/GUI/api/mongo-initialize.js"
       contain => silent_in_dir("$(sys.workdir)"),
       comment => "Initialise mongo cfreport database",
       handle => "cfe_internal_setup_knowledge_commands_mongo_mongoinitializejs";
-
-      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/sql_reports.js"
-      contain => silent_in_dir("$(sys.workdir)"),
-      comment => "Initialise mongo phpcfengine sql saved search query",
-      handle => "cfe_internal_setup_knowledge_commands_mongo_sql_reportsjs";
-
 }
 
 #############################################################################
