@@ -62,16 +62,15 @@ bundle agent cfe_autorun_inventory_listening_ports
 }
 
 bundle agent cfe_autorun_inventory_memory
-# @brief Inventory the memory totals (Enterprise only)
-#
-# This bundle uses `mon.val_mem_total` and is always enabled by
-# default, as it runs instantly and has no side effects.  It's only
-# useful in CFEngine Enterprise.
+# @brief Inventory the memory (Enterprise only)
 {
   vars:
     enterprise::
       "total" string => "$(mon.value_mem_total)",
       meta => { "inventory", "attribute_name=Memory size (MB)" };
+
+      "free" string => "$(mon.value_mem_free)",
+      meta => { "report" };
 }
 
 bundle agent cfe_autorun_inventory_proc
