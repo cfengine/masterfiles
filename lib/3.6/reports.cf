@@ -4,8 +4,7 @@ body report_data_select default_data_select_host
 # reporting value) should be prefixed with an underscore. By default the policy
 # framework explicitly excludes these variables and classes from collection.
 {
-      metatags_include => { "inventory",
-                            "monitoring" };
+      metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
       monitoring_include => { "cpu.*",
                               "mem_total",
@@ -23,8 +22,7 @@ body report_data_select default_data_select_policy_hub
 # reporting value) should be prefixed with an underscore. By default the policy
 # framework explicitly excludes these variables and classes from collection.
 {
-      metatags_include => { "inventory",
-                            "monitoring" };
+      metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
 
 }
