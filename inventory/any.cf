@@ -46,6 +46,9 @@ bundle agent inventory_autorun
       "listening ports" usebundle => cfe_autorun_inventory_listening_ports(),
       handle => "cfe_internal_autorun_listening_ports";
 
+      "disk" usebundle => cfe_autorun_inventory_disk(),
+      handle => "cfe_internal_autorun_disk";
+
       "memory" usebundle => cfe_autorun_inventory_memory(),
       handle => "cfe_internal_autorun_memory";
 }
@@ -59,6 +62,15 @@ bundle agent cfe_autorun_inventory_listening_ports
   vars:
       "ports" slist => { @(mon.listening_ports) },
       meta => { "inventory", "attribute_name=Ports listening" };
+}
+
+bundle agent cfe_autorun_inventory_disk
+# @brief Inventory the disk (Enterprise only)
+{
+  vars:
+    enterprise::
+      "free" string => "$(mon.value_diskfree)",
+      meta => { "report" };
 }
 
 bundle agent cfe_autorun_inventory_memory
