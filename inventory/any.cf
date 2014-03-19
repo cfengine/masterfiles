@@ -46,8 +46,14 @@ bundle agent inventory_autorun
       "listening ports" usebundle => cfe_autorun_inventory_listening_ports(),
       handle => "cfe_internal_autorun_listening_ports";
 
+      "disk" usebundle => cfe_autorun_inventory_disk(),
+      handle => "cfe_internal_autorun_disk";
+
       "memory" usebundle => cfe_autorun_inventory_memory(),
       handle => "cfe_internal_autorun_memory";
+
+      "loadaverage" usebundle => cfe_autorun_inventory_loadaverage(),
+      handle => "cfe_internal_autorun_loadaverage";
 }
 
 bundle agent cfe_autorun_inventory_listening_ports
@@ -61,17 +67,34 @@ bundle agent cfe_autorun_inventory_listening_ports
       meta => { "inventory", "attribute_name=Ports listening" };
 }
 
+bundle agent cfe_autorun_inventory_disk
+# @brief Inventory the disk (Enterprise only)
+{
+  vars:
+    enterprise::
+      "free" string => "$(mon.value_diskfree)",
+      meta => { "report" };
+}
+
 bundle agent cfe_autorun_inventory_memory
-# @brief Inventory the memory totals (Enterprise only)
-#
-# This bundle uses `mon.val_mem_total` and is always enabled by
-# default, as it runs instantly and has no side effects.  It's only
-# useful in CFEngine Enterprise.
+# @brief Inventory the memory (Enterprise only)
 {
   vars:
     enterprise::
       "total" string => "$(mon.value_mem_total)",
       meta => { "inventory", "attribute_name=Memory size (MB)" };
+
+      "free" string => "$(mon.value_mem_free)",
+      meta => { "report" };
+}
+
+bundle agent cfe_autorun_inventory_loadaverage
+# @brief Inventory the loadaverage (Enterprise only)
+{
+  vars:
+    enterprise::
+      "value" string => "$(mon.value_loadavg)",
+      meta => { "report" };
 }
 
 bundle agent cfe_autorun_inventory_proc
