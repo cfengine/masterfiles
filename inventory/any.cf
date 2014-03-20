@@ -325,14 +325,6 @@ bundle agent cfe_autorun_inventory_dmidecode
   classes:
       "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
 
-      "dmidecode_$(_canonified_var[$(dmivars)])_$(_canonified[$(dmivars)])"
-      expression => "any",
-      meta => { "inventory",
-                "attribute_name=none",
-                "derived-from=inventory_dmidecode.dmi[$(dmivars)]"
-      },
-      scope => "namespace";
-
   reports:
     inform_mode::
       "$(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
