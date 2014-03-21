@@ -292,31 +292,6 @@ bundle agent cfe_internal_selinux(condition)
 
 ##################################################################
 #
-# cfe_internal_hub_maintain
-#  - Start the hub maintenance process
-#  - By default, this is run every 6 hours
-#
-#  When modifying this, the following must be considered:
-#  - Intervals less than 6 hours must be used with caution
-#       as maintenance process could take a considerable time
-#  - parameters to action => bg("<if_elapsed>", "<expireafter>")
-#       must be changed accordingly
-##################################################################
-
-bundle agent cfe_internal_hub_maintain
-{
-  commands:
-
-    (Hr00|Hr06|Hr12|Hr18).Min00_05::
-
-      "$(sys.cf_hub) -m"
-      comment => "Perform hub database maintenance. This removes expired entries in the enterprise database and creates a total compliance cache for Mission Portal",
-      handle => "cfe_internal_start_hub_start_maintenance",
-      action => bg("60","60");
-}
-
-##################################################################
-#
 # cfe_internal_apache_sudoer
 #  - permit apache user to run passwordless sudo to cf-runagent
 #
