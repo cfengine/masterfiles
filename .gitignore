@@ -16,7 +16,7 @@ tests/*/xml_tmp_*
 tests/*/*.trs
 
 # copied from core
-tests/acceptance/default.cf.sub
+tests/acceptance/*.cf.sub
 
 # ignore vim dotfiles
 .*.sw[po]

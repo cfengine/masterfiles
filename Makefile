@@ -18,7 +18,7 @@ INSTALL_DIR = ${INSTALL} -m 750 -d
 ENV_FILE:=$(PWD)/tests/acceptance/testall.env
 
 copy:
-	cp $(CORE)/tests/acceptance/default.cf.sub tests/acceptance
+	cp $(CORE)/tests/acceptance/*.cf.sub tests/acceptance
 
 env:
 	echo export CORE=\"$(CORE)\" > $(ENV_FILE)
