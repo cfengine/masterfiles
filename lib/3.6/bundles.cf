@@ -633,16 +633,20 @@ bundle agent git(repo_path, subcmd, args)
       contain => in_dir("$(repo_path)");
 }
 
-bundle agent cmerge(varlist)
+bundle agent cmerge(name, varlist)
 # @brief bundle to merge many data containers into one
+# @param name the variable name to create
 # @param varlist a list of variable names (**MUST** be a list)
 #
-# The result will be in `cmerge.all`.  You can also use
-# `cmerge.all_str` for a string version of the merged containers.
+# The result will be in `cmerge.$(name)`.  You can also use
+# `cmerge.$(name)_str` for a string version of the merged containers.
+#
+# The name is variable so you can call this bundle for more than one
+# merge.
 #
 # If you merge a key-value map into an array or vice versa, the map
 # always wins.  So this example will result in a key-value map even
-# though `cmerge.all` starts as an array.
+# though `cmerge.$(name)` starts as an array.
 #
 # **Example:**
 #
@@ -663,7 +667,7 @@ bundle agent cmerge(varlist)
 #       "merged_str" string => format("%S", "cmerge.all");
 #
 #   methods:
-#       "go" usebundle => cmerge(@(todo)); # a, b, c, d
+#       "go" usebundle => cmerge("all", @(todo)); # a, b, c, d
 #
 #   reports:
 #       "merged = $(cmerge.all_str)";
@@ -671,7 +675,7 @@ bundle agent cmerge(varlist)
 # ```
 {
   vars:
-      "all" data => parsejson('[]'),            policy => "free";
-      "all" data => mergedata(all, $(varlist)), policy => "free"; # iterates!
-      "all_str" string => format("%S", all),    policy => "free";
+      "$(name)" data => parsejson('[]'),            policy => "free";
+      "$(name)" data => mergedata($(name), $(varlist)), policy => "free"; # iterates!
+      "$(name)_str" string => format("%S", $(name)),    policy => "free";
 }
