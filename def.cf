@@ -137,16 +137,58 @@ bundle common def
 
   classes:
 
-    ### Enable special features policies. Set to "any" to enable.
+      ### Enable special features policies. Set to "any" to enable.
 
-    # Internal CFEngine log files rotation
-    "cfengine_internal_rotate_logs" expression => "any";
+      # Internal CFEngine log files rotation
+      "cfengine_internal_rotate_logs" expression => "any";
 
-    # Transfer policies and binaries with encryption
-    "cfengine_internal_encrypt_transfers" expression => "!any";
+      # Transfer policies and binaries with encryption
+      # you can also request it from the command line with
+      # -Dcfengine_internal_encrypt_transfers
+      "cfengine_internal_encrypt_transfers" expression => "!any";
 
-    # Purge policies that don't exist on the server side.
-    "cfengine_internal_purge_policies" expression => "!any";
+      # Purge policies that don't exist on the server side.
+      # you can also request it from the command line with
+      # -Dcfengine_internal_purge_policies
+      "cfengine_internal_purge_policies" expression => "!any";
+}
+
+bundle common update_def
+{
+  vars:
+      "input_name_patterns" slist => { ".*.cf",".*.dat",".*.txt", ".*.conf", ".*.mustache",
+                                       "cf_promises_release_id" },
+      comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
+      handle => "common_def_vars_input_name_patterns";
+
+      # the permissions for your masterfiles, which will propagate to inputs
+      "masterfiles_perms_mode" string => "0600",
+      handle => "common_def_vars_masterfiles_perms_mode";
+
+      "dc_scripts" string => "/var/cfengine/httpd/htdocs/api/dc-scripts",
+      comment => "Directory where design center scripts are located on Enterprise Hub";
+
+      "DCWORKFLOW" string => "/opt/cfengine",
+      comment => "Directory where DC Workflow related things are stored";
+
+      "masterfiles_staging" string => "$(DCWORKFLOW)/masterfiles_staging",
+      comment => "Directory where Mission Portal Design Center
+                  activations are staged for commit to upstream repository";
+
+      "local_masterfiles_git" string => "$(DCWORKFLOW)/masterfiles.git",
+      comment => "Local bare git repository, serves as OOTB upstream repo";
+
+      "cf_git" string => "$(sys.workdir)/bin/git",
+      comment => "Path to git binary installed with CFEngine Enterprise";
+
+  classes:
+
+      # Update masterfiles from Git
+      # Enabled for enterprise users by default
+      # you can also request it from the command line with
+      # -Dcfengine_internal_masterfiles_update
+      "cfengine_internal_masterfiles_update" expression => "enterprise.!(cfengine_3_4|cfengine_3_5)";
+
 }
 
 bundle common inventory_control

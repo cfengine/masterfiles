@@ -244,7 +244,7 @@ bundle agent cfe_internal_update_policy
       "$(master_location)/."
       comment => "Make sure masterfiles folder has right file permissions",
       handle => "cfe_internal_update_policy_files_sys_workdir_masterfiles",
-      perms => u_m($(u_def.masterfiles_perms_mode)),
+      perms => u_m($(update_def.masterfiles_perms_mode)),
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 
@@ -289,7 +289,7 @@ body file_select u_cf3_files
 
 body file_select u_input_files
 {
-      leaf_name => { @(u_def.input_name_patterns) };
+      leaf_name => { @(update_def.input_name_patterns) };
       file_result => "leaf_name";
 }
 
