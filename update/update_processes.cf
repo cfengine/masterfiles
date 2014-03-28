@@ -153,7 +153,7 @@ bundle agent maintain_cfe_hub_process
       comment => "Ensure postgres.log file is there with right permissions",
       handle => "cfe_internal_maintain_cfe_hub_process_files_create_postgresql_log",
       create => "true",
-      perms => u_mo("0644","postgres");
+      perms => u_mo("0644","cfpostgres");
 
     !windows.am_policy_hub.start_mongod::
 
