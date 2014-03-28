@@ -398,7 +398,7 @@ body contain u_in_shell_and_silent
 body contain u_postgres
 {
   useshell   => "useshell";
-  exec_owner => "postgres";
+  exec_owner => "cfpostgres";
   chdir      => "/tmp";
   no_output  => "true";
 }
