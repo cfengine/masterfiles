@@ -27,6 +27,8 @@ body server control
       allowusers            => { "root" };
 
       maxconnections        => "100";
+      
+      bindtointerface       => "::";
 
     windows::
       cfruncommand => "$(sys.cf_twin) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
