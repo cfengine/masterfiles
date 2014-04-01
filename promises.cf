@@ -21,7 +21,6 @@ body common control
                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
                           service_catalogue,
-                          example_use_goals,         # See cfe_internal/example_use_goals.cf
 
       };
 
@@ -40,7 +39,6 @@ body common control
                   "cfe_internal/CFE_cfengine.cf",
                   "cfe_internal/CFE_hub_specific.cf",
                   "cfe_internal/CFE_knowledge.cf",
-                  "cfe_internal/example_use_goals.cf",
 
                  # Control body for all CFEngine robot agents
                   @(cfengine_controls.inputs),
