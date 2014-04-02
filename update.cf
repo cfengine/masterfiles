@@ -64,6 +64,14 @@ bundle common update_def
       "cf_git" string => "$(sys.workdir)/bin/git",
       comment => "Path to git binary installed with CFEngine Enterprise";
 
+      "cf_apache_user" string => "cfapache",
+      comment => "User that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_user";
+
+      "cf_apache_group" string => "cfapache",
+      comment => "Group that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_group";
+
   classes:
 
       # Update masterfiles from Git
