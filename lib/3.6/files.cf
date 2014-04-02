@@ -2104,7 +2104,7 @@ bundle agent cfe_syncdir(from, to)
       "$(to)/."
       create => "true",
       depth_search => recurse("inf"),
-      copy_from => copydir_sync($(from));
+      copy_from => cfe_copyfrom_sync($(from));
 
   reports:
     inform_mode::
@@ -2126,14 +2126,14 @@ bundle agent cfe_copyfile(from, to)
   files:
       "$(to)"
       create => "true",
-      copy_from => copydir_sync($(from));
+      copy_from => cfe_copyfrom_sync($(from));
 
   reports:
     inform_mode::
       "$(this.bundle): copying file $(from) to $(to)";
 }
 
-body copy_from copydir_sync(f)
+body copy_from cfe_copyfrom_sync(f)
 # @brief Copy a directory or file with digest checksums, preserving attributes and purging leftovers
 # @param f the file or directory
 {
@@ -2204,7 +2204,7 @@ bundle agent cfe_hardlinkfile(target, link)
   files:
       "$(link)"
       move_obstructions => "true",
-      link_from => cfe_link($(target), "hardlink");
+      link_from => cfe_linkfrom($(target), "hardlink");
 
   reports:
     inform_mode::
@@ -2226,14 +2226,14 @@ bundle agent cfe_linkfile(target, link)
   files:
       "$(link)"
       move_obstructions => "true",
-      link_from => cfe_link($(target), "symlink");
+      link_from => cfe_linkfrom($(target), "symlink");
 
   reports:
     inform_mode::
       "$(this.bundle): $(link) will be a symlink to $(target)";
 }
 
-body link_from cfe_link(source, type)
+body link_from cfe_linkfrom(source, type)
 # @brief Make any kind of link to a file
 # @param source link to this
 # @param type the link's type (`symlink` or `hardlink`)
