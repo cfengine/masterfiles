@@ -79,6 +79,11 @@ bundle common debian_knowledge
 #
 # This common bundle has useful information about Debian.
 {
+  classes:
+      "cfe_packages_apt_disable_compare" expression => "!any",
+      comment => "Set this to disable APT/dpkg version comparisons.
+You can set it in a bundle-local class, it doesn't have to be global here.";
+
   vars:
       "apt_prefix" string => "/usr/bin/env DEBIAN_FRONTEND=noninteractive LC_ALL=C PATH=/bin:/sbin/:/usr/bin:/usr/sbin";
       "call_dpkg" string => "$(apt_prefix) $(paths.path[dpkg])";
@@ -383,6 +388,7 @@ body package_method apt
       # set it to "0" to avoid caching of list during upgrade
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
+    !cfe_packages_apt_disable_compare::
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
       package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
@@ -457,6 +463,7 @@ body package_method apt_get
       package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
       package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
 
+    !cfe_packages_apt_disable_compare::
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
       package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
@@ -502,6 +509,7 @@ body package_method apt_get_noupdate
       package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
       package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
 
+    !cfe_packages_apt_disable_compare::
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
       package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
@@ -545,6 +553,7 @@ body package_method apt_get_release(release)
       package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
       package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
 
+    !cfe_packages_apt_disable_compare::
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
       package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
@@ -603,6 +612,7 @@ body package_method dpkg_version(repo)
       package_update_command =>  "$(debian_knowledge.call_dpkg) --install";
       package_patch_command =>  "$(debian_knowledge.call_dpkg) --install";
 
+    debian.!cfe_packages_apt_disable_compare::
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
       package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
@@ -1558,6 +1568,7 @@ body package_method generic
       package_name_convention => "$(name)";
       package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
 
+    debian.!cfe_packages_apt_disable_compare::
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
       package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
