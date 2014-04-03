@@ -39,39 +39,28 @@
 # the online docs
 #
 
-# For CFEngine Core: 3.6.0 to 3.6.x
-# Reporting bodies
+# For CFEngine Core: 3.5.0 to 3.5.x
+# Internal hub maintenance bundles
 
 ###################################################
 # If you find CFEngine useful, please consider    #
 # purchasing a commercial version of the software.#
 ###################################################
 
-body report_data_select default_data_select_host
-# @brief Data to collect from remote hosts by default
-# By convention variables and classes known to be internal, (having no
-# reporting value) should be prefixed with an underscore. By default the policy
-# framework explicitly excludes these variables and classes from collection.
+bundle agent cfe_internal_hub_maintain
+# @brief Executes reporting database maintenance process
+# When modifying this, the following must be considered:
+#  - Intervals less than 6 hours must be used with caution
+#       as maintenance process could take a considerable time
+#  - parameters to action => bg("<if_elapsed>", "<expireafter>")
+#       must be changed accordingly
 {
-      metatags_include => { "inventory", "report" };
-      metatags_exclude => { "noreport" };
-      monitoring_include => { "cpu.*",
-                              "mem_total",
-                              "mem_free",
-                              "mem_cached",
-                              "mem_swap",
-                              "mem_freeswap",
-                              "loadavg",
-                              "diskfree" };
-}
+  commands:
 
-body report_data_select default_data_select_policy_hub
-# @brief Data to collect from policy servers by default
-# By convention variables and classes known to be internal, (having no
-# reporting value) should be prefixed with an underscore. By default the policy
-# framework explicitly excludes these variables and classes from collection.
-{
-      metatags_include => { "inventory", "report" };
-      metatags_exclude => { "noreport" };
+    (Hr00|Hr06|Hr12|Hr18).Min00_05::
 
+      "$(sys.cf_hub) -m"
+      comment => "Perform hub database maintenance. This removes expired entries in the enterprise database and creates a total compliance cache for Mission Portal",
+      handle => "cfe_internal_start_hub_start_maintenance",
+      action => bg("60","60");
 }
