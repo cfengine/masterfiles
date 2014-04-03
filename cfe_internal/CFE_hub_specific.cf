@@ -469,17 +469,12 @@ bundle edit_line change_appsettings(p)
 
 }
 
-##################################################################
-#
-# cfe_internal_php_runalerts
+bundle agent cfe_internal_php_runalerts
+#@brief create and run PHP alerts
 #  - Bundle status need to be updated and displayed on MP. We do it
 # by running php binary with some parameters. cfe_internal_php_runalerts
 # is a bundle to create a shell script on the fly and keep running
 # the command by a specific interval (every 60s by default)
-#
-##################################################################
-
-bundle agent cfe_internal_php_runalerts
 {
   vars:
 
@@ -615,14 +610,9 @@ done"
       handle => "my_php_runalerts_script_insert_lines_php_runalerts_script";
 }
 
-#####################################################################
-#
-#cfe_internal_turncate_events
-# To cancell all the pending events once in a day
-#
-#####################################################################
-
 bundle agent cfe_internal_truncate_events
+#@brief cancel all the pending events once in a day
+
 {
   commands:
     Hr05.Min00_05::
@@ -631,149 +621,9 @@ bundle agent cfe_internal_truncate_events
       handle  => "cfe_internal_truncate_event_mp";
 }
 
-bundle agent cfe_internal_hub_maintain
-# @ignore
-# @brief Executes reporting database maintenance process
-# By default database clean up interval is 24 hours.
-# Length of log history in database is controlled
-# by modifying "history_length_days" key in report_settings
-# variable.
-#
-# Intervals less than 6 hours must be used with caution
-# as maintenance process could take a considerable time
-{
-  vars:
-      "report_settings" data => parsejson('[
-                                            {
-                                                "report": "contexts",
-                                                "table": "__ContextsLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "variables",
-                                                "table": "__VariablesLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "software",
-                                                "table": "__SoftwareLog",
-                                                "history_length_days": 28,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "software_updates",
-                                                "table": "__SoftwareUpdatesLog",
-                                                "history_length_days": 28,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "filechanges",
-                                                "table": "__FileChangesLog",
-                                                "history_length_days": 365,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "benchmarks",
-                                                "table": "__BenchmarksLog",
-                                                "history_length_days": 7,
-                                                "time_key": "CheckTimeStamp"
-                                            },
-                                            {
-                                                "report": "promise_executions",
-                                                "table": "__PromiseExecutionsLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
-                                            }
-                                           ]');
-
-      "diagnostics_settings" data => parsejson('[
-                                                     {
-                                                         "report": "hub_connection_errors",
-                                                         "table": "__HubConnectionErrors",
-                                                         "history_length_days": 1,
-                                                         "time_key": "CheckTimeStamp"
-                                                     },
-                                                     {
-                                                         "report": "diagnostics",
-                                                         "table": "__Diagnostics",
-                                                         "history_length_days": 1,
-                                                         "time_key": "TimeStamp"
-                                                     }
-                                                    ]');
-
-  methods:
-    Hr00.Min00_05::
-      "Remove old report history"
-      usebundle => cfe_internal_database_cleanup_reports(@(report_settings)),
-      action => if_elapsed(5);
-
-      "Remove cf-consumer history"
-      usebundle => cfe_internal_database_cleanup_consumer_status("50000"),
-      action => if_elapsed(5);
-
-      "Remove diagnostics history"
-      usebundle => cfe_internal_database_cleanup_diagnostics(@(diagnostics_settings)),
-      action => if_elapsed(5);
-}
-
-bundle agent cfe_internal_database_cleanup_reports (settings)
-# @ignore
-# @brief clean up the reporting tables
-{
-  vars:
-      "index" slist => getindices(settings);
-
-      "remove_query_$(settings[$(index)][report])"
-      string =>   "DELETE FROM $(settings[$(index)][table]) AS T
-                            USING (SELECT HostKey,
-                                          (LastAgentLocalExecutionTimestamp - INTERVAL '$(settings[$(index)][history_length_days]) day') AS purge_time
-                                   FROM __agentstatus) AS A
-                            WHERE T.HostKey = A.HostKey AND T.$(settings[$(index)][time_key]) <= A.purge_time;";
-
-
-  commands:
-      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      handle => "cf_database_maintain_report_$(settings[$(index)][report])";
-}
-
-bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
-# @ignore
-# @brief keep up to row_count entries in the database
-{
-
-  vars:
-      "remove_query"
-      string => "DELETE FROM status WHERE ts IN (SELECT ts FROM status ORDER BY ts DESC OFFSET $(row_count));";
-
-  commands:
-      "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
-      handle => "cf_database_maintain_consumer_status";
-}
-
-bundle agent cfe_internal_database_cleanup_diagnostics (settings)
-{
-  vars:
-      "index" slist => getindices("settings");
-
-      "remove_query_$(settings[$(index)][report])"
-      string => "DELETE FROM $(settings[$(index)][table]) WHERE $(settings[$(index)][time_key]) < (CURRENT_TIMESTAMP - INTERVAL '$(settings[$(index)][history_length_days]) day');";
-
-  commands:
-      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
-}
-
-#####################################################################
-#
-# cfe_internal_postgresql_maintenance
-# - PostgreSQL needs to be clean regularly. This bundle provides a way
-# to clean it up with vacuumdb command
-#
-#####################################################################
-
 bundle agent cfe_internal_postgresql_maintenance
+#@ignore
+#@brief PostgreSQL needs to be cleaned regularly with the vacuumdb command
 {
   vars:
 
@@ -783,24 +633,24 @@ bundle agent cfe_internal_postgresql_maintenance
       comment => "Command for cleaning a PostgreSQL database",
       handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd";
 
-    #
+      #
 
   processes:
 
     any::
 
-   "cf-hub"      signals => { "term" },
-   comment => "Terminate cf-hub while doing PostgreSQL maintenance",
-   handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
+      "cf-hub"      signals => { "term" },
+      comment => "Terminate cf-hub while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
 
-   "cf-consumer" signals => { "kill" },
-   comment => "Kill cf-consumer while doing PostgreSQL maintenance",
-   handle => "cfe_internal_postgresql_maintenance_processes_kill_cf_consumer";
-    
-    #
+      "cf-consumer" signals => { "kill" },
+      comment => "Kill cf-consumer while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_maintenance_processes_kill_cf_consumer";
+
+      #
 
   commands:
-  
+
     any::
 
       "$(vacuumdb_cmd)"
