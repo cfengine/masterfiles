@@ -93,6 +93,10 @@ bundle agent cfe_internal_hub_maintain
             "Remove cf-consumer history"
                 usebundle => cfe_internal_database_cleanup_consumer_status("50000"),
                 action => if_elapsed(5);
+
+            "Remove diagnostics history"
+                usebundle => cfe_internal_database_cleanup_diagnostics("1"),
+                action => if_elapsed(5);
 }
 
 bundle agent cfe_internal_database_cleanup_reports (settings)
@@ -126,4 +130,17 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
     commands:
         "$(sys.workdir)/bin/psql cfdb -c \"$(remove_query)\""
             handle => "cf_database_maintain_consumer_status";
+}
+
+bundle agent cfe_internal_database_cleanup_diagnostics (history_length_days)
+{
+    # Please take into consideration size of this database: ~4 new samples per host per hub collection round (default interval 5min).
+
+    vars:
+        "remove_query"
+            string => "DELETE FROM __diagnostics WHERE TimeStamp < (CURRENT_TIMESTAMP - INTERVAL '$(history_length_days) day');";
+
+    commands:
+        "$(sys.workdir)/bin/psql cfdb -c \"$(remove_query)\""
+            handle => "cf_database_maintain_diagnostics";
 }
