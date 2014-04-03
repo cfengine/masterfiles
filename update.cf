@@ -99,4 +99,5 @@ bundle common update_def
       # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
 
       "cfengine_internal_purge_policies" expression => "!any";
+
 }
