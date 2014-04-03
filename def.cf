@@ -157,6 +157,13 @@ bundle common def
       # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
 
       "cfengine_internal_purge_policies" expression => "!any";
+
+      # This class is for PosgreSQL maintenance
+      # pre-defined to every Sunday at 2 a.m.
+      # This can be changed later on.
+
+      "postgresql_maintenance" expression => "am_policy_hub.enterprise.Sunday.Hr02.Min00_05";
+
 }
 
 bundle common inventory_control

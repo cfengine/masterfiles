@@ -120,6 +120,12 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_mongod",
       ifvarclass => "nova|enterprise";
 
+      "$(sys.bindir)/vacuumdb"
+      restart_class => "no_vacuumdb",
+      comment => "Monitor vacuumdb process",
+      handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
+      ifvarclass => "nova|enterprise";
+
    am_policy_hub.!(cfengine_3_4||cfengine_3_5)::
       "$(sys.bindir)/redis-server"
       restart_class => "start_redis_server",

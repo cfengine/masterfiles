@@ -643,9 +643,9 @@ bundle agent cfe_internal_postgresql_maintenance
 {
   vars:
 
-    am_policy_hub::
+    any::
 
-      "vacuumdb_cmd" string => "$(sys.workdir)/bin/vacuumdb --full cfdb",
+      "vacuumdb_cmd" string => "$(sys.bindir)/vacuumdb --full cfdb",
       comment => "Command for cleaning a PostgreSQL database",
       handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd";
 
@@ -653,7 +653,7 @@ bundle agent cfe_internal_postgresql_maintenance
 
   processes:
 
-    am_policy_hub::
+    any::
 
    "cf-hub"      signals => { "term" },
    comment => "Terminate cf-hub while doing PostgreSQL maintenance",
@@ -667,7 +667,7 @@ bundle agent cfe_internal_postgresql_maintenance
 
   commands:
   
-    am_policy_hub::
+    any::
 
       "$(vacuumdb_cmd)"
       comment => "Run vacuumdb command",
