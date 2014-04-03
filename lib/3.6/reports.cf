@@ -83,6 +83,21 @@ bundle agent cfe_internal_hub_maintain
                                             }
                                            ]');
 
+            "diagnostics_settings" data => parsejson('[
+                                                     { 
+                                                         "report": "hub_connection_errors",
+                                                         "table": "__HubConnectionErrors",
+                                                         "history_length_days": 1,
+                                                         "time_key": "CheckTimeStamp"
+                                                     },
+                                                     { 
+                                                         "report": "diagnostics",
+                                                         "table": "__Diagnostics",
+                                                         "history_length_days": 1,
+                                                         "time_key": "TimeStamp"
+                                                     }
+                                                    ]');
+
     methods:
         Hr00.Min00_05::
             "Remove old report history"
@@ -94,7 +109,7 @@ bundle agent cfe_internal_hub_maintain
                 action => if_elapsed(5);
 
             "Remove diagnostics history"
-                usebundle => cfe_internal_database_cleanup_diagnostics("1"),
+                usebundle => cfe_internal_database_cleanup_diagnostics("@(diagnostics_settings)"),
                 action => if_elapsed(5);
 }
 
@@ -129,15 +144,15 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
             handle => "cf_database_maintain_consumer_status";
 }
 
-bundle agent cfe_internal_database_cleanup_diagnostics (history_length_days)
+bundle agent cfe_internal_database_cleanup_diagnostics (settings)
 {
-    # Please take into consideration size of this database: ~4 new samples per host per hub collection round (default interval 5min).
-
     vars:
-        "remove_query"
-            string => "DELETE FROM __diagnostics WHERE TimeStamp < (CURRENT_TIMESTAMP - INTERVAL '$(history_length_days) day');";
+        "index" slist => getindices("settings");
+
+        "remove_query_$(settings[$(index)][report])"
+            string => "DELETE FROM $(settings[$(index)][table]) WHERE $(settings[$(index)][time_key]) < (CURRENT_TIMESTAMP - INTERVAL '$(settings[$(index)][history_length_days]) day');";
 
     commands:
-        "$(sys.workdir)/bin/psql cfdb -c \"$(remove_query)\""
-            handle => "cf_database_maintain_diagnostics";
+        "$(sys.workdir)/bin/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
+            handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
 }
