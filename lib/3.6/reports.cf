@@ -28,6 +28,7 @@ body report_data_select default_data_select_policy_hub
 }
 
 bundle agent cfe_internal_hub_maintain
+# @ignore
 # @brief Executes reporting database maintenance process
 # By default database clean up interval is 24 hours.
 # Length of log history in database is controlled
@@ -95,6 +96,7 @@ bundle agent cfe_internal_hub_maintain
 }
 
 bundle agent cfe_internal_database_cleanup_reports (settings)
+# @ignore
 {
     vars:
         "index" slist => getindices("settings");
@@ -113,6 +115,7 @@ bundle agent cfe_internal_database_cleanup_reports (settings)
 }
 
 bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
+# @ignore
 {
     # keep up to row_count entries in the database
 
