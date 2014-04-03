@@ -99,4 +99,11 @@ bundle common update_def
       # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
 
       "cfengine_internal_purge_policies" expression => "!any";
+
+    am_policy_hub.enterprise::
+
+      "no_vacuumdb" not => returnszero("ps -ef  | grep -v grep | grep -q vacuumdb","useshell"),
+      comment => "Check if vacuumdb still running",
+      handle => "update_def_classes_no_vacuumdb";
+      
 }
