@@ -2043,7 +2043,6 @@ bundle agent cfe_mustache_makefile(mustache_file, json_file, target_file)
   files:
       "$(target_file)"
       create => "true",
-      edit_defaults => empty,
       edit_template => $(mustache_file),
       template_data => readjson($(json_file), "100k"),
       template_method => "mustache";
@@ -2065,7 +2064,6 @@ bundle agent cfe_mustache_makefile_string(mustache_file, json_string, target_fil
   files:
       "$(target_file)"
       create => "true",
-      edit_defaults => empty,
       edit_template => $(mustache_file),
       template_data => parsejson($(json_string)),
       template_method => "mustache";
