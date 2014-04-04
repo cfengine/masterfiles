@@ -49,6 +49,7 @@
 
 body report_data_select default_data_select_host
 # @brief Data to collect from remote hosts by default
+#
 # By convention variables and classes known to be internal, (having no
 # reporting value) should be prefixed with an underscore. By default the policy
 # framework explicitly excludes these variables and classes from collection.
@@ -67,6 +68,7 @@ body report_data_select default_data_select_host
 
 body report_data_select default_data_select_policy_hub
 # @brief Data to collect from policy servers by default
+#
 # By convention variables and classes known to be internal, (having no
 # reporting value) should be prefixed with an underscore. By default the policy
 # framework explicitly excludes these variables and classes from collection.
