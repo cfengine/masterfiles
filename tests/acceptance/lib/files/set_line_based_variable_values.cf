@@ -36,6 +36,8 @@ bundle agent test
       "config[read only]" string => '".* maybe"';
       # blanks should be OK
       "config[blank option]" string => "";
+      # this should result in a single line in the end
+      "config[spaces]" string => "x";
 
   files:
       "$(G.testfile).actual"

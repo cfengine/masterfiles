@@ -8,3 +8,4 @@ pid file = /var/run/rsyncd.pid
 # use chroot = yes
 #use chroot = no
 # read only = yes
+spaces =x
