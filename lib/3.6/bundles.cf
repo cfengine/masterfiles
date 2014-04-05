@@ -586,6 +586,15 @@ bundle agent git_clean(repo_path, stash)
 # [true|false] Note: For this to work, either the repo or the repo owner must
 # have user.email set. If user.email is not set, stashing will fail and the
 # repo will be cleaned without saving.
+#
+# **Example:**
+#
+# ```cf3
+#  methods:
+#    "test"
+#      usebundle => git_clean("/opt/cfengine/masterfiles_staging_tmp", "true"),
+#      comment => "Ensure that the staging area is a clean clone, attempt to stash any changes";
+# ```
 {
   vars:
     any::
