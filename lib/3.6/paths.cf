@@ -74,9 +74,16 @@ bundle common paths
       # Common full pathname of commands for OS
       #
 
+    enterprise.(am_policy_hub|policy_server)::
+      "path[git]"
+        string => "$(sys.workdir)/bin/git",
+        comment => "CFEngine Enterprise Hub ships with its own git which is used internally";
+
+    !(enterprise.(am_policy_hub|policy_server))::
+      "path[git]"      string => "/usr/bin/git";
+
     any::
       "path[getfacl]"  string => "/usr/bin/getfacl";
-      "path[git]"      string => "/usr/bin/git";
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
 

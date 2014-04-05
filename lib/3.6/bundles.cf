@@ -578,6 +578,78 @@ bundle agent git_checkout_new_branch(repo_path, new_branch)
       "git_checkout" usebundle => git("$(repo_path)", "checkout -b", "$(branch)");
 }
 
+bundle agent git_clean(repo_path, stash)
+# @brief Ensure that a given git repo is clean, optionally attempt to save any
+# modifications
+# @param repo_path Path to the clone
+# @param stash Attempt to save any local modification with git stash.
+# [true|false] Note: For this to work, either the repo or the repo owner must
+# have user.email set. If user.email is not set, stashing will fail and the
+# repo will be cleaned without saving.
+{
+  vars:
+    any::
+      "git_dir" string => "$(repo_path)/.git";
+      "stash_name" string => "CFEngine AUTOSTASH: $(sys.date)";
+
+    found_git_repo::
+      "repo_uid"
+        string  => filestat($(git_dir), "uid"),
+	      comment => "So that we don't mess up permissions, we will just execute
+                    all commands as the current owner of .git";
+
+      "repo_gid"
+        string  => filestat($(git_dir), "gid"),
+        comment => "So that we don't mess up permissions, we will just execute
+                    all commands as the current group of .git";
+
+  classes:
+    any::
+      "found_git_repo" expression => isdir($(git_dir));
+
+      "want_stash"
+        expression => strcmp("true", $(stash)),
+        comment    => "Indicates that we want to save (git stash) any local
+                     modifications or untracked files";
+
+    want_stash::
+      "stash" and => { "found_git_repo" };
+
+  commands:
+    stash::
+      "$(paths.git)"
+        args    => "stash save --quiet --include-untracked $(stash_name)",
+        contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) ),
+        classes => scoped_classes_generic( "bundle", "git_stash" ),
+        comment => "So that we don't lose any trail of what happend and so that
+                    we don't accidentally delete something important we stash any
+                    changes.
+                    Note:
+                      1. This promise will fail if user.email is not set
+                      2. We are respecting ignored files.";
+
+    found_git_repo::
+      "$(paths.git)"
+        args    => "clean --force -d",
+        contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) ),
+        classes => scoped_classes_generic( "bundle", "git_clean" ),
+        comment => "To have a clean clone we must remove any untracked files and
+                    directories. These should have all been stashed, but in case
+                    of error we go ahead and clean anyway.";
+
+     "/usr/bin/whoami"
+        contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) );
+
+  reports:
+    DEBUG::
+      "repo_uid: $(repo_uid)";
+      "repo_gid: $(repo_gid)";
+
+    any::
+      "$(this.bundle):: Warning: Not saving changes. Git stash failed. Perhaps 'user.email' or 'user.name' is not set."
+        ifvarclass => "git_stash_failed";
+}
+
 bundle agent git_commit(repo_path, message)
 # @brief executes a commit to the specificed git repository
 # @depends git
