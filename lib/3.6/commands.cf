@@ -216,6 +216,19 @@ body contain setuid_sh(owner)
 
 ##
 
+body contain setuidgid_dir(owner,group,dir)
+# @brief run command as specified owner and group in shell
+# @param owner username or uid to run command as
+# @param group groupname or gid to run command as
+# @param dir directory to run command from
+{
+      exec_owner => "$(owner)";
+      exec_group => "$(group)";
+      chdir      => "$(dir)";
+}
+
+##
+
 body contain setuidgid_sh(owner,group)
 # @brief run command as specified owner and group in shell
 # @param owner username or uid to run command as
