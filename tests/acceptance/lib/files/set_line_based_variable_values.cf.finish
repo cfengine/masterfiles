@@ -9,5 +9,6 @@ pid file=/tmp/rsyncd.pid
 #use chroot = no
 use chroot=maybe
 read only=".* maybe"
+spaces =x
 blank option=
 fake setting=anything
