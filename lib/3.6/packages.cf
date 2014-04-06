@@ -80,6 +80,11 @@ bundle common debian_knowledge
 # This common bundle has useful information about Debian.
 {
   vars:
+      # Debian default package architecture, see https://wiki.debian.org/Multiarch/Tuples
+      "default_arch" string => ifelse("x86_64", "amd64",
+                                      "i386", "i386",
+                                      $(sys.arch));
+
       "apt_prefix" string => "/usr/bin/env DEBIAN_FRONTEND=noninteractive LC_ALL=C PATH=/bin:/sbin/:/usr/bin:/usr/sbin";
       "call_dpkg" string => "$(apt_prefix) $(paths.path[dpkg])";
       "call_apt_get" string => "$(apt_prefix) $(paths.path[apt_get])";
@@ -103,6 +108,9 @@ bundle common redhat_knowledge
 # This common bundle has useful information about Redhat.
 {
   vars:
+      # Red Hat default package architecture
+      "default_arch" string => $(sys.arch);
+
       "call_yum" string => "$(paths.path[yum])";
       "call_rpm" string => "$(paths.path[rpm])";
 
@@ -1622,6 +1630,11 @@ bundle agent cfe_package_ensure(package_name, desired)
 #     "pleasezip" usebundle => cfe_package_ensure("zip", "add");
 # ```
 {
+  classes:
+      "additive" or => {
+                         strcmp("add", $(desired)),
+                         strcmp("addupdate", $(desired))
+      };
 
   packages:
 
@@ -1629,13 +1642,22 @@ bundle agent cfe_package_ensure(package_name, desired)
 
       "$(package_name)"
       package_policy => $(desired),
+      package_architectures => { "$(debian_knowledge.default_arch)" }, # required to avoid false positives: specify the architecture
       package_method => apt_get;
 
-
-    redhat::
+    redhat.additive::
 
       "$(package_name)"
       package_policy => $(desired),
+      package_architectures => { "$(redhat_knowledge.default_arch)" }, # required to avoid false positives: specify the architecture
+      package_version => "[0-9].*", # Redmine#2986: required, so we don't install e.g. pidgin-plugin* together with pidgin
+      package_method => yum_rpm;
+
+    redhat.!additive::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_architectures => { "$(redhat_knowledge.default_arch)" }, # required to avoid false positives: specify the architecture
       package_method => yum_rpm;
 
     !debian.!redhat::
