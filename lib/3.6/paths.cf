@@ -87,6 +87,11 @@ bundle common paths
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
 
+    _have_bin_env::
+      "path[env]"      string => "/bin/env";
+    !_have_bin_env::
+      "path[env]"      string => "/usr/bin/env";
+
     linux::
       "path[lsattr]"        string => "/usr/bin/lsattr";
       "path[tar]"           string => "/bin/tar";
@@ -476,6 +481,8 @@ bundle common paths
       "$(all_paths)" string => "$(path[$(all_paths)])";
 
   classes:
+      "_have_bin_env" expression => fileexists("/bin/env");
+
       "_stdlib_has_path_$(all_paths)"
       expression => isvariable("$(all_paths)"),
       comment    => "It's useful to know if a given path is defined";
