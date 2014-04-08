@@ -679,6 +679,32 @@ bundle agent git_commit(repo_path, message)
       "git_commit" usebundle => git("$(repo_path)", "commit", '-m "$(message)"');
 }
 
+bundle agent git_stash_pop(repo_path)
+# @brief pop off the last git stash
+# @depends git
+# @param repo_path absolute path to a git repository
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent git_stash_pop_myrepo
+# {
+#   vars:
+#     "repo"  string => "/var/git/myrepo";
+#
+#   methods:
+#     "git_stash_pop" usebundle => git_stash_pop($(repo));
+# }
+# ```
+{
+  classes:
+    "repo_exists" expression => isdir("$(repo_path)/.git");
+
+  methods:
+    repo_exists::
+      "git_stash_pop" usebundle => git($(repo_path), "stash", "pop --quiet");
+}
+
 bundle agent git(repo_path, subcmd, args)
 # @brief generic interface to git
 # @param repo_path absolute path to a new or existing git repository
