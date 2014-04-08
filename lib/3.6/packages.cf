@@ -103,9 +103,10 @@ bundle common debian_knowledge
 
 bundle common redhat_knowledge
 # @depends paths
-# @brief common Redhat knowledge bundle
+# @brief common Red Hat knowledge bundle (and RPM in general)
 #
-# This common bundle has useful information about Redhat.
+# This common bundle has useful information about Red Hat and other
+# platforms using RPM, such as SUSE and AIX.
 {
   vars:
       # Red Hat default package architecture
@@ -1667,13 +1668,17 @@ bundle agent cfe_package_absent(package)
       package_policy => "delete",
       package_method => apt_get_permissive;
 
-
     redhat::
       "$(package)"
       package_policy => "delete",
       package_method => yum_rpm_permissive;
 
-    !debian.!redhat::
+    suse::
+      "$(package)"
+      package_policy => "delete",
+      package_method => zypper;
+
+    !debian.!redhat.!suse::
       "$(package)"
       package_policy => "delete",
       package_method => generic;
@@ -1702,13 +1707,16 @@ bundle agent cfe_package_present(package)
       package_method => apt_get_permissive;
 
     redhat::
-
       "$(package)"
       package_policy => "add",
       package_method => yum_rpm_permissive;
 
-    !debian.!redhat::
+    suse::
+      "$(package)"
+      package_policy => "add",
+      package_method => zypper;
 
+    !debian.!redhat.!suse::
       "$(package)"
       package_policy => "add",
       package_method => generic;
@@ -1738,14 +1746,18 @@ bundle agent cfe_package_latest(package)
       package_method => apt_get_permissive;
 
     redhat::
-
       "$(package)"
       package_policy => "addupdate",
       package_version => "9999999999",
       package_method => yum_rpm_permissive;
 
-    !debian.!redhat::
+    suse::
+      "$(package)"
+      package_policy => "addupdate",
+      package_version => "9999999999",
+      package_method => zypper;
 
+    !debian.!redhat.!suse::
       "$(package)"
       package_policy => "addupdate",
       package_method => generic;
@@ -1904,7 +1916,16 @@ bundle agent cfe_package_specific(package_name, desired, package_version, packag
       package_architectures => { $(package_arch) },
       package_method => yum_rpm;
 
-    redhat.filebased::
+    suse.!filebased::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_select => '>=',
+      package_version => $(package_version),
+      package_architectures => { $(package_arch) },
+      package_method => zypper;
+
+    (suse|redhat|aix).filebased::
 
       "$(package_basename)"
       package_policy => $(desired),
@@ -1913,13 +1934,13 @@ bundle agent cfe_package_specific(package_name, desired, package_version, packag
       package_architectures => { $(package_arch) },
       package_method => rpm_version($(dir));
 
-    !filebased.!debian.!redhat::
+    !filebased.!debian.!redhat.!suse::
 
       "$(package_name)"
       package_policy => $(desired),
       package_method => generic;
 
   reports:
-    (inform_mode||verbose_mode).filebased.!debian.!redhat::
+    (inform_mode||verbose_mode).filebased.!suse.!debian.!redhat.!aix::
       "$(this.bundle): sorry, can't do file-based installs on $(sys.os)";
 }
