@@ -80,6 +80,11 @@ bundle common debian_knowledge
 # This common bundle has useful information about Debian.
 {
   vars:
+      # Debian default package architecture, see https://wiki.debian.org/Multiarch/Tuples
+      "default_arch" string => ifelse("x86_64", "amd64",
+                                      "i386", "i386",
+                                      $(sys.arch));
+
       "apt_prefix" string => "/usr/bin/env DEBIAN_FRONTEND=noninteractive LC_ALL=C PATH=/bin:/sbin/:/usr/bin:/usr/sbin";
       "call_dpkg" string => "$(apt_prefix) $(paths.path[dpkg])";
       "call_apt_get" string => "$(apt_prefix) $(paths.path[apt_get])";
@@ -103,6 +108,9 @@ bundle common redhat_knowledge
 # This common bundle has useful information about Redhat.
 {
   vars:
+      # Red Hat default package architecture
+      "default_arch" string => $(sys.arch);
+
       "call_yum" string => "$(paths.path[yum])";
       "call_rpm" string => "$(paths.path[rpm])";
 
@@ -462,6 +470,50 @@ body package_method apt_get
       package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
 }
 
+body package_method apt_get_permissive
+# @depends common_knowledge debian_knowledge
+# @brief APT permissive (just by name) package method
+#
+# This package method interacts with the APT package manager through
+# `apt-get`. It can't delete packages and can't take a target version
+# or architecture, so only the "add" and "addupdate" methods should be
+# used.
+#
+# **Example:**
+#
+# ```cf3
+# packages:
+#     "mypackage" package_method => apt_get_permissive, package_policy => "add";
+# ```
+{
+      package_changes => "bulk";
+      package_list_command => "$(debian_knowledge.call_dpkg) -l";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
+      package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
+      package_name_convention => "$(name)";
+
+      # set it to "0" to avoid caching of list during upgrade
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      # Target a specific release, such as backports
+      package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
+      package_list_update_command => "$(debian_knowledge.call_apt_get) update";
+      package_delete_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes -q remove";
+      package_update_command =>  "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
+      package_patch_command =>  "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
+      package_verify_command => "$(debian_knowledge.call_dpkg) -s";
+      package_noverify_returncode => "1";
+
+      package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
+      # make correct version comparisons
+      package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
+      package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
+}
+
 body package_method apt_get_release(release)
 # @depends common_knowledge debian_knowledge
 # @brief APT installation package method
@@ -764,6 +816,55 @@ body package_method yum_rpm
       package_name_convention => "$(name)-$(version).$(arch)";
 
       # just give the package name to rpm to delete, otherwise it gets "name.*" (from package_name_convention above)
+      package_delete_convention => "$(name)";
+
+      # set it to "0" to avoid caching of list during upgrade
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      package_patch_name_regex    => "([^.]+).*";
+      package_patch_version_regex => "[^\s]\s+([^\s]+).*";
+      package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
+
+      package_add_command    => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y install";
+      package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+      package_delete_command => "$(redhat_knowledge.call_rpm) -e --nodeps";
+      package_verify_command => "$(redhat_knowledge.call_rpm) -V";
+}
+
+body package_method yum_rpm_permissive
+# @depends common_knowledge redhat_knowledge
+# @brief Yum+RPM permissive (just by name) package method
+#
+# This package method interacts with the Yum and RPM package managers.
+#
+# Copy of yum_rpm which was contributed by Trond Hasle Amundsen
+#
+# This is an efficient package method for RPM-based systems - uses
+# `rpm` instead of `yum` to list installed packages. It can't delete
+# packages and can't take a target version or architecture, so only
+# the "add" and "addupdate" methods should be used.
+#
+# **Example:**
+#
+# ```cf3
+# packages:
+#     "mypackage" package_method => yum_rpm_permissive, package_policy => "add";
+# ```
+{
+      package_changes => "bulk";
+      package_list_command => "$(redhat_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+
+      package_list_name_regex    => "$(redhat_knowledge.rpm3_name_regex)";
+      package_list_version_regex => "$(redhat_knowledge.rpm3_version_regex)";
+      package_list_arch_regex    => "$(redhat_knowledge.rpm3_arch_regex)";
+
+      package_installed_regex => ".*";
+      package_name_convention => "$(name)";
+
+      # not needed, same as package_name_convention above
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
@@ -1545,7 +1646,7 @@ body package_method generic
 
 ## Useful bundles ##
 
-bundle agent cfe_package_ensure_absent(package)
+bundle agent cfe_package_absent(package)
 # @depends cfe_package_ensure
 # @brief Ensure package is absent
 # @param package the packages to remove
@@ -1557,165 +1658,194 @@ bundle agent cfe_package_ensure_absent(package)
 #
 # ```cf3
 # methods:
-#     "nozip" usebundle => cfe_package_ensure_absent("zip");
+#     "nozip" usebundle => cfe_package_absent("zip");
 # ```
 {
-  methods:
-      "ensure" usebundle => cfe_package_ensure($(package), "delete");
+  packages:
+    debian::
+      "$(package)"
+      package_policy => "delete",
+      package_method => apt_get_permissive;
+
+
+    redhat::
+      "$(package)"
+      package_policy => "delete",
+      package_method => yum_rpm_permissive;
+
+    !debian.!redhat::
+      "$(package)"
+      package_policy => "delete",
+      package_method => generic;
 }
 
-bundle agent cfe_package_ensure_present(package)
+bundle agent cfe_package_present(package)
 # @depends cfe_package_ensure
 # @brief Ensure package is present
 # @param package the packages to install
 #
-# This package method will install `package`, using
-# `cfe_package_ensure`.
+# This package method will install `package`. On Debian, it will use
+# `apt_get_permissive`. On Red Hat, `yum_rpm_permissive`. Otherwise,
+# `generic`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
-#     "pleasezip" usebundle => cfe_package_ensure_present("zip");
+#     "pleasezip" usebundle => cfe_package_present("zip");
 # ```
 {
-  methods:
-      "ensure" usebundle => cfe_package_ensure($(package), "add");
+  packages:
+    debian::
+      "$(package)"
+      package_policy => "add",
+      package_method => apt_get_permissive;
+
+    redhat::
+
+      "$(package)"
+      package_policy => "add",
+      package_method => yum_rpm_permissive;
+
+    !debian.!redhat::
+
+      "$(package)"
+      package_policy => "add",
+      package_method => generic;
 }
 
-bundle agent cfe_package_ensure_upgrade(package)
+bundle agent cfe_package_latest(package)
 # @depends cfe_package_ensure
 # @brief Ensure package is present and updated
 # @param package the package to add/update
 #
-# This package method will add or update `package`, using
-# `cfe_package_ensure`.
+# This package method will install `package` or update it to the
+# latest version. On Debian, it will use `apt_get_permissive`. On Red
+# Hat, `yum_rpm_permissive`. Otherwise, `generic`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
-#     "upgradezip" usebundle => cfe_package_ensure_upgrade("zip");
+#     "latestzip" usebundle => cfe_package_latest("zip");
 # ```
 {
-  methods:
-      "ensure" usebundle => cfe_package_ensure($(package), "addupdate");
-}
-
-bundle agent cfe_package_ensure(package_name, desired)
-# @depends apt_get yum_rpm generic
-# @brief Ensure `package_name` has the `desired` state
-# @param package_name the packages to ensure
-# @param desired the desired `package_policy`, add or delete or ...
-#
-# This package method will add or delete `packages` with
-# `package_policy` set to `desired`.
-#
-# On Debian, it will use `apt_get`.  On Red Hat, `yum_rpm`.
-# Otherwise, `generic`.
-#
-# **Example:**
-#
-# ```cf3
-# methods:
-#     "nozip" usebundle => cfe_package_ensure("zip", "delete");
-#     "pleasezip" usebundle => cfe_package_ensure("zip", "add");
-# ```
-{
-
   packages:
-
     debian::
-
-      "$(package_name)"
-      package_policy => $(desired),
-      package_method => apt_get;
-
+      "$(package)"
+      package_policy => "addupdate",
+      package_version => "9999999999",
+      package_method => apt_get_permissive;
 
     redhat::
 
-      "$(package_name)"
-      package_policy => $(desired),
-      package_method => yum_rpm;
+      "$(package)"
+      package_policy => "addupdate",
+      package_version => "9999999999",
+      package_method => yum_rpm_permissive;
 
     !debian.!redhat::
 
-      "$(package_name)"
-      package_policy => $(desired),
+      "$(package)"
+      package_policy => "addupdate",
       package_method => generic;
 }
 
-bundle agent cfe_package_named_ensure_present(packageorfile, select, package_version, package_arch)
-# @depends cfe_package_ensure_named
+bundle agent cfe_package_specific_present(packageorfile, package_version, package_arch)
+# @depends cfe_package_specific
 # @brief Ensure package is present
 # @param packageorfile the package or full filename to add
-# @param select the `package_select` method
 # @param package_version the `package_version` desired
 # @param package_arch a string determining the `package_architectures` desired
 #
 # This package method will add `packageorfile` as a package or file,
-# using `cfe_package_ensure_full`.
+# using `cfe_package_specific`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
 #      "addfilezip"
-#      usebundle => cfe_package_named_file_ensure_present("/mydir/zip",
-#                                                         "==",
-#                                                         "3.0-7",
-#                                                         ifelse("debian", "amd64",
-#                                                                "x86_64"));
+#      usebundle => cfe_package_specific_file_ensure_present("/mydir/zip",
+#                                                            "3.0-7",
+#                                                            $(debian_knowledge.default_arch));
 # ```
 {
   methods:
-      "ensure" usebundle => cfe_package_ensure_named($(package), "add", $(select), $(package_version), $(package_arch));
+      "ensure" usebundle => cfe_package_specific($(packageorfile),
+                                                 "add",
+                                                 $(package_version),
+                                                 $(package_arch));
 }
 
-bundle agent cfe_package_named_ensure_upgrade(packageorfile, select, package_version, package_arch)
-# @depends cfe_package_ensure_named
-# @brief Ensure package is added or updated
-# @param packageorfile the package or full filename to add or update
-# @param select the `package_select` method
+bundle agent cfe_package_specific_absent(packageorfile, package_version, package_arch)
+# @depends cfe_package_specific
+# @brief Ensure package is absent
+# @param packageorfile the package or full filename to delete
 # @param package_version the `package_version` desired
 # @param package_arch a string determining the `package_architectures` desired
 #
-# This package method will add or update `packageorfile` as a package
-# or file, using `cfe_package_ensure_full`.
+# This package method will remove `packageorfile` as a package or file,
+# using `cfe_package_specific`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
-#      "upgradefilezip"
-#      usebundle => cfe_package_named_file_ensure_upgrade("/mydir/zip",
-#                                                         "==",
-#                                                         "3.0-7",
-#                                                         ifelse("debian", "amd64",
-#                                                                "x86_64"));
-#      "upgradezip"
-#      usebundle => cfe_package_named_file_ensure_upgrade("/mydir/zip",
-#                                                         "==",
-#                                                         "3.0-7",
-#                                                         ifelse("debian", "amd64",
-#                                                                "x86_64"));
+#      "addfilezip"
+#      usebundle => cfe_package_specific_file_ensure_absent("/mydir/zip",
+#                                                           "3.0-7",
+#                                                           $(debian_knowledge.default_arch));
 # ```
 {
   methods:
-      "ensure" usebundle => cfe_package_ensure_named($(packageorfile), "addupdate", $(select), $(package_version), $(package_arch));
+      "ensure" usebundle => cfe_package_specific($(packageorfile),
+                                                 "delete",
+                                                 $(package_version),
+                                                 $(package_arch));
 }
 
-bundle agent cfe_package_ensure_named(package_name, desired, select, package_version, package_arch)
+bundle agent cfe_package_specific_latest(packageorfile, package_version, package_arch)
+# @depends cfe_package_specific
+# @brief Ensure package is added or updated
+# @param packageorfile the package or full filename to add or update
+# @param package_version the `package_version` desired
+# @param package_arch a string determining the `package_architectures` desired
+#
+# This package method will add or update `packageorfile` as a package
+# or file, using `cfe_package_specific`.
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "latestfilezip"
+#      usebundle => cfe_package_specific_file_ensure_latest("/mydir/zip",
+#                                                           "3.0-7",
+#                                                            $(debian_knowledge.default_arch));
+#      "latestzip"
+#      usebundle => cfe_package_specific_file_ensure_latest("/mydir/zip",
+#                                                           "3.0-7",
+#                                                           $(debian_knowledge.default_arch));
+# ```
+{
+  methods:
+      "ensure" usebundle => cfe_package_specific($(packageorfile),
+                                                 "addupdate",
+                                                 $(package_version),
+                                                 $(package_arch));
+}
+
+bundle agent cfe_package_specific(package_name, desired, package_version, package_arch)
 # @depends apt_get yum_rpm generic dpkg_version rpm_version
 # @brief Ensure `package_name` has the `desired` state
 # @param package_name the packages to ensure (can be files)
 # @param desired the desired `package_policy`, add or delete or addupdate
-# @param select the `package_select` method
 # @param package_version the desired `package_version`
 # @param package_arch the desired package architecture
 #
 # This package method will manage `packages` with `package_policy` set
-# to `desired`, using `select`, `package_version`, and `package_arch`.
+# to `desired`, using `package_version`, and `package_arch`.
 #
 # If `package_name` is **not** a file name: on Debian, it will use
 # `apt_get`.  On Red Hat, `yum_rpm`.  Otherwise, `generic`.
@@ -1723,13 +1853,17 @@ bundle agent cfe_package_ensure_named(package_name, desired, select, package_ver
 # If `package_name` **is** a file name, it will use `dpkg_version` or
 # `rpm_version` from the file's directory.
 #
+# For convenience on systems where `sys.arch` is not correct, you can
+# use `debian_knowledge.default_arch` and
+# `redhat_knowledge.default_arch`.
+#
 # **Example:**
 #
 # ```cf3
 # methods:
-#      "ensure" usebundle => cfe_package_ensure_named("zsh", "add", "==", "1.2.3", "amd64");
-#      "ensure" usebundle => cfe_package_ensure_named("/mydir/package.deb", "add", "==", "9.8.7", "amd64");
-#      "ensure" usebundle => cfe_package_ensure_named("tcsh", "delete", ">=", "2.3.4", "x86_64");
+#      "ensure" usebundle => cfe_package_specific("zsh", "add", "1.2.3", "amd64");
+#      "ensure" usebundle => cfe_package_specific("/mydir/package.deb", "add", "9.8.7", "amd64");
+#      "ensure" usebundle => cfe_package_specific("tcsh", "delete", "2.3.4", "x86_64");
 # ```
 {
   classes:
@@ -1746,7 +1880,7 @@ bundle agent cfe_package_ensure_named(package_name, desired, select, package_ver
 
       "$(package_name)"
       package_policy => $(desired),
-      package_select => $(select),
+      package_select => '>=',
       package_version => $(package_version),
       package_architectures => { $(package_arch) },
       package_method => apt_get;
@@ -1756,7 +1890,7 @@ bundle agent cfe_package_ensure_named(package_name, desired, select, package_ver
 
       "$(package_basename)"
       package_policy => $(desired),
-      package_select => $(select),
+      package_select => '>=',
       package_version => $(package_version),
       package_architectures => { $(package_arch) },
       package_method => dpkg_version($(dir));
@@ -1765,7 +1899,7 @@ bundle agent cfe_package_ensure_named(package_name, desired, select, package_ver
 
       "$(package_name)"
       package_policy => $(desired),
-      package_select => $(select),
+      package_select => '>=',
       package_version => $(package_version),
       package_architectures => { $(package_arch) },
       package_method => yum_rpm;
@@ -1774,7 +1908,7 @@ bundle agent cfe_package_ensure_named(package_name, desired, select, package_ver
 
       "$(package_basename)"
       package_policy => $(desired),
-      package_select => $(select),
+      package_select => '>=',
       package_version => $(package_version),
       package_architectures => { $(package_arch) },
       package_method => rpm_version($(dir));
