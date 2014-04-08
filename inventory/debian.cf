@@ -4,10 +4,6 @@ bundle common inventory_debian
 # This common bundle is for Debian inventory work.
 {
   vars:
-    has_os_release::
-      "os_release_info" string => readfile("/etc/os-release","256"),
-      comment => "Read more OS info" ;
-
     has_lsb_release::
       "lsb_release_info" string => readfile("/etc/lsb-release","256"),
       comment => "Read more OS info" ;
@@ -46,9 +42,9 @@ bundle common inventory_debian
 
     linuxmint.has_os_release::
       "lmde"
-      expression => regcmp('(?ms).*^NAME="Linux Mint LMDE"$.*', "$(os_release_info)"),
+      expression => regcmp('(?ms).*^NAME="Linux Mint LMDE"$.*', "$(inventory_linux.os_release_info)"),
       comment => "this is a Linux Mint Debian Edition",
-      meta => { "inventory", "attribute_name=none", "derived-from=inventory_debian.os_release_info" } ;
+      meta => { "inventory", "attribute_name=none", "derived-from=inventory_linux.os_release_info" } ;
 
     linuxmint.has_lsb_release::
       "lmde"
@@ -87,9 +83,6 @@ bundle common inventory_debian
       meta => { "inventory", "attribute_name=none" };
 
     any::
-      "has_os_release" expression => fileexists("/etc/os-release"),
-      comment => "Check if we can get more info from /etc/os-release";
-
       "has_lsb_release" expression => fileexists("/etc/lsb-release"),
       comment => "Check if we can get more info from /etc/lsb-release";
 

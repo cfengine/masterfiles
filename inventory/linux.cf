@@ -25,10 +25,10 @@ bundle common inventory_linux
 
       "os_release_has_version" expression => regextract('^VERSION_ID="?([^"]+)"?$', "$(os_release_info)", "version_array"),
       comment => "Extract VERSION_ID= line from os-release to version_array";
-      
+
     os_release_has_id::
       "$(os_release_id)" expression => "any";
 
-   os_release_has_version::
-     "$(os_release_id)_$(os_release_version)" expression => "any";
+    os_release_has_version::
+      "$(os_release_id)_$(os_release_version)" expression => "any";
 }
