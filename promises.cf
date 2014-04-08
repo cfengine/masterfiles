@@ -81,28 +81,45 @@ bundle common inventory
 #
 # Tested to work properly against 3.5.x
 {
-  vars:
-      # This list is intended to grow as needed
-    !(cfengine_3_4|cfengine_3_5).debian::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/debian.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_debian" };
-    !(cfengine_3_4|cfengine_3_5).redhat::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_redhat" };
-    !(cfengine_3_4|cfengine_3_5).SUSE::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/suse.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_suse" };
-    !(cfengine_3_4|cfengine_3_5).windows::
-      "inputs" slist => { "inventory/any.cf", "inventory/windows.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_windows" };
-    !(cfengine_3_4|cfengine_3_5).macos::
-      "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos" };
-    !(cfengine_3_4|cfengine_3_5).!windows.!macos.!debian.!redhat.!SUSE::
-      "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_generic" };
+  classes:
+      "cfengine_latest" expression => "!(cfengine_3_4|cfengine_3_5)";
+      "cfengine_legacy" expression => "(cfengine_3_4|cfengine_3_5)";
 
-    (cfengine_3_4|cfengine_3_5)::
+  vars:
+      # This list is intended to grow as needed #
+      ###########################################
+
+      # inputs and bundles common to all systems
+    cfengine_latest.any::
+      "inputs" slist => { "inventory/any.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun" };
+
+      # linux-based systems; cascade down the class chain.
+      # redefine inputs and bundles from least specific until most specific definition.
+    cfengine_latest.linux::
+      "inputs" slist => { @(inputs), "inventory/lsb.cf", "inventory/linux.cf" };
+      "bundles" slist => { @(bundles), "inventory_lsb", "inventory_linux" };
+    cfengine_latest.debian::
+      "inputs" slist => { @(inputs), "inventory/debian.cf" };
+      "bundles" slist => { @(bundles), "inventory_debian" };
+    cfengine_latest.redhat::
+      "inputs" slist => { @(inputs), "inventory/redhat.cf" };
+      "bundles" slist => { @(bundles), "inventory_redhat" };
+    cfengine_latest.SUSE::
+      "inputs" slist => { @(inputs), "inventory/suse.cf" };
+      "bundles" slist => { @(bundles), "inventory_suse" };
+
+    cfengine_latest.windows::
+      "inputs" slist => { @(inputs), "inventory/windows.cf" };
+      "bundles" slist => { @(bundles), "inventory_windows" };
+    cfengine_latest.macos::
+      "inputs" slist => { @(inputs), "inventory/macos.cf" };
+      "bundles" slist => { @(bundles), "inventory_macos" };
+    cfengine_latest.!linux.!windows.!macos::
+      "inputs" slist => { @(inputs), "inventory/generic.cf" };
+      "bundles" slist => { @(bundles), "inventory_generic" };
+
+    cfengine_legacy::
       "inputs" slist => { cf_null };
       "bundles" slist => { cf_null };
 
