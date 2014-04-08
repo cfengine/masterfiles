@@ -31,8 +31,9 @@ fi
 
 set -e
 
-rm -rf rpm_repo
-mkdir rpm_repo
+rm -rf rpm_repo/repodata
+rm -f rpm_repo/*$ARCH.rpm
+mkdir -p rpm_repo
 mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
 
