@@ -1,0 +1,34 @@
+bundle common inventory_linux
+# @brief Linux inventory
+#
+# This common bundle is for Linux inventory work.
+{
+  vars:
+    has_os_release::
+      "os_release_info" string => readfile("/etc/os-release", "512"),
+      comment => "Read /etc/os-release" ;
+
+    os_release_has_id::
+      "os_release_id" string => canonify("$(id_array[1])");
+
+    os_release_has_version::
+      "os_release_version" string => canonify("$(version_array[1])");
+
+  classes:
+
+    any::
+      "has_os_release" expression => fileexists("/etc/os-release"),
+      comment => "Check if we can get more info from /etc/os-release";
+
+      "os_release_has_id" expression => regextract('^ID="?([^"]+)"?$', "$(os_release_info)", "id_array"),
+      comment => "Extract ID= line from os-release to id_array";
+
+      "os_release_has_version" expression => regextract('^VERSION_ID="?([^"]+)"?$', "$(os_release_info)", "version_array"),
+      comment => "Extract VERSION_ID= line from os-release to version_array";
+      
+    os_release_has_id::
+      "$(os_release_id)" expression => "any";
+
+   os_release_has_version::
+     "$(os_release_id)_$(os_release_version)" expression => "any";
+}
