@@ -356,22 +356,20 @@ bundle agent cmerge(name, varlist)
 # {
 #   vars:
 #       # the "mymerge" tag is user-defined
-#       "a"       data  => parsejson('{ "a": "1" }'), meta => { "mymerge" };
-#       "b"       data  => parsejson('{ "b": "2" }'), meta => { "mymerge" };
-#       "c"       data  => parsejson('{ "c": "3" }'), meta => { "mymerge" };
-#       "d"       data  => parsejson('{ "d": "4" }'), meta => { "mymerge" };
+#       "a"       data  => parsejson('{ "mark": "b" }'), meta => { "mymerge" };
+#       "b"       data  => parsejson('{ "volker": "h" }'), meta => { "mymerge" };
 #
 #       # you can list them explicitly: "default:run.a" through "default:run.d"
 #       "todo"    slist => variablesmatching(".*", "mymerge");
 #
-#       # you can use cmerge.all_str, but this is how you access the result
+#       # you can use cmerge.all_str instead of accessing the merged data directly
 #       "merged_str" string => format("%S", "cmerge.all");
 #
 #   methods:
-#       "go" usebundle => cmerge("all", @(todo)); # a, b, c, d
+#       "go" usebundle => cmerge("all", @(todo)); # merge a, b into container cmerge.all
 #
 #   reports:
-#       "merged = $(cmerge.all_str)";
+#       "merged = $(cmerge.all_str)"; # will print a map with keys "mark" and "volker"
 # }
 # ```
 {
