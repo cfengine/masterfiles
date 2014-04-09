@@ -106,7 +106,7 @@ body process_count check_range(name,lower,upper)
       out_of_range_define => { "$(name)_out_of_range" };
 }
 
-bundle agent cfe_process_kill(name)
+bundle agent process_kill(name)
 # @brief Kill a process by name (can be a regular expression)
 # @param name the regular expression or string
 #
@@ -114,7 +114,7 @@ bundle agent cfe_process_kill(name)
 #
 # ```cf3
 # methods:
-#      "kill" usebundle => cfe_process_kill("badprocess");
+#      "kill" usebundle => process_kill("badprocess");
 # ```
 {
   processes:
