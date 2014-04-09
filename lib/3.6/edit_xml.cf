@@ -40,43 +40,93 @@
 #
 
 # For CFEngine Core: 3.6.0 to 3.6.x
-# Main COPBL include file
+# edit_xml bundles
 
 ###################################################
 # If you find CFEngine useful, please consider    #
 # purchasing a commercial version of the software.#
 ###################################################
 
-bundle common stdlib_common
-# @ignore
+bundle edit_xml xml_insert_tree_nopath(treestring)
+# @brief Insert XML tree with no path
+#
+# This `edit_xml` bundle inserts the given XML tree.  Use with an
+# empty XML document.
+#
+# @param treestring The XML tree, as a string
+#
+# **Example:**
+#
+# ```cf3
+#  files:
+#      "/newfile" edit_xml => xml_insert_tree_nopath('<x>y</x>');
+# ```
 {
-  vars:
-      "inputs" slist => {
-                          "$(this.promise_dirname)/paths.cf",
-                          "$(this.promise_dirname)/common.cf",
-                          "$(this.promise_dirname)/commands.cf",
-                          "$(this.promise_dirname)/packages.cf",
-                          "$(this.promise_dirname)/files.cf",
-                          "$(this.promise_dirname)/edit_xml.cf",
-                          "$(this.promise_dirname)/services.cf",
-                          "$(this.promise_dirname)/processes.cf",
-                          "$(this.promise_dirname)/storage.cf",
-                          "$(this.promise_dirname)/databases.cf",
-                          "$(this.promise_dirname)/users.cf",
-                          "$(this.promise_dirname)/monitor.cf",
-                          "$(this.promise_dirname)/guest_environments.cf",
-                          "$(this.promise_dirname)/bundles.cf",
-                          "$(this.promise_dirname)/reports.cf",
-                          "$(this.promise_dirname)/cfe_internal.cf",
-      };
-
-  reports:
-    verbose_mode::
-      "$(this.bundle): adding COPBL stdlib inputs='$(inputs)'";
+  insert_tree:
+      '$(treestring)';
 }
 
-body file control
-# @ignore
+bundle edit_xml xml_insert_tree(treestring, xpath)
+# @brief Insert XML tree at the given XPath
+#
+# This `edit_xml` bundle inserts the given XML tree at a specific
+# XPath.  Uses `insert_tree`.
+#
+# @param treestring The XML tree, as a string
+# @param xpath A valid XPath string
+#
+# **Example:**
+#
+# ```cf3
+#  files:
+#      "/file.xml" edit_xml => xml_insert_tree('<x>y</x>', '/a/b/c');
+# ```
 {
-      inputs => { @(stdlib_common.inputs) };
+  insert_tree:
+      '$(treestring)' select_xpath => "$(xpath)";
+}
+
+bundle edit_xml xml_set_value(value, xpath)
+# @brief Sets or replaces a value in XML at the given XPath
+#
+# This `edit_xml` bundle sets or replaces the value at a specific
+# XPath with the given value.  Uses `set_text`.
+#
+# @param value The new value
+# @param xpath A valid XPath string
+#
+# **Example:**
+#
+# ```cf3
+#  files:
+#      "/file.xml" edit_xml => xml_set_value('hello', '/a/b/c');
+# ```
+{
+  set_text:
+      "$(value)"
+      select_xpath => "$(xpath)";
+}
+
+bundle edit_xml xml_set_attribute(attr, value, xpath)
+# @brief Sets or replaces an attribute in XML at the given XPath
+#
+# This `edit_xml` bundle sets or replaces an attribute at a specific
+# XPath with the given value.  Uses `set_attribute`.
+#
+# @param attr The attribute name
+# @param value The new attribute value
+# @param xpath A valid XPath string
+#
+# **Example:**
+#
+# ```cf3
+#  files:
+#      "/file.xml" edit_xml => xml_set_attribute('parameter', 'ha', '/a/b/c');
+# ```
+{
+  set_attribute:
+      "$(attr)"
+      attribute_value => "$(value)",
+      select_xpath => "$(xpath)";
+
 }
