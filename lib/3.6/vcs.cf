@@ -47,7 +47,7 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
-bundle common bundles_common
+bundle common vcs_common
 # @ignore
 {
   vars:
@@ -58,7 +58,7 @@ bundle common bundles_common
 body file control
 # @ignore
 {
-      inputs => { @(bundles_common.inputs) };
+      inputs => { @(vcs_common.inputs) };
 }
 
 bundle agent git_init(repo_path)
