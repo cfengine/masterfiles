@@ -1490,22 +1490,6 @@ body perms mog(mode,user,group)
 
 ##
 
-body perms test_aware_mog(mode, user, group)
-# @brief Set the file's mode, owner and group based on the `test` class
-# @param mode The new mode
-# @param user The username of the new owner (if `test`, `$(this.promiser_uid)`)
-# @param group The group name (if `test`, `$(this.promiser_gid)`)
-{
-    any::
-      mode   => "$(mode)";
-    not_test::
-      owners => { "$(user)" };
-      groups => { "$(group)" };
-    test::
-      owners => { $(this.promiser_uid) };
-      groups => { $(this.promiser_gid) };
-}
-
 body perms og(u,g)
 # @brief Set the file's owner and group
 # @param u The username of the new owner
