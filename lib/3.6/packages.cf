@@ -1647,19 +1647,18 @@ body package_method generic
 
 ## Useful bundles ##
 
-bundle agent cfe_package_absent(package)
-# @depends cfe_package_ensure
+bundle agent package_absent(package)
 # @brief Ensure package is absent
 # @param package the packages to remove
 #
 # This package method will remove `package`, using
-# `cfe_package_ensure`.
+# `package_ensure`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
-#     "nozip" usebundle => cfe_package_absent("zip");
+#     "nozip" usebundle => package_absent("zip");
 # ```
 {
   packages:
@@ -1684,8 +1683,7 @@ bundle agent cfe_package_absent(package)
       package_method => generic;
 }
 
-bundle agent cfe_package_present(package)
-# @depends cfe_package_ensure
+bundle agent package_present(package)
 # @brief Ensure package is present
 # @param package the packages to install
 #
@@ -1697,7 +1695,7 @@ bundle agent cfe_package_present(package)
 #
 # ```cf3
 # methods:
-#     "pleasezip" usebundle => cfe_package_present("zip");
+#     "pleasezip" usebundle => package_present("zip");
 # ```
 {
   packages:
@@ -1722,8 +1720,7 @@ bundle agent cfe_package_present(package)
       package_method => generic;
 }
 
-bundle agent cfe_package_latest(package)
-# @depends cfe_package_ensure
+bundle agent package_latest(package)
 # @brief Ensure package is present and updated
 # @param package the package to add/update
 #
@@ -1735,7 +1732,7 @@ bundle agent cfe_package_latest(package)
 #
 # ```cf3
 # methods:
-#     "latestzip" usebundle => cfe_package_latest("zip");
+#     "latestzip" usebundle => package_latest("zip");
 # ```
 {
   packages:
@@ -1763,92 +1760,92 @@ bundle agent cfe_package_latest(package)
       package_method => generic;
 }
 
-bundle agent cfe_package_specific_present(packageorfile, package_version, package_arch)
-# @depends cfe_package_specific
+bundle agent package_specific_present(packageorfile, package_version, package_arch)
+# @depends package_specific
 # @brief Ensure package is present
 # @param packageorfile the package or full filename to add
 # @param package_version the `package_version` desired
 # @param package_arch a string determining the `package_architectures` desired
 #
 # This package method will add `packageorfile` as a package or file,
-# using `cfe_package_specific`.
+# using `package_specific`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
 #      "addfilezip"
-#      usebundle => cfe_package_specific_file_ensure_present("/mydir/zip",
-#                                                            "3.0-7",
-#                                                            $(debian_knowledge.default_arch));
+#      usebundle => package_specific_present("/mydir/zip",
+#                                            "3.0-7",
+#                                            $(debian_knowledge.default_arch));
 # ```
 {
   methods:
-      "ensure" usebundle => cfe_package_specific($(packageorfile),
-                                                 "add",
-                                                 $(package_version),
-                                                 $(package_arch));
+      "ensure" usebundle => package_specific($(packageorfile),
+                                             "add",
+                                             $(package_version),
+                                             $(package_arch));
 }
 
-bundle agent cfe_package_specific_absent(packageorfile, package_version, package_arch)
-# @depends cfe_package_specific
+bundle agent package_specific_absent(packageorfile, package_version, package_arch)
+# @depends package_specific
 # @brief Ensure package is absent
 # @param packageorfile the package or full filename to delete
 # @param package_version the `package_version` desired
 # @param package_arch a string determining the `package_architectures` desired
 #
 # This package method will remove `packageorfile` as a package or file,
-# using `cfe_package_specific`.
+# using `package_specific`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
 #      "addfilezip"
-#      usebundle => cfe_package_specific_file_ensure_absent("/mydir/zip",
-#                                                           "3.0-7",
-#                                                           $(debian_knowledge.default_arch));
+#      usebundle => package_specific_absent("/mydir/zip",
+#                                           "3.0-7",
+#                                           $(debian_knowledge.default_arch));
 # ```
 {
   methods:
-      "ensure" usebundle => cfe_package_specific($(packageorfile),
-                                                 "delete",
-                                                 $(package_version),
-                                                 $(package_arch));
+      "ensure" usebundle => package_specific($(packageorfile),
+                                             "delete",
+                                             $(package_version),
+                                             $(package_arch));
 }
 
-bundle agent cfe_package_specific_latest(packageorfile, package_version, package_arch)
-# @depends cfe_package_specific
+bundle agent package_specific_latest(packageorfile, package_version, package_arch)
+# @depends package_specific
 # @brief Ensure package is added or updated
 # @param packageorfile the package or full filename to add or update
 # @param package_version the `package_version` desired
 # @param package_arch a string determining the `package_architectures` desired
 #
 # This package method will add or update `packageorfile` as a package
-# or file, using `cfe_package_specific`.
+# or file, using `package_specific`.
 #
 # **Example:**
 #
 # ```cf3
 # methods:
 #      "latestfilezip"
-#      usebundle => cfe_package_specific_file_ensure_latest("/mydir/zip",
-#                                                           "3.0-7",
-#                                                            $(debian_knowledge.default_arch));
+#      usebundle => package_specific_latest("/mydir/zip",
+#                                           "3.0-7",
+#                                           $(debian_knowledge.default_arch));
 #      "latestzip"
-#      usebundle => cfe_package_specific_file_ensure_latest("/mydir/zip",
-#                                                           "3.0-7",
-#                                                           $(debian_knowledge.default_arch));
+#      usebundle => package_specific_latest("/mydir/zip",
+#                                           "3.0-7",
+#                                           $(debian_knowledge.default_arch));
 # ```
 {
   methods:
-      "ensure" usebundle => cfe_package_specific($(packageorfile),
-                                                 "addupdate",
-                                                 $(package_version),
-                                                 $(package_arch));
+      "ensure" usebundle => package_specific($(packageorfile),
+                                             "addupdate",
+                                             $(package_version),
+                                             $(package_arch));
 }
 
-bundle agent cfe_package_specific(package_name, desired, package_version, package_arch)
+bundle agent package_specific(package_name, desired, package_version, package_arch)
 # @depends apt_get yum_rpm generic dpkg_version rpm_version
 # @brief Ensure `package_name` has the `desired` state
 # @param package_name the packages to ensure (can be files)
@@ -1873,9 +1870,9 @@ bundle agent cfe_package_specific(package_name, desired, package_version, packag
 #
 # ```cf3
 # methods:
-#      "ensure" usebundle => cfe_package_specific("zsh", "add", "1.2.3", "amd64");
-#      "ensure" usebundle => cfe_package_specific("/mydir/package.deb", "add", "9.8.7", "amd64");
-#      "ensure" usebundle => cfe_package_specific("tcsh", "delete", "2.3.4", "x86_64");
+#      "ensure" usebundle => package_specific("zsh", "add", "1.2.3", "amd64");
+#      "ensure" usebundle => package_specific("/mydir/package.deb", "add", "9.8.7", "amd64");
+#      "ensure" usebundle => package_specific("tcsh", "delete", "2.3.4", "x86_64");
 # ```
 {
   classes:
