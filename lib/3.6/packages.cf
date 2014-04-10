@@ -560,6 +560,49 @@ body package_method apt_get_release(release)
 
 ##
 
+body package_method apt_get_safe
+# @depends common_knowledge debian_knowledge
+# @brief a more prudential apt_get method. Use it to reduce the likeliness of unexpected upgrades or removals
+#
+# This package method interacts with the APT package manager through `apt-get`.
+#
+# **Example:**
+#
+# ```cf3
+# packages:
+#     "mypackage" package_method => apt_get, package_policy => "add";
+# ```
+{
+      package_changes => "bulk";
+      package_list_command => "$(debian_knowledge.call_dpkg) -l";
+      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
+      package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
+      package_name_convention => "$(name)=$(version)";
+
+      # set it to "0" to avoid caching of list during upgrade
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      # Target a specific release, such as backports
+      package_add_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) -o APT::Get::Remove=false -o APT::Get::force-yes=false --yes install";
+      package_list_update_command => "$(debian_knowledge.call_apt_get) update";
+      package_delete_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes -q remove";
+      package_update_command =>  "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) -o APT::Get::Only-Upgrade=true -o APT::Get::Remove=false -o APT::Get::force-yes=false --yes install";
+      package_patch_command =>  "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) -o APT::Get::Only-Upgrade=true -o APT::Get::Remove=false -o APT::Get::force-yes=false --yes install";
+      package_verify_command => "$(debian_knowledge.call_dpkg) -s";
+      package_noverify_returncode => "1";
+
+      package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
+      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+
+      # make correct version comparisons
+      package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
+      package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
+}
+
+##
+
 body package_method dpkg_version(repo)
 # @depends common_knowledge debian_knowledge
 # @brief dpkg installation package method
