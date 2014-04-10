@@ -51,7 +51,11 @@ bundle common packages_common
 # @ignore
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/paths.cf" };
+      "inputs" slist => {
+                          "$(this.promise_dirname)/paths.cf",
+                          "$(this.promise_dirname)/files.cf",
+                          "$(this.promise_dirname)/common.cf"
+      };
 }
 
 body file control
@@ -198,6 +202,36 @@ bundle common pip_knowledge
       "pip_list_name_regex"    string => "^([[:alnum:]-_]+)\s\([\d.]+\)";
       "pip_list_version_regex" string => "^[[:alnum:]-_]+\s\(([\d.]+)\)";
       "pip_installed_regex"    string => "^([[:alnum:]-_]+\s\([\d.]+\))";
+}
+
+bundle common solaris_knowledge
+# @depends paths
+# @brief Solaris knowledge bundle
+#
+# This common bundle has useful information about the Solaris packages.
+{
+  vars:
+      "call_pkgadd" string => "$(paths.path[pkgadd])";
+      "call_pkgrm" string => "$(paths.path[pkgrm])";
+      "call_pkginfo" string => "$(paths.path[pkginfo])";
+
+      "admin_nocheck" string => "mail=
+instance=unique
+partial=nocheck
+runlevel=nocheck
+idepend=nocheck
+rdepend=nocheck
+space=nocheck
+setuid=nocheck
+conflict=nocheck
+action=nocheck
+networktimeout=60
+networkretries=3
+authentication=quit
+keystore=/var/sadm/security
+proxy=
+basedir=default";
+
 }
 
 body package_method pip(flags)
@@ -1176,15 +1210,35 @@ body package_method solaris(pkgname, spoolfile, adminfile)
 # to see how to use this.
 {
       package_changes => "individual";
-      package_list_command => "$(paths.path[pkginfo]) -l";
+      package_list_command => "$(solaris_knowledge.call_pkginfo) -l";
       package_multiline_start    =>  "\s*PKGINST:\s+[^\s]+.*";
       package_list_name_regex    => "\s*PKGINST:\s+([^\s]+).*";
       package_list_version_regex => "\s*VERSION:\s+([^\s]+).*";
       package_list_arch_regex    => "\s*ARCH:\s+([^\s]+)";
       package_installed_regex => "\s*STATUS:\s*(completely|partially)\s+installed.*";
       package_name_convention => "$(name)";
-      package_add_command => "$(paths.path[pkgadd]) -n -a /tmp/$(adminfile) -d /tmp/$(spoolfile)";
-      package_delete_command => "$(paths.path[pkgrm]) -n -a /tmp/$(adminfile)";
+      package_add_command => "$(solaris_knowledge.call_pkgadd) -n -a /tmp/$(adminfile) -d /tmp/$(spoolfile)";
+      package_delete_command => "$(solaris_knowledge.call_pkgrm) -n -a /tmp/$(adminfile)";
+}
+
+##
+
+body package_method solaris_install(adminfile)
+# @depends paths
+# @brief Package method for old Solaris package system
+#
+# @param adminfile The admin file created by `create_solaris_admin_file`
+{
+      package_changes => "individual";
+      package_list_command => "$(solaris_knowledge.call_pkginfo) -l";
+      package_multiline_start    =>  "\s*PKGINST:\s+[^\s]+.*";
+      package_list_name_regex    => "\s*PKGINST:\s+([^\s]+).*";
+      package_list_version_regex => "\s*VERSION:\s+([^\s]+).*";
+      package_list_arch_regex    => "\s*ARCH:\s+([^\s]+)";
+      package_installed_regex => "\s*STATUS:\s*(completely|partially)\s+installed.*";
+      package_name_convention => "$(name)";
+      package_add_command => "$(solaris_knowledge.call_pkgadd) -n -a $(adminfile)";
+      package_delete_command => "$(solaris_knowledge.call_pkgrm) -n -a $(adminfile)";
 }
 
 ##
@@ -1196,22 +1250,7 @@ bundle edit_line create_solaris_admin_file
 {
   insert_lines:
 
-      "mail=
-instance=unique
-partial=nocheck
-runlevel=nocheck
-idepend=nocheck
-rdepend=nocheck
-space=nocheck
-setuid=nocheck
-conflict=nocheck
-action=nocheck
-networktimeout=60
-networkretries=3
-authentication=quit
-keystore=/var/sadm/security
-proxy=
-basedir=default"
+      "$(solaris_knowledge.admin_nocheck)"
       comment => "Insert contents of Solaris admin file (automatically install packages)";
 }
 
@@ -1863,7 +1902,7 @@ bundle agent package_specific_latest(packageorfile, package_version, package_arc
 }
 
 bundle agent package_specific(package_name, desired, package_version, package_arch)
-# @depends apt_get yum_rpm generic dpkg_version rpm_version
+# @depends apt_get yum_rpm generic dpkg_version rpm_version zypper
 # @brief Ensure `package_name` has the `desired` state
 # @param package_name the packages to ensure (can be files)
 # @param desired the desired `package_policy`, add or delete or addupdate
@@ -1883,6 +1922,8 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
 # use `debian_knowledge.default_arch` and
 # `redhat_knowledge.default_arch`.
 #
+# Solaris is only supported with pkgadd.  Patches welcome.
+#
 # **Example:**
 #
 # ```cf3
@@ -1894,11 +1935,20 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
 {
   classes:
       "filebased" expression => fileexists($(package_name));
+      "solaris_pkgadd" and => { "solaris", "_stdlib_path_exists_pkgadd" };
 
   vars:
+      "solaris_adminfile" string => "/tmp/cfe-adminfile";
+
     filebased::
       "package_basename" string => lastnode($(package_name), "/");
       "dir" string => dirname($(package_name));
+
+  methods:
+    solaris_pkgadd.filebased::
+      "" usebundle => file_make($(solaris_adminfile),
+                                $(solaris_knowledge.admin_nocheck)),
+      classes => scoped_classes_generic("bundle", "solaris_adminfile");
 
   packages:
 
@@ -1906,11 +1956,10 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
 
       "$(package_name)"
       package_policy => $(desired),
-      package_select => '>=',
+      package_select => '>=', # see verify_packages.c
       package_version => $(package_version),
       package_architectures => { $(package_arch) },
       package_method => apt_get;
-
 
     debian.filebased::
 
@@ -1925,7 +1974,7 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
 
       "$(package_name)"
       package_policy => $(desired),
-      package_select => '>=',
+      package_select => '>=', # see verify_packages.c
       package_version => $(package_version),
       package_architectures => { $(package_arch) },
       package_method => yum_rpm;
@@ -1934,7 +1983,7 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
 
       "$(package_name)"
       package_policy => $(desired),
-      package_select => '>=',
+      package_select => '>=', # see verify_packages.c
       package_version => $(package_version),
       package_architectures => { $(package_arch) },
       package_method => zypper;
@@ -1948,6 +1997,14 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
       package_architectures => { $(package_arch) },
       package_method => rpm_version($(dir));
 
+    solaris_adminfile_ok::
+
+      "$(package_name)"
+      package_policy => $(desired),
+      package_select => '>=',
+      package_version => $(package_version),
+      package_method => solaris_install($(solaris_admin_file));
+
     !filebased.!debian.!redhat.!suse::
 
       "$(package_name)"
@@ -1955,6 +2012,6 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
       package_method => generic;
 
   reports:
-    (inform_mode||verbose_mode).filebased.!suse.!debian.!redhat.!aix::
+    (inform_mode||verbose_mode).filebased.!suse.!debian.!redhat.!aix.!solaris_pkgadd::
       "$(this.bundle): sorry, can't do file-based installs on $(sys.os)";
 }
