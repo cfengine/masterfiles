@@ -755,7 +755,7 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
       # If the line is commented out, uncomment and replace with
       # the correct value
       "^$(cp)($(i)$(bp).*|$(i))$"
-             comment => "Uncommented the value $(i)",
+             comment => "Uncommented the value '$(i)'",
         replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
           ifvarclass => "!exists_$(ci[$(i)]).!replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)])",
              classes => always("uncommented_$(ci[$(i)])");
@@ -763,24 +763,30 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
       # If the line is there with the wrong value, replace with
       # the correct value
       "^\s*($(i)$(bp)(?!$(ev[$(i)])$).*|$(i))$"
-           comment => "Correct the value $(i)",
+           comment => "Correct the value '$(i)'",
       replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
            classes => always("replace_attempted_$(ci[$(i)])");
 
   insert_lines:
-      # If the line doesn't exist, or there is more than one occurance
+      # If the line doesn't exist, or there is more than one occurrence
       # of the LHS commented out, insert a new line and try to place it
       # after the commented LHS (keep new line with old comments)
       "$(i)$(sep)$($(v)[$(i)])"
-         comment => "Insert the value, marker exists $(i)",
+         comment => "Insert the value, marker '$(i)' exists",
         location => after("^$(cp)($(i)$(bp).*|$(i))$"),
       ifvarclass => "replace_attempted_$(ci[$(i)]).multiple_comments_$(ci[$(i)])";
 
-      # If the line doesn't exist and there are no occurances
+      # If the line doesn't exist and there are no occurrences
       # of the LHS commented out, insert a new line at the eof
       "$(i)$(sep)$($(v)[$(i)])"
-         comment => "Insert the value, marker doesn't exist $(i)",
-      ifvarclass => "replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)])";
+         comment => "Insert the value, marker '$(i)' doesn't exist",
+      ifvarclass => "replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)]).!exists_$(ci[$(i)])";
+
+  reports:
+    verbose_mode|EXTRA::
+      "$(this.bundle): Line for '$(i)' exists" ifvarclass => "exists_$(ci[$(i)])";
+      "$(this.bundle): Line for '$(i)' does not exist" ifvarclass => "!exists_$(ci[$(i)])";
+
 }
 
 bundle edit_line set_config_values_matching(v,pat)
@@ -1066,94 +1072,6 @@ bundle edit_line fstab_option_editor(method, mount, option)
    field_edits:
       "(?!#)\S+\s+$(mount)\s.+"
       edit_field => fstab_options($(option), $(method));
-}
-
-###################################################
-# edit_xml bundles
-###################################################
-
-bundle edit_xml xml_insert_tree_nopath(treestring)
-# @brief Insert XML tree with no path
-#
-# This `edit_xml` bundle inserts the given XML tree.  Use with an
-# empty XML document.
-#
-# @param treestring The XML tree, as a string
-#
-# **Example:**
-#
-# ```cf3
-#  files:
-#      "/newfile" edit_xml => xml_insert_tree_nopath('<x>y</x>');
-# ```
-{
-  insert_tree:
-      '$(treestring)';
-}
-
-bundle edit_xml xml_insert_tree(treestring, xpath)
-# @brief Insert XML tree at the given XPath
-#
-# This `edit_xml` bundle inserts the given XML tree at a specific
-# XPath.  Uses `insert_tree`.
-#
-# @param treestring The XML tree, as a string
-# @param xpath A valid XPath string
-#
-# **Example:**
-#
-# ```cf3
-#  files:
-#      "/file.xml" edit_xml => xml_insert_tree('<x>y</x>', '/a/b/c');
-# ```
-{
-  insert_tree:
-      '$(treestring)';
-}
-
-bundle edit_xml xml_set_value(value, xpath)
-# @brief Sets or replaces a value in XML at the given XPath
-#
-# This `edit_xml` bundle sets or replaces the value at a specific
-# XPath with the given value.  Uses `set_text`.
-#
-# @param value The new value
-# @param xpath A valid XPath string
-#
-# **Example:**
-#
-# ```cf3
-#  files:
-#      "/file.xml" edit_xml => xml_set_value('hello', '/a/b/c');
-# ```
-{
-  set_text:
-      "$(value)"
-      select_xpath => "$(xpath)";
-}
-
-bundle edit_xml xml_set_attribute(attr, value, xpath)
-# @brief Sets or replaces an attribute in XML at the given XPath
-#
-# This `edit_xml` bundle sets or replaces an attribute at a specific
-# XPath with the given value.  Uses `set_attribute`.
-#
-# @param attr The attribute name
-# @param value The new attribute value
-# @param xpath A valid XPath string
-#
-# **Example:**
-#
-# ```cf3
-#  files:
-#      "/file.xml" edit_xml => xml_set_attribute('parameter', 'ha', '/a/b/c');
-# ```
-{
-  set_attribute:
-      "$(attr)"
-      attribute_value => "$(value)",
-      select_xpath => "$(xpath)";
-
 }
 
 ##-------------------------------------------------------
@@ -1533,6 +1451,15 @@ body link_from linkchildren(tofile)
       when_no_source  => "force";
       link_children => "true";
       when_linking_children => "if_no_such_file"; # "override_file";
+}
+
+body link_from linkfrom(source, type)
+# @brief Make any kind of link to a file
+# @param source link to this
+# @param type the link's type (`symlink` or `hardlink`)
+{
+      source => $(source);
+      link_type => $(type);
 }
 
 ##-------------------------------------------------------
@@ -2007,4 +1934,212 @@ body changes diff_noupdate
       report_changes => "content";
       report_diffs   => "true";
       update_hashes  => "no";
+}
+
+# template bundles
+
+bundle agent file_mustache(mustache_file, json_file, target_file)
+# @brief Make a file from a Mustache template and a JSON file
+# @param mustache_file the file with the Mustache template
+# @param json_file a file with JSON data
+# @param target_file the target file to write
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "m" usebundle => file_mustache("x.mustache", "y.json", "z.txt");
+# ```
+{
+  files:
+      "$(target_file)"
+      create => "true",
+      edit_template => $(mustache_file),
+      template_data => readjson($(json_file), "100k"),
+      template_method => "mustache";
+}
+
+bundle agent file_mustache_jsonstring(mustache_file, json_string, target_file)
+# @brief Make a file from a Mustache template and a JSON string
+# @param mustache_file the file with the Mustache template
+# @param json_string a string with JSON data
+# @param target_file the target file to write
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "m" usebundle => file_mustache_jsonstring("x.mustache", '{ "x": "y" }', "z.txt");
+# ```
+{
+  files:
+      "$(target_file)"
+      create => "true",
+      edit_template => $(mustache_file),
+      template_data => parsejson($(json_string)),
+      template_method => "mustache";
+}
+
+bundle agent file_tidy(file)
+# @brief Remove a file
+# @param file to remove
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "" usebundle => file_tidy("/tmp/z.txt");
+# ```
+{
+  files:
+      "$(file)" delete => tidy;
+
+  reports:
+    inform_mode|EXTRA::
+      "$(this.bundle): deleting $(file) with delete => tidy";
+}
+
+bundle agent dir_sync(from, to)
+# @brief Synchronize a directory entire, deleting unknown files
+# @param from source directory
+# @param to destination directory
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "" usebundle => dir_sync("/tmp", "/var/tmp");
+# ```
+{
+  files:
+      "$(to)/."
+      create => "true",
+      depth_search => recurse("inf"),
+      copy_from => copyfrom_sync($(from));
+
+  reports:
+    inform_mode|EXTRA::
+      "$(this.bundle): copying directory $(from) to $(to)";
+}
+
+bundle agent file_copy(from, to)
+# @brief Copy a file
+# @param from source file
+# @param to destination file
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "" usebundle => file_copy("/tmp/z.txt", "/var/tmp/y.txt");
+# ```
+{
+  files:
+      "$(to)"
+      create => "true",
+      copy_from => copyfrom_sync($(from));
+
+  reports:
+    inform_mode|EXTRA::
+      "$(this.bundle): copying file $(from) to $(to)";
+}
+
+body copy_from copyfrom_sync(f)
+# @brief Copy a directory or file with digest checksums, preserving attributes and purging leftovers
+# @param f the file or directory
+{
+      source => "$(f)";
+      purge => "true";
+      preserve => "true";
+      type_check => "false";
+      compare => "digest";
+}
+
+bundle agent file_make(file, str)
+# @brief Make a file from a string
+# @param file target
+# @param str the string data
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "" usebundle => file_make("/tmp/z.txt", "Some text
+# and some more text here");
+# ```
+{
+  files:
+      "$(file)"
+      create => "true",
+      edit_line => insert_lines($(str)),
+      edit_defaults => empty;
+
+  reports:
+    inform_mode|EXTRA::
+      "$(this.bundle): creating $(file) with contents '$(str)'";
+}
+
+bundle agent file_empty(file)
+# @brief Make an empty file
+# @param file target
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "" usebundle => file_empty("/tmp/z.txt");
+# ```
+{
+  files:
+      "$(file)"
+      create => "true",
+      edit_defaults => empty;
+
+  reports:
+    inform_mode|EXTRA::
+      "$(this.bundle): creating empty $(file) with 0 size";
+}
+
+bundle agent file_hardlink(target, link)
+# @brief Make a hard link to a file
+# @param target of link
+# @param link the hard link's location
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "" usebundle => file_hardlink("/tmp/z.txt", "/tmp/z.link");
+# ```
+{
+  files:
+      "$(link)"
+      move_obstructions => "true",
+      link_from => linkfrom($(target), "hardlink");
+
+  reports:
+    inform_mode|EXTRA::
+      "$(this.bundle): $(link) will be a hard link to $(target)";
+}
+
+bundle agent file_link(target, link)
+# @brief Make a symlink to a file
+# @param target of symlink
+# @param link the symlink's location
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "" usebundle => file_link("/tmp/z.txt", "/tmp/z.link");
+# ```
+{
+  files:
+      "$(link)"
+      move_obstructions => "true",
+      link_from => linkfrom($(target), "symlink");
+
+  reports:
+    inform_mode|EXTRA::
+      "$(this.bundle): $(link) will be a symlink to $(target)";
 }

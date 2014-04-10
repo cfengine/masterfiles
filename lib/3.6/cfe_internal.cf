@@ -1,0 +1,182 @@
+############################################################################
+#  Copyright (C) CFEngine AS
+#
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License LGPL as published by the
+#  Free Software Foundation; version 3.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  To the extent this program is licensed as part of the Enterprise
+#  versions of CFEngine, the applicable Commercial Open Source License
+#  (COSL) may apply to this file if you as a licensee so wish it. See
+#  included file COSL.txt.
+###########################################################################
+#
+# CFEngine Community Open Promise-Body Library
+#
+# This initiative started by CFEngine promotes a
+# standardized set of names and promise specifications
+# for template functionality within CFEngine 3.
+#
+# The aim is to promote an industry standard for
+# naming of configuration patterns, leading to a
+# de facto middleware of standardized syntax.
+#
+# Names should be intuitive and parameters should be
+# minimal to assist readability and comprehensibility.
+
+# Contributions to this file are voluntarily given to
+# the cfengine community, and are moderated by CFEngine.
+# No liability or warranty for misuse is implied.
+#
+# If you add to this file, please try to make the
+# contributions "self-documenting". Comments made
+# after the bundle/body statement are retained in
+# the online docs
+#
+
+# For CFEngine Core: 3.6.0 to 3.6.x
+# Internal hub maintenance bundles, incompatible with 3.5.x
+
+###################################################
+# If you find CFEngine useful, please consider    #
+# purchasing a commercial version of the software.#
+###################################################
+
+bundle agent cfe_internal_hub_maintain
+# @ignore
+# @brief Executes reporting database maintenance process
+# By default database clean up interval is 24 hours.
+# Length of log history in database is controlled
+# by modifying "history_length_days" key in report_settings
+# variable.
+#
+# Intervals less than 6 hours must be used with caution
+# as maintenance process could take a considerable time
+{
+  vars:
+      "report_settings" data => parsejson('[
+                                            {
+                                                "report": "contexts",
+                                                "table": "__ContextsLog",
+                                                "history_length_days": 7,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "variables",
+                                                "table": "__VariablesLog",
+                                                "history_length_days": 7,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "software",
+                                                "table": "__SoftwareLog",
+                                                "history_length_days": 28,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "software_updates",
+                                                "table": "__SoftwareUpdatesLog",
+                                                "history_length_days": 28,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "filechanges",
+                                                "table": "__FileChangesLog",
+                                                "history_length_days": 365,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "benchmarks",
+                                                "table": "__BenchmarksLog",
+                                                "history_length_days": 7,
+                                                "time_key": "CheckTimeStamp"
+                                            },
+                                            {
+                                                "report": "promise_executions",
+                                                "table": "__PromiseExecutionsLog",
+                                                "history_length_days": 7,
+                                                "time_key": "ChangeTimeStamp"
+                                            }
+                                           ]');
+
+      "diagnostics_settings" data => parsejson('[
+                                                     {
+                                                         "report": "hub_connection_errors",
+                                                         "table": "__HubConnectionErrors",
+                                                         "history_length_days": 1,
+                                                         "time_key": "CheckTimeStamp"
+                                                     },
+                                                     {
+                                                         "report": "diagnostics",
+                                                         "table": "__Diagnostics",
+                                                         "history_length_days": 1,
+                                                         "time_key": "TimeStamp"
+                                                     }
+                                                    ]');
+
+  methods:
+    Hr00.Min00_05::
+      "Remove old report history"
+      usebundle => cfe_internal_database_cleanup_reports(@(report_settings)),
+      action => if_elapsed(5);
+
+      "Remove cf-consumer history"
+      usebundle => cfe_internal_database_cleanup_consumer_status("50000"),
+      action => if_elapsed(5);
+
+      "Remove diagnostics history"
+      usebundle => cfe_internal_database_cleanup_diagnostics(@(diagnostics_settings)),
+      action => if_elapsed(5);
+}
+
+bundle agent cfe_internal_database_cleanup_reports (settings)
+# @ignore
+# @brief clean up the reporting tables
+{
+  vars:
+      "index" slist => getindices(settings);
+
+      "remove_query_$(settings[$(index)][report])"
+      string =>   "DELETE FROM $(settings[$(index)][table]) AS T
+                            USING (SELECT HostKey,
+                                          (LastAgentLocalExecutionTimestamp - INTERVAL '$(settings[$(index)][history_length_days]) day') AS purge_time
+                                   FROM __agentstatus) AS A
+                            WHERE T.HostKey = A.HostKey AND T.$(settings[$(index)][time_key]) <= A.purge_time;";
+
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
+      handle => "cf_database_maintain_report_$(settings[$(index)][report])";
+}
+
+bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
+# @ignore
+# @brief keep up to row_count entries in the database
+{
+
+  vars:
+      "remove_query"
+      string => "DELETE FROM status WHERE ts IN (SELECT ts FROM status ORDER BY ts DESC OFFSET $(row_count));";
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
+      handle => "cf_database_maintain_consumer_status";
+}
+
+bundle agent cfe_internal_database_cleanup_diagnostics (settings)
+{
+  vars:
+      "index" slist => getindices("settings");
+
+      "remove_query_$(settings[$(index)][report])"
+      string => "DELETE FROM $(settings[$(index)][table]) WHERE $(settings[$(index)][time_key]) < (CURRENT_TIMESTAMP - INTERVAL '$(settings[$(index)][history_length_days]) day');";
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
+      handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
+}

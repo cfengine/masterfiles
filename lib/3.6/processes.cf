@@ -105,3 +105,23 @@ body process_count check_range(name,lower,upper)
       match_range => irange("$(lower)","$(upper)");
       out_of_range_define => { "$(name)_out_of_range" };
 }
+
+bundle agent process_kill(name)
+# @brief Kill a process by name (can be a regular expression)
+# @param name the regular expression or string
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "kill" usebundle => process_kill("badprocess");
+# ```
+{
+  processes:
+    !windows::
+      # Signals are presented as an ordered list to the process.
+      "$(name)" signals => { "term", "kill" };
+    windows::
+      # On Windows, only the kill signal is supported, which terminates the process.
+      "$(name)" signals => { "kill" };
+}

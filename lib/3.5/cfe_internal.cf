@@ -39,44 +39,28 @@
 # the online docs
 #
 
-# For CFEngine Core: 3.6.0 to 3.6.x
-# Main COPBL include file
+# For CFEngine Core: 3.5.0 to 3.5.x
+# Internal hub maintenance bundles
 
 ###################################################
 # If you find CFEngine useful, please consider    #
 # purchasing a commercial version of the software.#
 ###################################################
 
-bundle common stdlib_common
-# @ignore
+bundle agent cfe_internal_hub_maintain
+# @brief Executes reporting database maintenance process
+# When modifying this, the following must be considered:
+#  - Intervals less than 6 hours must be used with caution
+#       as maintenance process could take a considerable time
+#  - parameters to action => bg("<if_elapsed>", "<expireafter>")
+#       must be changed accordingly
 {
-  vars:
-      "inputs" slist => {
-                          "$(this.promise_dirname)/paths.cf",
-                          "$(this.promise_dirname)/common.cf",
-                          "$(this.promise_dirname)/commands.cf",
-                          "$(this.promise_dirname)/packages.cf",
-                          "$(this.promise_dirname)/files.cf",
-                          "$(this.promise_dirname)/edit_xml.cf",
-                          "$(this.promise_dirname)/services.cf",
-                          "$(this.promise_dirname)/processes.cf",
-                          "$(this.promise_dirname)/storage.cf",
-                          "$(this.promise_dirname)/databases.cf",
-                          "$(this.promise_dirname)/users.cf",
-                          "$(this.promise_dirname)/monitor.cf",
-                          "$(this.promise_dirname)/guest_environments.cf",
-                          "$(this.promise_dirname)/bundles.cf",
-                          "$(this.promise_dirname)/reports.cf",
-                          "$(this.promise_dirname)/cfe_internal.cf",
-      };
+  commands:
 
-  reports:
-    verbose_mode::
-      "$(this.bundle): adding COPBL stdlib inputs='$(inputs)'";
-}
+    (Hr00|Hr06|Hr12|Hr18).Min00_05::
 
-body file control
-# @ignore
-{
-      inputs => { @(stdlib_common.inputs) };
+      "$(sys.cf_hub) -m"
+      comment => "Perform hub database maintenance. This removes expired entries in the enterprise database and creates a total compliance cache for Mission Portal",
+      handle => "cfe_internal_start_hub_start_maintenance",
+      action => bg("60","60");
 }

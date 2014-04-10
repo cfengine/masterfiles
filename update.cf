@@ -7,7 +7,7 @@
 body common control
 {
       bundlesequence => {
-                          "u_def",
+                          "update_def",
                           "cfe_internal_dc_workflow",
                           "cfe_internal_update_policy",
                           "cfe_internal_update_processes",
@@ -36,7 +36,7 @@ body agent control
 
 #############################################################################
 
-bundle common u_def
+bundle common update_def
 {
   vars:
       "input_name_patterns" slist => { ".*.cf",".*.dat",".*.txt", ".*.conf", ".*.mustache",
@@ -64,40 +64,40 @@ bundle common u_def
       "cf_git" string => "$(sys.workdir)/bin/git",
       comment => "Path to git binary installed with CFEngine Enterprise";
 
-    cfengine_3_4|cfengine_3_5::
-      "cf_apache_user" string => "apache",
-      handle => "common_u_def_vars_cf_apache_user",
-      comment => "User that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_user";
-
-      "cf_apache_group" string => "apache",
-      handle => "common_u_def_vars_cf_apache_group",
-      comment => "Group that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_group";
-
-    !cfengine_3_4.!cfengine_3_5::
       "cf_apache_user" string => "cfapache",
-      handle => "common_u_def_vars_cf_cfapache_user",
-      comment => "User that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_user";
+      comment => "User that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_user";
 
       "cf_apache_group" string => "cfapache",
-      handle => "common_u_def_vars_cf_cfapache_group",
-      comment => "Group that CFEngine Enterprise webserver runs as. Needs to stay in sync with def.cf_apache_group";
-
+      comment => "Group that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_group";
 
   classes:
-      # Transfer policies and binaries with encryption
-      # you can also request it from the command line with
-      # -Dcfengine_internal_encrypt_transfers
-      "cfengine_internal_encrypt_transfers" expression => "!any";
-
-      # Purge policies that don't exist on the server side.
-      # you can also request it from the command line with
-      # -Dcfengine_internal_purge_policies
-      "cfengine_internal_purge_policies" expression => "!any";
 
       # Update masterfiles from Git
       # Enabled for enterprise users by default
       # you can also request it from the command line with
       # -Dcfengine_internal_masterfiles_update
-      "cfengine_internal_masterfiles_update" expression => "enterprise.!(cfengine_3_4|cfengine_3_5)";
+
+      # NOTE THAT ENABLING THIS BY DEFAULT *WILL* OVERWRITE THE HUB'S /var/cfengine/masterfiles
+
+      #"cfengine_internal_masterfiles_update" expression => "enterprise.!(cfengine_3_4|cfengine_3_5)";
+      "cfengine_internal_masterfiles_update" expression => "!any";
+
+      # Transfer policies and binaries with encryption
+      # you can also request it from the command line with
+      # -Dcfengine_internal_encrypt_transfers
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
+
+      "cfengine_internal_encrypt_transfers" expression => "!any";
+
+      # Purge policies that don't exist on the server side.
+      # you can also request it from the command line with
+      # -Dcfengine_internal_purge_policies
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
+
+      "cfengine_internal_purge_policies" expression => "!any";
 
 }

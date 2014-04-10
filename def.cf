@@ -95,53 +95,75 @@ bundle common def
         comment => "Define path to shell used by cf-runagent",
         handle  => "common_def_vars_cf_runagent_shell";
 
-    enterprise::
-      "cfe_enterprise_generic_log_files"    slist => {
-                                               "$(sys.workdir)/cf_notkept.log",
-                                               "$(sys.workdir)/cf_repair.log",
-                                               "$(sys.workdir)/state/cf_value.log",
-      	};
-      
-    enterprise.am_policy_hub::
-      "cfe_enterprise_hub_log_files" slist => {						
-						"$(sys.workdir)/outputs/dc-scripts.log",
-						"$(sys.workdir)/httpd/logs/access_log", # Mission Portal
-						"$(sys.workdir)/httpd/logs/error_log", # Mission Portal
-	};
+    any::
+      "base_log_files" slist =>
+      {
+        "$(sys.workdir)/cf3.$(sys.host).runlog",
+        "$(sys.workdir)/promise_summary.log",
+      };
+
+      "enterprise_log_files" slist =>
+      {
+        "$(sys.workdir)/cf_notkept.log",
+        "$(sys.workdir)/cf_repair.log",
+        "$(sys.workdir)/state/cf_value.log",
+        "$(sys.workdir)/outputs/dc-scripts.log",
+      };
+
+      "hub_log_files" slist =>
+      {
+        "$(sys.workdir)/httpd/logs/access_log", # Mission Portal
+        "$(sys.workdir)/httpd/logs/error_log", # Mission Portal
+      };
 
     enterprise.!am_policy_hub::
-      "cfe_enterprise_hub_log_files" slist => { };
+      # CFEngine's own log files
+      "cfe_log_files" slist => { @(base_log_files), @(enterprise_log_files) };
+
+    enterprise.am_policy_hub::
+      # CFEngine's own log files
+      "cfe_log_files" slist => { @(base_log_files), @(enterprise_log_files), @(hub_log_files) };
 
     !enterprise::
-      "cfe_enterprise_generic_log_files" slist => { };
-      "cfe_enterprise_hub_log_files"     slist => { };
+      # CFEngine's own log files
+      "cfe_log_files" slist => { @(base_log_files) };
 
     any::
-      # CFEngine's own log files
-      "cfe_log_files"    slist => {
-				    "$(sys.workdir)/cf3.$(sys.host).runlog",
-				    "$(sys.workdir)/promise_summary.log",
-				    @(cfe_enterprise_generic_log_files),
-				    @(cfe_enterprise_hub_log_files),
-				  };
-
-      "cfe_log_dirs"     slist => {
-                                    "$(sys.workdir)/outputs",
-                                    "$(sys.workdir)/reports",
-                                  };
+      "cfe_log_dirs" slist =>
+      {
+        "$(sys.workdir)/outputs",
+        "$(sys.workdir)/reports",
+      };
 
   classes:
 
-    ### Enable special features policies. Set to "any" to enable.
+      ### Enable special features policies. Set to "any" to enable.
 
-    # Internal CFEngine log files rotation
-    "cfengine_internal_rotate_logs" expression => "any";
+      # Internal CFEngine log files rotation
+      "cfengine_internal_rotate_logs" expression => "any";
 
-    # Transfer policies and binaries with encryption
-    "cfengine_internal_encrypt_transfers" expression => "!any";
+      # Transfer policies and binaries with encryption
+      # you can also request it from the command line with
+      # -Dcfengine_internal_encrypt_transfers
 
-    # Purge policies that don't exist on the server side.
-    "cfengine_internal_purge_policies" expression => "!any";
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+
+      "cfengine_internal_encrypt_transfers" expression => "!any";
+
+      # Purge policies that don't exist on the server side.
+      # you can also request it from the command line with
+      # -Dcfengine_internal_purge_policies
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+
+      "cfengine_internal_purge_policies" expression => "!any";
+
+      # This class is for PosgreSQL maintenance
+      # pre-defined to every Sunday at 2 a.m.
+      # This can be changed later on.
+
+      "postgresql_maintenance" expression => "am_policy_hub.enterprise.Sunday.Hr02.Min00_05";
+
 }
 
 bundle common inventory_control

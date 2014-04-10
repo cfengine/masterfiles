@@ -51,7 +51,9 @@ bundle common bundles_common
 # @ignore
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/files.cf" };
+      "inputs" slist => { "$(this.promise_dirname)/paths.cf",
+                          "$(this.promise_dirname)/files.cf",
+                          "$(this.promise_dirname)/commands.cf" };
 }
 
 body file control
@@ -251,80 +253,6 @@ bundle agent logrotate(log_files, max_size, rotate_levels)
       file_select => bigger_than("$(max_size)");
 }
 
-bundle agent probabilistic_usebundle(probability, bundlename)
-# @brief activate named bundle probabilistically
-# @param probability probability that the named bundle will be activated during
-# a given agent execution
-# @param bundlename the bundle to activate based on the probability
-#
-# **Example:**
-#
-# ```cf3
-# bundle agent example
-# {
-#    methods:
-#      "Toss Coin"
-#        usebundle => probabilistic_usebundle("50", "heads"),
-#        comment => "Call bundle heads ~ 50% of the time";
-#
-#      "Trick Coin"
-#        usebundle => probabilistic_usebundle("75", "heads"),
-#        comment => "Call bundle heads ~ 75% of the time";
-# }
-# ```
-{
-  classes:
-    "fifty_fifty"
-      expression => strcmp("$(probability)", "50"),
-      comment => "We have to special case 50 because of the way dist classes
-                  work you would always get 50 defined";
-    "not_fifty_fifty" expression => "!fifty_fifty";
-    "have_remainder" expression => isvariable("remainder");
-
-    fifty_fifty.have_remainder::
-      "activate_bundle"
-        dist => { "$(probability)000", "$(remainder)"};
-
-    not_fifty_fifty.have_remainder::
-      "activate_bundle"
-        dist => { "$(probability)", "$(remainder)"};
-
-  vars:
-    fifty_fifty::
-      "remainder"
-        string => format("%d", eval("((100 - $(probability)) * 1000) +1", "math", "infix"));
-
-    not_fifty_fifty::
-      "remainder"
-        string => format("%d", eval("100 - $(probability)", "math", "infix"));
-
-  methods:
-    fifty_fifty::
-      "Activate bundle probabilistically"
-        handle => "probabilistic_usebundle_methods_special_case_fifty_fifty_activate_bundle",
-        usebundle => $(bundlename),
-        ifvarclass => "activate_bundle_$(probability)000",
-        comment => "Activate $(bundlename) $(probability)%ish of the time";
-
-    not_fifty_fifty::
-      "Activate bundle probabilistically"
-        handle => "probabilistic_usebundle_methods_activate_bundle",
-        usebundle => $(bundlename),
-        ifvarclass => "activate_bundle_$(probability)",
-        comment => "Activate $(bundlename) $(probability)% of the time";
-
-
-  reports:
-    DEBUG.fifty_fifty::
-      "$(this.bundle) Special case for 50/50";
-
-      "$(this.bundle) activate_bundle_$(probability)000"
-        ifvarclass => "activate_bundle_$(probability)000";
-
-      "$(this.bundle) activate_bundle_$(probability)001"
-        ifvarclass => "activate_bundle_$(probability)001";
-}
-
 bundle agent prunedir(dir, max_days)
 # @brief delete plain files inside "dir" older than "max_days" (not recursively).
 # @depends tidy
@@ -352,57 +280,6 @@ bundle agent prunedir(dir, max_days)
       delete        => tidy,
       file_select   => filetype_older_than("plain", "$(max_days)"),
       depth_search  => recurse("1");
-}
-
-bundle agent tcdb_fix
-# @brief Optimize tcdb and repair tcdb corruption
-#
-# **Example**:
-# ```cf3
-# methods:
-#   "Manage Tokyo Cabinet Corruption"
-#     usebundle => tcdb_fix,
-#     handle => "main_methods_tcdb_fix",
-#     comment => "Optimize/Repair or regenerate corrupt tcdb files";
-# ```
-# This bundle works around corruption issues with Tokyo Cabinet database files
-# in CFEngine 3.5. Find all tcdb files in $(sys.workdir) and run tchmgr
-# optimize on them. If any invalid record headers are found we remove the
-# affected database so that it can be re-created. This occurs hourly based on
-# `splayclass` and assumes a 5 minute agent execution interval.
-{
-  vars:
-
-    linux::
-      "db" slist => splitstring( execresult("/usr/bin/find $(sys.workdir) -name '*.tcdb' 2>/dev/null", "useshell"), "\n", "1000");
-
-
-  classes:
-
-      # NOTE: assumes that CFEngine is set to run every 5 minutes
-      "hourly_class" expression => splayclass("$(sys.host)$(sys.ipv4)", "hourly");
-
-    hourly_class.linux::
-      "detected_invalid_record_$(db)" expression => returnszero("/var/cfengine/bin/tchmgr optimize $(db) 2>&1 | grep -q 'invalid record header'", "useshell");
-
-
-  commands:
-
-      "$(paths.rm)"
-        args => "-f $(db)",
-        ifvarclass => canonify("detected_invalid_record_$(db)"),
-        classes => scoped_classes_generic("bundle", "absent_$(db)"),
-        handle => "fix_tcdb_commands_detected_invalid_record_rm_$(db)",
-        comment => "Invalid record headers indicate that the database corruption is beyond repair. It will be automatically re-created.";
-
-
-  reports:
-
-      "$(this.bundle) $(sys.fqhost): Detected invalid record header in $(db) - tried to repair"
-        ifvarclass => canonify("detected_invalid_record_$(db)");
-
-      "$(this.bundle) $(sys.fqhost): Repair failed, removed corrupt database: $(db)"
-        ifvarclass => canonify("absent_$(db)_repaired");
 }
 
 bundle agent url_ping(host, method, port, uri)
@@ -457,191 +334,20 @@ bundle agent url_ping(host, method, port, uri)
       ifvarclass => "url_not_ok_$(chost)";
 }
 
-bundle agent git_init(repo_path)
-# @brief initializes a new git repository if it does not already exist
-# @depends git
-# @param repo_path absolute path of where to initialize a git repository
-#
-# **Example:**
-#
-# ```cf3
-# bundle agent my_git_repositories
-# {
-#   vars:
-#     "basedir"  string => "/var/git";
-#     "repos"    slist  => { "myrepo", "myproject", "myPlugForMoreHaskell" };
-#
-#   files:
-#     "$(basedir)/$(repos)/."
-#       create => "true";
-#
-#   methods:
-#     "git_init" usebundle => git_init("$(basedir)/$(repos)");
-# }
-# ```
-{
-  classes:
-    "ok_norepo" not => fileexists("$(repo_path)/.git");
-
-  methods:
-    ok_norepo::
-      "git_init"  usebundle => git("$(repo_path)", "init", "");
-}
-
-bundle agent git_add(repo_path, file)
-# @brief adds files to the supplied repository's index
-# @depends git
-# @param repo_path absolute path to a git repository
-# @param file a file to stage in the index
-#
-# **Example:**
-#
-# ```cf3
-# bundle agent add_files_to_git_index
-# {
-#   vars:
-#     "repo"  string => "/var/git/myrepo";
-#     "files" slist  => { "fileA", "fileB", "fileC" };
-#
-#   methods:
-#     "git_add" usebundle => git_add("$(repo)", "$(files)");
-# }
-# ```
-{
-  classes:
-    "ok_repo" expression => fileexists("$(repo_path)/.git");
-
-  methods:
-    ok_repo::
-      "git_add" usebundle => git("$(repo_path)", "add", "$(file)");
-}
-
-bundle agent git_checkout(repo_path, branch)
-# @brief checks out an existing branch in the supplied git repository
-# @depends git
-# @param repo_path absolute path to a git repository
-# @param branch the name of an existing git branch to checkout
-#
-# **Example:**
-#
-# ```cf3
-# bundle agent git_checkout_some_existing_branch
-# {
-#   vars:
-#     "repo"   string => "/var/git/myrepo";
-#     "branch" string => "dev/some-topic-branch";
-#
-#   methods:
-#     "git_checkout" usebundle => git_checkout("$(repo)", "$(branch)");
-# }
-# ```
-{
-  classes:
-    "ok_repo" expression => fileexists("$(repo_path)/.git");
-
-  methods:
-    ok_repo::
-      "git_checkout" usebundle => git("$(repo_path)", "checkout", "$(branch)");
-}
-
-bundle agent git_checkout_new_branch(repo_path, new_branch)
-# @brief checks out and creates a new branch in the supplied git repository
-# @depends git
-# @param repo_path absolute path to a git repository
-# @param new_branch the name of the git branch to create and checkout
-#
-# **Example:**
-#
-# ```cf3
-# bundle agent git_checkout_new_branches
-# {
-#   vars:
-#     "repo[myrepo]"    string => "/var/git/myrepo";
-#     "branch[myrepo]"  string => "dev/some-new-topic-branch";
-#
-#     "repo[myproject]"   string => "/var/git/myproject";
-#     "branch[myproject]" string => "dev/another-new-topic-branch";
-#
-#     "repo_names"        slist => getindices("repo");
-#
-#   methods:
-#     "git_checkout_new_branch" usebundle => git_checkout_new_branch("$(repo[$(repo_names)])", "$(branch[$(repo_names)])");
-# }
-# ```
-{
-  classes:
-    "ok_repo" expression => fileexists("$(repo_path)/.git");
-
-  methods:
-    ok_repo::
-      "git_checkout" usebundle => git("$(repo_path)", "checkout -b", "$(branch)");
-}
-
-bundle agent git_commit(repo_path, message)
-# @brief executes a commit to the specificed git repository
-# @depends git
-# @param repo_path absolute path to a git repository
-# @param message the message to associate to the commmit
-#
-# **Example:**
-#
-# ```cf3
-# bundle agent make_git_commit
-# {
-#   vars:
-#     "repo"  string => "/var/git/myrepo";
-#     "msg"   string => "dituri added some bundles for common git operations";
-#
-#   methods:
-#     "git_commit" usebundle => git_commit("$(repo)", "$(msg)");
-# }
-# ```
-{
-  classes:
-    "ok_repo" expression => fileexists("$(repo_path)/.git");
-
-  methods:
-    ok_repo::
-      "git_commit" usebundle => git("$(repo_path)", "commit", '-m "$(message)"');
-}
-
-bundle agent git(repo_path, subcmd, args)
-# @brief generic interface to git
-# @param repo_path absolute path to a new or existing git repository
-# @param subcmd any valid git sub-command
-# @param args a single string of arguments to pass
-#
-# **Example:**
-#
-# ```cf3
-# bundle agent git_rm_files_from_staging
-# {
-#   vars:
-#     "repo"        string => "/var/git/myrepo";
-#     "git_cmd"     string => "reset --soft";
-#     "files"       slist  => { "fileA", "fileB", "fileC" };
-#
-#   methods:
-#     "git_reset" usebundle => git("$(repo)", "$(git_cmd)", "HEAD -- $(files)");
-# }
-# ```
-{
-  commands:
-    "$(paths.path[git])"
-      args => "$(subcmd) $(args)",
-      contain => in_dir("$(repo_path)");
-}
-
-bundle agent cmerge(varlist)
+bundle agent cmerge(name, varlist)
 # @brief bundle to merge many data containers into one
+# @param name the variable name to create
 # @param varlist a list of variable names (**MUST** be a list)
 #
-# The result will be in `cmerge.all`.  You can also use
-# `cmerge.all_str` for a string version of the merged containers.
+# The result will be in `cmerge.$(name)`.  You can also use
+# `cmerge.$(name)_str` for a string version of the merged containers.
+#
+# The name is variable so you can call this bundle for more than one
+# merge.
 #
 # If you merge a key-value map into an array or vice versa, the map
 # always wins.  So this example will result in a key-value map even
-# though `cmerge.all` starts as an array.
+# though `cmerge.$(name)` starts as an array.
 #
 # **Example:**
 #
@@ -650,27 +356,25 @@ bundle agent cmerge(varlist)
 # {
 #   vars:
 #       # the "mymerge" tag is user-defined
-#       "a"       data  => parsejson('{ "a": "1" }'), meta => { "mymerge" };
-#       "b"       data  => parsejson('{ "b": "2" }'), meta => { "mymerge" };
-#       "c"       data  => parsejson('{ "c": "3" }'), meta => { "mymerge" };
-#       "d"       data  => parsejson('{ "d": "4" }'), meta => { "mymerge" };
+#       "a"       data  => parsejson('{ "mark": "b" }'), meta => { "mymerge" };
+#       "b"       data  => parsejson('{ "volker": "h" }'), meta => { "mymerge" };
 #
 #       # you can list them explicitly: "default:run.a" through "default:run.d"
 #       "todo"    slist => variablesmatching(".*", "mymerge");
 #
-#       # you can use cmerge.all_str, but this is how you access the result
+#       # you can use cmerge.all_str instead of accessing the merged data directly
 #       "merged_str" string => format("%S", "cmerge.all");
 #
 #   methods:
-#       "go" usebundle => cmerge(@(todo)); # a, b, c, d
+#       "go" usebundle => cmerge("all", @(todo)); # merge a, b into container cmerge.all
 #
 #   reports:
-#       "merged = $(cmerge.all_str)";
+#       "merged = $(cmerge.all_str)"; # will print a map with keys "mark" and "volker"
 # }
 # ```
 {
   vars:
-      "all" data => parsejson('[]'),            policy => "free";
-      "all" data => mergedata(all, $(varlist)), policy => "free"; # iterates!
-      "all_str" string => format("%S", all),    policy => "free";
+      "$(name)" data => parsejson('[]'),            policy => "free";
+      "$(name)" data => mergedata($(name), $(varlist)), policy => "free"; # iterates!
+      "$(name)_str" string => format("%S", $(name)),    policy => "free";
 }

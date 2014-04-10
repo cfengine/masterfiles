@@ -68,6 +68,12 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_truncate_events",
       comment => "To run CFE truncate to pending";
 
+    postgresql_maintenance::
+
+      "hub" usebundle => cfe_internal_postgresql_maintenance,
+      handle => "cfe_internal_management_postgresql_maintenance",
+      comment => "Run vacuumdb to clean up PostgreSQL database";
+
     any::
 
       "any" usebundle => cfe_internal_correct_cftwin,

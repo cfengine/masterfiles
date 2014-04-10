@@ -9,7 +9,6 @@ installations and upgrades, and is used by CFEngine 3.6 and newer.
 
 ## Structure
 
-* `bootstrap/failsafe.cf`: the failsafe executed when all else fails
 * `cfe_internal`: internal CFEngine policies you shouldn't have to modify
 * `controls`: configuration of components, e.g. the `cf-agent` or `cf-serverd`
 * `def.cf`: defaults you can and should configure

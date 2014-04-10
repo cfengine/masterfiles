@@ -29,12 +29,6 @@ bundle agent test
       classes => if_ok("agent_worked_all_right");
 }
 
-body classes if_ok(x)
-{
-      promise_repaired => { "$(x)" };
-      promise_kept => { "$(x)" };
-}
-
 #######################################################
 
 bundle agent check

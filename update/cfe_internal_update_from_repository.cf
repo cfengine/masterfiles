@@ -11,6 +11,6 @@ bundle agent cfe_internal_update_from_repository
 bundle agent cfe_internal_masterfiles_stage
 {
   commands:
-      "$(u_def.dc_scripts)/masterfiles-stage.sh"
+      "$(update_def.dc_scripts)/masterfiles-stage.sh"
       handle => "masterfiles_update_stage";
 }

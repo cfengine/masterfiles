@@ -120,6 +120,12 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_mongod",
       ifvarclass => "nova|enterprise";
 
+      "$(sys.bindir)/vacuumdb"
+      restart_class => "no_vacuumdb",
+      comment => "Monitor vacuumdb process",
+      handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
+      ifvarclass => "nova|enterprise";
+
    am_policy_hub.!(cfengine_3_4||cfengine_3_5)::
       "$(sys.bindir)/redis-server"
       restart_class => "start_redis_server",
@@ -137,13 +143,13 @@ bundle agent maintain_cfe_hub_process
       restart_class => "start_cf_consumer",
       comment => "Monitor cf-consumer process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_consumer",
-      ifvarclass => "nova|enterprise";
+      ifvarclass => "(nova|enterprise).no_vacuumdb";
 
     am_policy_hub.files_ok.!windows::
       "cf-hub"      restart_class => "start_hub",
       comment => "Monitor cf-hub process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
-      ifvarclass => "nova|enterprise";
+      ifvarclass => "(nova|enterprise).no_vacuumdb";
 
       #
 
@@ -153,7 +159,7 @@ bundle agent maintain_cfe_hub_process
       comment => "Ensure postgres.log file is there with right permissions",
       handle => "cfe_internal_maintain_cfe_hub_process_files_create_postgresql_log",
       create => "true",
-      perms => u_mo("0644","postgres");
+      perms => u_mo("0644","cfpostgres");
 
     !windows.am_policy_hub.start_mongod::
 

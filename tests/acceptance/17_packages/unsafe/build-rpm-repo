@@ -31,8 +31,9 @@ fi
 
 set -e
 
-rm -rf rpm_repo
-mkdir rpm_repo
+rm -rf rpm_repo/repodata
+rm -f rpm_repo/*$ARCH.rpm
+mkdir -p rpm_repo
 mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
 
@@ -50,4 +51,4 @@ for i in alpha beta charlie; do
     cp ~/rpmbuild/RPMS/"$ARCH"/test-package-$i-1.0-2."$ARCH".rpm rpm_repo
 done
 
-createrepo rpm_repo
+createrepo --no-database --simple-md-filenames rpm_repo

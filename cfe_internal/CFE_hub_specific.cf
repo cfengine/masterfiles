@@ -292,31 +292,6 @@ bundle agent cfe_internal_selinux(condition)
 
 ##################################################################
 #
-# cfe_internal_hub_maintain
-#  - Start the hub maintenance process
-#  - By default, this is run every 6 hours
-#
-#  When modifying this, the following must be considered:
-#  - Intervals less than 6 hours must be used with caution
-#       as maintenance process could take a considerable time
-#  - parameters to action => bg("<if_elapsed>", "<expireafter>")
-#       must be changed accordingly
-##################################################################
-
-bundle agent cfe_internal_hub_maintain
-{
-  commands:
-
-    (Hr00|Hr06|Hr12|Hr18).Min00_05::
-
-      "$(sys.cf_hub) -m"
-      comment => "Perform hub database maintenance. This removes expired entries in the enterprise database and creates a total compliance cache for Mission Portal",
-      handle => "cfe_internal_start_hub_start_maintenance",
-      action => bg("60","60");
-}
-
-##################################################################
-#
 # cfe_internal_apache_sudoer
 #  - permit apache user to run passwordless sudo to cf-runagent
 #
@@ -494,17 +469,12 @@ bundle edit_line change_appsettings(p)
 
 }
 
-##################################################################
-#
-# cfe_internal_php_runalerts
+bundle agent cfe_internal_php_runalerts
+#@brief create and run PHP alerts
 #  - Bundle status need to be updated and displayed on MP. We do it
 # by running php binary with some parameters. cfe_internal_php_runalerts
 # is a bundle to create a shell script on the fly and keep running
 # the command by a specific interval (every 60s by default)
-#
-##################################################################
-
-bundle agent cfe_internal_php_runalerts
 {
   vars:
 
@@ -572,7 +542,7 @@ bundle agent cfe_internal_php_runalerts
   processes:
 
     kill_script::
-    
+
       "$(runalerts_script)"
       comment => "kill the php runalerts script because it is stale for some reason",
       handle => "cfe_internal_php_runalerts_process_kill_php_runalerts_script",
@@ -640,18 +610,50 @@ done"
       handle => "my_php_runalerts_script_insert_lines_php_runalerts_script";
 }
 
-#####################################################################
-#
-#cfe_internal_turncate_events
-# To cancell all the pending events once in a day 
-#
-#####################################################################
-
 bundle agent cfe_internal_truncate_events
+#@brief cancel all the pending events once in a day
+
 {
   commands:
-   Hr05.Min00_05::
-    "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks truncate_events"
-     comment => "Turncate all the pending notifications if there is any",
-     handle  => "cfe_internal_truncate_event_mp";
+    Hr05.Min00_05::
+      "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks truncate_events"
+      comment => "Turncate all the pending notifications if there is any",
+      handle  => "cfe_internal_truncate_event_mp";
+}
+
+bundle agent cfe_internal_postgresql_maintenance
+#@ignore
+#@brief PostgreSQL needs to be cleaned regularly with the vacuumdb command
+{
+  vars:
+
+    any::
+
+      "vacuumdb_cmd" string => "$(sys.bindir)/vacuumdb --full cfdb",
+      comment => "Command for cleaning a PostgreSQL database",
+      handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd";
+
+      #
+
+  processes:
+
+    any::
+
+      "cf-hub"      signals => { "term" },
+      comment => "Terminate cf-hub while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
+
+      "cf-consumer" signals => { "kill" },
+      comment => "Kill cf-consumer while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_maintenance_processes_kill_cf_consumer";
+
+      #
+
+  commands:
+
+    any::
+
+      "$(vacuumdb_cmd)"
+      comment => "Run vacuumdb command",
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd";
 }

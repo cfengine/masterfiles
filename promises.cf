@@ -21,7 +21,6 @@ body common control
                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
                           service_catalogue,
-                          example_use_goals,         # See cfe_internal/example_use_goals.cf
 
       };
 
@@ -40,7 +39,6 @@ body common control
                   "cfe_internal/CFE_cfengine.cf",
                   "cfe_internal/CFE_hub_specific.cf",
                   "cfe_internal/CFE_knowledge.cf",
-                  "cfe_internal/example_use_goals.cf",
 
                  # Control body for all CFEngine robot agents
                   @(cfengine_controls.inputs),
@@ -85,23 +83,26 @@ bundle common inventory
 {
   vars:
       # This list is intended to grow as needed
-    !(cfengine_3_4||cfengine_3_5).debian::
-      "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/debian.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_debian" };
-    !(cfengine_3_4||cfengine_3_5).redhat::
-      "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_redhat" };
-    !(cfengine_3_4||cfengine_3_5).windows::
+    !(cfengine_3_4|cfengine_3_5).debian::
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/debian.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_debian" };
+    !(cfengine_3_4|cfengine_3_5).redhat::
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_redhat" };
+    !(cfengine_3_4|cfengine_3_5).suse::
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/suse.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_suse" };
+    !(cfengine_3_4|cfengine_3_5).windows::
       "inputs" slist => { "inventory/any.cf", "inventory/windows.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_windows" };
-    !(cfengine_3_4||cfengine_3_5).macos::
+    !(cfengine_3_4|cfengine_3_5).macos::
       "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos" };
-    !(cfengine_3_4||cfengine_3_5).!windows.!macos.!debian.!redhat::
+    !(cfengine_3_4|cfengine_3_5).!windows.!macos.!debian.!redhat.!suse::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_generic" };
 
-    (cfengine_3_4||cfengine_3_5)::
+    (cfengine_3_4|cfengine_3_5)::
       "inputs" slist => { cf_null };
       "bundles" slist => { cf_null };
 
@@ -135,9 +136,10 @@ bundle common cfengine_stdlib
                           "lib/3.5/guest_environments.cf",
                           "lib/3.5/bundles.cf",
                           "lib/3.5/reports.cf",
+                          "lib/3.5/cfe_internal.cf",
       };
 
-    !(cfengine_3_4||cfengine_3_5)::
+    !(cfengine_3_4|cfengine_3_5)::
       # CFEngine 3.6 and higher can include through a secondary file
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
 
@@ -183,12 +185,12 @@ bundle common cfengine_controls
 bundle common cfengine_reports
 {
   vars:
-    (cfengine_3_4||cfengine_3_5)::
+    (cfengine_3_4|cfengine_3_5)::
       "inputs" slist => { cf_null };
 
-    !(cfengine_3_4||cfengine_3_5)::
+    !(cfengine_3_4|cfengine_3_5)::
       "inputs" slist => {
-                          "reports/host_info_report.cf",
+                          "cfe_internal/host_info_report.cf",
       };
 
   reports:

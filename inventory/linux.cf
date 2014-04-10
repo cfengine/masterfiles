@@ -1,0 +1,59 @@
+bundle common inventory_linux
+# @brief Linux inventory
+#
+# This common bundle is for Linux inventory work.
+{
+  vars:
+    has_os_release::
+      "os_release_info" string => readfile("/etc/os-release", "512"),
+      comment => "Read /etc/os-release" ;
+
+    os_release_has_id::
+      "os_release_id" string => canonify("$(id_array[1])");
+
+    os_release_has_version::
+      "os_release_version" string => canonify("$(version_array[1])");
+
+    has_proc_1_cmdline::
+      "proc_1_cmdline_split" slist => string_split(readfile("/proc/1/cmdline", "512"), " ", "2"),
+      comment => "Read /proc/1/cmdline and split off arguments";
+
+      "proc_1_cmdline" string => nth("proc_1_cmdline_split", 0),
+      comment => "Get argv[0] of /proc/1/cmdline";
+
+      # this is the same as the original file for non-links
+      "proc_1_process" string => filestat($(proc_1_cmdline), "linktarget");
+
+  classes:
+
+    any::
+      "has_os_release" expression => fileexists("/etc/os-release"),
+      comment => "Check if we can get more info from /etc/os-release";
+
+      "os_release_has_id" expression => regextract('^ID="?([^"\s]+)"?$',
+                                                   $(os_release_info),
+                                                   "id_array"),
+      comment => "Extract ID= line from os-release to id_array";
+
+      "os_release_has_version" expression => regextract('^VERSION_ID="?([^"]+)"?$',
+                                                        $(os_release_info),
+                                                        "version_array"),
+      comment => "Extract VERSION_ID= line from os-release to version_array";
+
+      "has_proc_1_cmdline" expression => fileexists("/proc/1/cmdline"),
+      comment => "Check if we can read /proc/1/cmdline";
+
+    os_release_has_id::
+      "$(os_release_id)" expression => "any";
+
+    os_release_has_version::
+      "$(os_release_id)_$(os_release_version)" expression => "any";
+
+    has_proc_1_cmdline::
+      "systemd" expression => strcmp(lastnode($(proc_1_process), "/"), "systemd"),
+      comment => "Check if (the link target of) /proc/1/cmdline is systemd";
+
+  reports:
+    inform_mode::
+      "$(this.bundle): OS release ID = $(os_release_id), OS release version = $(os_release_version)";
+}
