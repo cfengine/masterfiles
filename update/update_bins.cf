@@ -110,6 +110,12 @@ bundle agent cfe_internal_update_bins
 
       #
 
+  classes:
+
+      "have_software_dir" expression => fileexists($(local_software_dir));
+
+      #
+
   processes:
 
     bin_newpkg.!bin_update_success.enterprise::
@@ -142,7 +148,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "9.9.9",         # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
+      ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     stopped_cfprocs.windows.enterprise::
@@ -155,7 +161,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "9.9.9.9",       # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
+      ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.!windows.enterprise::
@@ -168,7 +174,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "9.9.9",         # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
+      ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.windows.enterprise::
@@ -181,7 +187,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "9.9.9.9",       # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition",
+      ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
       #
