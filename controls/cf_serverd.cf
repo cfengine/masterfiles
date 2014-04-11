@@ -21,11 +21,11 @@ body server control
       allowallconnects      => { "127.0.0.1" , "::1", @(def.acl) };
 
       # Out of the hosts in allowconnects, trust new keys only from the
-      # following ones.  This is open by default for bootstrapping,
-      # comment it out after all machines have been bootstrapped.
-      trustkeysfrom         => { "0.0.0.0/0" };
+      # following ones.  SEE COMMENTS IN def.cf
+      trustkeysfrom         => { @(def.trustkeysfrom) };
 
-      # Maximum number of concurrent connections. Suggest >= total_hosts
+      # Maximum number of concurrent connections.
+      # Suggested value >= total number of hosts
       maxconnections        => "100";
 
       allowusers            => { "root" };
