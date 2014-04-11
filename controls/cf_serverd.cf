@@ -13,20 +13,25 @@ body server control
       # for "openssl ciphers". Default is "AES256-GCM-SHA384:AES256-SHA"
       #allowciphers          => "AES256-GCM-SHA384:AES256-SHA";
 
-      # Allow connections from nodes which are out-of-sync
-      denybadclocks         => "false";
-
-      # By default deny all connections but the following:
-      ## List of hosts that may connect
+      # List of hosts that may connect (change the ACL in def.cf)
       allowconnects         => { "127.0.0.1" , "::1", @(def.acl) };
-      ## List of hosts that may have more than one connection established at the same time
+
+      # Out of them, which ones should be allowed to have more than one
+      # connection established at the same time?
       allowallconnects      => { "127.0.0.1" , "::1", @(def.acl) };
-      ## List of hosts that we'll accept any key they present (open this only for bootstrapping)
-      trustkeysfrom         => { "127.0.0.1" , "::1", @(def.acl) };
+
+      # Out of the hosts in allowconnects, trust new keys only from the
+      # following ones.  This is open by default for bootstrapping,
+      # comment it out after all machines have been bootstrapped.
+      trustkeysfrom         => { "0.0.0.0/0" };
+
+      # Maximum number of concurrent connections. Suggest >= total_hosts
+      maxconnections        => "100";
 
       allowusers            => { "root" };
 
-      maxconnections        => "100";
+      # Allow connections from nodes which are out-of-sync
+      denybadclocks         => "false";
 
     windows::
       cfruncommand => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
