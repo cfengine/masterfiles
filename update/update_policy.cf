@@ -17,7 +17,7 @@
 bundle agent cfe_internal_update_policy
 {
   vars:
-    !(cfengine_3_5||cfengine_3_4)::
+    !cfengine_3_5::
       "inputs_dir"         string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
@@ -26,7 +26,7 @@ bundle agent cfe_internal_update_policy
       comment => "Directory containing CFEngine binaries",
       handle => "cfe_internal_update_policy_vars_bin_dir";
 
-    (cfengine_3_5||cfengine_3_4)::
+    cfengine_3_5::
       "inputs_dir"         string => translatepath("$(sys.workdir)/inputs"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir_backport";
@@ -49,12 +49,12 @@ bundle agent cfe_internal_update_policy
       comment => "Directory containing CFEngine plugins",
       handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
 
-    !windows.!(cfengine_3_5||cfengine_3_4)::
+    !windows.!cfengine_3_5::
       "master_location"    string => "$(sys.masterdir)",
       comment => "The master CFEngine policy directory on the policy host",
       handle => "cfe_internal_update_policy_vars_master_location";
 
-    !windows.(cfengine_3_5||cfengine_3_4)::
+    !windows.cfengine_3_5::
       "master_location"    string => "$(sys.workdir)/masterfiles",
       comment => "The master CFEngine policy directory on the policy host",
       handle => "cfe_internal_update_policy_vars_master_location_backport";
