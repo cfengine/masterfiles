@@ -22,7 +22,7 @@ body server control
 
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  This is open by default for bootstrapping,
-      # comment it out after all machines have been bootstrapped.
+      # COMMENT IT OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
       trustkeysfrom         => { "0.0.0.0/0" };
 
       # Maximum number of concurrent connections. Suggest >= total_hosts
