@@ -105,21 +105,6 @@ bundle agent cfe_internal_setup_knowledge
       depth_search => recurse_basedir("inf"),
       perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
-      "$(cfe_internal_hub_vars.docroot)/rest"
-      comment => "Put REST api to webroot directory",
-      handle => "cfe_internal_setup_knowledge_files_workdir_rest",
-      copy_from => no_backup_cp("$(sys.workdir)/share/rest"),
-      depth_search => recurse_basedir("inf"),
-      perms => mo("0644",$(def.cf_apache_user));
-
-      "$(cfe_internal_hub_vars.docroot)/rest/.htaccess"
-      comment => "Create HTACCESS file for REST",
-      handle => "cfe_internal_setup_knowledge_files_rest_htaccess",
-      create => "true",
-      edit_line => rest_htaccess,
-      edit_defaults => empty,
-      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
-
       "$(cfe_internal_hub_vars.docroot)/application"
       comment => "Ensure permissions to all directiories in application to 755",
       handle => "cfe_internal_setup_knowledge_files_all_folders_in_application",
@@ -245,22 +230,6 @@ body depth_search recurse_exclude(d)
 {
       depth => "$(d)";
       exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "sql_lite", "rest", "application" };
-}
-
-############################################################################
-
-bundle edit_line rest_htaccess
-{
-  insert_lines:
-    any::
-      "<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_URI} !dispatch\.php$(const.dollar)
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule .* dispatch.php [L,QSA]
-</IfModule>"
-      comment => "REST's htaccess file content",
-      handle => "cfe_internal_rest_htaccess_insert_lines";
 }
 
 ############################################################################
