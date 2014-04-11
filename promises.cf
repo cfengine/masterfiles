@@ -63,7 +63,7 @@ body common control
 
       };
 
-      version => "CFEngine Promises.cf 3.6.0";
+      version => "CFEngine Promises.cf 3.7.0";
 
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
@@ -83,28 +83,28 @@ bundle common inventory
 {
   vars:
       # This list is intended to grow as needed
-    !(cfengine_3_4|cfengine_3_5).debian::
+    !cfengine_3_5.debian::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/debian.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_debian" };
-    !(cfengine_3_4|cfengine_3_5).redhat::
+    !cfengine_3_5.redhat::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_redhat" };
-    !(cfengine_3_4|cfengine_3_5).suse::
+    !cfengine_3_5.suse::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/suse.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_suse" };
-    !(cfengine_3_4|cfengine_3_5).windows::
+    !cfengine_3_5.windows::
       "inputs" slist => { "inventory/any.cf", "inventory/windows.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_windows" };
-    !(cfengine_3_4|cfengine_3_5).macos::
+    !cfengine_3_5.macos::
       "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos" };
-    !(cfengine_3_4|cfengine_3_5).!windows.!macos.!debian.!redhat.!suse::
+    !cfengine_3_5.!windows.!macos.!debian.!redhat.!suse::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_generic" };
 
-    (cfengine_3_4|cfengine_3_5)::
-      "inputs" slist => { cf_null };
-      "bundles" slist => { cf_null };
+    cfengine_3_5::
+      "inputs" slist => { };
+      "bundles" slist => { };
 
   reports:
     verbose_mode::
@@ -116,10 +116,6 @@ bundle common inventory
 bundle common cfengine_stdlib
 {
   vars:
-    cfengine_3_4::
-      # This is the standard library for CFEngine 3.4 and earlier
-      # (only 3.4 is explicitly supported)
-      "inputs" slist => { "libraries/cfengine_stdlib.cf" };
     cfengine_3_5::
       # 3.5 doesn't have "body file control" so all the includes are listed here
       "inputs" slist => {
@@ -139,7 +135,7 @@ bundle common cfengine_stdlib
                           "lib/3.5/cfe_internal.cf",
       };
 
-    !(cfengine_3_4|cfengine_3_5)::
+    !cfengine_3_5::
       # CFEngine 3.6 and higher can include through a secondary file
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
 
@@ -153,21 +149,6 @@ bundle common cfengine_stdlib
 bundle common cfengine_controls
 {
   vars:
-    cfengine_3_4::
-      # This is control body for CFEngine 3.4 and earlier
-      # server control seems to be a bit problem here
-      # (only 3.4 is explicitly supported)
-      "inputs" slist => {
-                          "controls/cf_agent.cf",
-                          "controls/cf_execd.cf",
-                          "controls/cf_hub.cf",
-                          "controls/cf_monitord.cf",
-                          "controls/cf_runagent.cf",
-                          "controls/3.4/cf_serverd.cf",
-      };
-
-    !cfengine_3_4::
-      # 3.5 and higher are fine with a standard version
       "inputs" slist => {
                           "controls/cf_agent.cf",
                           "controls/cf_execd.cf",
@@ -185,10 +166,10 @@ bundle common cfengine_controls
 bundle common cfengine_reports
 {
   vars:
-    (cfengine_3_4|cfengine_3_5)::
+    cfengine_3_5::
       "inputs" slist => { cf_null };
 
-    !(cfengine_3_4|cfengine_3_5)::
+    !cfengine_3_5::
       "inputs" slist => {
                           "cfe_internal/host_info_report.cf",
       };

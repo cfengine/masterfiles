@@ -35,12 +35,12 @@ bundle common def
 
       # End change #
 
-  cfengine_3_4|cfengine_3_5::
+  cfengine_3_5::
       "dir_masterfiles" string => translatepath("$(sys.workdir)/masterfiles"),
       comment => "Define masterfiles path",
       handle => "common_def_vars_dir_masterfiles_backport";
 
-  !cfengine_3_4.!cfengine_3_5::
+    !cfengine_3_5::
       "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
       comment => "Define masterfiles path",
       handle => "common_def_vars_dir_masterfiles";
@@ -65,7 +65,7 @@ bundle common def
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";
 
-    cfengine_3_4|cfengine_3_5::
+    cfengine_3_5::
       "cf_apache_user" string => "apache",
       comment => "User that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_user";
@@ -74,7 +74,7 @@ bundle common def
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_group";
 
-    !cfengine_3_4.!cfengine_3_5::
+    !cfengine_3_5::
       "cf_apache_user" string => "cfapache",
       comment => "User that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_user";

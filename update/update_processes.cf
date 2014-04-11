@@ -11,8 +11,6 @@
 #
 # update_processes
 #  - To enable/disable CFEngine based processes, use the slists below.
-# Important:
-#  - Use cf_null in an empty list (for backward compatibility with CFEngine Enterprise version < 3.5)
 ################################################################################
 
 bundle common cfe_internal_process_knowledge
@@ -36,16 +34,11 @@ bundle agent cfe_internal_update_processes
 
     any::
 
-      "agents_to_be_disabled"   slist => {
-					   # CFEngine Enterprise version < 3.5 requires the use of cf_null if slist is empty
- 					   # if all clients and policy server version >= 3.5, cf_null can be removed
-   			    		   cf_null,
-      },
+      "agents_to_be_disabled"   slist => { },
       comment => "CFE processes that should not be enabled",
       handle => "cfe_internal_update_processes_vars_agents_to_be_disabled";
 
       "agents_to_be_enabled"    slist => {
-   			    		   #cf_null, (uncomment this line if empty for server/clients version < 3.5)
 					   "cf-execd",
 					   "cf-serverd",
 					   "cf-monitord",
@@ -141,7 +134,7 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
       ifvarclass => "nova|enterprise";
 
-   am_policy_hub.!(cfengine_3_4||cfengine_3_5)::
+   am_policy_hub.!cfengine_3_5::
       "$(cfe_internal_process_knowledge.bindir)/redis-server"
       restart_class => "start_redis_server",
       comment => "Monitor redis-server process",
