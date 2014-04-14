@@ -268,7 +268,7 @@ bundle agent standard_services(service,state)
       "pattern[varnish]"          string => ".*varnish.*";
       "pattern[wpa_supplicant]"   string => ".*wpa_supplicant.*";
 
-    SuSE|suse::
+    suse::
 
       "baseinit[mysql]"           string => "mysqld";
       "pattern[mysql]"            string => ".*mysqld.*";
