@@ -11,6 +11,8 @@ ifeq ($(DESTDIR),)
   DESTDIR:=/var/cfengine/masterfiles
 endif
 
+UNAME := $(shell uname)
+
 ifeq ($(UNAME), Solaris)
 INSTALL = /usr/local/bin/install
 else
