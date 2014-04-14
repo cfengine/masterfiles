@@ -11,7 +11,12 @@ ifeq ($(DESTDIR),)
   DESTDIR:=/var/cfengine/masterfiles
 endif
 
+ifeq ($(UNAME), Solaris)
+INSTALL = /usr/local/bin/install
+else
 INSTALL = /usr/bin/install
+endif
+
 INSTALL_DATA = ${INSTALL} -m 600
 INSTALL_DIR = ${INSTALL} -m 750 -d
 
