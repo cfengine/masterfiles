@@ -74,8 +74,8 @@ bundle common debian_knowledge
       "call_aptitude" string => "$(apt_prefix) $(paths.path[aptitude])";
       "dpkg_options" string => "-o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef";
 
-      "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions $(v1) eq $(v2)";
-      "dpkg_compare_less" string => "$(call_dpkg) --compare-versions $(v1) lt $(v2)";
+      "dpkg_compare_equal" string => "$(call_dpkg) --compare-versions '$(v1)' eq '$(v2)'";
+      "dpkg_compare_less" string => "$(call_dpkg) --compare-versions '$(v1)' lt '$(v2)'";
 
       "list_name_regex" string => "^.i\s+([^\s:]+).*";
       "list_version_regex" string => "^.i\s+[^\s]+\s+([^\s]+).*";
