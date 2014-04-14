@@ -1,0 +1,163 @@
+############################################################################
+#  Copyright (C) CFEngine AS
+#
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License LGPL as published by the
+#  Free Software Foundation; version 3.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  To the extent this program is licensed as part of the Enterprise
+#  versions of CFEngine, the applicable Commercial Open Source License
+#  (COSL) may apply to this file if you as a licensee so wish it. See
+#  included file COSL.txt.
+###########################################################################
+#
+# CFEngine Community Open Promise-Body Library
+#
+# This initiative started by CFEngine promotes a
+# standardized set of names and promise specifications
+# for template functionality within CFEngine 3.
+#
+# The aim is to promote an industry standard for
+# naming of configuration patterns, leading to a
+# de facto middleware of standardized syntax.
+#
+# Names should be intuitive and parameters should be
+# minimal to assist readability and comprehensibility.
+
+# Contributions to this file are voluntarily given to
+# the cfengine community, and are moderated by CFEngine.
+# No liability or warranty for misuse is implied.
+#
+# If you add to this file, please try to make the
+# contributions "self-documenting". Comments made
+# after the bundle/body statement are retained in
+# the online docs
+#
+
+# For CFEngine Core: 3.6.0 to 3.6.x
+# Direct-call Packages bodies
+
+###################################################
+# If you find CFEngine useful, please consider    #
+# purchasing a commercial version of the software.#
+###################################################
+
+bundle common direct_packages_common
+# @ignore
+{
+  vars:
+      "inputs" slist => { "$(this.promise_dirname)/packages.cf" };
+}
+
+body file control
+# @ignore
+{
+      inputs => { @(direct_packages_common.inputs) };
+}
+
+bundle agent dpackage_common
+# @brief Common utilities for the dpackage_* bundles, internal use only
+{
+  commands:
+    debian::
+      "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) update"
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+    redhat::
+      "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update"
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+    suse::
+      "$(suse_knowledge.call_zypper) list-updates"
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+}
+
+bundle agent dpackage_latest(packages)
+# @brief Ensure a specific package is added or updated directly (no packages promises)
+# @param packages List of space-separated package names to add or update
+#
+# This package method will add or update `packages` with direct calls
+# to the specific platform's package manager, letting it choose the
+# latest package version.
+#
+# The promises will be attempted every
+# `common_knowledge.list_update_ifelapsed` minutes, which defaults to
+# 240 (4 hours).
+#
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "upgradegnupg"
+#      usebundle => dpackage_latest("gnupg");
+#
+#      "upgrade a b"
+#      usebundle => dpackage_latest("a b");
+# ```
+{
+  methods:
+      "common"
+      usebundle => dpackage_common,
+      handle => "dpackage_latest_common";
+
+  commands:
+    debian::
+      "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install $(packages)"
+      depends_on => { "dpackage_latest_common" },
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+    redhat::
+      "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update $(packages)"
+      depends_on => { "dpackage_latest_common" },
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+    suse::
+      "$(suse_knowledge.call_zypper) --non-interactive update $(packages)"
+      depends_on => { "dpackage_latest_common" },
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+}
+
+bundle agent dpackage_absent(packages)
+# @brief Ensure a specific package is absent directly (no packages promises)
+# @param packages List of space-separated package names to remove
+#
+# This package method will remove `packages` with direct calls
+# to the specific platform's package manager.
+#
+# The promises will be attempted every
+# `common_knowledge.list_update_ifelapsed` minutes, which defaults to
+# 240 (4 hours).
+#
+#
+# **Example:**
+#
+# ```cf3
+# methods:
+#      "nozsh"
+#      usebundle => dpackage_absent("zsh");
+#
+#      "remove a b"
+#      usebundle => dpackage_absent("a b");
+# ```
+{
+  methods:
+      "common"
+      usebundle => dpackage_common,
+      handle => "dpackage_absent_common";
+
+  commands:
+    debian::
+      "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes -q remove $(packages)"
+      depends_on => { "dpackage_absent_common" },
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+    redhat::
+      "$(redhat_knowledge.call_rpm) -e --nodeps $(packages)"
+      depends_on => { "dpackage_absent_common" },
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+    suse::
+      "$(suse_knowledge.call_zypper) --non-interactive remove --force-resolution $(packages)"
+      depends_on => { "dpackage_latest_common" },
+      action => if_elapsed($(common_knowledge.list_update_ifelapsed));
+}
