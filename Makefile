@@ -13,7 +13,7 @@ endif
 
 UNAME := $(shell uname)
 
-ifeq ($(UNAME), Solaris)
+ifeq ($(UNAME), SunOS)
 INSTALL = /usr/local/bin/install
 else
 INSTALL = /usr/bin/install
