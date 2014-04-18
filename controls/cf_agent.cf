@@ -25,6 +25,9 @@ body agent control
 
       skipidentify => "true";
 
+      # explicitly not supported (but they should break long before)
+      abortclasses => { "cfengine_3_3", "cfengine_3_4" };
+
       # Environment variables based on Distro
 
     debian::
