@@ -18,12 +18,12 @@
 bundle common cfe_internal_process_knowledge
 {
   vars:
-    !windows.(cfengine_3_4|cfengine_3_5)::
+    !windows.cfengine_3_5::
 
       "bindir"      string => "/var/cfengine/bin",
       comment => "Use a real path";
 
-    !windows.!(cfengine_3_4|cfengine_3_5)::
+    !windows.!cfengine_3_5::
 
       "bindir"      string => "$(sys.bindir)",
       comment => "Use a system variable";
