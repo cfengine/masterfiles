@@ -15,6 +15,21 @@
 #  - Use cf_null in an empty list (for backward compatibility with CFEngine Enterprise version < 3.5)
 ################################################################################
 
+bundle common cfe_internal_process_knowledge
+{
+  vars:
+    !windows.(cfengine_3_4|cfengine_3_5)::
+
+      "bindir"      string => "/var/cfengine/bin",
+      comment => "Use a real path";
+
+    !windows.!(cfengine_3_4|cfengine_3_5)::
+
+      "bindir"      string => "$(sys.bindir)",
+      comment => "Use a system variable";
+
+}
+
 bundle agent cfe_internal_update_processes
 {
   vars:
@@ -114,32 +129,32 @@ bundle agent maintain_cfe_hub_process
 
     am_policy_hub::
 
-      "$(sys.bindir)/mongod"
+      "$(cfe_internal_process_knowledge.bindir)/mongod"
       restart_class => "start_mongod",
       comment => "Monitor mongodb process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_mongod",
       ifvarclass => "nova|enterprise";
 
-      "$(sys.bindir)/vacuumdb"
+      "$(cfe_internal_process_knowledge.bindir)/vacuumdb"
       restart_class => "no_vacuumdb",
       comment => "Monitor vacuumdb process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
       ifvarclass => "nova|enterprise";
 
    am_policy_hub.!(cfengine_3_4||cfengine_3_5)::
-      "$(sys.bindir)/redis-server"
+      "$(cfe_internal_process_knowledge.bindir)/redis-server"
       restart_class => "start_redis_server",
       comment => "Monitor redis-server process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_redis",
       ifvarclass => "nova|enterprise";
 
-      "$(sys.bindir)/postgres"
+      "$(cfe_internal_process_knowledge.bindir)/postgres"
       restart_class => "start_postgres_server",
       comment => "Monitor postgres process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_postgres",
       ifvarclass => "nova|enterprise";
 
-      "$(sys.bindir)/cf-consumer"
+      "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
       restart_class => "start_cf_consumer",
       comment => "Monitor cf-consumer process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_consumer",
@@ -174,7 +189,7 @@ bundle agent maintain_cfe_hub_process
 
     !windows.am_policy_hub.start_mongod::
 
-      "$(sys.bindir)/mongod --dbpath $(cfe_internal_update_policy.mongodb_dir) --config $(cfe_internal_update_policy.mongodb_conf_file) > /dev/null < /dev/null 2>&1"
+      "$(cfe_internal_process_knowledge.bindir)/mongod --dbpath $(cfe_internal_update_policy.mongodb_dir) --config $(cfe_internal_update_policy.mongodb_conf_file) > /dev/null < /dev/null 2>&1"
       contain => u_in_shell,
       action => u_mongod_bg,
       comment => "Start mongod process",
@@ -182,19 +197,19 @@ bundle agent maintain_cfe_hub_process
 
     !windows.am_policy_hub.start_redis_server::
 
-     "$(sys.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)"
+     "$(cfe_internal_process_knowledge.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)"
       contain => u_in_shell,
       comment => "Start redis process",
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_redis";
 
     !windows.am_policy_hub.start_postgres_server::
-     "$(sys.bindir)/pg_ctl -D $(cfe_internal_update_policy.postgresdb_dir) -l $(cfe_internal_update_policy.postgresdb_log) start"
+     "$(cfe_internal_process_knowledge.bindir)/pg_ctl -D $(cfe_internal_update_policy.postgresdb_dir) -l $(cfe_internal_update_policy.postgresdb_log) start"
       contain => u_postgres,
       comment => "Start postgres process",
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
 
     !windows.am_policy_hub.start_cf_consumer::
-     "$(sys.bindir)/cf-consumer"
+     "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
       comment => "Start cf-consumer process",
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf-consumer";
 
@@ -220,18 +235,6 @@ bundle agent disable_cfengine_agents(process)
       comment => "Canonify a given process",
       handle => "cfe_internal_disable_cfengine_agents_vars_cprocess";
 
-    !windows.(cfengine_3_4|cfengine_3_5)::
-
-      "bindir"      string => "/var/cfengine/bin",
-      comment => "Use a real path",
-      handle => "cfe_internal_disable_cfengine_agents_vars_bindir_34_35";
-
-    !windows.!(cfengine_3_4|cfengine_3_5)::
-
-      "bindir"      string => "$(sys.bindir)",
-      comment => "Use a system variable",
-      handle => "cfe_internal_disable_cfengine_agents_vars_bindir_not_34_35";
-
       #
 
   classes:
@@ -248,7 +251,7 @@ bundle agent disable_cfengine_agents(process)
 
     !windows::
 
-      "$(bindir)/$(process)"
+      "$(cfe_internal_process_knowledge.bindir)/$(process)"
       signals => { "term" },
       comment => "Terminate cf-monitord",
       handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
@@ -269,20 +272,6 @@ bundle agent enable_cfengine_agents(process)
       comment => "Canonify a given process",
       handle => "cfe_internal_enable_cfengine_agents_vars_cprocess";
 
-    !windows.(cfengine_3_4|cfengine_3_5)::
-
-      "bindir"      string => "/var/cfengine/bin",
-      comment => "Use a real path",
-      handle => "cfe_internal_enable_cfengine_agents_vars_bindir_34_35";
-
-    !windows.!(cfengine_3_4|cfengine_3_5)::
-
-      "bindir"      string => "$(sys.bindir)",
-      comment => "Use a system variable",
-      handle => "cfe_internal_enable_cfengine_agents_vars_bindir_not_34_35";
-
-      #
-
   classes:
 
     !windows::
@@ -297,7 +286,7 @@ bundle agent enable_cfengine_agents(process)
 
     !windows::
 
-      "$(bindir)/$(process)"
+      "$(cfe_internal_process_knowledge.bindir)/$(process)"
       restart_class => "restart_$(cprocess)",
       comment => "Create a class to restart a process",
       handle => "cfe_internal_enable_cfengine_agents_processes_restart_process",
