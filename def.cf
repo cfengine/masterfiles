@@ -33,6 +33,15 @@ bundle common def
       comment => "Define an acl for the machines to be granted accesses",
       handle => "common_def_vars_acl";
 
+      # Out of the hosts in allowconnects, trust new keys only from the
+      # following ones.  This is open by default for bootstrapping.
+
+      "trustkeysfrom" slist => {
+                                 # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
+                                 "0.0.0.0/0", # allow any IP
+      },
+      comment => "Define from which machines keys can be trusted";
+
       # End change #
 
   cfengine_3_5::
