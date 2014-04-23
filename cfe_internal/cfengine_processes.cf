@@ -207,7 +207,7 @@ bundle agent cfe_internal_build_software_report
       package_policy => "add",
       package_method => apt;
 
-    SuSE::
+    suse::
 
       "wget"
       comment => "Install packages from the list",

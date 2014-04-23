@@ -407,10 +407,10 @@ bundle common paths
 
       "path[sysctl]"        string => "/sbin/sysctl";
 
-    !(SuSE||SUSE||suse)::
+    !suse::
       "path[logger]"        string => "/usr/bin/logger"; 
 
-    SuSE||SUSE||suse::
+    suse::
 
       "path[awk]"           string => "/usr/bin/awk";
       "path[bc]"            string => "/usr/bin/bc";

@@ -1446,9 +1446,9 @@ body package_method pacman
 body package_method zypper
 # @depends paths
 # @depends common_knowledge redhat_knowledge
-# @brief SuSE installation method
+# @brief SUSE installation method
 #
-# This package method interacts with the SuSE Zypper package manager
+# This package method interacts with the SUSE Zypper package manager
 #
 # **Example:**
 #
@@ -1500,7 +1500,7 @@ body package_method generic
 #     "mypackage" package_method => generic, package_policy => "add";
 # ```
 {
-    SuSE::
+    suse::
       package_changes => "bulk";
       package_list_command => "$(redhat_knowledge.call_rpm) -qa --queryformat \"i | repos | %{name} | %{version}-%{release} | %{arch}\n\"";
       # set it to "0" to avoid caching of list during upgrade
