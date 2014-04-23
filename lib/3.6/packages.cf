@@ -98,7 +98,7 @@ bundle common debian_knowledge
       "list_version_regex" string => "^.i\s+[^\s]+\s+([^\s]+).*";
 
       "patch_name_regex" string => "^Inst\s+(\S+)\s+.*";
-      "patch_version_regex" string => "^Inst\s+(\S+)\s+.*";
+      "patch_version_regex" string => "^Inst\s+\S+\s+\[\S+\]\s+\((\S+)\s+.*";
 }
 
 bundle common redhat_knowledge
