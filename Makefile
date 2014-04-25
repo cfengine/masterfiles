@@ -12,9 +12,14 @@ ifeq ($(DESTDIR),)
 endif
 
 UNAME := $(shell uname)
+REL := $(shell uname -r)
 
 ifeq ($(UNAME), SunOS)
-INSTALL = /usr/local/bin/install
+	ifneq ($(REL), 5.11)
+	INSTALL = /usr/sbin/install
+	else
+	INSTALL = /opt/csw/gnu/install
+	endif
 else
 INSTALL = /usr/bin/install
 endif
