@@ -47,6 +47,13 @@ bundle agent test
             package_policy => "add",
             package_method => yum_rpm,
             classes => test_set_class("pass_$(package_name)","fail_$(package_name)");
+
+        suse::
+
+            "$(package_name)"
+            package_policy => "add",
+            package_method => zypper,
+            classes => test_set_class("pass_$(package_name)","fail_$(package_name)");
 }
 
 
@@ -68,7 +75,7 @@ bundle agent check
 
             "has_pkg_$(test.package_name)" expression => returnszero("dpkg -l | grep ' $(test.package_name) '", "useshell");
 
-        redhat::
+        redhat|suse::
 
             "has_pkg_$(test.package_name)" expression => returnszero("/bin/rpm -qa | grep -qw $(test.package_name)", "useshell");
 

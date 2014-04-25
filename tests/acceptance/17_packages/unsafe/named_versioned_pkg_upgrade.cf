@@ -57,6 +57,15 @@ bundle agent test
             package_architectures => { "$(package_arch)" },
             package_method => yum_rpm,
             classes => test_set_class("pass","fail");
+
+        suse::
+            "$(package_name)"
+            package_policy => "addupdate",
+            package_select => "==",
+            package_version => "$(package_version)",
+            package_architectures => { "$(package_arch)" },
+            package_method => zypper,
+            classes => test_set_class("pass","fail");
 }
 
 
@@ -78,7 +87,7 @@ bundle agent check
         debian::
             "has_pkg" expression => returnszero("dpkg -l | grep ' $(test.package_name) ' > /dev/null", "useshell");
 
-        redhat::
+        redhat|suse::
             "has_pkg" expression => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
 
         any::

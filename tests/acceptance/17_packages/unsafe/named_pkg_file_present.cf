@@ -47,7 +47,7 @@ bundle agent test
             package_architectures => { "$(p.arch)" },
             package_method => dpkg_version("$(this.promise_dirname)/file_repo");
 
-        redhat::
+        redhat|suse::
 
             "$(package_name)"
             classes => test_set_class("pass","fail"),
@@ -80,7 +80,7 @@ bundle agent check
         debian::
             "has_pkg" expression => returnszero("dpkg -l | grep ' $(test.package_name) ' > /dev/null", "useshell");
 
-        redhat::
+        redhat|suse::
             "has_pkg" expression => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
 
         any::

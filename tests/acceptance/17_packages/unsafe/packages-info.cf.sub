@@ -13,12 +13,12 @@ bundle common p
     "name[2]" string => "test-package-$(distinct_name[2])";
     "name[3]" string => "test-package-$(distinct_name[3])";
 
-    redhat::
+    redhat|suse::
       "ext" string => "rpm";
     debian::
       "ext" string => "deb";
 
-    redhat.64_bit::
+    (redhat|suse).64_bit::
       "arch" string => "x86_64";
     debian.64_bit::
       "arch" string => "amd64";
@@ -36,7 +36,7 @@ bundle common p
       "file[2][2]" string => "/$(name[2])_$(version[2])_$(arch)-$(ext)-installed.txt";
       "file[3][1]" string => "/$(name[3])_$(version[1])_$(arch)-$(ext)-installed.txt";
       "file[3][2]" string => "/$(name[3])_$(version[2])_$(arch)-$(ext)-installed.txt";
-    redhat::
+    redhat|suse::
       "file[1][1]" string => "/$(name[1])-$(version[1])-$(arch)-$(ext)-installed.txt";
       "file[1][2]" string => "/$(name[1])-$(version[2])-$(arch)-$(ext)-installed.txt";
       "file[2][1]" string => "/$(name[2])-$(version[1])-$(arch)-$(ext)-installed.txt";
@@ -48,7 +48,7 @@ bundle common p
 bundle agent clear_packages
 {
   commands:
-    redhat::
+    redhat|suse::
      "$(paths.path[rpm]) -e --allmatches $(p.name[$(p.packages)])";
     debian::
      "$(paths.path[dpkg]) --purge $(p.name[$(p.packages)])";
@@ -57,7 +57,7 @@ bundle agent clear_packages
 bundle agent install_package(package_name, package_version)
 {
   commands:
-    redhat::
+    redhat|suse::
      "$(paths.path[rpm]) -U --force $(this.promise_dirname)/rpm_repo/$(package_name)-$(package_version).$(p.arch).rpm";
     debian::
      "$(paths.path[dpkg]) -i $(this.promise_dirname)/file_repo/$(package_name)_$(package_version)_$(p.arch).deb";
