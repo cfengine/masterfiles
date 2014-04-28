@@ -237,7 +237,6 @@ bundle agent standard_services(service,state)
 
       "stakeholders[cfengine3]" slist => { "cfengine_in" };
       "stakeholders[acpid]" slist => { "cpu", "cpu0", "cpu1", "cpu2", "cpu3" };
-      "stakeholders[mongod]" slist => { "mongo_in" };
       "stakeholders[postfix]" slist => { "smtp_in" };
       "stakeholders[sendmail]" slist => { "smtp_in" };
       "stakeholders[www]" slist => { "www_in", "wwws_in", "www_alt_in" };
@@ -257,7 +256,6 @@ bundle agent standard_services(service,state)
       "pattern[hddtemp]"          string => ".*hddtemp.*";
       "pattern[irqbalance]"       string => ".*irqbalance.*";
       "pattern[lm-sensor]"        string => ".*psensor.*";
-      "pattern[mongod]"           string => ".*mongod.*";
       "pattern[openvpn]"          string => ".*openvpn.*";
       "pattern[postfix]"          string => ".*postfix.*";
       "pattern[rsync]"            string => ".*rsync.*";
