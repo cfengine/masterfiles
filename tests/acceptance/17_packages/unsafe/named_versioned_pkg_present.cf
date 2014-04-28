@@ -24,6 +24,10 @@ body common control
 
 bundle agent init
 {
+  meta:
+      "test_suppress_fail" string => "suse",
+        meta => { "redmine5607" };
+
   methods:
     "clear_packages" usebundle => clear_packages;
 }
