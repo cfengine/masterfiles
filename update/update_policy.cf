@@ -78,10 +78,6 @@ bundle agent cfe_internal_update_policy
       comment => "Path to public key file",
       handle => "cfe_internal_update_policy_vars_ppkeys_file";
 
-      "mongodb_dir"        string => "$(sys.workdir)/state",
-      comment => "Directory where MongoDB files will be stored on hub - if changed: requires DB shutdown and move of files",
-      handle => "cfe_internal_update_policy_mongodb_dir";
-
       "postgresdb_dir"        string => "$(sys.workdir)/state/pg/data",
       comment => "Directory where Postgres database files will be stored on hub -",
       handle => "cfe_internal_update_policy_postgresdb_dir";
@@ -89,10 +85,6 @@ bundle agent cfe_internal_update_policy
       "postgresdb_log"        string => "/var/log/postgresql.log",
       comment => "File where Postgres database files will be logging -",
       handle => "cfe_internal_update_policy_postgresdb_log_file";
-
-      "mongodb_conf_file"  string => translatepath("$(sys.workdir)/config/mongod.conf"),
-      comment => "Path to MongoDB configuration file",
-      handle => "cfe_internal_update_policy_mongodb_conf_file";
 
       "redis_conf_file"  string => translatepath("$(sys.workdir)/config/redis.conf"),
       comment => "Path to Redis configuration file",
@@ -148,13 +140,6 @@ bundle agent cfe_internal_update_policy
       #
 
   files:
-
-    am_policy_hub::
-
-      "$(cfe_internal_update_policy.mongodb_dir)/."
-      comment => "Ensure MongoDB database directory is created",
-      handle => "cfe_internal_update_policy_mongodb_dir_create",
-      create => "true";
 
     !am_policy_hub::  # policy hub should not alter inputs/ uneccessary
 
@@ -408,13 +393,6 @@ body contain u_postgres
 body action u_ifwin_bg
 {
     windows::
-      background => "true";
-}
-
-#########################################################
-
-body action u_mongod_bg
-{
       background => "true";
 }
 
