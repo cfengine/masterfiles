@@ -13,9 +13,11 @@ bundle common def
 
     any::
 
-      # Begin change # Your domain name, for use in access control
+      # Begin change
 
-      "domain"  string => "example.com",
+      # Your domain name, for use in access control
+
+      "domain"  string => "$(sys.domain)", # this default may be inaccurate!
       comment => "Define a global domain for all hosts",
       handle => "common_def_vars_domain";
 
