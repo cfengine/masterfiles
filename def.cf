@@ -24,6 +24,12 @@ bundle common def
       # List here the IP masks that we grant access to on the server
 
       "acl"     slist => {
+                           # Allow everything in my own domain.
+
+                           # Note that this:
+                           # 1. requires def.domain to be correctly set
+                           # 2. will cause a DNS lookup for every access
+                           ".*$(def.domain)",
 
                            # Assume /16 LAN clients to start with
                            "$(sys.policy_hub)/16",
