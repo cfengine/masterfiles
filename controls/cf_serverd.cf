@@ -63,27 +63,27 @@ bundle server access_rules()
       "$(def.dir_masterfiles)"
       handle => "server_access_grant_access_policy",
       comment => "Grant access to the policy updates",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit => { @(def.acl) };
 
       "$(def.dir_software)"
       handle => "server_access_grant_access_datafiles",
       comment => "Grant access to software updates",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit => { @(def.acl) };
 
       "$(def.dir_bin)"
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit => { @(def.acl) };
 
       "$(def.dir_modules)"
       handle => "server_access_grant_access_modules",
       comment => "Grant access to modules directory",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit => { @(def.acl) };
 
       "$(def.dir_plugins)"
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
-      admit => { ".*$(def.domain)", @(def.acl) };
+      admit => { @(def.acl) };
 
       "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
