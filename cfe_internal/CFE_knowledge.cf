@@ -23,41 +23,7 @@ bundle agent cfe_internal_setup_knowledge
       # check when updates arrive, new compared to the database
       #
 
-    !windows.am_policy_hub::
-
-      "mongo_init"     not => fileexists("$(sys.workdir)/state/mongo_stamp"),
-      comment => "Check for a mongo_stamp file",
-      handle => "cfe_internal_setup_knowledge_classes_mongo_init";
-
-      #
-
-  processes:
-
-    am_policy_hub::
-
-      "$(sys.workdir)/bin/mongod"
-      comment => "Check for mongod process. If not running, don't setup HUB",
-      handle => "cfe_internal_setup_knowledge_processes_var_cfengine_bin_mongod",
-      process_count => check_process("mongod_started","mongod_not_started_yet");
-
-      #
-
   files:
-
-    mongo_init.mongod_started::
-
-      "$(cfe_internal_hub_vars.docroot)/mongo_stamp"
-      create => "true",
-      classes => if_repaired("init_mongo"),
-      comment => "Create a time stamp file for 1st time installation",
-      handle => "cfe_internal_setup_knowledge_files_mongo_stamp";
-
-    !windows.am_policy_hub.mongod_started::
-
-      "$(cfe_internal_hub_vars.docroot)/."
-      comment => "Ensure that there is always a doc root directory",
-      handle => "cfe_internal_setup_knowledge_files_create_doc_root",
-      create => "true";
 
       "$(cfe_internal_hub_vars.docroot)"
       comment => "Copy the basic knowledge base configuration from the installation to doc root",
@@ -146,49 +112,6 @@ bundle agent cfe_internal_setup_knowledge
       depth_search => recurse_basedir("inf"),
       comment => "Create tmp directories for httpd internal use",
       handle => "cfe_internal_setup_knowledge_files_tmp_dir";
-
-    mongod_not_started_yet::
-
-      "$(sys.workdir)/state/mongo_stamp"
-      comment => "Delete mongo_stamp if mongod is not running",
-      handle => "cfe_internal_setup_knowledge_files_delete_mongo_stamp",
-      delete => tidy;
-
-      "$(sys.workdir)/state/mongod.lock"
-      comment => "Delete mongod.lock if mongod is not running",
-      handle => "cfe_internal_setup_knowledge_files_delete_mongod_lock",
-      delete => tidy;
-
-      #
-
-  commands:
-
-    init_mongo::
-
-      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/export.js"
-      contain => silent_in_dir("$(sys.workdir)"),
-      comment => "Initialise mongo phpcfengine",
-      handle => "cfe_internal_setup_knowledge_commands_mongo_exportjs";
-
-      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/ootb_reports.js"
-      contain => silent_in_dir("$(sys.workdir)"),
-      comment => "Initialise mongo phpcfengine ootb reports",
-      handle => "cfe_internal_setup_knowledge_commands_mongo_ootb_reportsjs";
-
-      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/ootb_alerts.js"
-      contain => silent_in_dir("$(sys.workdir)"),
-      comment => "Initialise mongo phpcfengine ootb alerts",
-      handle => "cfe_internal_setup_knowledge_commands_mongo_ootb_alertsjs";
-
-      "$(sys.workdir)/bin/mongo phpcfengine $(sys.workdir)/share/GUI/phpcfenginenova/variables_dictionary.js"
-      contain => silent_in_dir("$(sys.workdir)"),
-      comment => "Initialise mongo phpcfengine inventory variables",
-      handle => "cfe_internal_setup_knowledge_commands_mongo_variables_dictionaryjs";
-
-      "$(sys.workdir)/bin/mongo --quiet cfreport $(sys.workdir)/share/GUI/api/mongo-initialize.js"
-      contain => silent_in_dir("$(sys.workdir)"),
-      comment => "Initialise mongo cfreport database",
-      handle => "cfe_internal_setup_knowledge_commands_mongo_mongoinitializejs";
 }
 
 #############################################################################

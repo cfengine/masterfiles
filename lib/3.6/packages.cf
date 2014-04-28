@@ -290,7 +290,6 @@ body package_method npm(dir)
 # packages:
 #     "express"              package_method => npm("$(dirs)"), package_policy => "add";
 #     "redis"                package_method => npm("$(dirs)"), package_policy => "delete";
-#     "mongoose-amqp-plugin" package_method => npm("$(dirs)"), package_policy => "verify";
 # ```
 {
       package_changes => "individual";
@@ -331,7 +330,6 @@ body package_method npm_g
 # packages:
 #     "express"              package_method => npm_g, package_policy => "add";
 #     "redis"                package_method => npm_g, package_policy => "delete";
-#     "mongoose-amqp-plugin" package_method => npm_g, package_policy => "verify";
 # ```
 {
       package_changes => "individual";
