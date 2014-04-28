@@ -86,39 +86,6 @@ bundle agent cfe_internal_update_folders
 
 ##################################################################
 #
-# cfe_internal_rotate_mongod_log
-#  - Make sure to rotate the mongod.log to avoid disk filling up
-#
-##################################################################
-
-bundle agent cfe_internal_rotate_mongod_log {
-
-  files:
-
-    mongod_log_rotated::
-
-      "/var/log"
-      comment => "Remove mongod logs older than 5 weeks",
-      handle => "cfe_internal_rotate_mongod_log_files_mongo_log",
-      file_select => name_age("^mongod.log.\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$","35"),
-      depth_search => recurse("1"),
-      delete => tidy;
-
-  processes:
-
-    Sunday::
-
-      "mongod"
-      comment  => "Send mongod the SIGUSR signal to refresh the log on a weekly basis",
-      handle  => "cfe_internal_rotate_mongod_log_processes_mongod",
-      signals => { "usr1" },
-      classes => if_repaired("mongod_log_rotated"),
-      action => if_elapsed("10000");
-
-}
-
-##################################################################
-#
 # cfe_internal_disable_selinux ***OBSOLETE***
 #  - Ensure everything will work smoothly. Put SELinux to
 # Permissive mode by now
@@ -171,7 +138,7 @@ bundle agent cfe_internal_disable_selinux
 ##################################################################
 #
 # cfe_internal_selinux(condition)
-#  - Allow SELinux to run Mission Portal and Mongo DB
+#  - Allow SELinux to run Mission Portal
 #
 # condition
 #   fix: Leave SELinux running and pierce a hole for Mission Portal
