@@ -85,6 +85,12 @@ bundle server access_rules()
       comment => "Grant access to shell for cfruncommand",
       admit => { "$(sys.policy_hub)" };
 
+    windows::
+      "c:\program files\cfengine\bin-twin\cf-agent.exe"
+      handle => "server_access_grant_access_agent_twin",
+      comment => "Grant access to the agent (for cf-runagent)",
+      admit   => { @(def.acl) };
+
     !am_policy_hub.enterprise::
 
       "delta"
@@ -130,15 +136,6 @@ bundle server access_rules()
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
       admit => { "$(sys.policy_hub)" };
-
-      # Uncomment the promise below to allow cf-runagent to
-      # access cf-agent on Windows machines
-      #
-      #  "c:\program files\cfengine\bin\cf-agent.exe"
-      #
-      #    handle => "grant_access_policy_agent",
-      #    comment => "Grant access to the agent (for cf-runagent)",
-      #    admit   => { ".*$(def.domain)", @(def.acl) };
 
   roles:
 
