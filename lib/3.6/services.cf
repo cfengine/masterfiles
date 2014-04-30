@@ -222,9 +222,9 @@ bundle agent standard_services(service,state)
 # ```
 {
   vars:
-      "all_states" slist => { "start", "restart", "reload", "stop" };
+      "all_states" slist => { "start", "restart", "reload", "stop", "disable" };
 
-      "inits" slist => { "sysvinitd", "sysvservice", "systemd" },
+      "inits" slist => { "sysvinitd", "sysvservice", "systemd", "chkconfig" },
       comment => "Currently handled init systems";
 
       "default[prefix][sysvservice]" string => "$(paths.service) ",
@@ -239,15 +239,37 @@ bundle agent standard_services(service,state)
                                                     "/etc/init.d/"),
       comment => "Command prefix for sysv init script interactions";
 
+      "default[prefix][chkconfig]" string => "$(default[prefix][sysvinitd])",
+      comment => "Command prefix for chkconfig init script interactions";
+
       "default[cmd][$(inits)]" string => "$(default[prefix][$(inits)])$(service) $(state)",
       comment => "Default command to control the service";
 
       "default[pattern]" string => "\b$(service)\b",
       comment => "Set default pattern for proc matching";
 
-      "default[init]" string => "sysvinitd",
-      comment => "Set the default init system used if one isn't defined";
+    _stdlib_path_exists_chkconfig::
+      "default[init]" string => "chkconfig",
+      comment => "Use chkconfig as the default init system if one isn't defined";
 
+    !_stdlib_path_exists_chkconfig::
+      "default[init]" string => "sysvinitd",
+      comment => "Use sysvinitd as the default init system if one isn't defined";
+
+    no_inits_set::
+      "init_system" string => "$(default[init])";
+
+    any::
+      "init_system" string => "$(init[$(service)])",
+      ifvarclass => "$(inits_set)";
+
+    start|restart|reload::
+      "chkconfig_mode" string => "on";
+
+    stop|disable::
+      "chkconfig_mode" string => "off";
+
+    any::
       "stakeholders[cfengine3]" slist => { "cfengine_in" };
       "stakeholders[acpid]" slist => { "cpu", "cpu0", "cpu1", "cpu2", "cpu3" };
       "stakeholders[postfix]" slist => { "smtp_in" };
@@ -436,6 +458,13 @@ bundle agent standard_services(service,state)
       "no_inits_set" not => isvariable("init[$(service)]"),
       comment => "Check if no init system is specified";
 
+      # define a class to tell us what init system we're using
+      "using_$(init_system)" expression => "any";
+
+  commands:
+    using_chkconfig::
+      "$(paths.chkconfig) $(service) $(chkconfig_mode)";
+
   processes:
 
     start::
@@ -452,7 +481,7 @@ bundle agent standard_services(service,state)
       restart_class => "start_$(service)",
       ifvarclass => not(isvariable("pattern[$(service)]"));
 
-    stop::
+    stop|disable::
 
       "$(pattern[$(service)])" -> { "@(stakeholders[$(service)])" }
 
