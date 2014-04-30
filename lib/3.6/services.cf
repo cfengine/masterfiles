@@ -694,3 +694,59 @@ bundle agent standard_services(service,state)
       "$(this.bundle): The baseinit is NOT provided, using default"
       ifvarclass => not(isvariable("baseinit[$(service)]"));
 }
+
+body service_method chkconfig
+# @brief service method to use `chkconfig_services`
+#
+# Example:
+#
+# ```
+# services:
+#   "ntpd" service_policy => "disable", service_method => chkconfig;
+# ```
+{
+      service_bundle => chkconfig_services("$(this.promiser)",
+                                           "$(this.service_policy)");
+}
+
+bundle agent chkconfig_services(service,state)
+# @brief chkconfig services bundle
+# @param service specific service to control
+# @param state desired state for that service
+#
+# Example:
+#
+# ```
+# services:
+#   # note that `chkconfig` calls `chkconfig_services`
+#   "ntpd" service_policy => "disable", service_method => chkconfig;
+# ```
+{
+  classes:
+      "$(all_states)" expression => strcmp($(state), $(all_states));
+
+  vars:
+      "all_states" slist => { "start", "restart", "reload", "stop", "disable" };
+
+    start|restart|reload::
+      "mode" string => "on";
+
+    stop|disable::
+      "mode" string => "off";
+
+  commands:
+      "$(paths.chkconfig) $(service) $(mode)";
+
+  services:
+      # this will drop down to standard_services for process
+      # management and running init scripts
+    !disable::
+      "$(service)" service_policy => $(state);
+    disable::
+      # standard_services is missing disable
+      "$(service)" service_policy => "stop";
+
+  reports:
+    inform_mode::
+      "$(this.bundle): ensuring $(service) is in state $(state)";
+}
