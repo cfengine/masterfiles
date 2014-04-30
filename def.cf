@@ -147,7 +147,7 @@ bundle common def
 
       ### Enable special features policies. Set to "any" to enable.
 
-      # Auto-load files in "services/auto" and run bundles tagged "autorun".
+      # Auto-load files in "services/autorun" and run bundles tagged "autorun".
       # Disabled by default!
       "services_autorun" expression => "!any";
 
