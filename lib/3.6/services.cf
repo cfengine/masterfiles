@@ -47,6 +47,19 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+bundle common services_common
+# @ignore
+{
+  vars:
+      "inputs" slist => { "$(this.promise_dirname)/paths.cf" };
+}
+
+body file control
+# @ignore
+{
+      inputs => { @(services_common.inputs) };
+}
+
 ##-------------------------------------------------------
 ## service promises
 ##-------------------------------------------------------
@@ -214,10 +227,10 @@ bundle agent standard_services(service,state)
       "inits" slist => { "sysvinitd", "sysvservice", "systemd" },
       comment => "Currently handled init systems";
 
-      "default[prefix][sysvservice]" string => "$(paths.path[service]) ",
+      "default[prefix][sysvservice]" string => "$(paths.service) ",
       comment => "Command for sysv service interactions";
 
-      "default[prefix][systemd]" string => "/bin/systemctl ",
+      "default[prefix][systemd]" string => "$(paths.systemctl) ",
       comment => "Command for systemd interactions";
 
       "default[prefix][sysvinitd]" string => ifelse("openbsd", "/etc/rc.d/",
