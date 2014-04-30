@@ -1,0 +1,18 @@
+body file control
+{
+      inputs => { @(autorun.inputs) };
+}
+
+bundle agent autorun
+{
+  vars:
+      "inputs" slist => findfiles("$(this.promise_dirname)/autorun/*.cf");
+      "bundles" slist => bundlesmatching(".*", "autorun");
+
+  methods:
+      "autorun" usebundle => $(bundles);
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): found bundle $(bundles) with tag 'autorun'";
+}

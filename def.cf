@@ -156,6 +156,10 @@ bundle common def
 
       ### Enable special features policies. Set to "any" to enable.
 
+      # Auto-load files in "services/auto" and run bundles tagged "autorun".
+      # Disabled by default!
+      "services_autorun" expression => "!any";
+
       # Internal CFEngine log files rotation
       "cfengine_internal_rotate_logs" expression => "any";
 

@@ -1,0 +1,9 @@
+bundle agent hello_world_autorun
+{
+  meta:
+      "tags" slist => { "autorun" };
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): Hello, this is an automatically loaded bundle";
+}
