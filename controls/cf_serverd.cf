@@ -34,19 +34,19 @@ body server control
       denybadclocks         => "false";
 
     windows::
-      cfruncommand => "$(sys.cf_twin) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
+      cfruncommand => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
 
     hpux::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"SHLIB_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     aix::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"LIBPATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     solaris::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
 
     !(windows|hpux|aix|solaris)::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"LD_LIBRARY_PATH=\"/var/cfengine/lib-twin\" $(sys.cf_twin) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
 }
 
