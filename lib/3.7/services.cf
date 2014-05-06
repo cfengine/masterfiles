@@ -108,16 +108,16 @@ bundle agent standard_services(service,state)
 # This bundle receives the service name and the desired service state,
 # then does the needful to reach the desired state.
 #
-# If you're running systemd, it will use systemctl.
+# If you're running systemd, systemctl will be used.
 #
-# If you're not running systemd and chkconfig is present, chkconfig
-# will be used.
+# Else, if chkconfig is present, it will be used.
 #
-# If you're not running systemd and chkconfig is not present but the
-# service command is available, service will be used.
+# Else, if the service command is available, if will be used.
 #
-# If neither systemd nor chkconfig not service are usable, control is
-# passed to `classic_services`.
+# Else, if the svcadm command is available, if will be used. Note you
+# have to supply the full SMF service identifier.
+#
+# Else, control is passed to `classic_services`.
 #
 # Note you do **not** have to call this bundle from `services`
 # promises. You can simply make a `methods` call to it. That would
@@ -139,9 +139,11 @@ bundle agent standard_services(service,state)
 
     start|restart|reload::
       "chkconfig_mode" string => "on";
+      "svcadm_mode" string => "enable";
 
     stop|disable::
       "chkconfig_mode" string => "off";
+      "svcadm_mode" string => "disable";
 
   classes:
       # define a class named after the desired state
@@ -150,6 +152,7 @@ bundle agent standard_services(service,state)
 
       "chkconfig" expression => "!systemd._stdlib_path_exists_chkconfig";
       "sysvservice" expression => "!systemd.!chkconfig._stdlib_path_exists_service";
+      "smf" expression => "!systemd.!chkconfig.!sysvservice._stdlib_path_exists_svcadm";
 
       "have_init" expression => fileexists($(init));
 
@@ -173,8 +176,11 @@ bundle agent standard_services(service,state)
     !systemd.!chkconfig.sysvservice.disable::
       "$(paths.service) $(service) stop";
 
+    !systemd.!chkconfig.!sysvservice.smf::
+      "$(paths.svcadm) $(svcadm_mode) $(service)";
+
   methods:
-    !systemd.!chkconfig.!sysvservice::
+    !systemd.!chkconfig.!sysvservice.!smf::
       # fallback
       "classic" usebundle => classic_services($(service), $(state));
 
@@ -185,7 +191,9 @@ bundle agent standard_services(service,state)
       "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))";
     inform_mode.sysvservice::
       "$(this.bundle): using System V service / Upstart layer to $(state) $(service)";
-    inform_mode.!systemd.!chkconfig.!sysvservice::
+    inform_mode.smf::
+      "$(this.bundle): using Solaris SMF to $(state) $(service) (svcadm mode $(svcadm_mode))";
+    inform_mode.!systemd.!chkconfig.!sysvservice.!smf::
       "$(this.bundle): falling back to classic_services to $(state) $(service)";
 }
 
