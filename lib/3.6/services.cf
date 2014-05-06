@@ -95,6 +95,103 @@ body service_method force_deps
 bundle agent standard_services(service,state)
 # @brief Standard services bundle, used by CFEngine by default
 # @author CFEngine AS
+# @param service Name of service to control
+# @param state The desired state for that service: "start", "restart", "reload", "stop", or "disable"
+#
+# This bundle is used by CFEngine if you don't specify a services
+# handler explicitly, and will work with systemd or chkconfig or other
+# non-sysvinit service managers. It will try to automate service
+# discovery, unlike `classic_services` which requires known service
+# names. If it can't do the automatic management, it will pass control
+# to `classic_services`.
+#
+# This bundle receives the service name and the desired service state,
+# then does the needful to reach the desired state.
+#
+# If you're running systemd, it will use systemctl.
+#
+# If you're not running systemd and chkconfig is present, chkconfig
+# will be used.
+#
+# If you're not running systemd and chkconfig is not present but the
+# service command is available, service will be used.
+#
+# If neither systemd nor chkconfig not service are usable, control is
+# passed to `classic_services`.
+#
+# Note you do **not** have to call this bundle from `services`
+# promises. You can simply make a `methods` call to it. That would
+# enable you to use systemd states like `try-restart` for instance.
+#
+# **Example:**
+#
+# ```cf3
+# services:
+#     "sshd" service_policy => "start"; # uses `standard_services`
+#
+# methods:
+#     "" usebundle => standard_services("sshd", "start"); # direct
+# ```
+{
+  vars:
+      "call_systemctl" string => "$(paths.sysctl) --no-ask-password --global --system";
+      "init" string => "/etc/init.d/$(service)";
+
+    start|restart|reload::
+      "chkconfig_mode" string => "on";
+
+    stop|disable::
+      "chkconfig_mode" string => "off";
+
+  classes:
+      # define a class named after the desired state
+      "$(state)" expression => "any";
+      "non_disabling" or => { "start", "stop", "restart", "reload" };
+
+      "chkconfig" expression => "!systemd._stdlib_path_exists_chkconfig";
+      "sysvservice" expression => "!systemd.!chkconfig._stdlib_path_exists_service";
+
+      "have_init" expression => fileexists($(init));
+
+  commands:
+    systemd:: # note this class is defined in `inventory/linux.cf`
+      # conveniently, systemd states map to `services` states, except
+      # for `enable`
+      "$(call_systemctl) $(state) $(service)";
+    systemd.start::
+      # so for `start` we explicitly enable the service, but for
+      # `stop` we do NOT disable it
+      "$(call_systemctl) enable $(service)";
+
+    !systemd.chkconfig::
+      "$(paths.chkconfig) $(service) $(chkconfig_mode)";
+    !systemd.chkconfig.have_init.non_disabling::
+      "$(init) $(state)" contain => silent;
+
+    !systemd.!chkconfig.sysvservice.non_disabling::
+      "$(paths.service) $(service) $(state)";
+    !systemd.!chkconfig.sysvservice.disable::
+      "$(paths.service) $(service) stop";
+
+  methods:
+    !systemd.!chkconfig.!sysvservice::
+      # fallback
+      "classic" usebundle => classic_services($(service), $(state));
+
+  reports:
+    inform_mode.systemd::
+      "$(this.bundle): using systemd layer to $(state) $(service)";
+    inform_mode.chkconfig::
+      "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))";
+    inform_mode.sysvservice::
+      "$(this.bundle): using System V service / Upstart layer to $(state) $(service)";
+    inform_mode.!systemd.!chkconfig.!sysvservice::
+      "$(this.bundle): falling back to classic_services to $(state) $(service)";
+}
+
+bundle agent classic_services(service,state)
+# @brief Standard services bundle, used by CFEngine by default
+# @author CFEngine AS
 # @author Tero Kantonen <prkele@gmail.com>
 # @param service specific service to control
 # @param state desired state for that service
