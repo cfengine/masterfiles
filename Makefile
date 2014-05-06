@@ -44,7 +44,7 @@ checklog: copy env
 	cd tests/acceptance && ./testall --printlog
 
 install:
-	for d in . cfe_internal controls inventory libraries lib/3.5 lib/3.6 lib/3.7 reports services services/autorun sketches/meta update; do \
+	for d in . cfe_internal controls inventory lib/3.5 lib/3.6 lib/3.7 reports services services/autorun sketches/meta update; do \
 		$(INSTALL_DIR) $(DESTDIR)/$$d; \
 		for f in $$d/*.cf; do\
 			$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
