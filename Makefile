@@ -32,7 +32,10 @@ checklog: copy env
 	cd tests/acceptance && ./testall --printlog
 
 install:
-	for d in . cfe_internal controls inventory libraries lib/3.5 lib/3.6 reports services sketches/meta update; do \
+	for f in .gitignore; do\
+		$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
+	done;
+	for d in . cfe_internal controls inventory libraries lib/3.5 lib/3.6 reports services services/autorun sketches/meta update; do \
 		$(INSTALL_DIR) $(DESTDIR)/$$d; \
 		for f in $$d/*.cf; do\
 			$(INSTALL_DATA) $$f $(DESTDIR)/$$f; \
