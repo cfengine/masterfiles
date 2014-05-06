@@ -88,8 +88,14 @@ bundle common inventory
 #
 # Tested to work properly against 3.5.x
 {
+  classes:
+      "other_unix_os" expression => "!windows.!macos.!linux";
+
   vars:
       # This list is intended to grow as needed
+    !cfengine_3_5.archlinux::
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb" };
     !cfengine_3_5.debian::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/debian.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_debian" };
@@ -105,7 +111,7 @@ bundle common inventory
     !cfengine_3_5.macos::
       "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos" };
-    !cfengine_3_5.!windows.!macos.!debian.!redhat.!suse::
+    !cfengine_3_5.other_unix_os::
       "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_generic" };
 
