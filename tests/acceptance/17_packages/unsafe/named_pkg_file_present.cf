@@ -7,9 +7,10 @@
 body common control
 {
     inputs => {
-               "../../default.cf.sub",
-               "../../../../lib/3.6/packages.cf",
-               "packages-info.cf.sub",
+                "../../dcs.cf.sub",
+                "../../../../$(sys.local_libdir)/stdlib.cf",
+                "../../../../$(sys.local_libdir)/packages.cf",
+                "packages-info.cf.sub",
               };
     bundlesequence  => { default("$(this.promise_filename)") };
     version => "1.0";
