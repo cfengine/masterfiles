@@ -1,0 +1,78 @@
+# Checks that a yum check-update with multiline entries generates the correct
+# software_patches_avail.cf file.
+
+body common control
+{
+      inputs => { "../dcs.cf.sub",
+                  "../../../$(sys.local_libdir)/stdlib.cf",
+                  "../../../$(sys.local_libdir)/packages.cf",
+                };
+      bundlesequence => { default($(this.promise_filename)) };
+}
+
+bundle agent init
+{
+  files:
+      "$(G.testdir)/package-update-list.txt"
+        create => "true",
+        # Taken from a yum run with long package names, broken at 80 columns.
+        edit_line => insert_lines("yum.noarch                 3.2.29-43.el6_5      rhui-REGION-rhel-server-releases
+yum-plugin-security.noarch
+                           1.1.30-17.el6_5
+                                                rhui-REGION-rhel-server-releases
+phonon-backend-gstreamer.x86_64
+                           1:4.6.2-28.el6_5     rhui-REGION-rhel-server-releases
+java-1.6.0-openjdk.x86_64  1:1.6.0.0-5.1.13.3.el6_5
+                                                rhui-REGION-rhel-server-releases");
+}
+
+# Taken from packages.cf, with some modifications.
+body package_method yum_test
+{
+      package_changes => "bulk";
+      package_list_command => "$(G.true)";
+      package_patch_command => "$(G.true)";
+      package_patch_list_command => "$(G.cat) $(G.testdir)/package-update-list.txt $(redhat_knowledge.check_update_postproc)";
+
+      package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
+      package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
+      package_list_arch_regex    => "$(rpm_knowledge.rpm3_arch_regex)";
+
+      package_installed_regex => ".*";
+      package_name_convention => "$(name)-$(version).$(arch)";
+
+      package_delete_convention => "$(name)";
+
+      package_list_update_command => "$(G.cat) $(G.testdir)/package-update-list.txt $(redhat_knowledge.check_update_postproc)";
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";
+
+      package_patch_name_regex    => "$(redhat_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(redhat_knowledge.patch_version_regex)";
+      package_patch_arch_regex    => "$(redhat_knowledge.patch_arch_regex)";
+
+      package_add_command    => "$(G.true)";
+      package_update_command => "$(G.true)";
+      package_patch_command  => "$(G.true)";
+      package_delete_command => "$(G.true)";
+      package_verify_command => "$(G.true)";
+}
+
+bundle agent test
+{
+  meta:
+      # Redhat specific issue.
+      "test_skip_unsupported" string => "!redhat|!enterprise";
+
+  packages:
+      "dummy-nonexisting-package"
+        package_policy => "addupdate",
+        package_method => yum_test;
+}
+
+bundle agent check
+{
+  methods:
+      "test" usebundle => sorted_check_diff("$(sys.workdir)/state/software_patches_avail.csv",
+                                            "$(this.promise_dirname)/multiline_yum_check_update.cf.expected",
+                                            "$(this.promise_filename)");
+}

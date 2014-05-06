@@ -454,8 +454,8 @@ body package_method inventory_yum_rpm(update_interval)
 # packages, as Yum may decide.
 {
       package_changes => "bulk";
-      package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '%{name}.%{arch} %{version}-%{release}\n'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
 
       package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
       package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
@@ -468,12 +468,12 @@ body package_method inventory_yum_rpm(update_interval)
       package_delete_convention => "$(name)";
 
       # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update";
+      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
       package_list_update_ifelapsed => $(update_interval);
 
-      package_patch_name_regex    => "([^.]+).*";
-      package_patch_version_regex => "[^\s]\s+([^\s]+).*";
-      package_patch_arch_regex    => "[^.]+\.([^\s]+).*";
+      package_patch_name_regex    => "$(redhat_knowledge.patch_name_regex)";
+      package_patch_version_regex => "$(redhat_knowledge.patch_version_regex)";
+      package_patch_arch_regex    => "$(redhat_knowledge.patch_arch_regex)";
 
       package_add_command    => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y install";
       package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
