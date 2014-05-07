@@ -145,13 +145,31 @@ bundle common redhat_knowledge
 
       "yum_options" string => "--quiet";
 
+      # yum check-update prints a lot of extra useless lines, but the package
+      # names we're interested in always contain a '.' followed by an
+      # architecture, so let's make sure of that when we match.
       "patch_name_regex" string    => "^(\S+)\.[^.]+\s.*";
-      "patch_version_regex" string => "^\S+\s+(\S+).*";
+      "patch_version_regex" string => "^\S+\.[^.]+\s+(\S+).*";
       "patch_arch_regex" string    => "^\S+\.([^.]+)\s.*";
 
-      # Combine multiline entries into one line. Any line without at least three
-      # fields gets combined with the next.
-      "check_update_postproc" string => "| sed -r -n -e ':begin;/\S+\s+\S+\s+\S+/!{N;s/\n//;bbegin;};p;'";
+      # Combine multiline entries into one line. A line without at least three
+      # fields gets combined with the next line, if that line starts with a
+      # space.
+      "check_update_postproc" string => "| $(paths.sed) -r -n -e '
+        :begin;
+        /\S+\s+\S+\s+\S+/!{    # Check for valid line.
+            N;                 # If not, read in the next line and append it.
+            /\n /!{            # Check whether that line started with a space.
+                h;             # If not, copy buffer to clipboard.
+                s/\n[^\n]*$//; # Erase last line.
+                p;             # Print current buffer.
+                x;             # Restore from clipboard.
+                s/^.*\n//;     # Erase everything but last line.
+            };
+            s/\n / /;          # Combine lines by removing newline.
+            bbegin;            # Jump back to begin.
+        };
+        p;                     # Print current buffer.'";
 }
 
 bundle common suse_knowledge
