@@ -1,0 +1,6 @@
+yum,3.2.29-43.el6_5,noarch,true
+yum-plugin-security,1.1.30-17.el6_5,noarch,true
+phonon-backend-gstreamer,1:4.6.2-28.el6_5,x86_64,true
+java-1.6.0-openjdk,1:1.6.0.0-5.1.13.3.el6_5,x86_64,true
+firefox,24.5.0-1.el5.centos,i386,true
+firefox,24.5.0-1.el5.centos,x86_64,true
