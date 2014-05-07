@@ -226,7 +226,7 @@ bundle agent disable_cfengine_agents(process)
       "$(cfe_internal_process_knowledge.bindir)/$(process)"
       signals => { "term" },
       comment => "Terminate $(process)",
-      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
+      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process_classic",
       ifvarclass => "disable_$(cprocess)";
 
     !windows.systemd::
@@ -234,7 +234,7 @@ bundle agent disable_cfengine_agents(process)
       "$(cfe_internal_process_knowledge.bindir)/$(process)"
       process_stop => "$(paths.systemctl) stop $(process).service",
       comment => "Terminate $(process)",
-      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
+      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process_systemd",
       ifvarclass => "disable_$(cprocess)";
 
 }
