@@ -153,6 +153,7 @@ bundle agent standard_services(service,state)
       "chkconfig" expression => "!systemd._stdlib_path_exists_chkconfig";
       "sysvservice" expression => "!systemd.!chkconfig._stdlib_path_exists_service";
       "smf" expression => "!systemd.!chkconfig.!sysvservice._stdlib_path_exists_svcadm";
+      "fallback" expression => "!systemd.!chkconfig.!sysvservice.!smf";
 
       "have_init" expression => fileexists($(init));
 
@@ -166,22 +167,21 @@ bundle agent standard_services(service,state)
       # `stop` we do NOT disable it
       "$(call_systemctl) enable $(service)";
 
-    !systemd.chkconfig::
+    chkconfig::
       "$(paths.chkconfig) $(service) $(chkconfig_mode)";
-    !systemd.chkconfig.have_init.non_disabling::
+    chkconfig.have_init.non_disabling::
       "$(init) $(state)" contain => silent;
 
-    !systemd.!chkconfig.sysvservice.non_disabling::
+    sysvservice.non_disabling::
       "$(paths.service) $(service) $(state)";
-    !systemd.!chkconfig.sysvservice.disable::
+    sysvservice.disable::
       "$(paths.service) $(service) stop";
 
-    !systemd.!chkconfig.!sysvservice.smf::
+    smf::
       "$(paths.svcadm) $(svcadm_mode) $(service)";
 
   methods:
-    !systemd.!chkconfig.!sysvservice.!smf::
-      # fallback
+    fallback::
       "classic" usebundle => classic_services($(service), $(state));
 
   reports:
@@ -193,7 +193,7 @@ bundle agent standard_services(service,state)
       "$(this.bundle): using System V service / Upstart layer to $(state) $(service)";
     inform_mode.smf::
       "$(this.bundle): using Solaris SMF to $(state) $(service) (svcadm mode $(svcadm_mode))";
-    inform_mode.!systemd.!chkconfig.!sysvservice.!smf::
+    inform_mode.fallback::
       "$(this.bundle): falling back to classic_services to $(state) $(service)";
 }
 
