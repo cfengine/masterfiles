@@ -22,18 +22,18 @@ bundle agent cfe_internal_update_policy
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
 
-      "bin_dir"         string => translatepath("$(sys.bindir)"),
+      "dir_bin"         string => translatepath("$(sys.bindir)"),
       comment => "Directory containing CFEngine binaries",
-      handle => "cfe_internal_update_policy_vars_bin_dir";
+      handle => "cfe_internal_update_policy_vars_dir_bin";
 
     (cfengine_3_5||cfengine_3_4)::
       "inputs_dir"         string => translatepath("$(sys.workdir)/inputs"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir_backport";
 
-      "bin_dir"         string => translatepath("$(sys.workdir)/bin"),
+      "dir_bin"         string => translatepath("$(sys.workdir)/bin"),
       comment => "Directory containing CFEngine binaries",
-      handle => "cfe_internal_update_policy_vars_bin_dir_backport";
+      handle => "cfe_internal_update_policy_vars_dir_bin_backport";
 
     windows::
 
@@ -199,7 +199,7 @@ bundle agent cfe_internal_update_policy
 
     !windows::
 
-      "$(bin_dir)"
+      "$(dir_bin)"
       comment => "Make sure cfengine binaries have right file permissions",
       handle => "cfe_internal_update_policy_files_sys_workdir_bin",
       perms => u_m("755"),
