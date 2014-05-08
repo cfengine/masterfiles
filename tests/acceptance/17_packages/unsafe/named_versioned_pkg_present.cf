@@ -24,6 +24,10 @@ body common control
 
 bundle agent init
 {
+  meta:
+      "test_suppress_fail" string => "suse",
+        meta => { "redmine5607" };
+
   methods:
     "clear_packages" usebundle => clear_packages;
 }
@@ -38,7 +42,7 @@ bundle agent test
       debian::
           "package_arch" string => "amd64";
           "package_version" string => "$(p.version[1])";
-      redhat::
+      redhat|suse::
           "package_arch" string => "x86_64";
           "package_version" string => "$(p.version[1])";
 
@@ -62,6 +66,15 @@ bundle agent test
             package_architectures => { "$(package_arch)" },
             package_method => yum_rpm,
             classes => test_set_class("pass","fail");
+
+        suse::
+            "$(package_name)"
+            package_policy => "add",
+            package_select => "==",
+            package_version => "$(package_version)",
+            package_architectures => { "$(package_arch)" },
+            package_method => zypper,
+            classes => test_set_class("pass","fail");
 }
 
 
@@ -83,7 +96,7 @@ bundle agent check
         debian::
             "has_pkg" expression => returnszero("dpkg -l | grep ' $(test.package_name) ' > /dev/null", "useshell");
 
-        redhat::
+        redhat|suse::
             "has_pkg" expression => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
 
         any::

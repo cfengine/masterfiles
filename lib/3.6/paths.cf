@@ -92,6 +92,11 @@ bundle common paths
     !_have_bin_env::
       "path[env]"      string => "/usr/bin/env";
 
+    _have_bin_systemctl::
+      "path[systemctl]"      string => "/bin/systemctl";
+    !_have_bin_systemctl::
+      "path[systemctl]"      string => "/usr/bin/systemctl";
+
     linux::
       "path[lsattr]"        string => "/usr/bin/lsattr";
       "path[tar]"           string => "/bin/tar";
@@ -163,7 +168,6 @@ bundle common paths
       "path[ip]"                string => "/usr/bin/ip";
       "path[ifconfig]"          string => "/usr/bin/ifconfig";
       "path[journalctl]"        string => "/usr/bin/journalctl";
-      "path[systemctl]"         string => "/usr/bin/systemctl";
       "path[netctl]"            string => "/usr/bin/netctl";
 
     freebsd|netbsd::
@@ -407,10 +411,10 @@ bundle common paths
 
       "path[sysctl]"        string => "/sbin/sysctl";
 
-    !(SuSE||SUSE||suse)::
+    !suse::
       "path[logger]"        string => "/usr/bin/logger"; 
 
-    SuSE||SUSE||suse::
+    suse::
 
       "path[awk]"           string => "/usr/bin/awk";
       "path[bc]"            string => "/usr/bin/bc";
@@ -477,11 +481,13 @@ bundle common paths
       "path[shadow]"       string => "/etc/security/passwd";
 
     any::
+
       "all_paths"     slist => getindices("path");
       "$(all_paths)" string => "$(path[$(all_paths)])";
 
   classes:
       "_have_bin_env" expression => fileexists("/bin/env");
+      "_have_bin_systemctl" expression => fileexists("/bin/systemctl");
 
       "_stdlib_has_path_$(all_paths)"
       expression => isvariable("$(all_paths)"),

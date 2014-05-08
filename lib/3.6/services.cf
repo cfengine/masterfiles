@@ -47,6 +47,19 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+bundle common services_common
+# @ignore
+{
+  vars:
+      "inputs" slist => { "$(this.promise_dirname)/paths.cf" };
+}
+
+body file control
+# @ignore
+{
+      inputs => { @(services_common.inputs) };
+}
+
 ##-------------------------------------------------------
 ## service promises
 ##-------------------------------------------------------
@@ -80,6 +93,111 @@ body service_method force_deps
 ##
 
 bundle agent standard_services(service,state)
+# @brief Standard services bundle, used by CFEngine by default
+# @author CFEngine AS
+# @param service Name of service to control
+# @param state The desired state for that service: "start", "restart", "reload", "stop", or "disable"
+#
+# This bundle is used by CFEngine if you don't specify a services
+# handler explicitly, and will work with systemd or chkconfig or other
+# non-sysvinit service managers. It will try to automate service
+# discovery, unlike `classic_services` which requires known service
+# names. If it can't do the automatic management, it will pass control
+# to `classic_services`.
+#
+# This bundle receives the service name and the desired service state,
+# then does the needful to reach the desired state.
+#
+# If you're running systemd, systemctl will be used.
+#
+# Else, if chkconfig is present, it will be used.
+#
+# Else, if the service command is available, if will be used.
+#
+# Else, if the svcadm command is available, if will be used. Note you
+# have to supply the full SMF service identifier.
+#
+# Else, control is passed to `classic_services`.
+#
+# Note you do **not** have to call this bundle from `services`
+# promises. You can simply make a `methods` call to it. That would
+# enable you to use systemd states like `try-restart` for instance.
+#
+# **Example:**
+#
+# ```cf3
+# services:
+#     "sshd" service_policy => "start"; # uses `standard_services`
+#
+# methods:
+#     "" usebundle => standard_services("sshd", "start"); # direct
+# ```
+{
+  vars:
+      "call_systemctl" string => "$(paths.sysctl) --no-ask-password --global --system";
+      "init" string => "/etc/init.d/$(service)";
+
+    start|restart|reload::
+      "chkconfig_mode" string => "on";
+      "svcadm_mode" string => "enable";
+
+    stop|disable::
+      "chkconfig_mode" string => "off";
+      "svcadm_mode" string => "disable";
+
+  classes:
+      # define a class named after the desired state
+      "$(state)" expression => "any";
+      "non_disabling" or => { "start", "stop", "restart", "reload" };
+
+      "chkconfig" expression => "!systemd._stdlib_path_exists_chkconfig";
+      "sysvservice" expression => "!systemd.!chkconfig._stdlib_path_exists_service";
+      "smf" expression => "!systemd.!chkconfig.!sysvservice._stdlib_path_exists_svcadm";
+      "fallback" expression => "!systemd.!chkconfig.!sysvservice.!smf";
+
+      "have_init" expression => fileexists($(init));
+
+  commands:
+    systemd:: # note this class is defined in `inventory/linux.cf`
+      # conveniently, systemd states map to `services` states, except
+      # for `enable`
+      "$(call_systemctl) $(state) $(service)";
+    systemd.start::
+      # so for `start` we explicitly enable the service, but for
+      # `stop` we do NOT disable it
+      "$(call_systemctl) enable $(service)";
+
+    chkconfig::
+      "$(paths.chkconfig) $(service) $(chkconfig_mode)";
+    chkconfig.have_init.non_disabling::
+      "$(init) $(state)" contain => silent;
+
+    sysvservice.non_disabling::
+      "$(paths.service) $(service) $(state)";
+    sysvservice.disable::
+      "$(paths.service) $(service) stop";
+
+    smf::
+      "$(paths.svcadm) $(svcadm_mode) $(service)";
+
+  methods:
+    fallback::
+      "classic" usebundle => classic_services($(service), $(state));
+
+  reports:
+    inform_mode.systemd::
+      "$(this.bundle): using systemd layer to $(state) $(service)";
+    inform_mode.chkconfig::
+      "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))";
+    inform_mode.sysvservice::
+      "$(this.bundle): using System V service / Upstart layer to $(state) $(service)";
+    inform_mode.smf::
+      "$(this.bundle): using Solaris SMF to $(state) $(service) (svcadm mode $(svcadm_mode))";
+    inform_mode.fallback::
+      "$(this.bundle): falling back to classic_services to $(state) $(service)";
+}
+
+bundle agent classic_services(service,state)
 # @brief Standard services bundle, used by CFEngine by default
 # @author CFEngine AS
 # @author Tero Kantonen <prkele@gmail.com>
@@ -209,15 +327,15 @@ bundle agent standard_services(service,state)
 # ```
 {
   vars:
-      "all_states" slist => { "start", "restart", "reload", "stop" };
+      "all_states" slist => { "start", "restart", "reload", "stop", "disable" };
 
-      "inits" slist => { "sysvinitd", "sysvservice", "systemd" },
+      "inits" slist => { "sysvinitd", "sysvservice", "systemd", "chkconfig" },
       comment => "Currently handled init systems";
 
-      "default[prefix][sysvservice]" string => "$(paths.path[service]) ",
+      "default[prefix][sysvservice]" string => "$(paths.service) ",
       comment => "Command for sysv service interactions";
 
-      "default[prefix][systemd]" string => "/bin/systemctl ",
+      "default[prefix][systemd]" string => "$(paths.systemctl) ",
       comment => "Command for systemd interactions";
 
       "default[prefix][sysvinitd]" string => ifelse("openbsd", "/etc/rc.d/",
@@ -226,15 +344,37 @@ bundle agent standard_services(service,state)
                                                     "/etc/init.d/"),
       comment => "Command prefix for sysv init script interactions";
 
+      "default[prefix][chkconfig]" string => "$(default[prefix][sysvinitd])",
+      comment => "Command prefix for chkconfig init script interactions";
+
       "default[cmd][$(inits)]" string => "$(default[prefix][$(inits)])$(service) $(state)",
       comment => "Default command to control the service";
 
       "default[pattern]" string => "\b$(service)\b",
       comment => "Set default pattern for proc matching";
 
-      "default[init]" string => "sysvinitd",
-      comment => "Set the default init system used if one isn't defined";
+    _stdlib_path_exists_chkconfig::
+      "default[init]" string => "chkconfig",
+      comment => "Use chkconfig as the default init system if one isn't defined";
 
+    !_stdlib_path_exists_chkconfig::
+      "default[init]" string => "sysvinitd",
+      comment => "Use sysvinitd as the default init system if one isn't defined";
+
+    no_inits_set::
+      "init_system" string => "$(default[init])";
+
+    any::
+      "init_system" string => "$(init[$(service)])",
+      ifvarclass => "$(inits_set)";
+
+    start|restart|reload::
+      "chkconfig_mode" string => "on";
+
+    stop|disable::
+      "chkconfig_mode" string => "off";
+
+    any::
       "stakeholders[cfengine3]" slist => { "cfengine_in" };
       "stakeholders[acpid]" slist => { "cpu", "cpu0", "cpu1", "cpu2", "cpu3" };
       "stakeholders[postfix]" slist => { "smtp_in" };
@@ -266,7 +406,7 @@ bundle agent standard_services(service,state)
       "pattern[varnish]"          string => ".*varnish.*";
       "pattern[wpa_supplicant]"   string => ".*wpa_supplicant.*";
 
-    SuSE|suse::
+    suse::
 
       "baseinit[mysql]"           string => "mysqld";
       "pattern[mysql]"            string => ".*mysqld.*";
@@ -423,6 +563,13 @@ bundle agent standard_services(service,state)
       "no_inits_set" not => isvariable("init[$(service)]"),
       comment => "Check if no init system is specified";
 
+      # define a class to tell us what init system we're using
+      "using_$(init_system)" expression => "any";
+
+  commands:
+    using_chkconfig::
+      "$(paths.chkconfig) $(service) $(chkconfig_mode)";
+
   processes:
 
     start::
@@ -439,7 +586,7 @@ bundle agent standard_services(service,state)
       restart_class => "start_$(service)",
       ifvarclass => not(isvariable("pattern[$(service)]"));
 
-    stop::
+    stop|disable::
 
       "$(pattern[$(service)])" -> { "@(stakeholders[$(service)])" }
 

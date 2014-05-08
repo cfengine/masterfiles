@@ -315,7 +315,7 @@ body package_method u_generic(repo)
       package_delete_command     => "/usr/bin/dpkg --purge";
       package_update_command     => "/usr/bin/dpkg --force-confdef --force-confnew --install";
 
-    redhat|SuSE::
+    redhat|SuSE|suse::
 
       package_changes => "individual";
 
@@ -341,7 +341,7 @@ body package_method u_generic(repo)
 
     redhat::
       package_list_update_command => "/usr/bin/yum --quiet check-update";
-    SuSE::
+    SuSE|suse::
       package_list_update_command => "/usr/bin/zypper list-updates";
 
     windows::

@@ -11,7 +11,19 @@ ifeq ($(DESTDIR),)
   DESTDIR:=/var/cfengine/masterfiles
 endif
 
+UNAME := $(shell uname)
+REL := $(shell uname -r)
+
+ifeq ($(UNAME), SunOS)
+	ifneq ($(REL), 5.11)
+	INSTALL = /usr/sbin/install
+	else
+	INSTALL = /opt/csw/gnu/install
+	endif
+else
 INSTALL = /usr/bin/install
+endif
+
 INSTALL_DATA = ${INSTALL} -m 600
 INSTALL_DIR = ${INSTALL} -m 750 -d
 
