@@ -143,7 +143,9 @@ bundle common redhat_knowledge
 
       "call_yum" string => "$(paths.path[yum])";
 
-      "yum_options" string => "--quiet";
+      # on RHEL 4, Yum doesn't know how to be --quiet
+      "yum_options" string => ifelse("rhel_4", "",
+                                     "--quiet");
 
       # yum check-update prints a lot of extra useless lines, but the package
       # names we're interested in always contain a '.' followed by an
