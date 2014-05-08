@@ -186,6 +186,12 @@ bundle common def
       # by this policy version.
       # Also note that this policy will only be run on enterprise policy_server
       "postgresql_maintenance_supported" expression => "policy_server.enterprise.!(cfengine_3_4|cfengine_3_5)";
+      
+      # Allow the hub to edit sudoers in order for the Apache user to
+      # run passwordless sudo cf-runagent. Enable this if you want the
+      # Mission Portal to be able to troubleshoot failed Design Center
+      # sketch activations on a host.
+      "cfengine_internal_sudoers_editing_enable" expression => "!any";
 
       # This class is for PosgreSQL maintenance
       # pre-defined to every Sunday at 2 a.m.
