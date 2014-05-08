@@ -209,7 +209,7 @@ bundle agent cfe_internal_update_policy
 
       "$(dir_bin)/$(agents)"
       comment => "Make sure cfengine binaries have right file permissions",
-      handle => "cfe_internal_update_policy_files_sys_workdir_bin",
+      handle => "cfe_internal_update_policy_files_dir_bin_agents",
       perms => u_m("755"),
       action => u_immediate;
 
@@ -219,6 +219,14 @@ bundle agent cfe_internal_update_policy
       perms => u_m("755"),
       action => u_immediate,
       ifvarclass => canonify("have_bindir_$(optional_agents)");
+
+      "$(sys.workdir)/bin"
+      comment => "Make sure cfengine binaries have right file permissions",
+      handle => "cfe_internal_update_policy_files_sys_workdir_bin",
+      perms => u_m("755"),
+      depth_search => u_recurse_basedir("inf"),
+      ifvarclass => and(strcmp($(sys.workdir), "/var/cfengine")),
+      action => u_immediate;
 
       "$(sys.workdir)/lib"
       comment => "Make sure cfengine libraries have right file permissions",
