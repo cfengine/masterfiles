@@ -102,9 +102,17 @@ bundle agent cfe_internal_update_policy
       comment => "List of CFEngine binaries",
       handle => "cfe_internal_update_policy_vars_agents";
 
+      "optional_agents" slist => {
+			           "cf-consumer",
+			           "cf-hub",
+      },
+      comment => "List of optional CFEngine binaries",
+      handle => "cfe_internal_update_policy_vars_optional_agents";
       #
 
   classes:
+
+      "have_bindir_$(optional_agents)" expression => fileexists("$(dir_bin)/$(optional_agents)");
 
     any::
 
@@ -199,12 +207,18 @@ bundle agent cfe_internal_update_policy
 
     !windows::
 
-      "$(dir_bin)"
+      "$(dir_bin)/$(agents)"
       comment => "Make sure cfengine binaries have right file permissions",
       handle => "cfe_internal_update_policy_files_sys_workdir_bin",
       perms => u_m("755"),
-      depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
+
+      "$(dir_bin)/$(optional_agents)"
+      comment => "Make sure the optional cfengine binaries have right file permissions",
+      handle => "cfe_internal_update_policy_files_sys_workdir_bin_optional",
+      perms => u_m("755"),
+      action => u_immediate,
+      ifvarclass => canonify("have_bindir_$(optional_agents)");
 
       "$(sys.workdir)/lib"
       comment => "Make sure cfengine libraries have right file permissions",
