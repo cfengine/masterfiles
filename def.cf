@@ -179,6 +179,12 @@ bundle common def
 
       "cfengine_internal_purge_policies" expression => "!any";
 
+      # Allow the hub to edit sudoers in order for the Apache user to
+      # run passwordless sudo cf-runagent. Enable this if you want the
+      # Mission Portal to be able to troubleshoot failed Design Center
+      # sketch activations on a host.
+      "cfengine_internal_sudoers_editing_enable" expression => "!any";
+
       # This class is for PosgreSQL maintenance
       # pre-defined to every Sunday at 2 a.m.
       # This can be changed later on.
