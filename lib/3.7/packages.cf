@@ -551,9 +551,7 @@ body package_method apt_get_permissive
 # @brief APT permissive (just by name) package method
 #
 # This package method interacts with the APT package manager through
-# `apt-get`. It can't delete packages and can't take a target version
-# or architecture, so only the "add" and "addupdate" methods should be
-# used.
+# `apt-get`.
 #
 # **Example:**
 #
