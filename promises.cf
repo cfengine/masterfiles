@@ -113,8 +113,8 @@ bundle common inventory
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb" };
     !cfengine_3_5.other_unix_os::
-      "inputs" slist => { "inventory/any.cf", "inventory/lsb.cf", "inventory/generic.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_lsb", "inventory_generic" };
+      "inputs" slist => { "inventory/any.cf", "inventory/generic.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_generic" };
 
     (cfengine_3_4|cfengine_3_5)::
       "inputs" slist => { cf_null };
