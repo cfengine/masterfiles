@@ -8,6 +8,7 @@ body common control
 {
       bundlesequence => {
                           "update_def",
+                          "update_inventory",
                           "cfe_internal_dc_workflow",
                           "cfe_internal_update_policy",
                           "cfe_internal_update_processes",
@@ -18,6 +19,7 @@ body common control
 
       inputs => {
                   "update/update_bins.cf",
+                  "inventory/linux.cf",
                   "update/cfe_internal_dc_workflow.cf",
                   "update/cfe_internal_local_git_remote.cf",
                   "update/cfe_internal_update_from_repository.cf",
@@ -100,4 +102,15 @@ bundle common update_def
 
       "cfengine_internal_purge_policies" expression => "!any";
 
+}
+
+
+bundle agent update_inventory
+{
+  methods:
+  
+    linux::
+      "Check for systemd on Linux"
+      usebundle => inventory_linux,
+      comment => "Check for systemd via the inventory";
 }
