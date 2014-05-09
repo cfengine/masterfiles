@@ -12,7 +12,7 @@ body executor control
 
     any::
 
-      splaytime  => "1";
+      splaytime  => "4"; # activity will be spread over this many time slices
       mailto     => "root@$(def.domain)";
       mailfrom   => "root@$(sys.host).$(def.domain)";
       smtpserver => "localhost";
