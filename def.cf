@@ -183,8 +183,10 @@ bundle common def
       # pre-defined to every Sunday at 2 a.m.
       # This can be changed later on.
 
-      "postgresql_maintenance" expression => "am_policy_hub.enterprise.Sunday.Hr02.Min00_05";
+      "postgresql_full_maintenance" expression => "policy_server.enterprise.Sunday.Hr02.Min00_05";
 
+      # Vacuum monitoring_mg table every day (except Sunday, when vacuum is run on entire db)
+      "postgresql_monitoring_maintenance" expression => "policy_server.enterprise.!Sunday.Hr02.Min00_05";
 }
 
 bundle common inventory_control
