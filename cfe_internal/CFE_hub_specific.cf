@@ -594,11 +594,12 @@ bundle agent cfe_internal_postgresql_maintenance
 {
   vars:
 
-    any::
+      "postgres_vacuum_options" string => ifelse("postgresql_full_maintenance", "--full --dbname=cfdb", "--full --dbname=cfdb --table=__monitoringmg");
+      "maintenance_type" string => ifelse("postgresql_full_maintenance", "full", "monitoring_only");
 
-      "vacuumdb_cmd" string => "$(sys.bindir)/vacuumdb --full cfdb",
-      comment => "Command for cleaning a PostgreSQL database",
-      handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd";
+      "vacuumdb_cmd" string => "$(sys.bindir)/vacuumdb $(postgres_vacuum_options)",
+      comment => "Command for cleaning a PostgreSQL database - $(maintenance_type)",
+      handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd_$(maintenance_type)";
 
       #
 
@@ -607,12 +608,12 @@ bundle agent cfe_internal_postgresql_maintenance
     any::
 
       "cf-hub"      signals => { "term" },
-      comment => "Terminate cf-hub while doing PostgreSQL maintenance",
-      handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
+      comment => "Terminate cf-hub while doing $(maintenance_type) PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_term_cf_hub";
 
       "cf-consumer" signals => { "kill" },
       comment => "Kill cf-consumer while doing PostgreSQL maintenance",
-      handle => "cfe_internal_postgresql_maintenance_processes_kill_cf_consumer";
+      handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_kill_cf_consumer";
 
       #
 
@@ -621,6 +622,6 @@ bundle agent cfe_internal_postgresql_maintenance
     any::
 
       "$(vacuumdb_cmd)"
-      comment => "Run vacuumdb command",
-      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd";
+      comment => "Run $(maintenance_type) vacuumdb command",
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_$(maintenance_type)";
 }
