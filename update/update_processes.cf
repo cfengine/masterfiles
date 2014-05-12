@@ -221,12 +221,20 @@ bundle agent disable_cfengine_agents(process)
 
   processes:
 
-    !windows::
+    !windows.!systemd::
 
       "$(cfe_internal_process_knowledge.bindir)/$(process)"
       signals => { "term" },
-      comment => "Terminate cf-monitord",
-      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
+      comment => "Terminate $(process)",
+      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process_classic",
+      ifvarclass => "disable_$(cprocess)";
+
+    !windows.systemd::
+
+      "$(cfe_internal_process_knowledge.bindir)/$(process)"
+      process_stop => "$(paths.systemctl) stop $(process).service",
+      comment => "Terminate $(process)",
+      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process_systemd",
       ifvarclass => "disable_$(cprocess)";
 
 }
@@ -268,9 +276,16 @@ bundle agent enable_cfengine_agents(process)
 
   commands:
 
-    !windows::
+    !windows.!systemd::
 
       "$(sys.$(cprocess))"
+      comment => "Restart a process",
+      handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
+      ifvarclass => "restart_$(cprocess)";
+
+    !windows.systemd::
+
+      "$(paths.systemctl) restart $(process).service"
       comment => "Restart a process",
       handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
       ifvarclass => "restart_$(cprocess)";
