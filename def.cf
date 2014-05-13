@@ -179,14 +179,19 @@ bundle common def
 
       "cfengine_internal_purge_policies" expression => "!any";
 
+      # Class defining which versions of cfengine are (not) supported
+      # by this policy version.
+      # Also note that this policy will only be run on enterprise policy_server
+      "postgresql_maintenance_supported" expression => "policy_server.enterprise.!(cfengine_3_4| cfengine_3_5)";
+
       # This class is for PosgreSQL maintenance
       # pre-defined to every Sunday at 2 a.m.
       # This can be changed later on.
 
-      "postgresql_full_maintenance" expression => "policy_server.enterprise.Sunday.Hr02.Min00_05";
+      "postgresql_full_maintenance" expression => "postgresql_maintenance_supported.Sunday.Hr02.Min00_05";
 
       # Vacuum monitoring_mg table every day (except Sunday, when vacuum is run on entire db)
-      "postgresql_monitoring_maintenance" expression => "policy_server.enterprise.!Sunday.Hr02.Min00_05";
+      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
 }
 
 bundle common inventory_control
