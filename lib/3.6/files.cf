@@ -2036,7 +2036,6 @@ bundle agent file_copy(from, to)
 {
   files:
       "$(to)"
-      create => "true",
       copy_from => copyfrom_sync($(from));
 
   reports:
