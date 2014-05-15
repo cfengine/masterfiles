@@ -343,6 +343,7 @@ bundle agent cfe_autorun_inventory_LLDP
   commands:
     !disable_inventory_LLDP::
       "$(inventory_control.lldpctl_exec) | perl -n -e 'my ($k, $v) = m/([^=]+)=(.*)/; $k =~ s/\W/_/g; print \"=$k=$v\";"
+      classes => kept_successful_command,
       module => "true";
 }
 

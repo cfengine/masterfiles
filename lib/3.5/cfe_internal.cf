@@ -61,6 +61,7 @@ bundle agent cfe_internal_hub_maintain
 
       "$(sys.cf_hub) -m"
       comment => "Perform hub database maintenance. This removes expired entries in the enterprise database and creates a total compliance cache for Mission Portal",
+      classes => kept_successful_command,
       handle => "cfe_internal_start_hub_start_maintenance",
       action => bg("60","60");
 }
