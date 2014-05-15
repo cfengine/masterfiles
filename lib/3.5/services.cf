@@ -805,15 +805,18 @@ bundle agent standard_services(service,state)
       "$(startcommand[$(service)])" -> { "@(stakeholders[$(service)])" }
 
       comment => "Execute command to start the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => canonify("start_$(service)");
 
     restart::
       "$(restartcommand[$(service)])" -> { "@(stakeholders[$(service)])" }
 
+      classes => kept_successful_command,
       comment => "Execute command to restart the $(service) service";
 
     reload::
       "$(reloadcommand[$(service)])" -> { "@(stakeholders[$(service)])" }
 
+      classes => kept_successful_command,
       comment => "Execute command to reload the $(service) service";
 }

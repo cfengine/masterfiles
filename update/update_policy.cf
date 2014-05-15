@@ -136,6 +136,7 @@ bundle agent cfe_internal_update_policy
 
       "$(sys.cf_key)"
       comment => "Generate cfengine encryption keys if necessary",
+      classes => u_kept_successful_command,
       handle => "cfe_internal_update_policy_commands_generate_keys";
 
     am_policy_hub.update_report::
@@ -143,6 +144,7 @@ bundle agent cfe_internal_update_policy
       "$(sys.cf_promises) -r"
          contain => u_in_shell_and_silent,
          comment => "Generate config knowledge format after update",
+         classes => u_kept_successful_command,
          handle => "cfe_internal_update_policy_commands_run_cf_promises_r";
 
       #

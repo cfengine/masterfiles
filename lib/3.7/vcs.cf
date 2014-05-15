@@ -327,11 +327,13 @@ bundle agent git(repo_path, subcmd, args)
     am_root.need_to_drop::
       "$(oneliner)"
       args => "$(subcmd) $(args)",
+      classes => kept_successful_command,
       contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) );
 
     !am_root|!need_to_drop::
       "$(oneliner)"
       args => "$(subcmd) $(args)",
+      classes => kept_successful_command,
       contain => in_dir( $(repo_path) );
 
   reports:

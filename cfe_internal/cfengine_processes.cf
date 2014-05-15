@@ -67,6 +67,7 @@ bundle agent cfe_internal_processes
 
       "$(sys.cf_execd)"
       comment => "Restart cf-execd process",
+      classes => kept_successful_command,
       handle => "cfe_internal_processes_commands_cf_execd";
 
       #
