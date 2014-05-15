@@ -101,3 +101,9 @@ bundle common update_def
       "cfengine_internal_purge_policies" expression => "!any";
 
 }
+
+body classes u_kept_successful_command
+# @brief Set command to "kept" instead of "repaired" if it returns 0
+{
+      kept_returncodes => { "0" };
+}

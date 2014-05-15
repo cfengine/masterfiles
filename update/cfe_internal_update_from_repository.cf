@@ -12,5 +12,6 @@ bundle agent cfe_internal_masterfiles_stage
 {
   commands:
       "$(update_def.dc_scripts)/masterfiles-stage.sh"
+      classes => u_kept_successful_command,
       handle => "masterfiles_update_stage";
 }

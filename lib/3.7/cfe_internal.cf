@@ -152,6 +152,7 @@ bundle agent cfe_internal_database_cleanup_reports (settings)
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
       contain => in_shell_and_silent,
+      classes => kept_successful_command,
       handle => "cf_database_maintain_report_$(settings[$(index)][report])";
 }
 
@@ -167,6 +168,7 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
       contain => in_shell_and_silent,
+      classes => kept_successful_command,
       handle => "cf_database_maintain_consumer_status";
 }
 
@@ -181,5 +183,6 @@ bundle agent cfe_internal_database_cleanup_diagnostics (settings)
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
       contain => in_shell_and_silent,
+      classes => kept_successful_command,
       handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
 }

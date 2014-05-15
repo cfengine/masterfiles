@@ -165,26 +165,35 @@ bundle agent standard_services(service,state)
     systemd:: # note this class is defined in `inventory/linux.cf`
       # conveniently, systemd states map to `services` states, except
       # for `enable`
-      "$(call_systemctl) $(state) $(service)";
+      "$(call_systemctl) $(state) $(service)"
+      classes => kept_successful_command;
     systemd.start::
       # so for `start` we explicitly enable the service, but for
       # `stop` we do NOT disable it
-      "$(call_systemctl) enable $(service)";
+      "$(call_systemctl) enable $(service)"
+      classes => kept_successful_command;
 
     chkconfig::
       "$(paths.chkconfig) $(service) $(chkconfig_mode)"
+      classes => kept_successful_command,
         ifvarclass => canonify("chkconfig_$(service)_registered");
 
     chkconfig.have_init.non_disabling::
-      "$(init) $(state)" contain => silent;
+      "$(init) $(state)"
+      classes => kept_successful_command,
+      contain => silent;
 
     sysvservice.non_disabling::
-      "$(paths.service) $(service) $(state)";
+      "$(paths.service) $(service) $(state)"
+      classes => kept_successful_command;
+
     sysvservice.disable::
-      "$(paths.service) $(service) stop";
+      "$(paths.service) $(service) stop"
+      classes => kept_successful_command;
 
     smf::
-      "$(paths.svcadm) $(svcadm_mode) $(service)";
+      "$(paths.svcadm) $(svcadm_mode) $(service)"
+      classes => kept_successful_command;
 
   methods:
     fallback::
@@ -578,7 +587,8 @@ bundle agent classic_services(service,state)
 
   commands:
     using_chkconfig::
-      "$(paths.chkconfig) $(service) $(chkconfig_mode)";
+      "$(paths.chkconfig) $(service) $(chkconfig_mode)"
+      classes => kept_successful_command;
 
   processes:
 
@@ -701,11 +711,13 @@ bundle agent classic_services(service,state)
 
       "$(startcommand[$(service)])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute command to start the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(isvariable("startcommand[$(service)]"),
                         canonify("start_$(service)"));
 ##
       "$(default[prefix][$(default[init])])$(baseinit[$(service)]) $(state)" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (baseinit init) command to start the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("startcommand[$(service)]")),
                         isvariable("baseinit[$(service)]"),
                         canonify("start_$(service)"),
@@ -713,6 +725,7 @@ bundle agent classic_services(service,state)
 
       "$(default[prefix][$(inits)])$(baseinit[$(service)]) $(state)" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (baseinit init) command to start the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("startcommand[$(service)]")),
                         isvariable("baseinit[$(service)]"),
                         canonify("start_$(service)"),
@@ -720,6 +733,7 @@ bundle agent classic_services(service,state)
 ##
       "$(default[cmd][$(default[init])])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (default) command to start the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("startcommand[$(service)]")),
                         not(isvariable("baseinit[$(service)]")),
                         canonify("start_$(service)"),
@@ -727,6 +741,7 @@ bundle agent classic_services(service,state)
 
       "$(default[cmd][$(inits)])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (default) command to start the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("startcommand[$(service)]")),
                         not(isvariable("baseinit[$(service)]")),
                         canonify("start_$(service)"),
@@ -735,29 +750,34 @@ bundle agent classic_services(service,state)
     restart::
       "$(restartcommand[$(service)])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute command to restart the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(isvariable("restartcommand[$(service)]"));
 ##
 
       "$(default[prefix][$(default[init])])$(baseinit[$(service)]) $(state)" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (baseinit init) command to restart the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("restartcommand[$(service)]")),
                         isvariable("baseinit[$(service)]"),
                         "no_inits_set");
 
       "$(default[prefix][$(inits)])$(baseinit[$(service)]) $(state)" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (baseinit init) command to restart the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("restartcommand[$(service)]")),
                         isvariable("baseinit[$(service)]"),
                         canonify("$(inits)_set"));
 ##
       "$(default[cmd][$(default[init])])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (default) command to restart the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("restartcommand[$(service)]")),
                         not(isvariable("baseinit[$(service)]")),
                         "no_inits_set");
 
       "$(default[cmd][$(inits)])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (default) command to restart the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("restartcommand[$(service)]")),
                         not(isvariable("baseinit[$(service)]")),
                         canonify("$(inits)_set"));
@@ -765,28 +785,33 @@ bundle agent classic_services(service,state)
     reload::
       "$(reloadcommand[$(service)])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute command to reload the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(isvariable("reloadcommand[$(service)]"));
 ##
       "$(default[prefix][$(default[init])])$(baseinit[$(service)]) $(state)" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (baseinit init) command to reload the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("reloadcommand[$(service)]")),
                         isvariable("baseinit[$(service)]"),
                         "no_inits_set");
 
       "$(default[prefix][$(inits)])$(baseinit[$(service)]) $(state)" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (baseinit init) command to reload the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("reloadcommand[$(service)]")),
                         isvariable("baseinit[$(service)]"),
                         canonify("$(inits)_set"));
 ##
       "$(default[cmd][$(default[init])])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (default) command to reload the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("reloadcommand[$(service)]")),
                         not(isvariable("baseinit[$(service)]")),
                         "no_inits_set");
 
       "$(default[cmd][$(inits)])" -> { "@(stakeholders[$(service)])" }
       comment => "Execute (default) command to reload the $(service) service",
+      classes => kept_successful_command,
       ifvarclass => and(not(isvariable("reloadcommand[$(service)]")),
                         not(isvariable("baseinit[$(service)]")),
                         canonify("$(inits)_set"));

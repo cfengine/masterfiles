@@ -172,23 +172,27 @@ bundle agent maintain_cfe_hub_process
      "$(cfe_internal_process_knowledge.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)"
       contain => u_in_shell,
       comment => "Start redis process",
+      classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_redis";
 
     !windows.am_policy_hub.start_postgres_server::
      "$(cfe_internal_process_knowledge.bindir)/pg_ctl -D $(cfe_internal_update_policy.postgresdb_dir) -l $(cfe_internal_update_policy.postgresdb_log) start"
       contain => u_postgres,
       comment => "Start postgres process",
+      classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
 
     !windows.am_policy_hub.start_cf_consumer::
      "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
       comment => "Start cf-consumer process",
+      classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf-consumer";
 
     !windows.am_policy_hub.start_hub::
 
       "$(sys.cf_hub)"
       comment => "Start cf-hub process",
+      classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf_hub";
 
 }
@@ -273,6 +277,7 @@ bundle agent enable_cfengine_agents(process)
       "$(sys.$(cprocess))"
       comment => "Restart a process",
       handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
+      classes => u_kept_successful_command,
       ifvarclass => "restart_$(cprocess)";
 
   reports:
@@ -347,6 +352,7 @@ bundle agent maintain_cfe_windows
       "$(sys.cf_serverd)"
       action => u_ifwin_bg,
       comment => "Start cf-serverd process",
+      classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_serverd";
 
     start_monitor|restart_monitor::
@@ -354,6 +360,7 @@ bundle agent maintain_cfe_windows
       "$(sys.cf_monitord)"
       action => u_ifwin_bg,
       comment => "Start cf-monitord process",
+      classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_monitord";
 
 }
