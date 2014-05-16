@@ -253,3 +253,10 @@ bundle agent service_catalogue
       handle => "main_methods_any_init_msg";
 
 }
+
+# special body for update/*.cf compatibility
+body classes u_kept_successful_command
+# @brief Set command to "kept" instead of "repaired" if it returns 0
+{
+      kept_returncodes => { "0" };
+}
