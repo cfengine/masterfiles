@@ -179,7 +179,7 @@ bundle agent standard_services(service,state)
       classes => kept_successful_command;
 
     chkconfig.stop.onboot::
-      # Only chkconfig enable if it's currently set to start on boot
+      # Only chkconfig disable if it's currently set to start on boot
       "$(paths.chkconfig) $(service) $(chkconfig_mode)"
       classes => kept_successful_command,
       contain => silent;
