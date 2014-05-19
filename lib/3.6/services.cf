@@ -157,9 +157,13 @@ bundle agent standard_services(service,state)
 
       "have_init" expression => fileexists($(init));
 
+    chkconfig.have_init::
+      "running" expression => returnszero("$(init) status > /dev/null", "useshell");
+
     chkconfig::
-      "chkconfig_$(service)_registerd" expression => returnszero("$(paths.chkconfig) $(service)", "noshell"),
-        comment => "We need to know if the service is registered with chkconfig before we can control it";
+      "onboot"
+      expression => returnszero("$(paths.chkconfig) $(service)", "noshell"),
+      comment => "We need to know if the service is configured to start at boot or not";
 
   commands:
     systemd:: # note this class is defined in `inventory/linux.cf`
@@ -173,12 +177,19 @@ bundle agent standard_services(service,state)
       "$(call_systemctl) enable $(service)"
       classes => kept_successful_command;
 
-    chkconfig::
+    chkconfig.stop.onboot::
+      # Only chkconfig enable if it's currently set to start on boot
       "$(paths.chkconfig) $(service) $(chkconfig_mode)"
       classes => kept_successful_command,
-        ifvarclass => canonify("chkconfig_$(service)_registered");
+      contain => silent;
 
-    chkconfig.have_init.non_disabling::
+    chkconfig.start.!onboot::
+      # Only chkconfig enable service if it's not already set to start on boot
+      "$(paths.chkconfig) $(service) $(chkconfig_mode)"
+      classes => kept_successful_command,
+      contain => silent;
+
+    chkconfig.have_init.((start.!running)|(stop.running)).non_disabling::
       "$(init) $(state)"
       classes => kept_successful_command,
       contain => silent;
