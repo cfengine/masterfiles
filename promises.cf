@@ -15,12 +15,12 @@ body common control
                           def,
                           cfe_internal_hub_vars,
 
+                          # Design Center
+                          cfsketch_run,
+
                           # autorun system
                           services_autorun,
                           $(services_autorun.bundle),
-
-                         # Design Center
-                          cfsketch_run,
 
                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
