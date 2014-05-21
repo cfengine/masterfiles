@@ -45,7 +45,7 @@ under `lib` sometimes, in order to be completely standalone.
 
 When `update.cf` is broken, things go bonkers. CFEngine will try to
 run a backup `failsafe.cf` you can find at
-https://github.com/cfengine/core/blob/master/libpromises/failsafe.cf
+https://github.com/cfengine/core/blob/3.6.x/libpromises/failsafe.cf
 (that `.cf` file is written into the C code and can't be modified). If
 things get to that point, you probably have to look at why corrupted
 policies made it into production.
@@ -53,7 +53,7 @@ policies made it into production.
 As is typical for CFEngine, the policy and the configuration are
 mixed. In `update.cf` you'll find some very useful settings. Keep
 referring to
-https://github.com/cfengine/masterfiles/blob/master/update.cf as you
+https://github.com/cfengine/masterfiles/blob/3.6.x/update.cf as you
 read this.  We are skipping the nonessential ones.
 
 #### How it works
@@ -71,7 +71,7 @@ This step implements the auto-deployment of policies. See
 ##### cfe_internal_update_policy
 
 This step updates the policy files themselves. See
-https://github.com/cfengine/masterfiles/blob/master/update/update_policy.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/update/update_policy.cf
 for the implementation details. Basically it's a check step that looks
 at `$(sys.inputdir)/cf_promises_validated` and compares it with the
 policy server's `$(sys.masterdir)/cf_promises_validated`. Then there's
@@ -142,7 +142,7 @@ with `cf-agent -KI -f ./promises.cf` but as before, make sure you
 understand what this command does before using it.
 
 Keep referring to
-https://github.com/cfengine/masterfiles/blob/master/def.cf as you
+https://github.com/cfengine/masterfiles/blob/3.6.x/def.cf as you
 read this.
 
 #### How it works
@@ -177,14 +177,14 @@ Off by default.
 
 Turn this on (set to `any`) to auto-load files in `services/autorun`
 and run bundles found that are tagged `autorun`. See
-https://github.com/cfengine/masterfiles/blob/master/services/autorun/hello.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/services/autorun/hello.cf
 for a simple example of such a bundle.
 
 ##### cfengine_internal_rotate_logs
 
 On by default. Rotates CFEngine's own logs. For the details, see the
 `cfe_internal_log_rotation` bundle in
-https://github.com/cfengine/masterfiles/blob/master/cfe_internal/CFE_cfengine.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/cfe_internal/CFE_cfengine.cf
 
 ##### cfengine_internal_encrypt_transfers
 
@@ -222,7 +222,7 @@ By default, this class is turned off (and the module is on) if the LSB
 executable `/usr/bin/lsb_release` can be found. This inventory module
 will populate inventory reports and variables for you with LSB
 details. For details, see
-https://github.com/cfengine/masterfiles/blob/master/inventory/lsb.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/lsb.cf
 
 ##### disable_inventory_dmidecode
 
@@ -230,7 +230,7 @@ By default, this class is turned off (and the module is on) if the
 executable `/usr/sbin/dmidecode` can be found. This inventory module
 will populate inventory reports and variables for you. For details,
 see
-https://github.com/cfengine/masterfiles/blob/master/inventory/any.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/any.cf
 
 ##### disable_inventory_LLDP
 
@@ -240,7 +240,7 @@ http://en.wikipedia.org/wiki/Link_Layer_Discovery_Protocol
 By default, this class is turned off (and the module is on) if the
 executable `/usr/bin/lldpctl` can be found. This inventory module will
 populate variables for you. For details, see
-https://github.com/cfengine/masterfiles/blob/master/inventory/any.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/any.cf
 
 ##### disable_inventory_package_refresh
 
@@ -248,14 +248,14 @@ By default, this class is turned off (and the module is on). This
 inventory module will populate the installed packages for you. On
 CFEngine Enterprise, the available packages will also be populated.
 For details, see
-https://github.com/cfengine/masterfiles/blob/master/inventory/any.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/any.cf
 
 ##### disable_inventory_mtab
 
 By default, this class is turned off (and the module is on) if
 `/etc/mtab` exists. This inventory module will populate variables for
 you based on the mounted filesystems. For details, see
-https://github.com/cfengine/masterfiles/blob/master/inventory/any.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/any.cf
 
 ##### disable_inventory_fstab
 
@@ -263,14 +263,14 @@ By default, this class is turned off (and the module is on) if
 `$(sys.fstab)` (usually `/etc/fstab` or `/etc/vfstab`) exists. This
 inventory module will populate variables for you based on the defined
 filesystems. For details, see
-https://github.com/cfengine/masterfiles/blob/master/inventory/any.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/any.cf
 
 ##### disable_inventory_proc
 
 By default, this class is turned off (and the module is on) if `/proc`
 is a directory. This inventory module will populate variables for you
 from some of the contents of `/proc`. For details, see
-https://github.com/cfengine/masterfiles/blob/master/inventory/any.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/any.cf
 
 ##### disable_inventory_cmdb
 
@@ -278,14 +278,14 @@ By default, this class is turned on (and the module is off).
 
 Turn this on (set to `any`) to allow each client to load a `me.json`
 file from the server and load its contents. For details, see
-https://github.com/cfengine/masterfiles/blob/master/inventory/any.cf
+https://github.com/cfengine/masterfiles/blob/3.6.x/inventory/any.cf
 
 ### promises.cf
 
 #### How it works
 
 `promises.cf` is your main run file. Keep referring to
-https://github.com/cfengine/masterfiles/blob/master/promises.cf as you
+https://github.com/cfengine/masterfiles/blob/3.6.x/promises.cf as you
 read this.
 
 #### promises.cf configuration
@@ -328,7 +328,8 @@ in the **winter** Olympics. That's unexpected behavior.
 * `controls`: configuration of components, e.g. the `cf-agent` or `cf-serverd`, beyond what `def.cf` can offer
 * `def.cf`: defaults you can and should configure, see above
 * `inventory`: inventory modules (loaded before anything else to discover facts about the system) live here; see above
-* `lib`: main library directory.  You'll see `3.5` and `3.6` and `3.7` under it.  These are the supported versions for masterfiles backwards compatibility.
+* `lib`: main library directory.  You'll see `3.5` and `3.6` under it.  These are the supported versions for masterfiles backwards compatibility.
+* `libraries`: old stdlib library directory.  You'll see `cfengine_stdlib.cf` under it.  This is an old library (the COPBL) you should not use if at all possible.  All its contents, plus bug fixes, are now in `lib`.
 * `promises.cf`: main policy, you will need to configure this, see above
 * `services`: your site's policies go here
 * `services_autorun`: see above
@@ -337,7 +338,7 @@ in the **winter** Olympics. That's unexpected behavior.
 
 ## Contributing
 
-Please see the [CONTRIBUTING.md](https://github.com/cfengine/masterfiles/blob/master/CONTRIBUTING.md) file.
+Please see the [CONTRIBUTING.md](https://github.com/cfengine/masterfiles/blob/3.6.x/CONTRIBUTING.md) file.
 
 The CFEngine masterfiles are under the MIT license, see
-https://github.com/cfengine/masterfiles/blob/master/LICENSE
+https://github.com/cfengine/masterfiles/blob/3.6.x/LICENSE
