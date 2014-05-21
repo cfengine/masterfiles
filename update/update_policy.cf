@@ -319,6 +319,9 @@ body copy_from u_rcp(from,server)
 
     cfengine_internal_purge_policies::
       purge => "true";
+
+    cfengine_internal_preserve_permissions::
+      preserve => "true";
 }
 
 #########################################################
