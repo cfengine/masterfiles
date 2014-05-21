@@ -199,6 +199,10 @@ On by default. Rotates CFEngine's own logs. For the details, see the
 `cfe_internal_log_rotation` bundle in
 https://github.com/cfengine/masterfiles/blob/master/cfe_internal/CFE_cfengine.cf
 
+#### cfengine_internal_agent_email
+
+On by default. Enables agent email output from `cf-execd`.
+
 ##### cfengine_internal_encrypt_transfers
 
 Duplicate of the one in `update.cf`. They should be set in unison or

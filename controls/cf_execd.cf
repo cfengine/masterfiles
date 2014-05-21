@@ -13,9 +13,13 @@ body executor control
     any::
 
       splaytime  => "4"; # activity will be spread over this many time slices
+
+    cfengine_internal_agent_email::
       mailto     => "root@$(def.domain)";
       mailfrom   => "root@$(sys.host).$(def.domain)";
       smtpserver => "localhost";
+
+    any::
 
       # Default:
       #
