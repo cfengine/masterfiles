@@ -163,6 +163,9 @@ bundle common def
       # Internal CFEngine log files rotation
       "cfengine_internal_rotate_logs" expression => "any";
 
+      # Disable agent email output
+      "cfengine_internal_agent_email" expression => "any";
+
       # Transfer policies and binaries with encryption
       # you can also request it from the command line with
       # -Dcfengine_internal_encrypt_transfers
