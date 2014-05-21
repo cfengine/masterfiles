@@ -179,6 +179,14 @@ bundle common def
 
       "cfengine_internal_purge_policies" expression => "!any";
 
+      # Preserve permissions of the policy server's masterfiles.
+      # you can also request it from the command line with
+      # -Dcfengine_internal_preserve_permissions
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+
+      "cfengine_internal_preserve_permissions" expression => "!any";
+
       # Allow the hub to edit sudoers in order for the Apache user to
       # run passwordless sudo cf-runagent. Enable this if you want the
       # Mission Portal to be able to troubleshoot failed Design Center

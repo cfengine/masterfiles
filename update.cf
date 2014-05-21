@@ -100,6 +100,14 @@ bundle common update_def
 
       "cfengine_internal_purge_policies" expression => "!any";
 
+      # Preserve permissions of the policy server's masterfiles.
+      # you can also request it from the command line with
+      # -Dcfengine_internal_preserve_permissions
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
+
+      "cfengine_internal_preserve_permissions" expression => "!any";
+
 }
 
 body classes u_kept_successful_command

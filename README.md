@@ -133,6 +133,19 @@ Turn this on (set to `any`) to delete any files in your
 Note it has a duplicate in `def.cf`, see below. If they are not
 synchronized, you will get unexpected behavior.
 
+##### cfengine_internal_preserve_permissions
+
+Off by default.
+
+Turn this on (set to `any`) to preserve the permissions of the policy
+server's masterfiles when they are copied.
+
+**This may result in FUNCTIONALITY LOSS if your scripts lose their
+exec bits unexpectedly**
+
+Note it has a duplicate in `def.cf`, see below. If they are not
+synchronized, you will get unexpected behavior.
+
 ### def.cf
 
 After `update.cf` is configured, you can configure the main `def.cf` policy.
@@ -192,6 +205,11 @@ Duplicate of the one in `update.cf`. They should be set in unison or
 you will get unexpected behavior.
 
 ##### cfengine_internal_purge_policies
+
+Duplicate of the one in `update.cf`. They should be set in unison or
+you will get unexpected behavior.
+
+##### cfengine_internal_preserve_permissions
 
 Duplicate of the one in `update.cf`. They should be set in unison or
 you will get unexpected behavior.
