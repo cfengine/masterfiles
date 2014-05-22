@@ -7,10 +7,10 @@ Maintainer: cfengine.com
 Priority: optional
 Section: custom
 Filename: pool/main/t/test-package-alpha/test-package-alpha_1.0-2_i386.deb
-Size: 584
-SHA256: 928e59b9206011c2d4c74a699c7d2414df959de7eed154091aa7c2b91e35cb75
-SHA1: 612f3a191e98f1b1ae507191afb81df09b4891a7
-MD5sum: 6e8bb97f652083236060f30dc6efc59e
+Size: 686
+SHA256: fd928acb367373bfb6e82cda4e9b4826d931ecde73755972efb8e0acf7520cca
+SHA1: 6cd0c12a10040c009e49c592641ade0b28d90738
+MD5sum: 38bf08bbb1f50d270baab9d6f535e037
 Description: Debian test package Alpha
 
 Package: test-package-beta
@@ -22,10 +22,10 @@ Maintainer: cfengine.com
 Priority: optional
 Section: custom
 Filename: pool/main/t/test-package-beta/test-package-beta_1.0-2_i386.deb
-Size: 586
-SHA256: 91f7768e6eaa95fb48333b92cb1206b0b229e27331409b4ac29097fd41953f26
-SHA1: 60721b93bc2dbe6c17e01960984b416fc6e84205
-MD5sum: 4bab60a56e8f2eda60219b132b3a3455
+Size: 684
+SHA256: 326caf8bed36e97ca988999e32fbd262387b650a4572834da84936f7ae437bc4
+SHA1: 9b9a0acc9d42a3eb5e862a83335fa0f2ce7d903d
+MD5sum: 3938a1317aea6c0ad49bd5a44253d9d1
 Description: Debian test package Beta
 
 Package: test-package-charlie
@@ -37,9 +37,9 @@ Maintainer: cfengine.com
 Priority: optional
 Section: custom
 Filename: pool/main/t/test-package-charlie/test-package-charlie_1.0-2_i386.deb
-Size: 586
-SHA256: bfb007b182fd853d3fad6cb68c15c710bb629e776cabc34664d7d74d74a45534
-SHA1: 279d89f0c6e36d7c4af7bc51352db900504f96f8
-MD5sum: 64d89304890128f1766cabafb351bbd8
+Size: 688
+SHA256: 6de6a026bd03ab9a206a901a8c69958bc57baa703e2c7d0bd8e1afcbbe82913c
+SHA1: f6154d65341fda3dedade787aebad8376fa71cb1
+MD5sum: 71ddc9e40b7d4e99f563f84c49407d2b
 Description: Debian test package Charlie
 
