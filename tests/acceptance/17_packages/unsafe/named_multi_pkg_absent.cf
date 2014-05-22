@@ -32,12 +32,14 @@ bundle agent init
 
             "$(package_name)"
             package_policy => "add",
+            package_architectures => { "$(p.arch)" },
             package_method => apt_get;
 
         redhat|suse::
 
             "$(package_name)"
             package_policy => "add",
+            package_architectures => { "$(p.arch)" },
             package_method => yum_rpm;
 }
 
