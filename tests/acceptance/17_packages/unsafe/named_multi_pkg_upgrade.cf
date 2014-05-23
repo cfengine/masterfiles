@@ -23,6 +23,10 @@ body common control
 
 bundle agent init
 {
+  meta:
+      "test_skip_needs_work" string => "suse",
+        meta => { "redmine5866" };
+
   methods:
     "install_package" usebundle => install_package("$(p.name[1])", "$(p.version[1])");
     "install_package" usebundle => install_package("$(p.name[2])", "$(p.version[1])");
