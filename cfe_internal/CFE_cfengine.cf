@@ -72,10 +72,6 @@ bundle agent cfe_internal_management
 
     any::
 
-      "any" usebundle => cfe_internal_correct_cftwin,
-      handle => "cfe_internal_management_correct_cftwin",
-      comment => "Ensure cf-twin in good shape";
-
       "any" usebundle => cfe_internal_limit_robot_agents,
       handle => "cfe_internal_management_limit_cfe_agents",
       comment => "Manage CFE processes";
@@ -160,56 +156,6 @@ body process_count check_monitord(n)
 {
       match_range => "0,$(n)";
       out_of_range_define => {"something_wrong_monitord"};
-}
-
-##################################################################
-#
-# cfe_internal_correct_cftwin
-#  - create cf-twin for self-upgrading purpose
-#
-##################################################################
-
-bundle agent cfe_internal_correct_cftwin
-{
-
-  vars:
-    "folder_inside_lib_to_drop" slist => {"git-core"};
-    
-  files:
-
-    windows::
-
-      "$(sys.workdir)\bin-twin"
-      comment => "Correct bin-twin directory, making it up-to-date syncing up with bin directory",
-      handle => "cfe_internal_correct_cftwin_file_bintwin",
-      move_obstructions => "true",
-      copy_from => local_dcp("$(sys.workdir)\bin"),
-      depth_search => recurse("inf");
-
-    !windows::
-
-      "/var/cfengine/lib-twin"
-      comment => "Correct lib-twin to be the same as lib, in case of dependency upgrade. This effect cf-twin's behaviour",
-      handle => "cfe_internal_correct_cftwin_files_libtwin",
-      perms => m("644"),
-      move_obstructions => "true",
-      copy_from => local_cp_libtwin("/var/cfengine/lib"),
-      depth_search => recurse_ignore("inf","@(folder_inside_lib_to_drop)");
-
-      "/var/cfengine/bin/cf-twin"
-      comment => "Correct cf-twin to be the same as cf-agent, in case of dependency upgrade",
-      handle => "cfe_internal_correct_cftwin_files_cftwin",
-      perms => m("755"),
-      copy_from => local_cp("/var/cfengine/bin/cf-agent");
-
-}
-
-#
-
-body copy_from local_cp_libtwin(from)
-{
-      source      => "$(from)";
-      purge       => "true";
 }
 
 ##################################################################
