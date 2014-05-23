@@ -38,14 +38,7 @@ bundle agent test
 {
     vars:
         "package_name" string => "$(p.name[3])";
-
-      debian::
-          "package_arch" string => "amd64";
-          "package_version" string => "$(p.version[1])";
-      redhat|suse::
-          "package_arch" string => "x86_64";
-          "package_version" string => "$(p.version[1])";
-
+        "package_version" string => "$(p.version[1])";
 
     packages:
 
@@ -54,7 +47,7 @@ bundle agent test
             package_policy => "add",
             package_select => "==",
             package_version => "$(package_version)",
-            package_architectures => { "$(package_arch)" },
+            package_architectures => { "$(p.arch)" },
             package_method => apt_get,
             classes => test_set_class("pass","fail");
 
@@ -63,7 +56,7 @@ bundle agent test
             package_policy => "add",
             package_select => "==",
             package_version => "$(package_version)",
-            package_architectures => { "$(package_arch)" },
+            package_architectures => { "$(p.arch)" },
             package_method => yum_rpm,
             classes => test_set_class("pass","fail");
 
@@ -72,7 +65,7 @@ bundle agent test
             package_policy => "add",
             package_select => "==",
             package_version => "$(package_version)",
-            package_architectures => { "$(package_arch)" },
+            package_architectures => { "$(p.arch)" },
             package_method => zypper,
             classes => test_set_class("pass","fail");
 }
