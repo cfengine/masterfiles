@@ -21,6 +21,10 @@ body common control
 
 bundle agent init
 {
+  meta:
+      "test_skip_needs_work" string => "suse",
+        meta => { "redmine5866" };
+
   methods:
     "clear_packages" usebundle => clear_packages;
 }

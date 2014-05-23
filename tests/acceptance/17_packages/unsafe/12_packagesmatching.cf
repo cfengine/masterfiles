@@ -30,6 +30,10 @@ body common control
 
 bundle agent init
 {
+  meta:
+      "test_skip_needs_work" string => "suse",
+        meta => { "redmine5866" };
+
   vars:
       "package_name" string => "$(p.name[1])";
 }

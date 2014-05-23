@@ -9,8 +9,24 @@
 
 body common control
 {
-  inputs => { "../../../../lib/3.6/files.cf" };
-  bundlesequence => { "repositories", "signing_keys", "update", "check" };
+  inputs => { "../../dcs.cf.sub",
+              "../../../../$(sys.local_libdir)/files.cf",
+              "../../../../$(sys.local_libdir)/commands.cf"
+            };
+  bundlesequence => { default("$(this.promise_filename)") };
+}
+
+bundle agent test
+{
+  meta:
+      "test_skip_needs_work" string => "suse",
+        meta => { "redmine5866" };
+
+  vars:
+      "bundles" slist => { "repositories", "signing_keys", "update" };
+
+  methods:
+      "any" usebundle => "$(bundles)";
 }
 
 bundle common global
