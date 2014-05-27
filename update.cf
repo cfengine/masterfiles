@@ -24,6 +24,9 @@ body common control
                   "update/update_policy.cf",
                   "update/update_processes.cf"
       };
+
+      # Uncomment to connect to the hub using latest protocol.
+      #protocol_version => "latest";
 }
 
 #############################################################################

@@ -72,6 +72,9 @@ body common control
 
       version => "CFEngine Promises.cf 3.6.0";
 
+      # Uncomment to connect to the hub using latest protocol.
+      #protocol_version => "latest";
+
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 }
