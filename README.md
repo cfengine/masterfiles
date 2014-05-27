@@ -180,9 +180,11 @@ policy server. Make sure you only allow hosts you want to allow.
 
 ##### trustkeysfrom
 
-`trustkeysfrom` tells the policy server what hosts to trust for
-bootstrapping. As the comments say, empty it after your hosts have
-been bootstrapped to avoid unpleasant surprises.
+`trustkeysfrom` tells the policy server from which IPs it should accept
+connections even if the host's key is unknown, trusting it at connect
+time. This is only useful to be open during for bootstrapping these
+hosts. As the comments say, empty it after your hosts have been
+bootstrapped to avoid unpleasant surprises.
 
 ##### services_autorun
 
