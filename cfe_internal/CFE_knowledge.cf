@@ -127,7 +127,7 @@ body action aggregator
 
 body file_select knowledge_files
 {
-      leaf_name => { ".*.cf", ".*.html", ".*.png", ".*php", ".*css" };
+      leaf_name => { ".*\.cf", ".*\.html", ".*\.png", ".*php", ".*css" };
       file_result => "leaf_name";
 }
 
