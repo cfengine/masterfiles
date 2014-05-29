@@ -25,6 +25,22 @@ override that easily:
 make install DESTDIR=/my/other/install/directory
 ```
 
+## Host report
+
+A very important piece of functionality, which you may want for your
+own use but will certainly be helpful for debugging or submitting bugs
+to CFEngine (core, masterfiles, or any other are) is the host report.
+
+Run the host report like so: `cf-agent -b host_info_report`
+
+You should see output like:
+
+```
+R: Host info report generated and avilable at '/var/cfengine/reports/host_info_report.txt'
+```
+
+Take a look at the resulting file, it has lots of useful information about the system.
+
 ## Setting up
 
 First, review `update.cf` and `def.cf`.  Most settings you need to change will live here.
