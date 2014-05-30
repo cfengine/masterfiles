@@ -198,6 +198,12 @@ and run bundles found that are tagged `autorun`. See
 https://github.com/cfengine/masterfiles/blob/3.6.x/services/autorun/hello.cf
 for a simple example of such a bundle.
 
+Please note that you either need the patch in
+https://github.com/cfengine/masterfiles/pull/257 or this will **not**
+work properly in 3.6.0 due to evaluation order. Using it from the
+command line with `cf-agent -Dservices_autorun` will still work, and
+the patch will be applied in 3.6.1.
+
 ##### cfengine_internal_rotate_logs
 
 On by default. Rotates CFEngine's own logs. For the details, see the
