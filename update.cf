@@ -109,4 +109,5 @@ body classes u_kept_successful_command
 # @brief Set command to "kept" instead of "repaired" if it returns 0
 {
       kept_returncodes => { "0" };
+      failed_returncodes => { "1" };
 }
