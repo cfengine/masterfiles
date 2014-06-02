@@ -203,7 +203,7 @@ bundle common services_autorun
       "inputs" slist => { };
       "bundle" string => "services_autorun"; # run self
 
-    !cfengine_3_5.services_autorun::
+    !cfengine_3_5::
       "inputs" slist => { "services/autorun.cf" };
       "bundle" string => "autorun"; # run loaded bundle
 
