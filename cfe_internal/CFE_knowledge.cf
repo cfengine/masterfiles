@@ -40,7 +40,7 @@ bundle agent cfe_internal_setup_knowledge
       "$(cfe_internal_hub_vars.docroot)/.htaccess"
       comment => "Correct up htaccess file in doc root",
       handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
-      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group)),
+      perms => mog("0644","root","root"),
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI/Apache-htaccess");
 
       "$(cfe_internal_hub_vars.docroot)/hub/."
@@ -48,14 +48,14 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_files_doc_root_hub",
       create => "true",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0755",$(def.cf_apache_user),$(def.cf_apache_group));
+      perms => mog("0755","root","root");
 
       "$(cfe_internal_hub_vars.docroot)/scripts/."
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/scripts",
       handle => "cfe_internal_setup_knowledge_files_doc_root_scripts",
       create => "true",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
+      perms => mog("0644","root","root");
 
       "$(cfe_internal_hub_vars.docroot)/tmp/."
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/tmp (temp files to email)",
@@ -69,6 +69,7 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_files_doc_root_application_logs",
       create => "true",
       depth_search => recurse_basedir("inf"),
+      file_select => cfe_internal_exclude_index_html,
       perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/application"
@@ -88,16 +89,16 @@ bundle agent cfe_internal_setup_knowledge
       "$(cfe_internal_hub_vars.docroot)/api"
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/api (writing exported reports PDF/CSV)",
       handle => "cfe_internal_setup_knowledge_files_doc_root_api",
-      file_select => cfe_internal_exclude_sh_scripts,
+      file_select => cfe_internal_exclude_sh_pl_scripts,
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
+      perms => mog("0644","root","root");
 
       "$(cfe_internal_hub_vars.docroot)/api/dc-scripts"
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/api/dc-scripts (execute git push/pull)",
       handle => "cfe_internal_setup_knowledge_files_doc_root_api_dc_scripts",
-      file_select => cfe_internal_sh_scripts,
+      file_select => cfe_internal_sh_pl_scripts,
       depth_search => recurse_basedir("inf"),
-      perms => mog("0700",$(def.cf_apache_user),$(def.cf_apache_group));
+      perms => mog("0755","root","root");
 
       "$(cfe_internal_hub_vars.docroot)/sql_lite/."
       comment => "Create a directory sql_lite for analytic to be working",
@@ -112,6 +113,12 @@ bundle agent cfe_internal_setup_knowledge
       depth_search => recurse_basedir("inf"),
       comment => "Create tmp directories for httpd internal use",
       handle => "cfe_internal_setup_knowledge_files_tmp_dir";
+
+      "$(sys.workdir)/httpd/logs/."
+      comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
+      handle => "cfe_internal_setup_knowledge_files_httpd_logs",
+      create => "true",
+      perms => mog("0664","root","cfapache");
 }
 
 #############################################################################
@@ -121,14 +128,6 @@ body action aggregator
       ifelapsed => "120";
       expireafter => "240";
       background => "true";
-}
-
-############################################################################
-
-body file_select knowledge_files
-{
-      leaf_name => { ".*\.cf", ".*\.html", ".*\.png", ".*php", ".*css" };
-      file_result => "leaf_name";
 }
 
 ############################################################################
@@ -164,14 +163,26 @@ body process_count check_process(in,out)
       out_of_range_define => { "$(out)" };
 }
 
-body file_select cfe_internal_exclude_sh_scripts
+############################################################################
+
+body file_select cfe_internal_exclude_sh_pl_scripts
 {
-  leaf_name => { ".*\.sh" };
+  leaf_name => { ".*\.sh",".*\.pl" };
   file_result => "!leaf_name";
 }
 
-body file_select cfe_internal_sh_scripts
+############################################################################
+
+body file_select cfe_internal_sh_pl_scripts
 {
-  leaf_name => { ".*\.sh" };
+  leaf_name => { ".*\.sh",".*\.pl" };
   file_result => "leaf_name";
+}
+
+############################################################################
+
+body file_select cfe_internal_exclude_index_html
+{
+  leaf_name => { "index.html" };
+  file_result => "!leaf_name";
 }
