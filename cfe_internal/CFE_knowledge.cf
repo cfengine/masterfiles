@@ -151,7 +151,7 @@ body depth_search recurse_basedir(d)
 body depth_search recurse_exclude(d)
 {
       depth => "$(d)";
-      exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "sql_lite", "rest", "application" };
+      exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "sql_lite", "rest", "application", "dc-scripts" };
 }
 
 ############################################################################
