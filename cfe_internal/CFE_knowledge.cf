@@ -186,3 +186,4 @@ body file_select cfe_internal_exclude_index_html
   leaf_name => { "index.html" };
   file_result => "!leaf_name";
 }
+
