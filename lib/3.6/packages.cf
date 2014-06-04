@@ -858,6 +858,7 @@ body package_method yum
       package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
       package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps";
       package_verify_command => "$(rpm_knowledge.call_rpm) -V";
+      package_noverify_returncode => "1";
 }
 
 ##
@@ -911,6 +912,7 @@ body package_method yum_rpm
       package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
       package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps";
       package_verify_command => "$(rpm_knowledge.call_rpm) -V";
+      package_noverify_returncode => "1";
 }
 
 body package_method yum_rpm_permissive
@@ -960,6 +962,7 @@ body package_method yum_rpm_permissive
       package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
       package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps";
       package_verify_command => "$(rpm_knowledge.call_rpm) -V";
+      package_noverify_returncode => "1";
 }
 
 ##
@@ -1008,6 +1011,7 @@ body package_method yum_rpm_enable_repo(repoid)
       package_patch_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
       package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps --allmatches";
       package_verify_command => "$(rpm_knowledge.call_rpm) -V";
+      package_noverify_returncode => "1";
 }
 
 ##
@@ -1127,6 +1131,7 @@ body package_method rpm_filebased(path)
 
       package_delete_command => "$(rpm_knowledge.call_rpm) -e --allmatches";
       package_verify_command => "$(rpm_knowledge.call_rpm) -V";
+      package_noverify_returncode => "1";
 }
 
 ##
@@ -1632,6 +1637,7 @@ body package_method generic
       package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
       package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps";
       package_verify_command => "$(rpm_knowledge.call_rpm) -V";
+      package_noverify_returncode => "1";
 
     debian::
       package_changes => "bulk";
