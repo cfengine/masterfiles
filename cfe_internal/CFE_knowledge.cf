@@ -98,7 +98,7 @@ bundle agent cfe_internal_setup_knowledge
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/api/static (writing exported reports PDF/CSV)",
       handle => "cfe_internal_setup_knowledge_files_doc_root_api_static",
       depth_search => recurse_basedir("inf"),
-      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group)),;
+      perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/api/dc-scripts"
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/api/dc-scripts (execute git push/pull)",
@@ -159,7 +159,7 @@ body depth_search recurse_basedir_exclude(d)
 {
       depth => "$(d)";
       include_basedir => "true";
-      exclude_dirs => { "static"};
+      exclude_dirs => { "static" };
 }
 
 ############################################################################
