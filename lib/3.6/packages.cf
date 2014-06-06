@@ -1206,7 +1206,7 @@ body package_method smartos
       package_add_command => "/opt/local/bin/pkgin -y install";
 
       package_delete_command => "/opt/local/bin/pkgin -y remove";
-      package_update_command =>  "/opt/local/bin/pkgin upgrade";
+      package_update_command =>  "/opt/local/bin/pkgin -y install";
 }
 
 body package_method opencsw
