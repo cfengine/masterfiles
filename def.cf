@@ -223,6 +223,14 @@ bundle common inventory_control
       "lsb_exec" string => "/usr/bin/lsb_release";
       "mtab" string => "/etc/mtab";
       "proc" string => "/proc";
+      "reclass_exec" string => "/usr/bin/reclass";
+
+      # on Debian systems at least, this is a convenient way to test
+      # reclass, but make sure to also change
+      # $(cfe_autorun_inventory_reclass.node)
+      #"reclass_options" string => "-b /usr/share/doc/reclass/examples/ -o json";
+
+      "reclass_options" string => "-o json";
 
   classes:
       # setting this disables all the inventory modules except package_refresh
@@ -275,6 +283,13 @@ bundle common inventory_control
       # disable_inventory is not set
       "disable_inventory_cmdb" expression => "any";
 
+      # reclass is an External Node Classifier at http://reclass.pantsfullofunix.net/index.html
+      # by default disable the reclass inventory if the general inventory
+      # is disabled or the binary does not exist.  Note that typically
+      # this is a reasonably fast binary.
+      "disable_inventory_reclass" expression => "disable_inventory";
+      "disable_inventory_reclass" not => fileexists($(reclass_exec));
+
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
@@ -294,4 +309,6 @@ bundle common inventory_control
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
       "$(this.bundle): CMDB module enabled";
+    verbose_mode.!disable_inventory_reclass::
+      "$(this.bundle): reclass module enabled";
 }

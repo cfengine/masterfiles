@@ -14,6 +14,10 @@ bundle agent inventory_autorun
 # earlier are no longer supported.
 {
   methods:
+    !disable_inventory_reclass::
+      "reclass" usebundle => cfe_autorun_inventory_reclass(),
+      handle => "cfe_internal_autorun_inventory_reclass";
+
     !disable_inventory_cmdb::
       "cmdb" usebundle => cfe_autorun_inventory_cmdb(),
       handle => "cfe_internal_autorun_inventory_cmdb";
@@ -546,6 +550,77 @@ body package_method inventory_zypper(update_interval)
       package_update_command => "$(suse_knowledge.call_zypper) --non-interactive update";
       package_patch_command => "$(suse_knowledge.call_zypper) --non-interactive patch$"; # $ means no args
       package_verify_command => "$(suse_knowledge.call_zypper) --non-interactive verify$";
+}
+
+bundle agent cfe_autorun_inventory_reclass
+# @brief Copy and load the reclass inventory
+#
+# For information about reclass, see
+# http://reclass.pantsfullofunix.net/index.html.
+#
+# This bundle is for refreshing the reclass inventory. It runs
+# `reclass --nodeinfo $(sys.uqhost)`
+#
+# Example nodeinfo, from the reclass examples:
+# ```
+# {
+#   "applications": [
+#     "motd",
+#     "test"
+#   ],
+#   "__reclass__": {
+#     "node": "localhost",
+#     "timestamp": "Thu May  8 12:07:00 2014",
+#     "name": "localhost",
+#     "uri": "yaml_fs:///usr/share/doc/reclass/examples/nodes/localhost.yml"
+#   },
+#   "classes": [
+#     "basenode",
+#     "unixnode",
+#     "mysite"
+#   ],
+#   "parameters": {
+#     "inventory_db": "reclass",
+#     "colour": "yellow",
+#     "realm": "mysite",
+#     "greeting": "Servus!"
+#   }
+# }
+# ```
+{
+  classes:
+      "disable_inventory_reclass" not => fileexists($(inventory_control.reclass_exec));
+      "got_reclass" expression => isvariable("enc");
+
+  vars:
+      "node" string => $(sys.uqhost);
+      # this is a convenient way to test reclass
+      # "node" string => "localhost";
+
+    !disable_inventory_reclass::
+      "enc" string => execresult("$(inventory_control.reclass_exec) $(inventory_control.reclass_options) --nodeinfo $(node)", "noshell");
+    got_reclass::
+      "r" data => parsejson($(enc));
+      "pkeys" slist => getindices("r[parameters]");
+
+      "reclass_applications" data => mergedata("r[applications]"),
+      meta => { "inventory", "attribute_name=reclass Applications" };
+
+      "reclass_parameter_$(pkeys)" string => "$(r[parameters][$(pkeys)])",
+      meta => { "inventory", "attribute_name=reclass Parameter $(pkeys)" };
+
+  classes:
+    got_reclass::
+      "reclass_$(r[classes])" scope => "namespace", expression => "any",
+      meta => { "inventory", "attribute_name=reclass Classes" };
+
+  reports:
+    inform_mode.got_reclass::
+      "$(this.bundle): $(node) application $(reclass_applications)";
+      "$(this.bundle): $(node) parameter reclass_parameter_$(pkeys) = $(reclass_parameter_$(pkeys))";
+      "$(this.bundle): $(node) class reclass_$(r[classes])";
+    inform_mode.!got_reclass::
+      "$(this.bundle): Could not get ENC data for $(node)";
 }
 
 bundle agent cfe_autorun_inventory_cmdb
