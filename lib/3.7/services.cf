@@ -566,7 +566,7 @@ bundle agent classic_services(service,state)
       "pattern[omsa-dataeng]"     string => ".*dsm_sa_datamgr.*";
 
       "baseinit[quagga]"          string => "quagga";
-      "pattern[quagga]"           string => "quagga.*";
+      "pattern[quagga]"           string => "quagga/.*";
 
     freebsd::
 
