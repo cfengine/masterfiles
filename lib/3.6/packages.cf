@@ -1202,7 +1202,11 @@ body package_method smartos
       package_add_command => "/opt/local/bin/pkgin -y install";
 
       package_delete_command => "/opt/local/bin/pkgin -y remove";
-      package_update_command =>  "/opt/local/bin/pkgin upgrade";
+      
+      # pkgin update doesn't do what you think it does. pkgin install against and
+      # already installed package will upgrade it however.
+      
+      package_update_command =>  "/opt/local/bin/pkgin -y install";
 }
 
 body package_method opencsw
