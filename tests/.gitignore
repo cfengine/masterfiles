@@ -1,0 +1,18 @@
+*.xml
+xml.tmp
+xml_tmp_*
+*.trs
+
+# acceptance tests
+/acceptance/*.log
+/acceptance/testall.env
+/acceptance/.succeeded
+/acceptance/workdir
+/acceptance/mock-package-manager
+/acceptance/mock-package-manager.exe
+/acceptance/xml-c14nize
+/acceptance//xml-c14nize.exe
+/acceptance/dnswrapper.so
+
+# copied from core
+/acceptance/*.cf.sub
