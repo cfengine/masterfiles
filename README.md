@@ -335,15 +335,6 @@ Make sure to add any of your own `services` files here if you don't
 use the `services_autorun` facility, to ensure the bundles in them are
 found.
 
-## Unexpected behavior
-
-Note that in this document, the term "unexpected behavior" has been
-used, so a definition would help.
-
-Last year, a CFEngine user got hit by a flying frisbee while walking
-backwards through a revolving door. This year, he won 4 track events
-in the **winter** Olympics. That's unexpected behavior.
-
 ## Further structure
 
 * `cfe_internal`: internal CFEngine policies you shouldn't modify or you will get unexpected behavior
