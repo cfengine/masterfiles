@@ -74,7 +74,8 @@ bundle agent cfe_autorun_inventory_listening_ports
 
 Well, the slist copy is a CFEngine detail (we get the listening ports
 from the monitoring daemon), so just assume that the data is correct.
-What's important is the second line that starts with `meta`. That
+What's important is the second line that starts with
+[`meta`][Promise Types and Attributes#meta]. That
 defines metadata for the promise that CFEngine will use to determine
 that this data is indeed inventory data and should be reported to the
 CFEngine Enterprise Hub.
@@ -213,7 +214,7 @@ R: cfe_autorun_inventory_fstab: we have a auto fstab entry under /mnt/cdrom
 
 * lives in: `any.cf`
 * parses: `me.json` (which is copied from the policy server; see implementation)
-* provides classes: `CLASS` for each CLASS found under the `classes` key in the JSON data
+* provides classes: `CLASS` for each CLASS found under the ```classes``` key in the JSON data
 * provides variables: `inventory_cmdb_load.VARNAME` for each VARNAME found under the `vars` key in the JSON data
 * implementation:
 [%CFEngine_include_snippet(masterfiles/inventory/any.cf, .+inventory_cmdb_load, \})%]
