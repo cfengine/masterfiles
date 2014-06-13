@@ -265,7 +265,8 @@ body classes classes_generic(x)
 
 body classes scoped_classes_generic(scope, x)
 # @brief Define `x` prefixed/suffixed with promise outcome
-# **See also:** `scope`
+# 
+# **See also:** [`scope`][Promise Types and Attributes#scope]
 #
 # @param scope The scope in which the class should be defined
 # @param x The unique part of the classes to be defined
