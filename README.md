@@ -435,10 +435,10 @@ https://github.com/cfengine/masterfiles/blob/3.6.x/LICENSE
 
 ## References
 
-[LSB]: //lsb.cf
-[DMI decoding]: //any.cf
-[LLDP]: //any.cf
-[mtab]: //any.cf
-[fstab]: //any.cf
-[procfs]: //any.cf
-[CMDB]: //any.cf
+[LSB]: inventory/lsb.cf
+[DMI decoding]: inventory/any.cf
+[LLDP]: inventory/any.cf
+[mtab]: inventory/any.cf
+[fstab]: inventory/any.cf
+[procfs]: inventory/any.cf
+[CMDB]: inventory/any.cf
