@@ -30,11 +30,6 @@ bundle agent cfe_internal_management
       comment => "Create empty directories for CFE self-upgrade";
 
     am_policy_hub.enterprise::
-      #### cfengine_internal_selinux() can be "enabled" or "disabled"
-
-      "hub" usebundle => cfe_internal_selinux("enabled"),
-      handle => "cfe_internal_management_fix_selinux",
-      comment => "Fix SELinux to be able to run Mission Portal";
 
       "hub" usebundle => cfe_internal_webserver("on"),
       handle => "cfe_internal_management_web_server",
