@@ -47,6 +47,20 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+bundle common cfe_internal_common
+# @ignore
+{
+  vars:
+      "inputs" slist => { "$(this.promise_dirname)/common.cf",
+                          "$(this.promise_dirname)/commands.cf"};
+}
+
+body file control
+# @ignore
+{
+      inputs => { @(cfe_internal_common.inputs) };
+}
+
 bundle agent cfe_internal_hub_maintain
 # @ignore
 # @brief Executes reporting database maintenance process

@@ -51,7 +51,8 @@ bundle common vcs_common
 # @ignore
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/paths.cf",
+      "inputs" slist => { "$(this.promise_dirname)/common.cf",
+                          "$(this.promise_dirname)/paths.cf",
                           "$(this.promise_dirname)/commands.cf" };
 }
 
