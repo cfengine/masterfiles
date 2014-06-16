@@ -225,7 +225,7 @@ bundle common services_autorun
 
     !(cfengine_3_4||cfengine_3_5)::
       "inputs" slist => { "services/autorun.cf" };
-      "found_inputs" slist => findfiles("$(this.promise_dirname)/services/autorun/*.cf");
+      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
 
   reports:
