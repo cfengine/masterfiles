@@ -1,5 +1,5 @@
 # Checks that a yum check-update with multiline entries generates the correct
-# software_patches_avail.cf file.
+# software_patches_avail.cf file, including when there are errors.
 
 body common control
 {
@@ -15,13 +15,15 @@ bundle agent init
   files:
       "$(G.testdir)/package-update-list.txt"
         create => "true",
-        # Taken from various yum runs with long package names, broken at 80
-        # columns.
+        # Taken from various yum runs with long package names and
+        # connection errors, broken at 80 columns.
         edit_line => insert_lines("Loaded plugins: fastestmirror, security
 Loading mirror speeds from cached hostfile
  * base: mirror.searchdaimon.com
  * extras: mirror.searchdaimon.com
  * updates: mirror.searchdaimon.com
+http://centos.vianett.no/5.9/os/x86_64/repodata/repomd.xml: [Errno 4] IOError: <urlopen error (101, 'Network is unreachable')>
+Trying other mirror.
 Skipping security plugin, no data
 
 yum.noarch                 3.2.29-43.el6_5      rhui-REGION-rhel-server-releases

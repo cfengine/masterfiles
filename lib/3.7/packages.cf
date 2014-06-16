@@ -147,12 +147,16 @@ bundle common redhat_knowledge
       "yum_options" string => ifelse("redhat_4", "",
                                      "--quiet");
 
-      # yum check-update prints a lot of extra useless lines, but the package
-      # names we're interested in always contain a '.' followed by an
-      # architecture, so let's make sure of that when we match.
-      "patch_name_regex" string    => "^(\S+)\.[^.]+\s.*";
-      "patch_version_regex" string => "^\S+\.[^.]+\s+(\S+).*";
-      "patch_arch_regex" string    => "^\S+\.([^.]+)\s.*";
+      # yum check-update prints a lot of extra useless lines, but the format of
+      # the actual package lines is:
+      #
+      #   <name>.<arch>    <version>    <repo>
+      #
+      # We try to match that format as closely as possible, so we reject
+      # possibly interspersed error messages.
+      "patch_name_regex" string    => "^(\S+)\.[^\s.]+\s+\S+\s+\S+\s*$";
+      "patch_version_regex" string => "^\S+\.[^\s.]+\s+(\S+)\s+\S+\s*$";
+      "patch_arch_regex" string    => "^\S+\.([^\s.]+)\s+\S+\s+\S+\s*$";
 
       # Combine multiline entries into one line. A line without at least three
       # fields gets combined with the next line, if that line starts with a
