@@ -1,0 +1,23 @@
+#######################################################
+#
+# Test autorun
+#
+#######################################################
+
+body common control
+{
+      inputs => { '../default.cf.sub' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent check
+{
+  methods:
+      "" usebundle => dcs_passif_output(".*R: hello_world_autorun: Hello, this is an automatically loaded bundle.*",
+                                        "",
+                                        "$(sys.cf_agent) -Dservices_autorun -v -f ../../promises.cf | $(G.grep) Hello",
+                                        $(this.promise_filename));
+}

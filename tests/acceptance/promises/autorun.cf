@@ -1,0 +1,42 @@
+#######################################################
+#
+# Test autorun
+#
+#######################################################
+
+body common control
+{
+      inputs => { '../default.cf.sub' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+bundle agent init
+{
+  commands:
+      "make install DESTDIR=$(G.testdir)"
+      contain => in_dir_shell("$(this.promise_dirname)/../../..");
+}
+
+bundle agent test
+{
+  files:
+      "$(G.testdir)/def.cf" edit_line => enable_autorun;
+}
+
+bundle edit_line enable_autorun
+{
+  insert_lines:
+      'bundle common __autorun_enable { classes: "services_autorun" expression => "any"; }';
+}
+
+#######################################################
+
+bundle agent check
+{
+  methods:
+      "" usebundle => dcs_passif_output(".*R: hello_world_autorun: Hello, this is an automatically loaded bundle.*",
+                                        "",
+                                        "$(sys.cf_agent) -v -f $(G.testdir)/promises.cf | $(G.grep) Hello",
+                                        $(this.promise_filename));
+}
