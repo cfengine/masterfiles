@@ -73,7 +73,7 @@ bundle agent cfe_autorun_inventory_disk
   vars:
     enterprise::
       "free" string => "$(mon.value_diskfree)",
-      meta => { "report" };
+               meta => { "inventory", "attribute_name=Disk free (%)" };
 }
 
 bundle agent cfe_autorun_inventory_memory
