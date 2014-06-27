@@ -224,6 +224,18 @@ bundle common inventory_control
       "mtab" string => "/etc/mtab";
       "proc" string => "/proc";
 
+      # Note: This controls local user discovery, by affects the inventory
+      # interface by proxy. If you would like to report on local user details
+      # but only expose a limtied set to the inventory interface please let us
+      # know.
+      "inventory_local_users_password_last_change_whitelist" -> { "handle:disable_inventory_local_users_whitelist" }
+        slist => { "root" },
+	      comment => "This list of usernames will be used as a white list and
+		                will restrict local user discovery to report the details
+		                only for these users. An empty list will result in all
+		                local users being reported and added to the inventory
+                    interface.";
+
   classes:
       # setting this disables all the inventory modules except package_refresh
       "disable_inventory" expression => "!any";
@@ -275,6 +287,35 @@ bundle common inventory_control
       # disable_inventory is not set
       "disable_inventory_cmdb" expression => "any";
 
+      # by default disable the local user discovery if the general
+      # inventory is disabled
+      "disable_inventory_local_users_discover" expression => "disable_inventory";
+
+      # by default disable reporting of encrypted passwords discovered by
+      # `cfe_autorun_inventory_local_users_discover`, even if disable_inventory
+      # is not set.
+      "disable_inventory_local_users_discover_report_encrypted_password" expression => "any";
+
+      # by default disable the local user inventory if the general
+      # inventory is disabled
+      "disable_inventory_local_users" expression => "disable_inventory";
+
+      # by default disable the locked local user inventory
+      "disable_inventory_local_users_locked" expression => "disable_inventory_local_users";
+
+      # by default disable the local user days since password change
+      "disable_inventory_local_users_password_last_change"
+        expression => "any";
+
+      # by default disable the local users with empty password inventory
+      "disable_inventory_local_users_password_empty" expression => "disable_inventory_local_users";
+
+      # Filter local user inventory based on whitelist if if the list has any content.
+      # by default the whitelist contains only "root" and will not collect other local users.
+      "disable_inventory_local_users_whitelist"
+        handle => "disable_inventory_local_users_whitelist",
+        expression => islessthan( length("inventory_local_users_password_last_change_whitelist"), 1);
+
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
@@ -294,4 +335,12 @@ bundle common inventory_control
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
       "$(this.bundle): CMDB module enabled";
+    verbose_mode.!disable_inventory_local_users_discovery::
+      "$(this.bundle): Local users discovery enabled";
+    verbose_mode.!disable_inventory_local_users::
+      "$(this.bundle): Local users locked module enabled";
+    verbose_mode.!disable_inventory_local_users_locked::
+      "$(this.bundle): Local users locked module enabled";
+    verbose_mode.!disable_inventory_local_users_password_last_change::
+      "$(this.bundle): Local users days since password change module enabled";
 }
