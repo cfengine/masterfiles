@@ -12,7 +12,7 @@ body executor control
 
     any::
 
-      splaytime  => "1";
+      splaytime  => "4";
 
     cfengine_internal_agent_email::
       mailto     => "root@$(def.domain)";
