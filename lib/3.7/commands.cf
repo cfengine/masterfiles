@@ -47,6 +47,16 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+bundle agent daemonize(command)
+# Runs a command as a daemon. I.e., fully detaches from
+# Cfengine. Note there will be no output from the command
+# reported by cf-agent.
+{
+    commands:
+        "exec 1>&-; exec 2>&-; $(command) &"
+            contain => in_shell;
+}
+
 ##-------------------------------------------------------
 ## contain
 ##-------------------------------------------------------
