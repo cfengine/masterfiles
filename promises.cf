@@ -65,7 +65,6 @@ body common control
                   "update/update_processes.cf",
 
                 # List of services here
-                  "services/init_msg.cf",
                   "services/file_change.cf",
 
       };
@@ -233,10 +232,6 @@ bundle agent service_catalogue
       comment => "Basic change management",
       handle => "service_catalogue_change_management",
       usebundle => change_management;
-
-      "INIT MSG" usebundle => init_msg,
-      comment => "Just a pre-defined policy bundled with the package",
-      handle => "main_methods_any_init_msg";
 
 }
 
