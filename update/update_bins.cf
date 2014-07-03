@@ -230,28 +230,6 @@ bundle agent cfe_internal_update_bins
       handle => "cfe_internal_update_bins_services_stop_cf_execd_windows",
       classes => u_if_repaired("stopped_cfprocs");
 
-      #
-
-  reports:
-
-    bin_newpkg.enterprise::
-
-      "An update for Cfengine binaries is downloaded, installing..."
-      comment => "Alert a message during installation",
-      handle => "cfe_internal_update_bins_reports_installation";
-
-    bin_update_success.enterprise::
-
-      "Successfully installed Cfengine binaries"
-      comment => "Alert a message when an update finishes",
-      handle => "cfe_internal_update_bins_reports_finish";
-
-    bin_update_fail.enterprise::
-
-      "Failed updating Cfengine binaries, should revert to old version"
-      comment => "Alert a message if an update failed",
-      handle => "cfe_internal_update_bins_reports_fail";
-
 }
 
 ################################################################################
