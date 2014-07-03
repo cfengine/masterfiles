@@ -43,23 +43,23 @@ bundle agent inventory_autorun
       handle => "cfe_internal_autorun_inventory_dmidecode";
 
     !disable_inventory_local_users_discover::
-      "local_users" usebundle => cfe_autorun_inventory_local_users_discover(),
+      "discover_local_users" usebundle => cfe_autorun_inventory_local_users_discover(),
       handle => "cfe_internal_autorun_discovery_local_users";
 
     !disable_inventory_local_users::
-      "local_users_locked" usebundle => inventory_local_users(),
+      "invnetory_local_users" usebundle => inventory_local_users(),
       handle => "cfe_internal_autorun_inventory_local_users";
 
     !disable_inventory_local_users_locked::
-      "local_users_locked" usebundle => inventory_local_users_locked(),
+      "inventory_local_users_locked" usebundle => inventory_local_users_locked(),
       handle => "cfe_internal_autorun_inventory_local_users_locked";
 
     !disable_inventory_local_users_password_last_change::
-      "local_users_days_since_password_change" usebundle => inventory_local_users_password_last_change(),
+      "inventory_local_users_password_last_change" usebundle => inventory_local_users_password_last_change(),
       handle => "cfe_internal_autorun_inventory_local_users_password_last_change";
 
     !disable_inventory_local_users_password_empty::
-      "local_users_password_empty" usebundle => inventory_local_users_password_empty(),
+      "inventory_local_users_password_empty" usebundle => inventory_local_users_password_empty(),
       handle => "cfe_internal_autorun_inventory_local_users_password_empty";
 
     any::
@@ -861,7 +861,7 @@ bundle agent inventory_local_users_password_last_change
                  };
 
       "pw_change_date[$(local_users)]"
-        string => strftime( "gmtime", "%Y-%m-%d", eval( "$(now) - days_since_change[$(local_users)])", "math", "infix" ) ),
+        string => eval( "$(now) - days_since_change[$(local_users)])", "math", "infix" ),
         ifvarclass => "$(cfe_autorun_inventory_local_users_discover.local_users_canonified_map[$(local_users)])_password_valid_hash",
         meta => {
                   "inventory",
