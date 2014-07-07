@@ -39,6 +39,23 @@ bundle agent cfe_internal_update_bins
       comment => "Local directory to store update log for this host",
       handle => "cfe_internal_update_bins_vars_local_update_log_dir";
 
+    !windows.enterprise::
+
+      "backup_script"   string => "/tmp/backup.sh";
+      "backup_file"     string => "/tmp/cfengine-nova-$(sys.cf_version).tar.gz";
+
+    (redhat|SuSE|SUSE).enterprise::
+
+      "upgrade_command" string => "/bin/rpm -U";
+
+    debian.enterprise::
+
+      "upgrade_command" string => "/usr/bin/dpkg --force-confdef --force-confnew --install";
+
+    (solaris|solarisx86).enterprise::
+
+      "upgrade_command" string => "/bin/sh $(local_software_dir)/upg_scr $(local_software_dir)/admin_file";
+
     windows.enterprise::
 
       "stop_signal"              string => "kill",
@@ -144,9 +161,9 @@ bundle agent cfe_internal_update_bins
       comment => "Update Nova package to a newer version",
       handle => "cfe_internal_update_bins_packages_nova_update_not_windows",
       package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
+      package_select => "==",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9",         # Install new Nova anyway
+      package_version => "3.6.1-1",         # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
@@ -157,9 +174,9 @@ bundle agent cfe_internal_update_bins
       comment => "Update Nova package to a newer version",
       handle => "cfe_internal_update_bins_packages_nova_update_windows_only",
       package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
+      package_select => "==",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9.9",       # Install new Nova anyway
+      package_version => "3.6.1.0",       # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
@@ -170,9 +187,9 @@ bundle agent cfe_internal_update_bins
       comment => "Update Nova package to a newer version (package is there)",
       handle => "cfe_internal_update_bins_packages_nova_update_not_windows_pkg_there",
       package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
+      package_select => "==",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9",         # Install new Nova anyway
+      package_version => "3.6.1-1",         # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
@@ -183,9 +200,9 @@ bundle agent cfe_internal_update_bins
       comment => "Update Nova package to a newer version (package is there)",
       handle => "cfe_internal_update_bins_packages_nova_update_windows_only_pkg_there",
       package_policy => "update",
-      package_select => ">=",            # picks the newest Nova available
+      package_select => "==",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
-      package_version => "9.9.9.9",       # Install new Nova anyway
+      package_version => "3.6.1.0",       # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
@@ -201,7 +218,15 @@ bundle agent cfe_internal_update_bins
       handle => "cfe_internal_update_bins_files_version_is_running",
       create => "true";
 
-    !am_policy_hub.enterprise::
+    !am_policy_hub.enterprise.trigger_upgrade::
+
+      "$(backup_script)"
+      comment => "Create a backup script for cf-upgrade",
+      handle => "cfe_internal_update_bins_files_upgrade_script",
+      create => "true",
+      edit_defaults => u_empty_no_backup,
+      edit_line => u_backup_script,
+      perms => u_m("0755");
 
       "$(local_software_dir)"
       comment => "Copy binary updates from master source on policy server",
@@ -211,7 +236,7 @@ bundle agent cfe_internal_update_bins
       action => u_immediate,
       classes => u_if_repaired("bin_newpkg");
 
-    bin_update_success.enterprise::
+    bin_update_success.enterprise.trigger_upgrade::
 
       "$(local_update_log_dir)/upgraded_binary_from_$(sys.nova_version)"
       comment => "Create an empty file after successfully upgrade the binary",
@@ -230,6 +255,44 @@ bundle agent cfe_internal_update_bins
       handle => "cfe_internal_update_bins_services_stop_cf_execd_windows",
       classes => u_if_repaired("stopped_cfprocs");
 
+}
+
+################################################################################
+
+bundle edit_line u_backup_script
+{
+  insert_lines:
+
+    linux::
+
+      "#!/bin/sh
+
+if [ $(const.dollar)1 = \"BACKUP\" ]; then
+ tar cfz $(const.dollar)2 /var/cfengine > /dev/null
+fi
+if [ $(const.dollar)1 = \"RESTORE\" ]; then
+ tar xfz $(const.dollar)2
+fi";
+
+    solarisx86|solaris::
+
+      "#!/bin/sh
+
+if [ $(const.dollar)1 = \"BACKUP\" ]; then
+ tar cf $(const.dollar)2 /var/cfengine;  gzip $(const.dollar)2
+fi
+if [ $(const.dollar)1 = \"RESTORE\" ]; then
+ gunzip $(const.dollar)2.gz; tar xf $(const.dollar)2
+fi";
+
+}
+
+################################################################################
+
+body edit_defaults u_empty_no_backup
+{
+  empty_file_before_editing => "true";
+  edit_backup => "false";  
 }
 
 ################################################################################
@@ -283,7 +346,7 @@ body package_method u_generic(repo)
       package_file_repositories  => { "$(repo)" };
 
     debian.x86_64::
-      package_name_convention    => "$(name)_$(version)_x86_64.deb";
+      package_name_convention    => "$(name)_$(version)_amd64.deb";
 
     debian.i686::
       package_name_convention    => "$(name)_$(version)_i386.deb";
@@ -291,7 +354,7 @@ body package_method u_generic(repo)
     debian::
       package_add_command        => "/usr/bin/dpkg --force-confdef --force-confnew --install";
       package_delete_command     => "/usr/bin/dpkg --purge";
-      package_update_command     => "/usr/bin/dpkg --force-confdef --force-confnew --install";
+      package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.upgrade_command)";
 
     redhat|SuSE|suse::
 
@@ -314,11 +377,13 @@ body package_method u_generic(repo)
       package_add_command        => "/bin/rpm -ivh ";
       package_delete_command     => "/bin/rpm -e --nodeps";
       package_verify_command     => "/bin/rpm -V";
-      package_update_command     => "/bin/rpm -Uvh ";
+      package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.upgrade_command)";
       package_noverify_regex     => ".*[^\s].*";
 
-    redhat::
+    redhat.!redhat_4::
       package_list_update_command => "/usr/bin/yum --quiet check-update";
+    redhat_4::
+      package_list_update_command => "/usr/bin/yum check-update";
     SuSE|suse::
       package_list_update_command => "/usr/bin/zypper list-updates";
 
@@ -401,7 +466,7 @@ body package_method u_generic(repo)
       # Cfengine appends path to package and package name below, respectively
       package_add_command        => "/bin/sh $(repo)/add_scr $(repo)/admin_file";
       package_delete_command     => "/usr/sbin/pkgrm -n -a $(repo)/admin_file";
-      package_update_command     => "/bin/sh $(repo)/upg_scr $(repo)/admin_file";
+      package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.upgrade_command)";
 
     aix::
 

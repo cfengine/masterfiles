@@ -10,11 +10,11 @@ body common control
                           "update_def",
                           "cfe_internal_dc_workflow",
                           "cfe_internal_update_policy",
+                          "cfe_internal_update_bins",
                           "cfe_internal_update_processes",
-                          "cfe_internal_update_bins"
       };
 
-      version => "update.cf 3.6.0";
+      version => "update.cf 3.6.1";
 
       inputs => {
                   "update/update_bins.cf",
@@ -76,6 +76,12 @@ bundle common update_def
       handle => "common_def_vars_cf_cfapache_group";
 
   classes:
+
+      # Trigger binary upgrade from policy hub
+      # Disable by default
+      "trigger_upgrade" or => {
+                               "!any",
+                              };
 
       # Update masterfiles from Git
       # Enabled for enterprise users by default
