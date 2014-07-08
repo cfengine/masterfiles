@@ -332,7 +332,11 @@ bundle edit_line u_install_script
 
       "#!/bin/sh
 
-/bin/sh $(cfe_internal_update_bins.local_software_dir)/upg_scr $(cfe_internal_update_bins.local_software_dir)/admin_file > /dev/null";
+pkgname=`pkginfo -d $(const.dollar)1 | awk '{print $(const.dollar)2}'`
+/usr/sbin/pkgrm -n -a $(cfe_internal_update_bins.local_software_dir)/admin_file $pkgname || true
+/usr/sbin/pkgadd -n -a $(cfe_internal_update_bins.local_software_dir)/admin_file -d $(const.dollar)1 all || true
+/var/cfengine/bin/cf-execd || true
+exit 0";
 
 }
 
