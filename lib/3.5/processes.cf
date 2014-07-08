@@ -77,6 +77,16 @@ body process_select by_owner(u)
 
 ##
 
+body process_select by_pid(pid)
+# @brief Select a process matching the given PID
+# @param pid PID of the process to be matched
+{
+      pid => irange("$(pid)","$(pid)");
+      process_result => "pid";
+}
+
+##
+
 body process_count any_count(cl)
 
 {

@@ -630,7 +630,15 @@ bundle agent cfe_internal_postgresql_maintenance
       comment => "Command for cleaning a PostgreSQL database - $(maintenance_type)",
       handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd_$(maintenance_type)";
 
+      "cf_consumer_pid" string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
+      comment => "Read cf-consumer.pid for the main cf-consumer PID",
+      handle => "cfe_internal_postgresql_maintenance_cf_consumer_pid";
       #
+
+  classes:
+      "cf_consumer_pid_correct" expression => isvariable("cf_consumer_pid"),
+      comment => "Check if cf-consumer pid is correct",
+      handle => "cfe_internal_cf_consumer_pid_correct";
 
   processes:
 
@@ -640,7 +648,9 @@ bundle agent cfe_internal_postgresql_maintenance
       comment => "Terminate cf-hub while doing $(maintenance_type) PostgreSQL maintenance",
       handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_term_cf_hub";
 
+    cf_consumer_pid_correct::
       "cf-consumer" signals => { "kill" },
+      process_select => by_pid("$(cf_consumer_pid)"),
       comment => "Kill cf-consumer while doing PostgreSQL maintenance",
       handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_kill_cf_consumer";
 
