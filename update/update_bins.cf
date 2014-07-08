@@ -196,7 +196,7 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    !am_policy_hub.(soloris|solarisx86).enterprise::
+    !am_policy_hub.(solaris|solarisx86).enterprise::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
