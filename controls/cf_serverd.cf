@@ -59,6 +59,9 @@ body server control
 bundle server access_rules()
 
 {
+  vars:
+    enterprise::      
+      "query_types" slist => {"delta", "rebase", "full"};
 
   access:
 
@@ -100,48 +103,20 @@ bundle server access_rules()
       comment => "Grant access to the agent (for cf-runagent)",
       admit   => { @(def.acl) };
 
-    !am_policy_hub.enterprise::
+    !policy_server.enterprise::
 
-      "delta"
-      handle => "server_access_grant_delta_for_hosts",
-      comment => "Grant delta reporting query for the hub on the hosts",
+      "$(query_types)"
+      handle => "server_access_grant_$(query_types)_for_hosts",
+      comment => "Grant $(query_types) reporting query for the hub on the hosts",
       resource_type => "query",
       report_data_select => default_data_select_host,
       admit => { "$(sys.policy_hub)" };
 
-      "full"
-      handle => "server_access_grant_full_for_hosts",
-      comment => "Grant full reporting query for the hub on the hosts",
-      resource_type => "query",
-      report_data_select => default_data_select_host,
-      admit => { "$(sys.policy_hub)" };
+    policy_server.enterprise::
 
-      "rebase"
-      handle => "server_access_grant_rebase_for_hosts",
-      comment => "Grant rebase reporting query for the hub on the hosts",
-      resource_type => "query",
-      report_data_select => default_data_select_host,
-      admit => { "$(sys.policy_hub)" };
-
-    am_policy_hub.enterprise::
-
-      "delta"
-      handle => "server_access_grant_delta_for_hub",
-      comment => "Grant delta reporting query for the hub on the policy server",
-      resource_type => "query",
-      report_data_select => default_data_select_policy_hub,
-      admit => { "$(sys.policy_hub)" };
-
-      "full"
-      handle => "server_access_grant_full_for_hub",
-      comment => "Grant full reporting query for the hub on the policy server",
-      resource_type => "query",
-      report_data_select => default_data_select_policy_hub,
-      admit => { "$(sys.policy_hub)" };
-
-      "rebase"
-      handle => "server_access_grant_rebase_for_hub",
-      comment => "Grant rebase reporting query for the hub on the policy server",
+      "$(query_types)"
+      handle => "server_access_grant_$(query_types)_for_hub",
+      comment => "Grant $(query_types) reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
       admit => { "$(sys.policy_hub)" };
