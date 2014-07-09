@@ -56,12 +56,7 @@ body report_data_select default_data_select_host
 {
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
-      monitoring_include => { "cpu.*",
-                              "mem_total",
-                              "mem_free",
-                              "mem_cached",
-                              "mem_swap",
-                              "mem_freeswap",
+      monitoring_include => { "cpu",
                               "loadavg",
                               "diskfree" };
 }
