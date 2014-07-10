@@ -221,6 +221,10 @@ bundle common paths
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
 
+    smartos::
+      "path[npm]"      string => "/opt/local/bin/npm";
+      "path[pip]"      string => "/opt/local/bin/pip";
+
     solaris::
 
       "path[awk]"      string => "/usr/bin/awk";
