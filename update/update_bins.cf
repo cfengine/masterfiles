@@ -45,6 +45,10 @@ bundle agent cfe_internal_update_bins
       "backup_file"     string => "/tmp/cfengine-nova-$(sys.cf_version).tar.gz";
       "install_script"  string => "/tmp/install.sh";
 
+    (solarisx86|solaris).enterprise::
+
+      "admin_file"      string => "/tmp/admin_file";
+
     windows.enterprise::
 
       "stop_signal"              string => "kill",
@@ -235,6 +239,15 @@ bundle agent cfe_internal_update_bins
 
     !am_policy_hub.enterprise.trigger_upgrade::
 
+      "$(admin_file)"
+      comment => "Create solaris admin_file to automate remove and install packages",
+      handle => "cfe_internal_update_bins_files_solaris_admin_file",
+      create => "true",
+      edit_defaults => u_empty_no_backup,
+      edit_line => u_admin_file,
+      perms => u_m("0644"),
+      ifvarclass => "solarisx86|solaris";
+
       "$(backup_script)"
       comment => "Create a backup script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_backup_script",
@@ -277,6 +290,47 @@ bundle agent cfe_internal_update_bins
       comment => "Stop the executor windows service before updating Cfengine",
       handle => "cfe_internal_update_bins_services_stop_cf_execd_windows",
       classes => u_if_repaired("stopped_cfprocs");
+
+}
+
+################################################################################
+
+bundle edit_line u_admin_file
+{
+  insert_lines:
+
+    sunos_5_8::
+
+      "mail=
+instance=unique
+partial=nocheck
+runlevel=nocheck
+idepend=nocheck
+rdepend=nocheck
+space=nocheck
+setuid=nocheck
+conflict=nocheck
+action=nocheck
+basedir=default";
+
+    sunos_5_9|sunos_5_10::
+
+      "mail=
+instance=overwrite
+partial=nocheck
+runlevel=nocheck
+idepend=nocheck
+rdepend=nocheck
+space=nocheck
+setuid=nocheck
+conflict=nocheck
+action=nocheck
+networktimeout=60
+networkretries=3
+authentication=quit
+keystore=/var/sadm/security
+proxy=
+basedir=default";
 
 }
 
@@ -333,8 +387,8 @@ bundle edit_line u_install_script
       "#!/bin/sh
 
 pkgname=`pkginfo -d $(const.dollar)1 | awk '{print $(const.dollar)2}'`
-/usr/sbin/pkgrm -n -a $(cfe_internal_update_bins.local_software_dir)/admin_file $pkgname || true
-/usr/sbin/pkgadd -n -a $(cfe_internal_update_bins.local_software_dir)/admin_file -d $(const.dollar)1 all || true
+/usr/sbin/pkgrm -n -a $(cfe_internal_update_bins.admin_file) $pkgname
+/usr/sbin/pkgadd -n -a $(cfe_internal_update_bins.admin_file) -d $(const.dollar)1 all
 /var/cfengine/bin/cf-execd || true
 exit 0";
 
