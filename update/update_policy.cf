@@ -380,7 +380,7 @@ body classes u_if_repaired_then_cancel(y)
 
 body classes u_if_else(yes,no)
 {
-      promise_kept     => { "$(yes)" };
+#      promise_kept     => { "$(yes)" };
       promise_repaired => { "$(yes)" };
       repair_failed    => { "$(no)" };
       repair_denied    => { "$(no)" };
