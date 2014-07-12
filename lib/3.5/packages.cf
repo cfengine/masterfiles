@@ -1469,8 +1469,8 @@ body package_method generic
     gentoo::
       package_changes => "individual";
       package_list_command => "/bin/sh -c '/bin/ls -d /var/db/pkg/*/* | cut -c 13-'";
-      package_list_name_regex => ".*/([^\s]+)-\d.*";
-      package_list_version_regex => ".*/[^\s]+-(\d.*)";
+      package_list_name_regex => "([^/]+/(?:(?!-\d).)+)-\d.*";
+      package_list_version_regex => "[^/]+/(?:(?!-\d).)+-(\d.*)";
       package_installed_regex => ".*";                          # all reported are installed
       package_name_convention => "$(name)";
       package_list_update_command => "/bin/true";               # I prefer manual syncing
