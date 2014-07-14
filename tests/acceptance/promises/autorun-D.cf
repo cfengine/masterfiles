@@ -14,7 +14,7 @@ body common control
 bundle agent init
 {
   commands:
-      "make install DESTDIR=$(G.testdir)"
+      "$(G.make) install DESTDIR=$(G.testdir)"
       contain => in_dir_shell("$(this.promise_dirname)/../../..");
 }
 
