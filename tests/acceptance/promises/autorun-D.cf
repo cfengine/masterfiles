@@ -25,6 +25,6 @@ bundle agent check
   methods:
       "" usebundle => dcs_passif_output(".*R: hello_world_autorun: Hello, this is an automatically loaded bundle.*",
                                         "",
-                                        "$(sys.cf_agent) -Dservices_autorun -v -f $(G.testdir)/promises.cf | $(G.grep) Hello",
+                                        "$(sys.cf_agent) -Dservices_autorun -v -f $(G.testdir)/var/cfengine/masterfiles/promises.cf | $(G.grep) Hello",
                                         $(this.promise_filename));
 }
