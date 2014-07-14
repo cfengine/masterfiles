@@ -25,7 +25,7 @@ body common control
 bundle agent init
 {
   meta:
-      "test_skip_needs_work" string => "suse",
+      "test_skip_needs_work" string => "!redhat.!debian",
         meta => { "redmine5866" };
 
   methods:
