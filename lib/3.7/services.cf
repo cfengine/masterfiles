@@ -135,7 +135,7 @@ bundle agent standard_services(service,state)
 # ```
 {
   vars:
-      "call_systemctl" string => "$(paths.sysctl) --no-ask-password --global --system";
+      "call_systemctl" string => "$(paths.systemctl) --no-ask-password --global --system";
       "init" string => "/etc/init.d/$(service)";
 
     start|restart|reload::
