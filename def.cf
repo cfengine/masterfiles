@@ -275,32 +275,6 @@ bundle common inventory_control
       # disable_inventory is not set
       "disable_inventory_cmdb" expression => "any";
 
-      # by default disable the local user discovery if the general
-      # inventory is disabled
-      "disable_inventory_local_users_discover" expression => "disable_inventory";
-
-      # by default disable reporting of encrypted passwords discovered by
-      # `cfe_autorun_inventory_local_users_discover`, even if disable_inventory
-      # is not set.
-      "disable_inventory_local_users_discover_report_encrypted_password" expression => "any";
-
-      # by default disable the local user inventory if the general
-      # inventory is disabled
-      "disable_inventory_local_users" expression => "disable_inventory";
-
-      # by default disable the locked local user inventory if the general
-      # inventory is disabled
-      "disable_inventory_local_users_locked" expression => "disable_inventory";
-
-      # by default disable the local user days since password change if the
-      # general inventory is disabled
-      "disable_inventory_local_users_password_last_change"
-        expression => "disable_inventory";
-
-      # by default disable the local users with empty password inventory if the general
-      # inventory is disabled
-      "disable_inventory_local_users_password_empty" expression => "disable_inventory";
-
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
@@ -320,12 +294,4 @@ bundle common inventory_control
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
       "$(this.bundle): CMDB module enabled";
-    verbose_mode.!disable_inventory_local_users_discovery::
-      "$(this.bundle): Local users discovery enabled";
-    verbose_mode.!disable_inventory_local_users::
-      "$(this.bundle): Local users locked module enabled";
-    verbose_mode.!disable_inventory_local_users_locked::
-      "$(this.bundle): Local users locked module enabled";
-    verbose_mode.!disable_inventory_local_users_password_last_change::
-      "$(this.bundle): Local users days since password change module enabled";
 }
