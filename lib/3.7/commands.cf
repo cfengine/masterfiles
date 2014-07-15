@@ -47,6 +47,23 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+bundle agent daemonize(command)
+# @brief Run a command as a daemon. I.e., fully detaches from Cfengine.
+# @param command The command to run detached
+# Note: there will be no output from the command reported by cf-agent.
+#
+# **Example:**
+# ```cf3
+# methods:
+#   "Launch Daemon"
+#     usebundle => daemonize("/bin/sleep 30");
+# ```
+{
+  commands:
+      "exec 1>&-; exec 2>&-; $(command) &"
+        contain => in_shell;
+}
+
 ##-------------------------------------------------------
 ## contain
 ##-------------------------------------------------------
