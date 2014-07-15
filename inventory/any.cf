@@ -318,9 +318,19 @@ bundle agent cfe_autorun_inventory_dmidecode
 
     have_dmidecode::
       "decoder" string => "$(inventory_control.dmidecoder)";
+
+    have_dmidecode.(redhat_4|redhat_3)::
+      "dmi[$(dmivars)]" string => "Unsupported",
+      meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" },
+      comment => "Old versions of dmidecode do not provide a reliable way to
+                  extract strings";
+
+    have_dmidecode.!(redhat_4|redhat_3)::
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                              "useshell"),
       meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
+
+
 
       "_canonified_var[$(dmivars)]" string => canonify($(dmivars));
       "_canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
