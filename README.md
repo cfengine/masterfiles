@@ -18,6 +18,7 @@ The contents of this repository are intended to live in `/var/cfengine/masterfil
 Use the convenience install target:
 
 ```
+./autogen.sh
 make install
 ```
 
@@ -26,8 +27,11 @@ default it installs in `/var/cfengine/masterfiles` but you can
 override that easily:
 
 ```
-make install DESTDIR=/my/other/install/directory
+./autogen.sh --prefix=/my/other/install/directory
+make install
 ```
+
+Note that the last directory component will always be called `masterfiles`.
 
 ## Host report
 
