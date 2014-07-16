@@ -453,15 +453,13 @@ bundle agent cfe_internal_postgresql_maintenance
       comment => "Command for cleaning a PostgreSQL database - $(maintenance_type)",
       handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd_$(maintenance_type)";
 
+    policy_server.enterprise.!cfengine_3_5::
       "cf_consumer_pid" string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
-      comment => "Read cf-consumer.pid for the main cf-consumer PID",
-      handle => "cfe_internal_postgresql_maintenance_cf_consumer_pid";
-      #
+      comment => "Read cf-consumer.pid for the main cf-consumer PID";
 
   classes:
       "cf_consumer_pid_correct" expression => isvariable("cf_consumer_pid"),
-      comment => "Check if cf-consumer pid is correct",
-      handle => "cfe_internal_cf_consumer_pid_correct";
+      comment => "Check if cf-consumer pid is correctly defined";
 
   processes:
 
