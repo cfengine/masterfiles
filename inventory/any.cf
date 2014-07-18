@@ -63,7 +63,7 @@ bundle agent cfe_autorun_inventory_listening_ports
 # default, as it runs instantly and has no side effects.
 {
   vars:
-      "ports" slist => sort( "mon.listening_ports", "int"),
+      "ports" slist => { @(mon.listening_ports) },
       meta => { "inventory", "attribute_name=Ports listening" };
 }
 
