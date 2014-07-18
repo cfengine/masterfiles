@@ -19,6 +19,7 @@ stamp-h1
 /missing
 /revision
 /ylwrap
+/test-driver
 
 # Misc.
 /cf_promises_*
