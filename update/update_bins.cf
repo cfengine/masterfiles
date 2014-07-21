@@ -40,12 +40,31 @@ bundle agent cfe_internal_update_bins
       handle => "cfe_internal_update_bins_vars_local_update_log_dir";
 
     !windows.enterprise::
+      
+      # backup script for cf-upgrade
+      # the script should have 2 conditions, BACKUP and RESTORE
+      # BACKUP and RESTORE status is $(const.dollar)1 variable in the script
+      # see more details at bundle edit_line u_backup_script
 
       "backup_script"   string => "/tmp/backup.sh";
+
+      # a single compressed backup file for cf-upgrade
+      # this backup_file is passed to backup_script as $(const.dollar)2 variable
+      # cf-upgrade will extract this file if return signal of upgrade command is not 0
+
       "backup_file"     string => "/tmp/cfengine-nova-$(sys.cf_version).tar.gz";
+
+      # install script for cf-upgrade
+      # each distribution has its own way to upgrade a package
+      # see more details at bundle edit_line u_install_script
+
       "install_script"  string => "/tmp/install.sh";
 
     (solarisx86|solaris).enterprise::
+
+      # to automatically remove or install packages on Solaris
+      # admin_file is a must to have to avoid pop-up interaction
+      # see more details at bundle edit_line u_admin_file
 
       "admin_file"      string => "/tmp/admin_file";
 
