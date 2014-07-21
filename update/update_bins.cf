@@ -248,6 +248,13 @@ bundle agent cfe_internal_update_bins
       perms => u_m("0644"),
       ifvarclass => "solarisx86|solaris";
 
+      "$(sys.workdir)/bin/cf-upgrade"
+      comment => "Copy cf-upgrade binary from policy hub for linux only",
+      handle => "cfe_internal_update_bins_files_cf_upgrade",
+      copy_from => u_rcp("$(master_software_location)/cf-upgrade","$(sys.policy_hub)"),
+      perms => u_m("0755"),
+      ifvarclass => "linux";
+
       "$(backup_script)"
       comment => "Create a backup script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_backup_script",
