@@ -50,7 +50,8 @@
 bundle agent daemonize(command)
 # @brief Run a command as a daemon. I.e., fully detaches from Cfengine.
 # @param command The command to run detached
-# Note: there will be no output from the command reported by cf-agent.
+# Note: There will be no output from the command reported by cf-agent. This
+# bundle has no effect on windows
 #
 # **Example:**
 # ```cf3
@@ -60,8 +61,13 @@ bundle agent daemonize(command)
 # ```
 {
   commands:
+    !windows::
       "exec 1>&-; exec 2>&-; $(command) &"
         contain => in_shell;
+
+  reports:
+    windows.(inform_mode|verbose_mode)::
+      "$(this.bundle): This bundle does not support Windows";
 }
 
 ##-------------------------------------------------------
