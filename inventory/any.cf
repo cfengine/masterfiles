@@ -331,9 +331,6 @@ bundle agent cfe_autorun_inventory_dmidecode
       "dmi[bios-version]" string => $(bios_array[2]),
       meta => { "inventory", "attribute_name=BIOS version" };
 
-    any::
-      "_canonified_var[$(dmivars)]" string => canonify($(dmivars));
-      "_canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
 
   classes:
       "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
