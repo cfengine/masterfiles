@@ -256,6 +256,18 @@ bundle agent cfe_internal_update_bins
       handle => "cfe_internal_update_bins_files_version_is_running",
       create => "true";
 
+    am_policy_hub.enterprise::
+
+      "$(master_software_location)/cf-upgrade/linux.i386/."
+      comment => "Prepare a directory for cf-upgrade",
+      handle => "cfe_internal_update_bins_files_linux_i386",
+      create => "true";
+
+      "$(master_software_location)/cf-upgrade/linux.x86_64/."
+      comment => "Prepare a directory for cf-upgrade",
+      handle => "cfe_internal_update_bins_files_linux_x86_64",
+      create => "true";
+
     !am_policy_hub.enterprise.trigger_upgrade::
 
       "$(admin_file)"
@@ -268,11 +280,18 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "solarisx86|solaris";
 
       "$(sys.workdir)/bin/cf-upgrade"
-      comment => "Copy cf-upgrade binary from policy hub for linux only",
-      handle => "cfe_internal_update_bins_files_cf_upgrade",
-      copy_from => u_rcp("$(master_software_location)/cf-upgrade","$(sys.policy_hub)"),
+      comment => "Copy cf-upgrade binary from policy hub for i386 linux",
+      handle => "cfe_internal_update_bins_files_cf_upgrade_i386_linux",
+      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.i386/cf-upgrade","$(sys.policy_hub)"),
       perms => u_m("0755"),
-      ifvarclass => "linux";
+      ifvarclass => "linux.i686";
+
+      "$(sys.workdir)/bin/cf-upgrade"
+      comment => "Copy cf-upgrade binary from policy hub for x86_64 linux",
+      handle => "cfe_internal_update_bins_files_cf_upgrade_x86_64_linux",
+      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.x86_64/cf-upgrade","$(sys.policy_hub)"),
+      perms => u_m("0755"),
+      ifvarclass => "linux.x86_64";
 
       "$(backup_script)"
       comment => "Create a backup script for cf-upgrade",
@@ -487,6 +506,9 @@ body package_method u_generic(repo)
     debian::
       package_add_command        => "/usr/bin/dpkg --force-confdef --force-confnew --install";
       package_delete_command     => "/usr/bin/dpkg --purge";
+    debian.cfengine_3_5::
+      package_update_command     => "/usr/bin/dpkg --force-confdef --force-confnew --install";
+    debian.!cfengine_3_5::
       package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     redhat|SuSE|suse::
@@ -510,8 +532,11 @@ body package_method u_generic(repo)
       package_add_command        => "/bin/rpm -ivh ";
       package_delete_command     => "/bin/rpm -e --nodeps";
       package_verify_command     => "/bin/rpm -V";
-      package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
       package_noverify_regex     => ".*[^\s].*";
+    (redhat|SuSE|suse).cfengine_3_5::
+      package_update_command     => "/bin/rpm -Uvh";
+    (redhat|SuSE|suse).!cfengine_3_5::
+      package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     redhat.!redhat_4::
       package_list_update_command => "/usr/bin/yum --quiet check-update";
@@ -599,6 +624,9 @@ body package_method u_generic(repo)
       # Cfengine appends path to package and package name below, respectively
       package_add_command        => "/bin/sh $(repo)/add_scr $(repo)/admin_file";
       package_delete_command     => "/usr/sbin/pkgrm -n -a $(repo)/admin_file";
+    (solarisx86|solaris).cfengine_3_5::
+      package_update_command     => "/bin/sh $(repo)/upg_scr $(repo)/admin_file";
+    (solarisx86|solaris).!cfengine_3_5::
       package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     aix::
