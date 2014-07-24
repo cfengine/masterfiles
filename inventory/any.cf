@@ -331,6 +331,9 @@ bundle agent cfe_autorun_inventory_dmidecode
       "dmi[bios-version]" string => $(bios_array[2]),
       meta => { "inventory", "attribute_name=BIOS version" };
 
+      "dmi[processor-version]" string => $(processor_array[1]),
+      meta => { "inventory", "attribute_name=CPU model" };
+
 
   classes:
       "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
@@ -339,6 +342,10 @@ bundle agent cfe_autorun_inventory_dmidecode
        "bios_match" expression => regextract(".*Manufacturer\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+)",
                                              execresult("gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer FROM WIN32_BIOS'", "powershell"),
                                              "bios_array");
+
+       "processor_match" expression => regextract(".*Name\W+(.*)",
+                                                  execresult("gwmi -query 'SELECT Name FROM WIN32_PROCESSOR'", "powershell"),
+                                                  "processor_array");
 
   reports:
     inform_mode::
