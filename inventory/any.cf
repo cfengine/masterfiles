@@ -328,32 +328,40 @@ bundle agent cfe_autorun_inventory_dmidecode
       "dmi[bios-vendor]" string => $(bios_array[1]),
       meta => { "inventory", "attribute_name=BIOS vendor" };
 
-      "dmi[bios-version]" string => $(bios_array[2]),
+      "dmi[system-serial-number]" string => $(bios_array[2]),
+      meta => { "inventory", "attribute_name=System serial number" };
+
+      "dmi[bios-version]" string => $(bios_array[3]),
       meta => { "inventory", "attribute_name=BIOS version" };
+
+      "dmi[system-version]" string => $(bios_array[4]),
+      meta => { "inventory", "attribute_name=System version" };
 
       "dmi[processor-version]" string => $(processor_array[1]),
       meta => { "inventory", "attribute_name=CPU model" };
+ 
+      "split_pscomputername"
+        slist => string_split($(system_array[1]), "PSComputerName\s.*", 2),
+        comment => "Work around weird appearance of PSComputerName into System manufacturer";
 
-      "dmi[system-manufacturer]" string => $(system_array[1]),
+      "dmi[system-manufacturer]" string => nth(split_pscomputername, 0),
       meta => { "inventory", "attribute_name=System manufacturer" };
-
 
   classes:
       "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
 
-       windows::
-       "bios_match" expression => regextract(".*Manufacturer\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+)",
-                                             execresult("gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer FROM WIN32_BIOS'", "powershell"),
-                                             "bios_array");
+    windows::
+      "bios_match" expression => regextract(".*Manufacturer\s+:\s([a-zA-Z0-9 ]+)\n.*SerialNumber\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+).*Version\W+([a-zA-Z0-9 -]+)",
+                                            execresult("gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer, SerialNumber, Version FROM WIN32_BIOS'", "powershell"),
+                                            "bios_array");
 
-       "processor_match" expression => regextract(".*Name\W+(.*)",
-                                                  execresult("gwmi -query 'SELECT Name FROM WIN32_PROCESSOR'", "powershell"),
-                                                  "processor_array");
+      "processor_match" expression => regextract(".*Name\W+(.*)",
+                                                 execresult("gwmi -query 'SELECT Name FROM WIN32_PROCESSOR'", "powershell"),
+                                                 "processor_array");
 
-       "system_match" expression => regextract(".*Manufacturer\W+(.*)",
-                                               execresult("gwmi -query 'SELECT Manufacturer FROM WIN32_COMPUTERSYSTEM'", "powershell"),
-                                               "system_array");
-
+      "system_match" expression => regextract(".*Manufacturer\W+(.*)",
+                                              execresult("gwmi -query 'SELECT Manufacturer FROM WIN32_COMPUTERSYSTEM'", "powershell"),
+                                              "system_array");
 
   reports:
     inform_mode::
