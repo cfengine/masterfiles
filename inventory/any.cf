@@ -324,13 +324,36 @@ bundle agent cfe_autorun_inventory_dmidecode
                                              "useshell"),
       meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
 
+    windows::
+      "dmi[bios-vendor]" string => $(bios_array[1]),
+      meta => { "inventory", "attribute_name=BIOS vendor" };
 
+      "dmi[bios-version]" string => $(bios_array[2]),
+      meta => { "inventory", "attribute_name=BIOS version" };
 
-      "_canonified_var[$(dmivars)]" string => canonify($(dmivars));
-      "_canonified[$(dmivars)]" string => canonify("$(dmi[$(dmivars)])");
+      "dmi[processor-version]" string => $(processor_array[1]),
+      meta => { "inventory", "attribute_name=CPU model" };
+
+      "dmi[system-manufacturer]" string => $(system_array[1]),
+      meta => { "inventory", "attribute_name=System manufacturer" };
+
 
   classes:
       "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
+
+       windows::
+       "bios_match" expression => regextract(".*Manufacturer\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+)",
+                                             execresult("gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer FROM WIN32_BIOS'", "powershell"),
+                                             "bios_array");
+
+       "processor_match" expression => regextract(".*Name\W+(.*)",
+                                                  execresult("gwmi -query 'SELECT Name FROM WIN32_PROCESSOR'", "powershell"),
+                                                  "processor_array");
+
+       "system_match" expression => regextract(".*Manufacturer\W+(.*)",
+                                               execresult("gwmi -query 'SELECT Manufacturer FROM WIN32_COMPUTERSYSTEM'", "powershell"),
+                                               "system_array");
+
 
   reports:
     inform_mode::
