@@ -170,12 +170,11 @@ bundle common paths
       "path[journalctl]"        string => "/usr/bin/journalctl";
       "path[netctl]"            string => "/usr/bin/netctl";
 
-    freebsd|netbsd::
+    freebsd|netbsd|openbsd::
 
       "path[awk]"      string => "/usr/bin/awk";
       "path[bc]"       string => "/usr/bin/bc";
       "path[cat]"      string => "/bin/cat";
-      "path[cksum]"    string => "/usr/bin/cksum";
       "path[crontabs]" string => "/var/cron/tabs";
       "path[cut]"      string => "/usr/bin/cut";
       "path[dc]"       string => "/usr/bin/dc";
@@ -194,32 +193,15 @@ bundle common paths
       "path[sed]"      string => "/usr/bin/sed";
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
+
+    freebsd|netbsd::
+
+      "path[cksum]"    string => "/usr/bin/cksum";
       "path[realpath]" string => "/bin/realpath";
 
     openbsd::
 
-      "path[awk]"      string => "/usr/bin/awk";
-      "path[bc]"       string => "/usr/bin/bc";
-      "path[cat]"      string => "/bin/cat";
       "path[cksum]"    string => "/bin/cksum";
-      "path[crontabs]" string => "/var/cron/tabs";
-      "path[cut]"      string => "/usr/bin/cut";
-      "path[dc]"       string => "/usr/bin/dc";
-      "path[df]"       string => "/bin/df";
-      "path[diff]"     string => "/usr/bin/diff";
-      "path[dig]"      string => "/usr/sbin/dig";
-      "path[echo]"     string => "/bin/echo";
-      "path[egrep]"    string => "/usr/bin/egrep";
-      "path[find]"     string => "/usr/bin/find";
-      "path[grep]"     string => "/usr/bin/grep";
-      "path[ls]"       string => "/bin/ls";
-      "path[netstat]"  string => "/usr/bin/netstat";
-      "path[ping]"     string => "/usr/bin/ping";
-      "path[perl]"     string => "/usr/bin/perl";
-      "path[printf]"   string => "/usr/bin/printf";
-      "path[sed]"      string => "/usr/bin/sed";
-      "path[sort]"     string => "/usr/bin/sort";
-      "path[tr]"       string => "/usr/bin/tr";
 
     solaris::
 
