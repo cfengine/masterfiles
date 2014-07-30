@@ -97,26 +97,26 @@ bundle common inventory
   vars:
       # This list is intended to grow as needed
     !(cfengine_3_4|cfengine_3_5).debian::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/debian.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_debian" };
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/debian.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_debian", "inventory_os" };
     !(cfengine_3_4|cfengine_3_5).redhat::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/redhat.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_redhat" };
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/redhat.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_redhat", "inventory_os" };
     !(cfengine_3_4|cfengine_3_5).suse::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/suse.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_suse" };
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/suse.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_suse", "inventory_os" };
     !(cfengine_3_4|cfengine_3_5).windows::
-      "inputs" slist => { "inventory/any.cf", "inventory/windows.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_windows" };
+      "inputs" slist => { "inventory/any.cf", "inventory/windows.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_windows", "inventory_os" };
     !(cfengine_3_4|cfengine_3_5).macos::
-      "inputs" slist => { "inventory/any.cf", "inventory/macos.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos" };
+      "inputs" slist => { "inventory/any.cf", "inventory/macos.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos", "inventory_os" };
     !(cfengine_3_4|cfengine_3_5).linux.!specific_linux_os::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb" };
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_os" };
     !cfengine_3_5.other_unix_os::
-      "inputs" slist => { "inventory/any.cf", "inventory/generic.cf" };
-      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_generic" };
+      "inputs" slist => { "inventory/any.cf", "inventory/generic.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_generic", "inventory_os" };
 
     (cfengine_3_4|cfengine_3_5)::
       "inputs" slist => { cf_null };
