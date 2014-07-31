@@ -6,7 +6,8 @@ bundle agent inventory_lsb
   classes:
       "have_lsb" expression => fileexists($(lsb_exec));
 
-      "_inventory_lsb_found" expression => regcmp("^[1-9][0-9]*$", $(dim));
+      "_inventory_lsb_found" expression => regcmp("^[1-9][0-9]*$", $(dim)),
+                                  scope => "namespace";
 
     _inventory_lsb_found::
       "lsb_$(os)" expression => "any",
