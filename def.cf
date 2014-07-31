@@ -27,16 +27,32 @@ bundle common def
 
       # Begin change #
 
-      # List here the IP masks that we grant access to on the server:
+      # Used with admit for classic protocol:
+      "acl_host_regexes" slist => {
+                                 # Allow everything in my own domain.
 
-      "acl"     slist => {
-                           # Allow everything in my own domain.
+                                 # Note that this:
+                                 # 1. requires def.domain to be correctly set
+                                 # 2. will cause a DNS lookup for every access
+                                 ".*\.$(escaped_domain)",
+      },
+      comment => "List of regexes matching hosts to which to grant access",
+      handle => "common_def_vars_acl_hostname";
 
-                           # Note that this:
-                           # 1. requires def.domain to be correctly set
-                           # 2. will cause a DNS lookup for every access
-                           ".*\.$(escaped_domain)",
+      # For use with admit_hostnames other lists of friendly hostnames:
+      "acl_hostnames" slist => {
+                                 # Allow everything in my own domain.
 
+                                 # Note that this:
+                                 # 1. requires def.domain to be correctly set
+                                 # 2. will cause a DNS lookup for every access
+                                 ".$(sys.domain)",
+      },
+      comment => "List of hosts and '.domain' matchers to which to grant access",
+      handle => "common_def_vars_acl_hostname";
+
+      # For use with admit_ips and where lists of IP addresses are needed:
+      "acl_ips" slist => {
                            # Assume /16 LAN clients to start with
                            "$(sys.policy_hub)/16",
 
@@ -44,6 +60,11 @@ bundle common def
                            #  "217.77.34.18",
                            #  "217.77.34.19",
       },
+      comment => "List of addresses of hosts to which to grant access",
+      handle => "common_def_vars_acl_ips";
+
+      # For use with (deprecated) plain admit (classic protocol):
+      "acl"     slist => { @(acl_host_regexes), @(acl_ips) },
       comment => "Define an acl for the machines to be granted accesses",
       handle => "common_def_vars_acl";
 
