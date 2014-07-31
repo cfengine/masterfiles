@@ -13,15 +13,21 @@ bundle common def
 
     any::
 
-      # Begin change
+      # Begin change #
 
-      # Your domain name, for use in access control
-
+      # Your domain name, for use in access control:
       "domain"  string => "$(sys.domain)", # this default may be inaccurate!
       comment => "Define a global domain for all hosts",
       handle => "common_def_vars_domain";
 
-      # List here the IP masks that we grant access to on the server
+      # End change #
+
+      "escaped_domain" string => escape("$(domain)"),
+      comment => "Escaped version of domain for use in regexes";
+
+      # Begin change #
+
+      # List here the IP masks that we grant access to on the server:
 
       "acl"     slist => {
                            # Allow everything in my own domain.
@@ -29,7 +35,7 @@ bundle common def
                            # Note that this:
                            # 1. requires def.domain to be correctly set
                            # 2. will cause a DNS lookup for every access
-                           ".*$(def.domain)",
+                           ".*\.$(escaped_domain)",
 
                            # Assume /16 LAN clients to start with
                            "$(sys.policy_hub)/16",
