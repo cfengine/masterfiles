@@ -1,11 +1,13 @@
 bundle common inventory_os
 {
 vars:
-  "description" string => ifelse(
-                                 and( isvariable("inventory_lsb.os"), isvariable("inventory_lsb.release") ),
-                                 "$(inventory_lsb.os) $(inventory_lsb.release)",
-                                 "$(sys.flavor) (LSB missing)"
-                                 ),
+
+_inventory_lsb_found::
+  "description" string => "$(inventory_lsb.os) $(inventory_lsb.release)",
+                  meta => { "inventory", "attribute_name=OS" };
+
+!_inventory_lsb_found::
+  "description" string => "$(sys.flavor) (LSB missing)",
                   meta => { "inventory", "attribute_name=OS" };
 
 }
