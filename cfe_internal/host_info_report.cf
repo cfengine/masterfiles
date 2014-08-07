@@ -140,7 +140,7 @@ bundle agent host_info_report_render_txt
 
   reports:
     host_info_report_output_repaired::
-      "Host info report generated and avilable at '$(host_info_report.host_info_report_output)'";
+      "Host info report generated and available at '$(host_info_report.host_info_report_output)'";
 
     host_info_report_output_not_ok::
       "There was a problem generating your host info report at '$(host_info_report.host_info_report_output)'";
