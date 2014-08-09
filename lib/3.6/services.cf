@@ -231,19 +231,19 @@ bundle agent standard_services(service,state)
         ifvarclass => "action_restart",
         classes    => kept_successful_command;
 
+      "$(call_systemctl) -q enable $(service)"
+        ifvarclass => "action_enable",
+        classes    => kept_successful_command;
+
+      "$(call_systemctl) -q disable $(service)"
+        ifvarclass => "action_disable",
+        classes    => kept_successful_command;
+
       # Custom action for any of the non-standard systemd actions such a
       # status, try-restart, isolate, et al.
       "$(call_systemctl) $(state) $(service)"
         ifvarclass => "action_custom",
         classes    => kept_successful_command;
-
-      # I don't exactly know what the 'kept_successful_command' class is used
-      # for, yet, but I only set it on the explicit actions.
-      "$(call_systemctl) -q enable $(service)"
-        ifvarclass => "action_enable";
-
-      "$(call_systemctl) -q disable $(service)"
-        ifvarclass => "action_disable";
 
 ### END systemd service-probing ###
 
