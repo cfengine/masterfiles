@@ -148,7 +148,7 @@ bundle agent standard_services(service,state)
 
     systemd::
       # On my systems, I'm seeing 115 or so lines of output... giving some wiggle room
-      "systemd_$(service)" slist => string_split(execresult("$(call_systemctl) show $(service)", "noshell"), "\n", "150");
+      "systemd_service_info" slist => string_split(execresult("$(call_systemctl) show $(service)", "noshell"), "\n", "150");
 
   classes:
       # define a class named after the desired state
@@ -179,12 +179,12 @@ bundle agent standard_services(service,state)
 # for anything not supported
 #
     systemd::
-      "service_enabled" expression => reglist(@(systemd_$(service)), "UnitFileState=enabled");
-      "service_active"  expression => reglist(@(systemd_$(service)), "ActiveState=active");
+      "service_enabled" expression => reglist(@(systemd_service_info), "UnitFileState=enabled");
+      "service_active"  expression => reglist(@(systemd_service_info), "ActiveState=active");
 
-      "can_stop_service"   expression => reglist(@(systemd_$(service)), "CanStop=yes");
-      "can_start_service"  expression => reglist(@(systemd_$(service)), "CanStart=yes");
-      "can_reload_service" expression => reglist(@(systemd_$(service)), "CanReload=yes");
+      "can_stop_service"   expression => reglist(@(systemd_service_info), "CanStop=yes");
+      "can_start_service"  expression => reglist(@(systemd_service_info), "CanStart=yes");
+      "can_reload_service" expression => reglist(@(systemd_service_info), "CanReload=yes");
 
       "request_start"   expression => strcmp("start", "$(state)");
       "request_stop"    expression => strcmp("stop", "$(state)");
