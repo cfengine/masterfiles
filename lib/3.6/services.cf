@@ -146,6 +146,10 @@ bundle agent standard_services(service,state)
       "chkconfig_mode" string => "off";
       "svcadm_mode" string => "disable";
 
+    systemd::
+      # On my systems, I'm seeing 115 or so lines of output... giving some wiggle room
+      "systemd_$(service)" slist => string_split(execresult("$(call_systemctl) show $(service)", "noshell"), "\n", "150");
+
   classes:
       # define a class named after the desired state
       "$(state)" expression => "any";
@@ -175,12 +179,12 @@ bundle agent standard_services(service,state)
 # for anything not supported
 #
     systemd::
-      "service_enabled" expression => returnszero("$(call_systemctl) -q is-enabled $(service)", "noshell");
-      "service_active"  expression => returnszero("$(call_systemctl) -q is-active $(service)", "noshell");
+      "service_enabled" expression => reglist(@(systemd_$(service)), "UnitFileState=enabled");
+      "service_active"  expression => reglist(@(systemd_$(service)), "ActiveState=active");
 
-      "can_stop_service"   expression => returnszero("$(call_systemctl) show $(service) | /bin/grep -qi \"^CanStop=yes\"", "useshell");
-      "can_start_service"  expression => returnszero("$(call_systemctl) show $(service) | /bin/grep -qi \"^CanStart=yes\"", "useshell");
-      "can_reload_service" expression => returnszero("$(call_systemctl) show $(service) | /bin/grep -qi \"^CanReload=yes\"", "useshell");
+      "can_stop_service"   expression => reglist(@(systemd_$(service)), "CanStop=yes");
+      "can_start_service"  expression => reglist(@(systemd_$(service)), "CanStart=yes");
+      "can_reload_service" expression => reglist(@(systemd_$(service)), "CanReload=yes");
 
       "request_start"   expression => strcmp("start", "$(state)");
       "request_stop"    expression => strcmp("stop", "$(state)");
