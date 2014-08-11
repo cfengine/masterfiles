@@ -170,10 +170,10 @@ bundle agent standard_services(service,state)
       expression => returnszero("$(paths.chkconfig) $(service)", "noshell"),
       comment => "We need to know if the service is configured to start at boot or not";
 
-### BEGIN systemd state-probing ###
-# Bryan Burke
-# bburke@eecs.utk.edu
-#
+### BEGIN ###
+# @brief probe the state of a systemd service
+# @author Bryan Burke
+# 
 # A collection of classes to determine the capabilities of a given systemd
 # service, then start, stop, etc. the service. Also supports a custom action
 # for anything not supported
@@ -245,7 +245,7 @@ bundle agent standard_services(service,state)
         ifvarclass => "action_custom",
         classes    => kept_successful_command;
 
-### END systemd service-probing ###
+### END systemd section ###
 
     chkconfig.stop.onboot::
       # Only chkconfig disable if it's currently set to start on boot
