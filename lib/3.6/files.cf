@@ -1348,6 +1348,17 @@ body copy_from perms_cp(from)
       preserve    => "true";
 }
 
+body copy_from perms_dcp(from)
+# @brief Copy a local file if it is different from the existing copy and
+# preserve file permissions on the local copy.
+#
+# @param from The path to the source file.
+{
+      source      => "$(from)";
+      preserve    => "true";
+      compare     => "digest";
+}
+
 body copy_from backup_local_cp(from)
 # @brief Copy a local file and  keep a backup of old versions.
 #
