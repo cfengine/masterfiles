@@ -173,7 +173,7 @@ bundle agent standard_services(service,state)
 ### BEGIN ###
 # @brief probe the state of a systemd service
 # @author Bryan Burke
-# 
+#
 # A collection of classes to determine the capabilities of a given systemd
 # service, then start, stop, etc. the service. Also supports a custom action
 # for anything not supported
@@ -181,6 +181,7 @@ bundle agent standard_services(service,state)
     systemd::
       "service_enabled" expression => reglist(@(systemd_service_info), "UnitFileState=enabled");
       "service_active"  expression => reglist(@(systemd_service_info), "ActiveState=active");
+      "service_loaded"  expression => reglist(@(systemd_service_info), "LoadState=loaded");
 
       "can_stop_service"   expression => reglist(@(systemd_service_info), "CanStop=yes");
       "can_start_service"  expression => reglist(@(systemd_service_info), "CanStart=yes");
@@ -211,7 +212,7 @@ bundle agent standard_services(service,state)
       "action_disable" expression => "request_stop.service_enabled";
 
   commands:
-    systemd:: # note this class is defined in `inventory/linux.cf`
+    systemd.service_loaded:: # note this class is defined in `inventory/linux.cf`
       # conveniently, systemd states map to `services` states, except
       # for `enable`
 
@@ -283,6 +284,8 @@ bundle agent standard_services(service,state)
   reports:
     inform_mode.systemd::
       "$(this.bundle): using systemd layer to $(state) $(service)";
+    inform_mode.systemd.!service_loaded::
+      "$(this.bundle): Service $(service) unit file is not loaded; doing nothing";
     inform_mode.chkconfig::
       "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))"
         ifvarclass => canonify("chkconfig_$(service)_registered");
