@@ -269,6 +269,7 @@ bundle common paths
       "path[egrep]"         string => "/bin/egrep";
       "path[ethtool]"       string => "/usr/sbin/ethtool";
       "path[find]"          string => "/usr/bin/find";
+      "path[free]"          string => "/usr/bin/free";
       "path[grep]"          string => "/bin/grep";
       "path[hostname]"      string => "/bin/hostname";
       "path[init]"          string => "/sbin/init";
@@ -357,6 +358,7 @@ bundle common paths
       "path[egrep]"         string => "/bin/egrep";
       "path[ethtool]"       string => "/sbin/ethtool";
       "path[find]"          string => "/usr/bin/find";
+      "path[free]"          string => "/usr/bin/free";
       "path[grep]"          string => "/bin/grep";
       "path[hostname]"      string => "/bin/hostname";
       "path[init]"          string => "/sbin/init";
