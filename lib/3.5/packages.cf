@@ -1016,8 +1016,8 @@ body package_method smartos
 {
       package_changes => "bulk";
       package_list_command => "/opt/local/bin/pkgin list";
-      package_list_name_regex    => "(.*)\-[0-9]+.*";
-      package_list_version_regex => ".*\-([0-9][^\s]+).*";
+      package_list_name_regex => "([^\s]+)\-[0-9]+.*\s";
+      package_list_version_regex => "[^\s]+\-([0-9][^\s]+)\s";
 
       package_installed_regex => ".*"; # all reported are installed
 
@@ -1027,10 +1027,10 @@ body package_method smartos
       package_add_command => "/opt/local/bin/pkgin -y install";
 
       package_delete_command => "/opt/local/bin/pkgin -y remove";
-      
+
       # pkgin update doesn't do what you think it does. pkgin install against and
       # already installed package will upgrade it however.
-      
+
       package_update_command =>  "/opt/local/bin/pkgin -y install";
 }
 
