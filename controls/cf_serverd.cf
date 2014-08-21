@@ -7,7 +7,6 @@
 ###############################################################################
 
 body server control
-
 {
       # List of ciphers the server accepts. For Syntax help see man page
       # for "openssl ciphers". Default is "AES256-GCM-SHA384:AES256-SHA"
@@ -47,20 +46,18 @@ body server control
       cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     solaris::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     !(windows|hpux|aix|solaris)::
       cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
-
 }
 
 ###############################################################################
 
-bundle server access_rules()
-
+bundle server access_rules
 {
   vars:
-    enterprise::      
+    enterprise::
       "query_types" slist => {"delta", "rebase", "full"};
 
   access:
@@ -70,27 +67,32 @@ bundle server access_rules()
       "$(def.dir_masterfiles)"
       handle => "server_access_grant_access_policy",
       comment => "Grant access to the policy updates",
-      admit => { @(def.acl) };
+      admit_hostnames => { @(def.acl_hostnames) },
+      admit_ips => { @(def.acl_ips) };
 
       "$(def.dir_software)"
       handle => "server_access_grant_access_datafiles",
       comment => "Grant access to software updates",
-      admit => { @(def.acl) };
+      admit_hostnames => { @(def.acl_hostnames) },
+      admit_ips => { @(def.acl_ips) };
 
       "$(def.dir_bin)"
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
-      admit => { @(def.acl) };
+      admit_hostnames => { @(def.acl_hostnames) },
+      admit_ips => { @(def.acl_ips) };
 
       "$(def.dir_modules)"
       handle => "server_access_grant_access_modules",
       comment => "Grant access to modules directory",
-      admit => { @(def.acl) };
+      admit_hostnames => { @(def.acl_hostnames) },
+      admit_ips => { @(def.acl_ips) };
 
       "$(def.dir_plugins)"
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
-      admit => { @(def.acl) };
+      admit_hostnames => { @(def.acl_hostnames) },
+      admit_ips => { @(def.acl_ips) };
 
       "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
@@ -101,7 +103,8 @@ bundle server access_rules()
       "c:\program files\cfengine\bin\cf-agent.exe"
       handle => "server_access_grant_access_agent",
       comment => "Grant access to the agent (for cf-runagent)",
-      admit   => { @(def.acl) };
+      admit_hostnames => { @(def.acl_hostnames) },
+      admit_ips => { @(def.acl_ips) };
 
     !policy_server.enterprise::
 
@@ -127,5 +130,4 @@ bundle server access_rules()
       # define certain soft-classes when running cf-agent on this host
 
       ".*" authorize => { "root" };
-
 }
