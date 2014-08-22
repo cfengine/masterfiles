@@ -141,6 +141,7 @@ bundle common paths
       "path[dmidecode]"         string => "/usr/bin/dmidecode";
       "path[echo]"              string => "/usr/bin/echo";
       "path[egrep]"             string => "/usr/bin/egrep";
+      "path[ethtool]"           string => "/usr/bin/ethtool";
       "path[find]"              string => "/usr/bin/find";
       "path[free]"              string => "/usr/bin/free";
       "path[grep]"              string => "/usr/bin/grep";
@@ -266,6 +267,7 @@ bundle common paths
       "path[domainname]"    string => "/bin/domainname";
       "path[echo]"          string => "/bin/echo";
       "path[egrep]"         string => "/bin/egrep";
+      "path[ethtool]"       string => "/usr/sbin/ethtool";
       "path[find]"          string => "/usr/bin/find";
       "path[grep]"          string => "/bin/grep";
       "path[hostname]"      string => "/bin/hostname";
@@ -353,6 +355,7 @@ bundle common paths
       "path[domainname]"    string => "/bin/domainname";
       "path[echo]"          string => "/bin/echo";
       "path[egrep]"         string => "/bin/egrep";
+      "path[ethtool]"       string => "/sbin/ethtool";
       "path[find]"          string => "/usr/bin/find";
       "path[grep]"          string => "/bin/grep";
       "path[hostname]"      string => "/bin/hostname";
@@ -419,6 +422,7 @@ bundle common paths
       "path[domainname]"    string => "/bin/domainname";
       "path[echo]"          string => "/bin/echo";
       "path[egrep]"         string => "/usr/bin/egrep";
+      "path[ethtool]"       string => "/usr/sbin/ethtool";
       "path[find]"          string => "/usr/bin/find";
       "path[free]"          string => "/usr/bin/free";
       "path[grep]"          string => "/usr/bin/grep";
