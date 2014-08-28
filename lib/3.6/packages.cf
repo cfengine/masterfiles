@@ -1832,19 +1832,19 @@ bundle agent package_latest(package)
     debian::
       "$(package)"
       package_policy => "addupdate",
-      package_version => "9999999999",
+      package_version => "999999999",
       package_method => apt_get_permissive;
 
     redhat::
       "$(package)"
       package_policy => "addupdate",
-      package_version => "9999999999",
+      package_version => "999999999",
       package_method => yum_rpm_permissive;
 
     suse::
       "$(package)"
       package_policy => "addupdate",
-      package_version => "9999999999",
+      package_version => "999999999",
       package_method => zypper;
 
     !debian.!redhat.!suse::
