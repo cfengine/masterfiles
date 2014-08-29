@@ -379,5 +379,5 @@ body classes u_always_forever(theclass)
       repair_failed => { $(theclass) };
       repair_denied => { $(theclass) };
       repair_timeout => { $(theclass) };
-      persist_time => 99999999999;
+      persist_time => 999999999;
 }
