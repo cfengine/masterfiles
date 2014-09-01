@@ -603,7 +603,12 @@ bundle agent classic_services(service,state)
   commands:
     using_chkconfig::
       "$(paths.chkconfig) $(service) $(chkconfig_mode)"
-      classes => kept_successful_command;
+      classes    => kept_successful_command,
+      ifvarclass => not(isvariable("baseinit[$(service)]"));
+
+      "$(paths.chkconfig) $(baseinit[$(service)]) $(chkconfig_mode)"
+      classes    => kept_successful_command,
+      ifvarclass => and(isvariable("baseinit[$(service)]"));
 
   processes:
 
