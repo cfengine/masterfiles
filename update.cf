@@ -14,7 +14,7 @@ body common control
                           "cfe_internal_update_processes",
       };
 
-      version => "update.cf 3.6.1";
+      version => "update.cf 3.6.2";
 
       inputs => {
                   "update/update_bins.cf",
