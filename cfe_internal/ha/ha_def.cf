@@ -1,0 +1,32 @@
+bundle common ha_def
+{
+ classes:
+   any::
+   "ha_enabled" expression => "!any";
+   #"ha_enabled" expression => "enterprise";
+
+ vars:
+  ha_enabled::
+   "config_file" string => "$(this.promise_dirname)/ha_info.json";
+   "ppkeys_staging" string => "$(sys.workdir)/ppkeys_staging";
+   "ppkeys_hubs" string => "$(sys.workdir)/ppkeys_hubs";
+
+   "config" data => readjson("$(config_file)", "4k");
+
+   "ips" slist => getindices("config");
+
+   "hub_sha[$(ips)]"
+      string => escape("root-SHA=$(config[$(ips)][sha]).pub"),
+      comment => "We need to construct an intermediary array so that we can
+                  extract a combined list of all hub keys.";
+
+   "hub_shas"
+     slist => getvalues("hub_sha"),
+     comment => "We use the list of hub key files for restricting clients access only to those";
+
+  reports:
+    verbose_mode::
+      "HA hub $(ips) $(config[$(ips)][sha])";
+}
+
+

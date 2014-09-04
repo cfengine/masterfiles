@@ -1,0 +1,15 @@
+{
+ "192.168.100.10":
+ {
+  "sha": "3e9df4ec8c9826eaa2c397f99eeae22e0a35a22307474d56f7fdedadff7dd485",
+  "internal_ip": "192.168.100.10",
+  "tags": ["node1"]
+ },
+ "192.168.100.11":
+ {
+  "sha": "37baa6f2f18a907131dadbf3e255d4ed0eda2f403e2123bab2c5f82f7ac8cd79",
+  "internal_ip": "192.168.100.11",
+  "tags": ["node2"]
+ }
+}
+

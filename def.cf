@@ -152,6 +152,15 @@ bundle common def
         "$(sys.workdir)/reports",
       };
 
+    # ha_enabled is defined in WORKDIR/cfe_internal/ha/ha_def.cf
+    # Disabled by default
+
+    ha_enabled::
+      "policy_servers" slist => {"$(sys.policy_hub)", @(ha_def.ips)};
+
+    !ha_enabled::
+      "policy_servers" slist => {"$(sys.policy_hub)"};
+
   classes:
 
       ### Enable special features policies. Set to "any" to enable.
@@ -192,6 +201,11 @@ bundle common def
       # Mission Portal to be able to troubleshoot failed Design Center
       # sketch activations on a host.
       "cfengine_internal_sudoers_editing_enable" expression => "!any";
+
+      # Class defining which versions of cfengine are (not) supported
+      # by this policy version.
+      # Also note that this policy will only be run on enterprise policy_server
+      "postgresql_maintenance_supported" expression => "(policy_server.enterprise.!cfengine_3_5.!ha_enabled)|(policy_server.enterprise.ha_enabled.hub_active)";
 
       # This class is for PosgreSQL maintenance
       # pre-defined to every Sunday at 2 a.m.
