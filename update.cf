@@ -7,6 +7,7 @@
 body common control
 {
       bundlesequence => {
+                          "ha_def",
                           "update_def",
                           "cfe_internal_dc_workflow",
                           "cfe_internal_update_policy",
@@ -17,6 +18,7 @@ body common control
       version => "update.cf 3.6.1";
 
       inputs => {
+                  "cfe_internal/ha/ha_def.cf",
                   "update/update_bins.cf",
                   "update/cfe_internal_dc_workflow.cf",
                   "update/cfe_internal_local_git_remote.cf",
@@ -42,9 +44,9 @@ body agent control
 bundle common update_def
 {
   vars:
-      "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf",
+      "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
                                        ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
-                                       ".*\.mustache", "cf_promises_release_id" },
+                                       "cf_promises_release_id", ".*\.json" },
       comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
       handle => "common_def_vars_input_name_patterns";
 
@@ -75,6 +77,15 @@ bundle common update_def
       "cf_apache_group" string => "cfapache",
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_group";
+
+    # ha_enabled is defined in WORKDIR/cfe_internal/ha/ha_def.cf
+    # Disabled by default
+
+    ha_enabled::
+      "policy_servers" slist => {"$(sys.policy_hub)", @(ha_def.ips)};
+
+    !ha_enabled::
+      "policy_servers" slist => {"$(sys.policy_hub)"};
 
   classes:
 

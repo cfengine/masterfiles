@@ -95,31 +95,51 @@ bundle server access_rules()
       "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
-      admit => { "$(sys.policy_hub)" };
+      admit => { @(def.policy_servers) };
+
+    policy_server.ha_enabled::
+      "$(sys.workdir)/ppkeys"
+      handle => "server_access_grant_access_ppkeys_hubs",
+      comment => "Grant access to ppkeys for HA hubs",
+      admit => { @(def.policy_servers) };
+
+      # When HA is enabled clients are updating active hub IP address
+      # using data stored in master_hub.dat file.
+      "$(sys.workdir)/state/master_hub.dat"
+      handle => "server_access_grant_access_policy_server_dat",
+      comment => "Grant access to policy_server.dat",
+      admit => { @(def.acl) };
+
+      # Hubs keys working in HA configuration are stored in ppkeys_hubs directory.
+      # In order to perform failover while active hub is down clients needs to
+      # have all hubs keys. This gives ability to connect to slave hub promoted to active role
+      # once active is down.
+      "$(sys.workdir)/ppkeys_hubs"
+      handle => "server_access_grant_access_to_clients",
+      comment => "Grant access to hubs' keys to clients",
+      admit => { @(def.acl) };
 
     windows::
       "c:\program files\cfengine\bin\cf-agent.exe"
       handle => "server_access_grant_access_agent",
       comment => "Grant access to the agent (for cf-runagent)",
-      admit   => { @(def.acl) };
+      admit   => { @(def.policy_servers) };
 
     !policy_server.enterprise::
-
       "$(query_types)"
       handle => "server_access_grant_$(query_types)_for_hosts",
       comment => "Grant $(query_types) reporting query for the hub on the hosts",
       resource_type => "query",
       report_data_select => default_data_select_host,
-      admit => { "$(sys.policy_hub)" };
+      admit => { @(def.policy_servers) };
 
     policy_server.enterprise::
-
       "$(query_types)"
       handle => "server_access_grant_$(query_types)_for_hub",
       comment => "Grant $(query_types) reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
-      admit => { "$(sys.policy_hub)" };
+      admit => { @(def.policy_servers) };
 
   roles:
 

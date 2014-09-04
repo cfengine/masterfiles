@@ -1,0 +1,127 @@
+bundle agent ha_main
+{
+ vars:
+  ha_enabled::
+   "policy_servers" slist => { @(ha_def.ips) };
+   "connected_servers" slist => filter("$(sys.policy_hub)", policy_servers, false, true, 10);
+
+ classes:
+   ha_enabled::
+    "ha_master_valid" expression => isvariable("sys.hub_active_ip");
+
+ methods:
+  policy_server.ha_enabled::
+    "sync_client_keys" usebundle => ha_hub_sync_clients_keys;
+    "copy_hubs_keys" usebundle => ha_hub_copy_hubs_keys;
+
+  policy_server.ha_enabled.!hub_active::
+    "sync_config_data" usebundle => ha_hub_sync_config_data;
+
+  policy_server.keys_staged::
+    "establish trust" usebundle => ha_update_staged_ppkeys;
+
+  !policy_server.ha_enabled::
+    "Copy hub keys to clients" usebundle => ha_node_sync_hub_keys;
+    "Write new master IP on hub" usebundle => update_master_ip_server;
+}
+
+bundle agent ha_hub_sync_config_data
+{
+ files:
+  "$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php"
+     copy_from => u_rcp("$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php", $(sys.hub_active_ip)),
+     comment => "",
+     handle => "ha_sync_robot_config";
+
+ "$(sys.workdir)/share/GUI/application/config/appsettings.php"
+     copy_from => u_rcp("$(sys.workdir)/share/GUI/application/config/appsettings.php", $(sys.hub_active_ip)),
+     comment => "",
+     handle => "ha_sync_appsettings_config";
+}
+
+bundle agent ha_hub_copy_hubs_keys
+{
+ files:
+   "$(ha_def.ppkeys_hubs)"
+      copy_from => no_backup_cp("$(sys.workdir)/ppkeys"),
+      file_select => hubs_keys_select,
+      comment => "Copy all hubs keys to directory accessible by clients",
+      handle => "ha_copy_hubs_keys",
+      depth_search => recurse("1"),
+      classes => if_repaired("hubs_keys_staged");
+}
+
+
+bundle agent update_master_ip_server
+{
+ files:
+ !policy_server::
+  "$(sys.workdir)/policy_server.dat"
+     copy_from => u_rcp("$(sys.workdir)/state/master_hub.dat", @(def.policy_servers)),
+     comment => "Update master hub IP on CFEngine node",
+     handle => "ha_cfengine_node_update_master";
+}
+
+bundle agent ha_hub_sync_clients_keys
+{
+ vars:
+   "exclude_files" slist => {"localhost.priv", "localhost.pub", @(ha_def.hub_shas)};
+ files:
+   "$(ha_def.ppkeys_staging)"
+      copy_from => no_backup_scp("$(sys.workdir)/ppkeys", @(ha_main.connected_servers)),
+      file_select => ex_list(@(exclude_files)),
+      comment => "Distribute all client keys between replica set servers",
+      handle => "ha_copy_client_keys_between_replica_set_servers",
+      depth_search => recurse("1"),
+      classes => if_repaired("keys_staged");
+}
+
+bundle agent ha_update_staged_ppkeys
+{
+ files:
+   "$(sys.workdir)/ppkeys"
+      copy_from => no_backup_cp("$(ha_def.ppkeys_staging)"),
+      file_select => plain,
+      comment => "Copy staged client keys to ppkeys",
+      handle => "ha_copy_staged_client_keys",
+      depth_search => recurse("1"),
+      classes => if_repaired("ppkeys_updated");
+}
+
+bundle agent ha_node_sync_hub_keys
+{
+  files:
+   !policy_server::
+    "$(sys.workdir)/ppkeys"
+      copy_from => no_backup_scp("$(ha_def.ppkeys_hubs)", @(def.policy_servers)),
+      file_select => hub_all_keys,
+      depth_search => u_recurse("inf"),
+      comment => "Distribute all hub keys to clients",
+      handle => "ha_copy_hub_keys_to_nodes",
+      classes => if_repaired("keys_copied_clients");
+}
+
+body file_select hub_all_keys
+{
+  leaf_name => {".*.pub"};
+  file_result => "leaf_name";
+}
+
+body file_select hubs_keys_select
+{
+ search_size => irange("426", "426");
+ leaf_name => {escape("root-SHA=$(ha_def.config[$(ha_main.connected_servers)][sha]).pub")};
+ file_result => "leaf_name";
+}
+
+
+body copy_from no_backup_scp(from,server)
+{
+ servers     => { "$(server)" };
+ source      => "$(from)";
+ compare     => "digest";
+ copy_backup => "false";
+ encrypt     => "true";
+ trustkey    => "true";
+}
+
