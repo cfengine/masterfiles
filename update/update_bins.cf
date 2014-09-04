@@ -282,14 +282,14 @@ bundle agent cfe_internal_update_bins
       "$(sys.workdir)/bin/cf-upgrade"
       comment => "Copy cf-upgrade binary from policy hub for i386 linux",
       handle => "cfe_internal_update_bins_files_cf_upgrade_i386_linux",
-      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.i386/cf-upgrade","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.i386/cf-upgrade", @(update_def.policy_servers)),
       perms => u_m("0755"),
       ifvarclass => "linux.i686";
 
       "$(sys.workdir)/bin/cf-upgrade"
       comment => "Copy cf-upgrade binary from policy hub for x86_64 linux",
       handle => "cfe_internal_update_bins_files_cf_upgrade_x86_64_linux",
-      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.x86_64/cf-upgrade","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.x86_64/cf-upgrade", @(update_def.policy_servers)),
       perms => u_m("0755"),
       ifvarclass => "linux.x86_64";
 
@@ -312,7 +312,7 @@ bundle agent cfe_internal_update_bins
       "$(local_software_dir)"
       comment => "Copy binary updates from master source on policy server",
       handle => "cfe_internal_update_bins_files_pkg_copy",
-      copy_from => u_pcp("$(master_software_location)/$(sys.flavour)_$(sys.arch)","$(sys.policy_hub)"),
+      copy_from => u_pcp("$(master_software_location)/$(sys.flavour)_$(sys.arch)", @(update_def.policy_servers)),
       depth_search => u_recurse("1"),  # Nova updates should be in root dir
       action => u_immediate,
       classes => u_if_repaired("bin_newpkg");

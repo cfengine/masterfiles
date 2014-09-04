@@ -156,7 +156,7 @@ bundle agent cfe_internal_update_policy
       "$(inputs_dir)/cf_promises_validated"
       comment => "Check whether a validation stamp is available for a new policy update to reduce the distributed load",
       handle => "cfe_internal_update_policy_check_valid_update",
-      copy_from => u_rcp("$(master_location)/cf_promises_validated","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(master_location)/cf_promises_validated", @(update_def.policy_servers)),
       action => u_immediate,
       classes => u_if_repaired("validated_updates_ready");
 
@@ -165,7 +165,7 @@ bundle agent cfe_internal_update_policy
       "$(modules_dir)"
       comment => "Always update modules files on client side",
       handle => "cfe_internal_update_policy_files_update_modules",
-      copy_from => u_rcp("$(modules_dir)","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(modules_dir)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
@@ -173,7 +173,7 @@ bundle agent cfe_internal_update_policy
       "$(plugins_dir)"
       comment => "Always update plugins files on client side",
       handle => "cfe_internal_update_policy_files_update_plugins",
-      copy_from => u_rcp("$(plugins_dir)","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(plugins_dir)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
@@ -183,7 +183,7 @@ bundle agent cfe_internal_update_policy
       "$(sys.workdir)\modules"
       comment => "Always update modules files on client side (Windows)",
       handle => "cfe_internal_update_policy_files_update_modules_windows",
-      copy_from => u_rcp("$(modules_dir)","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(modules_dir)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
@@ -191,7 +191,7 @@ bundle agent cfe_internal_update_policy
       "$(sys.workdir)\plugins"
       comment => "Always update plugins files on client side (Windows)",
       handle => "cfe_internal_update_policy_files_update_plugins_windows",
-      copy_from => u_rcp("$(plugins_dir)","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(plugins_dir)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
@@ -201,11 +201,19 @@ bundle agent cfe_internal_update_policy
       "$(inputs_dir)"
       comment => "Copy policy updates from master source on policy server if a new validation was acquired",
       handle => "cfe_internal_update_policy_files_inputs_dir",
-      copy_from => u_rcp("$(master_location)","$(sys.policy_hub)"),
+      copy_from => u_rcp("$(master_location)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       file_select  => u_input_files,
       action => u_immediate,
       classes => u_if_repaired("update_report");
+
+    !policy_server.ha_enabled::
+      "$(sys.workdir)/policy_server.dat"
+      comment => "Copy policy_server.dat file from server",
+      handle => "cfe_internal_update_ha_policy_server",
+      copy_from => u_rcp("$(sys.workdir)/state/master_hub.dat", @(update_def.policy_servers)),
+      action => u_immediate,
+      classes => u_if_repaired("replica_failover");  # not needed ?
 
     !windows::
 

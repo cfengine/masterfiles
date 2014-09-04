@@ -39,10 +39,6 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_setup_knowledge",
       comment => "Manage CFE Knowledge Map";
 
-      "hub" usebundle => cfe_internal_hub_maintain,
-      handle => "cfe_internal_management_hub_maintain",
-      comment => "Start the hub maintenance process";
-
       "hub" usebundle => cfe_internal_apache_sudoer,
       handle => "cfe_internal_management_apache_sudoer",
       comment => "Permit Apache user to run passwordless sudo cf-runagent";
@@ -55,6 +51,13 @@ bundle agent cfe_internal_management
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
 
+    # As passive hub is supposed to run read-only PostgreSQL instance 
+    # doing maintenance makes no sense and is not possible at all.
+    (am_policy_hub.enterprise.!ha_enabled)||(ha_enabled.hub_active)::
+
+      "hub" usebundle => cfe_internal_hub_maintain,
+      handle => "cfe_internal_management_hub_maintain",
+      comment => "Start the hub maintenance process";
       "hub" usebundle => cfe_internal_truncate_events,
       handle => "cfe_internal_truncate_events",
       comment => "To run CFE truncate to pending";
