@@ -92,6 +92,7 @@ bundle server access_rules()
       comment => "Grant access to plugins directory",
       admit => { @(def.acl) };
 
+    !windows::
       "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
