@@ -379,7 +379,8 @@ bundle agent cfe_internal_php_runalerts
 
   commands:
 
-    run_script::
+    # Run script only on active hub to not send duplicated alert emails.
+    (run_script.!ha_enabled)||(run_script.ha_enabled.hub_active)::
 
       "$(runalerts_script) > /dev/null < /dev/null 2>&1 &"
       comment => "to run php alerts script",
