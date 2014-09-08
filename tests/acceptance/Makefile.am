@@ -13,4 +13,6 @@ endif
 check_SCRIPTS=testall
 testall: copy env
 
-TESTS = testall
+TESTS =
+check-local:
+	@+MAKE=$(MAKE) ./testall
