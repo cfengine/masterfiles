@@ -315,6 +315,7 @@ bundle common paths
       "path[diff]"          string => "/usr/bin/diff";
       "path[dig]"           string => "/usr/bin/dig";
       "path[domainname]"    string => "/bin/domainname";
+      "path[dscl]"          string => "/usr/bin/dscl";
       "path[echo]"          string => "/bin/echo";
       "path[egrep]"         string => "/usr/bin/egrep";
       "path[find]"          string => "/usr/bin/find";
