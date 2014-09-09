@@ -103,6 +103,27 @@ bundle server access_rules()
       comment => "Grant access to ppkeys for HA hubs",
       admit => { @(def.policy_servers) };
 
+      # Allow slave hub to synchronize cf_robot and appsettings content.
+      # Files are containing configuration that must be the same on all hubs.
+      "$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php"
+      handle => "server_access_grant_access_cf_robot",
+      comment => "Grant access to cf_robot file for HA hubs",
+      admit => { @(def.policy_servers) };
+
+      "$(sys.workdir)/share/GUI/application/config/appsettings.php"
+      handle => "server_access_grant_access_appsettings",
+      comment => "Grant access to appsettings for HA hubs",
+      admit => { @(def.policy_servers) };
+      
+      # Allow access to notification_scripts directory so passive hub
+      # will be able to synchronize its content. Once passive hub will
+      # be promoted to act as a master all the custom scripts will be
+      # accessible.
+      "/opt/cfengine/notification_scripts"
+      handle => "server_access_grant_access_notification scripts",
+      comment => "Grant access tonotification scripts",
+      admit => { @(def.policy_servers) };
+
       # When HA is enabled clients are updating active hub IP address
       # using data stored in master_hub.dat file.
       "$(sys.workdir)/state/master_hub.dat"
