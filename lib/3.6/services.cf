@@ -229,17 +229,17 @@ bundle agent standard_services(service,state)
 }
 
 bundle agent classic_services(service,state)
-# @brief Standard services bundle, used by CFEngine by default
+# @brief Classic services bundle
 # @author CFEngine AS
 # @author Tero Kantonen <prkele@gmail.com>
 # @param service specific service to control
 # @param state desired state for that service
 #
-# This bundle is used by CFEngine if you don't specify a services
-# handler explicitly.
+# This bundle is used by `standard_services` if it doesn't have an
+# automatic driver for the current service manager.
 #
 # It receives the service name and the desired service state, then
-# does the needful to reach the desired state..
+# does the needful to reach the desired state.
 #
 # **Example:**
 #
