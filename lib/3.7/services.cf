@@ -166,6 +166,13 @@ bundle agent standard_services(service,state)
       expression => returnszero("$(paths.chkconfig) $(service)", "noshell"),
       comment => "We need to know if the service is configured to start at boot or not";
 
+      # We redirect stderr and stdout to dev null so that we do not create noise in the logs
+      "chkconfig_$(service)_unregistered"
+      not => returnszero("$(paths.chkconfig) --list $(service) &> /dev/null", "useshell"),
+      comment => "We need to know if the service is registered with chkconfig so that we can
+      perform other chkconfig operations, if the service is not registered it must be added.
+      Note we do not automatically try to add the service at this time.";
+
   commands:
     systemd:: # note this class is defined in `inventory/linux.cf`
       # conveniently, systemd states map to `services` states, except
@@ -185,12 +192,13 @@ bundle agent standard_services(service,state)
       contain => silent;
 
     chkconfig.start.!onboot::
-      # Only chkconfig enable service if it's not already set to start on boot
+      # Only chkconfig enable service if it's not already set to start on boot, and if its a registered chkconfig service
       "$(paths.chkconfig) $(service) $(chkconfig_mode)"
+      ifvarclass => canonify("!chkconfig_$(service)_unregistered"),
       classes => kept_successful_command,
       contain => silent;
 
-    chkconfig.have_init.((start.!running)|(stop.running)).non_disabling::
+    chkconfig.have_init.((start.!running)|((stop|restart|reload).running)).non_disabling::
       "$(init) $(state)"
       classes => kept_successful_command,
       contain => silent;
@@ -216,10 +224,10 @@ bundle agent standard_services(service,state)
       "$(this.bundle): using systemd layer to $(state) $(service)";
     inform_mode.chkconfig::
       "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))"
-        ifvarclass => canonify("chkconfig_$(service)_registered");
+        ifvarclass => canonify("!chkconfig_$(service)_unregistered");
     inform_mode.chkconfig::
-      "$(this.bundle): skipping chkconfig layer to $(state) $(service) because $(service) is not registered with chkconfig (chkconfig mode $(chkconfig_mode))"
-        ifvarclass => not(canonify("!chkconfig_$(service)_registered"));
+      "$(this.bundle): skipping chkconfig layer to $(state) $(service) because $(service) is not registered with chkconfig (chkconfig --list $(service))"
+        ifvarclass => canonify("chkconfig_$(service)_unregistered");
     inform_mode.sysvservice::
       "$(this.bundle): using System V service / Upstart layer to $(state) $(service)";
     inform_mode.smf::
