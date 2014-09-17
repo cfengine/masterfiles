@@ -40,6 +40,7 @@ bundle agent cfe_internal_update_folders
       "dirs" slist => {
                         "aix_5_powerpc",
                         "aix_6_powerpc",
+                        "aix_6.1_powerpc",
                         "aix_7_powerpc",
                         "ubuntu_8_i686",
                         "ubuntu_8_x86_64",
