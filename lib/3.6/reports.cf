@@ -68,5 +68,5 @@ body report_data_select default_data_select_policy_hub
 {
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
-
+      monitoring_include => { "" };
 }
