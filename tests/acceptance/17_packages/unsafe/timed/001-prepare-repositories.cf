@@ -3,15 +3,15 @@
 # Not really a test, but a preparation policy for running other package
 # tests. It sets up the required files for accessing our local package
 # repository.
-# It MUST run before the other tests in this directory.
+# It MUST run before the other tests in the unsafe packages directory.
 #
 ########################################################################
 
 body common control
 {
-  inputs => { "../../dcs.cf.sub",
-              "../../../../$(sys.local_libdir)/files.cf",
-              "../../../../$(sys.local_libdir)/commands.cf"
+  inputs => { "../../../dcs.cf.sub",
+              "../../../../../$(sys.local_libdir)/files.cf",
+              "../../../../../$(sys.local_libdir)/commands.cf"
             };
   bundlesequence => { default("$(this.promise_filename)") };
 }
@@ -34,7 +34,7 @@ bundle agent test
 bundle common global
 {
   vars:
-    "cwd" string => "$(this.promise_dirname)";
+    "resources" string => dirname("$(this.promise_dirname)");
 }
 
 body contain useshell
@@ -93,12 +93,12 @@ bundle edit_line repository
     redhat|suse::
       "[test-repository]";
       "name=Test repository";
-      "baseurl=file://$(global.cwd)/rpm_repo";
+      "baseurl=file://$(global.resources)/rpm_repo";
       "enabled=1";
       "gpgcheck=0";
     debian::
-      "deb file://$(global.cwd)/deb_repo1 package1 main";
-      "deb file://$(global.cwd)/deb_repo2 package2 main";
+      "deb file://$(global.resources)/deb_repo1 package1 main";
+      "deb file://$(global.resources)/deb_repo2 package2 main";
 }
 
 body edit_defaults edit_defaults
@@ -117,7 +117,7 @@ bundle agent signing_keys
 
   commands:
     debian::
-      "gpg --no-default-keyring --keyring $(global.cwd)/gpg/pubring.gpg --export \
+      "gpg --no-default-keyring --keyring $(global.resources)/gpg/pubring.gpg --export \
        | gpg --no-default-keyring --primary-keyring /etc/apt/trusted.gpg --import"
         contain => useshell,
         classes => if_successful("signing_keys_ok");
