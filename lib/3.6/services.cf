@@ -200,7 +200,6 @@ bundle agent standard_services(service,state)
 
     chkconfig.have_init.((start.!running)|((stop|restart|reload).running)).non_disabling::
       "$(init) $(state)"
-      classes => kept_successful_command,
       contain => silent;
 
     sysvservice.non_disabling::
