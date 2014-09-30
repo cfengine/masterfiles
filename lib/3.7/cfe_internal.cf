@@ -127,7 +127,7 @@ bundle agent cfe_internal_hub_maintain
                                                      },
                                                      {
                                                          "report": "diagnostics",
-                                                         "table": "__Diagnostics",
+                                                         "table": "Diagnostics",
                                                          "history_length_days": 1,
                                                          "time_key": "TimeStamp"
                                                      }
