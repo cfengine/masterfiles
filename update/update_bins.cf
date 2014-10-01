@@ -245,6 +245,19 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
+    !am_policy_hub.aix.enterprise::
+
+      "$(novapkg)"
+      comment => "Update Nova package to a newer version (package is there)",
+      handle => "cfe_internal_update_bins_packages_nova_update_aix_only_pkg_there",
+      package_policy => "update",
+      package_select => "==",            # picks the newest Nova available
+      package_architectures => { "$(pkgarch)" },
+      package_version => "3.6.2.0",       # Install new Nova anyway
+      package_method => u_generic( "$(local_software_dir)" ),
+      ifvarclass => "nova_edition.have_software_dir",
+      classes => u_if_else("bin_update_success", "bin_update_fail");
+
       #
 
   files:
