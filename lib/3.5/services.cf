@@ -70,6 +70,106 @@ body service_method force_deps
 
 ##
 
+###### BEGIN ######
+#
+# Bryan Burke
+# bburke@baburke.net
+#
+# service_method that, in conjunction with the custom_service_bundle(), is
+# designed to manage services that are not widely supported yet; at the moment,
+# this is systemd-style services only
+body service_method custom_service
+{
+    service_autostart_policy => "none";
+    service_bundle => custom_service_bundle("$(this.promiser)", "$(this.service_policy)");
+
+}
+
+bundle agent custom_service_bundle(service, state)
+{
+    methods:
+        fedora_18|fedora_19|redhat_7::
+            "SystemdService" usebundle => systemd_service("$(service)", "$(state)");
+}
+
+# Service bundle which handles systemd services.
+# It attempts to query the services for its capabilities (whether it can be
+# started, stopped, or reloaded), then make a decision about what it should do.
+#
+# Some things it does:
+# - Enables/disables a service if a start/stop is requested and the service is
+#   not currently enabled/disabled (this strikes me as convergent behavior, but
+#   others might disagree)
+# - It attempts to detect the current state (active, enabled, inactive,
+#   disabled) and does nothing if we're already in that state.
+# - If a reload is requested, and the service does not support reloading, it
+#   does a restart instead.
+bundle agent systemd_service(service,state)
+{
+  vars:
+    redhat_7|fedora_18|fedora_19::
+      "systemctl_path" string => "/bin/systemctl";
+
+      # On my systems, I'm seeing 115 or so lines of output... giving some wiggle room
+      "systemd_service_info" slist => splitstring(execresult("$(call_systemctl) show $(service)", "noshell"), "\n", "150");
+
+  classes:
+      "service_enabled" expression => reglist(@(systemd_service_info), "UnitFileState=enabled");
+      "service_active"  expression => reglist(@(systemd_service_info), "ActiveState=active");
+
+      "can_stop_service"   expression => reglist(@(systemd_service_info), "CanStop=yes");
+      "can_start_service"  expression => reglist(@(systemd_service_info), "CanStart=yes");
+      "can_reload_service" expression => reglist(@(systemd_service_info), "CanReload=yes");
+
+      "request_start"   expression => strcmp("start", "$(state)");
+      "request_stop"    expression => strcmp("stop", "$(state)");
+      "request_reload"  expression => strcmp("reload", "$(state)");
+      "request_restart" expression => strcmp("restart", "$(state)");
+
+      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart)";
+      "action_start"   expression => "request_start.!service_active.can_start_service";
+      "action_enable"  expression => "request_start.!service_enabled";
+      "action_stop"    expression => "request_stop.service_active.can_stop_service";
+      "action_disable" expression => "request_stop.service_enabled";
+      "action_reload"  expression => "request_reload.service_active.can_reload_service";
+      "action_restart"         or => {
+                                      "request_restart.service_active",
+
+                                      # Possibly undesirable... if a reload is
+                                      # requested, and the service "can't" be
+                                      # reloaded, then we restart it instead.
+                                      "request_reload.!can_reload_service.service_active",
+                                     };
+
+  commands:
+    action_start::
+      "$(systemctl_path) -q start $(service)";
+
+    action_enable::
+      "$(systemctl_path) -q enable $(service)";
+
+    action_stop::
+      "$(systemctl_path) -q stop $(service)";
+
+    action_reload::
+      "$(systemctl_path) -q reload $(service)";
+
+    action_restart::
+      "$(systemctl_path) -q restart $(service)";
+
+    action_disable::
+      "$(systemctl_path) -q disable $(service)";
+
+    action_custom::
+      "$(systemctl_path) $(state) $(service)";
+
+  reports:
+    inform_mode::
+      "Setting systemd service $(service) -> $(state)";
+}
+
+###### END ######
+
 bundle agent standard_services(service,state)
 {
       # DATA,
