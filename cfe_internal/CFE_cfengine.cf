@@ -7,6 +7,27 @@
 # and/or recommendation is needed.
 #
 ##################################################################
+
+bundle common cfe_internal_file_control
+# @brief Specify additional files needed for CFEngine self management
+{
+  meta:
+      "description"
+        string => "Specify additional files needed for CFEngine self management";
+
+  vars:
+      "inputs"
+        slist => {
+                   "$(this.promise_dirname)/postgres/pg_data_space_buffer.cf",
+                 };
+}
+
+body file control
+# @brief Include additional files needed for CFEngine self management
+{
+  inputs => { @(cfe_internal_file_control.inputs) };
+}
+
 ##################################################################
 #
 # cfe_internal_management
@@ -50,6 +71,11 @@ bundle agent cfe_internal_management
       "hub" usebundle => cfe_internal_php_runalerts,
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
+
+      "hub" usebundle => cfe_internal:pg_data_space_buffer,
+      handle => "cfe_internal_pg_data_space_buffer",
+      comment => "Ensure there is some reserved space in case of full disk and
+                 database repair is required";
 
     # As passive hub is supposed to run read-only PostgreSQL instance 
     # doing maintenance makes no sense and is not possible at all.
