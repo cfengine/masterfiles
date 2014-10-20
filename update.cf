@@ -129,6 +129,23 @@ bundle common update_def
 
       "cfengine_internal_preserve_permissions" expression => "!any";
 
+      # Disable checking of cf_promises_validated before updating clients.
+      # Disabling checking of cf_promises_validated ensures that remote agents
+      # will **always** scan all of masterfiles for any changes and update
+      # accordingly. This is not recommended as it both removes a safety
+      # mechanism that checks for policy to be valid before allowing clients to
+      # download updates, and the increased load on the hub will affect
+      # scalability. Consider using time_based, select_class, or dist based classes
+      # instead of any to retain some of the benefits. **DISABLE WITH CAUTION**
+
+      "cfengine_internal_disable_cf_promises_validated"
+        expression => "!any",
+        comment => "When cf_promises_validated is disabled remote agents will
+                   always scan all of masterfiles for changes. Disabling this
+                   is not recomended as it will increase the load on the policy
+                   server and increases the possibility for remote agents to
+                   recieve broken policy.";
+
 }
 
 body classes u_kept_successful_command

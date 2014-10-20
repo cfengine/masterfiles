@@ -114,6 +114,11 @@ bundle agent cfe_internal_update_policy
 
       "have_bindir_$(optional_agents)" expression => fileexists("$(dir_bin)/$(optional_agents)");
 
+      "validated_updates_ready"
+        expression => "cfengine_internal_disable_cf_promises_validated",
+        comment => "If cf_promises_validated is disabled, then updates are
+                    always considered validated.";
+
     any::
 
       "have_ppkeys"   expression => fileexists("$(ppkeys_file)"),
