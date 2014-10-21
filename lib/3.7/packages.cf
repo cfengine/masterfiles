@@ -559,6 +559,15 @@ body package_method apt_get_permissive
 # This package method interacts with the APT package manager through
 # `apt-get`.
 #
+# Normally you have to specify the package version, and it defaults to
+# `*`, which then triggers the bug of installing `xyz-abc` when you ask for `xyz`.
+#
+# This "permissive" body sets
+#
+#    package_name_convention => "$(name)";
+#
+# which is permissive in the sense of not requiring the version.
+#
 # **Example:**
 #
 # ```cf3
@@ -927,6 +936,15 @@ body package_method yum_rpm_permissive
 # `rpm` instead of `yum` to list installed packages. It can't delete
 # packages and can't take a target version or architecture, so only
 # the "add" and "addupdate" methods should be used.
+#
+# Normally you have to specify the package version, and it defaults to
+# `*`, which then triggers the bug of installing `xyz-abc` when you ask for `xyz`.
+#
+# This "permissive" body sets
+#
+#    package_name_convention => "$(name)";
+#
+# which is permissive in the sense of not requiring the version.
 #
 # **Example:**
 #
