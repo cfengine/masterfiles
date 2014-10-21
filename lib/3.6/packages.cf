@@ -144,7 +144,7 @@ bundle common redhat_knowledge
       "call_yum" string => "$(paths.path[yum])";
 
       # on RHEL 4, Yum doesn't know how to be --quiet
-      "yum_options" string => ifelse("redhat_4", "",
+      "yum_options" string => ifelse("centos_4|redhat_4", "",
                                      "--quiet");
 
       # yum check-update prints a lot of extra useless lines, but the format of
