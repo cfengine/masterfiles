@@ -486,7 +486,7 @@ bundle common u_common_knowledge
 # @see common_knowledge
 {
   vars:
-      "list_update_ifelapsed_now" string => "0";
+      "list_update_ifelapsed_now" string => "10080";
 }
 
 ################################################################################
