@@ -115,7 +115,7 @@ bundle common def
     any::
       "base_log_files" slist =>
       {
-        "$(sys.workdir)/cf3.$(sys.host).runlog",
+        "$(sys.workdir)/cf3.$(sys.uqhost).runlog",
         "$(sys.workdir)/promise_summary.log",
       };
 
