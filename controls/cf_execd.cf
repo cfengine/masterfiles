@@ -15,8 +15,8 @@ body executor control
       splaytime  => "4";
 
     cfengine_internal_agent_email::
-      mailto     => "root@$(def.domain)";
-      mailfrom   => "root@$(sys.uqhost).$(def.domain)";
+      mailto     => "$(def.mailto)";
+      mailfrom   => "$(def.mailfrom)";
       smtpserver => "localhost";
 
     any::
