@@ -21,6 +21,10 @@ bundle common def
       comment => "Define a global domain for all hosts",
       handle => "common_def_vars_domain";
 
+      # Mail settings used by body executor control found in controls/cf_execd.cf
+      "mailto" string => "root@$(def.domain)";
+      "mailfrom" string => "root@$(sys.uqhost).$(def.domain)";
+
       # List here the IP masks that we grant access to on the server
 
       "acl"     slist => {
