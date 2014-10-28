@@ -9,4 +9,9 @@ srcdir=`dirname $0`
 autoreconf -Wno-portability --force --install -I m4  ||  exit $?
 
 cd $ORIGDIR
-[ -z "$NO_CONFIGURE" ] && $srcdir/configure --enable-maintainer-mode "$@"
+if [ -z "$NO_CONFIGURE" ]
+then
+    $srcdir/configure --enable-maintainer-mode "$@"  ||  exit $?
+fi
+
+exit 0
