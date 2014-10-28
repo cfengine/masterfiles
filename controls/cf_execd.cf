@@ -17,7 +17,7 @@ body executor control
     cfengine_internal_agent_email::
       mailto     => "$(def.mailto)";
       mailfrom   => "$(def.mailfrom)";
-      smtpserver => "localhost";
+      smtpserver => "$(def.smtpserver)";
 
     any::
 
