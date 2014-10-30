@@ -274,16 +274,16 @@ bundle edit_line change_appsettings(p)
   replace_patterns:
 
     original_config::
-      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+\$_SERVER\['SERVER_NAME'\]\s+\.\s+'(?!/api).*"
+      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+'localhost'\s+\.\s+'(?!/api).*"
       comment => "Match a line and replace",
       handle => "cfe_internal_change_appsetting_replace_patterns_port_80",
-      replace_with => value("    $config['rest_server'] = $protocol . $_SERVER['SERVER_NAME'] . '/api';");
+      replace_with => value("    $config['rest_server'] = $protocol . 'localhost' . '/api';");
 
     !original_config::
-      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+\$_SERVER\['SERVER_NAME'\]\s+\.\s+'(?!\:$(p)/api).*"
+      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+\'localhost'\s+\.\s+'(?!\:$(p)/api).*"
       comment => "Match a line and replace",
       handle => "cfe_internal_change_appsetting_replace_patterns_not_port_80",
-      replace_with => value("    $config['rest_server'] = $protocol . $_SERVER['SERVER_NAME'] . ':$(p)/api';");
+      replace_with => value("    $config['rest_server'] = $protocol . 'localhost' . ':$(p)/api';");
 
 }
 
