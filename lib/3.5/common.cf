@@ -205,6 +205,7 @@ body classes if_ok_cancel(x)
 
 body classes cmd_repair(code,cl)
 {
+      kept_returncodes => { "0" };
       repaired_returncodes => { "$(code)" };
       promise_repaired => { "$(cl)" };
 }

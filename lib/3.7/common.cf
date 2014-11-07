@@ -248,6 +248,7 @@ body classes cmd_repair(code,cl)
 #
 # **See also:** `repaired_returncodes`
 {
+      kept_returncodes => { "0" };
       repaired_returncodes => { "$(code)" };
       promise_repaired => { "$(cl)" };
 }
