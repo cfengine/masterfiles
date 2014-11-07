@@ -3,12 +3,42 @@ bundle common inventory_redhat
 #
 # This common bundle is for Red Hat Linux inventory work.
 {
+  vars:
+    "oracle_hard_classes"
+      slist => classesmatching( "oracle",
+                                "hardclass", "inventory",
+                                "attribute_name=none", "source=agent"),
+      comment => "Find out of any hard oracle classes exist, simply using
+                  oracle opens the possibilty for an incorrect os
+                  classification in the event someone uses oracle as a
+                  hostname, or to indicate the presense of an oracle
+                  database.";
+
   classes:
-      "redhat_pure" expression => "redhat.!centos",
+      "oracle_linux"
+        expression => isgreaterthan(length(oracle_hard_classes), 0);
+
+      "redhat_pure" expression => "redhat.!(centos|oracle_linux)",
       comment => "pure Red Hat",
       meta => { "inventory", "attribute_name=none" };
 
       "redhat_derived" expression => "redhat.!redhat_pure",
       comment => "derived from Red Hat",
       meta => { "inventory", "attribute_name=none" };
+
+ reports:
+    redhat_pure.inform_mode::
+      "I am pure redhat";
+
+    redhat_derived.inform_mode::
+      "I am derived from redhat";
+
+    !redhat_pure.oracle_linux.inform_mode::
+      "I am an oracle linux box";
+
+    centos.inform_mode::
+      "I am a centos box";
+
+    redhat.!(centos|oracle_linux|redhat_pure).inform_mode::
+      "I need some additional instriumentation to better know myself";
 }
