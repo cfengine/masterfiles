@@ -55,6 +55,18 @@ bundle common def
       },
       comment => "Define from which machines keys can be trusted";
 
+
+  debian::
+      "environment_vars"
+        handle => "common_def_vars_environment_vars",
+        comment => "Environment variables of the agent process. The values
+                    of environment variables are inherited by child commands.",
+        slist => {
+                   "DEBIAN_FRONTEND=noninteractive",
+                  # "APT_LISTBUGS_FRONTEND=none",
+                  # "APT_LISTCHANGES_FRONTEND=none",
+                 };
+
       # End change #
 
   cfengine_3_5::
