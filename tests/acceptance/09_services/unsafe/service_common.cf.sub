@@ -1,0 +1,39 @@
+bundle common service_common
+{
+vars:
+
+  redhat|centos::
+    "service_name" string => "ntpd";
+}
+
+
+bundle agent service_is_running(name, true_class, false_class)
+{
+commands:
+
+  redhat_6|centos_6::
+    "/sbin/service $(name) status"
+      contain => silent,
+      classes => service_status_running_returncode("$(true_class)", "$(false_class)");
+
+}
+
+
+bundle agent service_stop(name)
+{
+commands:
+
+  redhat_6|centos_6::
+    "/sbin/service $(name) stop"
+      contain => silent;
+
+}
+
+
+body classes service_status_running_returncode(running_class, stopped_class)
+{
+      kept_returncodes => { "0" };
+      repaired_returncodes => { "3" };
+      promise_kept=> { "$(running_class)" };
+      promise_repaired => { "$(stopped_class)" };
+}
