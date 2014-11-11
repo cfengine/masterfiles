@@ -83,9 +83,11 @@ bundle common paths
       "path[git]"      string => "/usr/bin/git";
 
     !(freebsd|darwin|smartos)::
-      "path[getfacl]"  string => "/usr/bin/getfacl";
       "path[npm]"      string => "/usr/bin/npm";
       "path[pip]"      string => "/usr/bin/pip";
+
+    !(freebsd|darwin)::
+      "path[getfacl]"  string => "/usr/bin/getfacl";
 
     freebsd|darwin::
       "path[npm]"      string => "/usr/local/bin/npm";
