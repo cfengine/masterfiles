@@ -142,12 +142,15 @@ bundle common redhat_knowledge
       "default_arch" string => $(sys.arch);
 
       "call_yum" string => "$(paths.path[yum])";
+      "call_rpmvercmp" string => "$(sys.bindir)/rpmvercmp";
 
       # on RHEL 4, Yum doesn't know how to be --quiet
       "yum_options" string => ifelse("centos_4|redhat_4", "",
                                      "--quiet");
       "yum_offline_options" string => "$(yum_options) -C";
 
+      "yum_compare_equal" string => "$(call_rpmvercmp) '$(v1)' eq '$(v2)'";
+      "yum_compare_less" string => "$(call_rpmvercmp)  '$(v1)' lt '$(v2)'";
       # yum check-update prints a lot of extra useless lines, but the format of
       # the actual package lines is:
       #
@@ -869,6 +872,8 @@ body package_method yum
       package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps";
       package_verify_command => "$(rpm_knowledge.call_rpm) -V";
       package_noverify_returncode => "1";
+      package_version_less_command => "$(redhat_knowledge.yum_compare_less)";
+      package_version_equal_command => "$(redhat_knowledge.yum_compare_equal)";
 }
 
 ##
