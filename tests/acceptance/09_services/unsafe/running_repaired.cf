@@ -22,6 +22,9 @@ body common control
 
 bundle agent init
 {
+  meta:
+    "test_skip_needs_work" string => "!(redhat_6|centos_6)";
+
   methods:
     "" usebundle => service_stop( $(service_common.service_name) );
 }
