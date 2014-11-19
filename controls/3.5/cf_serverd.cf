@@ -69,7 +69,6 @@ bundle server access_rules()
 
       "$(def.dir_masterfiles)"
       handle => "server_access_grant_access_policy",
-      shortcut => "masterfiles",
       comment => "Grant access to the policy updates",
       admit => { @(def.acl) };
 
