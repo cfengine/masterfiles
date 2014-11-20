@@ -1,7 +1,11 @@
-#######################################################
-#
-# Test remove named package
-#
+bundle common test_meta
+{
+  vars:
+      "description" string => "Test that a package which is installed gets removed";
+      "story_id" string => "5514";
+      "covers" string => "operational_repaired";
+}
+
 #######################################################
 
 body common control
@@ -60,13 +64,11 @@ bundle agent test
         debian::
             "$(package_name)"
             package_policy => "delete",
-            package_method => apt_get,
             classes => test_set_class("pass","fail");
 
     redhat|suse::
         "$(package_name)"
         package_policy => "delete",
-        package_method => yum_rpm,
         classes => test_set_class("pass","fail");
 }
 
