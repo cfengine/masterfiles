@@ -1,47 +1,52 @@
 bundle agent ha_main
 {
  vars:
-  ha_enabled::
+  enable_cfengine_enterprise_hub_ha::
    "policy_servers" slist => { @(ha_def.ips) };
    "connected_servers" slist => filter("$(sys.policy_hub)", policy_servers, false, true, 10);
 
  classes:
-   ha_enabled::
+   enable_cfengine_enterprise_hub_ha::
     "ha_master_valid" expression => isvariable("sys.hub_active_ip");
 
  methods:
   policy_server.enterprise::
-    "manage_mp_ha_enabled_file" usebundle => ha_manage_mp_status_file;
+    "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_mp_status_file;
 
-  policy_server.ha_enabled::
+  policy_server.enable_cfengine_enterprise_hub_ha::
     "sync_client_keys" usebundle => ha_hub_sync_clients_keys;
     "copy_hubs_keys" usebundle => ha_hub_copy_hubs_keys;
 
-  policy_server.ha_enabled.!hub_active::
+  policy_server.enable_cfengine_enterprise_hub_ha.!hub_active::
     "sync_config_data" usebundle => ha_hub_sync_config_data;
 
   policy_server.keys_staged::
     "establish trust" usebundle => ha_update_staged_ppkeys;
 
-  !policy_server.ha_enabled::
+  !policy_server.enable_cfengine_enterprise_hub_ha::
     "Copy hub keys to clients" usebundle => ha_node_sync_hub_keys;
     "Write new master IP on hub" usebundle => update_master_ip_server;
 }
 
-# ha_enabled file is used by MP as a first test to figure out if
-# HA functionality is switched on or not. Based on existence of this 
+# enable_cfengine_enterprise_hub_ha file is used by MP as a first test to figure out if
+# HA functionality is switched on or not. Based on existence of this
 # file further actions are performed.
 bundle agent ha_manage_mp_status_file
 {
  files:
-  policy_server.!ha_enabled::
-    "$(sys.workdir)/httpd/htdocs/ha_enabled"
-      delete => tidy;
+  policy_server.!enable_cfengine_enterprise_hub_ha::
+    "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal" }
+      delete => tidy,
+      comment => "If this file is present when HA is not enabled
+                  Mission Portal will incorrectly report HA status.";
 
-  policy_server.ha_enabled::
-    "$(sys.workdir)/httpd/htdocs/ha_enabled"
+  policy_server.enable_cfengine_enterprise_hub_ha::
+    "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal" }
      create => "true",
-     perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group));
+     perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group)),
+     comment => "This file is used by mission portal to know that HA
+                 is enabled. Without it the UI will not report the
+                 correct HA status.";
 }
 
 bundle agent ha_hub_sync_config_data
