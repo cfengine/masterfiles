@@ -12,7 +12,7 @@ body common control
                         # Common bundle first (Best Practice)
                           inventory_control,
                           @(inventory.bundles),
-                          ha_def,
+                          @(cfengine_enterprise.def),
                           def,
                           cfe_internal_hub_vars,
 
@@ -26,13 +26,13 @@ body common control
                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
                           service_catalogue,
-                          ha_main,
+                          @(cfengine_enterprise.bundles),
 
       };
 
       inputs => {
                  # File definition for global variables and classes
-                  "cfe_internal/ha/ha_def.cf",
+                  @(cfengine_enterprise.inputs),
                   "def.cf",
 
                 # Inventory policy
@@ -69,7 +69,6 @@ body common control
 
                 # List of services here
                   "services/file_change.cf",
-                  "cfe_internal/ha/ha.cf"
 
       };
 
@@ -132,6 +131,30 @@ bundle common inventory
 }
 
       #
+
+bundle common cfengine_enterprise
+# @brief Inputs specific to CFEngine Enterpise
+{
+  vars:
+    enable_cfengine_enterprise_hub_ha::
+      "input[ha_main]"
+        string => "cfe_internal/ha/ha.cf";
+      "input[ha_def]"
+        string => "cfe_internal/ha/ha_def.cf";
+
+      "def"
+        slist => { "ha_def" };
+
+      "bundles"
+        slist => { "ha_main" };
+
+      "inputs" slist => getindices(input);
+
+    !enable_cfengine_enterprise_hub_ha::
+      "inputs" slist => { };
+      "def" slist => { "$(this.bundle)" };
+      "bundles" slist => { "$(this.bundle)" };
+}
 
 bundle common cfengine_stdlib
 {
