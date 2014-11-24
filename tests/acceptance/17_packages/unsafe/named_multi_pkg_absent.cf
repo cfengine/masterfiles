@@ -1,7 +1,11 @@
-#######################################################
-#
-# Test remove multiple packages
-#
+bundle common test_meta
+{
+  vars:
+      "description" string => "Test that multiple packages which are installed get removed";
+      "story_id" string => "5514";
+      "covers" string => "operational_repaired";
+}
+
 #######################################################
 
 body common control
@@ -63,14 +67,12 @@ bundle agent test
 
             "$(package_name)"
             package_policy => "delete",
-            package_method => apt_get,
             classes => test_set_class("pass_$(package_name)","fail_$(package_name)");
 
         redhat|suse::
 
             "$(package_name)"
             package_policy => "delete",
-            package_method => yum_rpm,
             classes => test_set_class("pass_$(package_name)","fail_$(package_name)");
 
 }

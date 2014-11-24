@@ -1,7 +1,11 @@
-#######################################################
-#
-# Test add named package
-#
+bundle common test_meta
+{
+  vars:
+      "description" string => "Test that a package not installed gets installed";
+      "story_id" string => "5513";
+      "covers" string => "operational_repaired";
+}
+
 #######################################################
 
 body common control
@@ -47,21 +51,18 @@ bundle agent test
 
 	    "$(package_name)"
             package_policy => "add",
-            package_method => apt_get,
             classes => test_set_class("pass","fail");
 
         redhat::
 
             "$(package_name)"
             package_policy => "add",
-            package_method => yum_rpm,
             classes => test_set_class("pass","fail");
 
         suse::
 
             "$(package_name)"
             package_policy => "add",
-            package_method => zypper,
             classes => test_set_class("pass","fail");
 }
 
