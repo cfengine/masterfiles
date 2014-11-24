@@ -175,7 +175,7 @@ bundle common cfengine_controls
                           "controls/cf_hub.cf",
                           "controls/cf_monitord.cf",
                           "controls/cf_runagent.cf",
-                          "controls/cf_serverd.cf",
+                          "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_serverd.cf",
       };
 
   reports:
