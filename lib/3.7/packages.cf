@@ -146,6 +146,7 @@ bundle common redhat_knowledge
       # on RHEL 4, Yum doesn't know how to be --quiet
       "yum_options" string => ifelse("centos_4|redhat_4", "",
                                      "--quiet");
+      "yum_offline_options" string => "$(yum_options) -C";
 
       # yum check-update prints a lot of extra useless lines, but the format of
       # the actual package lines is:
@@ -842,7 +843,7 @@ body package_method yum
 {
       package_changes => "bulk";
       package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
 
       package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
       package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
@@ -896,7 +897,7 @@ body package_method yum_rpm
 {
       package_changes => "bulk";
       package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
 
       package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
       package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
@@ -955,7 +956,7 @@ body package_method yum_rpm_permissive
 {
       package_changes => "bulk";
       package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
 
       package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
       package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
@@ -1007,7 +1008,7 @@ body package_method yum_rpm_enable_repo(repoid)
 {
       package_changes => "bulk";
       package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm2_output_format)'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
 
       package_list_name_regex    => "$(rpm_knowledge.rpm2_name_regex)";
       package_list_version_regex => "$(rpm_knowledge.rpm2_version_regex)";
@@ -1634,7 +1635,7 @@ body package_method generic
     redhat::
       package_changes => "bulk";
       package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
 
       package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
       package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";

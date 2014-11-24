@@ -499,7 +499,7 @@ body package_method inventory_yum_rpm(update_interval)
 {
       package_changes => "bulk";
       package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
+      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
 
       package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
       package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
