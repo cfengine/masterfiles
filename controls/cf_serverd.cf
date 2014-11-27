@@ -98,7 +98,7 @@ bundle server access_rules()
       comment => "Grant access to shell for cfruncommand",
       admit => { @(def.policy_servers) };
 
-    policy_server.ha_enabled::
+    policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/ppkeys"
       handle => "server_access_grant_access_ppkeys_hubs",
       comment => "Grant access to ppkeys for HA hubs",
@@ -115,7 +115,7 @@ bundle server access_rules()
       handle => "server_access_grant_access_appsettings",
       comment => "Grant access to appsettings for HA hubs",
       admit => { @(def.policy_servers) };
-      
+
       # Allow access to notification_scripts directory so passive hub
       # will be able to synchronize its content. Once passive hub will
       # be promoted to act as a master all the custom scripts will be

@@ -53,7 +53,7 @@ bundle agent cfe_internal_management
 
     # As passive hub is supposed to run read-only PostgreSQL instance 
     # doing maintenance makes no sense and is not possible at all.
-    (am_policy_hub.enterprise.!ha_enabled)||(ha_enabled.hub_active)::
+    (am_policy_hub.enterprise.!enable_cfengine_enterprise_hub_ha)||(enable_cfengine_enterprise_hub_ha.hub_active)::
 
       "hub" usebundle => cfe_internal_hub_maintain,
       handle => "cfe_internal_management_hub_maintain",
