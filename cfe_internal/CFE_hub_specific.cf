@@ -360,7 +360,7 @@ bundle agent cfe_internal_php_runalerts
   processes:
 
     # Make sure to kill script on non active hub(s).
-    kill_script||(ha_enabled.!hub_active)::
+    kill_script||(enable_cfengine_enterprise_hub_ha.!hub_active)::
 
       "$(runalerts_script)"
       comment => "kill the php runalerts script because it is stale for some reason",
@@ -369,7 +369,7 @@ bundle agent cfe_internal_php_runalerts
       classes => if_repaired("run_script");
 
     # Run script only on active hub to not send duplicated alert emails.
-    !ha_enabled||(ha_enabled.hub_active)::
+    !enable_cfengine_enterprise_hub_ha||(enable_cfengine_enterprise_hub_ha.hub_active)::
 
       "$(runalerts_script)"
       comment => "check if the php runalerts script is running or not",
@@ -381,7 +381,7 @@ bundle agent cfe_internal_php_runalerts
   commands:
 
     # Run script only on active hub to not send duplicated alert emails.
-    (run_script.!ha_enabled)||(run_script.ha_enabled.hub_active)::
+    (run_script.!enable_cfengine_enterprise_hub_ha)||(run_script.enable_cfengine_enterprise_hub_ha.hub_active)::
 
       "$(runalerts_script) > /dev/null < /dev/null 2>&1 &"
       comment => "to run php alerts script",
