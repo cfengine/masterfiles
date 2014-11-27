@@ -12,8 +12,8 @@ body common control
                         # Common bundle first (Best Practice)
                           inventory_control,
                           @(inventory.bundles),
-                          ha_def,
                           def,
+                          @(cfengine_enterprise_hub_ha.classification_bundles),
                           cfe_internal_hub_vars,
 
                           # Design Center
@@ -26,13 +26,12 @@ body common control
                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
                           service_catalogue,
-                          ha_main,
+                          @(cfengine_enterprise_hub_ha.management_bundles),
 
       };
 
       inputs => {
                  # File definition for global variables and classes
-                  "cfe_internal/ha/ha_def.cf",
                   "def.cf",
 
                 # Inventory policy
@@ -69,7 +68,6 @@ body common control
 
                 # List of services here
                   "services/file_change.cf",
-                  "cfe_internal/ha/ha.cf"
 
       };
 

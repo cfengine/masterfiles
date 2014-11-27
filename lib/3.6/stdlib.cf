@@ -68,7 +68,9 @@ bundle common stdlib_common
                           "$(this.promise_dirname)/bundles.cf",
                           "$(this.promise_dirname)/reports.cf",
                           "$(this.promise_dirname)/cfe_internal.cf",
+                          "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf",
       };
+
 
   reports:
     verbose_mode::

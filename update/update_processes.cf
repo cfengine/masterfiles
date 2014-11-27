@@ -141,7 +141,7 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_consumer",
       ifvarclass => "(nova|enterprise).no_vacuumdb";
 
-   am_policy_hub.!ha_enabled::
+   am_policy_hub.!enable_cfengine_enterprise_hub_ha::
       "$(cfe_internal_process_knowledge.bindir)/postgres"
       restart_class => "start_postgres_server",
       comment => "Monitor postgres process",
@@ -176,7 +176,7 @@ bundle agent maintain_cfe_hub_process
       classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_redis";
 
-    !windows.am_policy_hub.!ha_enabled.start_postgres_server::
+    !windows.am_policy_hub.!enable_cfengine_enterprise_hub_ha.start_postgres_server::
      "$(cfe_internal_process_knowledge.bindir)/pg_ctl -D $(cfe_internal_update_policy.postgresdb_dir) -l $(cfe_internal_update_policy.postgresdb_log) start"
       contain => u_postgres,
       comment => "Start postgres process",

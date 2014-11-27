@@ -1,12 +1,7 @@
 bundle common ha_def
 {
- classes:
-   any::
-   "ha_enabled" expression => "!any";
-   #"ha_enabled" expression => "enterprise";
-
  vars:
-  ha_enabled::
+  enable_cfengine_enterprise_hub_ha::
    "config_file" string => "$(this.promise_dirname)/ha_info.json";
    "ppkeys_staging" string => "$(sys.workdir)/ppkeys_staging";
    "ppkeys_hubs" string => "$(sys.workdir)/ppkeys_hubs";

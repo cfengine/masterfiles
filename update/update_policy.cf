@@ -212,7 +212,7 @@ bundle agent cfe_internal_update_policy
       action => u_immediate,
       classes => u_if_repaired("update_report");
 
-    !policy_server.ha_enabled::
+    !policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/policy_server.dat"
       comment => "Copy policy_server.dat file from server",
       handle => "cfe_internal_update_ha_policy_server",

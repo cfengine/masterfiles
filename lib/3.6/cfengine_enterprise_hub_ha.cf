@@ -39,45 +39,43 @@
 # the online docs
 #
 
-# For CFEngine Core: 3.7.0 to 3.7.x
-# Main COPBL include file
+# For CFEngine Core: 3.6.0 to 3.6.x
 
-###################################################
-# If you find CFEngine useful, please consider    #
-# purchasing a commercial version of the software.#
-###################################################
-
-bundle common stdlib_common
-# @ignore
+#################################################
+# CFEngine Enterprise Hub HA policy inclusion
+#################################################
+bundle common cfengine_enterprise_hub_ha
+# @brief Inputs specific to CFEngine Enterpise
 {
   vars:
-      "inputs" slist => {
-                          "$(this.promise_dirname)/paths.cf",
-                          "$(this.promise_dirname)/common.cf",
-                          "$(this.promise_dirname)/commands.cf",
-                          "$(this.promise_dirname)/packages.cf",
-                          "$(this.promise_dirname)/files.cf",
-                          "$(this.promise_dirname)/edit_xml.cf",
-                          "$(this.promise_dirname)/services.cf",
-                          "$(this.promise_dirname)/processes.cf",
-                          "$(this.promise_dirname)/storage.cf",
-                          "$(this.promise_dirname)/databases.cf",
-                          "$(this.promise_dirname)/users.cf",
-                          "$(this.promise_dirname)/monitor.cf",
-                          "$(this.promise_dirname)/guest_environments.cf",
-                          "$(this.promise_dirname)/bundles.cf",
-                          "$(this.promise_dirname)/reports.cf",
-                          "$(this.promise_dirname)/cfe_internal.cf",
-                          "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf",
-      };
+    enable_cfengine_enterprise_hub_ha::
 
-  reports:
-    verbose_mode::
-      "$(this.bundle): adding COPBL stdlib inputs='$(inputs)'";
+      "input[ha_main]"
+        string => "cfe_internal/ha/ha.cf";
+      "input[ha_def]"
+        string => "cfe_internal/ha/ha_def.cf";
+
+      "classification_bundles"
+        slist => { "ha_def" };
+
+      "management_bundles"
+        slist => { "ha_main" };
+
+      "inputs" slist => getvalues(input);
+
+    !enable_cfengine_enterprise_hub_ha::
+
+      "classification_bundles"
+        slist => { "$(this.bundle)" };
+
+      "management_bundles"
+        slist => { "$(this.bundle)" };
+
+      "inputs"
+        slist => { };
+
 }
-
 body file control
-# @ignore
 {
-      inputs => { @(stdlib_common.inputs) };
+  inputs => { @(cfengine_enterprise_hub_ha.inputs) };
 }
