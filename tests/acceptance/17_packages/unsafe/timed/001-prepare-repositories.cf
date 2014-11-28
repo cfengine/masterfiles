@@ -115,10 +115,15 @@ bundle agent signing_keys
         expression => "any",
         scope => "namespace";
 
+  files:
+    debian::
+      "$(G.testdir)/."
+        create => "true";
+
   commands:
     debian::
-      "gpg --no-default-keyring --keyring $(global.resources)/gpg/pubring.gpg --export \
-       | gpg --no-default-keyring --primary-keyring /etc/apt/trusted.gpg --import"
+      "gpg --homedir $(G.testdir) --no-default-keyring --keyring $(global.resources)/gpg/pubring.gpg --export \
+       | gpg --homedir $(G.testdir) --no-default-keyring --primary-keyring /etc/apt/trusted.gpg --import"
         contain => useshell,
         classes => if_successful("signing_keys_ok");
 }
