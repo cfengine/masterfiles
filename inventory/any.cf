@@ -324,7 +324,7 @@ bundle agent cfe_autorun_inventory_dmidecode
                                              "useshell"),
       meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
 
-    windows::
+    windows.powershell::
       "dmi[bios-vendor]" string => $(bios_array[1]),
       meta => { "inventory", "attribute_name=BIOS vendor" };
 
@@ -350,7 +350,7 @@ bundle agent cfe_autorun_inventory_dmidecode
   classes:
       "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
 
-    windows::
+    windows.powershell::
       "bios_match" expression => regextract(".*Manufacturer\s+:\s([a-zA-Z0-9 ]+)\n.*SerialNumber\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+).*Version\W+([a-zA-Z0-9 -]+)",
                                             execresult("gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer, SerialNumber, Version FROM WIN32_BIOS'", "powershell"),
                                             "bios_array");
