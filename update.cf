@@ -15,7 +15,7 @@ body common control
                           "cfe_internal_update_processes",
       };
 
-      version => "update.cf 3.6.2";
+      version => "update.cf 3.6.3";
 
       inputs => {
                   @(u_cfengine_enterprise.inputs),
