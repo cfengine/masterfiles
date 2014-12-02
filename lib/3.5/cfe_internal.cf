@@ -65,3 +65,13 @@ bundle agent cfe_internal_hub_maintain
       handle => "cfe_internal_start_hub_start_maintenance",
       action => bg("60","60");
 }
+
+bundle common cfengine_enterprise_hub_ha
+{
+  vars:
+    "classification_bundles"
+        slist => { };
+
+    "management_bundles"
+        slist => { };
+}
