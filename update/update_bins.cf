@@ -371,7 +371,7 @@ conflict=nocheck
 action=nocheck
 basedir=default";
 
-    sunos_5_9|sunos_5_10::
+    solaris.!sunos_5_8::
 
       "mail=
 instance=overwrite
