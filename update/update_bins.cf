@@ -201,7 +201,7 @@ bundle agent cfe_internal_update_bins
       package_policy => "update",
       package_select => "==",            # picks the newest Nova available
       package_architectures => { "$(pkgarch)" },
-      package_version => "3.7.0.0",       # Install new Nova anyway
+      package_version => "3.7.0",       # Install new Nova anyway
       package_method => u_generic( "$(local_software_dir)" ),
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
