@@ -401,10 +401,13 @@ bundle agent run_ifdefined(namespace, mybundle)
       "bundlesfound" slist => bundlesmatching("^$(namespace):$(mybundle)$");
       "count" int => length(bundlesfound);
 
+  classes:
+      "runidentified" expression => strcmp(1, $(count));
+
   methods:
       "any"
       usebundle  => $(bundlesfound),
-      ifvarclass => strcmp(1, $(count));
+      ifvarclass => "runidentified";
 
   reports:
     verbose_mode::
