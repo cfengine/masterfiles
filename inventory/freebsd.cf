@@ -1,0 +1,53 @@
+bundle common inventory_freebsd
+# @brief FreeBSD inventory
+#
+# This common bundle is for FreeBSD inventory work.
+# NOTE: Only for 10.x and later at the moment.
+{
+        vars:
+        has_os_release::
+                # BUG: Will try and fail on 9.x
+                "os_release_info" string => execresult("$(freebsd_version)"),
+                comment => "Get OS Release from freebsd-version";
+
+        os_release_major::
+                # BUG: Will try and fail on 9.x
+                "os_release_id" string => execresult("$(freebsd_version) | cut -d . -f 1"),
+                comment => "Release Major";
+
+        os_release_minor::
+                # BUG: Will try and fail on 9.x
+                "os_release_minor" string => execresult("$(freebsd_fersion) | cut -d . -f 2"),
+                comment => "Release Minor";
+
+        os_release_trunk::
+                # Trunk is easiest to deal with in some setups.
+                "os_release_trunk" string => execresult("uname -v | awk '{print $4}' | sed 's,:,,g'"),
+                comment => "Release Trunk Version";
+
+        os_architecture::
+                # Get the actual architecture of the system.
+                "os_architecture" string => execresult("uname -m"),
+                comment => "OS Architecture";
+
+        classes:
+        any::
+        "has_os_release" expression => fileexists("$(freebsd_version)"),
+        comment => "Check for presence of freebsd-version";
+
+        "os_release_major" expression => fileexists("$(freebsd_version)"),
+        comment => "Retrieve major version number from freebsd-version";
+
+        "os_release_minor" expression => fileexists("$(freebsd_version)"),
+        comment => "Retrieve minor version number from freebsd-version";
+
+        "os_release_trunk" expression => regextract('^r[0-9]'),
+        comment => "Retrieve release trunk number";
+
+        "os_architecture" expression => regextract('[a-z]*'),
+        comment => "Retrieve OS architecture";
+
+        reports:
+        inform_mode::
+                "$(this.bundle): FreeBSD Release $(os_release_id), Trunk $(os_release_trunk), Architecture $(os_architecture)";
+}
