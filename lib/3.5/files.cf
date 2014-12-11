@@ -1475,6 +1475,15 @@ body file_select filetypes_older_than(filetypes, days)
       file_result => "file_types.mtime";
 }
 
+body file_select symlinked_to(target)
+# @brief Select symlinks that point to $(target)
+# @param target The file the symlink should point to in order to be selected
+{
+  file_types  => { "symlink" };
+  issymlinkto => { "$(target)" };
+  file_result => "issymlinkto";
+}
+
 ##-------------------------------------------------------
 ## changes
 ##-------------------------------------------------------
