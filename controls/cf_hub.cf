@@ -20,4 +20,11 @@ body hub control
       # hub_schedule => { "Min00", "Min30", "(Evening|Night).Min45_50" };
       # port => "5308";
 
+      # Hub will discard accumulated reports on the clients
+      # and download only information about current state of the client 
+      # in case of not successfully downloading the reports for defined
+      # period of time. Default value is 6 hours. 
+      # Was introduced in CFEngine 3.6.4
+      # client_history_timeout => 6; # [hours]  
+
 }
