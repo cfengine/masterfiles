@@ -59,4 +59,4 @@ fi
 
 . "$TEST_DIR/testall.env"
 
-"$CORE/tests/acceptance/testall" --agent="$CORE/cf-agent/cf-agent" --cfpromises="$CORE/cf-promises/cf-promises" --cfserverd="$CORE/cf-serverd/cf-serverd" --cfkey="$CORE/cf-key/cf-key" "$@"
+"$CORE/tests/acceptance/testall" --agent="$CORE/cf-agent/cf-agent" --cfpromises="$CORE/cf-promises/cf-promises" --cfserverd="$CORE/cf-serverd/cf-serverd" --cfkey="$CORE/cf-key/cf-key" --rpmvercmp="$CORE/ext/rpmvercmp" "$@"
