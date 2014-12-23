@@ -1,0 +1,33 @@
+body file control
+{
+  namespace => "cfe_internal";
+}
+
+bundle agent pg_data_space_buffer
+{
+  meta:
+    "description"
+      string => "In case of full disk and database corruption we want to be
+                 sure that we have some available space to perform emergency
+                 database maintainance. This policy ensures that some files
+                 that are OK to delete are present.";
+
+    "ref"
+      slist => { "zendesk#1519", "redmine#6665" };
+
+  vars:
+    "pg_data_dir" string => "$(sys.workdir)/state/pg/data";
+    "buffer_files" slist => { "ok_to_delete_0", "ok_to_delete_1", "ok_to_delete_3" };
+    "buffer_file_sizeM" string => "100";
+    "dd" string => "$(default:paths.dd)";
+
+  classes:
+    "buffer_$(buffer_files)_exists"
+      expression => fileexists("$(pg_data_dir)/$(buffer_files)");
+
+  commands:
+    "$(dd)"
+      args => "if=/dev/zero of=$(pg_data_dir)/$(buffer_files) bs=1M count=$(buffer_file_sizeM)",
+      comment => "$($(this.bundle)_meta.description)",
+      ifvarclass => not("buffer_$(buffer_files)_exists");
+}
