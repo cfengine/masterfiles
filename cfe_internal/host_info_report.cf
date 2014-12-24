@@ -42,7 +42,7 @@ bundle agent host_info_report_software
         comment => "Get information about all packages currently on system";
 
       "package_names"
-        slist => getindices("package_state[name]");
+        slist => getindices("packages[name]");
 
     DEBUG::
       "printable"
