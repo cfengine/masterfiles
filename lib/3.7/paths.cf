@@ -207,7 +207,6 @@ bundle common paths
     freebsd_9_3|freebsd_10|freebsd_11::
   
       "path[ping]"     string => "/sbin/ping";
-      "path[sysctl]"   string => "/sbin/sysctl";
   
     freebsd|netbsd::
 
