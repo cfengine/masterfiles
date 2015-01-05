@@ -194,13 +194,20 @@ bundle common paths
       "path[grep]"     string => "/usr/bin/grep";
       "path[ls]"       string => "/bin/ls";
       "path[netstat]"  string => "/usr/bin/netstat";
-      "path[ping]"     string => "/usr/bin/ping";
       "path[perl]"     string => "/usr/bin/perl";
       "path[printf]"   string => "/usr/bin/printf";
       "path[sed]"      string => "/usr/bin/sed";
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
 
+    freebsd.!(freebsd_9_3|freebsd_10|freebsd_11)|netbsd|openbsd::
+  
+      "path[ping]"     string => "/usr/bin/ping";
+      
+    freebsd_9_3|freebsd_10|freebsd_11::
+  
+      "path[ping]"     string => "/sbin/ping";  
+  
     freebsd|netbsd::
 
       "path[cksum]"    string => "/usr/bin/cksum";
