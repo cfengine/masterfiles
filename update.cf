@@ -54,7 +54,7 @@ bundle common update_def
       "masterfiles_perms_mode" string => "0600",
       handle => "common_def_vars_masterfiles_perms_mode";
 
-      "dc_scripts" string => "/var/cfengine/httpd/htdocs/api/dc-scripts",
+      "dc_scripts" string => "$(sys.workdir)/httpd/htdocs/api/dc-scripts",
       comment => "Directory where design center scripts are located on Enterprise Hub";
 
       "DCWORKFLOW" string => "/opt/cfengine",
@@ -100,7 +100,7 @@ bundle common update_def
       # you can also request it from the command line with
       # -Dcfengine_internal_masterfiles_update
 
-      # NOTE THAT ENABLING THIS BY DEFAULT *WILL* OVERWRITE THE HUB'S /var/cfengine/masterfiles
+      # NOTE THAT ENABLING THIS BY DEFAULT *WILL* OVERWRITE THE HUB'S $(sys.workdir)/masterfiles
 
       #"cfengine_internal_masterfiles_update" expression => "enterprise.!(cfengine_3_4|cfengine_3_5)";
       "cfengine_internal_masterfiles_update" expression => "!any";

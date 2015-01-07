@@ -143,7 +143,7 @@ bundle edit_line apache_sudoer
 
     linux::
 
-      "$(def.cf_apache_user) ALL=(ALL) NOPASSWD:/var/cfengine/bin/cf-runagent *"
+      "$(def.cf_apache_user) ALL=(ALL) NOPASSWD:$(sys.bindir)/cf-runagent *"
       comment => "Add Apache user to run passwordless sudo cf-runagent",
       handle => "apache_sudoer_insert_lines";
 
@@ -174,7 +174,7 @@ bundle agent cfe_internal_webserver(state)
 
     am_policy_hub.on::
 
-      ".*/var/cfengine/httpd/bin/httpd.*"
+      ".*$(sys.workdir)/httpd/bin/httpd.*"
       restart_class => "start_cfe_httpd",
       comment => "Check if CFE httpd process exists or not",
       handle => "cfe_internal_webserver_processes_start_cfe_httpd";
@@ -185,7 +185,7 @@ bundle agent cfe_internal_webserver(state)
 
     start_cfe_httpd::
 
-      "LD_LIBRARY_PATH=/var/cfengine/lib:$LD_LIBRARY_PATH /var/cfengine/httpd/bin/apachectl start"
+      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl start"
       comment => "Start CFE httpd process if not exist",
       classes => kept_successful_command,
       handle => "cfe_internal_webserver_commands_start_cfe_httpd",
@@ -216,13 +216,13 @@ bundle agent cfe_internal_httpd_related
 
     am_policy_hub::
 
-      "/var/cfengine/httpd/conf/httpd.conf"
+      "$(sys.workdir)/httpd/conf/httpd.conf"
       comment => "Change TCP port on CFEngine httpd configuration",
       handle => "cfe_internal_httpd_related_files_httpd_conf",
       edit_line => change_port("$(tcp_port)"),
       classes => if_repaired("restart_cfe_httpd");
 
-      "/var/cfengine/httpd/htdocs/application/config/appsettings.php"
+      "$(sys.workdir)/httpd/htdocs/application/config/appsettings.php"
       comment => "Add TCP port to MP setting",
       handle => "cfe_internal_httpd_related_files_appsettings_php",
       edit_line => change_appsettings("$(tcp_port)");
@@ -233,7 +233,7 @@ bundle agent cfe_internal_httpd_related
 
     restart_cfe_httpd::
 
-      "LD_LIBRARY_PATH=/var/cfengine/lib:$LD_LIBRARY_PATH /var/cfengine/httpd/bin/apachectl restart"
+      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl restart"
       comment => "Restart CFEngine httpd if there is a change on configuration",
       classes => kept_successful_command,
       handle => "cfe_internal_httpd_related_commands_apachectl_restart",
@@ -298,11 +298,11 @@ bundle agent cfe_internal_php_runalerts
 
     any::
 
-      "runalerts_script" string => "/var/cfengine/bin/runalerts.sh",
+      "runalerts_script" string => "$(sys.workdir)/bin/runalerts.sh",
       comment => "location of php runalerts script",
       handle => "cfe_internal_php_runalerts_vars_runalerts_script";
 
-      "runalerts_stampfiles_dir" string => "/var/cfengine/httpd/php",
+      "runalerts_stampfiles_dir" string => "$(sys.workdir)/httpd/php",
       comment => "location of runalerts stamp file directory",
       handle => "cfe_internal_php_runalerts_var_runalerts_stampfiles_dir";
 
@@ -419,12 +419,12 @@ bundle edit_line my_php_runalerts_script(v1,v2,sdir,stime)
 
 while true; do
   touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sql[name])
- if [ -f /var/cfengine/httpd/php/runalerts_$(cfe_internal_php_runalerts.sql[name]) ]; then
-  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sql[limit]) $(cfe_internal_php_runalerts.sql[running]) $(cfe_internal_php_runalerts.sql[name]) >/dev/null 2>&1
+ if [ -f $(sys.workdir)/httpd/php/runalerts_$(cfe_internal_php_runalerts.sql[name]) ]; then
+  $(sys.workdir)/httpd/php/bin/php $(sys.workdir)/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sql[limit]) $(cfe_internal_php_runalerts.sql[running]) $(cfe_internal_php_runalerts.sql[name]) >/dev/null 2>&1
  fi
   touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sketch[name])
- if [ -f /var/cfengine/httpd/php/runalerts_$(cfe_internal_php_runalerts.sketch[name]) ]; then
-  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sketch[limit]) $(cfe_internal_php_runalerts.sketch[running]) $(cfe_internal_php_runalerts.sketch[name]) >/dev/null 2>&1
+ if [ -f $(sys.workdir)/httpd/php/runalerts_$(cfe_internal_php_runalerts.sketch[name]) ]; then
+  $(sys.workdir)/httpd/php/bin/php $(sys.workdir)/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sketch[limit]) $(cfe_internal_php_runalerts.sketch[running]) $(cfe_internal_php_runalerts.sketch[name]) >/dev/null 2>&1
  fi
  sleep $(stime)
 done"
