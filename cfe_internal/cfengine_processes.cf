@@ -148,7 +148,7 @@ bundle agent cfe_internal_enable
       "/etc/rc.conf"
       comment => "cfengine libraries should be enabled in rc.conf if appropriate",
       handle => "cfe_internal_enable_files_rc_conf_freebsd_1",
-      edit_line => append_if_no_line("[ -e /var/cfengine/lib ] && /sbin/ldconfig -m /var/cfengine/lib");
+      edit_line => append_if_no_line("[ -e $(sys.workdir)/lib ] && /sbin/ldconfig -m $(sys.workdir)/lib");
 
       "/etc/rc.conf"
       comment => "cfengine should be enabled in rc.conf",

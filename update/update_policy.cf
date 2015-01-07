@@ -117,7 +117,7 @@ bundle agent cfe_internal_update_policy
     any::
 
       "have_ppkeys"   expression => fileexists("$(ppkeys_file)"),
-      comment => "Check for /var/cfengine/ppkeys/localhost.pub",
+      comment => "Check for $(sys.workdir)/ppkeys/localhost.pub",
       handle => "cfe_internal_update_policy_classes_have_ppkeys";
 
       "local_files_ok" expression => fileexists("$(file_check)"),
