@@ -1,5 +1,6 @@
 {
     "classes": [ "services_autorun" ],
+    "inputs": [ "$(sys.libdir)/bundles.cf" ],
     "vars": {
         "domain": "mydomain-com",
         "mailto": "people@mydomain-com",

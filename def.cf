@@ -4,6 +4,10 @@
 #  - common/global variables and classes here
 #
 ###############################################################################
+body file control
+{
+      inputs => { @(def.extra_inputs) };
+}
 
 bundle common def
 
@@ -17,10 +21,11 @@ bundle common def
     any::
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
-      "overrides" data => readjson("$(this.promise_dirname)/services/def.json", 100k);
-      "override_vars" slist => getindices("overrides[vars]");
-      "override_classes" slist => getvalues("overrides[classes]");
-      "override_var_$(override_vars)" string => nth("overrides[vars]", $(override_vars));
+      "augments" data => readjson("$(this.promise_dirname)/services/def.json", 100k);
+      "extra_inputs" slist => getvalues("augments[inputs]");
+      "override_vars" slist => getindices("augments[vars]");
+      "override_classes" slist => getvalues("augments[classes]");
+      "override_var_$(override_vars)" string => nth("augments[vars]", $(override_vars));
 
       # Begin change
 
