@@ -8,23 +8,42 @@
 bundle common def
 
 {
+  classes:
+      # all override classes are defined true
+      "$(override_classes)" expression => "any";
 
   vars:
 
     any::
+      "defvars" slist => variablesmatching("default:def\..*", "defvar");
+
+      "overrides" data => readjson("$(this.promise_dirname)/services/def.json", 100k);
+      "override_vars" slist => getindices("overrides[vars]");
+      "override_classes" slist => getvalues("overrides[classes]");
+      "override_var_$(override_vars)" string => nth("overrides[vars]", $(override_vars));
 
       # Begin change
 
       # Your domain name, for use in access control
 
-      "domain"  string => "$(sys.domain)", # this default may be inaccurate!
+      "domain"  string => ifelse(isvariable("override_var_domain"), "$(override_var_domain)",
+                                "$(sys.domain)"), # this default may be inaccurate!
       comment => "Define a global domain for all hosts",
-      handle => "common_def_vars_domain";
+      handle => "common_def_vars_domain",
+      meta => { "defvar" };
 
       # Mail settings used by body executor control found in controls/cf_execd.cf
-      "mailto" string => "root@$(def.domain)";
-      "mailfrom" string => "root@$(sys.uqhost).$(def.domain)";
-      "smtpserver" string => "localhost";
+      "mailto" string => ifelse(isvariable("override_var_mailto"), "$(override_var_mailto)",
+                               "root@$(def.domain)"),
+      meta => { "defvar" };
+
+      "mailfrom" string => ifelse(isvariable("override_var_mailfrom"), "$(override_var_mailfrom)",
+                                 "root@$(sys.uqhost).$(def.domain)"),
+      meta => { "defvar" };
+
+      "smtpserver" string => ifelse(isvariable("override_var_smtpserver"), "$(override_var_smtpserver)",
+                                   "localhost"),
+      meta => { "defvar" };
 
       # List here the IP masks that we grant access to on the server
 
@@ -54,7 +73,6 @@ bundle common def
                                  "0.0.0.0/0", # allow any IP
       },
       comment => "Define from which machines keys can be trusted";
-
 
   debian::
       "environment_vars"
@@ -253,6 +271,12 @@ bundle common def
         comment => "If reports are not collected for an extended period of time
                     the disk may fill up or cause additional collection
                     issues.";
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): override request $(override_vars) to '$(override_var_$(override_vars))'; new value '$($(override_vars))'";
+      "$(this.bundle): override class $(override_classes)";
+      "$(this.bundle): $(defvars) = $($(defvars))";
 }
 
 bundle common inventory_control
