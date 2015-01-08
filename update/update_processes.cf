@@ -18,7 +18,7 @@ bundle common cfe_internal_process_knowledge
   vars:
     !windows.cfengine_3_5::
 
-      "bindir"      string => "/var/cfengine/bin",
+      "bindir"      string => "$(sys.workdir)/bin",
       comment => "Use a real path";
 
     !windows.!cfengine_3_5::
@@ -113,7 +113,7 @@ bundle agent maintain_cfe_hub_process
     am_policy_hub::
 
       "files_ok" expression => fileexists("$(file_check)"),
-      comment => "Check for /var/cfengine/inputs/promises.cf",
+      comment => "Check for $(sys.workdir)/inputs/promises.cf",
       handle => "cfe_internal_maintain_cfe_hub_process_classes_files_ok";
 
       #
