@@ -1,0 +1,9 @@
+{
+    "classes": [ "services_autorun" ],
+    "vars": {
+        "domain": "mydomain-com",
+        "mailto": "people@mydomain-com",
+        "mailfrom": "me@mydomain-com",
+        "smtpserver": "smtp.mydomain-com",
+    }
+}
