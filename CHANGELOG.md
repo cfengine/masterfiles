@@ -4,5 +4,19 @@ Notable changes to the framework should be documented here
 ## [Unreleased][unreleased]
 ### Added
  - CHANGELOG.md
- - def.json support for overriding defaults without modifying framework shipped policy
+ - Support for user specified overring of framework defaults without modifying
+   policy supplied by the framework itself (see example_def.json)
+
+### Changed
+ - Re-organize cfe_internal splitting core from enterprise specific policies
+   and loading the appropriate inputs only when necessary
+
+### Deprecated
+
+### Removed
+ - Diff reporting on /etc/shadow (Enterprise)
+
+### Fixed
+
+### Security
 

@@ -7,7 +7,7 @@ bundle agent host_info_report
   vars:
     "host_info_report_template"
       handle  => "host_info_report_vars_host_info_report_template",
-      string  => "$(this.promise_dirname)/../templates/$(this.bundle).mustache",
+      string  => "$(this.promise_dirname)/../../templates/$(this.bundle).mustache",
       comment => "Where the report template is found";
 
     "host_info_report_output"
