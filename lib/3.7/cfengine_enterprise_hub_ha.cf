@@ -51,9 +51,10 @@ bundle common cfengine_enterprise_hub_ha
     enable_cfengine_enterprise_hub_ha::
 
       "input[ha_main]"
-        string => "cfe_internal/ha/ha.cf";
+        string => "cfe_internal/enterprise/ha/ha.cf";
+        
       "input[ha_def]"
-        string => "cfe_internal/ha/ha_def.cf";
+        string => "cfe_internal/enterprise/ha/ha_def.cf";
 
       "classification_bundles"
         slist => { "ha_def" };

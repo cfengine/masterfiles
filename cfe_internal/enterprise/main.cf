@@ -1,0 +1,48 @@
+bundle agent cfe_internal_enterprise_main
+{
+  methods:
+    am_policy_hub::
+
+      "hub" usebundle => cfe_internal_update_folders,
+      handle => "cfe_internal_management_update_folders",
+      comment => "Create empty directories for CFE self-upgrade";
+
+    am_policy_hub.enterprise::
+
+      "hub" usebundle => cfe_internal_webserver("on"),
+      handle => "cfe_internal_management_web_server",
+      comment => "Manage Apache Web server (on/off)";
+
+      "hub" usebundle => cfe_internal_setup_knowledge,
+      handle => "cfe_internal_management_setup_knowledge",
+      comment => "Manage CFE Knowledge Map";
+
+      "hub" usebundle => cfe_internal_apache_sudoer,
+      handle => "cfe_internal_management_apache_sudoer",
+      comment => "Permit Apache user to run passwordless sudo cf-runagent";
+
+      "hub" usebundle => cfe_internal_httpd_related,
+      handle => "cfe_internal_management_httpd_related",
+      comment => "To run MP on another TCP port (80 by default)";
+
+      "hub" usebundle => cfe_internal_php_runalerts,
+      handle => "cfe_internal_management_php_runalerts",
+      comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
+
+    # As passive hub is supposed to run read-only PostgreSQL instance 
+    # doing maintenance makes no sense and is not possible at all.
+    (am_policy_hub.enterprise.!enable_cfengine_enterprise_hub_ha)||(enable_cfengine_enterprise_hub_ha.hub_active)::
+
+      "hub" usebundle => cfe_internal_hub_maintain,
+      handle => "cfe_internal_management_hub_maintain",
+      comment => "Start the hub maintenance process";
+      "hub" usebundle => cfe_internal_truncate_events,
+      handle => "cfe_internal_truncate_events",
+      comment => "To run CFE truncate to pending";
+
+    postgresql_full_maintenance|postgresql_monitoring_maintenance::
+
+      "hub" usebundle => cfe_internal_postgresql_maintenance,
+      handle => "cfe_internal_management_postgresql_maintenance",
+      comment => "Run vacuumdb to clean up PostgreSQL database";
+}
