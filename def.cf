@@ -16,16 +16,23 @@ bundle common def
       # all override classes are defined true
       "$(override_classes)" expression => "any";
 
+      "$(extra_roles[byname][$(roles_byname_keys)])" expression => classmatch("$(roles_byname_keys)");
+      "$(roles_byrole_keys)" expression => classmatch("$(extra_roles[byrole][$(roles_byrole_keys)])");
+
   vars:
 
     any::
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
       "augments" data => readjson("$(this.promise_dirname)/services/def.json", 100k);
+      "extra_roles" data => mergedata("augments[roles]");
       "extra_inputs" slist => getvalues("augments[inputs]");
       "override_vars" slist => getindices("augments[vars]");
       "override_classes" slist => getvalues("augments[classes]");
       "override_var_$(override_vars)" string => nth("augments[vars]", $(override_vars));
+
+      "roles_byname_keys" slist => getindices("extra_roles[byname]");
+      "roles_byrole_keys" slist => getindices("extra_roles[byrole]");
 
       # Begin change
 
