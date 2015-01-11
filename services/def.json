@@ -1,4 +1,20 @@
 {
+    "roles":
+    {
+        "byname":
+        {
+            "server3": [ "my_filehost", "my_gateway" ]
+            "redhat.*": [ "my_yum_role", "my_redhat_role" ]
+            "debian.*": [ "my_apt_role", "my_debian_role" ]
+        },
+
+        "byrole":
+        {
+            "my_apache": [ "server1", "server2", "redhat.*" ]
+            "my_other_apache": [ "server[34]", "debian.*" ]
+        },
+    },
+
     "classes": [ "services_autorun" ],
     "inputs": [ "$(sys.libdir)/bundles.cf" ],
     "vars": {
