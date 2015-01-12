@@ -43,19 +43,42 @@ body agent control
 
 bundle common update_def
 {
-  vars:
+  classes:
+      # all override classes are defined true
+      "$(override_classes)" expression => "any";
 
+  vars:
       "current_version" string => "3.7.0";
+    any::
+      "defvars" slist => variablesmatching("default:def\..*", "defvar");
+
+      "augments" data => readjson("$(this.promise_dirname)/services/def.json", 100k);
+      "override_vars" slist => getindices("augments[vars]");
+      "override_classes" slist => getvalues("augments[classes]");
+      "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
+      "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
+
+      # Begin change
+
+      "input_name_patterns" slist => getvalues("override_data_input_name_patterns"),
+      comment => "JSON-sourced filename patterns to match when updating the policy (see update/update_policy.cf)",
+      handle => "common_def_json_vars_input_name_patterns",
+      ifvarclass => isvariable("override_data_input_name_patterns"),
+      meta => { "defvar" };
 
       "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
                                        ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
                                        "cf_promises_release_id", ".*\.json" },
       comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
-      handle => "common_def_vars_input_name_patterns";
+      handle => "common_def_vars_input_name_patterns",
+      ifvarclass => not(isvariable("override_data_input_name_patterns")),
+      meta => { "defvar" };
 
       # the permissions for your masterfiles, which will propagate to inputs
-      "masterfiles_perms_mode" string => "0600",
-      handle => "common_def_vars_masterfiles_perms_mode";
+      "masterfiles_perms_mode" string => ifelse(isvariable("override_data_masterfiles_perms_mode"), "$(override_data_masterfiles_perms_mode)",
+                                               "0600"),
+      handle => "common_def_vars_masterfiles_perms_mode",
+      meta => { "defvar" };
 
       "dc_scripts" string => "$(sys.workdir)/httpd/htdocs/api/dc-scripts",
       comment => "Directory where design center scripts are located on Enterprise Hub";
@@ -152,6 +175,14 @@ bundle common update_def
       # Enable CFEngine Enterprise HA Policy
       "enable_cfengine_enterprise_hub_ha" expression => "!any";
       #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
+      ifvarclass => isvariable("override_data_$(override_vars)");
+
+      "$(this.bundle): override class $(override_classes)";
+      "$(this.bundle): $(defvars) = $($(defvars))";
 }
 
 bundle common u_cfengine_enterprise
