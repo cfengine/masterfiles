@@ -34,7 +34,7 @@ bundle common def
                            # Note that this:
                            # 1. requires def.domain to be correctly set
                            # 2. will cause a DNS lookup for every access
-                           ".*$(def.domain)",
+                           # ".*$(def.domain)",
 
                            # Assume /16 LAN clients to start with
                            "$(sys.policy_hub)/16",
