@@ -415,7 +415,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 # @param sectionName The section in the file within which values should be
 # modified
 #
-# **See also:** `set_variable_values_ini()`
+# **See also:** `manage_variable_values_ini()`
 {
   vars:
       "index" slist => getindices("$(tab)[$(sectionName)]");
