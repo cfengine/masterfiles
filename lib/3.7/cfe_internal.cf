@@ -200,3 +200,23 @@ bundle agent cfe_internal_database_cleanup_diagnostics (settings)
       classes => kept_successful_command,
       handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
 }
+
+bundle agent cfe_internal_cleanup_agent_reports 
+# @ignore
+# @brief cleanup accumulated agent reports if they grow too large
+{
+  classes:
+      "purge_diff_reports" expression => isgreaterthan("$(total_report_size)","$(def.max_client_history_size)");
+
+  vars:
+      "report_files" slist => findfiles("$(sys.workdir)/state/diff/*.diff");
+      "reports_size[$(report_files)]" int => filesize("$(report_files)");
+      "tmpmap" slist => maparray("$(this.v)", reports_size);
+      "total_report_size" real => sum(tmpmap);
+
+  files:
+    purge_diff_reports::
+      "$(report_files)"
+        delete => tidy,
+        handle => "cf_cleanup_agent_reports_$(report_files)";
+}

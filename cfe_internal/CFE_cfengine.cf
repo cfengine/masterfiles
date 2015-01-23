@@ -77,6 +77,12 @@ bundle agent cfe_internal_management
       "any" usebundle => cfe_internal_log_rotation,
       handle => "cfe_internal_management_log_rotation",
       comment => "Rotate CFEngine logs so we dont fill the disk";
+
+    enterprise::
+      "any" usebundle => cfe_internal_cleanup_agent_reports,
+      handle => "cfe_internal_management_cleanup_agent_reports",
+      comment => "Remove accumulated reports if they grow too large in size";
+
 }
 
 ##################################################################
