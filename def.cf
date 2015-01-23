@@ -150,6 +150,11 @@ bundle common def
         "$(sys.workdir)/httpd/logs/error_log", # Mission Portal
       };
 
+      "max_client_history_size" -> { "cf-hub", "CFEngine Enterprise" }
+        int => "50M",
+        comment => "The threshold of report diffs which will trigger purging of
+                    diff files.";
+
     enterprise.!am_policy_hub::
       # CFEngine's own log files
       "cfe_log_files" slist => { @(base_log_files), @(enterprise_log_files) };
@@ -240,6 +245,14 @@ bundle common def
       # Enable CFEngine Enterprise HA Policy
       "enable_cfengine_enterprise_hub_ha" expression => "!any";
       #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
+
+      # Enable cleanup of agent report diffs when they exceed
+      # `def.max_client_history_size`
+      "enable_cfe_internal_cleanup_agent_reports" -> { "cf-hub", "CFEngine Enterprise" }
+        expression => "enterprise_edition",
+        comment => "If reports are not collected for an extended period of time
+                    the disk may fill up or cause additional collection
+                    issues.";
 }
 
 bundle common inventory_control
