@@ -13,6 +13,9 @@ bundle common def
 
 {
   classes:
+      # all extra classes are defined true
+      "$(extra_classes)" expression => "any";
+
       # all override classes are defined true
       "$(override_classes)" expression => "any";
 
@@ -23,6 +26,8 @@ bundle common def
 
     any::
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
+
+      "extra_classes" slist => readstringlist("$(this.promise_dirname)/services/extra_classes.txt", "#.*", "\s", 10k, 100k);
 
       "augments" data => readjson("$(this.promise_dirname)/services/def.json", 100k);
       "extra_roles" data => mergedata("augments[roles]");
@@ -304,6 +309,8 @@ bundle common def
     verbose_mode::
       "$(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
       ifvarclass => isvariable("override_data_$(override_vars)");
+
+      "$(this.bundle): extra class $(extra_classes)";
 
       "$(this.bundle): override class $(override_classes)";
       "$(this.bundle): $(defvars) = $($(defvars))";
