@@ -25,8 +25,8 @@
         "mailfrom": "me@mydomain-com",
         "smtpserver": "smtp.mydomain-com",
 
-        "input_name_patterns": [ ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
-                                 ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
-                                 "cf_promises_release_id", ".*\.json", ".*\.js" ]
+        "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
+                                 ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
+                                 "cf_promises_release_id", ".*\\.json", ".*\\.js" ]
     }
 }
