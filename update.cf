@@ -80,8 +80,7 @@ bundle common update_def
       meta => { "defvar" };
 
       # the permissions for your masterfiles, which will propagate to inputs
-      "masterfiles_perms_mode" string => ifelse(isvariable("override_data_masterfiles_perms_mode"), "$(override_data_masterfiles_perms_mode)",
-                                               "0600"),
+      "masterfiles_perms_mode" string => "0600",
       handle => "common_def_vars_masterfiles_perms_mode",
       meta => { "defvar" };
 
