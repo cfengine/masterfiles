@@ -1,4 +1,8 @@
-SUBDIRS = tests/acceptance
+if HAVE_CORE
+    TESTS_SUBDIRS = tests/acceptance
+endif
+
+SUBDIRS = $(TESTS_SUBDIRS)
 
 # See configure.ac for MASTERFILES_INSTALL_TARGETS.
 nobase_dist_masterfiles_DATA = @MASTERFILES_INSTALL_TARGETS@
