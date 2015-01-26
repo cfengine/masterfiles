@@ -42,8 +42,10 @@ dnl Figure out core and enterprise directory.
 dnl ######################################################################
 
 AC_ARG_WITH(core,
-    AS_HELP_STRING(--with-core=<core>, [Build against core in directory <core>. Defaults to "../core". \
-                                        If not found there or if --with-core=no then tests are disabled]),
+    AS_HELP_STRING(--with-core=<core>,
+        [Build against core in directory <core>. Defaults to "../core". \
+        If not found there or if --with-core=no then tests are disabled]
+    ),
     AS_IF(test "x$with_core" == "xno",
     [
         core_dir=
@@ -82,15 +84,21 @@ AS_IF(test "x$core_dir" != x,
 AC_SUBST([core_dir])
 
 
-AC_ARG_WITH(enterprise, [AS_HELP_STRING(--with-enterprise=<enterprise>, [Build against enterprise in directory <enterprise>. Defaults to "../enterprise"])],
-            [AS_IF([test "x$with_enterprise" == "xno"], [
-                   enterprise_dir=
-            ],[
-                   enterprise_dir=$with_enterprise
-            ])],
-            enterprise_dir=$(pwd)/../enterprise
+AC_ARG_WITH(enterprise,
+    AS_HELP_STRING(--with-enterprise=<enterprise>,
+        [Build against enterprise in directory <enterprise>. \
+        Defaults to "../enterprise"]
+    ),
+    AS_IF(test "x$with_enterprise" == "xno",
+    [
+        enterprise_dir=
+    ],
+    [
+        enterprise_dir=$with_enterprise
+    ]),
+    enterprise_dir=`pwd`/../enterprise
 )
-AS_CASE([$enterprise_dir], [/*], [], [enterprise_dir=$(pwd)/$enterprise_dir])
+AS_CASE([$enterprise_dir], [/*], [], [enterprise_dir=`pwd`/$enterprise_dir])
 AM_CONDITIONAL([HAVE_ENTERPRISE], [test -d "$enterprise_dir/libcfenterprise"])
 AC_SUBST([enterprise_dir])
 
@@ -127,14 +135,18 @@ dnl Generate install target list.
 dnl ######################################################################
 
 AC_MSG_NOTICE([generating install targets])
+
 MASTERFILES_INSTALL_TARGETS=
-for i in cfe_internal controls inventory lib services sketches/meta update; do
+for i in cfe_internal controls inventory lib services sketches/meta update
+do
     MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(find "$srcdir/$i" -name '*.cf' -exec printf '%s ' '{}' ';')"
 done
-for i in templates; do
+for i in templates
+do
     MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(find "$srcdir/$i" -name '*.mustache' -exec printf '%s ' '{}' ';')"
 done
 MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(echo ./*.cf)"
+
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
 
 
