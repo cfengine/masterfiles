@@ -136,16 +136,16 @@ dnl ######################################################################
 
 AC_MSG_NOTICE([generating install targets])
 
-MASTERFILES_INSTALL_TARGETS=
+MASTERFILES_INSTALL_TARGETS=`echo $srcdir/*.cf`
+
 for i in cfe_internal controls inventory lib services sketches/meta update
 do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(find "$srcdir/$i" -name '*.cf' -exec printf '%s ' '{}' ';')"
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.cf' | xargs`"
 done
 for i in templates
 do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(find "$srcdir/$i" -name '*.mustache' -exec printf '%s ' '{}' ';')"
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.mustache' | xargs`"
 done
-MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(echo ./*.cf)"
 
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
 
