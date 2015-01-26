@@ -15,19 +15,19 @@ https://docs.cfengine.com/docs/master/guide-writing-and-serving-policy-policy-fr
 
 The contents of this repository are intended to live in `/var/cfengine/masterfiles` or wherever `$(sys.masterdir)` points.
 
-Use the convenience install target:
+If you have cloned the repository from github:
 
 ```
 ./autogen.sh
 make install
 ```
 
-to install only what's needed (without `tests`, only policies). By
-default it installs in `/var/cfengine/masterfiles` but you can
-override that easily:
+If you have downloaded a release tarball, you don't need to run
+`autogen.sh`. By default it installs in `/var/cfengine/masterfiles` but
+you can override that easily:
 
 ```
-./autogen.sh --prefix=/my/other/install/directory
+./configure --prefix=/install/directory
 make install
 ```
 
