@@ -205,16 +205,24 @@ bundle agent cfe_internal_cleanup_agent_reports
 # @ignore
 # @brief cleanup accumulated agent reports if they grow too large
 {
+  vars:
+    any::
+      "report_files" slist => findfiles("$(sys.workdir)/state/diff/*.diff");
+      "reports_size[$(report_files)]" int => filesize("$(report_files)");
+      "tmpmap" slist => maparray("$(this.v)", reports_size);
+
+    # We need to make sure that we have diff files before summing or errors are
+    # produced in the log. It's not possible to sum cf_null
+    have_diff_files::
+      "total_report_size" real => sum(tmpmap);
+
   classes:
       "cfe_internal_purge_diff_reports"
         expression => isgreaterthan("$(total_report_size)","$(def.max_client_history_size)"),
         comment => "Determine if the current sum of report diffs exceeds the max desired";
 
-  vars:
-      "report_files" slist => findfiles("$(sys.workdir)/state/diff/*.diff");
-      "reports_size[$(report_files)]" int => filesize("$(report_files)");
-      "tmpmap" slist => maparray("$(this.v)", reports_size);
-      "total_report_size" real => sum(tmpmap);
+      "have_diff_files"
+        expression => isgreaterthan(length(tmpmap), 0);
 
   files:
     cfe_internal_purge_diff_reports::
