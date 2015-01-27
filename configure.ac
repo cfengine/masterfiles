@@ -134,7 +134,10 @@ dnl ######################################################################
 dnl Generate install target list.
 dnl ######################################################################
 
-AC_MSG_NOTICE([generating install targets])
+AC_MSG_NOTICE([generating makefile targets])
+
+MASTERFILES_TESTS=`cd "$srcdir/tests/acceptance/" && find . -name '*.cf' | xargs`
+AC_SUBST(MASTERFILES_TESTS)
 
 MASTERFILES_INSTALL_TARGETS=`echo $srcdir/*.cf`
 
@@ -159,4 +162,6 @@ AC_CONFIG_FILES([Makefile
 
 AC_OUTPUT
 
+AC_MSG_RESULT()
 AC_MSG_RESULT(DONE: Configuration done. Run "make install" to install CFEngine Masterfiles.)
+AC_MSG_RESULT()
