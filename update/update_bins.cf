@@ -145,66 +145,7 @@ bundle agent cfe_internal_update_bins
 
       #
 
-  processes:
-
-    bin_newpkg.!bin_update_success.enterprise::
-
-      "$(cf_components)" signals => { "$(stop_signal)" },
-      comment => "Stop cfengine running processes before binary update",
-      handle => "cfe_internal_update_bins_processes_stop_cfengine",
-      classes => u_if_repaired("stopped_cfprocs");
-
-    bin_newpkg.!bin_update_success.!windows.enterprise::
-
-      "cf-execd"  signals => { "$(stop_signal)" },
-      comment => "Stop cf-execd running process before binary update",
-      handle => "cfe_internal_update_bins_processes_stop_cf_execd",
-      classes => u_if_repaired("stopped_cfprocs");
-
-      #
-
   packages:
-
-      # update packages after all CFEngine have been killed
-
-    stopped_cfprocs.linux.enterprise::
-
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version",
-      handle => "cfe_internal_update_bins_packages_nova_update_linux",
-      package_policy => "update",
-      package_select => "==",            # picks the newest Nova available
-      package_architectures => { "$(pkgarch)" },
-      package_version => "$(update_def.current_version)-1",
-      package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition.have_software_dir",
-      classes => u_if_else("bin_update_success", "bin_update_fail");
-
-    stopped_cfprocs.(solaris|solarisx86).enterprise::
-
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version",
-      handle => "cfe_internal_update_bins_packages_nova_update_solaris",
-      package_policy => "update",
-      package_select => "==",            # picks the newest Nova available
-      package_architectures => { "$(pkgarch)" },
-      package_version => "$(update_def.current_version)",
-      package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition.have_software_dir",
-      classes => u_if_else("bin_update_success", "bin_update_fail");
-
-    stopped_cfprocs.windows.enterprise::
-
-      "$(novapkg)"
-      comment => "Update Nova package to a newer version",
-      handle => "cfe_internal_update_bins_packages_nova_update_windows_only",
-      package_policy => "update",
-      package_select => "==",            # picks the newest Nova available
-      package_architectures => { "$(pkgarch)" },
-      package_version => "$(update_def.current_version)",
-      package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition.have_software_dir",
-      classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.linux.enterprise::
 
@@ -342,19 +283,6 @@ bundle agent cfe_internal_update_bins
       comment => "Create an empty file after successfully upgrade the binary",
       handle => "cfe_internal_update_bins_files_update_from_log",
       create => "true";
-
-      #
-
-  services:
-
-    bin_newpkg.windows.enterprise::
-
-      "CfengineNovaExec"
-      service_policy => "stop",
-      comment => "Stop the executor windows service before updating Cfengine",
-      handle => "cfe_internal_update_bins_services_stop_cf_execd_windows",
-      classes => u_if_repaired("stopped_cfprocs");
-
 }
 
 ################################################################################
