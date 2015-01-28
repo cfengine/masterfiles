@@ -45,24 +45,39 @@ bundle common update_def
 {
   classes:
       # all extra classes are defined true
-      "$(extra_classes)" expression => "any";
+      "$(extra_classes)" expression => "any", meta => { "extra" };
 
       # all override classes are defined true
-      "$(override_classes)" expression => "any";
+      "$(override_classes)" expression => "any", meta => { "override" };
+
+      "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
+
+      "augments_are_json" expression => regcmp(".+\.json", $(augments_file)), scope => "bundle";
+      "have_json_augments" and => { "have_augments_file", "augments_are_json" }, scope => "bundle";
+
+      "augments_are_yaml" expression => regcmp(".+\.yaml", $(augments_file)), scope => "bundle";
+      "have_yaml_augments" and => { "have_augments_file", "augments_are_yaml" }, scope => "bundle";
 
   vars:
       "current_version" string => "3.7.0";
     any::
+      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/services/def.yaml"), "$(this.promise_dirname)/services/def.yaml",
+                                      "$(this.promise_dirname)/services/def.json");
+
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
       "extra_classes" slist => readstringlist("$(this.promise_dirname)/services/extra_classes.txt", "#.*", "\s", 10k, 100k);
 
-      "augments" data => readjson("$(this.promise_dirname)/services/def.json", 100k);
+    have_augments_file::
+      "augments" data => readjson($(augments_file), 100k), ifvarclass => "augments_are_json";
+      "augments" data => readyaml($(augments_file), 100k), ifvarclass => "augments_are_yaml";
+
       "override_vars" slist => getindices("augments[vars]");
       "override_classes" slist => getvalues("augments[classes]");
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
+    any::
       # Begin change
 
       "input_name_patterns" slist => getvalues("override_data_input_name_patterns"),

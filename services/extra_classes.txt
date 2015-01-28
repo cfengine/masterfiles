@@ -1,1 +1,2 @@
-services_autorun
+# just uncomment the below to enable autorun
+# services_autorun
