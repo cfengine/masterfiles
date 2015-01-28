@@ -408,32 +408,38 @@ bundle agent cfe_autorun_inventory_packages
     debian::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => inventory_apt_get($(refresh));
+      package_method => inventory_apt_get($(refresh)),
+      action => if_elapsed_day;
 
     redhat::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => inventory_yum_rpm($(refresh));
+      package_method => inventory_yum_rpm($(refresh)),
+      action => if_elapsed_day;
 
     suse::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => inventory_zypper($(refresh));
+      package_method => inventory_zypper($(refresh)),
+      action => if_elapsed_day;
 
     aix::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => inventory_lslpp($(refresh));
+      package_method => inventory_lslpp($(refresh)),
+      action => if_elapsed_day;
 
     gentoo::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => emerge;
+      package_method => emerge,
+      action => if_elapsed_day;
 
     !redhat.!debian.!gentoo.!suse.!aix::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => generic;
+      package_method => generic,
+      action => if_elapsed_day;
 
   reports:
     inform_mode::
