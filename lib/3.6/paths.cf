@@ -200,13 +200,19 @@ bundle common paths
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
 
-    freebsd.!(freebsd_9_3|freebsd_10|freebsd_11)|netbsd|openbsd::
-  
+    freebsd.!(freebsd_9|freebsd_10|freebsd_11)|netbsd|openbsd::
+    
       "path[ping]"     string => "/usr/bin/ping";
+      "path[perl]"     slist => { "/usr/bin/perl", "/usr/local/bin/perl5.20" };
   
-    freebsd_9_3|freebsd_10|freebsd_11::
-  
-      "path[ping]"     string => "/sbin/ping";
+    freebsd_9|freebsd_10|freebsd_11::
+    
+      "path[ping]"     slist => { "/usr/sbin/ping", "/sbin/ping" };
+      "path[perl]"     slist => { "/usr/bin/perl", "/usr/local/bin/perl5.20" };
+    
+    freebsd_9|freebsd_10|freebsd_11|dragonfly::
+    
+      "path[pkg]"      string => "/usr/sbin/pkg";
   
     freebsd|netbsd::
 
@@ -216,6 +222,9 @@ bundle common paths
     freebsd::
 
       "path[getfacl]"  string => "/bin/getfacl";
+      "path[setfacl]"  string => "/bin/setfacl";
+      "path[getfmac]"  string => "/usr/sbin/getfmac";
+      "path[setfmac]"  string => "/usr/sbin/setfmac";
 
     openbsd::
 
@@ -496,6 +505,14 @@ bundle common paths
 
       "all_paths"     slist => getindices("path");
       "$(all_paths)" string => "$(path[$(all_paths)])";
+    
+    # FreeBSD Major Version Concatentator
+    # NOTE: Versions prior to 7 are unsupported.
+    "freebsd_7_mvc" slist => classesmatching("freebsd_7*");
+    "freebsd_8_mvc" slist => classesmatching("freebsd_8*");
+    "freebsd_9_mvc" slist => classesmatching("freebsd_9*");
+    "freebsd_10_mvc" slist => classesmatching("freebsd_10*");
+    "freebsd_11_mvc" slist => classesmatching("freebsd_11*");  # -CURRENT
 
   classes:
       "_have_bin_env" expression => fileexists("/bin/env");
@@ -508,4 +525,12 @@ bundle common paths
       "_stdlib_path_exists_$(all_paths)"
       expression => fileexists("$(path[$(all_paths)])"),
       comment    => "It's useful to know if $(all_paths) exists on the filesystem as defined";
+      
+      # FreeBSD Major Version Concatenator. Create a soft class to keep things above readable
+      # as opposed to 'freebsd_9_2|freebsd_9_3|freebsd_10_0|freebsd_10_1|freebsd_11_0|...::'
+      "freebsd_7" expression => $(freebsd_7_mvc);
+      "freebsd_8" expression => $(freebsd_8_mvc);
+      "freebsd_9" expression => $(freebsd_9_mvc);
+      "freebsd_10" expression => $(freebsd_10_mvc);
+      "freebsd_11" expression => $(freebsd_11_mvc);
 }
