@@ -151,6 +151,10 @@ bundle common def
       # CFEngine's own log files
       "cfe_log_files" slist => { @(base_log_files), @(enterprise_log_files), @(hub_log_files) };
 
+      # Number of days to keep scheduled reports before purging
+      "purge_scheduled_reports_older_than_days" ->  { "Mission Portal", "CFEngine Enterprise" }
+        int => "30";
+
     !enterprise::
       # CFEngine's own log files
       "cfe_log_files" slist => { @(base_log_files) };
@@ -162,7 +166,7 @@ bundle common def
         "$(sys.workdir)/reports",
       };
 
-    # enable_cfengine_enterprise_hub_ha is defined below 
+    # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 
     enable_cfengine_enterprise_hub_ha::
@@ -170,6 +174,7 @@ bundle common def
 
     !enable_cfengine_enterprise_hub_ha::
       "policy_servers" slist => {"$(sys.policy_hub)"};
+
 
   classes:
 
@@ -238,6 +243,7 @@ bundle common def
         comment => "If reports are not collected for an extended period of time
                     the disk may fill up or cause additional collection
                     issues.";
+
 }
 
 bundle common inventory_control

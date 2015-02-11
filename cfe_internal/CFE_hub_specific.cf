@@ -490,3 +490,15 @@ bundle agent cfe_internal_postgresql_maintenance
       classes => kept_successful_command,
       handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_$(maintenance_type)";
 }
+
+bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
+{
+  files:
+    "$(cfe_internal_hub_vars.docroot)/tmp/."
+      handle => "cfe_internal_purge_scheduled_reports_files_docroot_tmp",
+      delete => tidy,
+      depth_search => recurse("inf"),
+      file_select => filetype_older_than("plain", $(days) ),
+      comment => "Mission Portals scheduled reports are written here. They need
+                  to be purged after some time so that they do not fill the disk.";
+}
