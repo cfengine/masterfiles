@@ -64,6 +64,19 @@ body file control
 # edit_line bundles
 ###################################################
 
+bundle edit_line insert_before_if_no_line(before, string)
+# @brief Insert `string` before `before` if `string` is not found in the file
+# @param before The regular expression matching the line which `string` will be
+# inserted before
+# @param string The string to be prepended
+#
+{
+  insert_lines:
+      "$(string)"
+        location => before($(before)),
+        comment => "Prepend a line to the file if it doesn't already exist";
+}
+
 bundle edit_line insert_lines(lines)
 # @brief Append `lines` if they don't exist in the file
 # @param lines The lines to be appended
