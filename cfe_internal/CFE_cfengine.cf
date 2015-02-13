@@ -31,6 +31,13 @@ bundle agent cfe_internal_management
 
     am_policy_hub.enterprise::
 
+      "hub" -> { "Mission Portal", "CFEngine Enterprise" }
+        usebundle => cfe_internal_purge_scheduled_reports_older_than_days( $(def.purge_scheduled_reports_older_than_days) ),
+        handle    => "cfe_internal_management_purge_scheduled_reports_older_than_days",
+        comment   => "So that we do not fill up the disk we need to purge scheduled
+                      reports after some time.";
+
+
       "hub" usebundle => cfe_internal_webserver("on"),
       handle => "cfe_internal_management_web_server",
       comment => "Manage Apache Web server (on/off)";
