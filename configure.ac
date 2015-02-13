@@ -8,8 +8,9 @@ dnl ##########################################################################
 
 AC_PREREQ(2.59)
 
-dnl Version is unused, it will be grabbed from core.
-AC_INIT([cfengine], [1.0])
+define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
+
+AC_INIT([cfengine-masterfiles], [3.7.0a1.revision])
 
 _AM_SET_OPTION([tar-ustar])
 AM_INIT_AUTOMAKE([foreign])
@@ -40,27 +41,64 @@ dnl ######################################################################
 dnl Figure out core and enterprise directory.
 dnl ######################################################################
 
-AC_ARG_WITH(core, [AS_HELP_STRING(--with-core=<core>, [Build against core in directory <core>. Defaults to "../core"])],
-            [AS_IF([test "x$with_core" == "xno"], [AC_MSG_ERROR([You cannot build without a core directory (--without-core)], [2])],
-                   core_dir=$with_core
-            )],
-            core_dir=$(pwd)/../core
+AC_ARG_WITH(core,
+    AS_HELP_STRING(--with-core=<core>,
+        [Build against core in directory <core>. Defaults to "../core". \
+        If not found there or if --with-core=no then tests are disabled]
+    ),
+    AS_IF(test "x$with_core" == "xno",
+    [
+        core_dir=
+    ],
+    [
+        dnl The user passed --with-core=path but we must check if it's a
+        dnl valid core directory.
+        AS_IF(test -d "$with_core/libpromises",
+        [
+            core_dir="$with_core"
+        ],
+        [
+            AC_MSG_ERROR([$with_core is not a valid core directory (--with-core=$with_core)])
+        ])
+    ]),
+
+    dnl If --with-core was not passed at all, then default to ../core
+    dnl only if that is a valid core directory.
+    [if test -d `pwd`/../core/libpromises
+    then
+        core_dir="`pwd`/../core"
+    else
+        core_dir=
+    fi]
 )
-AS_IF([test ! -d "$core_dir/libpromises"],
-      [AC_MSG_ERROR([$with_core is not a valid core directory (--with-core=$core_dir)], [2])])
-AS_CASE([$core_dir], [/*], [], [core_dir=$(pwd)/$core_dir])
+
+dnl export HAVE_CORE for makefiles
+AM_CONDITIONAL(HAVE_CORE, test "x$core_dir" != x)
+dnl Transform the path from relative to absolute
+AS_IF(test "x$core_dir" != x,
+    [
+        AS_CASE([$core_dir], [/*], [],
+            [core_dir=`pwd`/$core_dir])
+    ]
+)
 AC_SUBST([core_dir])
 
 
-AC_ARG_WITH(enterprise, [AS_HELP_STRING(--with-enterprise=<enterprise>, [Build against enterprise in directory <enterprise>. Defaults to "../enterprise"])],
-            [AS_IF([test "x$with_enterprise" == "xno"], [
-                   enterprise_dir=
-            ],[
-                   enterprise_dir=$with_enterprise
-            ])],
-            enterprise_dir=$(pwd)/../enterprise
+AC_ARG_WITH(enterprise,
+    AS_HELP_STRING(--with-enterprise=<enterprise>,
+        [Build against enterprise in directory <enterprise>. \
+        Defaults to "../enterprise"]
+    ),
+    AS_IF(test "x$with_enterprise" == "xno",
+    [
+        enterprise_dir=
+    ],
+    [
+        enterprise_dir=$with_enterprise
+    ]),
+    enterprise_dir=`pwd`/../enterprise
 )
-AS_CASE([$enterprise_dir], [/*], [], [enterprise_dir=$(pwd)/$enterprise_dir])
+AS_CASE([$enterprise_dir], [/*], [], [enterprise_dir=`pwd`/$enterprise_dir])
 AM_CONDITIONAL([HAVE_ENTERPRISE], [test -d "$enterprise_dir/libcfenterprise"])
 AC_SUBST([enterprise_dir])
 
@@ -73,20 +111,47 @@ AS_IF([test x"$prefix" = xNONE],
 )
 datadir=${prefix}/masterfiles
 
+
+dnl ######################################################################
+dnl Print summary
+dnl ######################################################################
+
+AC_MSG_RESULT()
+AC_MSG_RESULT(Summary of options:)
+AM_COND_IF(HAVE_CORE,
+    AC_MSG_RESULT(Core directory       -> $core_dir),
+    AC_MSG_RESULT(Core directory       -> not set - tests are disabled)
+)
+AM_COND_IF(HAVE_ENTERPRISE,
+    AC_MSG_RESULT(Enterprise directory -> $enterprise_dir),
+    AC_MSG_RESULT(Enterprise directory -> not set - some tests are disabled)
+)
+AC_MSG_RESULT(Install prefix       -> $prefix)
+AC_MSG_RESULT()
+
+
 dnl ######################################################################
 dnl Generate install target list.
 dnl ######################################################################
 
-AC_MSG_NOTICE([generating install targets])
-MASTERFILES_INSTALL_TARGETS=
-for i in cfe_internal controls inventory lib services sketches/meta update; do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(find "$srcdir/$i" -name '*.cf' -exec printf '%s ' '{}' ';')"
+AC_MSG_NOTICE([generating makefile targets])
+
+MASTERFILES_TESTS=`cd "$srcdir/tests/acceptance/" && find . -name '*.cf' | xargs`
+AC_SUBST(MASTERFILES_TESTS)
+
+MASTERFILES_INSTALL_TARGETS=`echo $srcdir/*.cf`
+
+for i in cfe_internal controls inventory lib services sketches/meta update
+do
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.cf' | xargs`"
 done
-for i in templates; do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(find "$srcdir/$i" -name '*.mustache' -exec printf '%s ' '{}' ';')"
+for i in templates
+do
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.mustache' | xargs`"
 done
-MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $(echo ./*.cf)"
+
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
+
 
 dnl ######################################################################
 dnl Now make the Makefiles
@@ -97,4 +162,6 @@ AC_CONFIG_FILES([Makefile
 
 AC_OUTPUT
 
-AC_MSG_RESULT(DONE: Configuration done. Run make/gmake install to install CFEngine Community Masterfiles.)
+AC_MSG_RESULT()
+AC_MSG_RESULT(DONE: Configuration done. Run "make install" to install CFEngine Masterfiles.)
+AC_MSG_RESULT()
