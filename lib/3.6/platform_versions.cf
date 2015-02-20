@@ -1,0 +1,99 @@
+############################################################################
+# Copyright (C) CFEngine AS
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License LGPL as published by the
+# Free Software Foundation; version 3.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# To the extent this program is licensed as part of the Enterprise
+# versions of CFEngine, the applicable Commercial Open Source License
+# (COSL) may apply to this file if you as a licensee so wish it. See
+# included file COSL.txt.
+###########################################################################
+#
+# CFEngine Community Open Promise-Body Library
+#
+# This initiative started by CFEngine promotes a
+# standardized set of names and promise specifications
+# for template functionality within CFEngine 3.
+#
+# The aim is to promote an industry standard for
+# naming of configuration patterns, leading to a
+# de facto middleware of standardized syntax.
+#
+# Names should be intuitive and parameters should be
+# minimal to assist readability and comprehensibility.
+# Contributions to this file are voluntarily given to
+# the cfengine community, and are moderated by CFEngine.
+# No liability or warranty for misuse is implied.
+#
+# If you add to this file, please try to make the
+# contributions "self-documenting". Comments made
+# after the bundle/body statement are retained in
+# the online docs
+#
+# For CFEngine Core: 3.6.0 to 3.6.x
+# Platform versions bundle (used by other bodies)
+
+###################################################
+# If you find CFEngine useful, please consider    #
+# purchasing a commercial version of the software.#
+###################################################
+
+bundle common freebsd_major_versions
+# @brief Major Version Concatenation for FreeBSD to permit use of 
+# freebsd_MAJ classes (e.g. freebsd_10)
+#
+# This bundle provides dynamic soft-classes for FreeBSD major 
+# versions. Typically used for paths which change between 
+# major releases. Developers: this is updated (removal of oldest,
+# addition of newest) when -CURRENT changes major numbers.
+{
+  vars:
+    freebsd::
+      "freebsd_7_mvc" slist => classesmatching("freebsd_7*");
+      "freebsd_8_mvc" slist => classesmatching("freebsd_8*");
+      "freebsd_9_mvc" slist => classesmatching("freebsd_9*");
+      "freebsd_10_mvc" slist => classesmatching("freebsd_10*");
+      "freebsd_11_mvc" slist => classesmatching("freebsd_11*"); # -CURRENT
+  
+  classes:
+    "freebsd_7" expression => $(freebsd_7_mvc);
+    "freebsd_8" expression => $(freebsd_8_mvc);
+    "freebsd_9" expression => $(freebsd_9_mvc);
+    "freebsd_10" expression => $(freebsd_10_mvc);
+    "freebsd_11" expression => $(freebsd_11_mvc);
+}
+
+bundle common perl_version 
+# @brief FreeBSD (and some friends) Perl versions to cope with
+# the removal or absence of /usr/bin/perl but the presence of
+# a specific binary in /usr/local/bin.
+#
+# This function attempts to figure out which perl version is installed
+# on its own, but WILL BREAK DOWN when multiple versions are present!
+# Users are advised to specify the desired version explicitly in these
+# scenarios to ensure CFEngine works against the correct version.
+{
+  # Limiting classes needs to be above as other operating systems may have 
+  # these files but should default to /usr/bin/perl anyway.
+  dragonflybsd|freebsd|netbsd|openbsd::
+    vars:
+      perl_5_16::
+        "perl_version[path]" string => "/usr/local/bin/perl5.16";
+      perl_5_18::
+        "perl_version[path]" string => "/usr/local/bin/perl5.18";
+      perl_5_20::
+        "perl_version[path]" string => "/usr/local/bin/perl5.20";
+        
+    classes:
+      "perl_5_16" expression => fileexists("/usr/local/bin/perl5.16");
+      "perl_5_18" expression => fileexists("/usr/local/bin/perl5.18");
+      # /usr/bin/perl is guaranteed ABSENT after this point...
+      "perl_5_20" expression => fileexists("/usr/local/bin/perl5.20");
+}
