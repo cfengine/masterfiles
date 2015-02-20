@@ -167,13 +167,16 @@ bundle common paths
 
     netbsd|freebsd.!(freebsd_9_3|freebsd_10|freebsd_11)::
       "path[ping]"     string => "/usr/bin/ping";
-      
+
     freebsd_9_3|freebsd_10|freebsd_11::
       "path[ping]"     string => "/sbin/ping";
 
     freebsd::
 
       "path[getfacl]"  string => "/bin/getfacl";
+      "path[dtrace]"   string => "/usr/sbin/dtrace";
+      "path[zpool]"    string => "/sbin/zpool";
+      "path[zfs]"      string => "/sbin/zfs";
 
     openbsd::
 
