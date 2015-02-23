@@ -51,4 +51,6 @@ for i in alpha beta charlie; do
     cp ~/rpmbuild/RPMS/"$ARCH"/test-package-$i-1.0-2."$ARCH".rpm rpm_repo
 done
 
-createrepo --no-database --simple-md-filenames rpm_repo
+# Not all createrepo versions support the below arguments, but if they do
+# then they must be included.
+createrepo --no-database --simple-md-filenames rpm_repo || createrepo rpm_repo
