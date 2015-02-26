@@ -61,14 +61,14 @@ bundle agent cfe_internal_update_processes
 
   methods:
 
-    am_policy_hub.enterprise::
+    am_policy_hub.enterprise.!systemd::
 
       "TAKING CARE CFE HUB PROCESSES"
       usebundle => maintain_cfe_hub_process,
       comment => "Call a bundle to maintian HUB processes",
       handle => "cfe_internal_update_processes_methods_maintain_hub";
 
-    !windows::
+    !windows.!systemd::
 
       "DISABLING CFE AGENTS"
       usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
@@ -92,6 +92,12 @@ bundle agent cfe_internal_update_processes
       usebundle => maintain_cfe_windows,
       comment => "Call a bundle to maintain CFEngine on Windows",
       handle => "cfe_internal_update_processes_methods_maintain_windows";
+
+    systemd::
+      "CFENGINE systemd service"
+      usebundle => maintain_cfe_systemd,
+      comment => "Call a bundle to maintain CFEngine with systemd",
+      handle => "cfe_internal_update_processes_methods_maintain_systemd";
 
   reports:
       "The process $(all_agents) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it or move it to the agents_to_be_disabled list if you want it permanently disabled."
@@ -371,6 +377,22 @@ bundle agent maintain_cfe_windows
       classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_monitord";
 
+}
+
+bundle agent maintain_cfe_systemd
+{
+  classes:
+    systemd::
+      "restart_cfe"
+      not => returnszero("/usr/bin/systemctl -q is-active cfengine3", "noshell"),
+      comment => "Check running status of CFEngine using systemd",
+      handle => "cfe_internal_maintain_cfe_systemd_classes_restart_cfe";
+
+  commands:
+    restart_cfe::
+      "/usr/bin/systemctl -q start cfengine3"
+      comment => "Start CFEngine using systemd",
+      handle => "cfe_internal_maintain_cfe_systemd_commands_start_cfe";
 }
 
 body classes u_clear_always(theclass)
