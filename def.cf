@@ -258,7 +258,6 @@ bundle common def
         comment => "If reports are not collected for an extended period of time
                     the disk may fill up or cause additional collection
                     issues.";
-
 }
 
 bundle common inventory_control
