@@ -45,7 +45,7 @@ bundle common update_def
 {
   vars:
 
-      "current_version" string => "3.6.4";
+      "current_version" string => "3.6.5";
 
       "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
                                        "cf_promises_release_id", ".*\.json" },

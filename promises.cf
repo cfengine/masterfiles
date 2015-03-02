@@ -71,7 +71,7 @@ body common control
 
       };
 
-      version => "CFEngine Promises.cf 3.6.4";
+      version => "CFEngine Promises.cf 3.6.5";
 
       # Uncomment to connect to the hub using latest protocol.
       #protocol_version => "latest";
