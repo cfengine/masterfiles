@@ -76,24 +76,40 @@ bundle common perl_version
 # a specific binary in /usr/local/bin.
 #
 # This function attempts to figure out which perl version is installed
-# on its own, but WILL BREAK DOWN when multiple versions are present!
+# on its own, but MAY BREAK DOWN when multiple versions are present!
 # Users are advised to specify the desired version explicitly in these
 # scenarios to ensure CFEngine works against the correct version.
 {
   # Limiting classes needs to be above as other operating systems may have 
   # these files but should default to /usr/bin/perl anyway.
-  dragonflybsd|freebsd|netbsd|openbsd::
+  freebsd|dragonflybsd::
     vars:
-      perl_5_16::
-        "perl_version[path]" string => "/usr/local/bin/perl5.16";
-      perl_5_18::
-        "perl_version[path]" string => "/usr/local/bin/perl5.18";
-      perl_5_20::
-        "perl_version[path]" string => "/usr/local/bin/perl5.20";
-        
+      "bsd_perl_version" string => readstringlist("/usr/local/etc/perl5_version","[^\D].",1,4);
+      bsd_perl_old::
+        "bsd_path_perl" string => "/usr/bin/perl";
+      bsd_perl_new::
+        "bsd_path_perl" string => "/usr/local/bin/perl$(bsd_perl_version)"; 
+
     classes:
-      "perl_5_16" expression => fileexists("/usr/local/bin/perl5.16");
-      "perl_5_18" expression => fileexists("/usr/local/bin/perl5.18");
-      # /usr/bin/perl is guaranteed ABSENT after this point...
-      "perl_5_20" expression => fileexists("/usr/local/bin/perl5.20");
+      "bsd_perl_old" expression => strcmp("$(bsd_perl_version)","5.{2}[14,15,16,18]");
+      "bsd_perl_new" expression => strcmp("$(bsd_perl_version)","[5,6].{2}[^14,15,16,18]");
+}
+
+bundle common aix_vios_level
+# @brief Detects whether an AIX 6.1 host isn't actually AIX,
+# but rather a VIOS. This bundle creates both the 'aix_vios' 
+# class and 'vios_$(ioslevel)' e.g. "vios_2.2.2.3" class.
+#
+# This function only sets a class if it is definitively a VIOS
+# by checking for VIOS-exclusive files. Note that it does work
+# from both 'r oem' mode and can work from padmin.
+{
+  vars:
+    "aix_vios_level" string => readfile("/usr/ios/cli/ios.level", "8"),
+    comment => "Extract VIOS version from ios.level";
+
+  classes:
+    aix::
+      "aix_vios" expression => fileexists("/usr/ios/cli/ios.level");
+      "vios_$(aix_vios_level)" expression => fileexists("/usr/ios/cli/ios.level");
 }
