@@ -80,19 +80,17 @@ bundle common perl_version
 # Users are advised to specify the desired version explicitly in these
 # scenarios to ensure CFEngine works against the correct version.
 {
-  # Limiting classes needs to be above as other operating systems may have 
-  # these files but should default to /usr/bin/perl anyway.
-  freebsd|dragonflybsd::
-    vars:
+  vars:
+  	freebsd|dragonflybsd::
       "bsd_perl_version" string => readstringlist("/usr/local/etc/perl5_version","[^\D].",1,4);
       bsd_perl_old::
         "bsd_path_perl" string => "/usr/bin/perl";
       bsd_perl_new::
         "bsd_path_perl" string => "/usr/local/bin/perl$(bsd_perl_version)"; 
 
-    classes:
-      "bsd_perl_old" expression => strcmp("$(bsd_perl_version)","5.{2}[14,15,16,18]");
-      "bsd_perl_new" expression => strcmp("$(bsd_perl_version)","[5,6].{2}[^14,15,16,18]");
+  classes:
+    "bsd_perl_old" expression => strcmp("$(bsd_perl_version)","5.{2}[14,15,16,18]");
+    "bsd_perl_new" expression => strcmp("$(bsd_perl_version)","[5,6].{2}[^14,15,16,18]");
 }
 
 bundle common aix_vios_level
