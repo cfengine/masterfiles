@@ -776,11 +776,11 @@ bundle edit_line replace_or_add(pattern,line)
       "^(?!$(eline)$)$(pattern)$"
       comment => "Replace a pattern here",
       replace_with => value("$(line)"),
-      classes => always("replace_done_$(cline)");
+      classes => scoped_classes_generic("bundle", "replace_$(cline)");
 
   insert_lines:
       "$(line)"
-      ifvarclass => "replace_done_$(cline)";
+      ifvarclass => "replace_$(cline)_reached";
 }
 
 bundle edit_line fstab_option_editor(method, mount, option)
