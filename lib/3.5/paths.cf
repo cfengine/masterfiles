@@ -137,7 +137,7 @@ bundle common paths
       "path[ip]"                string => "/usr/bin/ip";
       "path[ifconfig]"          string => "/usr/bin/ifconfig";
       "path[journalctl]"        string => "/usr/bin/journalctl";
-      "path[systemctl]"         string => "/usr/bin/systemctl";
+      "path[systemctl]"         string => "/bin/systemctl";
       "path[netctl]"            string => "/usr/bin/netctl";
 
     freebsd|netbsd::
