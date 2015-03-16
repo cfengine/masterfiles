@@ -61,14 +61,14 @@ bundle agent cfe_internal_update_processes
 
   methods:
 
-    am_policy_hub.enterprise.!systemd::
+    am_policy_hub.enterprise.(!systemd|!redhat)::
 
       "TAKING CARE CFE HUB PROCESSES"
       usebundle => maintain_cfe_hub_process,
       comment => "Call a bundle to maintian HUB processes",
       handle => "cfe_internal_update_processes_methods_maintain_hub";
 
-    !windows.!systemd::
+    !windows.(!systemd|!redhat)::
 
       "DISABLING CFE AGENTS"
       usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
@@ -93,7 +93,7 @@ bundle agent cfe_internal_update_processes
       comment => "Call a bundle to maintain CFEngine on Windows",
       handle => "cfe_internal_update_processes_methods_maintain_windows";
 
-    systemd::
+    systemd.redhat::
       "CFENGINE systemd service"
       usebundle => maintain_cfe_systemd,
       comment => "Call a bundle to maintain CFEngine with systemd",
@@ -382,7 +382,7 @@ bundle agent maintain_cfe_windows
 bundle agent maintain_cfe_systemd
 {
   classes:
-    systemd::
+    systemd.redhat::
       "restart_cfe"
       not => returnszero("/bin/systemctl -q is-active cfengine3", "noshell"),
       comment => "Check running status of CFEngine using systemd",
