@@ -10,7 +10,7 @@ AC_PREREQ(2.59)
 
 define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
 
-AC_INIT([cfengine-masterfiles], [3.6.5])
+AC_INIT([cfengine-masterfiles], [3.6.6.revision])
 
 _AM_SET_OPTION([tar-ustar])
 AM_INIT_AUTOMAKE([foreign])
