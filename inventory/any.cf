@@ -542,7 +542,7 @@ body package_method inventory_lslpp(update_interval)
       package_list_update_ifelapsed => $(update_interval);
 
       package_list_command       => "/usr/bin/lslpp -Lqc"; # list RPMs too
-      package_list_name_regex    => "([^:]+):.*";
+      package_list_name_regex    => ".:+([^:]+):.*";
       package_list_version_regex => "[^:]+:[^:]+:([^:]+):.*";
       package_installed_regex    => "[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:([CA]):.*";
 
