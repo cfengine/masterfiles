@@ -31,11 +31,11 @@ bundle agent cfe_internal_update_bins
       comment => "The Cfengine binary updates directory on the policy host",
       handle => "cfe_internal_update_bins_vars_master_software_location";
 
-      "local_software_dir"        string => translatepath("/var/cfengine/software_updates/$(sys.flavour)_$(sys.arch)"),
+      "local_software_dir"        string => translatepath("$(sys.workdir)/software_updates/$(sys.flavour)_$(sys.arch)"),
       comment => "Local directory containing binary updates for this host",
       handle => "cfe_internal_update_bins_vars_local_software_dir";
 
-      "local_update_log_dir"      string => translatepath("/var/cfengine/software_updates/update_log"),
+      "local_update_log_dir"      string => translatepath("$(sys.workdir)/software_updates/update_log"),
       comment => "Local directory to store update log for this host",
       handle => "cfe_internal_update_bins_vars_local_update_log_dir";
 
