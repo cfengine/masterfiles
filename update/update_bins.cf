@@ -237,6 +237,7 @@ bundle agent cfe_internal_update_bins
       comment => "Create a backup script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_backup_script",
       create => "true",
+      ifvarclass => "!windows",
       edit_defaults => u_empty_no_backup,
       edit_line => u_backup_script,
       perms => u_m("0755");
@@ -245,6 +246,7 @@ bundle agent cfe_internal_update_bins
       comment => "Create an install script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_install_script",
       create => "true",
+      ifvarclass => "!windows",
       edit_defaults => u_empty_no_backup,
       edit_line => u_install_script,
       perms => u_m("0755");
