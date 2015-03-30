@@ -2100,6 +2100,15 @@ bundle agent file_make(file, str)
 # and some more text here");
 # ```
 {
+  vars:
+      "len" int => string_length($(str));
+    summarize::
+      "summary" string => format("%s...%s",
+                                string_head($(str), 18),
+                                string_tail($(str), 18));
+  classes:
+      "summarize" expression => isgreaterthan($(len), 40);
+
   files:
       "$(file)"
       create => "true",
@@ -2108,7 +2117,11 @@ bundle agent file_make(file, str)
 
   reports:
     inform_mode|EXTRA::
-      "$(this.bundle): creating $(file) with contents '$(str)'";
+      "$(this.bundle): creating $(file) with contents '$(str)'"
+      ifvarclass => "!summarize";
+
+      "$(this.bundle): creating $(file) with contents '$(summary)'"
+      ifvarclass => "summarize";
 }
 
 bundle agent file_make_mog(file, str, mode, owner, group)
@@ -2127,6 +2140,15 @@ bundle agent file_make_mog(file, str, mode, owner, group)
 # and some more text here", "0644", "root", "root");
 # ```
 {
+  vars:
+      "len" int => string_length($(str));
+    summarize::
+      "summary" string => format("%s...%s",
+                                string_head($(str), 18),
+                                string_tail($(str), 18));
+  classes:
+      "summarize" expression => isgreaterthan($(len), 40);
+
   files:
       "$(file)"
       create => "true",
@@ -2136,7 +2158,11 @@ bundle agent file_make_mog(file, str, mode, owner, group)
 
   reports:
     inform_mode|EXTRA::
-      "$(this.bundle): creating $(file) with contents '$(str)', mode '$(mode)', owner '$(owner)' and group '$(group)'";
+      "$(this.bundle): creating $(file) with contents '$(str)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
+      ifvarclass => "!summarize";
+
+      "$(this.bundle): creating $(file) with contents '$(summary)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
+      ifvarclass => "summarize";
 }
 
 bundle agent file_empty(file)
