@@ -1,0 +1,6 @@
+bundle common inventory_freebsd
+# @brief FreeBSD inventory bundle
+#
+# This common bundle is for FreeBSD inventory work.
+{
+}
