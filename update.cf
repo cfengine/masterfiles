@@ -61,7 +61,7 @@ bundle common update_def
     any::
       "augments_file" string => "$(this.promise_dirname)/services/def.json";
 
-      "defvars" slist => variablesmatching("default:def\..*", "defvar");
+      "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
 
       "extra_classes" slist => readstringlist("$(this.promise_dirname)/services/extra_classes.txt", "#.*", "\s", 10k, 100k);
 
