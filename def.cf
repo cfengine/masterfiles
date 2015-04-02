@@ -24,9 +24,6 @@ bundle common def
       "augments_are_json" expression => regcmp(".+\.json", $(augments_file)), scope => "bundle";
       "have_json_augments" and => { "have_augments_file", "augments_are_json" }, scope => "bundle";
 
-      "augments_are_yaml" expression => regcmp(".+\.yaml", $(augments_file)), scope => "bundle";
-      "have_yaml_augments" and => { "have_augments_file", "augments_are_yaml" }, scope => "bundle";
-
       "have_roles" expression => isvariable("augments[roles]"), scope => "bundle";
       "have_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
 
@@ -37,8 +34,7 @@ bundle common def
   vars:
 
     any::
-      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/services/def.yaml"), "$(this.promise_dirname)/services/def.yaml",
-                                      "$(this.promise_dirname)/services/def.json");
+      "augments_file" string => "$(this.promise_dirname)/services/def.json";
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
@@ -46,7 +42,6 @@ bundle common def
 
     have_augments_file::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "augments_are_json";
-      "augments" data => readyaml($(augments_file), 100k), ifvarclass => "augments_are_yaml";
 
       "extra_inputs" slist => getvalues("augments[inputs]");
       "override_vars" slist => getindices("augments[vars]");
