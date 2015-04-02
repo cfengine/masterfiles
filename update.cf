@@ -44,9 +44,6 @@ body agent control
 bundle common update_def
 {
   classes:
-      # all extra classes are defined true
-      "$(extra_classes)" expression => "any", meta => { "extra" };
-
       # all override classes are defined true
       "$(override_classes)" expression => "any", meta => { "override" };
 
@@ -62,8 +59,6 @@ bundle common update_def
       "augments_file" string => "$(this.promise_dirname)/services/def.json";
 
       "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
-
-      "extra_classes" slist => readstringlist("$(this.promise_dirname)/services/extra_classes.txt", "#.*", "\s", 10k, 100k);
 
     have_augments_file::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "augments_are_json";
@@ -195,8 +190,6 @@ bundle common update_def
     verbose_mode::
       "$(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
       ifvarclass => isvariable("override_data_$(override_vars)");
-
-      "$(this.bundle): extra class $(extra_classes)";
 
       "$(this.bundle): override class $(override_classes)";
       "$(this.bundle): $(defvars) = $($(defvars))";

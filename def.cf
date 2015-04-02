@@ -13,9 +13,6 @@ bundle common def
 
 {
   classes:
-      # all extra classes are defined true
-      "$(extra_classes)" expression => "any", meta => { "extra" };
-
       # all override classes are defined true
       "$(override_classes)" expression => "any", meta => { "override" };
 
@@ -23,6 +20,9 @@ bundle common def
 
       "augments_are_json" expression => regcmp(".+\.json", $(augments_file)), scope => "bundle";
       "have_json_augments" and => { "have_augments_file", "augments_are_json" }, scope => "bundle";
+
+      "augments_are_yaml" expression => regcmp(".+\.yaml", $(augments_file)), scope => "bundle";
+      "have_yaml_augments" and => { "have_augments_file", "augments_are_yaml" }, scope => "bundle";
 
       "have_roles" expression => isvariable("augments[roles]"), scope => "bundle";
       "have_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
@@ -34,14 +34,14 @@ bundle common def
   vars:
 
     any::
-      "augments_file" string => "$(this.promise_dirname)/services/def.json";
+      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/services/def.yaml"), "$(this.promise_dirname)/services/def.yaml",
+                                      "$(this.promise_dirname)/services/def.json");
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
-      "extra_classes" slist => readstringlist("$(this.promise_dirname)/services/extra_classes.txt", "#.*", "\s", 10k, 100k);
-
     have_augments_file::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "augments_are_json";
+      #"augments" data => readyaml($(augments_file), 100k), ifvarclass => "augments_are_yaml";
 
       "extra_inputs" slist => getvalues("augments[inputs]");
       "override_vars" slist => getindices("augments[vars]");
@@ -323,20 +323,19 @@ bundle common def
                     issues.";
 
   reports:
-    verbose_mode::
-      "$(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
+    DEBUG|DEBUG_def::
+      "DEBUG: $(this.bundle)";
+      "$(const.t) override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
       ifvarclass => isvariable("override_data_$(override_vars)");
 
-      "$(this.bundle): extra class $(extra_classes)";
-
-      "$(this.bundle): defined class role/byname $(extra_roles[byname][$(roles_byname_keys)]) because of classmatch('$(roles_byname_keys)')"
+      "$(const.t) defined class role/byname $(extra_roles[byname][$(roles_byname_keys)]) because of classmatch('$(roles_byname_keys)')"
       ifvarclass => "$(extra_roles[byname][$(roles_byname_keys)])";
 
-      "$(this.bundle): defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
+      "$(const.t) defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
       ifvarclass => "$(roles_byrole_keys)";
 
-      "$(this.bundle): override class $(override_classes)";
-      "$(this.bundle): $(defvars) = $($(defvars))";
+      "$(const.t) override class $(override_classes)";
+      "$(const.t) $(defvars) = $($(defvars))";
 }
 
 bundle common inventory_control
