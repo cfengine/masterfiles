@@ -4,32 +4,11 @@
 #  - common/global variables and classes here
 #
 ###############################################################################
-body file control
-{
-      inputs => { @(def.extra_inputs) };
-}
-
 bundle common def
 
 {
   classes:
-      # all override classes are defined true
-      "$(override_classes)" expression => "any", meta => { "override" };
-
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
-
-      "augments_are_json" expression => regcmp(".+\.json", $(augments_file)), scope => "bundle";
-      "have_json_augments" and => { "have_augments_file", "augments_are_json" }, scope => "bundle";
-
-      "augments_are_yaml" expression => regcmp(".+\.yaml", $(augments_file)), scope => "bundle";
-      "have_yaml_augments" and => { "have_augments_file", "augments_are_yaml" }, scope => "bundle";
-
-      "have_roles" expression => isvariable("augments[roles]"), scope => "bundle";
-      "have_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
-
-    have_roles::
-      "$(extra_roles[byname][$(roles_byname_keys)])" expression => classmatch("$(roles_byname_keys)"), meta => { "role" };
-      "$(roles_byrole_keys)" expression => classmatch("$(extra_roles[byrole][$(roles_byrole_keys)])"), meta => { "role" };
 
   vars:
 
@@ -37,56 +16,19 @@ bundle common def
       "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/services/def.yaml"), "$(this.promise_dirname)/services/def.yaml",
                                       "$(this.promise_dirname)/services/def.json");
 
-      "defvars" slist => variablesmatching("default:def\..*", "defvar");
-
-    have_augments_file::
-      "augments" data => readjson($(augments_file), 100k), ifvarclass => "augments_are_json";
-      #"augments" data => readyaml($(augments_file), 100k), ifvarclass => "augments_are_yaml";
-
-      "extra_inputs" slist => getvalues("augments[inputs]");
-      "override_vars" slist => getindices("augments[vars]");
-      "override_classes" slist => getvalues("augments[classes]");
-      "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
-      "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
-
-    !have_augments_file::
-      "extra_inputs" slist => {};
-
-    have_roles::
-      "extra_roles" data => mergedata("augments[roles]");
-      "roles_byname_keys" slist => getindices("extra_roles[byname]");
-      "roles_byrole_keys" slist => getindices("extra_roles[byrole]");
-
-    any::
-      # Begin change
-
       # Your domain name, for use in access control
-      "domain"  string => ifelse(isvariable("override_data_domain"), "$(override_data_domain)",
-                                "$(sys.domain)"), # this default may be inaccurate!
+      "domain"  string => "$(sys.domain)", # this default may be inaccurate!
       comment => "Define a global domain for all hosts",
-      handle => "common_def_vars_domain",
-      meta => { "defvar" };
+      handle => "common_def_vars_domain";
 
       # Mail settings used by body executor control found in controls/cf_execd.cf
-      "mailto" string => ifelse(isvariable("override_data_mailto"), "$(override_data_mailto)",
-                               "root@$(def.domain)"),
-      meta => { "defvar" };
+      "mailto" string => "root@$(def.domain)";
 
-      "mailfrom" string => ifelse(isvariable("override_data_mailfrom"), "$(override_data_mailfrom)",
-                                 "root@$(sys.uqhost).$(def.domain)"),
-      meta => { "defvar" };
+      "mailfrom" string => "root@$(sys.uqhost).$(def.domain)";
 
-      "smtpserver" string => ifelse(isvariable("override_data_smtpserver"), "$(override_data_smtpserver)",
-                                   "localhost"),
-      meta => { "defvar" };
+      "smtpserver" string => "localhost";
 
       # List here the IP masks that we grant access to on the server
-
-      "acl"     slist => getvalues("override_data_acl"),
-      comment => "JSON-sourced: Define an acl for the machines to be granted accesses",
-      handle => "common_def_json_vars_acl",
-      ifvarclass => isvariable("override_data_acl"),
-      meta => { "defvar" };
 
       "acl"     slist => {
                            # Allow everything in my own domain.
@@ -104,27 +46,18 @@ bundle common def
                            #  "217.77.34.19",
       },
       comment => "Define an acl for the machines to be granted accesses",
-      handle => "common_def_vars_acl",
-      ifvarclass => not(isvariable("override_data_acl")),
-      meta => { "defvar" };
+      handle => "common_def_vars_acl";
 
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  This is open by default for bootstrapping.
-
-      "trustkeysfrom" slist => getvalues("override_data_trustkeysfrom"),
-      comment => "JSON-sourced: define from which machines keys can be trusted",
-      ifvarclass => isvariable("override_data_trustkeysfrom"),
-      meta => { "defvar" };
 
       "trustkeysfrom" slist => {
                                  # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
                                  "0.0.0.0/0", # allow any IP
       },
-      comment => "Define from which machines keys can be trusted",
-      ifvarclass => not(isvariable("override_data_trustkeysfrom")),
-      meta => { "defvar" };
+      comment => "Define from which machines keys can be trusted";
 
-  debian::
+    debian::
       "environment_vars"
         handle => "common_def_vars_environment_vars",
         comment => "Environment variables of the agent process. The values
@@ -137,37 +70,11 @@ bundle common def
 
       # End change #
 
-  cfengine_3_5::
+    any::::
       "dir_masterfiles" string => translatepath("$(sys.workdir)/masterfiles"),
       comment => "Define masterfiles path",
       handle => "common_def_vars_dir_masterfiles_backport";
 
-    !cfengine_3_5::
-      "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
-      comment => "Define masterfiles path",
-      handle => "common_def_vars_dir_masterfiles";
-
-      "dir_reports"     string => translatepath("$(sys.workdir)/reports"),
-      comment => "Define reports path",
-      handle => "common_def_vars_dir_reports";
-
-      "dir_software"    string => translatepath("$(sys.workdir)/master_software_updates"),
-      comment => "Define software path",
-      handle => "common_def_vars_dir_software";
-
-      "dir_bin"         string => translatepath("$(sys.bindir)"),
-      comment => "Define binary path",
-      handle => "common_def_vars_dir_bin";
-
-      "dir_modules"     string => translatepath("$(sys.workdir)/modules"),
-      comment => "Define modules path",
-      handle => "common_def_vars_dir_modules";
-
-      "dir_plugins"     string => translatepath("$(sys.workdir)/plugins"),
-      comment => "Define plugins path",
-      handle => "common_def_vars_dir_plugins";
-
-    cfengine_3_5::
       "cf_apache_user" string => "apache",
       comment => "User that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_user";
@@ -176,22 +83,13 @@ bundle common def
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_group";
 
-    !cfengine_3_5::
-      "cf_apache_user" string => "cfapache",
-      comment => "User that CFEngine Enterprise webserver runs as",
-      handle => "common_def_vars_cf_cfapache_user";
-
-      "cf_apache_group" string => "cfapache",
-      comment => "Group that CFEngine Enterprise webserver runs as",
-      handle => "common_def_vars_cf_cfapache_group";
-
-      solaris::
+    solaris::
       "cf_runagent_shell"
         string  => "/usr/bin/sh",
         comment => "Define path to shell used by cf-runagent",
         handle  => "common_def_vars_solaris_cf_runagent_shell";
 
-      !(windows|solaris)::
+    !(windows|solaris)::
       "cf_runagent_shell"
         string  => "/bin/sh",
         comment => "Define path to shell used by cf-runagent",
@@ -295,25 +193,6 @@ bundle common def
       # sketch activations on a host.
       "cfengine_internal_sudoers_editing_enable" expression => "!any";
 
-      # Class defining which versions of cfengine are (not) supported
-      # by this policy version.
-      # Also note that this policy will only be run on enterprise policy_server
-      "postgresql_maintenance_supported"
-        expression => "(policy_server.enterprise.!cfengine_3_5.!enable_cfengine_enterprise_hub_ha)|(policy_server.enterprise.enable_cfengine_enterprise_hub_ha.hub_active)";
-
-      # This class is for PosgreSQL maintenance
-      # pre-defined to every Sunday at 2 a.m.
-      # This can be changed later on.
-
-      "postgresql_full_maintenance" expression => "postgresql_maintenance_supported.Sunday.Hr02.Min00_05";
-
-      # Vacuum monitoring_mg table every day (except Sunday, when vacuum is run on entire db)
-      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
-
-      # Enable CFEngine Enterprise HA Policy
-      "enable_cfengine_enterprise_hub_ha" expression => "!any";
-      #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
-
       # Enable cleanup of agent report diffs when they exceed
       # `def.max_client_history_size`
       "enable_cfe_internal_cleanup_agent_reports" -> { "cf-hub", "CFEngine Enterprise" }
@@ -325,17 +204,9 @@ bundle common def
   reports:
     DEBUG|DEBUG_def::
       "DEBUG: $(this.bundle)";
-      "$(const.t) override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
-      ifvarclass => isvariable("override_data_$(override_vars)");
+      "$(const.t) Found augments file '$(augments_file)', but augments are not supported in this version"
+        ifvarclass => "have_augments_file";
 
-      "$(const.t) defined class role/byname $(extra_roles[byname][$(roles_byname_keys)]) because of classmatch('$(roles_byname_keys)')"
-      ifvarclass => "$(extra_roles[byname][$(roles_byname_keys)])";
-
-      "$(const.t) defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
-      ifvarclass => "$(roles_byrole_keys)";
-
-      "$(const.t) override class $(override_classes)";
-      "$(const.t) $(defvars) = $($(defvars))";
 }
 
 bundle common inventory_control
