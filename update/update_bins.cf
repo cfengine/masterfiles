@@ -31,11 +31,11 @@ bundle agent cfe_internal_update_bins
       comment => "The Cfengine binary updates directory on the policy host",
       handle => "cfe_internal_update_bins_vars_master_software_location";
 
-      "local_software_dir"        string => translatepath("/var/cfengine/software_updates/$(sys.flavour)_$(sys.arch)"),
+      "local_software_dir"        string => translatepath("$(sys.workdir)/software_updates/$(sys.flavour)_$(sys.arch)"),
       comment => "Local directory containing binary updates for this host",
       handle => "cfe_internal_update_bins_vars_local_software_dir";
 
-      "local_update_log_dir"      string => translatepath("/var/cfengine/software_updates/update_log"),
+      "local_update_log_dir"      string => translatepath("$(sys.workdir)/software_updates/update_log"),
       comment => "Local directory to store update log for this host",
       handle => "cfe_internal_update_bins_vars_local_update_log_dir";
 
@@ -237,6 +237,7 @@ bundle agent cfe_internal_update_bins
       comment => "Create a backup script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_backup_script",
       create => "true",
+      ifvarclass => "!windows",
       edit_defaults => u_empty_no_backup,
       edit_line => u_backup_script,
       perms => u_m("0755");
@@ -245,6 +246,7 @@ bundle agent cfe_internal_update_bins
       comment => "Create an install script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_install_script",
       create => "true",
+      ifvarclass => "!windows",
       edit_defaults => u_empty_no_backup,
       edit_line => u_install_script,
       perms => u_m("0755");
