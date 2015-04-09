@@ -93,7 +93,7 @@ body mount nfs_p(server,source,perm)
 #
 # @param server Hostname or IP of remote server
 # @param source Path of remote file system to mount
-# @param perm A list of options that's passed to the mount command
+# @param perm A string of options that's passed to the mount command
 #
 # **See also:** `nfs`, `unmount()`
 {

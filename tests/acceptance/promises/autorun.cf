@@ -15,13 +15,23 @@ bundle agent init
 {
   commands:
       "$(G.make) install DESTDIR=$(G.testdir)"
-      contain => in_dir_shell("$(this.promise_dirname)/../../..");
+        contain => in_dir_shell("$(this.promise_dirname)/../../..");
+  vars:
+      # If masterfiles are installed with --prefix=/other/prefix then we
+      # need to figure out where did "make install DESTDIR=..." has put
+      # the files.
+      "promises_cf_slist" slist =>
+        findfiles("$(G.testdir)/**/promises.cf");
+      "promises_cf_path" string => nth(promises_cf_slist, 0);
+
+      "masterfiles_path" string => dirname("$(promises_cf_path)");
+      "def_cf_path"      string => concat("$(masterfiles_path)", "/def.cf");
 }
 
 bundle agent test
 {
   files:
-      "$(G.testdir)/var/cfengine/masterfiles/def.cf" edit_line => enable_autorun;
+      "$(init.def_cf_path)" edit_line => enable_autorun;
 }
 
 bundle edit_line enable_autorun
@@ -37,6 +47,6 @@ bundle agent check
   methods:
       "" usebundle => dcs_passif_output(".*R: hello_world_autorun: Hello, this is an automatically loaded bundle.*",
                                         "",
-                                        "$(sys.cf_agent) -v -f $(G.testdir)/var/cfengine/masterfiles/promises.cf | $(G.grep) Hello",
+                                        "$(sys.cf_agent) -v -f $(init.promises_cf_path) | $(G.grep) Hello",
                                         $(this.promise_filename));
 }

@@ -64,6 +64,19 @@ body file control
 # edit_line bundles
 ###################################################
 
+bundle edit_line insert_before_if_no_line(before, string)
+# @brief Insert `string` before `before` if `string` is not found in the file
+# @param before The regular expression matching the line which `string` will be
+# inserted before
+# @param string The string to be prepended
+#
+{
+  insert_lines:
+      "$(string)"
+        location => before($(before)),
+        comment => "Prepend a line to the file if it doesn't already exist";
+}
+
 bundle edit_line insert_lines(lines)
 # @brief Append `lines` if they don't exist in the file
 # @param lines The lines to be appended
@@ -1025,11 +1038,11 @@ bundle edit_line replace_or_add(pattern,line)
       "^(?!$(eline)$)$(pattern)$"
       comment => "Replace a pattern here",
       replace_with => value("$(line)"),
-      classes => always("replace_done_$(cline)");
+      classes => scoped_classes_generic("bundle", "replace_$(cline)");
 
   insert_lines:
       "$(line)"
-      ifvarclass => "replace_done_$(cline)";
+      ifvarclass => "replace_$(cline)_reached";
 }
 
 bundle edit_line converge(marker, lines)
@@ -2087,6 +2100,15 @@ bundle agent file_make(file, str)
 # and some more text here");
 # ```
 {
+  vars:
+      "len" int => string_length($(str));
+    summarize::
+      "summary" string => format("%s...%s",
+                                string_head($(str), 18),
+                                string_tail($(str), 18));
+  classes:
+      "summarize" expression => isgreaterthan($(len), 40);
+
   files:
       "$(file)"
       create => "true",
@@ -2095,7 +2117,11 @@ bundle agent file_make(file, str)
 
   reports:
     inform_mode|EXTRA::
-      "$(this.bundle): creating $(file) with contents '$(str)'";
+      "$(this.bundle): creating $(file) with contents '$(str)'"
+      ifvarclass => "!summarize";
+
+      "$(this.bundle): creating $(file) with contents '$(summary)'"
+      ifvarclass => "summarize";
 }
 
 bundle agent file_make_mog(file, str, mode, owner, group)
@@ -2114,6 +2140,15 @@ bundle agent file_make_mog(file, str, mode, owner, group)
 # and some more text here", "0644", "root", "root");
 # ```
 {
+  vars:
+      "len" int => string_length($(str));
+    summarize::
+      "summary" string => format("%s...%s",
+                                string_head($(str), 18),
+                                string_tail($(str), 18));
+  classes:
+      "summarize" expression => isgreaterthan($(len), 40);
+
   files:
       "$(file)"
       create => "true",
@@ -2123,7 +2158,11 @@ bundle agent file_make_mog(file, str, mode, owner, group)
 
   reports:
     inform_mode|EXTRA::
-      "$(this.bundle): creating $(file) with contents '$(str)', mode '$(mode)', owner '$(owner)' and group '$(group)'";
+      "$(this.bundle): creating $(file) with contents '$(str)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
+      ifvarclass => "!summarize";
+
+      "$(this.bundle): creating $(file) with contents '$(summary)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
+      ifvarclass => "summarize";
 }
 
 bundle agent file_empty(file)

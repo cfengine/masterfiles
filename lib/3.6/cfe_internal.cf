@@ -133,8 +133,12 @@ bundle agent cfe_internal_hub_maintain
                                                      }
                                                     ]');
 
+  classes:
+      "enable_cfe_internal_reporting_database_purge_old_history" -> { "postgres", "CFEngine Enterprise" }
+        expression => "enterprise_edition.Hr00.Min00_05";
+
   methods:
-    Hr00.Min00_05::
+    enable_cfe_internal_reporting_database_purge_old_history::
       "Remove old report history"
       usebundle => cfe_internal_database_cleanup_reports(@(report_settings)),
       action => if_elapsed(5);
