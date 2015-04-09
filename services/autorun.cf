@@ -9,11 +9,15 @@ bundle agent autorun
     services_autorun::
       "bundles" slist => bundlesmatching(".*", "autorun");
 
+      "sorted_bundles"
+        slist => sort("bundles", "lex"),
+        comment => "Lexicographically sorted bundles for predictable order";
+
   methods:
     services_autorun::
-      "autorun" usebundle => $(bundles);
+      "autorun" usebundle => $(sorted_bundles);
 
   reports:
     services_autorun.verbose_mode::
-      "$(this.bundle): found bundle $(bundles) with tag 'autorun'";
+      "$(this.bundle): found bundle $(sorted_bundles) with tag 'autorun'";
 }
