@@ -13,8 +13,9 @@ bundle common def
   vars:
 
     any::
-      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/services/def.yaml"), "$(this.promise_dirname)/services/def.yaml",
-                                      "$(this.promise_dirname)/services/def.json");
+      # use lib/x.y/def.json first, then def.json
+      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/def.json"), "$(this.promise_dirname)/def.json",
+                                                 "$(this.promise_dirname)/../../def.json");
 
       # Your domain name, for use in access control
       "domain"  string => "$(sys.domain)", # this default may be inaccurate!

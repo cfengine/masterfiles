@@ -1,18 +1,14 @@
 {
     "roles":
     {
-        "byname":
-        {
-            "server3": [ "my_filehost", "my_gateway" ]
-            "redhat.*": [ "my_yum_role", "my_redhat_role" ]
-            "debian.*": [ "my_apt_role", "my_debian_role" ]
-        },
-
-        "byrole":
-        {
-            "my_apache": [ "server1", "server2", "redhat.*" ]
-            "my_other_apache": [ "server[34]", "debian.*" ]
-        },
+        "my_apache": [ "server1", "server2", "redhat.*" ],
+        "my_other_apache": [ "server[34]", "debian.*" ],
+        "my_filehost": [ "server3" ],
+        "my_gateway": [ "server3" ],
+        "my_yum_role": [ "redhat.*" ],
+        "my_redhat_role": [ "redhat.*" ],
+        "my_apt_role": [ "debian.*" ],
+        "my_debian_role": [ "debian.*" ],
     },
 
     "classes": [ "services_autorun" ],
@@ -27,6 +23,6 @@
 
         "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
-                                 "cf_promises_release_id", ".*\\.json", ".*\\.js" ]
+                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ]
     }
 }

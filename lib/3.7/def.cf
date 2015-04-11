@@ -16,31 +16,23 @@ bundle common def
       "$(override_classes)" expression => "any", meta => { "override" };
 
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
-
-      "augments_are_json" expression => regcmp(".+\.json", $(augments_file)), scope => "bundle";
-      "have_json_augments" and => { "have_augments_file", "augments_are_json" }, scope => "bundle";
-
-      "augments_are_yaml" expression => regcmp(".+\.yaml", $(augments_file)), scope => "bundle";
-      "have_yaml_augments" and => { "have_augments_file", "augments_are_yaml" }, scope => "bundle";
-
       "have_roles" expression => isvariable("augments[roles]"), scope => "bundle";
       "have_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
 
     have_roles::
-      "$(extra_roles[byname][$(roles_byname_keys)])" expression => classmatch("$(roles_byname_keys)"), meta => { "role" };
-      "$(roles_byrole_keys)" expression => classmatch("$(extra_roles[byrole][$(roles_byrole_keys)])"), meta => { "role" };
+      "$(roles_keys)" expression => classmatch("$(extra_roles[$(roles_byrole_keys)])"), meta => { "role" };
 
   vars:
 
     any::
-      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/services/def.yaml"), "$(this.promise_dirname)/services/def.yaml",
-                                      "$(this.promise_dirname)/services/def.json");
+      # use lib/x.y/def.json first, then def.json
+      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/def.json"), "$(this.promise_dirname)/def.json",
+                                                 "$(this.promise_dirname)/../../def.json");
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
     have_augments_file::
-      "augments" data => readjson($(augments_file), 100k), ifvarclass => "augments_are_json";
-      #"augments" data => readyaml($(augments_file), 100k), ifvarclass => "augments_are_yaml";
+      "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "extra_inputs" slist => getvalues("augments[inputs]");
       "override_vars" slist => getindices("augments[vars]");
@@ -53,8 +45,7 @@ bundle common def
 
     have_roles::
       "extra_roles" data => mergedata("augments[roles]");
-      "roles_byname_keys" slist => getindices("extra_roles[byname]");
-      "roles_byrole_keys" slist => getindices("extra_roles[byrole]");
+      "roles_keys" slist => getindices("extra_roles");
 
     any::
       # Begin change
@@ -309,14 +300,14 @@ bundle common def
   reports:
     DEBUG|DEBUG_def::
       "DEBUG: $(this.bundle)";
+
+      "$(const.t) def.json was found at $(augments_file)";
+
       "$(const.t) override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
       ifvarclass => isvariable("override_data_$(override_vars)");
 
-      "$(const.t) defined class role/byname $(extra_roles[byname][$(roles_byname_keys)]) because of classmatch('$(roles_byname_keys)')"
-      ifvarclass => "$(extra_roles[byname][$(roles_byname_keys)])";
-
-      "$(const.t) defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
-      ifvarclass => "$(roles_byrole_keys)";
+      "$(const.t) defined role $(roles_keys) because of classmatch('$(extra_roles[$(roles_keys)])')"
+      ifvarclass => "$(roles_keys)";
 
       "$(const.t) override class $(override_classes)";
       "$(const.t) $(defvars) = $($(defvars))";

@@ -6,19 +6,17 @@ bundle common update_def
 
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
 
-      "augments_are_json" expression => regcmp(".+\.json", $(augments_file)), scope => "bundle";
-      "have_json_augments" and => { "have_augments_file", "augments_are_json" }, scope => "bundle";
-
-
   vars:
       "current_version" string => "3.7.0";
     any::
-      "augments_file" string => "$(this.promise_dirname)/services/def.json";
+      # use lib/x.y/def.json first, then def.json
+      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/def.json"), "$(this.promise_dirname)/def.json",
+                                                 "$(this.promise_dirname)/../../def.json");
 
       "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
 
     have_augments_file::
-      "augments" data => readjson($(augments_file), 100k), ifvarclass => "augments_are_json";
+      "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "override_vars" slist => getindices("augments[vars]");
       "override_classes" slist => getvalues("augments[classes]");
@@ -36,7 +34,7 @@ bundle common update_def
 
       "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
                                        ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
-                                       "cf_promises_release_id", ".*\.json" },
+                                       "cf_promises_release_id", ".*\.json", ".*\.yaml" },
       comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
       handle => "common_def_vars_input_name_patterns",
       ifvarclass => not(isvariable("override_data_input_name_patterns")),
