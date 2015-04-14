@@ -1,0 +1,102 @@
+bundle common test_meta
+{
+vars:
+  "description" string => "Test that a service which is not running gets started";
+  "story_id" string => "5583";
+  "covers" string => "operational_repaired";
+}
+
+#######################################################
+
+body common control
+{
+      inputs => { "../../dcs.cf.sub",
+                  "../../../../$(sys.local_libdir)/stdlib.cf",
+                  "service_common.cf.sub"
+                };
+
+      bundlesequence => { default($(this.promise_filename)) };
+}
+
+#######################################################
+
+bundle agent init
+{
+  meta:
+    "test_skip_needs_work" string => "!(redhat_6|centos_6)";
+
+  methods:
+    "" usebundle => service_stop( $(service_common.service_name) );
+}
+
+#######################################################
+
+bundle agent test
+{
+  methods:
+    "" usebundle => service_is_running("$(service_common.service_name)", "service_running_in_test", "service_not_running_in_test");
+
+  services:
+    service_not_running_in_test::
+    "$(service_common.service_name)"
+        action => immediate,
+        service_policy => "start";
+}
+
+#######################################################
+
+bundle agent check1
+{
+  methods:
+      "" usebundle => service_is_running("$(service_common.service_name)", "service_running_in_check", "service_not_running_in_check");
+}
+
+bundle agent check2
+{
+  # Stop the service again afterwards to avoid errors about lingering processes.
+  methods:
+      "" usebundle => service_stop( $(service_common.service_name) );
+  processes:
+      ".*ntpd.*"
+        process_select => ntpd,
+        signals => { "kill" };
+}
+
+body process_select ntpd
+{
+    # To avoid killing the system ntpd.
+    stime_range => irange(ago(0,0,0,0,1,0), now);
+}
+
+bundle agent check
+{
+  methods:
+      "" usebundle => check1;
+      "" usebundle => check2;
+
+  classes:
+      "ok" and => { "service_not_running_in_test", "service_running_in_check" };
+
+
+  reports:
+
+    DEBUG.service_running_in_test::
+      "$(service_common.service_name) found to be running in test bundle";
+
+    DEBUG.service_not_running_in_test::
+      "$(service_common.service_name) found to be not running in test bundle";
+
+    DEBUG.service_running_in_check::
+      "$(service_common.service_name) found to be running in check bundle";
+
+    DEBUG.service_not_running_in_check::
+      "$(service_common.service_name) found to be not running in check bundle";
+
+    report_test_meta::
+      "story_id=$(test_meta.story_id)";
+
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}
