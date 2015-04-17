@@ -24,14 +24,21 @@ bundle agent change_management
 
     linux::
 
-      "watch_files" slist =>  {
-				"/etc/passwd",
-				"/etc/shadow",
-				"/etc/group",
-				"/etc/services"
-      },
-      comment => "Define a list of files to be watched by cfengine",
-      handle => "change_management_vars_watch_files";
+      "watch_files_report_diffs"
+        slist =>  {
+				            "/etc/passwd",
+				            "/etc/group",
+				            "/etc/services",
+                  },
+        comment => "These files will be watched for change, and diffs will be
+                    reported back to mission portal if you are running CFEngine
+                    Enterprise.";
+
+      "watch_files_report_change"
+        slist => { "/etc/shadow" },
+        comment => "These files will be watched for change. No diffs will be
+                    reported back to mission portal, only that the file did
+                    change.";
 
       #  "watch_dirs" slist =>   {
       #                          "/usr",
@@ -41,10 +48,18 @@ bundle agent change_management
 
     linux::
 
-      "$(watch_files)" -> "goal_infosec"
-      comment => "Change detection on important files",
-      handle => "change_management_files_watch_files",
-      changes => diff;
+      "$(watch_files_report_diffs)" -> { "InfoSec" }
+        changes => diff,
+        handle => "change_management_files_watch_files_report_diffs",
+        comment => "Unplanned changes of these files may indicate a security
+                    breach.";
+
+      "$(watch_files_report_change)" -> { "InfoSec" }
+        changes => detect_content_using("sha256"),
+        comment => "Unplanned changes of these files may indicate a security
+                    breach. Diffs are not reported as an guard against leakage
+                    to those haveing access to report on these hosts but should
+                    not have access to shadow entries.";
 
       #   "$(watch_dirs)"  -> "goal_infosec"
       #      comment      => "Change detection on important directories",
