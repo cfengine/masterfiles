@@ -20,12 +20,12 @@ body common control
       inputs => {
                   "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def.cf",
                   @(u_cfengine_enterprise.inputs),
-                  "update/update_bins.cf",
-                  "update/cfe_internal_dc_workflow.cf",
-                  "update/cfe_internal_local_git_remote.cf",
-                  "update/cfe_internal_update_from_repository.cf",
-                  "update/update_policy.cf",
-                  "update/update_processes.cf"
+                  "cfe_internal/update/update_bins.cf",
+                  "cfe_internal/update/cfe_internal_dc_workflow.cf",
+                  "cfe_internal/update/cfe_internal_local_git_remote.cf",
+                  "cfe_internal/update/cfe_internal_update_from_repository.cf",
+                  "cfe_internal/update/update_policy.cf",
+                  "cfe_internal/update/update_processes.cf"
       };
 
       # Uncomment to connect to the hub using latest protocol.

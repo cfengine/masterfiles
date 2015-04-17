@@ -54,12 +54,12 @@ body common control
                   @(services_autorun.inputs),
 
                   # Add update files to build Knowledge Map relationship
-                  "update/update_bins.cf",
-                  "update/cfe_internal_dc_workflow.cf",
-                  "update/cfe_internal_local_git_remote.cf",
-                  "update/cfe_internal_update_from_repository.cf",
-                  "update/update_policy.cf",
-                  "update/update_processes.cf",
+                  "cfe_internal/update/update_bins.cf",
+                  "cfe_internal/update/cfe_internal_dc_workflow.cf",
+                  "cfe_internal/update/cfe_internal_local_git_remote.cf",
+                  "cfe_internal/update/cfe_internal_update_from_repository.cf",
+                  "cfe_internal/update/update_policy.cf",
+                  "cfe_internal/update/update_processes.cf",
 
                 # List of services here
                   "services/file_change.cf",

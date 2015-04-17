@@ -10,6 +10,8 @@ Notable changes to the framework should be documented here
 ### Changed
  - Re-organize cfe_internal splitting core from enterprise specific policies
    and loading the appropriate inputs only when necessary
+ - Moved update directory into cfe_internal as it is not generally intended to
+   be modified
 
 ### Deprecated
 
