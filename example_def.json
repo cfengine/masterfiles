@@ -1,0 +1,28 @@
+{
+    "roles":
+    {
+        "my_apache": [ "server1", "server2", "redhat.*" ],
+        "my_other_apache": [ "server[34]", "debian.*" ],
+        "my_filehost": [ "server3" ],
+        "my_gateway": [ "server3" ],
+        "my_yum_role": [ "redhat.*" ],
+        "my_redhat_role": [ "redhat.*" ],
+        "my_apt_role": [ "debian.*" ],
+        "my_debian_role": [ "debian.*" ],
+    },
+
+    "classes": [ "services_autorun" ],
+    "inputs": [ "$(sys.libdir)/bundles.cf" ],
+    "vars": {
+        "acl": [ ".*$(def.domain)", "$(sys.policy_hub)/16" ],
+
+        "domain": "mydomain-com",
+        "mailto": "people@mydomain-com",
+        "mailfrom": "me@mydomain-com",
+        "smtpserver": "smtp.mydomain-com",
+
+        "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
+                                 ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
+                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ]
+    }
+}

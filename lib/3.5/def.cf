@@ -4,26 +4,29 @@
 #  - common/global variables and classes here
 #
 ###############################################################################
-
 bundle common def
 
 {
+  classes:
+      "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
 
   vars:
 
     any::
-
-      # Begin change
+      # use lib/x.y/def.json first, then def.json
+      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/def.json"), "$(this.promise_dirname)/def.json",
+                                                 "$(this.promise_dirname)/../../def.json");
 
       # Your domain name, for use in access control
-
       "domain"  string => "$(sys.domain)", # this default may be inaccurate!
       comment => "Define a global domain for all hosts",
       handle => "common_def_vars_domain";
 
       # Mail settings used by body executor control found in controls/cf_execd.cf
       "mailto" string => "root@$(def.domain)";
+
       "mailfrom" string => "root@$(sys.uqhost).$(def.domain)";
+
       "smtpserver" string => "localhost";
 
       # List here the IP masks that we grant access to on the server
@@ -55,8 +58,7 @@ bundle common def
       },
       comment => "Define from which machines keys can be trusted";
 
-
-  debian::
+    debian::
       "environment_vars"
         handle => "common_def_vars_environment_vars",
         comment => "Environment variables of the agent process. The values
@@ -69,37 +71,11 @@ bundle common def
 
       # End change #
 
-  cfengine_3_5::
+    any::::
       "dir_masterfiles" string => translatepath("$(sys.workdir)/masterfiles"),
       comment => "Define masterfiles path",
       handle => "common_def_vars_dir_masterfiles_backport";
 
-    !cfengine_3_5::
-      "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
-      comment => "Define masterfiles path",
-      handle => "common_def_vars_dir_masterfiles";
-
-      "dir_reports"     string => translatepath("$(sys.workdir)/reports"),
-      comment => "Define reports path",
-      handle => "common_def_vars_dir_reports";
-
-      "dir_software"    string => translatepath("$(sys.workdir)/master_software_updates"),
-      comment => "Define software path",
-      handle => "common_def_vars_dir_software";
-
-      "dir_bin"         string => translatepath("$(sys.bindir)"),
-      comment => "Define binary path",
-      handle => "common_def_vars_dir_bin";
-
-      "dir_modules"     string => translatepath("$(sys.workdir)/modules"),
-      comment => "Define modules path",
-      handle => "common_def_vars_dir_modules";
-
-      "dir_plugins"     string => translatepath("$(sys.workdir)/plugins"),
-      comment => "Define plugins path",
-      handle => "common_def_vars_dir_plugins";
-
-    cfengine_3_5::
       "cf_apache_user" string => "apache",
       comment => "User that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_user";
@@ -108,22 +84,13 @@ bundle common def
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_apache_group";
 
-    !cfengine_3_5::
-      "cf_apache_user" string => "cfapache",
-      comment => "User that CFEngine Enterprise webserver runs as",
-      handle => "common_def_vars_cf_cfapache_user";
-
-      "cf_apache_group" string => "cfapache",
-      comment => "Group that CFEngine Enterprise webserver runs as",
-      handle => "common_def_vars_cf_cfapache_group";
-
-      solaris::
+    solaris::
       "cf_runagent_shell"
         string  => "/usr/bin/sh",
         comment => "Define path to shell used by cf-runagent",
         handle  => "common_def_vars_solaris_cf_runagent_shell";
 
-      !(windows|solaris)::
+    !(windows|solaris)::
       "cf_runagent_shell"
         string  => "/bin/sh",
         comment => "Define path to shell used by cf-runagent",
@@ -232,25 +199,6 @@ bundle common def
       # sketch activations on a host.
       "cfengine_internal_sudoers_editing_enable" expression => "!any";
 
-      # Class defining which versions of cfengine are (not) supported
-      # by this policy version.
-      # Also note that this policy will only be run on enterprise policy_server
-      "postgresql_maintenance_supported"
-        expression => "(policy_server.enterprise.!cfengine_3_5.!enable_cfengine_enterprise_hub_ha)|(policy_server.enterprise.enable_cfengine_enterprise_hub_ha.hub_active)";
-
-      # This class is for PosgreSQL maintenance
-      # pre-defined to every Sunday at 2 a.m.
-      # This can be changed later on.
-
-      "postgresql_full_maintenance" expression => "postgresql_maintenance_supported.Sunday.Hr02.Min00_05";
-
-      # Vacuum monitoring_mg table every day (except Sunday, when vacuum is run on entire db)
-      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
-
-      # Enable CFEngine Enterprise HA Policy
-      "enable_cfengine_enterprise_hub_ha" expression => "!any";
-      #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
-
       # Enable cleanup of agent report diffs when they exceed
       # `def.max_client_history_size`
       "enable_cfe_internal_cleanup_agent_reports" -> { "cf-hub", "CFEngine Enterprise" }
@@ -258,6 +206,13 @@ bundle common def
         comment => "If reports are not collected for an extended period of time
                     the disk may fill up or cause additional collection
                     issues.";
+
+  reports:
+    DEBUG|DEBUG_def::
+      "DEBUG: $(this.bundle)";
+      "$(const.t) Found augments file '$(augments_file)', but augments are not supported in this version"
+        ifvarclass => "have_augments_file";
+
 }
 
 bundle common inventory_control
