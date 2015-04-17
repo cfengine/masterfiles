@@ -25,9 +25,7 @@ bundle common def
   vars:
 
     any::
-      # use lib/x.y/def.json first, then def.json
-      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/def.json"), "$(this.promise_dirname)/def.json",
-                                                 "$(this.promise_dirname)/../../def.json");
+      "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
