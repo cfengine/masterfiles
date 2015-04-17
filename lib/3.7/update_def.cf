@@ -9,9 +9,7 @@ bundle common update_def
   vars:
       "current_version" string => "3.7.0";
     any::
-      # use lib/x.y/def.json first, then def.json
-      "augments_file" string => ifelse(fileexists("$(this.promise_dirname)/def.json"), "$(this.promise_dirname)/def.json",
-                                                 "$(this.promise_dirname)/../../def.json");
+      "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
       "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
 
