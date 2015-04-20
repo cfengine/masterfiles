@@ -10,7 +10,9 @@ bundle agent cfe_internal_core_main
 #      handle => "cfe_internal_management_limit_cfe_agents",
 #      comment => "Manage CFE processes";
 
-      "any" usebundle => cfe_internal_log_rotation,
+      "any"
+        usebundle => cfe_internal_log_rotation,
         handle => "cfe_internal_management_log_rotation",
         comment => "Rotate CFEngine logs so we dont fill the disk";
+
 }

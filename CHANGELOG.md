@@ -16,6 +16,9 @@ Notable changes to the framework should be documented here
    modified
  - To improve predictibility autorun bundles are activated in lexicographical
    order
+ - Relocate services/file_change.cf to cfe_internal/enterprise. This policy is
+   most useful for a good OOTB experience with CFEngine Enterprise Mission
+   Portal.
 
 ### Deprecated
 

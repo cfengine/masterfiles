@@ -1,6 +1,13 @@
 bundle agent cfe_internal_enterprise_main
 {
   methods:
+    any::
+
+      "security" -> { InfoSec }
+        usebundle => change_management,
+        comment => "Basic change management",
+        handle => "cfe_internal_enterprise_main_change_management";
+
     am_policy_hub::
 
       "hub" usebundle => cfe_internal_update_folders,

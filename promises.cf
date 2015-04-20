@@ -60,10 +60,6 @@ body common control
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
                   "cfe_internal/update/update_processes.cf",
-
-                # List of services here
-                  "services/file_change.cf",
-
       };
 
       version => "CFEngine Promises.cf 3.7.0";
@@ -170,10 +166,14 @@ bundle common cfe_internal_inputs
         string => "cfe_internal/enterprise/CFE_hub_specific.cf",
         comment => "Policy relating to CFEngine Enterprise Hub, for example
                     software updates, webserver configuration, and alerts";
-      
+
       "input[enterprise_knowledge]"
         string => "cfe_internal/enterprise/CFE_knowledge.cf",
         comment => "Settings mostly releated to CFEngine Enteprise Mission Portal";
+
+      "input[change_management]"
+        string => "cfe_internal/enterprise/file_change.cf",
+        comment => "This policy monitors critical system files for change";
 
     any::
       "inputs" slist => getvalues("input");
@@ -238,7 +238,7 @@ bundle common services_autorun
       "bundles" slist => { "services_autorun" }; # run self
 
     !cfengine_3_5::
-      "inputs" slist => { "services/autorun.cf" };
+      "inputs" slist => { "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
 
@@ -255,18 +255,10 @@ bundle common services_autorun
 ###############################################################################
 
 bundle agent service_catalogue
-
+# User Defined Custom Service Catalogue
 {
-
   methods:
-
-    any::
-
-      "security" -> { goal_infosec, goal_compliance }
-      comment => "Basic change management",
-      handle => "service_catalogue_change_management",
-      usebundle => change_management;
-
+    # Activate your custom policies here
 }
 
 # special body for update/*.cf compatibility
