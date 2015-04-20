@@ -12,7 +12,10 @@ Notable changes to the framework should be documented here
    and loading the appropriate inputs only when necessary
  - Moved update directory into cfe_internal as it is not generally intended to
    be modified
- - To improve predictibility autorun bundles are activated in lexicographical order
+ - services/autorun.cf moved to lib/VER/ as it is not generally intended to be
+   modified
+ - To improve predictibility autorun bundles are activated in lexicographical
+   order
 
 ### Deprecated
 
