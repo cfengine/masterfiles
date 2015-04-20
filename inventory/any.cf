@@ -151,6 +151,59 @@ bundle agent cfe_autorun_inventory_proc
       "cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])]" string => "$(cpuinfo_array[$(cpuinfo_idx)][1])";
       "cpuinfo_keys" slist => getindices("cpuinfo");
 
+      "cpuinfo_hyperthreading"
+        string => ifelse("cpuinfo_hyperthreading_disabled", "disabled", "cpuinfo_hyperthreading_enabled", "enabled", "unknown"),
+        meta => { "inventory", "attribute_name=Hyperthreading", "derived-from=$(files[cpuinfo])" };
+
+      "cpuinfo_physical_cores"
+        string => "$(cpuinfo[cpu cores])",
+        ifvarclass => "have_cpuinfo_cpu_cores",
+        meta => { "inventory", "attribute_name=CPU physical cores", "derived-from=$(files[cpuinfo])" };
+
+      "cpuinfo_cpu_model_name"
+        string => "$(cpuinfo[model name])",
+        ifvarclass => "have_cpuinfo_model_name",
+        meta => { "inventory", "attribute_name=CPU model", "derived-from=$(files[cpuinfo])" };
+
+    # We need to be able to count the number of unique physical id lines in
+    # /proc/cpu in order to get a physical processor count.
+      "cpuinfo_lines" slist => readstringlist(
+                                                 "$(files[cpuinfo])",
+                                                 "\s*#[^\n]*",
+                                                 "\n",
+                                                 500,
+                                                 50000);
+
+      "cpuinfo_processor_lines"
+        slist => grep("processor\s+:\s\d+", "cpuinfo_lines"),
+        comment => "The number of processor entries in $(files[cpuinfo]). If no
+                    'physical id' entries are found this is the processor count";
+
+      "cpuinfo_processor_lines_count"
+        int => length("cpuinfo_processor_lines");
+
+      "cpuinfo_physical_id_lines"
+        slist => grep("physical id.*", "cpuinfo_lines"),
+        comment => "This identifies which physical socket a logical core is on,
+                    the count of the unique physical id lines tells you how
+                    many physical sockets you have. THis would not be present
+                    on systems that are not multicore.";
+
+      "cpuinfo_physical_id_lines_unique"
+        slist => unique("cpuinfo_physical_id_lines");
+
+      "cpuinfo_physical_id_lines_unique_count"
+        int => length("cpuinfo_physical_id_lines_unique");
+
+
+      # If we have physical id lines in cpu info use that for socket inventory,
+      # else we should use the number of processor lines. physical id lines
+      # seem to only be present when multiple cores are active.
+      "cpuinfo_physical_socket_inventory"
+        string => ifelse(isgreaterthan( length("cpuinfo_physical_id_lines"), 0 ), "$(cpuinfo_physical_id_lines_unique_count)",
+                      "$(cpuinfo_processor_lines_count)"),
+        meta => { "inventory", "attribute_name=CPU Sockets" };
+
     _have_proc_partitions::
       "partitions_count" int =>  readstringarrayidx("partitions_array",
                                                     "$(files[partitions])",
@@ -167,7 +220,35 @@ bundle agent cfe_autorun_inventory_proc
       "version" string => readfile("$(files[version])", 2048);
 
   classes:
+
       "have_proc" expression => isdir($(inventory_control.proc));
+
+      # So that we don't inventory non dereferenced variables we check to see
+      # if we have the info first This is only necessary because its currently
+      # invalid to do isvariable on an array key that contains a space
+      # Ref: redmine#7088 https://dev.cfengine.com/issues/7088
+      "have_cpuinfo_cpu_cores" expression => strcmp("cpu cores", "$(cpuinfo_array[$(cpuinfo_idx)][0])");
+      "have_cpuinfo_model_name" expression => strcmp("model name", "$(cpuinfo_array[$(cpuinfo_idx)][0])");
+
+      # If siblings is greater (usually twice as much) than cores, HT is likely enabled
+      "cpuinfo_siblings_greater_than_cores"
+        expression => isgreaterthan("$(cpuinfo[siblings])", "$(cpuinfo[cpu cores])"),
+	comment => "If number of cores is equal to number of siblings then
+                    hyperthreading is OFF.
+                    Ref: http://linuxhunt.blogspot.com/2010/03/understanding-proccpuinfo.html";
+
+      # HT can't be enabled if the flag isn't present
+      "cpuinfo_flag_ht"
+        expression => regcmp("\bht\b", "$(cpuinfo[flags])");
+
+      "cpuinfo_hyperthreading_enabled"
+        and => { "cpuinfo_flag_ht", "cpuinfo_siblings_greater_than_cores" };
+
+      "cpuinfo_hyperthreading_disabled"
+        expression => strcmp("$(cpuinfo[cpu cores])", "$(cpuinfo[siblings])"),
+	comment => "If number of cores is equal to number of siblings then
+                    hyperthreading is OFF.
+                    Ref: http://linuxhunt.blogspot.com/2010/03/understanding-proccpuinfo.html";
 
     have_proc::
       "_have_proc_$(basefiles)"
@@ -184,6 +265,16 @@ bundle agent cfe_autorun_inventory_proc
       scope => "namespace";
 
   reports:
+    DEBUG|DEBUG_cfe_autorun_inventory_proc::
+     "DEBUG $(this.bundle)";
+     "$(const.t)cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])] = $(cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])])";
+     "$(const.t)Hyperthreading $(cpuinfo_hyperthreading)"
+       ifvarclass => "cpuinfo_hyperthreading_enabled|cpuinfo_hyperthreading_disabled";
+     "$(const.t)CPU physical cores: '$(cpuinfo_physical_cores)'"
+        ifvarclass => "have_cpuinfo_cpu_cores";
+     "$(const.t)CPU model name: '$(cpuinfo_cpu_model_name)'"
+        ifvarclass => "have_cpuinfo_model_name";
+     "$(const.t)CPU Physical Sockets: '$(cpuinfo_physical_socket_inventory)'";
     _have_proc_consoles.verbose_mode::
       "$(this.bundle): we have console $(consoles[$(console_idx)][0])";
     _have_proc_modules.verbose_mode::
@@ -293,7 +384,6 @@ bundle agent cfe_autorun_inventory_dmidecode
   "system-serial-number": "System serial number",
   "system-manufacturer": "System manufacturer",
   "system-version": "System version",
-  "processor-version": "CPU model"
 }');
 
       # other dmidecode variables you may want:
@@ -311,6 +401,7 @@ bundle agent cfe_autorun_inventory_dmidecode
       # processor-family
       # processor-frequency
       # processor-manufacturer
+      # processor-version # Known to be problematic in some environments, just use /proc/cpuinfo instead
       # system-product-name
       # system-uuid
 
@@ -337,9 +428,6 @@ bundle agent cfe_autorun_inventory_dmidecode
       "dmi[system-version]" string => $(bios_array[4]),
       meta => { "inventory", "attribute_name=System version" };
 
-      "dmi[processor-version]" string => $(processor_array[1]),
-      meta => { "inventory", "attribute_name=CPU model" };
- 
       "split_pscomputername"
         slist => string_split($(system_array[1]), "PSComputerName\s.*", 2),
         comment => "Work around weird appearance of PSComputerName into System manufacturer";
