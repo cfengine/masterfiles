@@ -60,6 +60,8 @@ body common control
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
                   "cfe_internal/update/update_processes.cf",
+
+                  "services/service_catalogue.cf",
       };
 
       version => "CFEngine Promises.cf 3.7.0";
@@ -247,19 +249,7 @@ bundle common services_autorun
       "$(this.bundle): defining inputs='$(inputs)'";
 }
 
-###############################################################################
-#
-# bundle agent service_catalogue
-#  - general purposes of usage
-#
-###############################################################################
 
-bundle agent service_catalogue
-# User Defined Custom Service Catalogue
-{
-  methods:
-    # Activate your custom policies here
-}
 
 # special body for update/*.cf compatibility
 body classes u_kept_successful_command
