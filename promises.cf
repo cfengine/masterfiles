@@ -25,7 +25,7 @@ body common control
 
                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
-                          service_catalogue,
+                          main,
                           @(cfengine_enterprise_hub_ha.management_bundles),
 
       };
@@ -53,7 +53,7 @@ body common control
                   # autorun system
                   @(services_autorun.inputs),
 
-                  "services/service_catalogue.cf",
+                  "services/main.cf",
       };
 
       version => "CFEngine Promises.cf 3.7.0";

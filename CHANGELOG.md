@@ -20,8 +20,9 @@ Notable changes to the framework should be documented here
  - Relocate services/file_change.cf to cfe_internal/enterprise. This policy is
    most useful for a good OOTB experience with CFEngine Enterprise Mission
    Portal.
- - Relocate service_catalogue from promsies.cf to
-   services/service_catalogue.cf. It is intended to be a user entry.
+ - Relocate service_catalogue from promsies.cf to services/main.cf. It is
+   intended to be a user entry. This name change correlates with the main
+   bundle being activated by default if there is no bundlesequence specified.
 
 ### Deprecated
 
