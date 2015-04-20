@@ -8,6 +8,7 @@ Notable changes to the framework should be documented here
    policy supplied by the framework itself (see example_def.json)
 
 ### Changed
+ - Relocate def.cf to controls/VER/
  - Re-organize cfe_internal splitting core from enterprise specific policies
    and loading the appropriate inputs only when necessary
  - Moved update directory into cfe_internal as it is not generally intended to
