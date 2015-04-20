@@ -25,7 +25,7 @@ bundle agent init
       "promises_cf_path" string => nth(promises_cf_slist, 0);
 
       "masterfiles_path" string => dirname("$(promises_cf_path)");
-      "def_cf_path"      string => concat("$(masterfiles_path)", "/def.cf");
+      "def_cf_path"      string => concat("$(masterfiles_path)", "/lib/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf");
 }
 
 bundle agent test
