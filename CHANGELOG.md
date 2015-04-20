@@ -27,6 +27,8 @@ Notable changes to the framework should be documented here
 
 ### Removed
  - Diff reporting on /etc/shadow (Enterprise)
+ - Update policy from promise.cf inputs. There is no reason to include the
+   update policy into promsies.cf, update.cf is the entry for the update policy
 
 ### Fixed
 
