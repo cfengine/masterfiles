@@ -146,7 +146,7 @@ bundle common cfe_internal_inputs
         comment => "This policy produces a text based host info report
                     and serves as a functional example of using mustache templates";
 
-    enterprise_edition.policy_server::
+    enterprise_edition::
 
       "input[enterprise_hub_specific]"
         string => "cfe_internal/enterprise/CFE_hub_specific.cf",
@@ -156,9 +156,6 @@ bundle common cfe_internal_inputs
       "input[enterprise_knowledge]"
         string => "cfe_internal/enterprise/CFE_knowledge.cf",
         comment => "Settings mostly releated to CFEngine Enteprise Mission Portal";
-
-
-    enterprise_edition::
 
       "input[enterprise_main]"
         string => "cfe_internal/enterprise/main.cf",
