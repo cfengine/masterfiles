@@ -1,5 +1,5 @@
 {
-    "roles":
+    "classes":
     {
         "my_apache": [ "server1", "server2", "redhat.*" ],
         "my_other_apache": [ "server[34]", "debian.*" ],
@@ -9,9 +9,9 @@
         "my_redhat_role": [ "redhat.*" ],
         "my_apt_role": [ "debian.*" ],
         "my_debian_role": [ "debian.*" ],
+        "services_autorun": [ "any" ],
     },
 
-    "classes": [ "services_autorun" ],
     "inputs": [ "$(sys.libdir)/bundles.cf" ],
     "vars": {
         "acl": [ ".*$(def.domain)", "$(sys.policy_hub)/16" ],

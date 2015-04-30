@@ -1,0 +1,13 @@
+###############################################################################
+#
+# bundle agent main
+#  - User/Site policy entry
+#
+###############################################################################
+
+bundle agent main
+# User Defined Service Catalogue
+{
+  methods:
+    # Activate your custom policies here
+}

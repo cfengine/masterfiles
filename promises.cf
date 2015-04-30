@@ -25,14 +25,14 @@ body common control
 
                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
-                          service_catalogue,
+                          main,
                           @(cfengine_enterprise_hub_ha.management_bundles),
 
       };
 
       inputs => {
                  # File definition for global variables and classes
-                  "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
+                  "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
 
                 # Inventory policy
                   @(inventory.inputs),
@@ -41,10 +41,8 @@ body common control
                   "sketches/meta/api-runfile.cf",
                   @(cfsketch_g.inputs),
 
-                 # CFEngine internal processes for Mission Portal mostly
-                  "cfe_internal/CFE_cfengine.cf",
-                  "cfe_internal/CFE_hub_specific.cf",
-                  "cfe_internal/CFE_knowledge.cf",
+                 # CFEngine internal policy for the management of CFEngine itself
+                  @(cfe_internal_inputs.inputs),
 
                  # Control body for all CFEngine robot agents
                   @(cfengine_controls.inputs),
@@ -52,23 +50,10 @@ body common control
                  # COPBL/Custom libraries.  Eventually this should use wildcards.
                   @(cfengine_stdlib.inputs),
 
-                 # Reports
-                  @(cfengine_reports.inputs),
-
                   # autorun system
                   @(services_autorun.inputs),
 
-                  # Add update files to build Knowledge Map relationship
-                  "update/update_bins.cf",
-                  "update/cfe_internal_dc_workflow.cf",
-                  "update/cfe_internal_local_git_remote.cf",
-                  "update/cfe_internal_update_from_repository.cf",
-                  "update/update_policy.cf",
-                  "update/update_processes.cf",
-
-                # List of services here
-                  "services/file_change.cf",
-
+                  "services/main.cf",
       };
 
       version => "CFEngine Promises.cf 3.7.0";
@@ -131,6 +116,60 @@ bundle common inventory
 
       #
 
+bundle common cfe_internal_inputs
+{
+  vars:
+    any::
+
+      "input[cfe_internal_management]"
+        string => "cfe_internal/CFE_cfengine.cf",
+        comment => "This policy activates internal managment policies
+                    for both core and enterprise";
+
+      "input[core_main]"
+        string => "cfe_internal/core/main.cf",
+        comment => "This policy activates other core policies";
+
+      "input[core_limit_robot_agents]"
+        string => "cfe_internal/core/limit_robot_agents.cf",
+        comment => "The policy here ensures that we don't have too many
+                    cf-monitord or cf-execd processes";
+
+      "input[core_log_rotation]"
+        string => "cfe_internal/core/log_rotation.cf",
+        comment => "This policy ensures that various cfengine log files
+                    do not grow without bound and fill up the disk";
+
+    !cfengine_3_5::
+      "input[core_host_info_report]"
+        string => "cfe_internal/core/host_info_report.cf",
+        comment => "This policy produces a text based host info report
+                    and serves as a functional example of using mustache templates";
+
+    enterprise_edition::
+
+      "input[enterprise_hub_specific]"
+        string => "cfe_internal/enterprise/CFE_hub_specific.cf",
+        comment => "Policy relating to CFEngine Enterprise Hub, for example
+                    software updates, webserver configuration, and alerts";
+
+      "input[enterprise_knowledge]"
+        string => "cfe_internal/enterprise/CFE_knowledge.cf",
+        comment => "Settings mostly releated to CFEngine Enteprise Mission Portal";
+
+      "input[enterprise_main]"
+        string => "cfe_internal/enterprise/main.cf",
+        comment => "This policy activates other enterprise specific policies";
+
+      "input[change_management]"
+        string => "cfe_internal/enterprise/file_change.cf",
+        comment => "This policy monitors critical system files for change";
+
+
+    any::
+      "inputs" slist => getvalues("input");
+}
+
 bundle common cfengine_stdlib
 {
   vars:
@@ -181,22 +220,6 @@ bundle common cfengine_controls
       "$(this.bundle): defining inputs='$(inputs)'";
 }
 
-bundle common cfengine_reports
-{
-  vars:
-    cfengine_3_5::
-      "inputs" slist => { cf_null };
-
-    !cfengine_3_5::
-      "inputs" slist => {
-                          "cfe_internal/host_info_report.cf",
-      };
-
-  reports:
-    verbose_mode::
-      "$(this.bundle): defining inputs='$(inputs)'";
-}
-
 bundle common services_autorun
 {
   vars:
@@ -206,7 +229,7 @@ bundle common services_autorun
       "bundles" slist => { "services_autorun" }; # run self
 
     !cfengine_3_5::
-      "inputs" slist => { "services/autorun.cf" };
+      "inputs" slist => { "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
 
@@ -215,27 +238,7 @@ bundle common services_autorun
       "$(this.bundle): defining inputs='$(inputs)'";
 }
 
-###############################################################################
-#
-# bundle agent service_catalogue
-#  - general purposes of usage
-#
-###############################################################################
 
-bundle agent service_catalogue
-
-{
-
-  methods:
-
-    any::
-
-      "security" -> { goal_infosec, goal_compliance }
-      comment => "Basic change management",
-      handle => "service_catalogue_change_management",
-      usebundle => change_management;
-
-}
 
 # special body for update/*.cf compatibility
 body classes u_kept_successful_command
