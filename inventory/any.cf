@@ -215,34 +215,8 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
       "have_cpuinfo_cpu_cores" expression => strcmp("cpu cores", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
       "have_cpuinfo_model_name" expression => strcmp("model name", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
 
-      # Stubbed out hyperthreading, works but difficult to detect reliably? Limited value?
-        ## If siblings is greater (usually twice as much) than cores, HT is likely enabled
-        #"cpuinfo_siblings_greater_than_cores"
-        #  expression => isgreaterthan("$(default:cfe_autorun_inventory_proc.cpuinfo[siblings])", "$(default:cfe_autorun_inventory_proc.cpuinfo[cpu cores])"),
-        #  comment => "If number of cores is equal to number of siblings then
-        #              hyperthreading is OFF.
-        #              Ref: http://linuxhunt.blogspot.com/2010/03/understanding-proccpuinfo.html";
-
-        ## HT can't be enabled if the flag isn't present
-        #"cpuinfo_flag_ht"
-        #  expression => regcmp("\bht\b", "$(default:cfe_autorun_inventory_proc.cpuinfo[flags])");
-
-        #"cpuinfo_hyperthreading_enabled"
-        #  and => { "cpuinfo_flag_ht", "cpuinfo_siblings_greater_than_cores" };
-
-        #"cpuinfo_hyperthreading_disabled"
-        #  expression => strcmp("$(default:cfe_autorun_inventory_proc.cpuinfo[cpu cores])", "$(default:cfe_autorun_inventory_proc.cpuinfo[siblings])"),
-        #  comment => "If number of cores is equal to number of siblings then
-        #              hyperthreading is OFF.
-        #              Ref: http://linuxhunt.blogspot.com/2010/03/understanding-proccpuinfo.html";
-
   vars:
     _have_cpuinfo::
-      # Stubbed out hyperthreading, works but difficult to detect reliably? Limited value?
-        #"cpuinfo_hyperthreading"
-        #  string => ifelse("cpuinfo_hyperthreading_disabled", "disabled", "cpuinfo_hyperthreading_enabled", "enabled", "unknown");
-        #  meta => { "inventory", "attribute_name=Hyperthreading", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
-
       "cpuinfo_physical_cores"
         string => "$(default:cfe_autorun_inventory_proc.cpuinfo[cpu cores])",
         ifvarclass => "have_cpuinfo_cpu_cores";
@@ -487,7 +461,6 @@ bundle agent cfe_autorun_inventory_dmidecode
       meta => { "inventory", "attribute_name=System version" };
 
       "dmi[processor-version]" string => $(processor_array[1]);
-      #meta => { "inventory", "attribute_name=CPU model" };
  
       "split_pscomputername"
         slist => string_split($(system_array[1]), "PSComputerName\s.*", 2),
