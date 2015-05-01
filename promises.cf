@@ -188,7 +188,6 @@ bundle common cfengine_stdlib
                           "lib/3.5/monitor.cf",
                           "lib/3.5/guest_environments.cf",
                           "lib/3.5/bundles.cf",
-                          "lib/3.5/reports.cf",
                           "lib/3.5/cfe_internal.cf",
       };
 
@@ -206,18 +205,46 @@ bundle common cfengine_stdlib
 bundle common cfengine_controls
 {
   vars:
-      "inputs" slist => {
-                          "controls/cf_agent.cf",
-                          "controls/cf_execd.cf",
-                          "controls/cf_hub.cf",
-                          "controls/cf_monitord.cf",
-                          "controls/cf_runagent.cf",
-                          "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_serverd.cf",
-      };
+    any::
+
+      "input[cf_agent]"
+        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_agent.cf",
+        comment => "Agent control options";
+
+      "input[cf_execd]"
+        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_execd.cf",
+        comment => "Executor (scheduler) control options";
+
+      "input[cf_monitord]"
+        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_monitord.cf",
+        comment => "Monitor/Measurement control options";
+
+      "input[cf_serverd]"
+        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_serverd.cf",
+        comment => "Server control options";
+
+      "input[cf_runagent]"
+        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_runagent.cf",
+        comment => "Runagent (remote activation request) control options";
+
+    enterprise_edition::
+
+      "input[cf_hub]" -> { "CFEngine Enterprise" }
+        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_hub.cf",
+        comment => "Hub (agent report collection) control options";
+
+      "input[reports]" -> { "CFEngine Enterprise" }
+        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/reports.cf",
+        comment => "Report collection options";
+
+    any::
+
+      "inputs" slist => getvalues(input);
 
   reports:
-    verbose_mode::
-      "$(this.bundle): defining inputs='$(inputs)'";
+    DEBUG|DEBUG_cfengine_controls::
+      "DEBUG $(this.bundle)";
+        "$(const.t)defining inputs='$(inputs)'";
 }
 
 bundle common services_autorun

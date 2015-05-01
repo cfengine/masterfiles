@@ -59,10 +59,6 @@ body server control
 bundle server access_rules()
 
 {
-  vars:
-    enterprise::      
-      "query_types" slist => {"delta", "rebase", "full"};
-
   access:
 
     any::
@@ -146,22 +142,6 @@ bundle server access_rules()
       handle => "server_access_grant_access_agent",
       comment => "Grant access to the agent (for cf-runagent)",
       admit   => { @(def.policy_servers) };
-
-    !policy_server.enterprise::
-      "$(query_types)"
-      handle => "server_access_grant_$(query_types)_for_hosts",
-      comment => "Grant $(query_types) reporting query for the hub on the hosts",
-      resource_type => "query",
-      report_data_select => default_data_select_host,
-      admit => { @(def.policy_servers) };
-
-    policy_server.enterprise::
-      "$(query_types)"
-      handle => "server_access_grant_$(query_types)_for_hub",
-      comment => "Grant $(query_types) reporting query for the hub on the policy server",
-      resource_type => "query",
-      report_data_select => default_data_select_policy_hub,
-      admit => { @(def.policy_servers) };
 
   roles:
 

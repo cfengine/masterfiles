@@ -9,6 +9,11 @@ Notable changes to the framework should be documented here
 
 ### Changed
  - Relocate def.cf to controls/VER/
+ - Relocate update_def to controls/VER
+ - Relocate all controls to controls/VER
+ - Only load cf_hub and reports.cf on CFEngine Enterprise installs
+ - Relocate acls related to report collection from bundle server access_rules
+   to controls/VER/reports.cf into bundle server report_access_rules
  - Re-organize cfe_internal splitting core from enterprise specific policies
    and loading the appropriate inputs only when necessary
  - Moved update directory into cfe_internal as it is not generally intended to
