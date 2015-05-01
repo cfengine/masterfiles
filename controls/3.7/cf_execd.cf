@@ -1,0 +1,53 @@
+###############################################################################
+# This part is for cf-execd
+#
+# These body settings determine the behaviour of cf-execd,
+# including scheduling times and output capture to
+# $(sys.workdir)/outputs and relay via email.
+###############################################################################
+
+body executor control
+
+{
+
+    any::
+
+      splaytime  => "4"; # activity will be spread over this many time slices
+
+    cfengine_internal_agent_email::
+      mailto     => "$(def.mailto)";
+      mailfrom   => "$(def.mailfrom)";
+      smtpserver => "$(def.smtpserver)";
+
+    any::
+
+      # Default:
+      #
+      # schedule => { "Min00", "Min05", "Min10", "Min15", "Min20",
+      #               "Min25", "Min30", "Min35", "Min40", "Min45",
+      #               "Min50", "Min55" };
+
+      # The full path and command to the executable run by default (overriding builtin).
+      # cf-twin needs its own safe environment because of the update mechanism
+
+    windows.cfengine_3_5::
+      exec_command => "$(sys.cf_twin) -f \"$(sys.workdir)\inputs\update.cf\" & $(sys.cf_agent) -Dcf_execd_initiated";
+    windows.!cfengine_3_5::
+      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -Dcf_execd_initiated";
+
+    hpux.cfengine_3_5::
+      exec_command => "SHLIB_PATH=\"$(sys.workdir)/lib-twin\" $(sys.cf_twin) -f \"$(sys.workdir)/inputs/update.cf\" ; $(sys.cf_agent) -Dcf_execd_initiated";
+    hpux.!cfengine_3_5::
+      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dcf_execd_initiated";
+
+    aix.cfengine_3_5::
+      exec_command => "LIBPATH=\"$(sys.workdir)/lib-twin\" $(sys.cf_twin) -f \"$(sys.workdir)/inputs/update.cf\" ; $(sys.cf_agent) -Dcf_execd_initiated";
+    aix.!cfengine_3_5::
+      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dcf_execd_initiated";
+
+    !(windows|hpux|aix).cfengine_3_5::
+      exec_command => "LD_LIBRARY_PATH=\"$(sys.workdir)/lib-twin\" $(sys.cf_twin) -f \"$(sys.workdir)/inputs/update.cf\" ; $(sys.cf_agent) -Dcf_execd_initiated";
+    !(windows|hpux|aix).!cfengine_3_5::
+      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dcf_execd_initiated";
+
+}
