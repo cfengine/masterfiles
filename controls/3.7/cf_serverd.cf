@@ -37,6 +37,9 @@ body server control
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
 
+    enterprise.!policy_server::
+      listen => "false";
+
     enterprise::
       call_collect_interval => "5";
       collect_window => "50";
