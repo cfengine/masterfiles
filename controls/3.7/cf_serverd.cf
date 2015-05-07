@@ -37,6 +37,10 @@ body server control
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
 
+    enterprise::
+      call_collect_interval => "5";
+      collect_window => "50";
+
     windows::
       cfruncommand => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
 
@@ -94,6 +98,11 @@ bundle server access_rules()
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
       admit => { @(def.policy_servers) };
+
+    enterprise.policy_server::
+      "collect_calls"
+        resource_type => "query",
+        admit_ips => { @{def.acl} };
 
     policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/ppkeys"
