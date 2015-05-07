@@ -7,7 +7,6 @@
 ###############################################################################
 
 body server control
-
 {
       # List of ciphers the server accepts. For Syntax help see man page
       # for "openssl ciphers". Default is "AES256-GCM-SHA384:AES256-SHA"
@@ -54,17 +53,15 @@ body server control
       cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     solaris::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     !(windows|hpux|aix|solaris)::
       cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
-
 }
 
 ###############################################################################
 
 bundle server access_rules()
-
 {
   access:
 
@@ -162,5 +159,4 @@ bundle server access_rules()
       # define certain soft-classes when running cf-agent on this host
 
       ".*" authorize => { "root" };
-
 }
