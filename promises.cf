@@ -78,7 +78,7 @@ bundle common inventory
 # Tested to work properly against 3.5.x
 {
   classes:
-      "other_unix_os" expression => "!windows.!macos.!linux";
+      "other_unix_os" expression => "!windows.!macos.!linux.!freebsd";
       "specific_linux_os" expression => "redhat|debian|suse";
 
   vars:
@@ -98,6 +98,9 @@ bundle common inventory
     !cfengine_3_5.macos::
       "inputs" slist => { "inventory/any.cf", "inventory/macos.cf", "inventory/os.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_macos", "inventory_os" };
+    !cfengine_3_5.freebsd::
+      "inputs" slist => { "inventory/any.cf", "inventory/freebsd.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_freebsd", "inventory_os" };
     !cfengine_3_5.linux.!specific_linux_os::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/os.cf"};
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_os" };

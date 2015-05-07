@@ -222,11 +222,20 @@ bundle common inventory_control
 # are disabled.
 {
   vars:
-      "dmidecoder" string => "/usr/sbin/dmidecode";
       "lldpctl_exec" string => "/usr/bin/lldpctl";
       "lsb_exec" string => "/usr/bin/lsb_release";
       "mtab" string => "/etc/mtab";
       "proc" string => "/proc";
+
+  vars:
+
+    freebsd::
+
+      "dmidecoder" string => "/usr/local/sbin/dmidecode";
+
+    !freebsd::
+
+      "dmidecoder" string => "/usr/sbin/dmidecode";
 
   classes:
       # setting this disables all the inventory modules except package_refresh
@@ -272,7 +281,7 @@ bundle common inventory_control
       # by default disable the proc inventory if the general
       # inventory is disabled or /proc is missing.  Note that
       # this is typically fast.
-      "disable_inventory_proc" expression => "disable_inventory";
+      "disable_inventory_proc" expression => "disable_inventory|freebsd";
       "disable_inventory_proc" not => isdir($(proc));
 
       # by default don't run the CMDB integration every time, even if
