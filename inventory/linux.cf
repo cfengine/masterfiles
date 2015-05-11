@@ -2,6 +2,10 @@ bundle common inventory_linux
 # @brief Linux inventory
 #
 # This common bundle is for Linux inventory work.
+#
+# Provides:
+#  os_release_id, and os_release_version based on parsing of /etc/os-release
+#  systemd class based on linktarget of /proc/1/cmdline
 {
   vars:
     has_os_release::
@@ -54,6 +58,7 @@ bundle common inventory_linux
       comment => "Check if (the link target of) /proc/1/cmdline is systemd";
 
   reports:
-    inform_mode.has_os_release::
-      "$(this.bundle): OS release ID = $(os_release_id), OS release version = $(os_release_version)";
+    (DEBUG|DEBUG_inventory_linux).has_os_release::
+      "DEBUG $(this.bundle)";
+      "$(const.t)OS release ID = $(os_release_id), OS release version = $(os_release_version)";
 }
