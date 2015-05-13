@@ -115,12 +115,6 @@ bundle agent cfe_internal_hub_maintain
                                                 "table": "__PromiseExecutionsLog",
                                                 "history_length_days": 7,
                                                 "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "promiselog",
-                                                "table": "__PromiseLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
                                             }
                                            ]');
 

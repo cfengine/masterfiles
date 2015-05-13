@@ -115,12 +115,6 @@ bundle agent cfe_internal_hub_maintain
                                                 "table": "__PromiseExecutionsLog",
                                                 "history_length_days": 7,
                                                 "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "promiselog",
-                                                "table": "__PromiseLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
                                             }
                                            ]');
 
@@ -156,6 +150,10 @@ bundle agent cfe_internal_hub_maintain
       "Remove diagnostics history"
       usebundle => cfe_internal_database_cleanup_diagnostics(@(diagnostics_settings)),
       action => if_elapsed(5);
+
+      "Remove promise log history"
+      usebundle => cfe_internal_database_cleanup_promise_log("7"),
+      action => if_elapsed(5);      
 }
 
 bundle agent cfe_internal_database_cleanup_reports (settings)
@@ -243,4 +241,27 @@ bundle agent cfe_internal_cleanup_agent_reports
       "$(files)"
         delete => tidy,
         handle => "cf_cleanup_agent_reports_$(files)";
+}
+
+bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
+# @ignore
+# @brief clean up promise log
+{
+  vars:
+    "cleanup_query_repaired"
+    string => "SELECT promise_log_repaired_partition_cleanup('$(history_length_days) day');";
+
+    "cleanup_query_notkept"
+    string => "SELECT promise_log_notkept_partition_cleanup('1 day');";
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
+      contain => in_shell_and_silent,
+      classes => kept_successful_command,
+      handle => "cf_database_maintain_promise_log_repaired";
+
+      "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_notkept)\""
+      contain => in_shell_and_silent,
+      classes => kept_successful_command,
+      handle => "cf_database_maintain_promise_log_notkept";
 }
