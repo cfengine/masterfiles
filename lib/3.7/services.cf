@@ -283,21 +283,21 @@ bundle agent standard_services(service,state)
       "classic" usebundle => classic_services($(service), $(state));
 
   reports:
-    inform_mode.systemd::
+    verbose_mode.systemd::
       "$(this.bundle): using systemd layer to $(state) $(service)";
-    inform_mode.systemd.!service_loaded::
+    verbose_mode.systemd.!service_loaded::
       "$(this.bundle): Service $(service) unit file is not loaded; doing nothing";
-    inform_mode.chkconfig::
+    verbose_mode.chkconfig::
       "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))"
         ifvarclass => "!chkconfig_$(c_service)_unregistered";
-    inform_mode.chkconfig::
+    verbose_mode.chkconfig::
       "$(this.bundle): skipping chkconfig layer to $(state) $(service) because $(service) is not registered with chkconfig (chkconfig --list $(service))"
         ifvarclass => "chkconfig_$(c_service)_unregistered";
-    inform_mode.sysvservice::
+    verbose_mode.sysvservice::
       "$(this.bundle): using System V service / Upstart layer to $(state) $(service)";
-    inform_mode.smf::
+    verbose_mode.smf::
       "$(this.bundle): using Solaris SMF to $(state) $(service) (svcadm mode $(svcadm_mode))";
-    inform_mode.fallback::
+    verbose_mode.fallback::
       "$(this.bundle): falling back to classic_services to $(state) $(service)";
 }
 
