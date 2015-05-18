@@ -303,8 +303,6 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
      "$(const.t)CPU model name: '$(cpuinfo_cpu_model_name)'"
         ifvarclass => "have_cpuinfo_model_name";
      "$(const.t)CPU Physical Sockets: '$(cpuinfo_physical_socket_inventory)'";
-     "$(const.t)Hyperthreading $(cpuinfo_hyperthreading)"
-       ifvarclass => "cpuinfo_hyperthreading_enabled|cpuinfo_hyperthreading_disabled";
 }
 
 bundle agent cfe_autorun_inventory_cpuinfo
