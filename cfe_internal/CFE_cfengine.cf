@@ -17,19 +17,26 @@
 
 bundle agent cfe_internal_management
 {
+  vars:
+    any::
+      "policy[cfe_internal_core_main]"
+        string => "cfe_internal_core_main",
+        comment => "Activate policies related to basic CFEngine operations";
+
+    enterprise_edition::
+      "policy[cfe_internal_enterprise_main]"
+        string => "cfe_internal_enterprise_main",
+        comment => "Activate policies related to CFEngne Enterprise operations";
+
+    any::
+      "bundles" slist => getindices(policy);
+
   methods:
 
       #
       # CFEngine internals
       #
 
-    any::
-      "any"
-        usebundle => "cfe_internal_core_main",
-        comment => "Activate policies related to basic CFEngine operations";
-
-    enterprise_edition::
-      "any"
-        usebundle => "cfe_internal_enterprise_main",
-        comment => "Activate policies related to CFEngne Enterprise operations";
+      "CFEngine_Internals"
+        usebundle => "$(bundles)";
 }

@@ -14,7 +14,6 @@ body common control
                           @(inventory.bundles),
                           def,
                           @(cfengine_enterprise_hub_ha.classification_bundles),
-                          cfe_internal_hub_vars,
 
                           # Design Center
                           cfsketch_run,
