@@ -119,11 +119,11 @@ bundle agent cfe_internal_update_bins
       comment => "Name convention of package arch on 32-bit RHEL",
       handle => "cfe_internal_update_bins_vars_pkgarch_redhat_32b";
 
-    redhat.x86_64.enterprise::
+    redhat.(x86_64|ppc64).enterprise::
 
       "pkgarch"                 string => "$(sys.arch)",
-      comment => "Name convention of package arch on 64-bit RHEL",
-      handle => "cfe_internal_update_bins_vars_pkgarch_redhat_64b";
+      comment => "Name convention of package arch on RHEL x86_64 and ppc64",
+      handle => "cfe_internal_update_bins_vars_pkgarch_redhat_x86_64_and_ppc64";
 
     (freebsd|netbsd|debian|aix).enterprise::
 
