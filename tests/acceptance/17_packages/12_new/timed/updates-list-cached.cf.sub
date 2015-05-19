@@ -1,0 +1,28 @@
+# Test that updates list cache is not updated too often.
+
+body common control
+{
+    inputs => { "../../../default.cf.sub" };
+    bundlesequence => { default($(this.promise_filename)) };
+
+    package_module => "test_module";
+}
+
+body package_module test_module
+{
+    # Cache should be updated on pass 1 and 2, but not pass 3.
+    # On pass 1, the cache is empty, on pass 2, the 2 minute ifelapsed value
+    # should have expired. On pass 3 it has not.
+    query_updates_ifelapsed => "2";
+
+    query_installed_ifelapsed => "30";
+}
+
+bundle agent test
+{
+  packages:
+      # Promise outcome is irrelevant, we're only interested in the cached package list.
+      "cfe-present-package"
+        policy => "present",
+        version => "latest";
+}

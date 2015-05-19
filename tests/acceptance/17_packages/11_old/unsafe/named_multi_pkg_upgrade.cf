@@ -1,0 +1,121 @@
+#######################################################
+#
+# Test add multiple packages
+#
+#######################################################
+
+body common control
+{
+    inputs => {
+                "../../../dcs.cf.sub",
+                "../../../../../$(sys.local_libdir)/stdlib.cf",
+                "../../../../../$(sys.local_libdir)/packages.cf",
+                "../../packages-info.cf.sub",
+              };
+    bundlesequence  => { default("$(this.promise_filename)") };
+    version => "1.0";
+    cache_system_functions => "no";
+}
+
+
+
+#######################################################
+
+bundle agent init
+{
+  meta:
+      "test_skip_needs_work" string => "!redhat.!debian",
+        meta => { "redmine5866" };
+      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
+      "test_skip_unsupported" string => "redhat_4";
+
+  methods:
+    "install_package" usebundle => install_package("$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy");
+    "install_package" usebundle => install_package("$(p.name[2])", "$(p.version[1])", "$(p.arch)", "dummy");
+    "install_package" usebundle => install_package("$(p.name[3])", "$(p.version[1])", "$(p.arch)", "dummy");
+}
+
+#######################################################
+
+bundle agent test
+{
+    vars:
+        "package_name" slist => { "$(p.name[3])","$(p.name[1])","$(p.name[2])"};
+    packages:
+
+        debian::
+
+            "$(package_name)"
+            package_policy => "update",
+            package_select => "==",
+            package_version => "1.0-2",
+            package_method => apt_get,
+            classes => test_set_class("pass_$(package_name)","fail_$(package_name)");
+
+        redhat::
+
+            "$(package_name)"
+            package_policy => "update",
+            package_select => "==",
+            package_version => "1.0-2",
+            package_method => yum_rpm,
+            classes => test_set_class("pass_$(package_name)","fail_$(package_name)");
+
+        suse::
+
+            "$(package_name)"
+            package_policy => "update",
+            package_select => "==",
+            package_version => "1.0-2",
+            package_method => zypper,
+            classes => test_set_class("pass_$(package_name)","fail_$(package_name)");
+}
+
+
+
+body classes test_set_class(ok_class,notok_class)
+{
+        promise_kept => { "$(ok_class)" };
+        promise_repaired => { "$(ok_class)" };
+        repair_failed => { "$(notok_class)" };
+}
+
+#######################################################
+
+bundle agent check
+{
+    classes:
+
+        debian::
+
+            "has_pkg_$(test.package_name)" expression => returnszero("dpkg -l | grep ' $(test.package_name) '", "useshell");
+
+        redhat|suse::
+
+            "has_pkg_$(test.package_name)" expression => returnszero("/bin/rpm -qa | grep -qw $(test.package_name)", "useshell");
+
+        any::
+            "has_file_test_package_charlie" expression => fileexists("$(p.file[3][$(p.latest_version)])");
+            "has_file_test_package_alpha" expression => fileexists("$(p.file[1][$(p.latest_version)])");
+            "has_file_test_package_beta" expression => fileexists("$(p.file[2][$(p.latest_version)])");
+
+            # Would be nice to test the pass_* and fail_* classes here, but CFEngine
+            # doesn't set the classes properly when installing multiple new packages.
+            "charlie_ok" and => { #"pass_test_package_charlie", "!fail_test_package_charlie",
+                                  "has_pkg_test_package_charlie", "has_file_test_package_charlie" };
+            "alpha_ok" and => { #"pass_test_package_alpha", "!fail_test_package_alpha",
+                                "has_pkg_test_package_alpha", "has_file_test_package_alpha" };
+            "beta_ok" and => { #"pass_test_package_beta", "!fail_test_package_beta",
+                               "has_pkg_test_package_beta", "has_file_test_package_beta" };
+            "ok" and => { "charlie_ok", "alpha_ok", "beta_ok" };
+
+    reports:
+
+        ok::
+
+            "$(this.promise_filename) Pass";
+
+       !ok::
+
+            "$(this.promise_filename) FAIL";
+}
