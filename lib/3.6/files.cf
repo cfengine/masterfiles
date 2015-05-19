@@ -2028,8 +2028,8 @@ bundle agent file_tidy(file)
       "$(file)" delete => tidy;
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): deleting $(file) with delete => tidy";
+    DEBUG|DEBUG_file_tidy::
+      "DEBUG $(this.bundle): deleting $(file) with delete => tidy";
 }
 
 bundle agent dir_sync(from, to)
@@ -2051,8 +2051,8 @@ bundle agent dir_sync(from, to)
       copy_from => copyfrom_sync($(from));
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): copying directory $(from) to $(to)";
+    DEBUG|DEBUG_dir_sync::
+      "DEBUG $(this.bundle): copying directory $(from) to $(to)";
 }
 
 bundle agent file_copy(from, to)
@@ -2072,8 +2072,8 @@ bundle agent file_copy(from, to)
       copy_from => copyfrom_sync($(from));
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): copying file $(from) to $(to)";
+    DEBUG|DEBUG_file_copy::
+      "DEBUG $(this.bundle): copying file $(from) to $(to)";
 }
 
 body copy_from copyfrom_sync(f)
@@ -2107,8 +2107,8 @@ bundle agent file_make(file, str)
       edit_defaults => empty;
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): creating $(file) with contents '$(str)'";
+    DEBUG|DEBUG_file_make::
+      "DEBUG $(this.bundle): creating $(file) with contents '$(str)'";
 }
 
 bundle agent file_empty(file)
@@ -2128,8 +2128,8 @@ bundle agent file_empty(file)
       edit_defaults => empty;
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): creating empty $(file) with 0 size";
+    DEBUG|DEBUG_file_empty::
+      "DEBUG $(this.bundle): creating empty $(file) with 0 size";
 }
 
 bundle agent file_hardlink(target, link)
@@ -2150,8 +2150,8 @@ bundle agent file_hardlink(target, link)
       link_from => linkfrom($(target), "hardlink");
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): $(link) will be a hard link to $(target)";
+    DEBUG|DEBUG_file_hardlink::
+      "DEBUG $(this.bundle): $(link) will be a hard link to $(target)";
 }
 
 bundle agent file_link(target, link)
@@ -2172,6 +2172,6 @@ bundle agent file_link(target, link)
       link_from => linkfrom($(target), "symlink");
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): $(link) will be a symlink to $(target)";
+    DEBUG|DEBUG_file_link::
+      "DEBUG $(this.bundle): $(link) will be a symlink to $(target)";
 }

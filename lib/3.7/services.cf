@@ -905,49 +905,49 @@ bundle agent classic_services(service,state)
                         canonify("$(inits)_set"));
 
   reports:
-    inform_mode::
-      "$(this.bundle): Using init system $(inits)"
+    DEBUG|DEBUG_classic_services::
+      "DEBUG $(this.bundle): Using init system $(inits)"
       ifvarclass => and(canonify("$(inits)_set"));
 
-      "$(this.bundle): No init system is set, using $(default[init])"
+      "DEBUG $(this.bundle): No init system is set, using $(default[init])"
       ifvarclass => "no_inits_set";
 
-      "$(this.bundle): The service $(service) needs to be started"
+      "DEBUG $(this.bundle): The service $(service) needs to be started"
       ifvarclass => and(canonify("start_$(service)"));
 
-      "$(this.bundle): The service pattern is provided: $(pattern[$(service)])"
+      "DEBUG $(this.bundle): The service pattern is provided: $(pattern[$(service)])"
       ifvarclass => and(isvariable("pattern[$(service)]"));
 
-      "$(this.bundle): The default service pattern was used: $(default[pattern])"
+      "DEBUG $(this.bundle): The default service pattern was used: $(default[pattern])"
       ifvarclass => not(isvariable("pattern[$(service)]"));
 
-      "$(this.bundle): The stopcommand is provided: $(stopcommand[$(service)])"
+      "DEBUG $(this.bundle): The stopcommand is provided: $(stopcommand[$(service)])"
       ifvarclass => and(isvariable("stopcommand[$(service)]"));
 
-      "$(this.bundle): The stopcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The stopcommand is NOT provided, using default"
       ifvarclass => not(isvariable("stopcommand[$(service)]"));
 
-      "$(this.bundle): The startcommand is provided: $(startcommand[$(service)])"
+      "DEBUG $(this.bundle): The startcommand is provided: $(startcommand[$(service)])"
       ifvarclass => and(isvariable("startcommand[$(service)]"));
 
-      "$(this.bundle): The startcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The startcommand is NOT provided, using default"
       ifvarclass => not(isvariable("startcommand[$(service)]"));
 
-      "$(this.bundle): The restartcommand is provided: $(restartcommand[$(service)])"
+      "DEBUG $(this.bundle): The restartcommand is provided: $(restartcommand[$(service)])"
       ifvarclass => and(isvariable("restartcommand[$(service)]"));
 
-      "$(this.bundle): The restartcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The restartcommand is NOT provided, using default"
       ifvarclass => not(isvariable("restartcommand[$(service)]"));
 
-      "$(this.bundle): The reloadcommand is provided: $(reloadcommand[$(service)])"
+      "DEBUG $(this.bundle): The reloadcommand is provided: $(reloadcommand[$(service)])"
       ifvarclass => and(isvariable("reloadcommand[$(service)]"));
 
-      "$(this.bundle): The reloadcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The reloadcommand is NOT provided, using default"
       ifvarclass => not(isvariable("reloadcommand[$(service)]"));
 
-      "$(this.bundle): The baseinit is provided: $(baseinit[$(service)])"
+      "DEBUG $(this.bundle): The baseinit is provided: $(baseinit[$(service)])"
       ifvarclass => and(isvariable("baseinit[$(service)]"));
 
-      "$(this.bundle): The baseinit is NOT provided, using default"
+      "DEBUG $(this.bundle): The baseinit is NOT provided, using default"
       ifvarclass => not(isvariable("baseinit[$(service)]"));
 }

@@ -39,7 +39,7 @@
 # the online docs
 #
 
-# For CFEngine Core: 3.7.0 to 3.7.x
+# For CFEngine Core: 3.6.0 to 3.6.x
 # Commands bodies
 
 ###################################################
@@ -66,8 +66,9 @@ bundle agent daemonize(command)
         contain => in_shell;
 
   reports:
-    windows.(inform_mode|verbose_mode)::
-      "$(this.bundle): This bundle does not support Windows";
+    DEBUG|DEBUG_daemonize::
+      "DEBUG $(this.bundle): This bundle does not support Windows"
+        ifvarclass => "windows";
 }
 
 ##-------------------------------------------------------

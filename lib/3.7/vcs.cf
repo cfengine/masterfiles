@@ -289,8 +289,8 @@ bundle agent git(repo_path, subcmd, args)
 # @param args a single string of arguments to pass
 #
 # This bundle will drop privileges if running as root (uid 0) and the
-# repository is owned by a different user. Use `inform_mode` (from the
-# command line, `-I`) to see every Git command it runs.
+# repository is owned by a different user. Use `DEBUG` or `DEBUG_git` classes (from the
+# command line, `--define DEBUG` or `--define DEBUG_git`) to see every Git command it runs.
 #
 # **Example:**
 #
@@ -338,9 +338,10 @@ bundle agent git(repo_path, subcmd, args)
       contain => in_dir( $(repo_path) );
 
   reports:
-    inform_mode.am_root.need_to_drop::
-      "$(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'";
+    DEBUG|DEBUG_git::
+      "DEBUG $(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'"
+        ifvarclass => "am_root.need_to_drop";
 
-    inform_mode.(!am_root|!need_to_drop)::
-      "$(this.bundle): with current privileges, in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'";
+      "DEBUG $(this.bundle): with current privileges, in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'"
+        ifvarclass => "!am_root|!need_to_drop";
 }

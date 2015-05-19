@@ -33,18 +33,19 @@ bundle agent feature
       "_$(off)" string => "off", classes => feature_cancel("$(extract_$(off)[1])");
 
   reports:
-    inform_mode::
-      "$(this.bundle): $(on) => SET class '$(extract_$(on)[2]) for '$(extract_$(on)[1])'"
+    DEBUG|DEBUG_feature::
+      "DEBUG $(this.bundle)";
+      "$(const.t)$(on) => SET class '$(extract_$(on)[2]) for '$(extract_$(on)[1])'"
       ifvarclass => "parsed_$(on)";
 
-      "$(this.bundle): $(off) => UNSET class '$(extract_$(off)[1])'"
+      "$(const.t)$(off) => UNSET class '$(extract_$(off)[1])'"
       ifvarclass => "parsed_$(off)";
 
-      "$(this.bundle): have $(extract_$(on)[2])" ifvarclass => "$(extract_$(on)[2])";
-      "$(this.bundle): have no $(extract_$(on)[2])" ifvarclass => "!$(extract_$(on)[2])";
+      "$(const.t)have $(extract_$(on)[2])" ifvarclass => "$(extract_$(on)[2])";
+      "$(const.t)have no $(extract_$(on)[2])" ifvarclass => "!$(extract_$(on)[2])";
 
-      "$(this.bundle): have $(extract_$(off)[1])" ifvarclass => "$(extract_$(off)[1])";
-      "$(this.bundle): have no $(extract_$(off)[1])" ifvarclass => "!$(extract_$(off)[1])";
+      "$(const.t)have $(extract_$(off)[1])" ifvarclass => "$(extract_$(off)[1])";
+      "$(const.t)have no $(extract_$(off)[1])" ifvarclass => "!$(extract_$(off)[1])";
 }
 
 bundle agent feature_test
@@ -71,11 +72,13 @@ bundle agent feature_test
       "off" slist => classesmatching("feature_unset_.*");
 
   reports:
-      "$(this.bundle): have $(extract_$(on)[2])" ifvarclass => "$(extract_$(on)[2])";
-      "$(this.bundle): have no $(extract_$(on)[2])" ifvarclass => "!$(extract_$(on)[2])";
+    DEBUG|DEBUG_feature_test::
+      "DEBUG $(this.bundle)";
+      "$(const.t)have $(extract_$(on)[2])" ifvarclass => "$(extract_$(on)[2])";
+      "$(const.t)have no $(extract_$(on)[2])" ifvarclass => "!$(extract_$(on)[2])";
 
-      "$(this.bundle): have $(extract_$(off)[1])" ifvarclass => "$(extract_$(off)[1])";
-      "$(this.bundle): have no $(extract_$(off)[1])" ifvarclass => "!$(extract_$(off)[1])";
+      "$(const.t)have $(extract_$(off)[1])" ifvarclass => "$(extract_$(off)[1])";
+      "$(const.t)have no $(extract_$(off)[1])" ifvarclass => "!$(extract_$(off)[1])";
 }
 
 body classes feature_cancel(x)

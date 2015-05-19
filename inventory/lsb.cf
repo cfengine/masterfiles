@@ -71,9 +71,12 @@ bundle agent inventory_lsb
       meta => { "inventory", "attribute_name=none" };
 
   reports:
-    inform_mode._inventory_lsb_found::
-      "$(this.bundle): OS = $(os), codename = $(codename), release = $(release), flavor = $(flavor), description = $(description)";
-    verbose_mode._inventory_lsb_found::
-      "$(this.bundle): got $(dim) LSB keys";
-      "$(this.bundle): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)][1])'";
+    DEBUG|DEBUG_inventory_lsb::
+      "DEBUG $(this.bundle)";
+      "$(const.t)OS = $(os), codename = $(codename), release = $(release), flavor = $(flavor), description = $(description)"
+        ifvarclass => "_inventory_lsb_found";
+      "$(const.t): got $(dim) LSB keys"
+        ifvarclass => "_inventory_lsb_found";
+      "$(const.t): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)][1])'"
+        ifvarclass => "_inventory_lsb_found";
 }
