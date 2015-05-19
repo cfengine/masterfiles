@@ -1,0 +1,45 @@
+#!/usr/bin/python
+
+import sys
+import os
+import re
+
+if sys.argv[1] == "supports-api-version":
+    sys.stdout.write("1\n")
+    sys.exit(0)
+
+module_dir = os.path.dirname(sys.argv[0])
+
+log = open(module_dir + "/test_module.log", "a")
+log.write(sys.argv[1] + "\n")
+log.close()
+
+pkg_name = ""
+for line in sys.stdin:
+    if line.startswith('File='):
+        pkg_name = line.split('=', 1)[1].rstrip()
+        break
+
+log = open(module_dir + "/test_module.log", "r")
+install_found = False
+for line in log:
+    if line.find("repo-install") >= 0:
+        install_found = True
+log.close()
+
+if sys.argv[1] == "list-installed":
+    if install_found:
+        sys.stdout.write("Name=cfe-present-package\nVersion=3\nArchitecture=amd64\n")
+    else:
+        sys.stdout.write("Name=cfe-present-package\nVersion=1\nArchitecture=amd64\n")
+
+elif sys.argv[1] == "list-updates" or sys.argv[1] == "list-updates-local":
+    # Don't print anything if repo-install has been called. We simulate having
+    # installed the update.
+    if not install_found:
+        sys.stdout.write("Name=cfe-present-package\nVersion=3\nArchitecture=amd64\n")
+
+elif sys.argv[1] == "get-package-data":
+    sys.stdout.write("PackageType=repo\nName=" + pkg_name + "\n")
+
+sys.exit(0)

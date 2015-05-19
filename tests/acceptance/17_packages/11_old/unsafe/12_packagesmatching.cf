@@ -1,0 +1,88 @@
+#######################################################
+#
+# Test packagesmatching()
+#
+# IMPORTANT!! This test depends on
+# 11_packagesmatching.cf running first. This is because
+# we need a fresh test directory with an empty package
+# cache in order to test that packagesmatching updates
+# that cache. If we install the package in the same
+# policy, then the cache is already filled and the test
+# is useless.
+# Running a sub invocation does not work, because it
+# still uses the same cache on disk.
+#
+#######################################################
+
+body common control
+{
+      inputs => { "../../packages-info.cf.sub",
+                  "../../../dcs.cf.sub",
+                  "../../../../../inventory/any.cf",
+                  "../../../../../$(sys.local_libdir)/stdlib.cf",
+                  "../../../../../$(sys.local_libdir)/packages.cf",
+                };
+      bundlesequence  => { "inventory_autorun", default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent init
+{
+  meta:
+      "test_skip_needs_work" string => "!redhat.!debian",
+        meta => { "redmine5866" };
+      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
+      "test_skip_unsupported" string => "redhat_4";
+
+  vars:
+      "package_name" string => "$(p.name[1])";
+}
+
+#######################################################
+
+bundle agent test
+{
+  vars:
+      "all_packages" data => packagesmatching("$(init.package_name)",
+                             ".*", ".*", ".*");
+}
+
+#######################################################
+
+bundle agent check
+{
+  classes:
+    any::
+      "function_ok" expression => strcmp("$(test.all_packages[0])", "$(init.package_name)");
+      "file1_ok" expression => fileexists("$(sys.workdir)/state/software_packages.csv");
+      "file1_size_ok" not => strcmp(filestat("$(sys.workdir)/state/software_packages.csv", "size"), "0");
+    enterprise::
+      "file2_ok" expression => fileexists("$(sys.workdir)/state/software_patches_avail.csv");
+      "file2_size_ok" not => strcmp(filestat("$(sys.workdir)/state/software_patches_avail.csv", "size"), "0");
+
+    !enterprise::
+      "ok" and => { "function_ok", "file1_ok", "file1_size_ok" };
+    enterprise::
+      "ok" and => { "function_ok", "file1_ok", "file2_ok", "file1_size_ok", "file2_size_ok" };
+
+  reports:
+    DEBUG::
+      "packagesmatching: $(test.all_packages[0])";
+    DEBUG.!function_ok::
+      "function_ok not set";
+    DEBUG.!file1_ok::
+      "file1_ok not set";
+    DEBUG.!file2_ok::
+      "file2_ok not set";
+    DEBUG.!file1_size_ok::
+      "file1_size_ok not set";
+    DEBUG.!file2_size_ok::
+      "file2_size_ok not set";
+
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}

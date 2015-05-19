@@ -1,0 +1,89 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
+log.write("apt-get " + (" ".join(sys.argv[1:])) + "\n")
+log.close()
+
+if sys.argv.count("upgrade"):
+    # Subset of a real run of "apt-get upgrade".
+    sys.stdout.write('''NOTE: This is only a simulation!
+      apt-get needs root privileges for real execution.
+      Keep also in mind that locking is deactivated,
+      so don't depend on the relevance to the real current situation!
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages have been kept back:
+  linux-generic linux-headers-generic linux-image-generic
+The following packages will be upgraded:
+  apt apt-transport-https apt-utils binutils dpkg dpkg-dev
+  flashplugin-installer fonts-opensymbol gnupg gnupg-agent gnupg2
+  google-chrome-stable google-talkplugin gpgv gstreamer0.10-plugins-bad
+  icedtea-6-jre-cacao icedtea-6-jre-jamvm libapt-inst1.4 libapt-pkg4.12
+  libc-bin libc-dev-bin libc6 libc6:i386 libc6-dbg libc6-dev libc6-i386
+  libdpkg-perl libgcrypt11 libgcrypt11:i386 libgstreamer-plugins-bad0.10-0
+  liblightdm-gobject-1-0 libmysqlclient18:i386 libreoffice-base-core
+  libreoffice-calc libreoffice-common libreoffice-core libreoffice-draw
+  libreoffice-emailmerge libreoffice-gnome libreoffice-gtk
+  libreoffice-help-en-gb libreoffice-help-en-us libreoffice-impress
+  libreoffice-l10n-en-gb libreoffice-l10n-en-za libreoffice-l10n-nn
+  libreoffice-math libreoffice-style-human libreoffice-style-tango
+  libreoffice-writer libsdl1.2debian libtasn1-3 libtasn1-3:i386 libtiff4
+  libtiff4:i386 libx11-6 libx11-6:i386 libx11-data libx11-dev libx11-doc
+  libx11-xcb1 libxext-dev libxext6 libxext6:i386 libxfixes3 libxi6 libxi6:i386
+  libxp6 libxrandr2 libxrender-dev libxrender1 libxrender1:i386 libxv1
+  libxv1:i386 lightdm linux-libc-dev multiarch-support mysql-common ntpdate
+  openjdk-6-jre openjdk-6-jre-headless openjdk-6-jre-lib php5-cli php5-common
+  python-uno smplayer tcpdump thunderbird thunderbird-globalmenu
+  thunderbird-gnome-support thunderbird-locale-en thunderbird-locale-en-gb
+  thunderbird-locale-en-us thunderbird-locale-nn thunderbird-locale-nn-no
+  tzdata tzdata-java uno-libs3 ure usb-creator-common usb-creator-gtk
+  x11proto-core-dev xserver-xorg-video-vmware
+103 upgraded, 0 newly installed, 0 to remove and 7 not upgraded.
+Inst dpkg [1.16.1.2ubuntu7.5] (1.16.1.2ubuntu7.6 Ubuntu:12.04/precise-updates [amd64])
+Conf dpkg (1.16.1.2ubuntu7.6 Ubuntu:12.04/precise-updates [amd64])
+Inst tzdata-java [2015b-0ubuntu0.12.04] (2015d-0ubuntu0.12.04 Ubuntu:12.04/precise-updates [all]) []
+Inst tzdata [2015b-0ubuntu0.12.04] (2015d-0ubuntu0.12.04 Ubuntu:12.04/precise-updates [all])
+Conf tzdata (2015d-0ubuntu0.12.04 Ubuntu:12.04/precise-updates [all])
+Inst libc-bin [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64]) [libc6:amd64 libc6:i386 ]
+Conf libc-bin (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64]) [libc6:amd64 libc6:i386 ]
+Inst libc6-i386 [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64]) [libc6:amd64 libc6:i386 ]
+Inst libc-dev-bin [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64]) [libc6-dev:amd64 libc6:amd64 libc6:i386 ]
+Inst libc6-dev [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64]) [libc6:amd64 libc6:i386 ]
+Inst libc6-dbg [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64]) [libc6:amd64 libc6:i386 ]
+Inst libc6 [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64]) [libc6:amd64 on libc6:i386] [libc6:i386 on libc6:amd64] [libc6:i386 ]
+Inst libc6:i386 [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [i386])
+Conf libc6 (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64])
+Conf libc6:i386 (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [i386])
+Inst linux-libc-dev [2.6.32-48squeeze4] (2.6.32-48squeeze6 Debian:6.0.10/oldstable, Debian-Security:6.0/oldoldstable [amd64])
+Inst libapt-pkg4.12 [0.8.16~exp12ubuntu10.22] (0.8.16~exp12ubuntu10.23 Ubuntu:12.04/precise-updates [amd64])
+Conf libapt-pkg4.12 (0.8.16~exp12ubuntu10.23 Ubuntu:12.04/precise-updates [amd64])
+Inst gpgv [1.4.11-3ubuntu2.7] (1.4.11-3ubuntu2.9 Ubuntu:12.04/precise-updates [amd64])
+Conf gpgv (1.4.11-3ubuntu2.9 Ubuntu:12.04/precise-updates [amd64])
+Inst gnupg [1.4.11-3ubuntu2.7] (1.4.11-3ubuntu2.9 Ubuntu:12.04/precise-updates [amd64])
+Conf gnupg (1.4.11-3ubuntu2.9 Ubuntu:12.04/precise-updates [amd64])
+Inst apt [0.8.16~exp12ubuntu10.22] (0.8.16~exp12ubuntu10.23 Ubuntu:12.04/precise-updates [amd64])
+Conf apt (0.8.16~exp12ubuntu10.23 Ubuntu:12.04/precise-updates [amd64])
+Inst libapt-inst1.4 [0.8.16~exp12ubuntu10.22] (0.8.16~exp12ubuntu10.23 Ubuntu:12.04/precise-updates [amd64])
+Inst ntpdate [1:4.2.6.p3+dfsg-1ubuntu3.3] (1:4.2.6.p3+dfsg-1ubuntu3.4 Ubuntu:12.04/precise-updates [amd64])
+Inst libgcrypt11 [1.5.0-3ubuntu0.3] (1.5.0-3ubuntu0.4 Ubuntu:12.04/precise-updates [amd64]) [libgcrypt11:amd64 on libgcrypt11:i386] [libgcrypt11:i386 on libgcrypt11:amd64] [libgcrypt11:i386 ]
+Inst libgcrypt11:i386 [1.5.0-3ubuntu0.3] (1.5.0-3ubuntu0.4 Ubuntu:12.04/precise-updates [i386])
+Conf libgcrypt11 (1.5.0-3ubuntu0.4 Ubuntu:12.04/precise-updates [amd64])
+Conf libgcrypt11:i386 (1.5.0-3ubuntu0.4 Ubuntu:12.04/precise-updates [i386])
+Inst libtasn1-3 [2.10-1ubuntu1.2] (2.10-1ubuntu1.3 Ubuntu:12.04/precise-updates [amd64]) [libtasn1-3:amd64 on libtasn1-3:i386] [libtasn1-3:i386 on libtasn1-3:amd64] [libtasn1-3:i386 ]
+Inst libtasn1-3:i386 [2.10-1ubuntu1.2] (2.10-1ubuntu1.3 Ubuntu:12.04/precise-updates [i386])
+Conf libtasn1-3 (2.10-1ubuntu1.3 Ubuntu:12.04/precise-updates [amd64])
+Conf libtasn1-3:i386 (2.10-1ubuntu1.3 Ubuntu:12.04/precise-updates [i386])
+Inst libx11-data [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [all])
+Inst libx11-dev [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [amd64]) []
+Inst libx11-6 [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [amd64]) [libx11-6:amd64 on libx11-6:i386] [libx11-6:i386 on libx11-6:amd64] [libx11-6:i386 ]
+Inst libx11-6:i386 [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])
+Conf libx11-data (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [all])
+Conf libx11-6 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [amd64])
+Conf libx11-6:i386 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])
+''')
+
+sys.exit(0)

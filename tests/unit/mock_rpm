@@ -1,0 +1,42 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
+log.write("rpm " + (" ".join(sys.argv[1:])) + "\n")
+log.close()
+
+if sys.argv.count("-qa"):
+    sys.stdout.write('''Name=firefox
+Version=24.5.0-1.el5.centos
+Architecture=i386
+Name=yum
+Version=3.2.29-43.el6_5
+Architecture=noarch
+''')
+elif sys.argv.count("-qp"):
+    sys.stdout.write('''Name=file_pkg
+Version=10.0
+Architecture=x86_64
+''')
+elif sys.argv.count("--qf") and sys.argv.count("-q"):
+    if sys.argv.count("arch-i386-exists"):
+        sys.stdout.write("i386")
+    elif sys.argv.count("arch-x86_64-exists") or sys.argv.count("upgrade") or sys.argv.count("downgrade") or sys.argv.count("disappearing-upgrade"):
+        sys.stdout.write("x86_64")
+elif sys.argv.count("-q") and sys.argv.count("upgrade-2.x86_64"):
+    if "upgrade upgrade-2.x86_64" in open(os.environ['CFENGINE_TEST_MOCK_LOG'], "r").read():
+        sys.exit(0)
+    else:
+        sys.exit(1)
+elif sys.argv.count("-q") and sys.argv.count("downgrade-1.x86_64"):
+    if "downgrade downgrade-1.x86_64" in open(os.environ['CFENGINE_TEST_MOCK_LOG'], "r").read():
+        sys.exit(0)
+    else:
+        sys.exit(1)
+elif sys.argv.count("-q") and sys.argv.count("disappearing-upgrade-2.x86_64"):
+    if "install disappearing-upgrade-2.x86_64" in open(os.environ['CFENGINE_TEST_MOCK_LOG'], "r").read():
+        sys.exit(0)
+    else:
+        sys.exit(1)
