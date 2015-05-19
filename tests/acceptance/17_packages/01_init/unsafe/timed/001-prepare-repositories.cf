@@ -42,17 +42,24 @@ bundle agent repositories
   vars:
     suse::
       "repo_file" string => "/etc/zypp/repos.d/test-repository.repo";
+      "repos" slist => { "rpm_repo" };
     redhat::
       "repo_file" string => "/etc/yum.repos.d/test-repository.repo";
+      "repos" slist => { "rpm_repo" };
     debian::
       "repo_file" string => "/etc/apt/sources.list.d/testdebian.list";
+      "repos" slist => { "deb_repo1", "deb_repo2" };
 
   files:
-    "$(repo_file)"
-      create => "true",
-      edit_line => repository,
-      edit_defaults => edit_defaults,
-      classes => if_successful("repo_ok");
+      "/test-repos/$(repos)"
+        copy_from => local_cp("$(p.resources)/$(repos)"),
+        depth_search => recurse("inf");
+
+      "$(repo_file)"
+        create => "true",
+        edit_line => repository,
+        edit_defaults => edit_defaults,
+        classes => if_successful("repo_ok");
 
     # Remove original sources so that we don't hammer the distro servers.
     debian::
@@ -88,12 +95,12 @@ bundle edit_line repository
     redhat|suse::
       "[test-repository]";
       "name=Test repository";
-      "baseurl=file://$(p.resources)/rpm_repo";
+      "baseurl=file:///test-repos/rpm_repo";
       "enabled=1";
       "gpgcheck=0";
     debian::
-      "deb file://$(p.resources)/deb_repo1 package1 main";
-      "deb file://$(p.resources)/deb_repo2 package2 main";
+      "deb file:///test-repos/deb_repo1 package1 main";
+      "deb file:///test-repos/deb_repo2 package2 main";
 }
 
 body edit_defaults edit_defaults
