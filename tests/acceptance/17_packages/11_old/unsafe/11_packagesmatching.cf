@@ -1,0 +1,50 @@
+#######################################################
+#
+# Test packagesmatching()
+#
+# This is not a real test, but a preparation policy for
+# 12_packagesmatching.cf. See the comments in there.
+#
+#######################################################
+
+body common control
+{
+      inputs => { "../../packages-info.cf.sub",
+                  "../../../dcs.cf.sub",
+                  "../../../../../$(sys.local_libdir)/stdlib.cf",
+                  "../../../../../$(sys.local_libdir)/packages.cf"
+                };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent init
+{
+  meta:
+      "test_skip_needs_work" string => "!redhat.!debian",
+        meta => { "redmine5866" };
+      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
+      "test_skip_unsupported" string => "redhat_4";
+
+  methods:
+    "clear_packages" usebundle => clear_packages("dummy");
+}
+
+#######################################################
+
+bundle agent test
+{
+  methods:
+    "install_package" usebundle => install_package("$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy");
+}
+
+#######################################################
+
+bundle agent check
+{
+  reports:
+      # Not a real test case so pass unconditionally.
+      "$(this.promise_filename) Pass";
+}

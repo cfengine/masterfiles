@@ -1,0 +1,111 @@
+bundle common p
+{
+  vars:
+    "resources" string => "$(this.promise_dirname)/resources";
+
+    "packages" ilist => { 1, 2, 3 };
+    "versions" ilist => { 1, 2 };
+    "archs" slist => { "64_bit", "32_bit" };
+    "latest_version" int => "2";
+
+    "distinct_name[1]" string => "alpha";
+    "distinct_name[2]" string => "beta";
+    "distinct_name[3]" string => "charlie";
+
+    "name[1]" string => "test-package-$(distinct_name[1])";
+    "name[2]" string => "test-package-$(distinct_name[2])";
+    "name[3]" string => "test-package-$(distinct_name[3])";
+
+    redhat|suse::
+      "ext" string => "rpm";
+      "delim" string => "-";
+    debian::
+      "ext" string => "deb";
+      "delim" string => "_";
+
+    redhat|suse::
+      "64_bit" string => "x86_64";
+    debian::
+      "64_bit" string => "amd64";
+    any::
+      "32_bit" string => "i386";
+
+    64_bit::
+      "arch" string => "$(64_bit)";
+    32_bit::
+      "arch" string => "$(32_bit)";
+
+    any::
+      "version[1]" string => "1.0-1";
+      "version[2]" string => "1.0-2";
+
+    redhat|suse::
+      "package[$(packages)][$(versions)][$(archs)]"
+        string => "$(p.resources)/rpm_repo/$(name[$(packages)])-$(version[$(versions)]).$($(archs)).rpm";
+    debian::
+      "package[$(packages)][$(versions)][$(archs)]"
+        string => "$(p.resources)/file_repo/$(name[$(packages)])_$(version[$(versions)])_$($(archs)).deb";
+
+    any::
+      # Files which default to current architecture.
+      "file[$(packages)][$(versions)]" string => "/$(name[$(packages)])$(delim)$(version[$(versions)])$(delim)$(arch)-$(ext)-installed.txt";
+
+      # Files where you specify the architecture.
+      "file[$(packages)][$(versions)][64_bit]" string => "/$(name[$(packages)])$(delim)$(version[$(versions)])$(delim)$(64_bit)-$(ext)-installed.txt";
+      "file[$(packages)][$(versions)][32_bit]" string => "/$(name[$(packages)])$(delim)$(version[$(versions)])$(delim)$(32_bit)-$(ext)-installed.txt";
+}
+
+
+# key is to make the invocation unique, for multiple invocation.
+bundle agent clear_package_cache(key)
+{
+  files:
+      "$(sys.workdir)" # TODO: Should be statedir
+        delete => tidy,
+        depth_search => recurse("inf"),
+        file_select => by_name("packages_(installed|updates)_.*\.lmdb.*"),
+        comment => $(key);
+}
+
+# key is to make the invocation unique, for multiple invocation.
+bundle agent clear_packages(key)
+{
+  vars:
+    EXTRA::
+      "output_sink" string => "";
+    !EXTRA::
+      "output_sink" string => "> $(G.dev_null) 2>&1";
+
+  commands:
+    redhat|suse::
+      "$(paths.path[rpm]) -e --allmatches $(p.name[$(p.packages)]) $(output_sink)"
+        contain => in_shell,
+        comment => $(key);
+    debian::
+      "$(paths.path[dpkg]) --purge $(p.name[$(p.packages)]):$(p.$(p.archs)) $(output_sink)"
+        contain => in_shell,
+        comment => $(key);
+      "$(paths.path[dpkg]) --purge $(p.name[$(p.packages)]) $(output_sink)"
+        contain => in_shell,
+        comment => $(key);
+}
+
+# key is to make the invocation unique, for multiple invocation.
+bundle agent install_package(package_name, package_version, package_arch, key)
+{
+  vars:
+    EXTRA::
+      "output_sink" string => "";
+    !EXTRA::
+      "output_sink" string => "> $(G.dev_null) 2>&1";
+
+  commands:
+    redhat|suse::
+      "$(paths.path[rpm]) -U --force $(p.resources)/rpm_repo/$(package_name)-$(package_version).$(package_arch).rpm $(output_sink)"
+        contain => in_shell,
+        comment => $(key);
+    debian::
+      "$(paths.path[dpkg]) -i $(p.resources)/file_repo/$(package_name)_$(package_version)_$(package_arch).deb $(output_sink)"
+        contain => in_shell,
+        comment => $(key);
+}

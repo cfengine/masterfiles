@@ -1,0 +1,38 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
+log.write("dpkg-query " + (" ".join(sys.argv[1:])) + "\n")
+log.close()
+
+if sys.argv.count("${Architecture}=${Status}\n"):
+    if sys.argv.count("netcat:*"):
+        sys.stdout.write('''amd64=install ok installed
+i386=install ok installed
+should-not-be-here= not-installed
+''')
+else:
+    # Assembled from various pieces of running dpkg-query.
+    sys.stdout.write('''Status=deinstall ok config-files
+Name=firefox
+Version=24.5.0-1.el5.centos
+Architecture=i386
+Status=install ok config-files
+Name=firefox
+Version=24.5.0-1.el5.centos
+Architecture=amd64
+Status=hold ok config-files
+Name=netcat
+Version=1.2.3.4
+Architecture=amd64
+Status=hold ok installed
+Name=netcat
+Version=1.2.3.5
+Architecture=amd64
+Status=install ok installed
+Name=yum
+Version=3.2.29-43.el6_5
+Architecture=all
+''')

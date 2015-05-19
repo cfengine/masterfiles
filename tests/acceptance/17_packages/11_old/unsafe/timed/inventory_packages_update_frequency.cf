@@ -1,0 +1,56 @@
+# Test that we don't refresh the package updates too often.
+
+body common control
+{
+    inputs => { "../../../../dcs.cf.sub",
+                "../../../../../../inventory/any.cf",
+                "../../../../../../$(sys.local_libdir)/stdlib.cf",
+                "../../../../../../$(sys.local_libdir)/packages.cf"
+              };
+    bundlesequence  => { "inventory_autorun", default("$(this.promise_filename)") };
+}
+
+bundle agent test
+{
+  meta:
+      "test_skip_needs_work" string => "!redhat.!debian";
+      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
+      "test_skip_unsupported" string => "redhat_4";
+
+  classes:
+      "cache_exists" expression => fileexists("$(sys.workdir)/state/software_update_timestamp_$(pkg_man)"),
+        scope => "namespace";
+
+  vars:
+    redhat::
+      "pkg_man" string => "yum";
+    debian::
+      "pkg_man" string => "apt-get";
+    any::
+      "last_update" string => filestat("$(sys.workdir)/state/software_update_timestamp_$(pkg_man)", "mtime");
+
+  files:
+    test_pass_1::
+      "$(G.testdir)/first_update.txt"
+        create => "true",
+        edit_line => insert_lines($(last_update));
+    test_pass_2::
+      "$(G.testdir)/second_update.txt"
+        create => "true",
+        edit_line => insert_lines($(last_update));
+}
+
+bundle agent check
+{
+  methods:
+    !cache_exists::
+      "any" usebundle => dcs_fail($(this.promise_filename));
+
+    test_pass_1.cache_exists::
+      "any" usebundle => dcs_wait($(this.promise_filename), 70);
+
+    test_pass_2.cache_exists::
+      "any" usebundle => dcs_check_diff("$(G.testdir)/first_update.txt",
+                                        "$(G.testdir)/second_update.txt",
+                                        "$(this.promise_filename)");
+}

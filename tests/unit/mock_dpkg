@@ -1,0 +1,8 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
+log.write("dpkg " + (" ".join(sys.argv[1:])) + "\n")
+log.close()
