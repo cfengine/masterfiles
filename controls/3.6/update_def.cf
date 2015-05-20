@@ -141,16 +141,15 @@ bundle common update_def
 
   reports:
     DEBUG|DEBUG_update_def::
-      "DEBUG: $(this.bundle)";
-      "$(const.t) override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
+      "DEBUG $(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
         ifvarclass => isvariable("override_data_$(override_vars)");
 
-      "$(const.t) defined class role/byname $(extra_roles[byname][$(roles_byname_keys)]) because of classmatch('$(roles_byname_keys)')"
+      "DEBUG $(this.bundle): defined class role/byname $(extra_roles[byname][$(roles_byname_keys)]) because of classmatch('$(roles_byname_keys)')"
         ifvarclass => "$(extra_roles[byname][$(roles_byname_keys)])";
 
-      "$(const.t) defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
+      "DEBUG $(this.bundle): defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
         ifvarclass => "$(roles_byrole_keys)";
 
-      "$(const.t) override class $(override_classes)";
-      "$(const.t) $(defvars) = $($(defvars))";
+      "DEBUG $(this.bundle): override class $(override_classes)";
+      "DEBUG $(this.bundle): $(defvars) = $($(defvars))";
 }

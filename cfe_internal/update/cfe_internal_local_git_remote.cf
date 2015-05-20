@@ -15,11 +15,10 @@ support sketch activation deployments from Mission Portal",
 
   reports:
     DEBUG|DEBUG_cfe_internal_local_git_remote::
-      "DEBUG $(this.bundle)";
-      "$(const.t)set the permissions of the Git clone $(update_def.local_masterfiles_git)"
+      "DEBUG $(this.bundle): set the permissions of the Git clone $(update_def.local_masterfiles_git)"
         ifvarclass => "did_perms_local_git_remote_clone";
 
-      "$(const.t)failed to set the permissions of the Git clone $(update_def.local_masterfiles_git)"
+      "DEBUG $(this.bundle): failed to set the permissions of the Git clone $(update_def.local_masterfiles_git)"
         ifvarclass => "failed_perms_local_git_remote_clone";
 }
 

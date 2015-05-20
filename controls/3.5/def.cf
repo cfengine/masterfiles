@@ -209,8 +209,7 @@ bundle common def
 
   reports:
     DEBUG|DEBUG_def::
-      "DEBUG: $(this.bundle)";
-      "$(const.t) Found augments file '$(augments_file)', but augments are not supported in this version"
+      "DEBUG $(this.bundle): Found augments file '$(augments_file)', but augments are not supported in this version"
         ifvarclass => "have_augments_file";
 
 }

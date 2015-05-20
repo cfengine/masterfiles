@@ -67,8 +67,7 @@ bundle agent daemonize(command)
 
   reports:
     DEBUG|DEBUG_daemonize::
-      "DEBUG $(this.bundle)";
-      "$(const.t): This bundle does not support Windows"
+      "DEBUG $(this.bundle): This bundle does not support Windows"
         ifvarclass => "windows";
 }
 
