@@ -245,8 +245,7 @@ bundle common cfengine_controls
 
   reports:
     DEBUG|DEBUG_cfengine_controls::
-      "DEBUG $(this.bundle)";
-        "$(const.t)defining inputs='$(inputs)'";
+        "DEBUG $(this.bundle): defining inputs='$(inputs)'";
 }
 
 bundle common services_autorun
@@ -263,8 +262,8 @@ bundle common services_autorun
       "bundles" slist => { "autorun" }; # run loaded bundles
 
   reports:
-    verbose_mode::
-      "$(this.bundle): defining inputs='$(inputs)'";
+    DEBUG|DEBUG_services_autorun::
+      "DEBUG $(this.bundle): defining inputs='$(inputs)'";
 }
 
 

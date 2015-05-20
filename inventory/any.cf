@@ -100,8 +100,7 @@ bundle agent cfe_autorun_inventory_ipv4_addresses
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_ipv4_addresses::
-      "DEBUG $(this.bundle)";
-      "$(const.t)Inventorying: '$(ipv4_addresses)'";
+      "DEBUG $(this.bundle): Inventorying '$(ipv4_addresses)'";
 }
 
 bundle agent cfe_autorun_inventory_disk
@@ -296,13 +295,12 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_proc::
-     "DEBUG $(this.bundle)";
-     "$(const.t)cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])] = $(default:cfe_autorun_inventory_proc.cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])])";
-     "$(const.t)CPU physical cores: '$(cpuinfo_physical_cores)'"
+     "DEBUG $(this.bundle): cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])] = $(default:cfe_autorun_inventory_proc.cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])])";
+     "DEBUG $(this.bundle): CPU physical cores: '$(cpuinfo_physical_cores)'"
         ifvarclass => "have_cpuinfo_cpu_cores";
-     "$(const.t)CPU model name: '$(cpuinfo_cpu_model_name)'"
+     "DEBUG $(this.bundle): CPU model name: '$(cpuinfo_cpu_model_name)'"
         ifvarclass => "have_cpuinfo_model_name";
-     "$(const.t)CPU Physical Sockets: '$(cpuinfo_physical_socket_inventory)'";
+     "DEBUG $(this.bundle): CPU Physical Sockets: '$(cpuinfo_physical_socket_inventory)'";
 }
 
 bundle agent cfe_autorun_inventory_cpuinfo
@@ -335,9 +333,8 @@ bundle agent cfe_autorun_inventory_cpuinfo
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_cpuinfo::
-      "DEBUG $(this.bundle)";
-      "$(const.t) CPU model: $(cpu_model)";
-      "$(const.t) CPU physical cores: $(cpuinfo_physical_cores)";
+      "DEBUG $(this.bundle): CPU model: '$(cpu_model)'";
+      "DEBUG $(this.bundle): CPU physical cores: '$(cpuinfo_physical_cores)'";
 }
 
 bundle agent cfe_autorun_inventory_mtab
@@ -514,8 +511,8 @@ bundle agent cfe_autorun_inventory_dmidecode
                                               "system_array");
 
   reports:
-    inform_mode::
-      "$(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
+    DEBUG|DEBUG_cfe_autorun_inventory_dmidecode::
+      "DEBUG $(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
 }
 
 bundle agent cfe_autorun_inventory_LLDP
@@ -592,12 +589,12 @@ bundle agent cfe_autorun_inventory_packages
       action => if_elapsed_day;
 
   reports:
-    inform_mode::
-      "$(this.bundle): refresh interval is $(refresh)";
-    inform_mode.have_inventory::
-      "$(this.bundle): we have the inventory files.";
-    inform_mode.!have_inventory::
-      "$(this.bundle): we don't have the inventory files.";
+    DEBUG|DEBUG_cfe_autorun_inventory_packages::
+      "DEBUG $(this.bundle): refresh interval is $(refresh)";
+      "DEBUG $(this.bundle): we have the inventory files."
+        ifvarclass => "have_inventory";
+      "DEBUG $(this.bundle): we don't have the inventory files."
+        ifvarclass => "!have_inventory";
 }
 
 body package_method inventory_apt_get(update_interval)
@@ -786,13 +783,15 @@ bundle agent inventory_cmdb_load(file)
       "ckeys" slist => getindices("cmdb[classes]");
 
   reports:
-    inform_mode.have_cmdb_data::
-      "$(this.bundle): Got CMDB data from $(file): $(cmdb_string)";
-    verbose_mode.have_cmdb_data::
-      "$(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))";
-      "$(this.bundle): Got CMDB class = $(ckeys)";
-    inform_mode.!have_cmdb_data::
-      "$(this.bundle): Could not read the CMDB data from $(file)";
+    DEBUG|DEBUG_inventory_cmdb_load::
+      "DEBUG $(this.bundle): Got CMDB data from $(file): $(cmdb_string)"
+        ifvarclass => "have_cmdb_data";
+      "DEBUG $(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))"
+        ifvarclass => "have_cmdb_data";
+      "DEBUG $(this.bundle): Got CMDB class = $(ckeys)"
+        ifvarclass => "have_cmdb_data";
+      "DEBUG $(this.bundle): Could not read the CMDB data from $(file)"
+        ifvarclass => "!have_cmdb_data";
 }
 
 body copy_from inventory_cmdb_copy_from

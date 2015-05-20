@@ -283,22 +283,27 @@ bundle agent standard_services(service,state)
       "classic" usebundle => classic_services($(service), $(state));
 
   reports:
-    inform_mode.systemd::
-      "$(this.bundle): using systemd layer to $(state) $(service)";
-    inform_mode.systemd.!service_loaded::
-      "$(this.bundle): Service $(service) unit file is not loaded; doing nothing";
-    inform_mode.chkconfig::
-      "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))"
-        ifvarclass => "!chkconfig_$(c_service)_unregistered";
-    inform_mode.chkconfig::
-      "$(this.bundle): skipping chkconfig layer to $(state) $(service) because $(service) is not registered with chkconfig (chkconfig --list $(service))"
-        ifvarclass => "chkconfig_$(c_service)_unregistered";
-    inform_mode.sysvservice::
-      "$(this.bundle): using System V service / Upstart layer to $(state) $(service)";
-    inform_mode.smf::
-      "$(this.bundle): using Solaris SMF to $(state) $(service) (svcadm mode $(svcadm_mode))";
-    inform_mode.fallback::
-      "$(this.bundle): falling back to classic_services to $(state) $(service)";
+    DEBUG|DEBUG_standard_services::
+      "DEBUG $(this.bundle): using systemd layer to $(state) $(service)"
+        ifvarclass => "systemd";
+
+      "DEBUG $(this.bundle): Service $(service) unit file is not loaded; doing nothing"
+        ifvarclass => "systemd.!service_loaded";
+
+      "DEBUG $(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))"
+        ifvarclass => "chkconfig.!chkconfig_$(c_service)_unregistered";
+
+      "DEBUG $(this.bundle): skipping chkconfig layer to $(state) $(service) because $(service) is not registered with chkconfig (chkconfig --list $(service))"
+        ifvarclass => "chkconfig.chkconfig_$(c_service)_unregistered";
+
+      "DEBUG $(this.bundle): using System V service / Upstart layer to $(state) $(service)"
+        ifvarclass => "sysvservice";
+
+      "DEBUG $(this.bundle): using Solaris SMF to $(state) $(service) (svcadm mode $(svcadm_mode))"
+        ifvarclass => "smf";
+
+      "DEBUG $(this.bundle): falling back to classic_services to $(state) $(service)"
+        ifvarclass => "fallback";
 }
 
 bundle agent classic_services(service,state)
@@ -905,49 +910,49 @@ bundle agent classic_services(service,state)
                         canonify("$(inits)_set"));
 
   reports:
-    inform_mode::
-      "$(this.bundle): Using init system $(inits)"
+    DEBUG|DEBUG_classic_services::
+      "DEBUG $(this.bundle): Using init system $(inits)"
       ifvarclass => and(canonify("$(inits)_set"));
 
-      "$(this.bundle): No init system is set, using $(default[init])"
+      "DEBUG $(this.bundle): No init system is set, using $(default[init])"
       ifvarclass => "no_inits_set";
 
-      "$(this.bundle): The service $(service) needs to be started"
+      "DEBUG $(this.bundle): The service $(service) needs to be started"
       ifvarclass => and(canonify("start_$(service)"));
 
-      "$(this.bundle): The service pattern is provided: $(pattern[$(service)])"
+      "DEBUG $(this.bundle): The service pattern is provided: $(pattern[$(service)])"
       ifvarclass => and(isvariable("pattern[$(service)]"));
 
-      "$(this.bundle): The default service pattern was used: $(default[pattern])"
+      "DEBUG $(this.bundle): The default service pattern was used: $(default[pattern])"
       ifvarclass => not(isvariable("pattern[$(service)]"));
 
-      "$(this.bundle): The stopcommand is provided: $(stopcommand[$(service)])"
+      "DEBUG $(this.bundle): The stopcommand is provided: $(stopcommand[$(service)])"
       ifvarclass => and(isvariable("stopcommand[$(service)]"));
 
-      "$(this.bundle): The stopcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The stopcommand is NOT provided, using default"
       ifvarclass => not(isvariable("stopcommand[$(service)]"));
 
-      "$(this.bundle): The startcommand is provided: $(startcommand[$(service)])"
+      "DEBUG $(this.bundle): The startcommand is provided: $(startcommand[$(service)])"
       ifvarclass => and(isvariable("startcommand[$(service)]"));
 
-      "$(this.bundle): The startcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The startcommand is NOT provided, using default"
       ifvarclass => not(isvariable("startcommand[$(service)]"));
 
-      "$(this.bundle): The restartcommand is provided: $(restartcommand[$(service)])"
+      "DEBUG $(this.bundle): The restartcommand is provided: $(restartcommand[$(service)])"
       ifvarclass => and(isvariable("restartcommand[$(service)]"));
 
-      "$(this.bundle): The restartcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The restartcommand is NOT provided, using default"
       ifvarclass => not(isvariable("restartcommand[$(service)]"));
 
-      "$(this.bundle): The reloadcommand is provided: $(reloadcommand[$(service)])"
+      "DEBUG $(this.bundle): The reloadcommand is provided: $(reloadcommand[$(service)])"
       ifvarclass => and(isvariable("reloadcommand[$(service)]"));
 
-      "$(this.bundle): The reloadcommand is NOT provided, using default"
+      "DEBUG $(this.bundle): The reloadcommand is NOT provided, using default"
       ifvarclass => not(isvariable("reloadcommand[$(service)]"));
 
-      "$(this.bundle): The baseinit is provided: $(baseinit[$(service)])"
+      "DEBUG $(this.bundle): The baseinit is provided: $(baseinit[$(service)])"
       ifvarclass => and(isvariable("baseinit[$(service)]"));
 
-      "$(this.bundle): The baseinit is NOT provided, using default"
+      "DEBUG $(this.bundle): The baseinit is NOT provided, using default"
       ifvarclass => not(isvariable("baseinit[$(service)]"));
 }

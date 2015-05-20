@@ -297,18 +297,16 @@ bundle common def
                     issues.";
 
   reports:
-    DEBUG|DEBUG_def::
-      "DEBUG: $(this.bundle)";
+    DEBUG|DEBUG_$(this.bundle)::
+      "DEBUG $(this.bundle): def.json was found at $(augments_file)";
 
-      "$(const.t) def.json was found at $(augments_file)";
-
-      "$(const.t) override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
+      "DEBUG $(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
       ifvarclass => isvariable("override_data_$(override_vars)");
 
-      "$(const.t) defined class '$(augments_classes_data_keys)' because of classmatch('$(augments[classes][$(augments_classes_data_keys)])')"
+      "DEBUG $(this.bundle): defined class '$(augments_classes_data_keys)' because of classmatch('$(augments[classes][$(augments_classes_data_keys)])')"
       ifvarclass => "$(augments_classes_data_keys)";
 
-      "$(const.t) $(defvars) = $($(defvars))";
+      "DEBUG $(this.bundle): $(defvars) = $($(defvars))";
 }
 
 bundle common inventory_control

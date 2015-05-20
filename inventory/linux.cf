@@ -59,6 +59,5 @@ bundle common inventory_linux
 
   reports:
     (DEBUG|DEBUG_inventory_linux).has_os_release::
-      "DEBUG $(this.bundle)";
-      "$(const.t)OS release ID = $(os_release_id), OS release version = $(os_release_version)";
+      "DEBUG $(this.bundle): OS release ID = $(os_release_id), OS release version = $(os_release_version)";
 }
