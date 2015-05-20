@@ -1,18 +1,16 @@
 #!/usr/bin/python
 
-from __future__ import print_function
-
 import sys
 import os
 
 log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
-print("yum " + (" ".join(sys.argv[1:])), file=log)
+log.write("yum " + (" ".join(sys.argv[1:])) + "\n")
 log.close()
 
 if sys.argv.count("check-update"):
     # Taken from various yum runs with long package names and
     # connection errors, broken at 80 columns.
-    print('''Loaded plugins: fastestmirror, security
+    sys.stdout.write('''Loaded plugins: fastestmirror, security
 Loading mirror speeds from cached hostfile
  * base: mirror.searchdaimon.com
  * extras: mirror.searchdaimon.com
@@ -34,4 +32,5 @@ Obsoleting Packages
 firefox.i386                        24.5.0-1.el5.centos                updates
     firefox.i386                    17.0.6-1.el5.centos                installed
 firefox.x86_64                      24.5.0-1.el5.centos                updates
-    firefox.x86_64                  17.0.6-1.el5.centos                installed''')
+    firefox.x86_64                  17.0.6-1.el5.centos                installed
+''')

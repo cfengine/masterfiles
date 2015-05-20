@@ -1,15 +1,14 @@
 #!/usr/bin/python
 
-from __future__ import print_function
-
 import sys
 import os
 
 log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
-print("dpkg-deb " + (" ".join(sys.argv[1:])), file=log)
+log.write("dpkg-deb " + (" ".join(sys.argv[1:])) + "\n")
 log.close()
 
 if sys.argv.count("-W"):
-    print('''Name=file_pkg
+    sys.stdout.write('''Name=file_pkg
 Version=10.0
-Architecture=x86_64''')
+Architecture=x86_64
+''')

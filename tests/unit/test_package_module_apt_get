@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-from __future__ import print_function
-
 import sys
 import subprocess
 import os
@@ -22,16 +20,17 @@ except OSError:
     pass
 
 # operation       = file-install/repo-install/etc.
-# input           = list of lines to give process on stdin.
-# expected_output = list of chunks that should appear somewhere in output.
+# input           = List of lines to give process on stdin.
 # no_lines        = The number of lines that the output should have.
-# mock_output     = list of chunks that should appear somewhere in the mock log.
-#                   This is currently the command line that the mock command
+# expected_output = List of chunks that should appear somewhere in output.
+# mock_lines      = The number of lines that mock_output should have.
+# mock_output     = List of chunks that should appear somewhere in the mock log.
+#                   The mock log is the command line(s) that the mock command
 #                   was called with.
 def check(operation, input, no_lines, expected_output, mock_lines, mock_output):
     process = subprocess.Popen([apt_get_module, operation], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in input:
-        print(line, file=process.stdin)
+        process.stdin.write(line + "\n")
     process.stdin.close()
 
     output = ""
@@ -42,14 +41,14 @@ def check(operation, input, no_lines, expected_output, mock_lines, mock_output):
 
     for chunk in expected_output:
         if output.find(chunk) < 0:
-            print("Fail: Does not appear in output: \"" + chunk + "\"")
-            print("Actual output:\n\"" + output + "\"")
+            sys.stdout.write("Fail: Does not appear in output: \"" + chunk + "\"\n")
+            sys.stdout.write("Actual output:\n\"" + output + "\"\n")
             return False
 
     if (line_count != no_lines):
-        print("Fail: Incorrect number of lines returned: " + str(line_count)
-              + " != " + str(no_lines) + " (expected)")
-        print("Actual output:\n\"" + output + "\"")
+        sys.stdout.write("Fail: Incorrect number of lines returned: " + str(line_count)
+                         + " != " + str(no_lines) + " (expected)\n")
+        sys.stdout.write("Actual output:\n\"" + output + "\"\n")
         return False
 
     output = ""
@@ -65,14 +64,14 @@ def check(operation, input, no_lines, expected_output, mock_lines, mock_output):
 
     for chunk in mock_output:
         if output.find(chunk) < 0:
-            print("Fail: Does not appear in mock log: \"" + chunk + "\"")
-            print("Actual output:\n\"" + output + "\"")
+            sys.stdout.write("Fail: Does not appear in mock log: \"" + chunk + "\"\n")
+            sys.stdout.write("Actual output:\n\"" + output + "\"\n")
             return False
 
     if (line_count != mock_lines):
-        print("Fail: Incorrect number of lines in mock log: " + str(line_count)
-              + " != " + str(mock_lines) + " (expected)")
-        print("Actual output:\n\"" + output + "\"")
+        sys.stdout.write("Fail: Incorrect number of lines in mock log: " + str(line_count)
+                         + " != " + str(mock_lines) + " (expected)\n")
+        sys.stdout.write("Actual output:\n\"" + output + "\"\n")
         return False
 
     try:

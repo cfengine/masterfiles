@@ -1,17 +1,15 @@
 #!/usr/bin/python
 
-from __future__ import print_function
-
 import sys
 import os
 
 log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
-print("apt-get " + (" ".join(sys.argv[1:])), file=log)
+log.write("apt-get " + (" ".join(sys.argv[1:])) + "\n")
 log.close()
 
 if sys.argv.count("upgrade"):
     # Subset of a real run of "apt-get upgrade".
-    print('''NOTE: This is only a simulation!
+    sys.stdout.write('''NOTE: This is only a simulation!
       apt-get needs root privileges for real execution.
       Keep also in mind that locking is deactivated,
       so don't depend on the relevance to the real current situation!
@@ -85,6 +83,7 @@ Inst libx11-6 [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precis
 Inst libx11-6:i386 [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])
 Conf libx11-data (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [all])
 Conf libx11-6 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [amd64])
-Conf libx11-6:i386 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])''')
+Conf libx11-6:i386 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])
+''')
 
 exit(0)
