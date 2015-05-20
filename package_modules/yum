@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-from __future__ import print_function
-
 import sys
 import os
 import subprocess
@@ -32,17 +30,17 @@ def get_package_data():
     repo = False
     if (re.match("^/.*", pkg_string)):
         # Absolute file.
-        print("PackageType=file")
+        sys.stdout.write("PackageType=file\n")
     elif (re.search("([:,]|-[0-9])", pkg_string)):
         # Contains either a version number or an illegal symbol.
-        print(line + "ErrorMessage: Package string with illegal format")
+        sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
         return 1
     else:
         repo = True
-        print("PackageType=repo")
+        sys.stdout.write("PackageType=repo\n")
 
     if (repo):
-        print("Name=" + pkg_string)
+        sys.stdout.write("Name=" + pkg_string + "\n")
         return 0
     else:
         sys.stdout.flush()
@@ -87,9 +85,9 @@ def list_updates(online):
         lastline = ""
         match = re.match("^(\S+)\.([^.\s]+)\s+(\S+)\s+\S+\s*$", line)
         if match != None:
-            print("Name=" + match.group(1))
-            print("Version=" + match.group(3))
-            print("Architecture=" + match.group(2))
+            sys.stdout.write("Name=" + match.group(1) + "\n")
+            sys.stdout.write("Version=" + match.group(3) + "\n")
+            sys.stdout.write("Architecture=" + match.group(2) + "\n")
 
     return 0
 
@@ -184,11 +182,11 @@ def file_install():
 ret = 0
 
 if len(sys.argv) < 2:
-    print("Need to provide argument", file=sys.stderr)
+    sys.stderr.write("Need to provide argument\n")
     exit(2)
 
 elif sys.argv[1] == "supports-api-version":
-    print("1")
+    sys.stdout.write("1\n")
 
 elif sys.argv[1] == "get-package-data":
     ret = get_package_data()
@@ -212,7 +210,7 @@ elif sys.argv[1] == "file-install":
     ret = file_install()
 
 else:
-    print("Invalid operation", file=sys.stderr)
+    sys.stderr.write("Invalid operation\n")
     exit(2)
 
 exit(ret)
