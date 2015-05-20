@@ -297,7 +297,7 @@ bundle common def
                     issues.";
 
   reports:
-    DEBUG|DEBUG_def::
+    DEBUG|DEBUG_$(this.bundle)::
       "DEBUG $(this.bundle): def.json was found at $(augments_file)";
 
       "DEBUG $(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"

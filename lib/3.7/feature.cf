@@ -33,7 +33,7 @@ bundle agent feature
       "_$(off)" string => "off", classes => feature_cancel("$(extract_$(off)[1])");
 
   reports:
-    DEBUG|DEBUG_feature::
+    DEBUG|DEBUG_$(this.bundle)::
       "DEBUG $(this.bundle): $(on) => SET class '$(extract_$(on)[2]) for '$(extract_$(on)[1])'"
       ifvarclass => "parsed_$(on)";
 
@@ -71,7 +71,7 @@ bundle agent feature_test
       "off" slist => classesmatching("feature_unset_.*");
 
   reports:
-    DEBUG|DEBUG_feature_test::
+    DEBUG|DEBUG_$(this.bundle)::
       "DEBUG $(this.bundle): have $(extract_$(on)[2])" ifvarclass => "$(extract_$(on)[2])";
       "DEBUG $(this.bundle): have no $(extract_$(on)[2])" ifvarclass => "!$(extract_$(on)[2])";
 

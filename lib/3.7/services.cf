@@ -905,7 +905,7 @@ bundle agent classic_services(service,state)
                         canonify("$(inits)_set"));
 
   reports:
-    DEBUG|DEBUG_classic_services::
+    DEBUG|DEBUG_$(this.bundle)::
       "DEBUG $(this.bundle): Using init system $(inits)"
       ifvarclass => and(canonify("$(inits)_set"));
 

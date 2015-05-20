@@ -140,7 +140,7 @@ bundle common update_def
       #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
 
   reports:
-    DEBUG|DEBUG_update_def::
+    DEBUG|DEBUG_$(this.bundle)::
       "DEBUG $(this.bundle): override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
         ifvarclass => isvariable("override_data_$(override_vars)");
 

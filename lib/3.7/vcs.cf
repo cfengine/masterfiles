@@ -338,7 +338,7 @@ bundle agent git(repo_path, subcmd, args)
       contain => in_dir( $(repo_path) );
 
   reports:
-    DEBUG|DEBUG_git::
+    DEBUG|DEBUG_$(this.bundle)::
       "DEBUG $(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'"
         ifvarclass => "am_root.need_to_drop";
 
