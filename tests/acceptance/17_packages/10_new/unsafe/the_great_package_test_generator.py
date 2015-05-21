@@ -172,26 +172,31 @@ def get_possible_promises():
     promises = []
     for text in text_promises:
         promise = {}
-        if text[0] == "P":
+        if text[0] != "P":
+            promise["policy"] = "absent"
+        else:
             promise["policy"] = "present"
-            if text[1] == "F":
+
+            if text[1] != "F":
+                promise["type"] = "repo"
+            else:
                 promise["type"] = "file"
+
                 if text[2:4] == "64":
                     promise["file_arch"] = "64_bit"
                 else:
                     promise["file_arch"] = "32_bit"
+
                 if text[5] == "1":
                     promise["file_version"] = "1"
                 else:
                     promise["file_version"] = "2"
-            else:
-                promise["type"] = "repo"
-        else:
-            promise["policy"] = "absent"
+
         if text[6:9] == "A64":
             promise["arch"] = "64_bit"
-        if text[6:9] == "A32":
+        elif text[6:9] == "A32":
             promise["arch"] = "32_bit"
+
         if text[9:11] == "VL":
             promise["version"] = "latest"
         elif text[9] == "V":
