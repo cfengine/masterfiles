@@ -411,7 +411,7 @@ bundle agent ''' + test_handle + '''_check
         print("        expression => \"!" + test_handle + "___class_kept.!" + test_handle + "___class_repaired." + test_handle + "___class_failed\";")
     else:
         print("        expression => \"!" + test_handle + "___class_kept." + test_handle + "___class_repaired.!" + test_handle + "___class_failed\";")
-        
+
     if warn_only:
         file_state_to_check = from_state
     else:
@@ -482,7 +482,7 @@ def main_bundles(test_handles):
       "run_all_tests"
         not => "specific_test_case_specified",
         scope => "namespace";
-    
+
   methods:''')
     for handle in test_handles:
         print("    run_all_tests|" + handle + "::")
