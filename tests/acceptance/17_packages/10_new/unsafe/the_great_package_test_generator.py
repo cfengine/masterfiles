@@ -219,6 +219,7 @@ def resolve_arch_conflicts(from_64, from_32, to_64, to_32):
                 to_32 = to_64
             else:
                 to_32 = "0"
+
     elif from_32 != to_32:
         if from_64 != "0":
             if to_32 >= from_64:
@@ -226,7 +227,7 @@ def resolve_arch_conflicts(from_64, from_32, to_64, to_32):
             else:
                 to_64 = "0"
 
-    return (to_64, to_32)
+    return to_64, to_32
 
 
 # Simulate, with the given promise, what the state of the system would be,
@@ -235,37 +236,38 @@ def simulate_promise(promise, from_64, from_32):
     to_64 = from_64
     to_32 = from_32
 
+    arch, version = promise.get('arch'), promise.get('version')
     if promise["policy"] == "present":
         if promise["type"] == "repo":
-            if promise.get("arch") == "64_bit":
-                if promise.get("version") == "latest":
-                    to_64 = "2"
-                elif promise.get("version"):
-                    to_64 = promise["version"]
+            if version == "latest":
+                version = "2"
+
+            if arch == "64_bit":
+                if version:
+                    to_64 = version
                 elif from_64 == "0":
                     to_64 = "2"
-                (to_64, to_32) = resolve_arch_conflicts(from_64, from_32, to_64, to_32)
-            elif promise.get("arch") == "32_bit":
-                if promise.get("version") == "latest":
-                    to_32 = "2"
-                elif promise.get("version"):
-                    to_32 = promise["version"]
+
+                to_64, to_32 = resolve_arch_conflicts(from_64, from_32, to_64, to_32)
+
+            elif arch == "32_bit":
+                if version:
+                    to_32 = version
                 elif from_32 == "0":
                     to_32 = "2"
-                (to_64, to_32) = resolve_arch_conflicts(from_64, from_32, to_64, to_32)
-            else:
-                if promise.get("version"):
-                    version = ""
-                    if promise.get("version") == "latest":
-                        version = "2"
-                    else:
-                        version = promise["version"]
-                    if from_64 != "0" or (from_64 == "0" and from_32 == "0"):
-                        to_64 = version
-                    if from_32 != "0":
-                        to_32 = version
-                elif from_64 == "0" and from_32 == "0":
-                    to_64 = "2"
+
+                to_64, to_32 = resolve_arch_conflicts(from_64, from_32, to_64, to_32)
+
+            elif version:
+
+                if from_64 != "0" or (from_64 == "0" and from_32 == "0"):
+                    to_64 = version
+
+                if from_32 != "0":
+                    to_32 = version
+
+            elif from_64 == "0" and from_32 == "0":
+                to_64 = "2"
 
         else:
             # Todo: Errors when file doesn't match arch/version?
@@ -273,30 +275,25 @@ def simulate_promise(promise, from_64, from_32):
                 to_64 = promise["file_version"]
             else:
                 to_32 = promise["file_version"]
+
     else:
-        if promise.get("arch") == "64_bit":
-            if promise.get("version"):
-                if promise["version"] == from_64:
-                    to_64 = "0"
-            else:
+        if arch == "64_bit":
+            if not version or version == from_64:
                 to_64 = "0"
-        elif promise.get("arch") == "32_bit":
-            if promise.get("version"):
-                if promise["version"] == from_32:
-                    to_32 = "0"
-            else:
+        elif arch == "32_bit":
+            if not version or version == from_32:
                 to_32 = "0"
         else:
-            if promise.get("version"):
-                if promise["version"] == from_64:
+            if version:
+                if version == from_64:
                     to_64 = "0"
-                if promise["version"] == from_32:
+                if version == from_32:
                     to_32 = "0"
             else:
                 to_64 = "0"
                 to_32 = "0"
 
-    return (to_64, to_32)
+    return to_64, to_32
 
 
 # Calculate all possible transitions from from_state, to to_state.
