@@ -58,7 +58,7 @@ Inst libc6 [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [
 Inst libc6:i386 [2.15-0ubuntu10.11] (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [i386])
 Conf libc6 (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [amd64])
 Conf libc6:i386 (2.15-0ubuntu10.12 Ubuntu:12.04/precise-updates [i386])
-Inst linux-libc-dev [3.2.0-79.115] (3.2.0-82.119 Ubuntu:12.04/precise-updates [amd64])
+Inst linux-libc-dev [2.6.32-48squeeze4] (2.6.32-48squeeze6 Debian:6.0.10/oldstable, Debian-Security:6.0/oldoldstable [amd64])
 Inst libapt-pkg4.12 [0.8.16~exp12ubuntu10.22] (0.8.16~exp12ubuntu10.23 Ubuntu:12.04/precise-updates [amd64])
 Conf libapt-pkg4.12 (0.8.16~exp12ubuntu10.23 Ubuntu:12.04/precise-updates [amd64])
 Inst gpgv [1.4.11-3ubuntu2.7] (1.4.11-3ubuntu2.9 Ubuntu:12.04/precise-updates [amd64])
