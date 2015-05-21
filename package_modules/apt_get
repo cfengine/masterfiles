@@ -91,13 +91,22 @@ def list_updates(online):
     process = subprocess.Popen([apt_get_cmd] + apt_get_options + ["-s", "upgrade"], stdout=subprocess.PIPE)
     for line in process.stdout:
         # Example of lines that we try to match:
-        # Inst php5-cli [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [amd64]) []
-        # Inst php5-cli:i386 [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [i386]) []
-        match = re.match("^Inst\s+([^\s:]+)(:\S+)?\s+\[[^]\s]+\]\s+\((\S+)\s+\S+\s+\[([^]\s]+)\]\).*", line)
+        #        (name)  (old version (ignored))  (new version)     (repository(ies) (ignored))  (arch)
+        #           |              |                    |                        |                 |
+        #           V              V                    V                        V                 V
+        #   Inst php5-cli [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [amd64]) []
+        #
+        # Note architecture included in the name on this one:
+        #   Inst php5-cli:i386 [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [i386]) []
+        #
+        # Note multiple repositories in this one:
+        #   Inst linux-libc-dev [2.6.32-48squeeze4] (2.6.32-48squeeze6 Debian:6.0.10/oldstable, Debian-Security:6.0/oldoldstable [amd64])
+        #
+        match = re.match("^Inst\s+([^\s:]+)(?::\S+)?\s+\[[^]\s]+\]\s+\((\S+)\s+[^,\s]+(?:,\s+[^,\s]+)*\s+\[([^]\s]+)\]\).*", line)
         if match != None:
             sys.stdout.write("Name=" + match.group(1) + "\n")
-            sys.stdout.write("Version=" + match.group(3) + "\n")
-            sys.stdout.write("Architecture=" + match.group(4) + "\n")
+            sys.stdout.write("Version=" + match.group(2) + "\n")
+            sys.stdout.write("Architecture=" + match.group(3) + "\n")
 
     return 0
 
