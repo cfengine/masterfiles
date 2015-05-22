@@ -289,7 +289,7 @@ bundle agent standard_services(service,state)
       "$(this.bundle): Service $(service) unit file is not loaded; doing nothing";
     verbose_mode.chkconfig::
       "$(this.bundle): using chkconfig layer to $(state) $(service) (chkconfig mode $(chkconfig_mode))"
-        ifvarclass => "!chkconfig_$(c_service)_unregistered";
+        ifvarclass => "!chkconfig_$(c_service)_unregistered.((start.!onboot)|(stop.onboot))";
     verbose_mode.chkconfig::
       "$(this.bundle): skipping chkconfig layer to $(state) $(service) because $(service) is not registered with chkconfig (chkconfig --list $(service))"
         ifvarclass => "chkconfig_$(c_service)_unregistered";
