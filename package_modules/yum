@@ -1,0 +1,218 @@
+#!/usr/bin/python
+
+from __future__ import print_function
+
+import sys
+import os
+import subprocess
+import re
+
+rpm_cmd = "/bin/rpm"
+rpm_output_format = "Name=%{name}\nVersion=%{version}\nArchitecture=%{arch}\n"
+
+yum_cmd = "/usr/bin/yum"
+yum_options = "--quiet"
+
+if (os.environ.get('CFENGINE_TEST_RPM_CMD')):
+    rpm_cmd = os.environ['CFENGINE_TEST_RPM_CMD']
+if (os.environ.get('CFENGINE_TEST_YUM_CMD')):
+    yum_cmd = os.environ['CFENGINE_TEST_YUM_CMD']
+
+def get_package_data():
+    pkg_string = ""
+    for line in sys.stdin:
+        result = re.match("^File=(.*)", line)
+        if (result):
+            pkg_string = result.group(1)
+            break
+
+    if (pkg_string == ""):
+        return 1
+
+    repo = False
+    if (re.match("^/.*", pkg_string)):
+        # Absolute file.
+        print("PackageType=file")
+    elif (re.search("([:,]|-[0-9])", pkg_string)):
+        # Contains either a version number or an illegal symbol.
+        print(line + "ErrorMessage: Package string with illegal format")
+        return 1
+    else:
+        repo = True
+        print("PackageType=repo")
+
+    if (repo):
+        print("Name=" + pkg_string)
+        return 0
+    else:
+        sys.stdout.flush()
+        return subprocess.call([rpm_cmd, "--qf", rpm_output_format, "-qp", result.group(1)])
+
+
+def list_installed():
+    for line in sys.stdin:
+        # Ignore everything.
+        pass
+
+    return subprocess.call([rpm_cmd, "-qa", "--qf", rpm_output_format])
+
+
+def list_updates(online):
+    for line in sys.stdin:
+        # Ignore everything.
+        pass
+
+    if online:
+        online_flag = []
+    else:
+        online_flag = ["-C"]
+
+    process = subprocess.Popen([yum_cmd, yum_options] + online_flag + ["check-update"], stdout=subprocess.PIPE)
+    lastline = ""
+    for line in process.stdout:
+        # Combine multiline entries into one line. A line without at least three
+        # space separated fields gets combined with the next line, if that line
+        # starts with a space.
+        if len(lastline) > 0 and line[0] != " ":
+            # Line does not start with a space. No combination.
+            lastline = ""
+
+        line = lastline + line
+        match = re.match("^\S+\s+\S+\s+\S+", line)
+        if match == None:
+            # Keep line but strip trailing newline.
+            lastline = line[:-1]
+            continue
+
+        lastline = ""
+        match = re.match("^(\S+)\.([^.\s]+)\s+(\S+)\s+\S+\s*$", line)
+        if match != None:
+            print("Name=" + match.group(1))
+            print("Version=" + match.group(3))
+            print("Architecture=" + match.group(2))
+
+    return 0
+
+
+def package_arguments_builder():
+    name = ""
+    version = ""
+    arch = ""
+    args = []
+    for line in sys.stdin:
+        result = re.match("^Name=(.*)", line)
+        if (result):
+            if (name != ""):
+                # Each new "Name=" triggers a new entry.
+                args_add = name
+                if (version != ""):
+                    args_add += "-" + version
+                if (arch != ""):
+                    args_add += ":" + arch
+                args.append(args_add)
+
+                version = ""
+                arch = ""
+
+            name = result.group(1)
+            continue
+
+        result = re.match("^Version=(.*)", line)
+        if (result):
+            version = result.group(1)
+            continue
+
+        result = re.match("^Architecture=(.*)", line)
+        if (result):
+            arch = result.group(1)
+            continue
+
+    if (name == ""):
+        return args
+
+    args_add = name
+    if (version != ""):
+        args_add += "-" + version
+    if (arch != ""):
+        args_add += ":" + arch
+    args.append(args_add)
+
+    return args
+
+
+def repo_install():
+    cmd_line = [yum_cmd, yum_options, "install"]
+
+    args = package_arguments_builder()
+
+    if (not args):
+        return 0
+
+    cmd_line.extend(args)
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+def remove():
+    cmd_line = [rpm_cmd, "-e"]
+
+    args = package_arguments_builder()
+
+    if (not args):
+        return 0
+
+    cmd_line.extend(args)
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+def file_install():
+    cmd_line = [rpm_cmd, "-U"]
+    found = False
+    for line in sys.stdin:
+        result = re.match("^File=(.*)", line)
+        if (result):
+            found = True
+            cmd_line.append(result.group(1))
+
+    if (not found):
+        return 0
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+ret = 0
+
+if len(sys.argv) < 2:
+    print("Need to provide argument", file=sys.stderr)
+    exit(2)
+
+elif sys.argv[1] == "supports-api-version":
+    print("1")
+
+elif sys.argv[1] == "get-package-data":
+    ret = get_package_data()
+
+elif sys.argv[1] == "list-installed":
+    ret = list_installed()
+
+elif sys.argv[1] == "list-updates":
+    ret = list_updates(True)
+
+elif sys.argv[1] == "list-updates-local":
+    ret = list_updates(False)
+
+elif sys.argv[1] == "repo-install":
+    ret = repo_install()
+
+elif sys.argv[1] == "remove":
+    ret = remove()
+
+elif sys.argv[1] == "file-install":
+    ret = file_install()
+
+else:
+    print("Invalid operation", file=sys.stderr)
+    exit(2)
+
+exit(ret)

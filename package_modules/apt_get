@@ -1,0 +1,252 @@
+#!/usr/bin/python
+
+from __future__ import print_function
+
+import sys
+import os
+import subprocess
+import re
+
+dpkg_cmd = "/usr/bin/dpkg"
+dpkg_deb_cmd = "/usr/bin/dpkg-deb"
+dpkg_query_cmd = "/usr/bin/dpkg-query"
+dpkg_output_format = "Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n"
+dpkg_status_format = "Status=${Status}\n" + dpkg_output_format
+
+apt_get_options = ["-o", "Dpkg::Options::=--force-confold", "-o", "Dpkg::Options::=--force-confdef", "-y", "--force-yes"]
+apt_get_cmd = "/usr/bin/apt-get"
+
+os.environ['DEBIAN_FRONTEND'] = "noninteractive"
+os.environ['LC_ALL'] = "C"
+
+if (os.environ.get('CFENGINE_TEST_DPKG_CMD')):
+    dpkg_cmd = os.environ['CFENGINE_TEST_DPKG_CMD']
+if (os.environ.get('CFENGINE_TEST_DPKG_DEB_CMD')):
+    dpkg_deb_cmd = os.environ['CFENGINE_TEST_DPKG_DEB_CMD']
+if (os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD')):
+    dpkg_query_cmd = os.environ['CFENGINE_TEST_DPKG_QUERY_CMD']
+if (os.environ.get('CFENGINE_TEST_APT_GET_CMD')):
+    apt_get_cmd = os.environ['CFENGINE_TEST_APT_GET_CMD']
+
+def get_package_data():
+    pkg_string = ""
+    for line in sys.stdin:
+        result = re.match("^File=(.*)", line)
+        if (result):
+            pkg_string = result.group(1)
+            break
+
+    if (pkg_string == ""):
+        return 1
+
+    repo = False
+    if (re.match("^/.*", pkg_string)):
+        # Absolute file.
+        print("PackageType=file")
+    elif (re.search("([:,]|-[0-9])", pkg_string)):
+        # Contains either a version number or an illegal symbol.
+        print(line + "ErrorMessage: Package string with illegal format")
+        return 1
+    else:
+        repo = True
+        print("PackageType=repo")
+
+    if (repo):
+        print("Name=" + pkg_string)
+        return 0
+    else:
+        sys.stdout.flush()
+        return subprocess.call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", result.group(1)])
+
+
+def list_installed():
+    for line in sys.stdin:
+        # Ignore everything.
+        pass
+
+    process = subprocess.Popen([dpkg_query_cmd, "--showformat", dpkg_status_format, "-W"], stdout=subprocess.PIPE)
+    installed_package = False
+    for line in process.stdout:
+        if line[-1] == "\n":
+            line = line[:-1]
+        # The space before "installed" is important, because it can be "not-installed".
+        if re.match("^Status=.* installed.*", line):
+            installed_package = True
+        elif re.match("^Status=.*", line):
+            installed_package = False
+        elif installed_package:
+            print(line)
+
+    return 0
+
+
+def list_updates(online):
+    for line in sys.stdin:
+        # Ignore everything.
+        pass
+
+    if online:
+        result = subprocess.call([apt_get_cmd] + apt_get_options + ["update"], stdout=sys.stderr)
+        if (result != 0):
+            return result
+
+    process = subprocess.Popen([apt_get_cmd] + apt_get_options + ["-s", "upgrade"], stdout=subprocess.PIPE)
+    for line in process.stdout:
+        # Example of lines that we try to match:
+        # Inst php5-cli [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [amd64]) []
+        # Inst php5-cli:i386 [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [i386]) []
+        match = re.match("^Inst\s+([^\s:]+)(:\S+)?\s+\[[^]\s]+\]\s+\((\S+)\s+\S+\s+\[([^]\s]+)\]\).*", line)
+        if match != None:
+            print("Name=" + match.group(1))
+            print("Version=" + match.group(3))
+            print("Architecture=" + match.group(4))
+
+    return 0
+
+
+def one_package_argument(name, arch, version, is_apt_install):
+    args = []
+    archs = []
+    if arch != "":
+        archs.append(arch)
+    elif is_apt_install:
+        # Here we have no specified architecture and we are installing.
+        # If we have existing versions, operate on those, instead of the
+        # platform default.
+        process = subprocess.Popen([dpkg_query_cmd, "--showformat", "${Architecture}=${Status}\n",
+                                    "-W", name + ":*"], stdout=subprocess.PIPE)
+        for line in process.stdout:
+            # The space before "installed" is important, because it can be "not-installed".
+            match = re.match("^([^=]*)=.* installed.*", line)
+            if match:
+                archs.append(match.group(1))
+
+    version_suffix = ""
+    if version != "" and is_apt_install:
+        version_suffix = "=" + version
+
+    if len(archs) > 0:
+        for arch in archs:
+            args.append(name + ":" + arch + version_suffix)
+    elif is_apt_install:
+        args.append(name + version_suffix)
+    else:
+        # Delete all architectures if none is specified.
+        args.append(name + ":*" + version_suffix)
+
+    return args
+
+
+def package_arguments_builder(is_apt_install):
+    name = ""
+    version = ""
+    arch = ""
+    args = []
+    for line in sys.stdin:
+        result = re.match("^Name=(.*)", line)
+        if (result):
+            if (name != ""):
+                # Each new "Name=" triggers a new entry.
+                args += one_package_argument(name, arch, version, is_apt_install)
+
+                version = ""
+                arch = ""
+
+            name = result.group(1)
+            continue
+
+        result = re.match("^Version=(.*)", line)
+        if (result):
+            version = result.group(1)
+            continue
+
+        result = re.match("^Architecture=(.*)", line)
+        if (result):
+            arch = result.group(1)
+            continue
+
+    if name != "":
+        args += one_package_argument(name, arch, version, is_apt_install)
+
+    return args
+
+
+def repo_install():
+    cmd_line = [apt_get_cmd] + apt_get_options + ["install"]
+
+    args = package_arguments_builder(True)
+
+    if (not args):
+        return 0
+
+    cmd_line.extend(args)
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+def remove():
+    cmd_line = [dpkg_cmd]
+    cmd_line.append("--remove")
+
+    args = package_arguments_builder(False)
+
+    if (not args):
+        return 0
+
+    cmd_line.extend(args)
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+def file_install():
+    cmd_line = [dpkg_cmd]
+    cmd_line.append("-i")
+
+    found = False
+    for line in sys.stdin:
+        result = re.match("^File=(.*)", line)
+        if (result):
+            found = True
+            cmd_line.append(result.group(1))
+
+    if (not found):
+        return 0
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+ret = 0
+
+if len(sys.argv) < 2:
+    print("Need to provide argument", file=sys.stderr)
+    exit(2)
+
+elif sys.argv[1] == "supports-api-version":
+    print("1")
+
+elif sys.argv[1] == "get-package-data":
+    ret = get_package_data()
+
+elif sys.argv[1] == "list-installed":
+    ret = list_installed()
+
+elif sys.argv[1] == "list-updates":
+    ret = list_updates(True)
+
+elif sys.argv[1] == "list-updates-local":
+    ret = list_updates(False)
+
+elif sys.argv[1] == "repo-install":
+    ret = repo_install()
+
+elif sys.argv[1] == "remove":
+    ret = remove()
+
+elif sys.argv[1] == "file-install":
+    ret = file_install()
+
+else:
+    print("Invalid operation", file=sys.stderr)
+    exit(2)
+
+exit(ret)
