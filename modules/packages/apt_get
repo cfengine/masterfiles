@@ -1,0 +1,243 @@
+#!/usr/bin/python
+
+import sys
+import os
+import subprocess
+import re
+
+dpkg_cmd = os.environ.get('CFENGINE_TEST_DPKG_CMD', "/usr/bin/dpkg")
+dpkg_deb_cmd = os.environ.get('CFENGINE_TEST_DPKG_DEB_CMD', "/usr/bin/dpkg-deb")
+dpkg_query_cmd = os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD', "/usr/bin/dpkg-query")
+
+dpkg_output_format = "Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n"
+dpkg_status_format = "Status=${Status}\n" + dpkg_output_format
+
+apt_get_options = ["-o",
+                   "Dpkg::Options::=--force-confold",
+                   "-o",
+                   "Dpkg::Options::=--force-confdef",
+                   "-y",
+                   "--force-yes"]
+apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
+
+os.environ['DEBIAN_FRONTEND'] = "noninteractive"
+os.environ['LC_ALL'] = "C"
+
+def get_package_data():
+    pkg_string = ""
+    for line in sys.stdin:
+        if line.startswith("File="):
+            pkg_string = line.split("=", 1)[1].rstrip()
+            # Don't break, we need to exhaust stdin.
+
+    if not pkg_string:
+        return 1
+
+    if (pkg_string.startswith("/")):
+        # Absolute file.
+        sys.stdout.write("PackageType=file\n")
+        sys.stdout.flush()
+        return subprocess.call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", pkg_string])
+    elif (re.search("([:,]|-[0-9])", pkg_string)):
+        # Contains either a version number or an illegal symbol.
+        sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
+        return 1
+    else:
+        sys.stdout.write("PackageType=repo\n")
+        sys.stdout.write("Name=" + pkg_string + "\n")
+        return 0
+
+
+def list_installed():
+    # Ignore everything.
+    sys.stdin.readlines()
+
+    process = subprocess.Popen([dpkg_query_cmd, "--showformat", dpkg_status_format, "-W"], stdout=subprocess.PIPE)
+    installed_package = False
+    for line in process.stdout:
+        line = line.rstrip("\n")
+        # The space before "installed" is important, because it can be "not-installed".
+        if line.startswith("Status=") and line.split("=", 1)[1].find(" installed") >= 0:
+            installed_package = True
+        elif line.startswith("Status="):
+            installed_package = False
+        elif installed_package:
+            sys.stdout.write(line + "\n")
+
+    return 0
+
+
+def list_updates(online):
+    # Ignore everything.
+    sys.stdin.readlines()
+
+    if online:
+        result = subprocess.call([apt_get_cmd] + apt_get_options + ["update"], stdout=sys.stderr)
+        if result != 0:
+            return result
+
+    process = subprocess.Popen([apt_get_cmd] + apt_get_options + ["-s", "upgrade"], stdout=subprocess.PIPE)
+    for line in process.stdout:
+        # Example of lines that we try to match:
+        #        (name)  (old version (ignored))  (new version)     (repository(ies) (ignored))  (arch)
+        #           |              |                    |                        |                 |
+        #           V              V                    V                        V                 V
+        #   Inst php5-cli [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [amd64]) []
+        #
+        # Note architecture included in the name on this one:
+        #   Inst php5-cli:i386 [5.3.10-1ubuntu3.17] (5.3.10-1ubuntu3.18 Ubuntu:12.04/precise-updates [i386]) []
+        #
+        # Note multiple repositories in this one:
+        #   Inst linux-libc-dev [2.6.32-48squeeze4] (2.6.32-48squeeze6 Debian:6.0.10/oldstable, Debian-Security:6.0/oldoldstable [amd64])
+        #
+        #                               name                   old version       new version
+        #                                 |                         |                 |
+        #                         /-------+-------\              /--+--\       /------+-------\
+        match = re.match("^Inst\s+(?P<name>[^\s:]+)(?::\S+)?\s+\[[^]\s]+\]\s+\((?P<version>\S+)" +
+
+        #                         repository(ies)              arch
+        #                               |                        |
+        #                    /----------+----------\     /-------+-------\
+                         "\s+[^,\s]+(?:,\s+[^,\s]+)*\s+\[(?P<arch>[^]\s]+)\]\).*", line)
+
+        if match is not None:
+            sys.stdout.write("Name=" + match.group("name") + "\n")
+            sys.stdout.write("Version=" + match.group("version") + "\n")
+            sys.stdout.write("Architecture=" + match.group("arch") + "\n")
+
+    return 0
+
+
+def one_package_argument(name, arch, version, is_apt_install):
+    args = []
+    archs = []
+    if arch:
+        archs.append(arch)
+    elif is_apt_install:
+        # Here we have no specified architecture and we are installing.
+        # If we have existing versions, operate on those, instead of the
+        # platform default.
+        process = subprocess.Popen([dpkg_query_cmd, "--showformat", "${Architecture}=${Status}\n",
+                                    "-W", name + ":*"], stdout=subprocess.PIPE)
+        for line in process.stdout:
+            # The space before "installed" is important, because it can be "not-installed".
+            if "=" in line:
+                arch, stat = line.split("=", 1)
+                if stat.find(" installed") >= 0:
+                    archs.append(arch)
+
+    version_suffix = ""
+    if version != "" and is_apt_install:
+        version_suffix = "=" + version
+
+    if archs:
+        args = [name + ':' + arch + version_suffix for arch in archs]
+    elif is_apt_install:
+        args.append(name + version_suffix)
+    else:
+        # Delete all architectures if none is specified.
+        args.append(name + ":*" + version_suffix)
+
+    return args
+
+
+def package_arguments_builder(is_apt_install):
+    name = ""
+    version = ""
+    arch = ""
+    args = []
+    for line in sys.stdin:
+        if line.startswith("Name="):
+            if name:
+                # Each new "Name=" triggers a new entry.
+                args += one_package_argument(name, arch, version, is_apt_install)
+
+                version = ""
+                arch = ""
+
+            name = line.split("=", 1)[1].rstrip()
+
+        elif line.startswith("Version="):
+            version = line.split("=", 1)[1].rstrip()
+
+        elif line.startswith("Architecture="):
+            arch = line.split("=", 1)[1].rstrip()
+
+    if name:
+        args += one_package_argument(name, arch, version, is_apt_install)
+
+    return args
+
+
+def repo_install():
+    cmd_line = [apt_get_cmd] + apt_get_options + ["install"]
+
+    args = package_arguments_builder(True)
+
+    if args:
+        return subprocess.call(cmd_line + args, stdout=sys.stderr)
+    return 0
+
+def remove():
+    cmd_line = [dpkg_cmd, "--remove"]
+
+    args = package_arguments_builder(False)
+
+    if (not args):
+        return 0
+
+    cmd_line.extend(args)
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+def file_install():
+    cmd_line = [dpkg_cmd, "-i"]
+
+    found = False
+    for line in sys.stdin:
+        if line.startswith("File="):
+            found = True
+            cmd_line.append(line.split("=", 1)[1].rstrip())
+
+    if (not found):
+        return 0
+
+    return subprocess.call(cmd_line, stdout=sys.stderr)
+
+
+def main():
+    if len(sys.argv) < 2:
+        sys.stderr.write("Need to provide argument\n")
+        return 2
+
+    elif sys.argv[1] == "supports-api-version":
+        sys.stdout.write("1\n")
+        return 0
+
+    elif sys.argv[1] == "get-package-data":
+        return get_package_data()
+
+    elif sys.argv[1] == "list-installed":
+        return list_installed()
+
+    elif sys.argv[1] == "list-updates":
+        return list_updates(True)
+
+    elif sys.argv[1] == "list-updates-local":
+        return list_updates(False)
+
+    elif sys.argv[1] == "repo-install":
+        return repo_install()
+
+    elif sys.argv[1] == "remove":
+        return remove()
+
+    elif sys.argv[1] == "file-install":
+        return file_install()
+
+    else:
+        sys.stderr.write("Invalid operation\n")
+        return 2
+
+sys.exit(main())
