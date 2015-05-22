@@ -158,6 +158,7 @@ dnl Now make the Makefiles
 dnl ######################################################################
 
 AC_CONFIG_FILES([Makefile
+                modules/packages/Makefile
                 tests/acceptance/Makefile])
 
 AC_OUTPUT
