@@ -45,6 +45,10 @@ bundle agent cfe_internal_update_policy
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
+      "package_modules_dir" string => "/var/cfengine/package_modules", # NB! NOT $(sys.workdir) on Windows !
+      comment => "Directory containing CFEngine package modules",
+      handle => "cfe_internal_update_policy_vars_package_modules_dir_windows";
+
       "plugins_dir"        string => "/var/cfengine/plugins",      # NB! NOT $(sys.workdir) on Windows !
       comment => "Directory containing CFEngine plugins",
       handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
@@ -63,6 +67,10 @@ bundle agent cfe_internal_update_policy
       "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir";
+
+      "package_modules_dir" string => translatepath("$(sys.workdir)/package_modules"),
+      comment => "Directory containing CFEngine package modules",
+      handle => "cfe_internal_update_policy_vars_package_modules_dir";
 
       "plugins_dir"        string => translatepath("$(sys.workdir)/plugins"),
       comment => "Directory containing CFEngine plugins",
@@ -175,6 +183,14 @@ bundle agent cfe_internal_update_policy
       perms => u_m("755"),
       action => u_immediate;
 
+      "$(package_modules_dir)"
+      comment => "Always update package modules files on client side",
+      handle => "cfe_internal_update_policy_files_update_package_modules",
+      copy_from => u_rcp("$(package_modules_dir)", @(update_def.policy_servers)),
+      depth_search => u_recurse("inf"),
+      perms => u_m("755"),
+      action => u_immediate;
+
       "$(plugins_dir)"
       comment => "Always update plugins files on client side",
       handle => "cfe_internal_update_policy_files_update_plugins",
@@ -189,6 +205,14 @@ bundle agent cfe_internal_update_policy
       comment => "Always update modules files on client side (Windows)",
       handle => "cfe_internal_update_policy_files_update_modules_windows",
       copy_from => u_rcp("$(modules_dir)", @(update_def.policy_servers)),
+      depth_search => u_recurse("inf"),
+      perms => u_m("755"),
+      action => u_immediate;
+
+      "$(sys.workdir)\package_modules"
+      comment => "Always update package modules files on client side (Windows)",
+      handle => "cfe_internal_update_policy_files_update_package_modules_windows",
+      copy_from => u_rcp("$(package_modules_dir)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;

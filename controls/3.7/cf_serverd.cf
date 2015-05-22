@@ -88,6 +88,11 @@ bundle server access_rules()
       comment => "Grant access to modules directory",
       admit => { @(def.acl) };
 
+      "$(def.dir_package_modules)"
+      handle => "server_access_grant_access_package_modules",
+      comment => "Grant access to package modules directory",
+      admit => { @(def.acl) };
+
       "$(def.dir_plugins)"
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
