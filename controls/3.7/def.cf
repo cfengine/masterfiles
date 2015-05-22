@@ -180,8 +180,6 @@ bundle common def
 
       "enterprise_log_files" slist =>
       {
-        "$(sys.workdir)/cf_notkept.log",
-        "$(sys.workdir)/cf_repair.log",
         "$(sys.workdir)/state/cf_value.log",
         "$(sys.workdir)/outputs/dc-scripts.log",
       };
