@@ -31,7 +31,21 @@ bundle agent cfe_internal_update_bins
       comment => "The Cfengine binary updates directory on the policy host",
       handle => "cfe_internal_update_bins_vars_master_software_location";
 
-      "local_software_dir"        string => translatepath("$(sys.workdir)/software_updates/$(sys.flavour)_$(sys.arch)"),
+    !hpux::
+      "package_dir"
+        string => "$(sys.flavour)_$(sys.arch)"
+        comment => "The directory within software updates to look for packages";
+
+    hpux::
+      "package_dir"
+        string => "$(sys.class)_$(sys.arch)"
+        comment => "The directory within software updates to look for packages.
+                    On HPUX sys.flavor includes versions, so we use sys.class
+                    instead.";
+
+    enterprise::
+
+      "local_software_dir"        string => translatepath("$(sys.workdir)/software_updates/$(package_dir)"),
       comment => "Local directory containing binary updates for this host",
       handle => "cfe_internal_update_bins_vars_local_software_dir";
 
@@ -40,7 +54,7 @@ bundle agent cfe_internal_update_bins
       handle => "cfe_internal_update_bins_vars_local_update_log_dir";
 
     !windows.enterprise::
-      
+
       # backup script for cf-upgrade
       # the script should have 2 conditions, BACKUP and RESTORE
       # BACKUP and RESTORE status is $(const.dollar)1 variable in the script
@@ -67,18 +81,6 @@ bundle agent cfe_internal_update_bins
       # see more details at bundle edit_line u_admin_file
 
       "admin_file"      string => "/tmp/admin_file";
-
-    windows.enterprise::
-
-      "stop_signal"              string => "kill",
-      comment => "Define a stop signal for Windows",
-      handle => "cfe_internal_update_bins_vars_stop_signal_windows";
-
-    !windows.enterprise::
-
-      "stop_signal"              string => "term",
-      comment => "Define a stop signal for *NIX system",
-      handle => "cfe_internal_update_bins_vars_stop_signal_unix";
 
     (solarisx86|solaris).enterprise::
 
@@ -251,10 +253,16 @@ bundle agent cfe_internal_update_bins
       edit_line => u_install_script,
       perms => u_m("0755");
 
+      "$(local_software_dir)/."
+        create => "true",
+        handle => "cfe_internal_update_bins_files_local_software_dir_presence",
+        comment => "Ensure the local software directory exists for new binaries
+                    to be downloaded to";
+
       "$(local_software_dir)"
       comment => "Copy binary updates from master source on policy server",
       handle => "cfe_internal_update_bins_files_pkg_copy",
-      copy_from => u_pcp("$(master_software_location)/$(sys.flavour)_$(sys.arch)", @(update_def.policy_servers)),
+      copy_from => u_pcp("$(master_software_location)/$(package_dir)", @(update_def.policy_servers)),
       depth_search => u_recurse("1"),  # Nova updates should be in root dir
       action => u_immediate,
       classes => u_if_repaired("bin_newpkg");
