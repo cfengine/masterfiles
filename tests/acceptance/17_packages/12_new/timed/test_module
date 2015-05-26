@@ -16,7 +16,7 @@ with open(module_dir + "/test_module.log", "a") as log:
 pkg_name = ""
 for line in sys.stdin:
     if line.startswith('File='):
-        pkg_name = line.split('=', 1)[1]
+        pkg_name = line.split('=', 1)[1].rstrip()
         break
 
 if sys.argv[1] == "list-installed":
