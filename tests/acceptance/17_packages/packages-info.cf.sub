@@ -18,8 +18,10 @@ bundle common p
 
     redhat|suse::
       "ext" string => "rpm";
+      "delim" string => "-";
     debian::
       "ext" string => "deb";
+      "delim" string => "_";
 
     redhat|suse::
       "64_bit" string => "x86_64";
@@ -46,12 +48,13 @@ bundle common p
 
     any::
       # Files which default to current architecture.
-      "file[$(packages)][$(versions)]" string => "/$(name[$(packages)])_$(version[$(versions)])_$(arch)-$(ext)-installed.txt";
+      "file[$(packages)][$(versions)]" string => "/$(name[$(packages)])$(delim)$(version[$(versions)])$(delim)$(arch)-$(ext)-installed.txt";
 
       # Files where you specify the architecture.
-      "file[$(packages)][$(versions)][64_bit]" string => "/$(name[$(packages)])_$(version[$(versions)])_$(64_bit)-$(ext)-installed.txt";
-      "file[$(packages)][$(versions)][32_bit]" string => "/$(name[$(packages)])_$(version[$(versions)])_$(32_bit)-$(ext)-installed.txt";
+      "file[$(packages)][$(versions)][64_bit]" string => "/$(name[$(packages)])$(delim)$(version[$(versions)])$(delim)$(64_bit)-$(ext)-installed.txt";
+      "file[$(packages)][$(versions)][32_bit]" string => "/$(name[$(packages)])$(delim)$(version[$(versions)])$(delim)$(32_bit)-$(ext)-installed.txt";
 }
+
 
 # key is to make the invocation unique, for multiple invocation.
 bundle agent clear_package_cache(key)
