@@ -19,16 +19,19 @@ for line in sys.stdin:
         pkg_name = line.split('=', 1)[1].rstrip()
         break
 
+with open(module_dir + "/test_module.log", "r") as log:
+    install_found = any(line.find("repo-install") >= 0 for line in log)
+
 if sys.argv[1] == "list-installed":
-    sys.stdout.write("Name=cfe-present-package\nVersion=1\nArchitecture=amd64\n")
+    if install_found:
+        sys.stdout.write("Name=cfe-present-package\nVersion=3\nArchitecture=amd64\n")
+    else:
+        sys.stdout.write("Name=cfe-present-package\nVersion=1\nArchitecture=amd64\n")
 
 elif sys.argv[1] == "list-updates" or sys.argv[1] == "list-updates-local":
-    with open(module_dir + "/test_module.log", "r") as log:
-        found = any(line.find("repo-install") >= 0 for line in log)
-
     # Don't print anything if repo-install has been called. We simulate having
     # installed the update.
-    if not found:
+    if not install_found:
         sys.stdout.write("Name=cfe-present-package\nVersion=3\nArchitecture=amd64\n")
 
 elif sys.argv[1] == "get-package-data":

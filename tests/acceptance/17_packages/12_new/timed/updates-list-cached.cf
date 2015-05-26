@@ -29,11 +29,9 @@ list-updates-local
 END-OF-AGENT-RUN---
 get-package-data
 list-updates
-repo-install
 END-OF-AGENT-RUN---
 get-package-data
-repo-install
-");
+END-OF-AGENT-RUN---");
 }
 
 bundle agent test

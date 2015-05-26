@@ -23,14 +23,16 @@ bundle agent init
     test_pass_1::
       "any" usebundle => file_make($(G.testfile), "get-package-data
 list-installed
+list-updates
 repo-install
 list-installed
-list-updates
+list-updates-local
 END-OF-AGENT-RUN---
 get-package-data
 repo-install
 list-installed
-list-updates-local");
+list-updates-local
+END-OF-AGENT-RUN---");
 }
 
 bundle agent test
