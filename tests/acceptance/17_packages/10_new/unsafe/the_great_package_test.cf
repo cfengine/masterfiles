@@ -27030,7 +27030,7 @@ bundle agent test
       "run_all_tests"
         not => "specific_test_case_specified",
         scope => "namespace";
-    
+
   methods:
     run_all_tests|from_64_bit_2_to_32_bit_1___promise_policy_present_arch_32_bit_version_1_type_repo::
       "from_64_bit_2_to_32_bit_1___promise_policy_present_arch_32_bit_version_1_type_repo"
