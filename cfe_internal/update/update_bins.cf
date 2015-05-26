@@ -33,12 +33,12 @@ bundle agent cfe_internal_update_bins
 
     !hpux::
       "package_dir"
-        string => "$(sys.flavour)_$(sys.arch)"
+        string => "$(sys.flavour)_$(sys.arch)",
         comment => "The directory within software updates to look for packages";
 
     hpux::
       "package_dir"
-        string => "$(sys.class)_$(sys.arch)"
+        string => "$(sys.class)_$(sys.arch)",
         comment => "The directory within software updates to look for packages.
                     On HPUX sys.flavor includes versions, so we use sys.class
                     instead.";
