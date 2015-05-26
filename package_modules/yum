@@ -15,9 +15,8 @@ yum_options = "--quiet"
 def get_package_data():
     pkg_string = ""
     for line in sys.stdin:
-        result = re.match("^File=(.*)", line)
-        if result:
-            pkg_string = result.group(1)
+        if line.startswith("File="):
+            pkg_string = line.split("=", 1)[1].rstrip()
             break
 
     if not pkg_string:
@@ -86,9 +85,8 @@ def package_arguments_builder():
     arch = ""
     args = []
     for line in sys.stdin:
-        result = re.match("^Name=(.*)", line)
-        if result:
-            if name != "":
+        if line.startswith("Name="):
+            if name:
                 # Each new "Name=" triggers a new entry.
                 args_add = name
                 if version:
@@ -100,18 +98,13 @@ def package_arguments_builder():
                 version = ""
                 arch = ""
 
-            name = result.group(1)
-            continue
+            name = line.split("=", 1)[1].rstrip()
 
-        result = re.match("^Version=(.*)", line)
-        if result:
-            version = result.group(1)
-            continue
+        elif line.startswith("Version="):
+            version = line.split("=", 1)[1].rstrip()
 
-        result = re.match("^Architecture=(.*)", line)
-        if result:
-            arch = result.group(1)
-            continue
+        elif line.startswith("Architecture="):
+            arch = line.split("=", 1)[1].rstrip()
 
     if name:
         return args
@@ -150,10 +143,9 @@ def file_install():
     cmd_line = [rpm_cmd, "-U"]
     found = False
     for line in sys.stdin:
-        result = re.match("^File=(.*)", line)
-        if result:
+        if line.startswith("File="):
             found = True
-            cmd_line.append(result.group(1))
+            cmd_line.append(line.split("=", 1)[1].rstrip())
 
     if not found:
         return 0

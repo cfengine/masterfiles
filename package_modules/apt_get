@@ -26,9 +26,8 @@ os.environ['LC_ALL'] = "C"
 def get_package_data():
     pkg_string = ""
     for line in sys.stdin:
-        result = re.match("^File=(.*)", line)
-        if result:
-            pkg_string = result.group(1)
+        if line.startswith("File="):
+            pkg_string = line.split("=", 1)[1].rstrip()
             break
 
     if not pkg_string:
@@ -39,7 +38,7 @@ def get_package_data():
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
-        return subprocess.call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", result.group(1)])
+        return subprocess.call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", pkg_string])
     elif (re.search("([:,]|-[0-9])", pkg_string)):
         # Contains either a version number or an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -60,7 +59,7 @@ def list_installed():
     for line in process.stdout:
         line = line.rstrip("\n")
         # The space before "installed" is important, because it can be "not-installed".
-        if re.match("^Status=.* installed.*", line):
+        if line.startswith("Status=") and line.split("=", 1)[1].find(" installed") >= 0:
             installed_package = True
         elif line.startswith("Status="):
             installed_package = False
@@ -150,27 +149,21 @@ def package_arguments_builder(is_apt_install):
     arch = ""
     args = []
     for line in sys.stdin:
-        result = re.match("^Name=(.*)", line)
-        if result:
-            if (name != ""):
+        if line.startswith("Name="):
+            if name:
                 # Each new "Name=" triggers a new entry.
                 args += one_package_argument(name, arch, version, is_apt_install)
 
                 version = ""
                 arch = ""
 
-            name = result.group(1)
-            continue
+            name = line.split("=", 1)[1].rstrip()
 
-        result = re.match("^Version=(.*)", line)
-        if result:
-            version = result.group(1)
-            continue
+        elif line.startswith("Version="):
+            version = line.split("=", 1)[1].rstrip()
 
-        result = re.match("^Architecture=(.*)", line)
-        if result:
-            arch = result.group(1)
-            continue
+        elif line.startswith("Architecture="):
+            arch = line.split("=", 1)[1].rstrip()
 
     if name:
         args += one_package_argument(name, arch, version, is_apt_install)
@@ -205,10 +198,9 @@ def file_install():
 
     found = False
     for line in sys.stdin:
-        result = re.match("^File=(.*)", line)
-        if result:
+        if line.startswith("File="):
             found = True
-            cmd_line.append(result.group(1))
+            cmd_line.append(line.split("=", 1)[1].rstrip())
 
     if (not found):
         return 0
