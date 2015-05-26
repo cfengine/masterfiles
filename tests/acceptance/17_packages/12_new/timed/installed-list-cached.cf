@@ -8,6 +8,9 @@ body common control
 
 bundle agent init
 {
+  meta:
+    "test_skip_needs_work" string => "windows";
+
   files:
     test_pass_1::
       "$(sys.workdir)/package_modules/test_module"

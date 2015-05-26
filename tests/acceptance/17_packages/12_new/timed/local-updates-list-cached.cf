@@ -10,8 +10,7 @@ body common control
 bundle agent init
 {
   meta:
-      "test_suppress_fail" string => "any",
-        meta => { "redmine7144" };
+    "test_skip_needs_work" string => "windows";
 
   files:
     test_pass_1::
