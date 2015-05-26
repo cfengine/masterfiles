@@ -20,7 +20,7 @@ def get_package_data():
             pkg_string = result.group(1)
             break
 
-    if pkg_string:
+    if not pkg_string:
         return 1
 
     repo = False
