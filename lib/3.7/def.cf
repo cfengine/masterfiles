@@ -146,6 +146,10 @@ bundle common def
       comment => "Define modules path",
       handle => "common_def_vars_dir_modules";
 
+      "dir_package_modules" string => translatepath("$(sys.workdir)/package_modules"),
+      comment => "Define package modules path",
+      handle => "common_def_vars_dir_package_modules";
+
       "dir_plugins"     string => translatepath("$(sys.workdir)/plugins"),
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";

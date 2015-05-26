@@ -5,42 +5,41 @@ import os
 import subprocess
 import re
 
-dpkg_cmd = "/usr/bin/dpkg"
-dpkg_deb_cmd = "/usr/bin/dpkg-deb"
-dpkg_query_cmd = "/usr/bin/dpkg-query"
+dpkg_cmd = os.environ.get('CFENGINE_TEST_DPKG_CMD', "/usr/bin/dpkg")
+dpkg_deb_cmd = os.environ.get('CFENGINE_TEST_DPKG_DEB_CMD', "/usr/bin/dpkg-deb")
+dpkg_query_cmd = os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD', "/usr/bin/dpkg-query")
+
 dpkg_output_format = "Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n"
 dpkg_status_format = "Status=${Status}\n" + dpkg_output_format
 
-apt_get_options = ["-o", "Dpkg::Options::=--force-confold", "-o", "Dpkg::Options::=--force-confdef", "-y", "--force-yes"]
-apt_get_cmd = "/usr/bin/apt-get"
+apt_get_options = ["-o",
+                   "Dpkg::Options::=--force-confold",
+                   "-o",
+                   "Dpkg::Options::=--force-confdef",
+                   "-y",
+                   "--force-yes"]
+apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
 
 os.environ['DEBIAN_FRONTEND'] = "noninteractive"
 os.environ['LC_ALL'] = "C"
-
-if (os.environ.get('CFENGINE_TEST_DPKG_CMD')):
-    dpkg_cmd = os.environ['CFENGINE_TEST_DPKG_CMD']
-if (os.environ.get('CFENGINE_TEST_DPKG_DEB_CMD')):
-    dpkg_deb_cmd = os.environ['CFENGINE_TEST_DPKG_DEB_CMD']
-if (os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD')):
-    dpkg_query_cmd = os.environ['CFENGINE_TEST_DPKG_QUERY_CMD']
-if (os.environ.get('CFENGINE_TEST_APT_GET_CMD')):
-    apt_get_cmd = os.environ['CFENGINE_TEST_APT_GET_CMD']
 
 def get_package_data():
     pkg_string = ""
     for line in sys.stdin:
         result = re.match("^File=(.*)", line)
-        if (result):
+        if result:
             pkg_string = result.group(1)
             break
 
-    if (pkg_string == ""):
+    if pkg_string:
         return 1
 
     repo = False
-    if (re.match("^/.*", pkg_string)):
+    if (pkg_string.startswith("/")):
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
+        sys.stdout.flush()
+        return subprocess.call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", result.group(1)])
     elif (re.search("([:,]|-[0-9])", pkg_string)):
         # Contains either a version number or an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -48,29 +47,22 @@ def get_package_data():
     else:
         repo = True
         sys.stdout.write("PackageType=repo\n")
-
-    if (repo):
         sys.stdout.write("Name=" + pkg_string + "\n")
         return 0
-    else:
-        sys.stdout.flush()
-        return subprocess.call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", result.group(1)])
 
 
 def list_installed():
-    for line in sys.stdin:
-        # Ignore everything.
-        pass
+    # Ignore everything.
+    sys.stdin.readlines()
 
     process = subprocess.Popen([dpkg_query_cmd, "--showformat", dpkg_status_format, "-W"], stdout=subprocess.PIPE)
     installed_package = False
     for line in process.stdout:
-        if line[-1] == "\n":
-            line = line[:-1]
+        line = line.rstrip("\n")
         # The space before "installed" is important, because it can be "not-installed".
         if re.match("^Status=.* installed.*", line):
             installed_package = True
-        elif re.match("^Status=.*", line):
+        elif line.startswith("Status="):
             installed_package = False
         elif installed_package:
             sys.stdout.write(line + "\n")
@@ -79,13 +71,12 @@ def list_installed():
 
 
 def list_updates(online):
-    for line in sys.stdin:
-        # Ignore everything.
-        pass
+    # Ignore everything.
+    sys.stdin.readlines()
 
     if online:
         result = subprocess.call([apt_get_cmd] + apt_get_options + ["update"], stdout=sys.stderr)
-        if (result != 0):
+        if result != 0:
             return result
 
     process = subprocess.Popen([apt_get_cmd] + apt_get_options + ["-s", "upgrade"], stdout=subprocess.PIPE)
@@ -102,11 +93,20 @@ def list_updates(online):
         # Note multiple repositories in this one:
         #   Inst linux-libc-dev [2.6.32-48squeeze4] (2.6.32-48squeeze6 Debian:6.0.10/oldstable, Debian-Security:6.0/oldoldstable [amd64])
         #
-        match = re.match("^Inst\s+([^\s:]+)(?::\S+)?\s+\[[^]\s]+\]\s+\((\S+)\s+[^,\s]+(?:,\s+[^,\s]+)*\s+\[([^]\s]+)\]\).*", line)
+        #                               name                   old version       new version
+        #                                 |                         |                 |
+        #                         /-------+-------\              /--+--\       /------+-------\
+        match = re.match("^Inst\s+(?P<name>[^\s:]+)(?::\S+)?\s+\[[^]\s]+\]\s+\((?P<version>\S+)" +
+
+        #                         repository(ies)              arch
+        #                               |                        |
+        #                    /----------+----------\     /-------+-------\
+                         "\s+[^,\s]+(?:,\s+[^,\s]+)*\s+\[(?P<arch>[^]\s]+)\]\).*", line)
+
         if match != None:
-            sys.stdout.write("Name=" + match.group(1) + "\n")
-            sys.stdout.write("Version=" + match.group(2) + "\n")
-            sys.stdout.write("Architecture=" + match.group(3) + "\n")
+            sys.stdout.write("Name=" + match.group("name") + "\n")
+            sys.stdout.write("Version=" + match.group("version") + "\n")
+            sys.stdout.write("Architecture=" + match.group("arch") + "\n")
 
     return 0
 
@@ -114,7 +114,7 @@ def list_updates(online):
 def one_package_argument(name, arch, version, is_apt_install):
     args = []
     archs = []
-    if arch != "":
+    if arch:
         archs.append(arch)
     elif is_apt_install:
         # Here we have no specified architecture and we are installing.
@@ -124,17 +124,17 @@ def one_package_argument(name, arch, version, is_apt_install):
                                     "-W", name + ":*"], stdout=subprocess.PIPE)
         for line in process.stdout:
             # The space before "installed" is important, because it can be "not-installed".
-            match = re.match("^([^=]*)=.* installed.*", line)
-            if match:
-                archs.append(match.group(1))
+            if "=" in line:
+                arch, stat = line.split("=", 1)
+                if stat.find(" installed") >= 0:
+                    archs.append(arch)
 
     version_suffix = ""
     if version != "" and is_apt_install:
         version_suffix = "=" + version
 
-    if len(archs) > 0:
-        for arch in archs:
-            args.append(name + ":" + arch + version_suffix)
+    if archs:
+        args = [name + ':' + arch + version_suffix for arch in archs]
     elif is_apt_install:
         args.append(name + version_suffix)
     else:
@@ -151,7 +151,7 @@ def package_arguments_builder(is_apt_install):
     args = []
     for line in sys.stdin:
         result = re.match("^Name=(.*)", line)
-        if (result):
+        if result:
             if (name != ""):
                 # Each new "Name=" triggers a new entry.
                 args += one_package_argument(name, arch, version, is_apt_install)
@@ -163,16 +163,16 @@ def package_arguments_builder(is_apt_install):
             continue
 
         result = re.match("^Version=(.*)", line)
-        if (result):
+        if result:
             version = result.group(1)
             continue
 
         result = re.match("^Architecture=(.*)", line)
-        if (result):
+        if result:
             arch = result.group(1)
             continue
 
-    if name != "":
+    if name:
         args += one_package_argument(name, arch, version, is_apt_install)
 
     return args
@@ -183,17 +183,12 @@ def repo_install():
 
     args = package_arguments_builder(True)
 
-    if (not args):
-        return 0
-
-    cmd_line.extend(args)
-
-    return subprocess.call(cmd_line, stdout=sys.stderr)
-
+    if args:
+        return subprocess.call(cmd_line + args, stdout=sys.stderr)
+    return 0
 
 def remove():
-    cmd_line = [dpkg_cmd]
-    cmd_line.append("--remove")
+    cmd_line = [dpkg_cmd, "--remove"]
 
     args = package_arguments_builder(False)
 
@@ -206,13 +201,12 @@ def remove():
 
 
 def file_install():
-    cmd_line = [dpkg_cmd]
-    cmd_line.append("-i")
+    cmd_line = [dpkg_cmd, "-i"]
 
     found = False
     for line in sys.stdin:
         result = re.match("^File=(.*)", line)
-        if (result):
+        if result:
             found = True
             cmd_line.append(result.group(1))
 
@@ -222,38 +216,38 @@ def file_install():
     return subprocess.call(cmd_line, stdout=sys.stderr)
 
 
-ret = 0
+def main():
+    if len(sys.argv) < 2:
+        sys.stderr.write("Need to provide argument\n")
+        return 2
 
-if len(sys.argv) < 2:
-    sys.stderr.write("Need to provide argument\n")
-    exit(2)
+    elif sys.argv[1] == "supports-api-version":
+        sys.stdout.write("1\n")
+        return 0
 
-elif sys.argv[1] == "supports-api-version":
-    sys.stdout.write("1\n")
+    elif sys.argv[1] == "get-package-data":
+        return get_package_data()
 
-elif sys.argv[1] == "get-package-data":
-    ret = get_package_data()
+    elif sys.argv[1] == "list-installed":
+        return list_installed()
 
-elif sys.argv[1] == "list-installed":
-    ret = list_installed()
+    elif sys.argv[1] == "list-updates":
+        return list_updates(True)
 
-elif sys.argv[1] == "list-updates":
-    ret = list_updates(True)
+    elif sys.argv[1] == "list-updates-local":
+        return list_updates(False)
 
-elif sys.argv[1] == "list-updates-local":
-    ret = list_updates(False)
+    elif sys.argv[1] == "repo-install":
+        return repo_install()
 
-elif sys.argv[1] == "repo-install":
-    ret = repo_install()
+    elif sys.argv[1] == "remove":
+        return remove()
 
-elif sys.argv[1] == "remove":
-    ret = remove()
+    elif sys.argv[1] == "file-install":
+        return file_install()
 
-elif sys.argv[1] == "file-install":
-    ret = file_install()
+    else:
+        sys.stderr.write("Invalid operation\n")
+        return 2
 
-else:
-    sys.stderr.write("Invalid operation\n")
-    exit(2)
-
-exit(ret)
+sys.exit(main())
