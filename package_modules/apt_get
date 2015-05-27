@@ -33,7 +33,6 @@ def get_package_data():
     if not pkg_string:
         return 1
 
-    repo = False
     if (pkg_string.startswith("/")):
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
@@ -44,7 +43,6 @@ def get_package_data():
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
         return 1
     else:
-        repo = True
         sys.stdout.write("PackageType=repo\n")
         sys.stdout.write("Name=" + pkg_string + "\n")
         return 0
