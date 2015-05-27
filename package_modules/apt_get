@@ -100,7 +100,7 @@ def list_updates(online):
         #                    /----------+----------\     /-------+-------\
                          "\s+[^,\s]+(?:,\s+[^,\s]+)*\s+\[(?P<arch>[^]\s]+)\]\).*", line)
 
-        if match != None:
+        if match is not None:
             sys.stdout.write("Name=" + match.group("name") + "\n")
             sys.stdout.write("Version=" + match.group("version") + "\n")
             sys.stdout.write("Architecture=" + match.group("arch") + "\n")
