@@ -17,12 +17,11 @@ def get_package_data():
     for line in sys.stdin:
         if line.startswith("File="):
             pkg_string = line.split("=", 1)[1].rstrip()
-            break
+            # Don't break, we need to exhaust stdin.
 
     if not pkg_string:
         return 1
 
-    repo = False
     if pkg_string.startswith("/"):
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
@@ -33,7 +32,6 @@ def get_package_data():
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
         return 1
     else:
-        repo = True
         sys.stdout.write("PackageType=repo\n")
         sys.stdout.write("Name=" + pkg_string + "\n")
         return 0
@@ -64,14 +62,14 @@ def list_updates(online):
 
         line = lastline + line
         match = re.match("^\S+\s+\S+\s+\S+", line)
-        if match == None:
+        if match is None:
             # Keep line but strip trailing newline.
             lastline = line[:-1]
             continue
 
         lastline = ""
         match = re.match("^(?P<name>\S+)\.(?P<arch>[^.\s]+)\s+(?P<version>\S+)\s+\S+\s*$", line)
-        if match != None:
+        if match is not None:
             sys.stdout.write("Name=" + match.group("name") + "\n")
             sys.stdout.write("Version=" + match.group("version") + "\n")
             sys.stdout.write("Architecture=" + match.group("arch") + "\n")
