@@ -17,7 +17,7 @@ def get_package_data():
     for line in sys.stdin:
         if line.startswith("File="):
             pkg_string = line.split("=", 1)[1].rstrip()
-            break
+            # Don't break, we need to exhaust stdin.
 
     if not pkg_string:
         return 1
