@@ -86,4 +86,4 @@ Conf libx11-6 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [amd64])
 Conf libx11-6:i386 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])
 ''')
 
-exit(0)
+sys.exit(0)

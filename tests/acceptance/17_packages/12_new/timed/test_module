@@ -6,7 +6,7 @@ import re
 
 if sys.argv[1] == "supports-api-version":
     sys.stdout.write("1\n")
-    exit(0)
+    sys.exit(0)
 
 module_dir = os.path.dirname(sys.argv[0])
 
@@ -37,4 +37,4 @@ elif sys.argv[1] == "list-updates" or sys.argv[1] == "list-updates-local":
 elif sys.argv[1] == "get-package-data":
     sys.stdout.write("PackageType=repo\nName=" + pkg_name + "\n")
 
-exit(0)
+sys.exit(0)
