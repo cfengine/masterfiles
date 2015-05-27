@@ -14,7 +14,7 @@ bundle agent init
 
   files:
     test_pass_1::
-      "$(sys.workdir)/package_modules/test_module"
+      "$(sys.workdir)/modules/packages/test_module"
         copy_from => local_cp("$(this.promise_dirname)/test_module"),
         perms => m("0755");
 
@@ -39,7 +39,7 @@ bundle agent test
   commands:
       "$(sys.cf_agent) -D AUTO -f $(this.promise_filename).sub";
 
-      "$(G.echo) END-OF-AGENT-RUN--- >> $(sys.workdir)/package_modules/test_module.log"
+      "$(G.echo) END-OF-AGENT-RUN--- >> $(sys.workdir)/modules/packages/test_module.log"
         contain => in_shell;
 }
 
@@ -49,6 +49,6 @@ bundle agent check
     test_pass_1::
       "any" usebundle => dcs_wait($(this.promise_filename), 65);
     test_pass_2::
-      "any" usebundle => dcs_check_diff("$(sys.workdir)/package_modules/test_module.log",
+      "any" usebundle => dcs_check_diff("$(sys.workdir)/modules/packages/test_module.log",
                                         $(G.testfile), $(this.promise_filename));
 }

@@ -4,7 +4,7 @@ import sys
 import subprocess
 import os
 
-yum_module = "../../package_modules/yum"
+yum_module = "../../modules/packages/yum"
 
 cwd = os.getcwd()
 # Will cause the package module to call these instead.

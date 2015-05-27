@@ -4,7 +4,7 @@ import sys
 import subprocess
 import os
 
-apt_get_module = "../../package_modules/apt_get"
+apt_get_module = "../../modules/packages/apt_get"
 
 cwd = os.getcwd()
 # Will cause the package module to call these instead.
