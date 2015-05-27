@@ -85,6 +85,9 @@ bundle agent clear_packages(key)
       "$(paths.path[dpkg]) --purge $(p.name[$(p.packages)]):$(p.$(p.archs)) $(output_sink)"
         contain => in_shell,
         comment => $(key);
+      "$(paths.path[dpkg]) --purge $(p.name[$(p.packages)]) $(output_sink)"
+        contain => in_shell,
+        comment => $(key);
 }
 
 # key is to make the invocation unique, for multiple invocation.
