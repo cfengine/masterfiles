@@ -1,0 +1,26 @@
+# Test that the local updates list cache is called instead of the online
+# version when ifelapsed has not expired.
+
+body common control
+{
+    inputs => { "../../../default.cf.sub" };
+    bundlesequence => { default($(this.promise_filename)) };
+
+    package_module => "test_module";
+}
+
+body package_module test_module
+{
+    query_updates_ifelapsed => "30";
+    query_installed_ifelapsed => "30";
+}
+
+bundle agent test
+{
+  packages:
+      # Trigger updates cache fill. Second time should use local version.
+      # Promise outcome is irrelevant, we're only interested in the cached package list.
+      "cfe-nonexisting-package"
+        policy => "present",
+        version => "latest";
+}

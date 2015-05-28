@@ -1,0 +1,10 @@
+Package: test-package-charlie
+Version: 1.0-1
+Section: custom
+Priority: optional
+Architecture: i386
+Multi-Arch: same
+Essential: no
+Installed-Size: 1024
+Maintainer: cfengine.com
+Description: Debian test package Charlie

@@ -1,0 +1,36 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
+log.write("yum " + (" ".join(sys.argv[1:])) + "\n")
+log.close()
+
+if sys.argv.count("check-update"):
+    # Taken from various yum runs with long package names and
+    # connection errors, broken at 80 columns.
+    sys.stdout.write('''Loaded plugins: fastestmirror, security
+Loading mirror speeds from cached hostfile
+ * base: mirror.searchdaimon.com
+ * extras: mirror.searchdaimon.com
+ * updates: mirror.searchdaimon.com
+http://centos.vianett.no/5.9/os/x86_64/repodata/repomd.xml: [Errno 4] IOError: <urlopen error (101, 'Network is unreachable')>
+Trying other mirror.
+Skipping security plugin, no data
+
+yum.noarch                 3.2.29-43.el6_5      rhui-REGION-rhel-server-releases
+yum-plugin-security.noarch
+                           1.1.30-17.el6_5
+                                                rhui-REGION-rhel-server-releases
+Useless header:
+phonon-backend-gstreamer.x86_64
+                           1:4.6.2-28.el6_5     rhui-REGION-rhel-server-releases
+java-1.6.0-openjdk.x86_64  1:1.6.0.0-5.1.13.3.el6_5
+                                                rhui-REGION-rhel-server-releases
+Obsoleting Packages
+firefox.i386                        24.5.0-1.el5.centos                updates
+    firefox.i386                    17.0.6-1.el5.centos                installed
+firefox.x86_64                      24.5.0-1.el5.centos                updates
+    firefox.x86_64                  17.0.6-1.el5.centos                installed
+''')

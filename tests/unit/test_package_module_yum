@@ -1,0 +1,131 @@
+#!/usr/bin/python
+
+import sys
+import subprocess
+import os
+
+yum_module = "../../modules/packages/yum"
+
+cwd = os.getcwd()
+# Will cause the package module to call these instead.
+os.environ['CFENGINE_TEST_RPM_CMD'] = cwd + "/mock_rpm"
+os.environ['CFENGINE_TEST_YUM_CMD'] = cwd + "/mock_yum"
+mock_log = cwd + "/mock_output.log"
+os.environ['CFENGINE_TEST_MOCK_LOG'] = mock_log
+try:
+    os.unlink(mock_log)
+except OSError:
+    pass
+
+# operation       = file-install/repo-install/etc.
+# input           = List of lines to give process on stdin.
+# no_lines        = The number of lines that the output should have.
+# expected_output = List of chunks that should appear somewhere in output.
+# mock_lines      = The number of lines that mock_output should have.
+# mock_output     = List of chunks that should appear somewhere in the mock log.
+#                   The mock log is the command line(s) that the mock command
+#                   was called with.
+def check(operation, input, no_lines, expected_output, mock_lines, mock_output):
+    process = subprocess.Popen([yum_module, operation],
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in input:
+        process.stdin.write(line + "\n")
+    process.stdin.close()
+
+    output = ""
+    line_count = 0
+    for line in process.stdout:
+        output += line
+        line_count += 1
+
+    for chunk in expected_output:
+        if output.find(chunk) < 0:
+            sys.stdout.write("Fail: Does not appear in output: \"" + chunk + "\"\n")
+            sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+            return False
+
+    if line_count != no_lines:
+        sys.stdout.write("Fail: Incorrect number of lines returned: " + str(line_count)
+                         + " != " + str(no_lines) + " (expected)\n")
+        sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+        return False
+
+    output = ""
+    line_count = 0
+    try:
+        log = open(mock_log, "r")
+        for line in log:
+            output += line
+            line_count += 1
+        log.close()
+    except IOError:
+        pass
+
+    for chunk in mock_output:
+        if output.find(chunk) < 0:
+            sys.stdout.write("Fail: Does not appear in mock log: \"" + chunk + "\"\n")
+            sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+            return False
+
+    if line_count != mock_lines:
+        sys.stdout.write("Fail: Incorrect number of lines in mock log: " + str(line_count)
+                         + " != " + str(mock_lines) + " (expected)\n")
+        sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+        return False
+
+    try:
+        os.unlink(mock_log)
+    except OSError:
+        pass
+
+    return True
+
+assert check("supports-api-version", [], 1, ["1"], 0, [])
+
+assert check("file-install", ["File=/path/to/pkg"], 0, [], 1, ["rpm -U /path/to/pkg"])
+assert check("file-install", ["File=/path/to/pkg","File=/path/to/pkg2"], 0, [], 1, ["rpm -U /path/to/pkg /path/to/pkg2"])
+
+assert check("repo-install", ["Name=a\nVersion=1\nArchitecture=x",
+                              "Name=b\nArchitecture=y",
+                              "Name=c\nVersion=3",
+                              "Name=d"],
+             0, [], 1, ["yum --quiet install a-1:x b:y c-3 d"])
+
+assert check("remove", ["Name=a\nVersion=1\nArchitecture=x",
+                        "Name=b\nArchitecture=y",
+                        "Name=c\nVersion=3",
+                        "Name=d"],
+             0, [], 1, ["rpm -e a-1:x b:y c-3 d"])
+
+assert check("list-updates", [], 18,
+             ["Name=yum\nVersion=3.2.29-43.el6_5\nArchitecture=noarch",
+              "Name=yum-plugin-security\nVersion=1.1.30-17.el6_5\nArchitecture=noarch",
+              "Name=phonon-backend-gstreamer\nVersion=1:4.6.2-28.el6_5\nArchitecture=x86_64",
+              "Name=java-1.6.0-openjdk\nVersion=1:1.6.0.0-5.1.13.3.el6_5\nArchitecture=x86_64",
+              "Name=firefox\nVersion=24.5.0-1.el5.centos\nArchitecture=i386",
+              "Name=firefox\nVersion=24.5.0-1.el5.centos\nArchitecture=x86_64"],
+             1, ["yum --quiet check-update"])
+
+assert check("list-updates-local", [], 18,
+             ["Name=yum\nVersion=3.2.29-43.el6_5\nArchitecture=noarch",
+              "Name=yum-plugin-security\nVersion=1.1.30-17.el6_5\nArchitecture=noarch",
+              "Name=phonon-backend-gstreamer\nVersion=1:4.6.2-28.el6_5\nArchitecture=x86_64",
+              "Name=java-1.6.0-openjdk\nVersion=1:1.6.0.0-5.1.13.3.el6_5\nArchitecture=x86_64",
+              "Name=firefox\nVersion=24.5.0-1.el5.centos\nArchitecture=i386",
+              "Name=firefox\nVersion=24.5.0-1.el5.centos\nArchitecture=x86_64"],
+             1, ["yum --quiet -C check-update"])
+
+assert check("list-installed", [], 6,
+             ["Name=firefox\nVersion=24.5.0-1.el5.centos\nArchitecture=i386",
+              "Name=yum\nVersion=3.2.29-43.el6_5\nArchitecture=noarch"],
+             4, ["rpm -qa --qf Name=%{name}\nVersion=%{version}\nArchitecture=%{arch}\n"])
+
+assert check("get-package-data", ["File=/path/to/pkg"], 4,
+             ["PackageType=file\nName=file_pkg\nVersion=10.0\nArchitecture=x86_64"],
+             4, ["rpm --qf Name=%{name}\nVersion=%{version}\nArchitecture=%{arch}\n -qp /path/to/pkg"])
+assert check("get-package-data", ["File=repo_pkg"], 2,
+             ["PackageType=repo\nName=repo_pkg"],
+             0, [])
+assert check("get-package-data", ["File=repo/pkg"], 2,
+             ["PackageType=repo\nName=repo/pkg"],
+             0, [])

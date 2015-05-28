@@ -1,0 +1,176 @@
+#!/usr/bin/python
+
+import sys
+import subprocess
+import os
+
+apt_get_module = "../../modules/packages/apt_get"
+
+cwd = os.getcwd()
+# Will cause the package module to call these instead.
+os.environ['CFENGINE_TEST_DPKG_CMD'] = cwd + "/mock_dpkg"
+os.environ['CFENGINE_TEST_DPKG_DEB_CMD'] = cwd + "/mock_dpkg_deb"
+os.environ['CFENGINE_TEST_DPKG_QUERY_CMD'] = cwd + "/mock_dpkg_query"
+os.environ['CFENGINE_TEST_APT_GET_CMD'] = cwd + "/mock_apt_get"
+mock_log = cwd + "/mock_output.log"
+os.environ['CFENGINE_TEST_MOCK_LOG'] = mock_log
+try:
+    os.unlink(mock_log)
+except OSError:
+    pass
+
+# operation       = file-install/repo-install/etc.
+# input           = List of lines to give process on stdin.
+# no_lines        = The number of lines that the output should have.
+# expected_output = List of chunks that should appear somewhere in output.
+# mock_lines      = The number of lines that mock_output should have.
+# mock_output     = List of chunks that should appear somewhere in the mock log.
+#                   The mock log is the command line(s) that the mock command
+#                   was called with.
+def check(operation, input, no_lines, expected_output, mock_lines, mock_output):
+    process = subprocess.Popen([apt_get_module, operation],
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in input:
+        process.stdin.write(line + "\n")
+    process.stdin.close()
+
+    output = ""
+    line_count = 0
+    for line in process.stdout:
+        output += line
+        line_count += 1
+
+    for chunk in expected_output:
+        if output.find(chunk) < 0:
+            sys.stdout.write("Fail: Does not appear in output: \"" + chunk + "\"\n")
+            sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+            return False
+
+    if line_count != no_lines:
+        sys.stdout.write("Fail: Incorrect number of lines returned: " + str(line_count)
+                         + " != " + str(no_lines) + " (expected)\n")
+        sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+        return False
+
+    output = ""
+    line_count = 0
+    try:
+        log = open(mock_log, "r")
+        for line in log:
+            output += line
+            line_count += 1
+        log.close()
+    except IOError:
+        pass
+
+    for chunk in mock_output:
+        if output.find(chunk) < 0:
+            sys.stdout.write("Fail: Does not appear in mock log: \"" + chunk + "\"\n")
+            sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+            return False
+
+    if line_count != mock_lines:
+        sys.stdout.write("Fail: Incorrect number of lines in mock log: " + str(line_count)
+                         + " != " + str(mock_lines) + " (expected)\n")
+        sys.stdout.write("Actual output:\n\"" + output + "\"\n")
+        return False
+
+    try:
+        os.unlink(mock_log)
+    except OSError:
+        pass
+
+    return True
+
+apt_get_options = "-o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --force-yes"
+
+assert check("supports-api-version", [], 1, ["1"], 0, [])
+
+assert check("file-install", ["File=/path/to/pkg"], 0, [], 1, ["dpkg -i /path/to/pkg"])
+assert check("file-install", ["File=/path/to/pkg","File=/path/to/pkg2"], 0, [], 1, ["dpkg -i /path/to/pkg /path/to/pkg2"])
+
+assert check("repo-install", ["Name=a\nVersion=1\nArchitecture=x",
+                              "Name=b\nArchitecture=y",
+                              "Name=c\nVersion=3",
+                              "Name=netcat",
+                              "Name=netcat\nVersion=3",
+                              "Name=d"],
+             0, [], 9, ["dpkg-query --showformat ${Architecture}=${Status}\n -W netcat:*",
+                        "apt-get " + apt_get_options + " install a:x=1 b:y c=3 netcat:amd64 netcat:i386 netcat:amd64=3 netcat:i386=3 d"])
+
+assert check("remove", ["Name=a\nVersion=1\nArchitecture=x",
+                        "Name=b\nArchitecture=y",
+                        "Name=c\nVersion=3",
+                        "Name=d"],
+             0, [], 1, ["dpkg --remove a:x b:y c:* d:*"])
+
+assert check("list-updates", [], 75,
+             ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
+              "Name=tzdata-java\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
+              "Name=tzdata\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
+              "Name=libc-bin\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6-i386\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc-dev-bin\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6-dev\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6-dbg\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6\nVersion=2.15-0ubuntu10.12\nArchitecture=i386",
+              "Name=linux-libc-dev\nVersion=2.6.32-48squeeze6\nArchitecture=amd64",
+              "Name=libapt-pkg4.12\nVersion=0.8.16~exp12ubuntu10.23\nArchitecture=amd64",
+              "Name=gpgv\nVersion=1.4.11-3ubuntu2.9\nArchitecture=amd64",
+              "Name=gnupg\nVersion=1.4.11-3ubuntu2.9\nArchitecture=amd64",
+              "Name=apt\nVersion=0.8.16~exp12ubuntu10.23\nArchitecture=amd64",
+              "Name=libapt-inst1.4\nVersion=0.8.16~exp12ubuntu10.23\nArchitecture=amd64",
+              "Name=ntpdate\nVersion=1:4.2.6.p3+dfsg-1ubuntu3.4\nArchitecture=amd64",
+              "Name=libgcrypt11\nVersion=1.5.0-3ubuntu0.4\nArchitecture=amd64",
+              "Name=libgcrypt11\nVersion=1.5.0-3ubuntu0.4\nArchitecture=i386",
+              "Name=libtasn1-3\nVersion=2.10-1ubuntu1.3\nArchitecture=amd64",
+              "Name=libtasn1-3\nVersion=2.10-1ubuntu1.3\nArchitecture=i386",
+              "Name=libx11-data\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=all",
+              "Name=libx11-dev\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386"],
+             2, ["apt-get " + apt_get_options + " update\napt-get " + apt_get_options + " -s upgrade"])
+
+assert check("list-updates-local", [], 75,
+             ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
+              "Name=tzdata-java\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
+              "Name=tzdata\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
+              "Name=libc-bin\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6-i386\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc-dev-bin\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6-dev\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6-dbg\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6\nVersion=2.15-0ubuntu10.12\nArchitecture=amd64",
+              "Name=libc6\nVersion=2.15-0ubuntu10.12\nArchitecture=i386",
+              "Name=linux-libc-dev\nVersion=2.6.32-48squeeze6\nArchitecture=amd64",
+              "Name=libapt-pkg4.12\nVersion=0.8.16~exp12ubuntu10.23\nArchitecture=amd64",
+              "Name=gpgv\nVersion=1.4.11-3ubuntu2.9\nArchitecture=amd64",
+              "Name=gnupg\nVersion=1.4.11-3ubuntu2.9\nArchitecture=amd64",
+              "Name=apt\nVersion=0.8.16~exp12ubuntu10.23\nArchitecture=amd64",
+              "Name=libapt-inst1.4\nVersion=0.8.16~exp12ubuntu10.23\nArchitecture=amd64",
+              "Name=ntpdate\nVersion=1:4.2.6.p3+dfsg-1ubuntu3.4\nArchitecture=amd64",
+              "Name=libgcrypt11\nVersion=1.5.0-3ubuntu0.4\nArchitecture=amd64",
+              "Name=libgcrypt11\nVersion=1.5.0-3ubuntu0.4\nArchitecture=i386",
+              "Name=libtasn1-3\nVersion=2.10-1ubuntu1.3\nArchitecture=amd64",
+              "Name=libtasn1-3\nVersion=2.10-1ubuntu1.3\nArchitecture=i386",
+              "Name=libx11-data\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=all",
+              "Name=libx11-dev\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386"],
+             1, ["apt-get " + apt_get_options + " -s upgrade"])
+
+assert check("list-installed", [], 6,
+             ["Name=netcat\nVersion=1.2.3.5\nArchitecture=amd64",
+              "Name=yum\nVersion=3.2.29-43.el6_5\nArchitecture=all"],
+             5, ["dpkg-query --showformat Status=${Status}\nName=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n -W"])
+
+assert check("get-package-data", ["File=/path/to/pkg"], 4,
+             ["PackageType=file\nName=file_pkg\nVersion=10.0\nArchitecture=x86_64"],
+             4, ["dpkg-deb --showformat Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n -W /path/to/pkg"])
+assert check("get-package-data", ["File=repo_pkg"], 2,
+             ["PackageType=repo\nName=repo_pkg"],
+             0, [])
+assert check("get-package-data", ["File=repo/pkg"], 2,
+             ["PackageType=repo\nName=repo/pkg"],
+             0, [])

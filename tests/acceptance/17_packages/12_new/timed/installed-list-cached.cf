@@ -1,0 +1,48 @@
+# Test that installed list cache is not updated too often.
+
+body common control
+{
+    inputs => { "../../../default.cf.sub" };
+    bundlesequence => { default($(this.promise_filename)) };
+}
+
+bundle agent init
+{
+  meta:
+    "test_skip_needs_work" string => "windows";
+
+  files:
+    test_pass_1::
+      "$(sys.workdir)/modules/packages/test_module"
+        copy_from => local_cp("$(this.promise_dirname)/test_module"),
+        perms => m("0755");
+
+  methods:
+    test_pass_1::
+      "any" usebundle => file_make($(G.testfile), "list-installed
+END-OF-AGENT-RUN---
+list-installed
+END-OF-AGENT-RUN---
+END-OF-AGENT-RUN---");
+}
+
+bundle agent test
+{
+  commands:
+      "$(sys.cf_agent) -D AUTO -f $(this.promise_filename).sub";
+
+      "$(G.echo) END-OF-AGENT-RUN--- >> $(sys.workdir)/modules/packages/test_module.log"
+        contain => in_shell;
+}
+
+bundle agent check
+{
+  methods:
+    test_pass_1::
+      "any" usebundle => dcs_wait($(this.promise_filename), 125);
+    test_pass_2::
+      "any" usebundle => dcs_wait($(this.promise_filename), 65);
+    test_pass_3::
+      "any" usebundle => dcs_check_diff("$(sys.workdir)/modules/packages/test_module.log",
+                                        $(G.testfile), $(this.promise_filename));
+}

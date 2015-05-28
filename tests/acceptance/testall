@@ -49,7 +49,14 @@ if [ -f /usr/xpg4/bin/grep ]; then
   export PATH
 fi
 
-TEST_DIR=$(dirname $0)
+TEST_DIR="$(dirname $0)"
+case "$TEST_DIR" in
+    /*)
+        ;;
+    *)
+        TEST_DIR="$(pwd)/$TEST_DIR"
+        ;;
+esac
 
 if ! test -f "$TEST_DIR/testall.env"; then
     echo "The testall.env file needs to exist in the same directory as $0." 1>&2
@@ -59,4 +66,4 @@ fi
 
 . "$TEST_DIR/testall.env"
 
-"$CORE/tests/acceptance/testall" --agent="$CORE/cf-agent/cf-agent" --cfpromises="$CORE/cf-promises/cf-promises" --cfserverd="$CORE/cf-serverd/cf-serverd" --cfkey="$CORE/cf-key/cf-key" --rpmvercmp="$CORE/ext/rpmvercmp" "$@"
+"$CORE/tests/acceptance/testall" --agent="$CORE/cf-agent/cf-agent" --cfpromises="$CORE/cf-promises/cf-promises" --cfserverd="$CORE/cf-serverd/cf-serverd" --cfkey="$CORE/cf-key/cf-key" --rpmvercmp="$CORE/ext/rpmvercmp" --include="$TEST_DIR/../../modules/packages" "$@"

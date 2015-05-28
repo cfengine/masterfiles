@@ -1,0 +1,22 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
+log.write("rpm " + (" ".join(sys.argv[1:])) + "\n")
+log.close()
+
+if sys.argv.count("-qa"):
+    sys.stdout.write('''Name=firefox
+Version=24.5.0-1.el5.centos
+Architecture=i386
+Name=yum
+Version=3.2.29-43.el6_5
+Architecture=noarch
+''')
+elif sys.argv.count("-qp"):
+    sys.stdout.write('''Name=file_pkg
+Version=10.0
+Architecture=x86_64
+''')
