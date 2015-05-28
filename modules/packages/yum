@@ -11,7 +11,7 @@ rpm_quiet_option = ["--quiet"]
 rpm_output_format = "Name=%{name}\nVersion=%{version}\nArchitecture=%{arch}\n"
 
 yum_cmd = os.environ.get('CFENGINE_TEST_YUM_CMD', "/usr/bin/yum")
-yum_options = ["--quiet"]
+yum_options = ["--quiet", "-y"]
 
 def get_package_data():
     pkg_string = ""
