@@ -240,12 +240,17 @@ def repo_install():
     # 1. Try to upgrade using "yum upgrade-to".
     # 2. Query the package again, see if it is the right version now.
     # 3. If not, try to downgrade using "yum downgrade".
-    # 4. (No need to check again, CFEngine will do the final check)
+    # 4. Query the package again, see if it is the right version now.
+    # 5. Final safeguard, try installing using "yum install". This may happen
+    #    in case two architectures were updates simultaneously, but the first
+    #    upgrade may cause the second to disappear and in this case only install
+    #    will work.
+    # 6. (No need to check again, CFEngine will do the final check)
     #
     # This is considerably more expensive than what we do for apt, but it's the
     # only way to cover all bases. In apt it will be one apt call for any number
     # of packages, with yum it will in the worst case be:
-    #   1 + 3 * number_of_packages
+    #   1 + 5 * number_of_packages
     # although a more common case will probably be:
     #   1 + 2 * number_of_packages
     # since it's unlikely that people will do a whole lot of downgrades
@@ -272,6 +277,14 @@ def repo_install():
                 continue
 
             cmd_line = [yum_cmd] + yum_options + ["downgrade", item]
+            subprocess_call(cmd_line, stdout=sys.stderr)
+
+            # See if it succeeded.
+            cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
+            if subprocess_call(cmd_line, stdout=sys.stderr) == 0:
+                continue
+
+            cmd_line = [yum_cmd] + yum_options + ["install", item]
             subprocess_call(cmd_line, stdout=sys.stderr)
 
             # No check for downgrade. CFEngine will figure out that it's missing
