@@ -292,7 +292,7 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
       "cpuinfo_physical_socket_inventory"
         string => ifelse(isgreaterthan( length("cpuinfo_physical_id_lines"), 0 ), "$(cpuinfo_physical_id_lines_unique_count)",
                       "$(cpuinfo_processor_lines_count)"),
-        meta => { "inventory", "attribute_name=CPU Sockets" };
+        meta => { "inventory", "attribute_name=CPU sockets" };
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_proc::
