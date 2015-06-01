@@ -1,0 +1,30 @@
+###############################################################################
+#
+# This part is for cf-hub
+#
+# Settings describing the details of the fixed behavioural promises made
+# by cf-monitord. The system defaults will be sufficient for most users.
+#
+###############################################################################
+
+body hub control
+
+{
+
+    am_policy_hub::
+
+      # exclude_hosts => { "192.168.12.21", "10.10", "10.12.*" };
+
+      # cf-hub collects up reports from registered hosts every 5 minutes.
+
+      # hub_schedule => { "Min00", "Min30", "(Evening|Night).Min45_50" };
+      # port => "5308";
+
+      # Hub will discard accumulated reports on the clients
+      # and download only information about current state of the client 
+      # in case of not successfully downloading the reports for defined
+      # period of time. Default value is 6 hours. 
+      # Was introduced in CFEngine 3.6.4
+      # client_history_timeout => 6; # [hours]  
+
+}
