@@ -1,0 +1,156 @@
+bundle common update_def
+{
+  classes:
+      # all override classes are defined true
+      "$(override_classes)" expression => "any", meta => { "override" };
+
+      "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
+
+  vars:
+      "current_version" string => "3.7.0";
+    any::
+      "augments_file" string => "$(this.promise_dirname)/../../def.json";
+
+      "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
+
+    have_augments_file::
+      "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
+
+      "override_vars" slist => getindices("augments[vars]");
+      "override_classes" slist => getvalues("augments[classes]");
+      "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
+      "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
+
+    any::
+      # Begin change
+
+      "input_name_patterns" slist => getvalues("override_data_input_name_patterns"),
+      comment => "JSON-sourced filename patterns to match when updating the policy (see update/update_policy.cf)",
+      handle => "common_def_json_vars_input_name_patterns",
+      ifvarclass => isvariable("override_data_input_name_patterns"),
+      meta => { "defvar" };
+
+      "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
+                                       ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
+                                       "cf_promises_release_id", ".*\.json", ".*\.yaml" },
+      comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
+      handle => "common_def_vars_input_name_patterns",
+      ifvarclass => not(isvariable("override_data_input_name_patterns")),
+      meta => { "defvar" };
+
+      # the permissions for your masterfiles, which will propagate to inputs
+      "masterfiles_perms_mode" string => "0600",
+      handle => "common_def_vars_masterfiles_perms_mode",
+      meta => { "defvar" };
+
+      "dc_scripts" string => "$(sys.workdir)/httpd/htdocs/api/dc-scripts",
+      comment => "Directory where design center scripts are located on Enterprise Hub";
+
+      "DCWORKFLOW" string => "/opt/cfengine",
+      comment => "Directory where DC Workflow related things are stored";
+
+      "masterfiles_staging" string => "$(DCWORKFLOW)/masterfiles_staging",
+      comment => "Directory where Mission Portal Design Center
+                  activations are staged for commit to upstream repository";
+
+      "local_masterfiles_git" string => "$(DCWORKFLOW)/masterfiles.git",
+      comment => "Local bare git repository, serves as OOTB upstream repo";
+
+      "cf_git" string => "$(sys.workdir)/bin/git",
+      comment => "Path to git binary installed with CFEngine Enterprise";
+
+      "cf_apache_user" string => "cfapache",
+      comment => "User that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_user";
+
+      "cf_apache_group" string => "cfapache",
+      comment => "Group that CFEngine Enterprise webserver runs as",
+      handle => "common_def_vars_cf_cfapache_group";
+
+    # enable_cfengine_enterprise_hub_ha is defined below 
+    # Disabled by default
+
+    enable_cfengine_enterprise_hub_ha::
+      "policy_servers" slist => {"$(sys.policy_hub)", @(ha_def.ips)};
+
+    !enable_cfengine_enterprise_hub_ha::
+      "policy_servers" slist => {"$(sys.policy_hub)"};
+
+  classes:
+
+      # Trigger binary upgrade from policy hub
+      # Disable by default
+      "trigger_upgrade" or => {
+                               "!any",
+                              };
+
+      # Update masterfiles from Git
+      # Enabled for enterprise users by default
+      # you can also request it from the command line with
+      # -Dcfengine_internal_masterfiles_update
+
+      # NOTE THAT ENABLING THIS BY DEFAULT *WILL* OVERWRITE THE HUB'S $(sys.workdir)/masterfiles
+
+      #"cfengine_internal_masterfiles_update" expression => "enterprise.!(cfengine_3_4|cfengine_3_5)";
+      "cfengine_internal_masterfiles_update" expression => "!any";
+
+      # Transfer policies and binaries with encryption
+      # you can also request it from the command line with
+      # -Dcfengine_internal_encrypt_transfers
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
+
+      "cfengine_internal_encrypt_transfers" expression => "!any";
+
+      # Purge policies that don't exist on the server side.
+      # you can also request it from the command line with
+      # -Dcfengine_internal_purge_policies
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
+
+      "cfengine_internal_purge_policies" expression => "!any";
+
+      # Preserve permissions of the policy server's masterfiles.
+      # you can also request it from the command line with
+      # -Dcfengine_internal_preserve_permissions
+
+      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN def.cf
+
+      "cfengine_internal_preserve_permissions" expression => "!any";
+
+      # Disable checking of cf_promises_validated before updating clients.
+      # Disabling checking of cf_promises_validated ensures that remote agents
+      # will **always** scan all of masterfiles for any changes and update
+      # accordingly. This is not recommended as it both removes a safety
+      # mechanism that checks for policy to be valid before allowing clients to
+      # download updates, and the increased load on the hub will affect
+      # scalability. Consider using time_based, select_class, or dist based classes
+      # instead of any to retain some of the benefits. **DISABLE WITH CAUTION**
+
+      "cfengine_internal_disable_cf_promises_validated"
+        expression => "!any",
+        comment => "When cf_promises_validated is disabled remote agents will
+                   always scan all of masterfiles for changes. Disabling this
+                   is not recomended as it will increase the load on the policy
+                   server and increases the possibility for remote agents to
+                   recieve broken policy.";
+
+      # Enable CFEngine Enterprise HA Policy
+      "enable_cfengine_enterprise_hub_ha" expression => "!any";
+      #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
+
+  reports:
+    DEBUG|DEBUG_update_def::
+      "DEBUG: $(this.bundle)";
+      "$(const.t) override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
+        ifvarclass => isvariable("override_data_$(override_vars)");
+
+      "$(const.t) defined class role/byname $(extra_roles[byname][$(roles_byname_keys)]) because of classmatch('$(roles_byname_keys)')"
+        ifvarclass => "$(extra_roles[byname][$(roles_byname_keys)])";
+
+      "$(const.t) defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
+        ifvarclass => "$(roles_byrole_keys)";
+
+      "$(const.t) override class $(override_classes)";
+      "$(const.t) $(defvars) = $($(defvars))";
+}

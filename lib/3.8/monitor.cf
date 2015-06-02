@@ -1,0 +1,118 @@
+############################################################################
+#  Copyright (C) CFEngine AS
+#
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License LGPL as published by the
+#  Free Software Foundation; version 3.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  To the extent this program is licensed as part of the Enterprise
+#  versions of CFEngine, the applicable Commercial Open Source License
+#  (COSL) may apply to this file if you as a licensee so wish it. See
+#  included file COSL.txt.
+###########################################################################
+#
+# CFEngine Community Open Promise-Body Library
+#
+# This initiative started by CFEngine promotes a
+# standardized set of names and promise specifications
+# for template functionality within CFEngine 3.
+#
+# The aim is to promote an industry standard for
+# naming of configuration patterns, leading to a
+# de facto middleware of standardized syntax.
+#
+# Names should be intuitive and parameters should be
+# minimal to assist readability and comprehensibility.
+
+# Contributions to this file are voluntarily given to
+# the cfengine community, and are moderated by CFEngine.
+# No liability or warranty for misuse is implied.
+#
+# If you add to this file, please try to make the
+# contributions "self-documenting". Comments made
+# after the bundle/body statement are retained in
+# the online docs
+#
+
+# For CFEngine Core: 3.7.0 to 3.7.x
+# Monitor bodies
+
+###################################################
+# If you find CFEngine useful, please consider    #
+# purchasing a commercial version of the software.#
+###################################################
+
+####################################################
+## monitor bodyparts
+####################################################
+
+body match_value scan_log(line)
+# @brief Selects lines matching `line` in a growing file
+# @param line Regular expression for matching lines.
+#
+# **See also:** `select_line_matching`, `track_growing_file`
+{
+      select_line_matching => "$(line)";
+      track_growing_file => "true";
+}
+
+##
+
+body match_value scan_changing_file(line)
+# @brief Selects lines matching `line` in a changing file
+# @param line Regular expression for matching lines.
+#
+# **See also:** `select_line_matching`, `track_growing_file`
+{
+      select_line_matching => "$(line)";
+      track_growing_file => "false";
+}
+
+##
+
+body match_value single_value(regex)
+# @brief Extract lines matching `regex` as values
+# @param regex Regular expression matching lines and values
+#
+# **See also:** `select_line_matching`, `extraction_regex`
+{
+      select_line_matching => "$(regex)";
+      extraction_regex => "($(regex))";
+}
+
+##
+
+body match_value line_match_value(line_match, extract_regex)
+# @brief Find lines matching line_match and extract a value matching extract_regex
+# @param line_match Regular expression matching line where value is found
+# @param extract_regex Regular expression matching value to extract
+#
+# **See also:** `select_line_matching`, `extraction_regex`
+#
+# **Example:**
+#
+# ```cf3
+# bundle monitor example
+# {
+#   vars:
+#      "regex_vsz" string => "root\s+[0-9]+\s+[0-9]+\s+[0-9]+\s+[0-9.]+\s+[0-9.]+\s+([0-9]+).*";
+#    measurements:
+#      "/var/cfengine/state/cf_procs"
+#              handle => "cf_serverd_vsz",
+#              comment => "Tracking the memory consumption of a process can help us identify possible memory leaks",
+#              stream_type => "file",
+#              data_type => "int",
+#              history_type => "weekly",
+#              units => "kB",
+#              match_value => line_match_value(".*cf-serverd.*", "$(regex_vsz)");
+# }
+# ```
+{
+      select_line_matching => "$(line_match)";
+      extraction_regex => "$(extract_regex)";
+}
