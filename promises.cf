@@ -252,7 +252,7 @@ bundle common cfengine_controls
 bundle common services_autorun
 {
   vars:
-    cfengine_3_5||!services_autorun::
+    cfengine_3_5|!services_autorun::
       "inputs" slist => { };
       "found_inputs" slist => {};
       "bundles" slist => { "services_autorun" }; # run self
