@@ -13,6 +13,60 @@ rpm_output_format = "Name=%{name}\nVersion=%{version}-%{release}\nArchitecture=%
 yum_cmd = os.environ.get('CFENGINE_TEST_YUM_CMD', "/usr/bin/yum")
 yum_options = ["--quiet", "-y"]
 
+redirection_is_broken_cached = -1
+
+def redirection_is_broken():
+    # Older versions of Python have a bug where it is impossible to redirect
+    # stderr using subprocess, and any attempt at redirecting *anything*, not
+    # necessarily stderr, will result in it being closed instead. This is very
+    # bad, because RPM may then open its RPM database on file descriptor 2
+    # (stderr), and will cause it to output error messages directly into the
+    # database file. Fortunately "stdout=subprocess.PIPE" doesn't have the bug,
+    # and that's good, because it would have been much more tricky to solve.
+    global redirection_is_broken_cached
+    if redirection_is_broken_cached == -1:
+        cmd_line = [sys.argv[0], "internal-test-stderr"]
+        if subprocess.call(cmd_line, stdout=sys.stderr) == 0:
+            redirection_is_broken_cached = 0
+        else:
+            redirection_is_broken_cached = 1
+
+    return redirection_is_broken_cached
+
+
+def subprocess_Popen(cmd, stdout=None, stderr=None):
+    if not redirection_is_broken() or (stdout is None and stderr is None) or stdout == subprocess.PIPE or stderr == subprocess.PIPE:
+        return subprocess.Popen(cmd, stdout=stdout, stderr=stderr)
+
+    old_stdout_fd = -1
+    old_stderr_fd = -1
+
+    if stdout is not None:
+        old_stdout_fd = os.dup(1)
+        os.dup2(stdout.fileno(), 1)
+
+    if stderr is not None:
+        old_stderr_fd = os.dup(2)
+        os.dup2(stderr.fileno(), 2)
+
+    result = subprocess.Popen(cmd)
+
+    if old_stdout_fd >= 0:
+        os.dup2(old_stdout_fd, 1)
+        os.close(old_stdout_fd)
+
+    if old_stderr_fd >= 0:
+        os.dup2(old_stderr_fd, 2)
+        os.close(old_stderr_fd)
+
+    return result
+
+
+def subprocess_call(cmd, stdout=None, stderr=None):
+    process = subprocess_Popen(cmd, stdout, stderr)
+    return process.wait()
+
+
 def get_package_data():
     pkg_string = ""
     for line in sys.stdin:
@@ -27,7 +81,7 @@ def get_package_data():
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
-        return subprocess.call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string])
+        return subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string])
     elif re.search("([:,]|-[0-9])", pkg_string):
         # Contains either a version number or an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -42,7 +96,7 @@ def list_installed():
     # Ignore everything.
     sys.stdin.readlines()
 
-    return subprocess.call([rpm_cmd, "-qa", "--qf", rpm_output_format])
+    return subprocess_call([rpm_cmd, "-qa", "--qf", rpm_output_format])
 
 
 def list_updates(online):
@@ -53,7 +107,7 @@ def list_updates(online):
     if not online:
         online_flag = ["-C"]
 
-    process = subprocess.Popen([yum_cmd] + yum_options + online_flag + ["check-update"], stdout=subprocess.PIPE)
+    process = subprocess_Popen([yum_cmd] + yum_options + online_flag + ["check-update"], stdout=subprocess.PIPE)
     lastline = ""
     for line in process.stdout:
         # Combine multiline entries into one line. A line without at least three
@@ -95,7 +149,7 @@ def one_package_argument(name, arch, version, is_yum_install):
         # Here we have no specified architecture and we are installing.
         # If we have existing versions, operate on those, instead of the
         # platform default.
-        process = subprocess.Popen([rpm_cmd, "--qf", "%{arch}\n",
+        process = subprocess_Popen([rpm_cmd, "--qf", "%{arch}\n",
                                     "-q", name], stdout=subprocess.PIPE)
         existing_archs = [line for line in process.stdout]
         process.wait()
@@ -204,21 +258,21 @@ def repo_install():
         cmd_line = [yum_cmd] + yum_options + ["install"]
         cmd_line.extend(single_cmd_args)
 
-        ret = subprocess.call(cmd_line, stdout=sys.stderr)
+        ret = subprocess_call(cmd_line, stdout=sys.stderr)
 
     if multi_cmd_args:
         for item in multi_cmd_args:
             # Try to upgrade.
             cmd_line = [yum_cmd] + yum_options + ["upgrade-to", item]
-            subprocess.call(cmd_line, stdout=sys.stderr)
+            subprocess_call(cmd_line, stdout=sys.stderr)
 
             # See if it succeeded.
             cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-            if subprocess.call(cmd_line, stdout=sys.stderr) == 0:
+            if subprocess_call(cmd_line, stdout=sys.stderr) == 0:
                 continue
 
             cmd_line = [yum_cmd] + yum_options + ["downgrade", item]
-            subprocess.call(cmd_line, stdout=sys.stderr)
+            subprocess_call(cmd_line, stdout=sys.stderr)
 
             # No check for downgrade. CFEngine will figure out that it's missing
             # if it failed.
@@ -237,7 +291,7 @@ def remove():
     args = package_arguments_builder(False)[0]
 
     if args:
-        return subprocess.call(cmd_line + args, stdout=sys.stderr)
+        return subprocess_call(cmd_line + args, stdout=sys.stderr)
     return 0
 
 
@@ -252,13 +306,21 @@ def file_install():
     if not found:
         return 0
 
-    return subprocess.call(cmd_line, stdout=sys.stderr)
+    return subprocess_call(cmd_line, stdout=sys.stderr)
 
 
 def main():
     if len(sys.argv) < 2:
         sys.stderr.write("Need to provide argument\n")
         return 2
+
+    if sys.argv[1] == "internal-test-stderr":
+        # This will cause an exception if stderr is closed.
+        try:
+            os.fstat(2)
+        except OSError:
+            return 1
+        return 0
 
     elif sys.argv[1] == "supports-api-version":
         sys.stdout.write("1\n")
