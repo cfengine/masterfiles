@@ -296,7 +296,7 @@ def remove():
 
 
 def file_install():
-    cmd_line = [rpm_cmd] + rpm_quiet_option + ["-U"]
+    cmd_line = [rpm_cmd] + rpm_quiet_option + ["--force", "-U"]
     found = False
     for line in sys.stdin:
         if line.startswith("File="):
