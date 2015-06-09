@@ -137,6 +137,9 @@ bundle agent cfe_internal_hub_maintain
       "enable_cfe_internal_reporting_database_purge_old_history" -> { "postgres", "CFEngine Enterprise" }
         expression => "enterprise_edition.Hr00.Min00_05";
 
+      "enable_cfe_internal_parition_creation_job" -> { "postgres", "CFEngine Enterprise" }
+        expression => "enterprise_edition.Hr00.Min00_05";
+
   methods:
     enable_cfe_internal_reporting_database_purge_old_history::
       "Remove old report history"
@@ -154,6 +157,11 @@ bundle agent cfe_internal_hub_maintain
       "Remove promise log history"
       usebundle => cfe_internal_database_cleanup_promise_log("7"),
       action => if_elapsed(5);      
+
+    enable_cfe_internal_parition_creation_job::
+      "Create new partitions for partitioned tables"
+      usebundle => cfe_internal_database_partitioning(),
+      action => if_elapsed(5);
 }
 
 bundle agent cfe_internal_database_cleanup_reports (settings)
@@ -249,10 +257,10 @@ bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
 {
   vars:
     "cleanup_query_repaired"
-    string => "SELECT promise_log_repaired_partition_cleanup('$(history_length_days) day');";
+    string => "SELECT promise_log_partition_cleanup('REPAIRED', '$(history_length_days) day');";
 
     "cleanup_query_notkept"
-    string => "SELECT promise_log_notkept_partition_cleanup('1 day');";
+    string => "SELECT promise_log_partition_cleanup('NOTKEPT', '1 day');";
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
@@ -264,4 +272,23 @@ bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
       contain => in_shell_and_silent,
       classes => kept_successful_command,
       handle => "cf_database_maintain_promise_log_notkept";
+}
+
+bundle agent cfe_internal_database_partitioning()
+# @ignore
+# @brief create any nesesary table partitions for database
+{
+  vars:
+    "promise_outcome"
+    slist => {"REPAIRED", "NOTKEPT"};
+
+    "query_create_promise_log_$(promise_outcome)"
+    string => "SELECT promise_log_partition_create(NOW() - INTERVAL '7 day', 7 + 3, '$(promise_outcome)');";
+
+  commands:
+      # "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
+      "psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
+      contain => in_shell_and_silent,
+      classes => kept_successful_command,
+      handle => "cf_database_create_partition_promise_log_$(promise_outcome)";
 }
