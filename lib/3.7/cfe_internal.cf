@@ -181,8 +181,7 @@ bundle agent cfe_internal_database_cleanup_reports (settings)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_report_$(settings[$(index)][report])";
 }
 
@@ -197,8 +196,7 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_consumer_status";
 }
 
@@ -212,8 +210,7 @@ bundle agent cfe_internal_database_cleanup_diagnostics (settings)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
 }
 
@@ -264,13 +261,11 @@ bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_promise_log_repaired";
 
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_notkept)\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_promise_log_notkept";
 }
 
@@ -286,9 +281,7 @@ bundle agent cfe_internal_database_partitioning()
     string => "SELECT promise_log_partition_create(NOW() - INTERVAL '7 day', 7 + 3, '$(promise_outcome)');";
 
   commands:
-      # "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
-      "psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
+      contain => silent,
       handle => "cf_database_create_partition_promise_log_$(promise_outcome)";
 }
