@@ -1430,7 +1430,7 @@ body package_method generic
       package_list_version_regex => "$(debian_knowledge.list_version_regex)";
       package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
       package_name_convention => "$(name)";
-      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";		# 4 hours
+      package_list_update_ifelapsed => "$(common_knowledge.list_update_ifelapsed)";     # 4 hours
 
       # make correct version comparisons
       package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";

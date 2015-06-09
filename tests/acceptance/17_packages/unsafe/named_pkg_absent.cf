@@ -41,7 +41,7 @@ bundle agent init
 
         debian::
 
-	    "$(package_name)"
+           "$(package_name)"
             package_policy => "add",
             package_method => apt_get;
 

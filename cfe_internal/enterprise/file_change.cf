@@ -26,9 +26,9 @@ bundle agent change_management
 
       "watch_files_report_diffs"
         slist =>  {
-				            "/etc/passwd",
-				            "/etc/group",
-				            "/etc/services",
+                   "/etc/passwd",
+                   "/etc/group",
+                   "/etc/services",
                   },
         comment => "These files will be watched for change, and diffs will be
                     reported back to mission portal if you are running CFEngine
