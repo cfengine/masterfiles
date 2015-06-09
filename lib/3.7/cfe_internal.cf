@@ -107,7 +107,7 @@ bundle agent cfe_internal_hub_maintain
                                             {
                                                 "report": "benchmarks",
                                                 "table": "__BenchmarksLog",
-                                                "history_length_days": 7,
+                                                "history_length_days": 1,
                                                 "time_key": "CheckTimeStamp"
                                             },
                                             {
@@ -137,6 +137,9 @@ bundle agent cfe_internal_hub_maintain
       "enable_cfe_internal_reporting_database_purge_old_history" -> { "postgres", "CFEngine Enterprise" }
         expression => "enterprise_edition.Hr00.Min00_05";
 
+      "enable_cfe_internal_parition_creation_job" -> { "postgres", "CFEngine Enterprise" }
+        expression => "enterprise_edition.Hr00.Min00_05";
+
   methods:
     enable_cfe_internal_reporting_database_purge_old_history::
       "Remove old report history"
@@ -149,6 +152,15 @@ bundle agent cfe_internal_hub_maintain
 
       "Remove diagnostics history"
       usebundle => cfe_internal_database_cleanup_diagnostics(@(diagnostics_settings)),
+      action => if_elapsed(5);
+
+      "Remove promise log history"
+      usebundle => cfe_internal_database_cleanup_promise_log("7"),
+      action => if_elapsed(5);      
+
+    enable_cfe_internal_parition_creation_job::
+      "Create new partitions for partitioned tables"
+      usebundle => cfe_internal_database_partitioning(),
       action => if_elapsed(5);
 }
 
@@ -169,8 +181,7 @@ bundle agent cfe_internal_database_cleanup_reports (settings)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_report_$(settings[$(index)][report])";
 }
 
@@ -185,8 +196,7 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_consumer_status";
 }
 
@@ -200,8 +210,7 @@ bundle agent cfe_internal_database_cleanup_diagnostics (settings)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      contain => in_shell_and_silent,
-      classes => kept_successful_command,
+      contain => silent,
       handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
 }
 
@@ -211,26 +220,68 @@ bundle agent cfe_internal_cleanup_agent_reports
 {
   vars:
     any::
-      "report_files" slist => findfiles("$(sys.workdir)/state/diff/*.diff");
-      "reports_size[$(report_files)]" int => filesize("$(report_files)");
+      "diff_files" slist => findfiles("$(sys.workdir)/state/diff/*.diff");
+      "promise_log_files" slist => findfiles("$(sys.workdir)/state/promise_log/*.csv");
+
+      "files" slist => { @(diff_files), @(promise_log_files) };
+
+      "reports_size[$(files)]" int => filesize("$(files)");
       "tmpmap" slist => maparray("$(this.v)", reports_size);
 
-    # We need to make sure that we have diff files before summing or errors are
-    # produced in the log. It's not possible to sum cf_null
-    have_diff_files::
+    # We need to make sure that we have files before summing or errors are
+    # produced in the log
+    have_files::
       "total_report_size" real => sum(tmpmap);
 
   classes:
-      "cfe_internal_purge_diff_reports"
+      "cfe_internal_purge_reports"
         expression => isgreaterthan("$(total_report_size)","$(def.max_client_history_size)"),
-        comment => "Determine if the current sum of report diffs exceeds the max desired";
+        comment => "Determine if the current sum of reports exceeds the max desired";
 
-      "have_diff_files"
+      "have_files"
         expression => isgreaterthan(length(tmpmap), 0);
 
   files:
-    cfe_internal_purge_diff_reports::
-      "$(report_files)"
+    cfe_internal_purge_reports::
+      "$(files)"
         delete => tidy,
-        handle => "cf_cleanup_agent_reports_$(report_files)";
+        handle => "cf_cleanup_agent_reports_$(files)";
+}
+
+bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
+# @ignore
+# @brief clean up promise log
+{
+  vars:
+    "cleanup_query_repaired"
+    string => "SELECT promise_log_partition_cleanup('REPAIRED', '$(history_length_days) day');";
+
+    "cleanup_query_notkept"
+    string => "SELECT promise_log_partition_cleanup('NOTKEPT', '1 day');";
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
+      contain => silent,
+      handle => "cf_database_maintain_promise_log_repaired";
+
+      "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_notkept)\""
+      contain => silent,
+      handle => "cf_database_maintain_promise_log_notkept";
+}
+
+bundle agent cfe_internal_database_partitioning()
+# @ignore
+# @brief create any nesesary table partitions for database
+{
+  vars:
+    "promise_outcome"
+    slist => {"REPAIRED", "NOTKEPT"};
+
+    "query_create_promise_log_$(promise_outcome)"
+    string => "SELECT promise_log_partition_create(NOW() - INTERVAL '7 day', 7 + 3, '$(promise_outcome)');";
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
+      contain => silent,
+      handle => "cf_database_create_partition_promise_log_$(promise_outcome)";
 }
