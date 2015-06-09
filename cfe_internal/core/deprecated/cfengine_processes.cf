@@ -10,12 +10,12 @@ bundle agent cfe_internal_processes
   vars:
 
       "cf_components"   slist => {
-				   "cf-key",
-				   "cf-monitord",
-				   "cf-promises",
-				   "cf-runagent",
-				   "cf-serverd",
-				   "cf-hub"
+                                  "cf-key",
+                                  "cf-monitord",
+                                  "cf-promises",
+                                  "cf-runagent",
+                                  "cf-serverd",
+                                  "cf-hub"
       },
       comment => "Define all cfengine robot agents",
       handle => "cfe_internal_processes_vars_cf_components";

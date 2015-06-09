@@ -49,7 +49,7 @@ bundle agent test
 
         debian::
 
-	    "$(package_name)"
+           "$(package_name)"
             package_policy => "add",
             classes => test_set_class("pass","fail");
 
