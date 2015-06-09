@@ -91,20 +91,20 @@ bundle agent cfe_internal_update_policy
       handle => "cfe_internal_update_policy_redis_conf_file";
 
       "agents" slist => {
-			  "cf-agent",
-			  "cf-execd",
-			  "cf-key",
-			  "cf-monitord",
-			  "cf-promises",
-			  "cf-runagent",
-			  "cf-serverd",
+                         "cf-agent",
+                         "cf-execd",
+                         "cf-key",
+                         "cf-monitord",
+                         "cf-promises",
+                         "cf-runagent",
+                         "cf-serverd",
       },
       comment => "List of CFEngine binaries",
       handle => "cfe_internal_update_policy_vars_agents";
 
       "optional_agents" slist => {
-			           "cf-consumer",
-			           "cf-hub",
+                                  "cf-consumer",
+                                  "cf-hub",
       },
       comment => "List of optional CFEngine binaries",
       handle => "cfe_internal_update_policy_vars_optional_agents";

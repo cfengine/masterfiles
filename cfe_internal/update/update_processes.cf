@@ -39,9 +39,9 @@ bundle agent cfe_internal_update_processes
       handle => "cfe_internal_update_processes_vars_agents_to_be_disabled";
 
       "agents_to_be_enabled"    slist => {
-					   "cf-execd",
-					   "cf-serverd",
-					   "cf-monitord",
+                                          "cf-execd",
+                                          "cf-serverd",
+                                          "cf-monitord",
       },
       comment => "CFE processes that should be enabled",
       handle => "cfe_internal_update_processes_vars_agents_to_be_enable";

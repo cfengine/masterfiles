@@ -45,7 +45,7 @@ bundle agent test
 
         debian::
 
-	    "$(package_name)"
+            "$(package_name)"
             package_policy => "addupdate",
             package_select => "==",
             package_version => "1.0-2",
