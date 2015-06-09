@@ -28,6 +28,7 @@ Notable changes to the framework should be documented here
  - Relocate service_catalogue from promsies.cf to services/main.cf. It is
    intended to be a user entry. This name change correlates with the main
    bundle being activated by default if there is no bundlesequence specified.
+ - Reduse benchmarks sample history to 1 day.
 
 ### Deprecated
 
