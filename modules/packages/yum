@@ -7,10 +7,65 @@ import re
 
 
 rpm_cmd = os.environ.get('CFENGINE_TEST_RPM_CMD', "/bin/rpm")
-rpm_output_format = "Name=%{name}\nVersion=%{version}\nArchitecture=%{arch}\n"
+rpm_quiet_option = ["--quiet"]
+rpm_output_format = "Name=%{name}\nVersion=%{version}-%{release}\nArchitecture=%{arch}\n"
 
 yum_cmd = os.environ.get('CFENGINE_TEST_YUM_CMD', "/usr/bin/yum")
-yum_options = "--quiet"
+yum_options = ["--quiet", "-y"]
+
+redirection_is_broken_cached = -1
+
+def redirection_is_broken():
+    # Older versions of Python have a bug where it is impossible to redirect
+    # stderr using subprocess, and any attempt at redirecting *anything*, not
+    # necessarily stderr, will result in it being closed instead. This is very
+    # bad, because RPM may then open its RPM database on file descriptor 2
+    # (stderr), and will cause it to output error messages directly into the
+    # database file. Fortunately "stdout=subprocess.PIPE" doesn't have the bug,
+    # and that's good, because it would have been much more tricky to solve.
+    global redirection_is_broken_cached
+    if redirection_is_broken_cached == -1:
+        cmd_line = [sys.argv[0], "internal-test-stderr"]
+        if subprocess.call(cmd_line, stdout=sys.stderr) == 0:
+            redirection_is_broken_cached = 0
+        else:
+            redirection_is_broken_cached = 1
+
+    return redirection_is_broken_cached
+
+
+def subprocess_Popen(cmd, stdout=None, stderr=None):
+    if not redirection_is_broken() or (stdout is None and stderr is None) or stdout == subprocess.PIPE or stderr == subprocess.PIPE:
+        return subprocess.Popen(cmd, stdout=stdout, stderr=stderr)
+
+    old_stdout_fd = -1
+    old_stderr_fd = -1
+
+    if stdout is not None:
+        old_stdout_fd = os.dup(1)
+        os.dup2(stdout.fileno(), 1)
+
+    if stderr is not None:
+        old_stderr_fd = os.dup(2)
+        os.dup2(stderr.fileno(), 2)
+
+    result = subprocess.Popen(cmd)
+
+    if old_stdout_fd >= 0:
+        os.dup2(old_stdout_fd, 1)
+        os.close(old_stdout_fd)
+
+    if old_stderr_fd >= 0:
+        os.dup2(old_stderr_fd, 2)
+        os.close(old_stderr_fd)
+
+    return result
+
+
+def subprocess_call(cmd, stdout=None, stderr=None):
+    process = subprocess_Popen(cmd, stdout, stderr)
+    return process.wait()
+
 
 def get_package_data():
     pkg_string = ""
@@ -26,7 +81,7 @@ def get_package_data():
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
-        return subprocess.call([rpm_cmd, "--qf", rpm_output_format, "-qp", result.group(1)])
+        return subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string])
     elif re.search("([:,]|-[0-9])", pkg_string):
         # Contains either a version number or an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -41,16 +96,18 @@ def list_installed():
     # Ignore everything.
     sys.stdin.readlines()
 
-    return subprocess.call([rpm_cmd, "-qa", "--qf", rpm_output_format])
+    return subprocess_call([rpm_cmd, "-qa", "--qf", rpm_output_format])
 
 
 def list_updates(online):
     # Ignore everything.
     sys.stdin.readlines()
 
-    online_flag = [] if online else ["-C"]
+    online_flag = []
+    if not online:
+        online_flag = ["-C"]
 
-    process = subprocess.Popen([yum_cmd, yum_options] + online_flag + ["check-update"], stdout=subprocess.PIPE)
+    process = subprocess_Popen([yum_cmd] + yum_options + online_flag + ["check-update"], stdout=subprocess.PIPE)
     lastline = ""
     for line in process.stdout:
         # Combine multiline entries into one line. A line without at least three
@@ -77,21 +134,61 @@ def list_updates(online):
     return 0
 
 
-def package_arguments_builder():
+# Returns a pair:
+# List 1: Contains arguments for a single command line.
+# List 2: Contains arguments for multiple command lines (see comments in
+#         repo_install()).
+def one_package_argument(name, arch, version, is_yum_install):
+    args = []
+    archs = []
+    exists = False
+
+    if arch:
+        archs.append(arch)
+    elif is_yum_install:
+        # Here we have no specified architecture and we are installing.
+        # If we have existing versions, operate on those, instead of the
+        # platform default.
+        process = subprocess_Popen([rpm_cmd, "--qf", "%{arch}\n",
+                                    "-q", name], stdout=subprocess.PIPE)
+        existing_archs = [line for line in process.stdout]
+        process.wait()
+        if process.returncode == 0 and existing_archs:
+            exists = True
+            archs += existing_archs
+
+    version_suffix = ""
+    if version:
+        version_suffix = "-" + version
+
+    if archs:
+        args += [name + version_suffix + "." + arch for arch in archs]
+    else:
+        args.append(name + version_suffix)
+
+    if exists and version:
+        return [], args
+    else:
+        return args, []
+
+
+# Returns a pair:
+# List 1: Contains arguments for a single command line.
+# List 2: Contains arguments for multiple command lines (see comments in
+#         repo_install()).
+def package_arguments_builder(is_yum_install):
     name = ""
     version = ""
     arch = ""
-    args = []
+    single_cmd_args = []
+    multi_cmd_args = []
     for line in sys.stdin:
         if line.startswith("Name="):
             if name:
                 # Each new "Name=" triggers a new entry.
-                args_add = name
-                if version:
-                    args_add += "-" + version
-                if arch:
-                    args_add += ":" + arch
-                args.append(args_add)
+                single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
+                single_cmd_args += single_list
+                multi_cmd_args += multi_list
 
                 version = ""
                 arch = ""
@@ -105,40 +202,114 @@ def package_arguments_builder():
             arch = line.split("=", 1)[1].rstrip()
 
     if name:
-        return args
+        single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
+        single_cmd_args += single_list
+        multi_cmd_args += multi_list
 
-    args_add = name
-    if version:
-        args_add += "-" + version
-    if arch:
-        args_add += ":" + arch
-    args.append(args_add)
-
-    return args
+    return single_cmd_args, multi_cmd_args
 
 
 def repo_install():
-    cmd_line = [yum_cmd, yum_options, "install"]
+    # Due to how yum works we need to split repo installs into several
+    # components.
+    #
+    # 1. Installation of fresh packages is easy, we add all of them on one
+    #    command line.
+    # 2. Upgrade of existing packages where no version has been specified is
+    #    also easy, we add that to the same command line.
+    # 3. Up/downgrade of existing packages where version is specified is
+    #    tricky, for several reasons:
+    #      a) There is no one yum command that will do both, "install" or
+    #         "upgrade" will only upgrade, and "downgrade" will only downgrade.
+    #      b) There is no way rpm or yum will tell you which version is higher
+    #         than the other, and we know from experience with the old package
+    #         promise implementation that we don't want to try to do such a
+    #         comparison ourselves.
+    #      c) yum has no dry-run mode, so we cannot tell in advance which
+    #         operation will succeed.
+    #      d) yum will not even tell you whether operation succeeded when you
+    #         run it for real
+    #
+    # So here's what we need to do. We start by querying each package to find
+    # out whether that exact version is installed. If it fulfills 1. or 2. we
+    # add it to that single command line.
+    #
+    # If we end up at 3. we need to split the work and do each package
+    # separately. We do:
+    #
+    # 1. Try to upgrade using "yum upgrade-to".
+    # 2. Query the package again, see if it is the right version now.
+    # 3. If not, try to downgrade using "yum downgrade".
+    # 4. Query the package again, see if it is the right version now.
+    # 5. Final safeguard, try installing using "yum install". This may happen
+    #    in case two architectures were updates simultaneously, but the first
+    #    upgrade may cause the second to disappear and in this case only install
+    #    will work.
+    # 6. (No need to check again, CFEngine will do the final check)
+    #
+    # This is considerably more expensive than what we do for apt, but it's the
+    # only way to cover all bases. In apt it will be one apt call for any number
+    # of packages, with yum it will in the worst case be:
+    #   1 + 5 * number_of_packages
+    # although a more common case will probably be:
+    #   1 + 2 * number_of_packages
+    # since it's unlikely that people will do a whole lot of downgrades
+    # simultaneously.
 
-    args = package_arguments_builder()
+    ret = 0
+    single_cmd_args, multi_cmd_args = package_arguments_builder(True)
 
-    if args:
-        return subprocess.call(cmd_line + args, stdout=sys.stderr)
-    return 0
+    if single_cmd_args:
+        cmd_line = [yum_cmd] + yum_options + ["install"]
+        cmd_line.extend(single_cmd_args)
+
+        ret = subprocess_call(cmd_line, stdout=sys.stderr)
+
+    if multi_cmd_args:
+        for item in multi_cmd_args:
+            # Try to upgrade.
+            cmd_line = [yum_cmd] + yum_options + ["upgrade-to", item]
+            subprocess_call(cmd_line, stdout=sys.stderr)
+
+            # See if it succeeded.
+            cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
+            if subprocess_call(cmd_line, stdout=sys.stderr) == 0:
+                continue
+
+            cmd_line = [yum_cmd] + yum_options + ["downgrade", item]
+            subprocess_call(cmd_line, stdout=sys.stderr)
+
+            # See if it succeeded.
+            cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
+            if subprocess_call(cmd_line, stdout=sys.stderr) == 0:
+                continue
+
+            cmd_line = [yum_cmd] + yum_options + ["install", item]
+            subprocess_call(cmd_line, stdout=sys.stderr)
+
+            # No check for downgrade. CFEngine will figure out that it's missing
+            # if it failed.
+
+    # ret == 0 doesn't mean we succeeded with everything, but it's expensive to
+    # check, so let CFEngine do that.
+    return ret
 
 
 def remove():
-    cmd_line = [rpm_cmd, "-e"]
+    cmd_line = [rpm_cmd, "--allmatches"] + rpm_quiet_option + ["-e"]
 
-    args = package_arguments_builder()
+    # package_arguments_builder will always return empty second element in case
+    # of removals, so just drop it.         |
+    #                                       V
+    args = package_arguments_builder(False)[0]
 
     if args:
-        return subprocess.call(cmd_line + args, stdout=sys.stderr)
+        return subprocess_call(cmd_line + args, stdout=sys.stderr)
     return 0
 
 
 def file_install():
-    cmd_line = [rpm_cmd, "-U"]
+    cmd_line = [rpm_cmd] + rpm_quiet_option + ["--force", "-U"]
     found = False
     for line in sys.stdin:
         if line.startswith("File="):
@@ -148,13 +319,21 @@ def file_install():
     if not found:
         return 0
 
-    return subprocess.call(cmd_line, stdout=sys.stderr)
+    return subprocess_call(cmd_line, stdout=sys.stderr)
 
 
 def main():
     if len(sys.argv) < 2:
         sys.stderr.write("Need to provide argument\n")
         return 2
+
+    if sys.argv[1] == "internal-test-stderr":
+        # This will cause an exception if stderr is closed.
+        try:
+            os.fstat(2)
+        except OSError:
+            return 1
+        return 0
 
     elif sys.argv[1] == "supports-api-version":
         sys.stdout.write("1\n")

@@ -12,10 +12,8 @@ dpkg_query_cmd = os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD', "/usr/bin/dpkg-q
 dpkg_output_format = "Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n"
 dpkg_status_format = "Status=${Status}\n" + dpkg_output_format
 
-apt_get_options = ["-o",
-                   "Dpkg::Options::=--force-confold",
-                   "-o",
-                   "Dpkg::Options::=--force-confdef",
+apt_get_options = ["-o", "Dpkg::Options::=--force-confold",
+                   "-o", "Dpkg::Options::=--force-confdef",
                    "-y",
                    "--force-yes"]
 apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
