@@ -57,22 +57,14 @@ body common control
 
       version => "CFEngine Promises.cf 3.7.0";
 
-      # From 3.7 onwards there is a new package promise implementation using package
-      # modules in which you MUST provide package modules used to generate
-      # software inventory reports. You can also provide global default package module 
-      # instead of specifying it in all package promises.
-      # Please also note that software inventory reports is CFEngine enterprise only
-      # feature and core users can remove package_inventory line.
-      #debian|redhat::
-      #    package_inventory => { $(package_module_knowledge.platform_default) };
-      #    package_module => $(package_module_knowledge.platform_default);
-
       # Uncomment to connect to the hub using latest protocol.
       #protocol_version => "latest";
 
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 }
+
+      #
 
 bundle common inventory
 # @brief Set up inventory inputs
