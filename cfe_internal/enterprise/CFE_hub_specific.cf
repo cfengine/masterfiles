@@ -87,6 +87,7 @@ bundle agent cfe_internal_update_folders
                         "sunos_5.10_sun4u",
                         "sunos_5.10_sun4v",
                         "sunos_5.10_i86pc",
+                        "hpux_ia64",
       },
       comment => "Define a list for $(sys.flavour)_$(sys.arch) directories",
       handle => "cfe_internal_update_folders_vars_dirs";
