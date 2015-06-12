@@ -38,6 +38,8 @@ Notable changes to the framework should be documented here
    update policy into promsies.cf, update.cf is the entry for the update policy
 
 ### Fixed
+ - standard_services now restarts the service if it was not already running
+   when using service_policy => restart with chkconfig (Redmine #7258)
 
 ### Security
 
