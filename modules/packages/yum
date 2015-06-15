@@ -149,7 +149,7 @@ def one_package_argument(name, arch, version, is_yum_install):
     if is_yum_install:
         process = subprocess_Popen([rpm_cmd, "--qf", "%{arch}\n",
                                     "-q", name], stdout=subprocess.PIPE)
-        existing_archs = [line for line in process.stdout]
+        existing_archs = [line.rstrip() for line in process.stdout]
         process.wait()
         if process.returncode == 0 and existing_archs:
             exists = True
