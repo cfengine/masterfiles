@@ -145,17 +145,19 @@ def one_package_argument(name, arch, version, is_yum_install):
 
     if arch:
         archs.append(arch)
-    elif is_yum_install:
-        # Here we have no specified architecture and we are installing.
-        # If we have existing versions, operate on those, instead of the
-        # platform default.
+
+    if is_yum_install:
         process = subprocess_Popen([rpm_cmd, "--qf", "%{arch}\n",
                                     "-q", name], stdout=subprocess.PIPE)
-        existing_archs = [line for line in process.stdout]
+        existing_archs = [line.rstrip() for line in process.stdout]
         process.wait()
         if process.returncode == 0 and existing_archs:
             exists = True
-            archs += existing_archs
+            if not arch:
+                # Here we have no specified architecture and we are
+                # installing.  If we have existing versions, operate
+                # on those, instead of the platform default.
+                archs += existing_archs
 
     version_suffix = ""
     if version:
