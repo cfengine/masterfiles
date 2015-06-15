@@ -21,6 +21,63 @@ apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
 os.environ['DEBIAN_FRONTEND'] = "noninteractive"
 os.environ['LC_ALL'] = "C"
 
+redirection_is_broken_cached = -1
+
+def redirection_is_broken():
+    # Older versions of Python have a bug where it is impossible to redirect
+    # stderr using subprocess, and any attempt at redirecting *anything*, not
+    # necessarily stderr, will result in it being closed instead. This is very
+    # bad, because RPM may then open its RPM database on file descriptor 2
+    # (stderr), and will cause it to output error messages directly into the
+    # database file. Fortunately "stdout=subprocess.PIPE" doesn't have the bug,
+    # and that's good, because it would have been much more tricky to solve.
+    global redirection_is_broken_cached
+    if redirection_is_broken_cached == -1:
+        cmd_line = [sys.argv[0], "internal-test-stderr"]
+        if subprocess.call(cmd_line, stdout=sys.stderr) == 0:
+            redirection_is_broken_cached = 0
+        else:
+            redirection_is_broken_cached = 1
+
+    return redirection_is_broken_cached
+
+
+def subprocess_Popen(cmd, stdout=None, stderr=None):
+    if not redirection_is_broken() or (stdout is None and stderr is None) or stdout == subprocess.PIPE or stderr == subprocess.PIPE:
+        return subprocess.Popen(cmd, stdout=stdout, stderr=stderr)
+
+    old_stdout_fd = -1
+    old_stderr_fd = -1
+
+    if stdout is not None:
+        old_stdout_fd = os.dup(1)
+        os.dup2(stdout.fileno(), 1)
+
+    if stderr is not None:
+        old_stderr_fd = os.dup(2)
+        os.dup2(stderr.fileno(), 2)
+
+    result = subprocess.Popen(cmd)
+
+    if old_stdout_fd >= 0:
+        os.dup2(old_stdout_fd, 1)
+        os.close(old_stdout_fd)
+
+    if old_stderr_fd >= 0:
+        os.dup2(old_stderr_fd, 2)
+        os.close(old_stderr_fd)
+
+    return result
+
+
+def subprocess_call(cmd, stdout=None, stderr=None):
+    process = subprocess_Popen(cmd, stdout, stderr)
+    return process.wait()
+
+
+
+
+
 def get_package_data():
     pkg_string = ""
     for line in sys.stdin:
@@ -35,7 +92,7 @@ def get_package_data():
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
-        return subprocess.call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", pkg_string])
+        return subprocess_call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", pkg_string])
     elif (re.search("([:,]|-[0-9])", pkg_string)):
         # Contains either a version number or an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -50,7 +107,7 @@ def list_installed():
     # Ignore everything.
     sys.stdin.readlines()
 
-    process = subprocess.Popen([dpkg_query_cmd, "--showformat", dpkg_status_format, "-W"], stdout=subprocess.PIPE)
+    process = subprocess_Popen([dpkg_query_cmd, "--showformat", dpkg_status_format, "-W"], stdout=subprocess.PIPE)
     installed_package = False
     for line in process.stdout:
         line = line.rstrip("\n")
@@ -70,11 +127,11 @@ def list_updates(online):
     sys.stdin.readlines()
 
     if online:
-        result = subprocess.call([apt_get_cmd] + apt_get_options + ["update"], stdout=sys.stderr)
+        result = subprocess_call([apt_get_cmd] + apt_get_options + ["update"], stdout=sys.stderr)
         if result != 0:
             return result
 
-    process = subprocess.Popen([apt_get_cmd] + apt_get_options + ["-s", "upgrade"], stdout=subprocess.PIPE)
+    process = subprocess_Popen([apt_get_cmd] + apt_get_options + ["-s", "upgrade"], stdout=subprocess.PIPE)
     for line in process.stdout:
         # Example of lines that we try to match:
         #        (name)  (old version (ignored))  (new version)     (repository(ies) (ignored))  (arch)
@@ -93,35 +150,47 @@ def list_updates(online):
         #                         /-------+-------\              /--+--\       /------+-------\
         match = re.match("^Inst\s+(?P<name>[^\s:]+)(?::\S+)?\s+\[[^]\s]+\]\s+\((?P<version>\S+)" +
 
-        #                         repository(ies)              arch
-        #                               |                        |
-        #                    /----------+----------\     /-------+-------\
-                         "\s+[^,\s]+(?:,\s+[^,\s]+)*\s+\[(?P<arch>[^]\s]+)\]\).*", line)
+        #                         repository(ies)                arch (might be optional)
+        #                               |                          |
+        #                    /----------+----------\     /---------+---------\
+                         "\s+[^,\s]+(?:,\s+[^,\s]+)*(\s+\[(?P<arch>[^]\s]+)\])?\).*", line)
 
         if match is not None:
             sys.stdout.write("Name=" + match.group("name") + "\n")
             sys.stdout.write("Version=" + match.group("version") + "\n")
-            sys.stdout.write("Architecture=" + match.group("arch") + "\n")
+
+            arch = match.group("arch")
+            if not arch:
+                arch = get_platform_arch()
+            sys.stdout.write("Architecture=" + arch + "\n")
 
     return 0
 
 
+def get_platform_arch():
+    process = subprocess_Popen([dpkg_cmd, "--print-architecture"], stdout=subprocess.PIPE)
+    for line in process.stdout:
+        return line.rstrip()
+    return None
+
 def one_package_argument(name, arch, version, is_apt_install):
     args = []
     archs = []
+    platform_arch = get_platform_arch()
+
     if arch:
-        archs.append(arch)
-    elif is_apt_install:
-        # Here we have no specified architecture and we are installing.
-        # If we have existing versions, operate on those, instead of the
+        if arch != platform_arch:
+            archs.append(arch)
+    else:
+        # If we have existing architectures, operate on those, instead of the
         # platform default.
-        process = subprocess.Popen([dpkg_query_cmd, "--showformat", "${Architecture}=${Status}\n",
-                                    "-W", name + ":*"], stdout=subprocess.PIPE)
+        process = subprocess_Popen([dpkg_query_cmd, "--showformat", "${Architecture}=${Status}\n",
+                                "-W", name + ":*"], stdout=subprocess.PIPE)
         for line in process.stdout:
             # The space before "installed" is important, because it can be "not-installed".
             if "=" in line:
                 arch, stat = line.split("=", 1)
-                if stat.find(" installed") >= 0:
+                if stat.find(" installed") >=  0:
                     archs.append(arch)
 
     version_suffix = ""
@@ -130,11 +199,8 @@ def one_package_argument(name, arch, version, is_apt_install):
 
     if archs:
         args = [name + ':' + arch + version_suffix for arch in archs]
-    elif is_apt_install:
-        args.append(name + version_suffix)
     else:
-        # Delete all architectures if none is specified.
-        args.append(name + ":*" + version_suffix)
+        args.append(name + version_suffix)
 
     return args
 
@@ -173,7 +239,7 @@ def repo_install():
     args = package_arguments_builder(True)
 
     if args:
-        return subprocess.call(cmd_line + args, stdout=sys.stderr)
+        return subprocess_call(cmd_line + args, stdout=sys.stderr)
     return 0
 
 def remove():
@@ -186,7 +252,7 @@ def remove():
 
     cmd_line.extend(args)
 
-    return subprocess.call(cmd_line, stdout=sys.stderr)
+    return subprocess_call(cmd_line, stdout=sys.stderr)
 
 
 def file_install():
@@ -201,7 +267,7 @@ def file_install():
     if (not found):
         return 0
 
-    return subprocess.call(cmd_line, stdout=sys.stderr)
+    return subprocess_call(cmd_line, stdout=sys.stderr)
 
 
 def main():
