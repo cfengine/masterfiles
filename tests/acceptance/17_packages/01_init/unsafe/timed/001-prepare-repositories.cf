@@ -26,7 +26,11 @@ bundle agent test
       "test_skip_unsupported" string => "redhat_4";
 
   vars:
-      "bundles" slist => { "repositories", "signing_keys", "update" };
+      "bundles" slist => { "repositories",
+                           "signing_keys",
+                           "apt_config",
+                           "update"
+                         };
 
   methods:
       "any" usebundle => "$(bundles)";
@@ -130,6 +134,31 @@ bundle agent signing_keys
         classes => if_successful("signing_keys_ok");
 }
 
+bundle agent apt_config
+{
+  classes:
+    !(ubuntu_10|debian_6)::
+      "apt_config_ok" expression => "any",
+        scope => "namespace";
+
+  files:
+    ubuntu_10|debian_6::
+      # Work around bug: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=715494
+      # Apt cache does not behave correctly if installing more than one package
+      # per second.
+      "/etc/apt/apt.conf.d/nocache"
+        create => "true",
+        edit_line => no_apt_cache,
+        edit_defaults => empty,
+        classes => if_successful("apt_config_ok");
+}
+
+bundle edit_line no_apt_cache
+{
+  insert_lines:
+      'Dir::Cache::pkgcache "";';
+}
+
 bundle agent update
 {
   commands:
@@ -156,7 +185,11 @@ body classes if_successful(x)
 bundle agent check
 {
   classes:
-    "everything_ok" and => { "repo_ok", "signing_keys_ok", "update_ok" };
+    "everything_ok" and => { "repo_ok",
+                             "signing_keys_ok",
+                             "apt_config_ok",
+                             "update_ok"
+                           };
 
   reports:
     everything_ok::
