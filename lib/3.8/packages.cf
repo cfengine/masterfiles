@@ -47,6 +47,31 @@
 # purchasing a commercial version of the software.#
 ###################################################
 
+bundle common package_module_knowledge
+{
+  vars:
+    debian::
+      "platform_default" string => "apt_get";
+
+    redhat::
+      "platform_default" string => "yum";
+}
+
+body package_module apt_get
+{
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
+    #default_options =>  {};
+}
+
+body package_module yum
+{
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
+    #default_options => {};
+}
+
+
 bundle common packages_common
 # @ignore
 {
