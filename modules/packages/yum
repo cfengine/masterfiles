@@ -239,7 +239,7 @@ def repo_install():
     # If we end up at 3. we need to split the work and do each package
     # separately. We do:
     #
-    # 1. Try to upgrade using "yum upgrade-to".
+    # 1. Try to upgrade using "yum upgrade".
     # 2. Query the package again, see if it is the right version now.
     # 3. If not, try to downgrade using "yum downgrade".
     # 4. Query the package again, see if it is the right version now.
@@ -270,7 +270,7 @@ def repo_install():
     if multi_cmd_args:
         for item in multi_cmd_args:
             # Try to upgrade.
-            cmd_line = [yum_cmd] + yum_options + ["upgrade-to", item]
+            cmd_line = [yum_cmd] + yum_options + ["upgrade", item]
             subprocess_call(cmd_line, stdout=sys.stderr)
 
             # See if it succeeded.
