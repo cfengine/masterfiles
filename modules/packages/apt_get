@@ -179,8 +179,7 @@ def one_package_argument(name, arch, version, is_apt_install):
     platform_arch = get_platform_arch()
 
     if arch:
-        if arch != platform_arch:
-            archs.append(arch)
+        archs.append(arch)
     else:
         # If we have existing architectures, operate on those, instead of the
         # platform default.
@@ -198,9 +197,16 @@ def one_package_argument(name, arch, version, is_apt_install):
         version_suffix = "=" + version
 
     if archs:
-        args = [name + ':' + arch + version_suffix for arch in archs]
+        for cur_arch in archs:
+            if cur_arch == platform_arch:
+                if is_apt_install:
+                    args.append((name + version_suffix, name + version_suffix))
+                else:
+                    args.append((name + version_suffix, name + ':' + cur_arch + version_suffix))
+            else:
+                args.append((name + ':' + cur_arch + version_suffix, name + ':' + cur_arch + version_suffix))
     else:
-        args.append(name + version_suffix)
+        args.append((name + version_suffix, name + version_suffix))
 
     return args
 
@@ -214,7 +220,7 @@ def package_arguments_builder(is_apt_install):
         if line.startswith("Name="):
             if name:
                 # Each new "Name=" triggers a new entry.
-                args += one_package_argument(name, arch, version, is_apt_install)
+                args.extend(one_package_argument(name, arch, version, is_apt_install))
 
                 version = ""
                 arch = ""
@@ -228,7 +234,7 @@ def package_arguments_builder(is_apt_install):
             arch = line.split("=", 1)[1].rstrip()
 
     if name:
-        args += one_package_argument(name, arch, version, is_apt_install)
+        args.extend(one_package_argument(name, arch, version, is_apt_install))
 
     return args
 
@@ -238,8 +244,13 @@ def repo_install():
 
     args = package_arguments_builder(True)
 
-    if args:
-        return subprocess_call(cmd_line + args, stdout=sys.stderr)
+    if (not args):
+        return 0
+
+    a1, a2 =  map(list, zip(*args))
+
+    if a1:
+        return subprocess_call(cmd_line + a1, stdout=sys.stderr)
     return 0
 
 def remove():
@@ -250,10 +261,13 @@ def remove():
     if (not args):
         return 0
 
-    cmd_line.extend(args)
+    a1, a2 =  map(list, zip(*args))
 
-    return subprocess_call(cmd_line, stdout=sys.stderr)
+    ret = subprocess_call(cmd_line + a1, stdout=sys.stderr)
+    if ret != 0 and a1 != a2:
+        ret = subprocess_call(cmd_line + a2, stdout=sys.stderr)
 
+    return ret
 
 def file_install():
     cmd_line = [dpkg_cmd, "-i"]
