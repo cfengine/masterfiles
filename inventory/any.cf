@@ -698,9 +698,11 @@ body package_method inventory_lslpp(update_interval)
       package_list_update_ifelapsed => $(update_interval);
 
       package_list_command       => "/usr/bin/lslpp -Lqc"; # list RPMs too
-      package_list_name_regex    => "([^:]+):.*";
       package_list_version_regex => "[^:]+:[^:]+:([^:]+):.*";
-      package_installed_regex    => "[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:([CA]):.*";
+      # Make sure version is not included in the name, that indicates RPM
+      # packages, which we should ignore.
+      package_list_name_regex    => "[^:]+:(([^-:]|-[^0-9])+):.*";
+      package_installed_regex    => "[^:]+:(([^-:]|-[^0-9])+):[^:]+:[^:]+:.*";
 
       package_name_convention    => "$(name)-$(version).+";
 
