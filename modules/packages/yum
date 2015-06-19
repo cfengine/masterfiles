@@ -177,24 +177,41 @@ def one_package_argument(name, arch, version, is_yum_install):
 # Returns a pair:
 # List 1: Contains arguments for a single command line.
 # List 2: Contains arguments for multiple command lines (see comments in
-#         repo_install()).
+#         repo_install()). This is a list of lists, where the logic is:
+#           list
+#             |             +---- package1:amd64    -+
+#             +- sublist ---+                        +--- Do these together
+#             |             +---- package1:i386     -+
+#             |
+#             |
+#             |             +---- package2:amd64    -+
+#             +- sublist ---+                        +--- And these together
+#                           +---- package2:i386     -+
 def package_arguments_builder(is_yum_install):
     name = ""
     version = ""
     arch = ""
-    single_cmd_args = []
-    multi_cmd_args = []
+    single_cmd_args = []    # List of arguments
+    multi_cmd_args = []     # List of lists of arguments
+    old_name = ""
     for line in sys.stdin:
         if line.startswith("Name="):
             if name:
                 # Each new "Name=" triggers a new entry.
                 single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
                 single_cmd_args += single_list
-                multi_cmd_args += multi_list
+                if name == old_name:
+                    # Packages that differ only by architecture should be
+                    # processed together
+                    multi_cmd_args[-1] += multi_list
+                elif multi_list:
+                    # Otherwise we process them individually.
+                    multi_cmd_args += [multi_list]
 
                 version = ""
                 arch = ""
 
+            old_name = name
             name = line.split("=", 1)[1].rstrip()
 
         elif line.startswith("Version="):
@@ -206,7 +223,13 @@ def package_arguments_builder(is_yum_install):
     if name:
         single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
         single_cmd_args += single_list
-        multi_cmd_args += multi_list
+        if name == old_name:
+            # Packages that differ only by architecture should be
+            # processed together
+            multi_cmd_args[-1] += multi_list
+        elif multi_list:
+            # Otherwise we process them individually.
+            multi_cmd_args += [multi_list]
 
     return single_cmd_args, multi_cmd_args
 
@@ -239,14 +262,13 @@ def repo_install():
     # If we end up at 3. we need to split the work and do each package
     # separately. We do:
     #
-    # 1. Try to upgrade using "yum upgrade-to".
+    # 1. Try to upgrade using "yum upgrade".
     # 2. Query the package again, see if it is the right version now.
     # 3. If not, try to downgrade using "yum downgrade".
     # 4. Query the package again, see if it is the right version now.
     # 5. Final safeguard, try installing using "yum install". This may happen
-    #    in case two architectures were updates simultaneously, but the first
-    #    upgrade may cause the second to disappear and in this case only install
-    #    will work.
+    #    in case we have one architecture already, but we are installing a
+    #    second one. In this case only install will work.
     # 6. (No need to check again, CFEngine will do the final check)
     #
     # This is considerably more expensive than what we do for apt, but it's the
@@ -268,28 +290,42 @@ def repo_install():
         ret = subprocess_call(cmd_line, stdout=sys.stderr)
 
     if multi_cmd_args:
-        for item in multi_cmd_args:
+        for block in multi_cmd_args:
             # Try to upgrade.
-            cmd_line = [yum_cmd] + yum_options + ["upgrade-to", item]
+            cmd_line = [yum_cmd] + yum_options + ["upgrade"] + block
             subprocess_call(cmd_line, stdout=sys.stderr)
 
             # See if it succeeded.
-            cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-            if subprocess_call(cmd_line, stdout=sys.stderr) == 0:
+            success = True
+            for item in block:
+                cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
+                if subprocess_call(cmd_line, stdout=sys.stderr) != 0:
+                    success = False
+                    break
+
+            if success:
                 continue
 
-            cmd_line = [yum_cmd] + yum_options + ["downgrade", item]
+            # Try to downgrade.
+            cmd_line = [yum_cmd] + yum_options + ["downgrade"] + block
             subprocess_call(cmd_line, stdout=sys.stderr)
 
             # See if it succeeded.
-            cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-            if subprocess_call(cmd_line, stdout=sys.stderr) == 0:
+            success = True
+            for item in block:
+                cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
+                if subprocess_call(cmd_line, stdout=sys.stderr) != 0:
+                    success = False
+                    break
+
+            if success:
                 continue
 
-            cmd_line = [yum_cmd] + yum_options + ["install", item]
+            # Try to plain install.
+            cmd_line = [yum_cmd] + yum_options + ["install"] + block
             subprocess_call(cmd_line, stdout=sys.stderr)
 
-            # No check for downgrade. CFEngine will figure out that it's missing
+            # No final check. CFEngine will figure out that it's missing
             # if it failed.
 
     # ret == 0 doesn't mean we succeeded with everything, but it's expensive to
