@@ -30,8 +30,8 @@ EXTRA_DIST  = README.md
 EXTRA_DIST += lib
 # Distribute all custom test packages and related files
 EXTRA_DIST += 17_packages
-# Also distribute the .cf files and the testall script itself.  TODO
-# this should be set as a dependency to check-local, e.g. with
+# Also distribute the '.cf*' files and the testall script itself.
+# TODO this should be set as a dependency to check-local, e.g. with
 # check-local_SOURCE. Unfortunately I couldn't find a way so that
 # automake would include these files in the dist tarball.
 EXTRA_DIST += testall @MASTERFILES_TESTS@

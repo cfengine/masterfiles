@@ -136,7 +136,7 @@ dnl ######################################################################
 
 AC_MSG_NOTICE([generating makefile targets])
 
-MASTERFILES_TESTS=`cd "$srcdir/tests/acceptance/" && find . -name '*.cf' | xargs`
+MASTERFILES_TESTS=`cd "$srcdir/tests/acceptance/" && find . -name '*.cf*' | xargs`
 AC_SUBST(MASTERFILES_TESTS)
 
 MASTERFILES_INSTALL_TARGETS=`echo $srcdir/*.cf`
