@@ -463,6 +463,9 @@ bundle agent cfe_autorun_inventory_dmidecode
     have_dmidecode::
       "decoder" string => "$(inventory_control.dmidecoder)";
 
+
+    # Redhat 4 can support the -s option to dmidecode if
+    # kernel-utils-2.4-15.el4 or greater is installed.
     have_dmidecode.!(redhat_4|redhat_3)::
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                              "useshell"),
