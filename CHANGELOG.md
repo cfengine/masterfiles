@@ -13,6 +13,8 @@ Notable changes to the framework should be documented here
  - Support for def.json class augmentation in update policy
  - Run vacuum operation on postgresql every night as a part of maintenance.
  - Add measure_promise_time action body to lib (3.5, 3.6, 3.7, 3.8)
+ - New negative class guard `cfengine_internal_disable_agent_email` so that
+   agent email can be easily disabled by augmenting def.json
 
 ### Changed
  - Relocate def.cf to controls/VER/
