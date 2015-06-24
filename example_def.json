@@ -10,6 +10,7 @@
         "my_apt_role": [ "debian.*" ],
         "my_debian_role": [ "debian.*" ],
         "services_autorun": [ "any" ],
+        "cfengine_internal_disable_agent_email": [ "enterprise_edition" ]
     },
 
     "inputs": [ "$(sys.libdir)/bundles.cf" ],

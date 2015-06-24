@@ -14,7 +14,7 @@ body executor control
 
       splaytime  => "4"; # activity will be spread over this many time slices
 
-    cfengine_internal_agent_email::
+    cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
       mailto     => "$(def.mailto)";
       mailfrom   => "$(def.mailfrom)";
       smtpserver => "$(def.smtpserver)";
