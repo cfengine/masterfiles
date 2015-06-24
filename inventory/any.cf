@@ -601,12 +601,12 @@ bundle agent cfe_autorun_inventory_packages
       action => if_elapsed_day;
 
   reports:
-    inform_mode::
-      "$(this.bundle): refresh interval is $(refresh)";
-    inform_mode.have_inventory::
-      "$(this.bundle): we have the inventory files.";
-    inform_mode.!have_inventory::
-      "$(this.bundle): we don't have the inventory files.";
+    DEBUG|DEBUG_cfe_autorun_inventory_packages::
+      "DEBUG $(this.bundle): refresh interval is $(refresh)";
+    (DEBUG|DEBUG_cfe_autorun_inventory_packages).have_inventory::
+      "DEBUG $(this.bundle): we have the inventory files.";
+    (DEBUG|DEBUG_cfe_autorun_inventory_packages).!have_inventory::
+      "DEBUG $(this.bundle): we don't have the inventory files.";
 }
 
 body package_method inventory_apt_get(update_interval)
