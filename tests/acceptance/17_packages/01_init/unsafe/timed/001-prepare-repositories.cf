@@ -1,0 +1,199 @@
+########################################################################
+#
+# Not really a test, but a preparation policy for running other package
+# tests. It sets up the required files for accessing our local package
+# repository.
+# It MUST run before the other tests in the unsafe packages directory.
+#
+########################################################################
+
+body common control
+{
+  inputs => { "../../../../dcs.cf.sub",
+              "../../../../../../$(sys.local_libdir)/files.cf",
+              "../../../../../../$(sys.local_libdir)/commands.cf",
+              "../../../packages-info.cf.sub",
+            };
+  bundlesequence => { default("$(this.promise_filename)") };
+}
+
+bundle agent test
+{
+  meta:
+      "test_skip_needs_work" string => "!redhat.!debian",
+        meta => { "redmine5866" };
+      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
+      "test_skip_unsupported" string => "redhat_4";
+
+  vars:
+      "bundles" slist => { "repositories",
+                           "signing_keys",
+                           "apt_config",
+                           "update"
+                         };
+
+  methods:
+      "any" usebundle => "$(bundles)";
+}
+
+body contain useshell
+{
+  useshell => "useshell";
+}
+
+bundle agent repositories
+{
+  vars:
+    suse::
+      "repo_file" string => "/etc/zypp/repos.d/test-repository.repo";
+      "repos" slist => { "rpm_repo" };
+    redhat::
+      "repo_file" string => "/etc/yum.repos.d/test-repository.repo";
+      "repos" slist => { "rpm_repo" };
+    debian::
+      "repo_file" string => "/etc/apt/sources.list.d/testdebian.list";
+      "repos" slist => { "deb_repo1", "deb_repo2" };
+
+  files:
+      "/test-repos/$(repos)"
+        copy_from => local_cp("$(p.resources)/$(repos)"),
+        depth_search => recurse("inf");
+
+      "$(repo_file)"
+        create => "true",
+        edit_line => repository,
+        edit_defaults => edit_defaults,
+        classes => if_successful("repo_ok");
+
+    # Remove original sources so that we don't hammer the distro servers.
+    debian::
+      "/etc/apt/sources.list"
+        delete => tidy;
+      "/etc/apt/sources.list.d"
+        delete => tidy,
+        depth_search => recurse("inf"),
+        file_select => not_test_source;
+
+    redhat::
+      "/etc/yum.repos.d"
+        delete => tidy,
+        depth_search => recurse("inf"),
+        file_select => not_test_source;
+
+    suse::
+      "/etc/zypp/repos.d"
+        delete => tidy,
+        depth_search => recurse("inf"),
+        file_select => not_test_source;
+}
+
+body file_select not_test_source
+{
+  file_result => "!path_name";
+  path_name => { "$(repositories.repo_file)" };
+}
+
+bundle edit_line repository
+{
+  insert_lines:
+    redhat|suse::
+      "[test-repository]";
+      "name=Test repository";
+      "baseurl=file:///test-repos/rpm_repo";
+      "enabled=1";
+      "gpgcheck=0";
+    debian::
+      "deb file:///test-repos/deb_repo1 package1 main";
+      "deb file:///test-repos/deb_repo2 package2 main";
+}
+
+body edit_defaults edit_defaults
+{
+  edit_backup => "false";
+  empty_file_before_editing => "true";
+}
+
+bundle agent signing_keys
+{
+  classes:
+    !debian::
+      "signing_keys_ok"
+        expression => "any",
+        scope => "namespace";
+
+  files:
+    debian::
+      "$(G.testdir)/."
+        create => "true";
+
+  commands:
+    debian::
+      "gpg --homedir $(G.testdir) --no-default-keyring --keyring $(p.resources)/gpg/pubring.gpg --export \
+       | gpg --homedir $(G.testdir) --no-default-keyring --primary-keyring /etc/apt/trusted.gpg --import"
+        contain => useshell,
+        classes => if_successful("signing_keys_ok");
+}
+
+bundle agent apt_config
+{
+  classes:
+    !(ubuntu_10|debian_6)::
+      "apt_config_ok" expression => "any",
+        scope => "namespace";
+
+  files:
+    ubuntu_10|debian_6::
+      # Work around bug: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=715494
+      # Apt cache does not behave correctly if installing more than one package
+      # per second.
+      "/etc/apt/apt.conf.d/nocache"
+        create => "true",
+        edit_line => no_apt_cache,
+        edit_defaults => empty,
+        classes => if_successful("apt_config_ok");
+}
+
+bundle edit_line no_apt_cache
+{
+  insert_lines:
+      'Dir::Cache::pkgcache "";';
+}
+
+bundle agent update
+{
+  commands:
+    suse::
+      "zypper ref"
+        contain => useshell,
+        classes => if_successful("update_ok");
+    redhat::
+      "yum makecache"
+        contain => useshell,
+        classes => if_successful("update_ok");
+    debian::
+      "apt-get update"
+        contain => useshell,
+        classes => if_successful("update_ok");
+}
+
+body classes if_successful(x)
+{
+  promise_repaired => { "$(x)" };
+  promise_kept     => { "$(x)" };
+}
+
+bundle agent check
+{
+  classes:
+    "everything_ok" and => { "repo_ok",
+                             "signing_keys_ok",
+                             "apt_config_ok",
+                             "update_ok"
+                           };
+
+  reports:
+    everything_ok::
+      "$(this.promise_filename) Pass";
+    !everything_ok::
+      "$(this.promise_filename) FAIL";
+}

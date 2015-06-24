@@ -1,0 +1,48 @@
+Package: test-package-alpha
+Version: 1.0-2
+Architecture: amd64
+Multi-Arch: same
+Essential: no
+Installed-Size: 1024
+Maintainer: cfengine.com
+Priority: optional
+Section: custom
+Filename: pool/main/t/test-package-alpha/test-package-alpha_1.0-2_amd64.deb
+Size: 708
+SHA256: a68989e5db911978e37d130aa84b680423f8b30642c422debad7ad8c1a672cc2
+SHA1: 22bff49b221bc3b52e3f4a3d6420e1fb6455e78c
+MD5sum: 04ee3558d62e12a95dec5351eaa7c7ec
+Description: Debian test package Alpha
+
+Package: test-package-beta
+Version: 1.0-2
+Architecture: amd64
+Multi-Arch: same
+Essential: no
+Installed-Size: 1024
+Maintainer: cfengine.com
+Priority: optional
+Section: custom
+Filename: pool/main/t/test-package-beta/test-package-beta_1.0-2_amd64.deb
+Size: 706
+SHA256: cf2a3bcff06c005353558b7476215dd0582048a9bf84b31065be8442c495f7fa
+SHA1: d1c22bc3b6ffa3f6db00f58caf91372beb8f21dc
+MD5sum: 66304b0bbe2886a6de819aadef4fc695
+Description: Debian test package Beta
+
+Package: test-package-charlie
+Version: 1.0-2
+Architecture: amd64
+Multi-Arch: same
+Essential: no
+Installed-Size: 1024
+Maintainer: cfengine.com
+Priority: optional
+Section: custom
+Filename: pool/main/t/test-package-charlie/test-package-charlie_1.0-2_amd64.deb
+Size: 710
+SHA256: 6a326d2b4656ee28e1aa7845fa24b4b0a43bf62fe2ceaff8977239f54db6c405
+SHA1: dddf2d404ce04ff68b71710fe6fc3ff8f39c6af7
+MD5sum: 1b64c7b4210946b0096eb53124260360
+Description: Debian test package Charlie
+

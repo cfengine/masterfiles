@@ -1,0 +1,67 @@
+bundle common test_meta
+{
+  vars:
+      "description" string => "Test that package inventory is generated properly using package managers";
+      "story_id" string => "5513";
+      "covers" string => "operational_repaired";
+}
+
+body common control
+{
+    inputs => { "../../../dcs.cf.sub",
+                "../../../../../$(sys.local_libdir)/stdlib.cf",
+                "../../../../../$(sys.local_libdir)/packages.cf",
+                "../../../../../inventory/any.cf",
+                "../../packages-info.cf.sub",
+              };
+    bundlesequence => { default($(this.promise_files)) };
+}
+
+bundle agent init
+{
+  meta:
+      "test_skip_needs_work" string => "!redhat.!debian";
+      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
+      # And available patches is an Enterprise feature.
+      "test_skip_unsupported" string => "redhat_4|!enterprise";
+
+  methods:
+      "any" usebundle => clear_packages("dummy");
+      "any" usebundle => install_package("$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy");
+      "any" usebundle => install_package("$(p.name[3])", "$(p.version[$(p.latest_version)])", "$(p.arch)", "dummy");
+}
+
+bundle agent test
+{
+  methods:
+      "any" usebundle => inventory_autorun;
+}
+
+bundle agent check
+{
+  vars:
+      "inst" string => "$(sys.workdir)/state/software_packages.csv";
+      "inst_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
+      "inst_matches" int => countlinesmatching("$(inst_expr)", "$(inst)");
+
+      "upd" string => "$(sys.workdir)/state/software_patches_avail.csv";
+      "upd_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
+      "upd_matches" int => countlinesmatching("$(upd_expr)", "$(upd)");
+
+  classes:
+      # Should match all packages except the second one.
+      "inst_ok" expression => strcmp("$(inst_matches)", "2");
+      # Should only match the first package.
+      "upd_ok" expression => strcmp("$(upd_matches)", "1");
+
+      "ok" and => { "inst_ok", "upd_ok" };
+
+  reports:
+    DEBUG::
+      "Install matches: $(inst_matches)";
+      "Update matches: $(upd_matches)";
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}

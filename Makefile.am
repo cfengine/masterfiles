@@ -1,5 +1,5 @@
 SUBDIRS = \
-	modules/packages
+	modules/packages \
 	tests/unit
 
 if HAVE_CORE

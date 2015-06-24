@@ -1,0 +1,104 @@
+#######################################################
+#
+# Test installation of package from local repo
+#
+#######################################################
+
+body common control
+{
+    inputs => {
+                "../../../dcs.cf.sub",
+                "../../../../../$(sys.local_libdir)/stdlib.cf",
+                "../../../../../$(sys.local_libdir)/packages.cf",
+                "../../packages-info.cf.sub",
+              };
+    bundlesequence  => { default("$(this.promise_filename)") };
+    version => "1.0";
+    cache_system_functions => "no";
+}
+
+#######################################################
+
+bundle agent init
+{
+  meta:
+      "test_skip_needs_work" string => "!redhat.!debian",
+        meta => { "redmine5866" };
+      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
+      "test_skip_unsupported" string => "redhat_4";
+
+  methods:
+    "clear_packages" usebundle => clear_packages("dummy");
+}
+
+#######################################################
+
+bundle agent test
+{
+
+    vars:
+
+        "package_name" string => "$(p.name[3])";
+        "package_version" string => "$(p.version[1])";
+        "cwd" string => execresult("/bin/pwd", "noshell");
+
+    packages:
+
+        debian::
+
+            "$(package_name)"
+            classes => test_set_class("pass","fail"),
+            package_policy => "add",
+            package_select => "==",
+            package_version => "$(package_version)",
+            package_architectures => { "$(p.arch)" },
+            package_method => dpkg_version("$(p.resources)/file_repo");
+
+        redhat|suse::
+
+            "$(package_name)"
+            classes => test_set_class("pass","fail"),
+            package_policy => "add",
+            package_select => "==",
+            package_version => "$(package_version)",
+            package_architectures => { "$(p.arch)" },
+            package_method => rpm_version("$(p.resources)/rpm_repo");
+
+
+
+}
+
+
+
+body classes test_set_class(ok_class,notok_class)
+{
+    promise_kept => { "$(ok_class)" };
+    promise_repaired => { "$(ok_class)" };
+    repair_failed => { "$(notok_class)" };
+}
+
+#######################################################
+
+bundle agent check
+{
+
+    classes:
+
+        debian::
+            "has_pkg" expression => returnszero("dpkg -l | grep ' $(test.package_name) ' > /dev/null", "useshell");
+
+        redhat|suse::
+            "has_pkg" expression => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
+
+        any::
+            "has_file" expression => fileexists("$(p.file[3][1])");
+            "ok" expression => "pass.!fail.has_pkg.has_file";
+
+    reports:
+      ok::
+        "$(this.promise_filename) Pass";
+      !ok::
+        "$(this.promise_filename) FAIL";
+}
+
+

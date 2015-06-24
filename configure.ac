@@ -12,6 +12,8 @@ define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
 
 AC_INIT([cfengine-masterfiles], [3.8.0a1.revision])
 
+AC_CANONICAL_TARGET
+
 _AM_SET_OPTION([tar-ustar])
 AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE([enable])
@@ -111,6 +113,11 @@ AS_IF([test x"$prefix" = xNONE],
 )
 datadir=${prefix}/masterfiles
 
+dnl ######################################################################
+dnl OS specific stuff
+dnl ######################################################################
+
+m4_include([m4/cf3_platforms.m4])
 
 dnl ######################################################################
 dnl Print summary
@@ -159,7 +166,8 @@ dnl ######################################################################
 
 AC_CONFIG_FILES([Makefile
                 modules/packages/Makefile
-                tests/acceptance/Makefile])
+                tests/acceptance/Makefile
+                tests/unit/Makefile])
 
 AC_OUTPUT
 
