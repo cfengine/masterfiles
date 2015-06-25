@@ -143,18 +143,30 @@ dnl ######################################################################
 
 AC_MSG_NOTICE([generating makefile targets])
 
-MASTERFILES_TESTS=`cd "$srcdir/tests/acceptance/" && find . -name '*.cf*' | xargs`
+# Do not try to unroll these for loops by putting the find commands directly in
+# the assignments, it will overflow on the Solaris and HP-UX shells.
+MASTERFILES_TESTS=''
+for i in `cd "$srcdir/tests/acceptance/" && find . -name '*.cf*'`
+do
+    MASTERFILES_TESTS="$MASTERFILES_TESTS $i"
+done
 AC_SUBST(MASTERFILES_TESTS)
 
 MASTERFILES_INSTALL_TARGETS=`echo $srcdir/*.cf`
 
 for i in cfe_internal controls inventory lib services sketches/meta update
 do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.cf' | xargs`"
+    for j in `find "$srcdir/$i" -name '*.cf'`
+    do
+        MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
+    done
 done
 for i in templates
 do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.mustache' | xargs`"
+    for j in `find "$srcdir/$i" -name '*.mustache'`
+    do
+        MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
+    done
 done
 
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
