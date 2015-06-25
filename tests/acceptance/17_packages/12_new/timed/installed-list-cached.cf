@@ -9,7 +9,7 @@ body common control
 bundle agent init
 {
   meta:
-    "test_skip_needs_work" string => "windows";
+    "test_skip_needs_work" string => "!linux";
 
   files:
     test_pass_1::
