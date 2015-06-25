@@ -143,18 +143,18 @@ dnl ######################################################################
 
 AC_MSG_NOTICE([generating makefile targets])
 
-MASTERFILES_TESTS=`cd "$srcdir/tests/acceptance/" && find . -name '*.cf*' | xargs`
+MASTERFILES_TESTS=`cd "$srcdir/tests/acceptance/" && find . -name '*.cf*' | xargs | sed -e 's/\n/ /g'`
 AC_SUBST(MASTERFILES_TESTS)
 
 MASTERFILES_INSTALL_TARGETS=`echo $srcdir/*.cf`
 
 for i in cfe_internal controls inventory lib services sketches/meta update
 do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.cf' | xargs`"
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.cf' | xargs | sed -e 's/\n/ /g'`"
 done
 for i in templates
 do
-    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.mustache' | xargs`"
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `find "$srcdir/$i" -name '*.mustache' | xargs | sed -e 's/\n/ /g'`"
 done
 
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
