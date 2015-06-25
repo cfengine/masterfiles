@@ -23,6 +23,11 @@ bundle common inventory_debian
       "mint_release" string  => "$(mint_info[RELEASE][1])" ;
       "mint_codename" string => "$(mint_info[CODENAME][1])" ;
 
+    init_is_link::
+      "init_link_destination"
+          string => filestat("/sbin/init","linktarget") ;
+
+
   classes:
     any::
       "debian_derived_evaluated"
@@ -82,6 +87,12 @@ bundle common inventory_debian
       comment => "derived from Debian",
       meta => { "inventory", "attribute_name=none" };
 
+    init_is_link::
+      "systemd"
+          expression => regcmp("/lib/systemd/systemd",
+                               "$(init_link_destination)"),
+          comment => "Check if /sbin/init links to systemd" ;
+
     any::
       "has_lsb_release" expression => fileexists("/etc/lsb-release"),
       comment => "Check if we can get more info from /etc/lsb-release";
@@ -89,4 +100,7 @@ bundle common inventory_debian
       "has_etc_linuxmint_info" expression => fileexists("/etc/linuxmint/info"),
       comment => "If this is a Linux Mint system, this *could* be available";
 
+      "init_is_link"
+          expression => islink("/sbin/init"),
+          comment => "Detect if init is a link" ;
 }
