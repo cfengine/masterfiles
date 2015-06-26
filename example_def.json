@@ -11,6 +11,7 @@
         "my_debian_role": [ "debian.*" ],
         "services_autorun": [ "any" ],
         "cfengine_internal_disable_agent_email": [ "enterprise_edition" ]
+        "cfe_internal_core_watchdog_enabled": [ "any" ],
     },
 
     "inputs": [ "$(sys.libdir)/bundles.cf" ],

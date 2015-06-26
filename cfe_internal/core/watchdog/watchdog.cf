@@ -1,0 +1,66 @@
+bundle agent cfe_internal_core_watchdog(state)
+# @breif Configure external watchdog processes to keep cf-execd running
+# @param state (enabled|disabled) The state to keep the watchdog configuration in
+{
+  meta:
+    "description"
+      string => "Configure external watchdog processes (like cron, or monit) to
+                 make sure that cf-execd is always running";
+
+  classes:
+    any::
+
+      "have_cron_d"
+        expression => isdir("/etc/cron.d");
+
+      "invalid_state"
+        not => regcmp("(enabled|disabled)", "$(state)");
+
+    !invalid_state::
+
+      # Define a class for whatever the desired state is so long as the state is
+      # valid
+
+      "$(state)"
+        expression => "any";
+
+  vars:
+    any::
+
+      "cf_execd"
+        string => ifelse("windows", translatepath('"$(sys.bindir)/cf-execd.exe)"'),
+                         "$(sys.bindir)/cf-execd");
+
+      "template"
+        string => "$(this.promise_dirname)/../../../templates/cfengine_watchdog.mustache";
+
+    have_cron_d::
+
+      "cron_d_watchdog" string => "/etc/cron.d/cfengine_watchdog";
+
+  files:
+
+    enabled.have_cron_d::
+
+      "$(cron_d_watchdog)"
+        create => "true";
+
+      "$(cron_d_watchdog)"
+        edit_defaults => empty,
+        edit_template => "$(template)",
+        handle => "cfe_internal_core_watchdog_enable_cron_d_file_content",
+        template_method => "mustache";
+
+    disabled.have_cron_d::
+
+      "$(cron_d_watchdog)"
+        delete => tidy;
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_core_watchdog::
+      "DEBUG $(this.bundle): Watchdog '$(state)'";
+      "DEBUG $(this.bundle): Have /etc/cron.d/."
+        ifvarclass => "have_cron_d";
+      "DEBUG $(this.bundle): Invalid state '$(state)' only enabled|disabled allowed"
+        ifvarclass => "invalid_state";
+}
