@@ -10,6 +10,7 @@
         "my_apt_role": [ "debian.*" ],
         "my_debian_role": [ "debian.*" ],
         "services_autorun": [ "any" ],
+        "cfe_internal_core_watchdog_enabled": [ "any" ],
     },
 
     "inputs": [ "$(sys.libdir)/bundles.cf" ],

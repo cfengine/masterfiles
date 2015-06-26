@@ -1,0 +1,5 @@
+# This file is managed by CFEngine
+{{#classes.have_cron_d}}
+# If cf-execd is executable and if no process matching cf-execd can be found then restart cf-execd
+* * * * * root [ -x {{{vars.cfe_internal_core_watchdog.cf_execd}}} ] && if ! pgrep cf-execd > /dev/null; then {{{vars.cfe_internal_core_watchdog.cf_execd}}} {{{vars.cfe_internal_core_watchdog.cf_execd_options}}}; fi
+{{/classes.have_cron_d}}
