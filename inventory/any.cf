@@ -517,8 +517,8 @@ bundle agent cfe_autorun_inventory_dmidecode
                                               "system_array");
 
   reports:
-    inform_mode::
-      "$(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
+    DEBUG|DEBUG_cfe_autorun_inventory_dmidecode::
+      "DEBUG $(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
 }
 
 bundle agent cfe_autorun_inventory_LLDP
@@ -601,12 +601,12 @@ bundle agent cfe_autorun_inventory_packages
       action => if_elapsed_day;
 
   reports:
-    inform_mode::
-      "$(this.bundle): refresh interval is $(refresh)";
-    inform_mode.have_inventory::
-      "$(this.bundle): we have the inventory files.";
-    inform_mode.!have_inventory::
-      "$(this.bundle): we don't have the inventory files.";
+    DEBUG|DEBUG_cfe_autorun_inventory_packages::
+      "DEBUG $(this.bundle): refresh interval is $(refresh)";
+      "DEBUG $(this.bundle): we have the inventory files.";
+        ifvarclass => "have_inventory";
+      "DEBUG $(this.bundle): we don't have the inventory files.";
+        ifvarclass => "!have_inventory";
 }
 
 body package_method inventory_apt_get(update_interval)
@@ -797,13 +797,15 @@ bundle agent inventory_cmdb_load(file)
       "ckeys" slist => getindices("cmdb[classes]");
 
   reports:
-    inform_mode.have_cmdb_data::
-      "$(this.bundle): Got CMDB data from $(file): $(cmdb_string)";
-    verbose_mode.have_cmdb_data::
-      "$(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))";
-      "$(this.bundle): Got CMDB class = $(ckeys)";
-    inform_mode.!have_cmdb_data::
-      "$(this.bundle): Could not read the CMDB data from $(file)";
+    DEBUG|DEBUG_inventory_cmdb_load::
+      "DEBUG $(this.bundle): Got CMDB data from $(file): $(cmdb_string)";
+        ifvarclass => "have_cmdb_data";
+      "DEBUG $(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))";
+        ifvarclass => "have_cmdb_data";
+      "DEBUG $(this.bundle): Got CMDB class = $(ckeys)";
+        ifvarclass => "have_cmdb_data";
+      "DEBUG $(this.bundle): Could not read the CMDB data from $(file)";
+        ifvarclass => "!have_cmdb_data";
 }
 
 body copy_from inventory_cmdb_copy_from
