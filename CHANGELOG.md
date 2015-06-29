@@ -6,6 +6,7 @@ Notable changes to the framework should be documented here
  - CHANGELOG.md
  - Support for user specified overring of framework defaults without modifying
    policy supplied by the framework itself (see example_def.json)
+ - Support for def.json class augmentation in update policy
 
 ### Changed
  - Relocate def.cf to controls/VER/
