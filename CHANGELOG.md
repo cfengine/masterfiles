@@ -30,6 +30,7 @@ Notable changes to the framework should be documented here
    intended to be a user entry. This name change correlates with the main
    bundle being activated by default if there is no bundlesequence specified.
  - Reduce benchmarks sample history to 1 day.
+ - Update policy no longer generates a keypair if one is not found. (Redmine: #7167)
 
 ### Deprecated
 
