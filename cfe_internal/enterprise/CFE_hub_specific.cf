@@ -132,7 +132,6 @@ bundle agent cfe_internal_apache_sudoer
       edit_line => apache_sudoer;
 
   reports:
-    inform_mode.!cfengine_internal_sudoers_editing_enable::
     (DEBUG|DEBUG_cfengine_internal_apache_sudoer).!cfengine_internal_sudoers_editing_enable::
       "DEBUG $(this.bundle): Editing of the sudoers file is disabled. The Apache user
        may not be able to run passwordless sudo cf-runagent";
