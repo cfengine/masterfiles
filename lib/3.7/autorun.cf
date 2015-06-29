@@ -18,6 +18,6 @@ bundle agent autorun
       "autorun" usebundle => $(sorted_bundles);
 
   reports:
-    services_autorun.verbose_mode::
-      "$(this.bundle): found bundle $(sorted_bundles) with tag 'autorun'";
+    DEBUG|DEBUG_autorun|DEBUG_services_autorun::
+      "DEBUG $(this.bundle): found bundle $(sorted_bundles) with tag 'autorun'";
 }

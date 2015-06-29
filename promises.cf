@@ -271,8 +271,12 @@ bundle common services_autorun
       "bundles" slist => { "autorun" }; # run loaded bundles
 
   reports:
-    verbose_mode::
-      "$(this.bundle): defining inputs='$(inputs)'";
+    DEBUG|DEBUG_services_autorun::
+      "DEBUG $(this.bundle): adding input='$(inputs)'"
+        ifvarclass => isvariable("inputs");
+
+      "DEBUG $(this.bundle): adding input='$(found_inputs)'"
+        ifvarclass => isvariable("found_inputs");
 }
 
 
