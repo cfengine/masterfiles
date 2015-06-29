@@ -33,7 +33,7 @@ bundle agent feature
       "_$(off)" string => "off", classes => feature_cancel("$(extract_$(off)[1])");
 
   reports:
-    inform_mode::
+    "DEBUG|DEBUG_$(this.bundle)"::
       "$(this.bundle): $(on) => SET class '$(extract_$(on)[2]) for '$(extract_$(on)[1])'"
       ifvarclass => "parsed_$(on)";
 

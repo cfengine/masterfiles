@@ -31,6 +31,7 @@ Notable changes to the framework should be documented here
    bundle being activated by default if there is no bundlesequence specified.
  - Reduce benchmarks sample history to 1 day.
  - Update policy no longer generates a keypair if one is not found. (Redmine: #7167)
+ - inform_mode classes changed to DEBUG|DEBUG_$(this.bundle):: (Redmine: #7191)
 
 ### Deprecated
 

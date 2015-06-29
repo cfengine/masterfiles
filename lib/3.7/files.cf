@@ -2028,8 +2028,8 @@ bundle agent file_tidy(file)
       "$(file)" delete => tidy;
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): deleting $(file) with delete => tidy";
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): deleting $(file) with delete => tidy";
 }
 
 bundle agent dir_sync(from, to)
@@ -2051,8 +2051,8 @@ bundle agent dir_sync(from, to)
       copy_from => copyfrom_sync($(from));
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): copying directory $(from) to $(to)";
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): copying directory $(from) to $(to)";
 }
 
 bundle agent file_copy(from, to)
@@ -2072,8 +2072,8 @@ bundle agent file_copy(from, to)
       copy_from => copyfrom_sync($(from));
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): copying file $(from) to $(to)";
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): copying file $(from) to $(to)";
 }
 
 body copy_from copyfrom_sync(f)
@@ -2116,11 +2116,11 @@ bundle agent file_make(file, str)
       edit_defaults => empty;
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): creating $(file) with contents '$(str)'"
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): creating $(file) with contents '$(str)'"
       ifvarclass => "!summarize";
 
-      "$(this.bundle): creating $(file) with contents '$(summary)'"
+      "DEBUG $(this.bundle): creating $(file) with contents '$(summary)'"
       ifvarclass => "summarize";
 }
 
@@ -2157,11 +2157,11 @@ bundle agent file_make_mog(file, str, mode, owner, group)
       edit_defaults => empty;
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): creating $(file) with contents '$(str)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): creating $(file) with contents '$(str)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
       ifvarclass => "!summarize";
 
-      "$(this.bundle): creating $(file) with contents '$(summary)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
+      "DEBUG $(this.bundle): creating $(file) with contents '$(summary)', mode '$(mode)', owner '$(owner)' and group '$(group)'"
       ifvarclass => "summarize";
 }
 
@@ -2182,8 +2182,8 @@ bundle agent file_empty(file)
       edit_defaults => empty;
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): creating empty $(file) with 0 size";
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): creating empty $(file) with 0 size";
 }
 
 bundle agent file_hardlink(target, link)
@@ -2204,8 +2204,8 @@ bundle agent file_hardlink(target, link)
       link_from => linkfrom($(target), "hardlink");
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): $(link) will be a hard link to $(target)";
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): $(link) will be a hard link to $(target)";
 }
 
 bundle agent file_link(target, link)
@@ -2226,6 +2226,6 @@ bundle agent file_link(target, link)
       link_from => linkfrom($(target), "symlink");
 
   reports:
-    inform_mode|EXTRA::
-      "$(this.bundle): $(link) will be a symlink to $(target)";
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): $(link) will be a symlink to $(target)";
 }

@@ -2140,6 +2140,6 @@ bundle agent package_specific(package_name, desired, package_version, package_ar
       package_method => generic;
 
   reports:
-    (inform_mode||verbose_mode).filebased.!suse.!debian.!redhat.!aix.!solaris_pkgadd::
-      "$(this.bundle): sorry, can't do file-based installs on $(sys.os)";
+    "(DEBUG|DEBUG_$(this.bundle)).filebased.!suse.!debian.!redhat.!aix.!solaris_pkgadd"::
+      "DEBUG $(this.bundle): sorry, can't do file-based installs on $(sys.os)";
 }
