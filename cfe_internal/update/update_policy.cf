@@ -121,10 +121,6 @@ bundle agent cfe_internal_update_policy
 
     any::
 
-      "have_ppkeys"   expression => fileexists("$(ppkeys_file)"),
-      comment => "Check for $(sys.workdir)/ppkeys/localhost.pub",
-      handle => "cfe_internal_update_policy_classes_have_ppkeys";
-
       "local_files_ok" expression => fileexists("$(file_check)"),
       comment => "Check for $(sys.masterdir)/promises.cf",
       handle => "cfe_internal_update_classes_files_ok";
@@ -136,13 +132,6 @@ bundle agent cfe_internal_update_policy
       #
 
   commands:
-
-    !have_ppkeys::
-
-      "$(sys.cf_key)"
-      comment => "Generate cfengine encryption keys if necessary",
-      classes => u_kept_successful_command,
-      handle => "cfe_internal_update_policy_commands_generate_keys";
 
     am_policy_hub.update_report::
 
