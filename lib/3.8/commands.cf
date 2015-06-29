@@ -66,8 +66,8 @@ bundle agent daemonize(command)
         contain => in_shell;
 
   reports:
-    windows.(inform_mode|verbose_mode)::
-      "$(this.bundle): This bundle does not support Windows";
+    "windows.(DEBUG|DEBUG_$(this.bundle))"::
+      "DEBUG $(this.bundle): This bundle does not support Windows";
 }
 
 ##-------------------------------------------------------
