@@ -31,6 +31,8 @@ Notable changes to the framework should be documented here
    bundle being activated by default if there is no bundlesequence specified.
  - Reduce benchmarks sample history to 1 day.
  - Update policy no longer generates a keypair if one is not found. (Redmine: #7167)
+ - Relocate cfe_internal_postgresql_maintenance bundle to lib/VER/
+ - Set postgresql_monitoring_maintenance only for versions 3.6.0 and 3.6.1
 
 ### Deprecated
 

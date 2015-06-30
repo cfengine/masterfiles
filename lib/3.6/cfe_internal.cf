@@ -234,3 +234,48 @@ bundle agent cfe_internal_cleanup_agent_reports
         delete => tidy,
         handle => "cf_cleanup_agent_reports_$(report_files)";
 }
+
+bundle agent cfe_internal_postgresql_maintenance
+#@ignore
+#@brief PostgreSQL needs to be cleaned regularly with the vacuumdb command
+{
+  vars:
+
+      "postgres_vacuum_options" string => ifelse("postgresql_full_maintenance", "--full --dbname=cfdb", "--full --dbname=cfdb --table=__monitoringmg");
+      "maintenance_type" string => ifelse("postgresql_full_maintenance", "full", "monitoring_only");
+
+      "vacuumdb_cmd" string => "$(sys.bindir)/vacuumdb $(postgres_vacuum_options)",
+      comment => "Command for cleaning a PostgreSQL database - $(maintenance_type)",
+      handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd_$(maintenance_type)";
+
+    policy_server.enterprise.!cfengine_3_5::
+      "cf_consumer_pid" string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
+      comment => "Read cf-consumer.pid for the main cf-consumer PID";
+
+  classes:
+      "cf_consumer_pid_correct" expression => isvariable("cf_consumer_pid"),
+      comment => "Check if cf-consumer pid is correctly defined";
+
+  processes:
+
+    any::
+
+      "cf-hub"      signals => { "term" },
+      comment => "Terminate cf-hub while doing $(maintenance_type) PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_term_cf_hub";
+
+    cf_consumer_pid_correct::
+      "cf-consumer" signals => { "kill" },
+      process_select => by_pid("$(cf_consumer_pid)"),
+      comment => "Kill cf-consumer while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_kill_cf_consumer";
+
+  commands:
+
+    any::
+
+      "$(vacuumdb_cmd)"
+      comment => "Run $(maintenance_type) vacuumdb command",
+      classes => kept_successful_command,
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_$(maintenance_type)";
+}

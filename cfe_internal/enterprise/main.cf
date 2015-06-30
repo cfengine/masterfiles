@@ -49,6 +49,7 @@ bundle agent cfe_internal_enterprise_main
       "hub" usebundle => cfe_internal_hub_maintain,
       handle => "cfe_internal_management_hub_maintain",
       comment => "Start the hub maintenance process";
+      
       "hub" usebundle => cfe_internal_truncate_events,
       handle => "cfe_internal_truncate_events",
       comment => "To run CFE truncate to pending";
