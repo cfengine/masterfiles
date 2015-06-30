@@ -324,5 +324,20 @@ bundle agent cfe_internal_postgresql_maintenance
       "$(vacuum_cfdb_cmd)"
       comment => "Run vacuum db full command (database: cfdb)",
       classes => kept_successful_command,
-      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_$(maintenance_type)";
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_full";
+}
+
+bundle agent cfe_internal_postgresql_vacuum
+#@ignore
+#@brief Vacuum (with analyze) over cfdb database.
+{
+  vars:
+      "vacuum_cfdb_cmd" 
+      string => "$(sys.bindir)/vacuumdb --analyze --quiet --dbname=cfdb",
+      comment => "Vacuum command with update statistics enabled";
+
+  commands:
+      "$(vacuum_cfdb_cmd)"
+      comment => "Run vacuum db command (database: cfdb)",
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb";
 }
