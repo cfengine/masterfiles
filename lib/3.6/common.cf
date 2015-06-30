@@ -88,6 +88,16 @@ body action measure_performance(x)
 
 ##
 
+body action measure_promise_time(identifier)
+# @brief Performance will be measured and recorded under identifier
+#
+# @param identifier Measurement name.
+{
+      measurement_class => "$(identifier)";
+}
+
+##
+
 body action warn_only
 # @brief Warn once an hour if the promise needs to be repaired
 #

@@ -80,6 +80,13 @@ body action measure_performance(x)
 
 ##
 
+body action measure_promise_time(identifier)
+{
+      measurement_class => "$(identifier)";
+}
+
+##
+
 body action warn_only
 {
       action_policy => "warn";
