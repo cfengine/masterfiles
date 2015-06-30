@@ -281,9 +281,6 @@ bundle common def
 
       "postgresql_full_maintenance" expression => "postgresql_maintenance_supported.Sunday.Hr02.Min00_05";
 
-      # Vacuum monitoring_mg table every day (except Sunday, when vacuum is run on entire db)
-      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
-
       # Enable CFEngine Enterprise HA Policy
       "enable_cfengine_enterprise_hub_ha" expression => "!any";
       #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";

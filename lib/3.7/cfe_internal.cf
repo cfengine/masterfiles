@@ -285,3 +285,44 @@ bundle agent cfe_internal_database_partitioning()
       contain => silent,
       handle => "cf_database_create_partition_promise_log_$(promise_outcome)";
 }
+
+bundle agent cfe_internal_postgresql_maintenance
+#@ignore
+#@brief Vacuum Full PostgreSQL for maintenance
+{
+  vars:
+      "vacuum_cfdb_cmd" string => "$(sys.bindir)/vacuumdb --full --dbname=cfdb",
+      comment => "Vacuum Full PostgreSQL (database: cfdb)",
+      handle => "cfe_internal_postgresql_maintenance_vacuum_full";
+
+    policy_server.enterprise.!cfengine_3_5::
+      "cf_consumer_pid" string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
+      comment => "Read cf-consumer.pid for the main cf-consumer PID";
+
+  classes:
+      "cf_consumer_pid_correct" expression => isvariable("cf_consumer_pid"),
+      comment => "Check if cf-consumer pid is correctly defined";
+
+  processes:
+
+    any::
+
+      "cf-hub"      signals => { "term" },
+      comment => "Terminate cf-hub while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
+
+    cf_consumer_pid_correct::
+      "cf-consumer" signals => { "kill" },
+      process_select => by_pid("$(cf_consumer_pid)"),
+      comment => "Kill cf-consumer while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_maintenance_processes_kill_cf_consumer";
+
+  commands:
+
+    any::
+
+      "$(vacuum_cfdb_cmd)"
+      comment => "Run vacuum db full command (database: cfdb)",
+      classes => kept_successful_command,
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_$(maintenance_type)";
+}
