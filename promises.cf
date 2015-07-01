@@ -156,6 +156,11 @@ bundle common cfe_internal_inputs
         comment => "This policy produces a text based host info report
                     and serves as a functional example of using mustache templates";
 
+      "input[cfengine_internal_core_watchdog]"
+        string => "cfe_internal/core/watchdog/watchdog.cf",
+        comment => "This policy configures external watchdogs to ensure that
+                    cf-execd is always running.";
+
     enterprise_edition::
 
       "input[enterprise_hub_specific]"
