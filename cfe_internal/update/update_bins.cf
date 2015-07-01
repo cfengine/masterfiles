@@ -60,7 +60,7 @@ bundle agent cfe_internal_update_bins
       # BACKUP and RESTORE status is $(const.dollar)1 variable in the script
       # see more details at bundle edit_line u_backup_script
 
-      "backup_script"   string => "/tmp/backup.sh";
+      "backup_script"   string => "/tmp/cf-upgrade_backup.sh";
 
       # a single compressed backup file for cf-upgrade
       # this backup_file is passed to backup_script as $(const.dollar)2 variable
@@ -72,7 +72,7 @@ bundle agent cfe_internal_update_bins
       # each distribution has its own way to upgrade a package
       # see more details at bundle edit_line u_install_script
 
-      "install_script"  string => "/tmp/install.sh";
+      "install_script"  string => "/tmp/cf-upgrade_install.sh";
 
     (solarisx86|solaris).enterprise::
 
@@ -80,7 +80,7 @@ bundle agent cfe_internal_update_bins
       # admin_file is a must to have to avoid pop-up interaction
       # see more details at bundle edit_line u_admin_file
 
-      "admin_file"      string => "/tmp/admin_file";
+      "admin_file"      string => "/tmp/cf-upgrade_admin_file";
 
     (solarisx86|solaris).enterprise::
 
