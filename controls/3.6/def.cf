@@ -282,7 +282,7 @@ bundle common def
 
       # Vacuum full monitoring_mg table every day (except Sunday, when vacuum full is run on entire db)
       # Required only by CFEngine Enterprise Hub 3.6.0 and 3.6.1
-      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05.(nova_3_6_0|nova_3_6_1)";
+      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05.(cfengine_3_6_0|cfengine_3_6_1)";
 
       # Run vacuum job on database
       # pre-defined to every night except Sunday when full cleanup is executed.
