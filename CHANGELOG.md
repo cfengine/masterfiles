@@ -35,6 +35,8 @@ Notable changes to the framework should be documented here
  - Update policy no longer generates a keypair if one is not found. (Redmine: #7167)
  - Relocate cfe_internal_postgresql_maintenance bundle to lib/VER/
  - Set postgresql_monitoring_maintenance only for versions 3.6.0 and 3.6.1
+ - Move hub specific bundles from lib/VER/cfe_internal.cf into lib/VER/cfe_internal_hub.cf
+   and load them only if policy_server policy if set.
 
 ### Deprecated
 
