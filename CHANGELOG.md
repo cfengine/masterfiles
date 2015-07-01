@@ -38,6 +38,7 @@ Notable changes to the framework should be documented here
  - Diff reporting on /etc/shadow (Enterprise)
  - Update policy from promise.cf inputs. There is no reason to include the
    update policy into promsies.cf, update.cf is the entry for the update policy
+ - _not_repaired outcome from classes_generic and scoped_classes generic (Redmine: # 7022)
 
 ### Fixed
  - standard_services now restarts the service if it was not already running
