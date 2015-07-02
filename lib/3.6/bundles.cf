@@ -416,3 +416,51 @@ bundle agent run_ifdefined(namespace, mybundle)
     verbose_mode::
       "$(this.bundle): found matching bundles $(bundlesfound) for namespace '$(namespace)' and bundle '$(mybundle)'";
 }
+bundle agent sysctl(settings_array)
+# @brief bundle to set and load sysctl settings
+# @param name of array containing sysctl settings
+#
+# This bundle is a wrapper around set_variable_values 
+# targetting /etc/sysctl.conf. It runs sysctl -p after
+# editing sysctl.conf, to load the new values.
+# Contributed by Aleksey Tsalolikhin, 2 July 2015
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent example
+# {
+#   vars:
+#       "sysctl_settings[vm.swappiness]"         string => "4";
+#       "sysctl_settings[net.core.rmem_max]"     string => "4194304";
+#       "sysctl_settings[net.core.rmem_default]" string => "4194304";
+#
+#   methods:
+#       "Edit and reload /etc/sysctl.conf" usebundle => sysctl("$(this.bundle).sysctl_settings");
+# }
+#
+# ```
+{
+  vars:
+      "sysctl_conf" string => "/etc/sysctl.conf";
+
+    DEBUG|verbose_mode::
+      "keys" slist => getindices("$(settings_array)");
+
+  files:
+      "$(sysctl_conf)"
+        edit_line     => set_variable_values("$(settings_array)"),
+        edit_defaults => backup_timestamp,
+        classes       => if_repaired("reinit_sysctl");
+
+  commands:
+    reinit_sysctl::
+      "$(paths.path[sysctl]) -p $(sysctl_conf)";
+
+  reports:
+    DEBUG|verbose_mode::
+      "array name = $(settings_array)";
+      "$(this.bundle): $(settings_array): $(keys) = $($(settings_array)[$(keys)])";
+    (DEBUG|verbose_mode).reinit_sysctl::
+      "$(this.bundle): Edited and reloaded $(sysctl_conf)";
+}
