@@ -79,3 +79,11 @@ bundle common cfengine_enterprise_hub_ha
 bundle agent cfe_internal_cleanup_agent_reports {}
 # @ignore
 # @brief cleanup accumulated agent reports if they grow too large (do not apply for cfengine < 3.6.0)
+
+bundle agent cfe_internal_postgresql_maintenance {}
+#@ignore
+#@brief PostgreSQL needs to be cleaned regularly with the vacuumdb command (do not apply for cfengine < 3.6.0)
+
+bundle agent cfe_internal_postgresql_vacuum {}
+#@ignore
+#@brief Vacuum (with analyze) over cfdb database. (do not apply for cfengine < 3.6.0)

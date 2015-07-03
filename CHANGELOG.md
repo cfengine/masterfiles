@@ -7,6 +7,8 @@ Notable changes to the framework should be documented here
  - Support for user specified overring of framework defaults without modifying
    policy supplied by the framework itself (see example_def.json)
  - Support for def.json class augmentation in update policy
+ - Run vacuum operation on postgresql every night as a part of maintenance.
+ - Add measure_promise_time action body to lib (3.5, 3.6, 3.7, 3.8)
 
 ### Changed
  - Relocate def.cf to controls/VER/
@@ -31,6 +33,10 @@ Notable changes to the framework should be documented here
    bundle being activated by default if there is no bundlesequence specified.
  - Reduce benchmarks sample history to 1 day.
  - Update policy no longer generates a keypair if one is not found. (Redmine: #7167)
+ - Relocate cfe_internal_postgresql_maintenance bundle to lib/VER/
+ - Set postgresql_monitoring_maintenance only for versions 3.6.0 and 3.6.1
+ - Move hub specific bundles from lib/VER/cfe_internal.cf into lib/VER/cfe_internal_hub.cf
+   and load them only if policy_server policy if set.
 
 ### Deprecated
 

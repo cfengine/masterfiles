@@ -1,0 +1,266 @@
+############################################################################
+#  Copyright (C) CFEngine AS
+#
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License LGPL as published by the
+#  Free Software Foundation; version 3.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  To the extent this program is licensed as part of the Enterprise
+#  versions of CFEngine, the applicable Commercial Open Source License
+#  (COSL) may apply to this file if you as a licensee so wish it. See
+#  included file COSL.txt.
+###########################################################################
+#
+# CFEngine Community Open Promise-Body Library
+#
+# This initiative started by CFEngine promotes a
+# standardized set of names and promise specifications
+# for template functionality within CFEngine 3.
+#
+# The aim is to promote an industry standard for
+# naming of configuration patterns, leading to a
+# de facto middleware of standardized syntax.
+#
+# Names should be intuitive and parameters should be
+# minimal to assist readability and comprehensibility.
+
+# Contributions to this file are voluntarily given to
+# the cfengine community, and are moderated by CFEngine.
+# No liability or warranty for misuse is implied.
+#
+# If you add to this file, please try to make the
+# contributions "self-documenting". Comments made
+# after the bundle/body statement are retained in
+# the online docs
+#
+
+# For CFEngine Core: 3.6.0 to 3.6.x
+# Internal hub maintenance bundles, incompatible with 3.5.x
+
+###################################################
+# If you find CFEngine useful, please consider    #
+# purchasing a commercial version of the software.#
+###################################################
+
+bundle common cfe_internal_hub_common
+# @ignore
+{
+  vars:
+      "inputs" slist => { "$(this.promise_dirname)/common.cf",
+                          "$(this.promise_dirname)/commands.cf"};
+}
+
+body file control
+# @ignore
+{
+      inputs => { @(cfe_internal_hub_common.inputs) };
+}
+
+bundle agent cfe_internal_hub_maintain
+# @ignore
+# @brief Executes reporting database maintenance process
+# By default database clean up interval is 24 hours.
+# Length of log history in database is controlled
+# by modifying "history_length_days" key in report_settings
+# variable.
+#
+# Intervals less than 6 hours must be used with caution
+# as maintenance process could take a considerable time
+{
+  vars:
+      "report_settings" data => parsejson('[
+                                            {
+                                                "report": "contexts",
+                                                "table": "__ContextsLog",
+                                                "history_length_days": 7,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "variables",
+                                                "table": "__VariablesLog",
+                                                "history_length_days": 7,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "software",
+                                                "table": "__SoftwareLog",
+                                                "history_length_days": 28,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "software_updates",
+                                                "table": "__SoftwareUpdatesLog",
+                                                "history_length_days": 28,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "filechanges",
+                                                "table": "__FileChangesLog",
+                                                "history_length_days": 365,
+                                                "time_key": "ChangeTimeStamp"
+                                            },
+                                            {
+                                                "report": "benchmarks",
+                                                "table": "__BenchmarksLog",
+                                                "history_length_days": 1,
+                                                "time_key": "CheckTimeStamp"
+                                            },
+                                            {
+                                                "report": "promise_executions",
+                                                "table": "__PromiseExecutionsLog",
+                                                "history_length_days": 7,
+                                                "time_key": "ChangeTimeStamp"
+                                            }
+                                           ]');
+
+      "diagnostics_settings" data => parsejson('[
+                                                     {
+                                                         "report": "hub_connection_errors",
+                                                         "table": "__HubConnectionErrors",
+                                                         "history_length_days": 1,
+                                                         "time_key": "CheckTimeStamp"
+                                                     },
+                                                     {
+                                                         "report": "diagnostics",
+                                                         "table": "Diagnostics",
+                                                         "history_length_days": 1,
+                                                         "time_key": "TimeStamp"
+                                                     }
+                                                    ]');
+
+  classes:
+      "enable_cfe_internal_reporting_database_purge_old_history" -> { "postgres", "CFEngine Enterprise" }
+        expression => "enterprise_edition.Hr00.Min00_05";
+
+  methods:
+    enable_cfe_internal_reporting_database_purge_old_history::
+      "Remove old report history"
+      usebundle => cfe_internal_database_cleanup_reports(@(report_settings)),
+      action => if_elapsed(5);
+
+      "Remove cf-consumer history"
+      usebundle => cfe_internal_database_cleanup_consumer_status("50000"),
+      action => if_elapsed(5);
+
+      "Remove diagnostics history"
+      usebundle => cfe_internal_database_cleanup_diagnostics(@(diagnostics_settings)),
+      action => if_elapsed(5);
+}
+
+bundle agent cfe_internal_database_cleanup_reports (settings)
+# @ignore
+# @brief clean up the reporting tables
+{
+  vars:
+      "index" slist => getindices(settings);
+
+      "remove_query_$(settings[$(index)][report])"
+      string =>   "DELETE FROM $(settings[$(index)][table]) AS T
+                            USING (SELECT HostKey,
+                                          (LastAgentLocalExecutionTimestamp - INTERVAL '$(settings[$(index)][history_length_days]) day') AS purge_time
+                                   FROM __agentstatus) AS A
+                            WHERE T.HostKey = A.HostKey AND T.$(settings[$(index)][time_key]) <= A.purge_time;";
+
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
+      contain => in_shell_and_silent,
+      classes => kept_successful_command,
+      handle => "cf_database_maintain_report_$(settings[$(index)][report])";
+}
+
+bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
+# @ignore
+# @brief keep up to row_count entries in the database
+{
+
+  vars:
+      "remove_query"
+      string => "DELETE FROM status WHERE ts IN (SELECT ts FROM status ORDER BY ts DESC OFFSET $(row_count));";
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
+      contain => in_shell_and_silent,
+      classes => kept_successful_command,
+      handle => "cf_database_maintain_consumer_status";
+}
+
+bundle agent cfe_internal_database_cleanup_diagnostics (settings)
+{
+  vars:
+      "index" slist => getindices("settings");
+
+      "remove_query_$(settings[$(index)][report])"
+      string => "DELETE FROM $(settings[$(index)][table]) WHERE $(settings[$(index)][time_key]) < (CURRENT_TIMESTAMP - INTERVAL '$(settings[$(index)][history_length_days]) day');";
+
+  commands:
+      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
+      contain => in_shell_and_silent,
+      classes => kept_successful_command,
+      handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
+}
+
+bundle agent cfe_internal_postgresql_maintenance
+#@ignore
+#@brief PostgreSQL needs to be cleaned regularly with the vacuumdb command
+{
+  vars:
+
+      "postgres_vacuum_options" string => ifelse("postgresql_full_maintenance", "--full --dbname=cfdb", "--full --dbname=cfdb --table=__monitoringmg");
+      "maintenance_type" string => ifelse("postgresql_full_maintenance", "full", "monitoring_only");
+
+      "vacuumdb_cmd" string => "$(sys.bindir)/vacuumdb $(postgres_vacuum_options)",
+      comment => "Command for cleaning a PostgreSQL database - $(maintenance_type)",
+      handle => "cfe_internal_postgresql_maintenance_vars_vacuum_cmd_$(maintenance_type)";
+
+    policy_server.enterprise.!cfengine_3_5::
+      "cf_consumer_pid" string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
+      comment => "Read cf-consumer.pid for the main cf-consumer PID";
+
+  classes:
+      "cf_consumer_pid_correct" expression => isvariable("cf_consumer_pid"),
+      comment => "Check if cf-consumer pid is correctly defined";
+
+  processes:
+
+    any::
+
+      "cf-hub"      signals => { "term" },
+      comment => "Terminate cf-hub while doing $(maintenance_type) PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_term_cf_hub";
+
+    cf_consumer_pid_correct::
+      "cf-consumer" signals => { "kill" },
+      process_select => by_pid("$(cf_consumer_pid)"),
+      comment => "Kill cf-consumer while doing PostgreSQL maintenance",
+      handle => "cfe_internal_postgresql_$(maintenance_type)_maintenance_processes_kill_cf_consumer";
+
+  commands:
+
+    any::
+
+      "$(vacuumdb_cmd)"
+      comment => "Run $(maintenance_type) vacuumdb command",
+      classes => kept_successful_command,
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_$(maintenance_type)";
+}
+
+bundle agent cfe_internal_postgresql_vacuum
+#@ignore
+#@brief Vacuum (with analyze) over cfdb database.
+{
+  vars:
+      "vacuum_cfdb_cmd" 
+      string => "$(sys.bindir)/vacuumdb --analyze --quiet --dbname=cfdb",
+      comment => "Vacuum command with update statistics enabled";
+
+  commands:
+      "$(vacuum_cfdb_cmd)"
+      comment => "Run vacuum db command (database: cfdb)",
+      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb";
+}

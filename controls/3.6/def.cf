@@ -278,11 +278,15 @@ bundle common def
       # This class is for PosgreSQL maintenance
       # pre-defined to every Sunday at 2 a.m.
       # This can be changed later on.
-
       "postgresql_full_maintenance" expression => "postgresql_maintenance_supported.Sunday.Hr02.Min00_05";
 
-      # Vacuum monitoring_mg table every day (except Sunday, when vacuum is run on entire db)
-      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
+      # Vacuum full monitoring_mg table every day (except Sunday, when vacuum full is run on entire db)
+      # Required only by CFEngine Enterprise Hub 3.6.0 and 3.6.1
+      "postgresql_monitoring_maintenance" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05.(cfengine_3_6_0|cfengine_3_6_1)";
+
+      # Run vacuum job on database
+      # pre-defined to every night except Sunday when full cleanup is executed.
+      "postgresql_vacuum" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
 
       # Enable CFEngine Enterprise HA Policy
       "enable_cfengine_enterprise_hub_ha" expression => "!any";
