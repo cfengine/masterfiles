@@ -37,6 +37,7 @@ Notable changes to the framework should be documented here
  - Set postgresql_monitoring_maintenance only for versions 3.6.0 and 3.6.1
  - Move hub specific bundles from lib/VER/cfe_internal.cf into lib/VER/cfe_internal_hub.cf
    and load them only if policy_server policy if set.
+ - Re-organize lib/VER/stdlib.cf from lists into classic array for use with getvalues
 
 ### Deprecated
 
