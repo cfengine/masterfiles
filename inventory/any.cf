@@ -603,9 +603,9 @@ bundle agent cfe_autorun_inventory_packages
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_packages::
       "DEBUG $(this.bundle): refresh interval is $(refresh)";
-      "DEBUG $(this.bundle): we have the inventory files.";
+      "DEBUG $(this.bundle): we have the inventory files."
         ifvarclass => "have_inventory";
-      "DEBUG $(this.bundle): we don't have the inventory files.";
+      "DEBUG $(this.bundle): we don't have the inventory files."
         ifvarclass => "!have_inventory";
 }
 
@@ -798,13 +798,13 @@ bundle agent inventory_cmdb_load(file)
 
   reports:
     DEBUG|DEBUG_inventory_cmdb_load::
-      "DEBUG $(this.bundle): Got CMDB data from $(file): $(cmdb_string)";
+      "DEBUG $(this.bundle): Got CMDB data from $(file): $(cmdb_string)"
         ifvarclass => "have_cmdb_data";
-      "DEBUG $(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))";
+      "DEBUG $(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))"
         ifvarclass => "have_cmdb_data";
-      "DEBUG $(this.bundle): Got CMDB class = $(ckeys)";
+      "DEBUG $(this.bundle): Got CMDB class = $(ckeys)"
         ifvarclass => "have_cmdb_data";
-      "DEBUG $(this.bundle): Could not read the CMDB data from $(file)";
+      "DEBUG $(this.bundle): Could not read the CMDB data from $(file)"
         ifvarclass => "!have_cmdb_data";
 }
 
