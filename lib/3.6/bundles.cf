@@ -431,9 +431,12 @@ bundle agent sysctl(settings_array)
 # bundle agent example
 # {
 #   vars:
-#       "sysctl_settings[vm.swappiness]"         string => "4";
-#       "sysctl_settings[net.core.rmem_max]"     string => "4194304";
-#       "sysctl_settings[net.core.rmem_default]" string => "4194304";
+#       "sysctl_settings"
+#         data => parsejson('{
+#                              "net.core.rmem_max"     :  "4194304",
+#                              "net.core.rmem_default" : "4194304",
+#                              "vm.swappiness"         : "5",
+#                            }');
 #
 #   methods:
 #       "Edit and reload /etc/sysctl.conf" usebundle => sysctl("$(this.bundle).sysctl_settings");
