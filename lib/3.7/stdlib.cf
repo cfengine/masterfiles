@@ -51,25 +51,27 @@ bundle common stdlib_common
 # @ignore
 {
   vars:
-      "inputs" slist => {
-                          "$(this.promise_dirname)/paths.cf",
-                          "$(this.promise_dirname)/common.cf",
-                          "$(this.promise_dirname)/commands.cf",
-                          "$(this.promise_dirname)/packages.cf",
-                          "$(this.promise_dirname)/files.cf",
-                          "$(this.promise_dirname)/edit_xml.cf",
-                          "$(this.promise_dirname)/services.cf",
-                          "$(this.promise_dirname)/processes.cf",
-                          "$(this.promise_dirname)/storage.cf",
-                          "$(this.promise_dirname)/databases.cf",
-                          "$(this.promise_dirname)/users.cf",
-                          "$(this.promise_dirname)/monitor.cf",
-                          "$(this.promise_dirname)/guest_environments.cf",
-                          "$(this.promise_dirname)/bundles.cf",
-                          "$(this.promise_dirname)/cfe_internal.cf",
-                          "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf",
-                          "$(this.promise_dirname)/cfe_internal_hub.cf",
-      };
+
+      "input[paths]"                      string => "$(this.promise_dirname)/paths.cf";
+      "input[common]"                     string => "$(this.promise_dirname)/common.cf";
+      "input[commands]"                   string => "$(this.promise_dirname)/commands.cf";
+      "input[packages]"                   string => "$(this.promise_dirname)/packages.cf";
+      "input[files]"                      string => "$(this.promise_dirname)/files.cf";
+      "input[edit_xml]"                   string => "$(this.promise_dirname)/edit_xml.cf";
+      "input[services]"                   string => "$(this.promise_dirname)/services.cf";
+      "input[processes]"                  string => "$(this.promise_dirname)/processes.cf";
+      "input[storage]"                    string => "$(this.promise_dirname)/storage.cf";
+      "input[databases]"                  string => "$(this.promise_dirname)/databases.cf";
+      "input[users]"                      string => "$(this.promise_dirname)/users.cf";
+      "input[monitor]"                    string => "$(this.promise_dirname)/monitor.cf";
+      "input[guest_environments]"         string => "$(this.promise_dirname)/guest_environments.cf";
+      "input[bundles]"                    string => "$(this.promise_dirname)/bundles.cf";
+      "input[cfe_internal]"               string => "$(this.promise_dirname)/cfe_internal.cf";
+      "input[cfe_internal_hub]"           string => "$(this.promise_dirname)/cfe_internal_hub.cf";
+      "input[cfengine_enterprise_hub_ha]" string => "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf";
+
+    any::
+      "inputs" slist => getvalues(input);
 
   reports:
     verbose_mode::
