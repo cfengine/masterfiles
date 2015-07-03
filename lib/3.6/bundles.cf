@@ -444,7 +444,7 @@ bundle agent sysctl(settings_array)
   vars:
       "sysctl_conf" string => "/etc/sysctl.conf";
 
-    DEBUG|verbose_mode::
+    DEBUG|DEBUG_sysctl|verbose_mode::
       "keys" slist => getindices("$(settings_array)");
 
   files:
@@ -458,9 +458,9 @@ bundle agent sysctl(settings_array)
       "$(paths.path[sysctl]) -p $(sysctl_conf)";
 
   reports:
-    DEBUG|verbose_mode::
-      "array name = $(settings_array)";
-      "$(this.bundle): $(settings_array): $(keys) = $($(settings_array)[$(keys)])";
-    (DEBUG|verbose_mode).reinit_sysctl::
-      "$(this.bundle): Edited and reloaded $(sysctl_conf)";
+    DEBUG|DEBUG_sysctl|verbose_mode::
+      "DEBUG $(this.bundle): array name = $(settings_array)";
+      "DEBUG $(this.bundle): $(settings_array): $(keys) = $($(settings_array)[$(keys)])";
+    (DEBUG|DEBUG_sysctl|verbose_mode).reinit_sysctl::
+      "DEBUG $(this.bundle): Edited and reloaded $(sysctl_conf)";
 }
