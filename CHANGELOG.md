@@ -1,7 +1,7 @@
 # Changelog
 Notable changes to the framework should be documented here
 
-## [Unreleased][unreleased]
+## 3.7
 ### Added
  - CHANGELOG.md
  - Support for user specified overring of framework defaults without modifying
