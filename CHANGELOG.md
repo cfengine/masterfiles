@@ -1,6 +1,18 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+## [Unreleased][unreleased]
+### Added
+ - External watchdog policy to ensure that cf-execd is running so that policy will be
+   run on schedule.
+   - This policy configures /etc/cron.d/cfengine_watchdog if /etc/cron.d is
+     present to check for cf-execd once a minute and launch it if it is not
+     running.
+   - The policy can be enabled by defining the class
+     cfe_internal_core_watchdog_enabled, or disabled by defining
+     cfe_internal_core_watchdog_disabled. In the event both classes are defined
+     at the same time enabled wins.
+
 ## 3.7
 ### Added
  - CHANGELOG.md
@@ -11,15 +23,6 @@ Notable changes to the framework should be documented here
  - Add measure_promise_time action body to lib (3.5, 3.6, 3.7, 3.8)
  - New negative class guard `cfengine_internal_disable_agent_email` so that
    agent email can be easily disabled by augmenting def.json
- - External watchdog policy to ensure that cf-execd is running so that policy will be
-   run on schedule.
-   - This policy configures /etc/cron.d/cfengine_watchdog if /etc/cron.d is
-     present to check for cf-execd once a minute and launch it if it is not
-     running.
-   - The policy can be enabled by defining the class
-     cfe_internal_core_watchdog_enabled, or disabled by defining
-     cfe_internal_core_watchdog_disabled. In the event both classes are defined
-     at the same time enabled wins.
 
 ### Changed
  - Relocate def.cf to controls/VER/
