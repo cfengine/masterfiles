@@ -61,7 +61,6 @@ bundle agent cfe_internal_core_watchdog_cron_d(state)
         create => "true";
 
       "$(cron_d_watchdog)"
-        edit_defaults => empty,
         edit_template => "$(template)",
         handle => "cfe_internal_core_watchdog_enable_cron_d_file_content",
         template_method => "mustache";
