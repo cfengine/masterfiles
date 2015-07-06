@@ -152,6 +152,5 @@ body copy_from no_backup_scp(from,server)
  compare     => "digest";
  copy_backup => "false";
  encrypt     => "true";
- trustkey    => "true";
 }
 
