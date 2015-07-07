@@ -216,7 +216,7 @@ bundle common def
         "$(sys.workdir)/reports",
       };
 
-    # enable_cfengine_enterprise_hub_ha is defined below 
+    # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 
     enable_cfengine_enterprise_hub_ha::
@@ -238,6 +238,11 @@ bundle common def
 
       # Enable agent email output (also see mailto, mailfrom and smtpserver)
       "cfengine_internal_agent_email" expression => "any";
+
+
+      # Enable or disable external watchdog to ensure cf-execd is running
+      "cfe_internal_core_watchdog_enabled" expression => "!any";
+      "cfe_internal_core_watchdog_disabled" expression => "!any";
 
       # Transfer policies and binaries with encryption
       # you can also request it from the command line with

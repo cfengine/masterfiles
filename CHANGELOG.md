@@ -3,6 +3,18 @@ Notable changes to the framework should be documented here
 
 ## [Unreleased][unreleased]
 ### Added
+ - External watchdog policy to ensure that cf-execd is running so that policy will be
+   run on schedule.
+   - This policy configures /etc/cron.d/cfengine_watchdog if /etc/cron.d is
+     present to check for cf-execd once a minute and launch it if it is not
+     running.
+   - The policy can be enabled by defining the class
+     cfe_internal_core_watchdog_enabled, or disabled by defining
+     cfe_internal_core_watchdog_disabled. In the event both classes are defined
+     at the same time enabled wins.
+
+## 3.7
+### Added
  - CHANGELOG.md
  - Support for user specified overring of framework defaults without modifying
    policy supplied by the framework itself (see example_def.json)

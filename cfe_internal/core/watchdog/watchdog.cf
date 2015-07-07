@@ -1,0 +1,72 @@
+bundle agent cfe_internal_core_watchdog(state)
+# @breif Configure external watchdog processes to keep cf-execd running
+# @param state (enabled|disabled) The state to keep the watchdog configuration in
+{
+  meta:
+    "description"
+      string => "Configure external watchdog processes (like cron, or monit) to
+                 make sure that cf-execd is always running";
+
+  classes:
+      "invalid_state"
+        not => regcmp("(enabled|disabled)", "$(state)");
+
+      "have_cron_d"
+        expression => isdir("/etc/cron.d");
+
+      "use_cfe_internal_core_watchdog_cron_d"
+        expression => "have_cron_d._stdlib_has_path_pgrep";
+
+  methods:
+    use_cfe_internal_core_watchdog_cron_d::
+      "any" usebundle => cfe_internal_core_watchdog_cron_d( $(state) );
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_core_watchdog::
+      "DEBUG $(this.bundle): Watchdog '$(state)'";
+      "DEBUG $(this.bundle): Invalid state '$(state)' only enabled|disabled allowed"
+        ifvarclass => "invalid_state";
+
+    !use_cfe_internal_core_watchdog_cron_d::
+      "WARNING $(this.bundle): Currently only supports /etc/cron.d on systems that have pgrep in the the stdlib paths bundle.";
+}
+
+bundle agent cfe_internal_core_watchdog_cron_d(state)
+# @brief Use a cron job installed in /etc/cron.d to watch and make sure that
+# cf-execd is always running.
+# @param state (enabled|disabled) The state to keep the watchdog configuration
+# in. Enabled manages the cron job, disabled removes it.
+{
+  classes:
+    any::
+
+      # Define a class for whatever the desired state is
+
+      "$(state)"
+        expression => "any";
+
+  vars:
+    any::
+
+      "template"
+        string => "$(this.promise_dirname)/../../../templates/cfengine_watchdog.mustache";
+
+      "cron_d_watchdog" string => "/etc/cron.d/cfengine_watchdog";
+
+  files:
+
+    enabled::
+
+      "$(cron_d_watchdog)"
+        create => "true";
+
+      "$(cron_d_watchdog)"
+        edit_template => "$(template)",
+        handle => "cfe_internal_core_watchdog_enable_cron_d_file_content",
+        template_method => "mustache";
+
+    disabled::
+
+      "$(cron_d_watchdog)"
+        delete => tidy;
+}
