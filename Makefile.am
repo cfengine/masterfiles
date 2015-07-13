@@ -10,7 +10,12 @@ endif
 nobase_dist_masterfiles_DATA = @MASTERFILES_INSTALL_TARGETS@
 masterfilesdir=$(datadir)
 
-EXTRA_DIST = README.md inventory/README.md lib/README.md CONTRIBUTING.md LICENSE
+EXTRA_DIST = CONTRIBUTING.md \
+	inventory/README.md \
+	lib/README.md \
+	LICENSE \
+	PACKAGE-MODULE-API.md \
+	README.md
 
 # Do not reveal usernames of the buildslave
 TAR_OPTIONS = --owner=0 --group=0
