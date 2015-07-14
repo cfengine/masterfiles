@@ -73,7 +73,15 @@ bundle agent cfe_internal_management
 
       "hub" usebundle => cfe_internal_postgresql_maintenance,
       handle => "cfe_internal_management_postgresql_maintenance",
+      action => measure_promise_time("cfe_internal_management_postgresql_maintenance"),
       comment => "Run vacuumdb to clean up PostgreSQL database";
+
+    postgresql_vacuum::
+
+      "hub" usebundle => cfe_internal_postgresql_vacuum,
+      handle => "cfe_internal_management_postgresql_vacuum",
+      action => measure_promise_time("cfe_internal_management_postgresql_vacuum"),
+      comment => "Maintain PostgreSQL by executing vacuum";
 
     any::
 
