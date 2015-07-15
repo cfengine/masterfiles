@@ -12,6 +12,7 @@ Notable changes to the framework should be documented here
      cfe_internal_core_watchdog_enabled, or disabled by defining
      cfe_internal_core_watchdog_disabled. In the event both classes are defined
      at the same time enabled wins.
+   - Fix process_result logic to match the purpose of body process_select days_older_than (Redmine #3009)
 
 ## 3.7
 ### Added
