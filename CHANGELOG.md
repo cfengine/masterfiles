@@ -42,6 +42,9 @@ Notable changes to the framework should be documented here
  - Move hub specific bundles from lib/VER/cfe_internal.cf into lib/VER/cfe_internal_hub.cf
    and load them only if policy_server policy if set.
  - Re-organize lib/VER/stdlib.cf from lists into classic array for use with getvalues
+ - inform_mode classes changed to DEBUG|DEBUG_$(this.bundle):: (Redmine: #7191)
+ - Enabled limit_robot_agents in order to work around multiple cf-execd
+   processes after upgrade. (Redmine #7185)
 
 ### Deprecated
 
