@@ -14,7 +14,7 @@ Notable changes to the framework should be documented here
      at the same time enabled wins.
    - Fix process_result logic to match the purpose of body process_select days_older_than (Redmine #3009)
 
-## 3.7
+## 3.7.0
 ### Added
  - CHANGELOG.md
  - Support for user specified overring of framework defaults without modifying
@@ -54,6 +54,8 @@ Notable changes to the framework should be documented here
    and load them only if policy_server policy if set.
  - Re-organize lib/VER/stdlib.cf from lists into classic array for use with getvalues
  - inform_mode classes changed to DEBUG|DEBUG_$(this.bundle):: (Redmine: #7191)
+ - Enabled limit_robot_agents in order to work around multiple cf-execd
+   processes after upgrade. (Redmine #7185)
 
 ### Deprecated
 
