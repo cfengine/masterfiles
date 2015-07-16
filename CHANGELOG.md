@@ -66,6 +66,7 @@ Notable changes to the framework should be documented here
 ### Fixed
  - standard_services now restarts the service if it was not already running
    when using service_policy => restart with chkconfig (Redmine #7258)
+ - Multiple cf-execds running after cf-upgrade initiated upgrade. (Redmine #7185)
 
 ### Security
 
