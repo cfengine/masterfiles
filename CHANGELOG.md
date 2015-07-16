@@ -1,7 +1,11 @@
 # Changelog
 Notable changes to the framework should be documented here
 
-# 3.7.0
+## [Unreleased][unreleased]
+### Fixed
+   - Fix process_result logic to match the purpose of body process_select days_older_than (Redmine #3009)
+
+## 3.7.0
 ### Added
  - CHANGELOG.md
  - Support for user specified overring of framework defaults without modifying
