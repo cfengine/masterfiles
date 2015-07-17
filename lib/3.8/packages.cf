@@ -48,6 +48,10 @@
 ###################################################
 
 bundle common package_module_knowledge
+# @brief common package_module_knowledge bundle
+#
+# This common bundle defines which package modules are the defaults on different
+# platforms.
 {
   vars:
     debian::
