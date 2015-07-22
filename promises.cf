@@ -32,6 +32,7 @@ body common control
       inputs => {
                  # File definition for global variables and classes
                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
+                  "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def_inputs.cf",
 
                 # Inventory policy
                   @(inventory.inputs),
