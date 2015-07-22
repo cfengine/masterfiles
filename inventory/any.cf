@@ -83,20 +83,20 @@ bundle agent cfe_autorun_inventory_ipv4_addresses
 # This will filter the loopback address (127.0.0.1, as it is likely not very interesting)
 {
   vars:
-    "filter_reg"
-      string => "127\.0\.0\.1",
-      comment => "Addresses that match this regular expression will be filtered
+      "filter_reg"
+        string => "127\.0\.0\.1",
+        comment => "Addresses that match this regular expression will be filtered
                   from the inventory for ipv4 addresses";
 
-    # Strings are displayed more beautifully in Mission Portal than lists, so
-    # we first generate the list of addresses to be inventoried and then do
-    # inventory using an array.
-    "ipv4_addresses"
-      slist => filter( $(filter_reg), "sys.ip_addresses", "true", "true", 999999999);
+      # Strings are displayed more beautifully in Mission Portal than lists, so
+      # we first generate the list of addresses to be inventoried and then do
+      # inventory using an array.
+      "ipv4_addresses"
+        slist => filter( $(filter_reg), "sys.ip_addresses", "true", "true", 999999999);
 
-    "ipv4[$(ipv4_addresses)]"
-      string => "$(ipv4_addresses)",
-      meta => { "inventory", "attribute_name=IPv4 addresses" };
+      "ipv4[$(ipv4_addresses)]"
+        string => "$(ipv4_addresses)",
+        meta => { "inventory", "attribute_name=IPv4 addresses" };
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_ipv4_addresses::
