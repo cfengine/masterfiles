@@ -1,0 +1,4 @@
+body file control
+{
+      inputs => { @(def.augments_inputs) };
+}
