@@ -79,29 +79,26 @@ bundle agent cfe_autorun_inventory_listening_ports
 }
 
 bundle agent cfe_autorun_inventory_ipv4_addresses
-# @brief Inventory ipv4 addresses
-# This will filter the loopback address (127.0.0.1, as it is likely not very interesting)
+# @brief Map ipv4 addresses to interfaces in the array variable cfe_autorun_inventory_ipv4_addresses.ipv4
+# This will use sys.interfaces, which excludes loopback interfaces.
 {
   vars:
-      "filter_reg"
-        string => "127\.0\.0\.1",
-        comment => "Addresses that match this regular expression will be filtered
-                  from the inventory for ipv4 addresses";
-
       # Strings are displayed more beautifully in Mission Portal than lists, so
       # we first generate the list of addresses to be inventoried and then do
       # inventory using an array.
-      "ipv4_addresses"
-        slist => filter( $(filter_reg), "sys.ip_addresses", "true", "true", 999999999);
 
-      "ipv4[$(ipv4_addresses)]"
-        string => "$(ipv4_addresses)",
+      # We don't use sys.interfaces and sys.ipv4 directly below
+      # because the parser doesn't like them in array keys, even if
+      # they are being expanded.
+      "if" slist => { @(sys.interfaces) }; # note this excludes loopback
+      "ip[$(if)]" string => "$(sys.ipv4[$(if)])";
+
+      "ipv4[$(ip[$(if)])]" string => "$(if)",
         meta => { "inventory", "attribute_name=IPv4 addresses" };
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_ipv4_addresses::
-      "DEBUG $(this.bundle)";
-      "$(const.t)Inventorying: '$(ipv4_addresses)'";
+      "DEBUG $(this.bundle): inventorying: ipv4[$(ip[$(if)])] = '$(if)'";
 }
 
 bundle agent cfe_autorun_inventory_disk
