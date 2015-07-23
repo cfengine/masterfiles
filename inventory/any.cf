@@ -533,9 +533,11 @@ bundle agent cfe_autorun_inventory_LLDP
 
   commands:
     !disable_inventory_LLDP::
-      "$(inventory_control.lldpctl_exec) | perl -n -e 'my ($k, $v) = m/([^=]+)=(.*)/; $k =~ s/\W/_/g; print \"=$k=$v\";"
-      classes => kept_successful_command,
-      module => "true";
+      # we'd use '-f json' but it's not available in the standard lldpctl package
+      "$(inventory_control.lldpctl_exec) -f keyvalue | $(sys.workdir)/modules/inventory/lldpctl.pl"
+        contain => in_shell,
+        classes => kept_successful_command,
+        module => "true";
 }
 
 bundle agent cfe_autorun_inventory_packages

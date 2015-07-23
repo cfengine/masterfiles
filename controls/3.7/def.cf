@@ -319,7 +319,7 @@ bundle common inventory_control
 # are disabled.
 {
   vars:
-      "lldpctl_exec" string => "/usr/bin/lldpctl";
+      "lldpctl_exec" string => "/usr/sbin/lldpctl";
       "lsb_exec" string => "/usr/bin/lsb_release";
       "mtab" string => "/etc/mtab";
       "proc" string => "/proc";
