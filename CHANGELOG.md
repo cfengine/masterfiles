@@ -2,6 +2,8 @@
 Notable changes to the framework should be documented here
 
 ## [Unreleased][unreleased]
+### Fixed
+   - Augmenting inputs from the augments_file (Redmine #7420)
 
 ## 3.7.0
 ### Added
