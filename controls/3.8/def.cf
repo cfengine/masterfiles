@@ -4,11 +4,6 @@
 #  - common/global variables and classes here
 #
 ###############################################################################
-body file control
-{
-      inputs => { @(def.augments_inputs) };
-}
-
 bundle common def
 {
   classes:

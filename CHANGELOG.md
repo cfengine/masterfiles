@@ -12,6 +12,8 @@ Notable changes to the framework should be documented here
      cfe_internal_core_watchdog_enabled, or disabled by defining
      cfe_internal_core_watchdog_disabled. In the event both classes are defined
      at the same time enabled wins.
+### Fixed
+   - Augmenting inputs from the augments_file (Redmine #7420)
 
 ## 3.7.0
 ### Added
