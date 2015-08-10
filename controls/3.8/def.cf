@@ -83,6 +83,9 @@ bundle common def
                            # Assume /16 LAN clients to start with
                            "$(sys.policy_hub)/16",
 
+                           # Uncomment below if HA is used
+                           #"@(def.policy_servers)"
+
                            #  "2001:700:700:3.*",
                            #  "217.77.34.18",
                            #  "217.77.34.19",
