@@ -13,7 +13,7 @@ bundle agent ha_main
   policy_server.enterprise::
     "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_mp_status_file;
 
-  policy_server.enable_cfengine_enterprise_hub_ha.hub_active
+  policy_server.enable_cfengine_enterprise_hub_ha.hub_active::
     "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_notification_scripts_dir;
 
   policy_server.enable_cfengine_enterprise_hub_ha::
