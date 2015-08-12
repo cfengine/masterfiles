@@ -1,6 +1,6 @@
 {
     "classes":
     {
-        "cfe_internal_enable_phase_policy_channel:": [ "any" ]
+        "cfe_internal_enable_phase_policy_channel": [ "any" ]
     }
 }
