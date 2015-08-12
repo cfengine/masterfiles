@@ -101,6 +101,9 @@ bundle server access_rules()
         comment => "Grant access to phase definitions",
         admit => { @(def.acl) };
 
+      "/var/cfengine/policychannel"
+        admit => { @(def.acl) };
+
     policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/ppkeys"
       handle => "server_access_grant_access_ppkeys_hubs",

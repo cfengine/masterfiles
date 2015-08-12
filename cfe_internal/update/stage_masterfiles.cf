@@ -22,12 +22,3 @@ bundle agent stage_masterfiles
         args => "$(masterfiles_destination)/$(policy_channels) $(param_location)/$(policy_channels).sh",
         comment => "We want to try and update each policy channel based on the current settings";
 }
-
-bundle server policy_channel_access_rules
-{
-  access:
-    policy_server::
-      "/var/cfengine/policychannel"
-        admit => { @(def.acl) };
-
-}
