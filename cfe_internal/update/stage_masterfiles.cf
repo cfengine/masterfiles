@@ -8,7 +8,7 @@ bundle agent stage_masterfiles
         string => "/vagrant/multimasterfiles";
 
       "masterfiles_destination"
-        string => "/var/cfengine/policychannels";
+        string => "/var/cfengine/policychannel";
 
       "policy_channels"
         slist => { "production_1", "production_2", "development", "tag" };

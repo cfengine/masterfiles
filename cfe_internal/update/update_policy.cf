@@ -36,101 +36,6 @@ bundle agent cfe_internal_update_policy_from_channel
         usebundle => simple_policy_update_v1_cfe_internal_update_policy;
 
 }
-
-bundle agent cfe_internal_update_phase_and_channel_selection
-{
-  vars:
-      # We restrict loading the data file to when the file is present to avoid
-      # policy errors when the data file is not present
-      "phase_data"
-        data => readjson( "$(cfe_internal_update_phase_data.path[local_phase_definition])", inf),
-        ifvarclass => filexists("$(cfe_internal_update_phase_data.path[local_phase_definition])");
-
-      # This is the a list of the possible phases. The list is numeric in nature
-      # as it identifies the index postion of the phase. Here is an example of
-      # accessing a phases name: $(phase_data[phases][$(phases)][name])
-      "phases"
-        slist => getindices("phase_data[phases]");
-
-      # For each potential phase we need to get the list of nodes
-      # Nodes can be one of the following:
-      #  - hostname regex (fully qualified or short)
-      #  - ip address regex (ipv4 or ipv6)
-      #  - hostkey (SHA=31bcb32950d8b91ffdfca85bca71364ec8f67c93246e3617c3a49af58363c4a1)
-      #  - Any class defined on the node (Evaluation order has implications on this)
-      "phase_$(phases)_matches"
-        slist => getvalues("phase_data[phases][$(phases)][nodes]");
-
-      # We need to reverse the list of matches because variables will be set
-      # based on the last match iterated over. This makes the phase with
-      # the lowest index win.
-      "sorted_phase_$(phases)_matches"
-        slist => reverse(sort("int", "@(phase_$(phases)_matches)"));
-
-      # Find the index of nodegroup that the host is part of.
-      "selected_phase"
-        int => "$(phases)",
-        if => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
-                  classmatch(canonify("$(phase_$(phases)_matches)")),
-                  classmatch("$(phase_$(phases)_matches)"));
-
-    successfully_selected_phase::
-      "selected_phase_name"
-        string => "$(phase_data[phases][$(selected_phase)][name])",
-        meta => { "inventory", "attribute_name=Phase" },
-        comment => "We want to inventory the name for use in Mission Portal";
-
-      # once we have selected a nodegroup we can
-      "selected_phase_policychannel"
-        string => "$(phase_data[phases][$(selected_phase)][policychannel])",
-        meta => { "inventory", "attribute_name=Policy Channel" },
-        comment => "This is the policy channel that the nodegroup is associated with";
-
-    # I tried unsuccessfully to use ifelse when setting this variable
-    # value, but it was not working out for me, so I fell back to a
-    # traditional pattern.
-    !successfully_selected_phase::
-      "selected_phase_name"
-        string => "default",
-        meta => { "inventory", "attribute_name=Phase" },
-        comment => "We want to inventory the name for use in Mission Portal";
-
-      "selected_phase_policychannel"
-        string => "default",
-        meta => { "inventory", "attribute_name=Policy Channel" },
-        comment => "This is the policy channel that the nodegroup is associated with";
-
-    any::
-      "masterfiles_location"
-        string => ifelse( strcmp("default", "$(selected_phase_policychannel)"), "$(update_def.masterfiles_location)", "/var/cfengine/policychannel/$(selected_phase_policychannel)"),
-        comment => "If the policy channel is 'default' then the masterfiles location is '$(update_def.masterfiles_location)";
-
-  classes:
-      "successfully_selected_phase"
-        expression => isvariable("selected_phase");
-
-  reports:
-    DEBUG|DEBUG_cfe_internal_update_phase_and_channel_selection::
-      "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)MATCH='$(phase_$(phases)_matches)'"
-        if => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
-                  classmatch(canonify("$(phase_$(phases)_matches)")),
-                  classmatch("$(phase_$(phases)_matches)"));
-
-
-      "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)NOMATCH='$(phase_$(phases)_matches)'"
-        unless => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
-                      classmatch(canonify("$(phase_$(phases)_matches)")),
-                      classmatch("$(phase_$(phases)_matches)"));
-
-
-      "DEBUG $(this.bundle): Selected masterfiles policy channel
-$(const.t)phase: index='$(selected_phase)'
-$(const.t)name='$(selected_phase_name)'
-$(const.t)policychannel='$(selected_phase_policychannel)'
-$(const.t)Masterfiles should be sourced from:  '$(masterfiles_location)'";
-
-}
-
 bundle agent cfe_internal_update_phase_data
 {
   meta:
@@ -167,11 +72,111 @@ bundle agent cfe_internal_update_phase_data
 		    phase definition on the policy server.";
 
   reports:
-    DEBUG|DEBUG_cfe_internal_update_phase_data::  
+    DEBUG|DEBUG_cfe_internal_update_phase_data::
       "DEBUG $(this.bundle): Remote phase definition path='$(path[remote_phase_definition])'";
       "DEBUG $(this.bundle): Local phase definition path='$(path[local_phase_definition])'";
       "DEBUG $(this.bundle): Local phase definition in sync with remote phase definition"
         depends_on => { "cfe_internal_update_phase_data_file" };
+}
+
+bundle agent cfe_internal_update_phase_and_channel_selection
+{
+  vars:
+      # We restrict loading the data file to when the file is present to avoid
+      # policy errors when the data file is not present
+      # PROBABLY WANT ACTION IMMEDIATE HERE SO THAT LOCKING DOES NOT SEND US TO DEFAULT
+      "phase_data"
+        data => readjson( "$(cfe_internal_update_phase_data.path[local_phase_definition])", inf);
+#        ifvarclass => filexists("$(cfe_internal_update_phase_data.path[local_phase_definition])");
+      # This ifvarclass is problematic, when in place it never loas the json data WTF?
+
+      # This is the a list of the possible phases. The list is numeric in nature
+      # as it identifies the index postion of the phase. Here is an example of
+      # accessing a phases name: $(phase_data[phases][$(phases)][name])
+      "phases"
+        slist => getindices("phase_data[phases]");
+
+      # For each potential phase we need to get the list of nodes
+      # Nodes can be one of the following:
+      #  - hostname regex (fully qualified or short)
+      #  - ip address regex (ipv4 or ipv6)
+      #  - hostkey (SHA=31bcb32950d8b91ffdfca85bca71364ec8f67c93246e3617c3a49af58363c4a1)
+      #  - Any class defined on the node (Evaluation order has implications on this)
+      "phase_$(phases)_matches"
+        slist => getvalues("phase_data[phases][$(phases)][nodes]");
+
+      # We need to reverse the list of matches because variables will be set
+      # based on the last match iterated over. This makes the phase with
+      # the lowest index win.
+      "sorted_phase_$(phases)_matches"
+        slist => reverse(sort("int", "@(phase_$(phases)_matches)"));
+
+      # Find the index of nodegroup that the host is part of.
+      "selected_phase"
+        int => "$(phases)",
+        if => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
+                  classmatch(canonify("$(phase_$(phases)_matches)")),
+                  classmatch("$(phase_$(phases)_matches)"));
+
+    # I tried unsuccessfully to use ifelse when setting this variable
+    # value, but it was not working out for me, so I fell back to a
+    # traditional pattern.
+    !successfully_selected_phase::
+      "selected_phase_name"
+        string => "default",
+        meta => { "inventory", "attribute_name=Phase" },
+        comment => "We want to inventory the name for use in Mission Portal";
+
+      "selected_phase_policychannel"
+        string => "default",
+        meta => { "inventory", "attribute_name=Policy Channel" },
+        comment => "This is the policy channel that the nodegroup is associated with";
+
+
+    successfully_selected_phase::
+      "selected_phase_name"
+        string => "$(phase_data[phases][$(selected_phase)][name])",
+        meta => { "inventory", "attribute_name=Phase" },
+        comment => "We want to inventory the name for use in Mission Portal";
+
+      # once we have selected a nodegroup we can
+      "selected_phase_policychannel"
+        string => "$(phase_data[phases][$(selected_phase)][policychannel])",
+        meta => { "inventory", "attribute_name=Policy Channel" },
+        comment => "This is the policy channel that the nodegroup is associated with";
+
+    any::
+      "masterfiles_location"
+        string => ifelse( strcmp("default", "$(selected_phase_policychannel)"), "$(update_def.masterfiles_location)", "/var/cfengine/policychannel/$(selected_phase_policychannel)"),
+        comment => "If the policy channel is 'default' then the masterfiles location is '$(update_def.masterfiles_location)";
+
+  classes:
+      "successfully_selected_phase"
+        expression => isvariable("selected_phase");
+
+  reports:
+      "$(this.bundle) $(phases)";
+      "$(this.bundle) $(phase_data[phases][0][name])";
+      "$(cfe_internal_update_phase_data.path[local_phase_definition])";
+    DEBUG|DEBUG_cfe_internal_update_phase_and_channel_selection::
+      "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)MATCH='$(phase_$(phases)_matches)'"
+        if => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
+                  classmatch(canonify("$(phase_$(phases)_matches)")),
+                  classmatch("$(phase_$(phases)_matches)"));
+
+
+      "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)NOMATCH='$(phase_$(phases)_matches)'"
+        unless => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
+                      classmatch(canonify("$(phase_$(phases)_matches)")),
+                      classmatch("$(phase_$(phases)_matches)"));
+
+
+      "DEBUG $(this.bundle): Selected masterfiles policy channel
+$(const.t)phase: index='$(selected_phase)'
+$(const.t)name='$(selected_phase_name)'
+$(const.t)policychannel='$(selected_phase_policychannel)'
+$(const.t)Masterfiles should be sourced from:  '$(masterfiles_location)'";
+
 }
 
 
