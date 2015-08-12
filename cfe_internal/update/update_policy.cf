@@ -43,8 +43,8 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       # We restrict loading the data file to when the file is present to avoid
       # policy errors when the data file is not present
       "phase_data"
-        data => readjson( "$(cfe_internal_update_phase_data.path[local_phase_definition])", inf);
-      #  ifvarclass => filexists("$(cfe_internal_update_phase_data.path[local_phase_definition])");
+        data => readjson( "$(cfe_internal_update_phase_data.path[local_phase_definition])", inf),
+        ifvarclass => filexists("$(cfe_internal_update_phase_data.path[local_phase_definition])");
 
       # This is the a list of the possible phases. The list is numeric in nature
       # as it identifies the index postion of the phase. Here is an example of
