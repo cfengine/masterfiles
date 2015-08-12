@@ -11,11 +11,11 @@ bundle agent stage_masterfiles
         string => "/var/cfengine/policychannels";
 
       "policy_channels"
-        slist => { "production_1", "production_2", "development" };
+        slist => { "production_1", "production_2", "development", "tag" };
 
   commands:
       # masterfiles-stage.sh DESTINATION PARAMS
       "$(staging_script)"
-        args => "$(masterfiles_destination) $(param_location)/$(policy_channels).sh",
+        args => "$(masterfiles_destination)/$(policy_channels) $(param_location)/$(policy_channels).sh",
         comment => "We want to try and update each policy channel based on the current settings";
 }
