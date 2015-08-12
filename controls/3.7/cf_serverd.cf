@@ -95,6 +95,12 @@ bundle server access_rules()
       comment => "Grant access to shell for cfruncommand",
       admit => { @(def.policy_servers) };
 
+    policy_server::
+      "/var/cfengine/def/phases.json"
+        handle => "server_access_grant_access_def_phases_json",
+        comment => "Grant access to phase definitions",
+        admit => { @(def.acl) };
+
     policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/ppkeys"
       handle => "server_access_grant_access_ppkeys_hubs",

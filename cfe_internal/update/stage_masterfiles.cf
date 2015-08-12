@@ -1,0 +1,21 @@
+bundle agent stage_masterfiles
+{
+  vars:
+      "staging_script"
+        string => "/vagrant/multimasterfiles/masterfiles-stage.sh";
+
+      "param_location"
+        string => "/vagrant/multimasterfiles";
+
+      "masterfiles_destination"
+        string => "/var/cfengine/policychannels";
+
+      "policy_channels"
+        slist => { "production_1", "production_2", "development" };
+
+  commands:
+      # masterfiles-stage.sh DESTINATION PARAMS
+      "$(staging_script)"
+        args => "$(masterfiles_destination) $(param_location)/$(policy_channels).sh",
+        comment => "We want to try and update each policy channel based on the current settings";
+}

@@ -48,6 +48,11 @@ bundle common update_def
       ifvarclass => not(isvariable("override_data_input_name_patterns")),
       meta => { "defvar" };
 
+      "masterfiles_location"
+        string => "/var/cfengine/masterfiles",
+        handle => "common_update_def_vars_default_masterfiles_location",
+        comment => "Default path to masterfiles on the policy server.";
+
       # the permissions for your masterfiles, which will propagate to inputs
       "masterfiles_perms_mode" string => "0600",
       handle => "common_def_vars_masterfiles_perms_mode",

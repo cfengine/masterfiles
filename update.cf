@@ -25,6 +25,7 @@ body common control
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
+                  "cfe_internal/update/simple_policy_update_v1.cf",
                   "cfe_internal/update/update_processes.cf"
       };
 
