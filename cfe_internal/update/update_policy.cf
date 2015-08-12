@@ -84,7 +84,8 @@ bundle agent cfe_internal_update_phase_and_channel_selection
   vars:
       # We restrict loading the data file to when the file is present to avoid
       # policy errors when the data file is not present
-      # PROBABLY WANT ACTION IMMEDIATE HERE SO THAT LOCKING DOES NOT SEND US TO DEFAULT
+      # NO need for action immediate, vars aren't promise locked
+      # Only readjson if variable does not exists optimization?
       "phase_data"
         data => readjson( "$(cfe_internal_update_phase_data.path[local_phase_definition])", inf),
         ifvarclass => fileexists("$(cfe_internal_update_phase_data.path[local_phase_definition])");
