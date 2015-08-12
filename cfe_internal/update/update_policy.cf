@@ -86,9 +86,8 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       # policy errors when the data file is not present
       # PROBABLY WANT ACTION IMMEDIATE HERE SO THAT LOCKING DOES NOT SEND US TO DEFAULT
       "phase_data"
-        data => readjson( "$(cfe_internal_update_phase_data.path[local_phase_definition])", inf);
-#        ifvarclass => filexists("$(cfe_internal_update_phase_data.path[local_phase_definition])");
-      # This ifvarclass is problematic, when in place it never loas the json data WTF?
+        data => readjson( "$(cfe_internal_update_phase_data.path[local_phase_definition])", inf),
+        ifvarclass => fileexists("$(cfe_internal_update_phase_data.path[local_phase_definition])");
 
       # This is the a list of the possible phases. The list is numeric in nature
       # as it identifies the index postion of the phase. Here is an example of
