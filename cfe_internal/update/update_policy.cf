@@ -120,7 +120,7 @@ bundle agent cfe_internal_update_phase_and_channel_selection
 
     # I tried unsuccessfully to use ifelse when setting this variable
     # value, but it was not working out for me, so I fell back to a
-    # traditional pattern.
+    # traditional pattern. Plus potential backwards compatibility issues.
     !successfully_selected_phase::
       "selected_phase_name"
         string => "default",
