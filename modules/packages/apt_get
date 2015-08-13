@@ -93,7 +93,7 @@ def get_package_data():
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
         return subprocess_call([dpkg_deb_cmd, "--showformat", dpkg_output_format, "-W", pkg_string])
-    elif (re.search("([:,]|-[0-9])", pkg_string)):
+    elif (re.search("([:,]|_[0-9])", pkg_string)):
         # Contains either a version number or an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
         return 1
