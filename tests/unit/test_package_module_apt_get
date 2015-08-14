@@ -129,7 +129,7 @@ dpkg-query --showformat ${Architecture}=${Status}
 dpkg --print-architecture
 dpkg-query --showformat ${Architecture}=${Status}
  -W d:*
-dpkg --remove a:x b:y c d"""])
+apt-get """ + apt_get_options + " remove a:x=1 b:y c=3 d"])
 
 assert check("list-updates", [], 75,
              ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
