@@ -193,7 +193,7 @@ def one_package_argument(name, arch, version, is_apt_install):
                     archs.append(arch)
 
     version_suffix = ""
-    if version != "" and is_apt_install:
+    if version != "":
         version_suffix = "=" + version
 
     if archs:
@@ -266,7 +266,7 @@ def repo_install():
     return 0
 
 def remove():
-    cmd_line = [dpkg_cmd, "--remove"]
+    cmd_line = [apt_get_cmd] + apt_get_options + ["remove"]
 
     args = package_arguments_builder(False)
 

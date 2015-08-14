@@ -122,7 +122,7 @@ assert check("remove", ["Name=a\nVersion=1\nArchitecture=x",
                         "Name=b\nArchitecture=y",
                         "Name=c\nVersion=3",
                         "Name=d"],
-             0, [], 1, ["rpm --allmatches --quiet -e a-1.x b.y c-3 d"])
+             0, [], 1, ["yum --quiet -y remove a-1.x b.y c-3 d"])
 
 assert check("list-updates", [], 18,
              ["Name=yum\nVersion=3.2.29-43.el6_5\nArchitecture=noarch",
