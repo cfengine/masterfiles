@@ -1,13 +1,5 @@
 bundle agent cfe_internal_update_policy
 {
-  methods:
-    "Update policy from channel"
-      usebundle => cfe_internal_update_policy_from_channel,
-      comment => "Update policy based on phase and policy channel selection";
-}
-
-bundle agent cfe_internal_update_policy_from_channel
-{
   meta:
     "description"
       string => "This bundle updates inputs from a policy channel";
@@ -17,7 +9,7 @@ bundle agent cfe_internal_update_policy_from_channel
     # If phase based policy channel is enabled, then we will update
     # the phase data and select a phase and policy channel.
 
-    cfe_internal_enable_phase_policy_channel::
+    enable_phased_rollout::
 
       "Update phase data"
         usebundle => cfe_internal_update_phase_data,
@@ -33,9 +25,10 @@ bundle agent cfe_internal_update_policy_from_channel
     any::
 
       "Update Policy from Selected Channel"
-        usebundle => simple_policy_update_v1_cfe_internal_update_policy;
+        usebundle => cfe_internal_copy_policy;
 
 }
+
 bundle agent cfe_internal_update_phase_data
 {
   meta:
