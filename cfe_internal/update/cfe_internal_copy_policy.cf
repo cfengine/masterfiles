@@ -147,18 +147,6 @@ bundle agent simple_policy_update_v1_cfe_internal_update_policy
 
       #
 
-  commands:
-
-    am_policy_hub.update_report::
-
-      "$(sys.cf_promises) -r"
-         contain => u_in_shell_and_silent,
-         comment => "Generate config knowledge format after update",
-         classes => u_kept_successful_command,
-         handle => "cfe_internal_update_policy_commands_run_cf_promises_r";
-
-      #
-
   files:
 
     !am_policy_hub::  # policy hub should not alter inputs/ uneccessary
