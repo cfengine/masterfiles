@@ -86,8 +86,11 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       # This is the a list of the possible phases. The list is numeric in nature
       # as it identifies the index postion of the phase. Here is an example of
       # accessing a phases name: $(phase_data[phases][$(phases)][name])
-      "phases"
+      "_phases"
         slist => getindices("phase_data[phases]");
+      # We need to reverse sort the phases in order to get the "first match" behavior
+      "phases"
+        slist => reverse( "_phases" );
 
       # For each potential phase we need to get the list of nodes
       # Nodes can be one of the following:
@@ -97,13 +100,6 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       #  - Any class defined on the node (Evaluation order has implications on this)
       "phase_$(phases)_matches"
         slist => getvalues("phase_data[phases][$(phases)][nodes]");
-
-      # We need to reverse the list of matches because variables will be set
-      # based on the last match iterated over. This makes the phase with
-      # the lowest index win.
-      "sorted_phase_$(phases)_matches"
-        #slist => reverse(sort("int", "@(phase_$(phases)_matches)"));
-        slist => reverse(sort("int", "@(phase_$(phases)_matches)"));
 
       # Find the index of nodegroup that the host is part of.
       "selected_phase"
