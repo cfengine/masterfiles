@@ -104,9 +104,9 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       # Find the index of nodegroup that the host is part of.
       "selected_phase"
         int => "$(phases)",
-        if => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
-                  classmatch(canonify("$(phase_$(phases)_matches)")),
-                  classmatch("$(phase_$(phases)_matches)"));
+        ifvarclass => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
+                      classmatch(canonify("$(phase_$(phases)_matches)")),
+                      classmatch("$(phase_$(phases)_matches)"));
 
     # I tried unsuccessfully to use ifelse when setting this variable
     # value, but it was not working out for me, so I fell back to a
