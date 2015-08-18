@@ -1,5 +1,4 @@
 {
-# NICK WAS HERE
     "classes":
     {
         "my_apache": [ "server1", "server2", "redhat.*" ],
