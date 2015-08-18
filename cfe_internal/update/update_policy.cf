@@ -150,15 +150,15 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       "$(cfe_internal_update_phase_data.path[local_phase_definition])";
     DEBUG|DEBUG_cfe_internal_update_phase_and_channel_selection::
       "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)MATCH='$(phase_$(phases)_matches)'"
-        if => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
+        ifvarclass => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
                   classmatch(canonify("$(phase_$(phases)_matches)")),
                   classmatch("$(phase_$(phases)_matches)"));
 
-
-      "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)NOMATCH='$(phase_$(phases)_matches)'"
-        unless => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
-                      classmatch(canonify("$(phase_$(phases)_matches)")),
-                      classmatch("$(phase_$(phases)_matches)"));
+# Unless doesnt work in 3.6
+#      "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)NOMATCH='$(phase_$(phases)_matches)'"
+#        unless => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
+#                      classmatch(canonify("$(phase_$(phases)_matches)")),
+#                      classmatch("$(phase_$(phases)_matches)"));
 
 
       "DEBUG $(this.bundle): Selected masterfiles policy channel
