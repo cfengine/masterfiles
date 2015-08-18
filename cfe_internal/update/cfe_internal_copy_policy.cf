@@ -29,11 +29,7 @@ bundle agent cfe_internal_copy_policy
 
     windows::
 
-      "master_location"    string => "$(update_def.masterfiles_location)",  # NB! NOT $(sys.workdir) on Windows !
-      comment => "The master CFEngine policy directory on the policy host",
-      handle => "cfe_internal_update_policy_vars_master_location_windows";
-
-      "modules_dir"        string => "/var/cfengine/modules",      # NB! NOT $(sys.workdir) on Windows !
+     "modules_dir"        string => "/var/cfengine/modules",      # NB! NOT $(sys.workdir) on Windows !
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
@@ -41,7 +37,16 @@ bundle agent cfe_internal_copy_policy
       comment => "Directory containing CFEngine plugins",
       handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
 
-    !windows.!cfengine_3_5::
+    !windows::
+      "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
+      comment => "Directory containing CFEngine modules",
+      handle => "cfe_internal_update_policy_vars_modules_dir";
+
+      "plugins_dir"        string => translatepath("$(sys.workdir)/plugins"),
+      comment => "Directory containing CFEngine plugins",
+      handle => "cfe_internal_update_policy_vars_plugins_dir";
+
+    any::
       "master_location"
          string => "$(cfe_internal_update_phase_and_channel_selection.masterfiles_location)",
          ifvarclass => "enable_phased_rollout",
@@ -54,25 +59,6 @@ bundle agent cfe_internal_copy_policy
          comment => "The master CFEngine policy directory on the policy host",
          handle => "cfe_internal_update_policy_vars_master_location_if_not_phase_based_policy_channel";
 
-
-  vars:
-
-
-    !windows.cfengine_3_5::
-      "master_location"    string => "$(sys.workdir)/masterfiles",
-      comment => "The master CFEngine policy directory on the policy host",
-      handle => "cfe_internal_update_policy_vars_master_location_backport";
-
-    !windows::
-      "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
-      comment => "Directory containing CFEngine modules",
-      handle => "cfe_internal_update_policy_vars_modules_dir";
-
-      "plugins_dir"        string => translatepath("$(sys.workdir)/plugins"),
-      comment => "Directory containing CFEngine plugins",
-      handle => "cfe_internal_update_policy_vars_plugins_dir";
-
-    any::
 
       "file_check"         string => translatepath("$(inputs_dir)/promises.cf"),
       comment => "Path to a policy file",
