@@ -22,18 +22,10 @@ bundle agent cfe_internal_copy_policy
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
 
-      "dir_bin"         string => translatepath("$(sys.bindir)"),
-      comment => "Directory containing CFEngine binaries",
-      handle => "cfe_internal_update_policy_vars_dir_bin";
-
     cfengine_3_5::
       "inputs_dir"         string => translatepath("$(sys.workdir)/inputs"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir_backport";
-
-      "dir_bin"         string => translatepath("$(sys.workdir)/bin"),
-      comment => "Directory containing CFEngine binaries",
-      handle => "cfe_internal_update_policy_vars_dir_bin_backport";
 
     windows::
 
@@ -63,10 +55,6 @@ bundle agent cfe_internal_copy_policy
          handle => "cfe_internal_update_policy_vars_master_location_if_not_phase_based_policy_channel";
 
 
-  reports:
-      DEBUG::
-        "DEBUG $(this.bundle): master_location = '$(master_location)'";
-
   vars:
 
 
@@ -89,42 +77,6 @@ bundle agent cfe_internal_copy_policy
       "file_check"         string => translatepath("$(inputs_dir)/promises.cf"),
       comment => "Path to a policy file",
       handle => "cfe_internal_update_vars_file_check";
-
-      "ppkeys_file"        string => translatepath("$(sys.workdir)/ppkeys/localhost.pub"),
-      comment => "Path to public key file",
-      handle => "cfe_internal_update_policy_vars_ppkeys_file";
-
-      "postgresdb_dir"        string => "$(sys.workdir)/state/pg/data",
-      comment => "Directory where Postgres database files will be stored on hub -",
-      handle => "cfe_internal_update_policy_postgresdb_dir";
-
-      "postgresdb_log"        string => "/var/log/postgresql.log",
-      comment => "File where Postgres database files will be logging -",
-      handle => "cfe_internal_update_policy_postgresdb_log_file";
-
-      "redis_conf_file"  string => translatepath("$(sys.workdir)/config/redis.conf"),
-      comment => "Path to Redis configuration file",
-      handle => "cfe_internal_update_policy_redis_conf_file";
-
-      "agents" slist => {
-                         "cf-agent",
-                         "cf-execd",
-                         "cf-key",
-                         "cf-monitord",
-                         "cf-promises",
-                         "cf-runagent",
-                         "cf-serverd",
-      },
-      comment => "List of CFEngine binaries",
-      handle => "cfe_internal_update_policy_vars_agents";
-
-      "optional_agents" slist => {
-                                  "cf-consumer",
-                                  "cf-hub",
-      },
-      comment => "List of optional CFEngine binaries",
-      handle => "cfe_internal_update_policy_vars_optional_agents";
-      #
 
   classes:
 
@@ -213,48 +165,7 @@ bundle agent cfe_internal_copy_policy
       action => u_immediate,
       classes => u_if_repaired("replica_failover");  # not needed ?
 
-    !windows::
-
-      "$(dir_bin)/$(agents)"
-      comment => "Make sure cfengine binaries have right file permissions",
-      handle => "cfe_internal_update_policy_files_dir_bin_agents",
-      perms => u_m("755"),
-      action => u_immediate;
-
-      "$(dir_bin)/$(optional_agents)"
-      comment => "Make sure the optional cfengine binaries have right file permissions",
-      handle => "cfe_internal_update_policy_files_sys_workdir_bin_optional",
-      perms => u_m("755"),
-      action => u_immediate,
-      ifvarclass => canonify("have_bindir_$(optional_agents)");
-
-      "$(sys.workdir)/bin"
-      comment => "Make sure cfengine binaries have right file permissions",
-      handle => "cfe_internal_update_policy_files_sys_workdir_bin",
-      perms => u_m("755"),
-      depth_search => u_recurse_basedir("inf"),
-      ifvarclass => and(strcmp($(sys.workdir), "/var/cfengine")),
-      action => u_immediate;
-
-      "$(sys.workdir)/lib"
-      comment => "Make sure cfengine libraries have right file permissions",
-      handle => "cfe_internal_update_policy_files_sys_workdir_lib",
-      perms => u_shared_lib_perms,
-      depth_search => u_recurse_basedir("inf"),
-      action => u_immediate;
-
-      "/usr/local/sbin/$(agents)"
-      comment => "Create symlinks of CFE binaries in /usr/local/sbin",
-      handle => canonify("cfe_internal_update_policy_files_sbin_$(agents)"),
-      move_obstructions => "true",
-      link_from => u_ln_s("$(sys.workdir)/bin/$(agents)");
-
-      "/usr/local/sbin/$(agents).cfsaved"
-      comment => "Remove all .cfsaved file extension",
-      handle => canonify("cfe_internal_update_policy_files_remove_$(agent)_cfsaved"),
-      delete => u_tidy;
-
-    am_policy_hub::
+     am_policy_hub::
 
       "$(master_location)/."
       comment => "Make sure masterfiles folder has right file permissions",
@@ -262,6 +173,12 @@ bundle agent cfe_internal_copy_policy
       perms => u_m($(update_def.masterfiles_perms_mode)),
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
+
+  reports:
+
+      DEBUG|DEBUG_cfe_internal_copy_policy::
+        "DEBUG $(this.bundle): master_location = '$(master_location)'";
+
 
 }
 

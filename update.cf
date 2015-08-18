@@ -11,6 +11,7 @@ body common control
                           @(u_cfengine_enterprise.def),
                           "cfe_internal_dc_workflow",
                           "stage_masterfiles",
+                          "cfe_internal_bin_perms", # Previously intermingled in the policy update bundle(now copy_policy)
                           "cfe_internal_update_policy",
                           "cfe_internal_update_bins",
                           "cfe_internal_update_processes",
