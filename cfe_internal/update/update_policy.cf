@@ -102,6 +102,7 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       # based on the last match iterated over. This makes the phase with
       # the lowest index win.
       "sorted_phase_$(phases)_matches"
+        #slist => reverse(sort("int", "@(phase_$(phases)_matches)"));
         slist => reverse(sort("int", "@(phase_$(phases)_matches)"));
 
       # Find the index of nodegroup that the host is part of.
