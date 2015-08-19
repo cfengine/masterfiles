@@ -145,8 +145,11 @@ bundle agent cfe_internal_update_phase_and_channel_selection
         expression => isvariable("selected_phase");
 
   reports:
+      "$(this.bundle) $(phases)";
+      "$(this.bundle) $(phase_data[phases][0][name])";
+      "$(cfe_internal_update_phase_data.path[local_phase_definition])";
     DEBUG|DEBUG_cfe_internal_update_phase_and_channel_selection::
-      "DEBUG $(this.bundle): Attempting to match '$(phase_$(phases)_matches)'";
+      "DEBUG $(this.bundle): '$(phase_$(phases)_matches)'";
       "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)MATCH='$(phase_$(phases)_matches)'"
         ifvarclass => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
                   classmatch(canonify("$(phase_$(phases)_matches)")),
@@ -163,11 +166,6 @@ $(const.t)phase: index='$(selected_phase)'
 $(const.t)name='$(selected_phase_name)'
 $(const.t)policychannel='$(selected_phase_policychannel)'
 $(const.t)Masterfiles should be sourced from:  '$(masterfiles_location)'";
-
-}
-$(const.t)policychannel='$(selected_phase_policychannel)'
-$(const.t)Masterfiles should be sourced from:  '$(masterfiles_location)'";
-
 }
 
 
