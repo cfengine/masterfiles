@@ -86,13 +86,13 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       # This is the a list of the possible phases. The list is numeric in nature
       # as it identifies the index postion of the phase. Here is an example of
       # accessing a phases name: $(phase_data[phases][$(phases)][name])
-      "_phases"
-        slist => getindices("phase_data[phases]");
-      # We need to reverse sort the phases in order to get the "first match" behavior
       "phases"
-        slist => reverse( "_phases" );
+        slist => getindices("phase_data[phases]");
 
       # For each potential phase we need to get the list of nodes
+      # Nodes can be one of the following:
+      #  - hostname regex (fully qualified or short)
+      #  - ip address regex (ipv4 or ipv6)
       # Nodes can be one of the following:
       #  - hostname regex (fully qualified or short)
       #  - ip address regex (ipv4 or ipv6)
@@ -145,10 +145,8 @@ bundle agent cfe_internal_update_phase_and_channel_selection
         expression => isvariable("selected_phase");
 
   reports:
-      "$(this.bundle) $(phases)";
-      "$(this.bundle) $(phase_data[phases][0][name])";
-      "$(cfe_internal_update_phase_data.path[local_phase_definition])";
     DEBUG|DEBUG_cfe_internal_update_phase_and_channel_selection::
+      "DEBUG $(this.bundle): Attempting to match '$(phase_$(phases)_matches)'";
       "DEBUG $(this.bundle):$(const.n)$(const.t)index='$(phases)' $(const.n)$(const.t)name='$(phase_data[phases][$(phases)][name])' $(const.n)$(const.t)MATCH='$(phase_$(phases)_matches)'"
         ifvarclass => or( classmatch(canonify("PK_$(phase_$(phases)_matches)")),
                   classmatch(canonify("$(phase_$(phases)_matches)")),
@@ -163,6 +161,10 @@ bundle agent cfe_internal_update_phase_and_channel_selection
       "DEBUG $(this.bundle): Selected masterfiles policy channel
 $(const.t)phase: index='$(selected_phase)'
 $(const.t)name='$(selected_phase_name)'
+$(const.t)policychannel='$(selected_phase_policychannel)'
+$(const.t)Masterfiles should be sourced from:  '$(masterfiles_location)'";
+
+}
 $(const.t)policychannel='$(selected_phase_policychannel)'
 $(const.t)Masterfiles should be sourced from:  '$(masterfiles_location)'";
 
