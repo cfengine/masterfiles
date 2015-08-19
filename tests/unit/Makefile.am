@@ -14,3 +14,5 @@ EXTRA_DIST = \
 	mock_dpkg_query \
 	mock_rpm \
 	mock_yum
+
+EXTRA_DIST += $(check_SCRIPTS)

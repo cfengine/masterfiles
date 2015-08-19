@@ -13,6 +13,9 @@ bundle agent ha_main
   policy_server.enterprise::
     "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_mp_status_file;
 
+  policy_server.enable_cfengine_enterprise_hub_ha.hub_active::
+    "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_notification_scripts_dir;
+
   policy_server.enable_cfengine_enterprise_hub_ha::
     "sync_client_keys" usebundle => ha_hub_sync_clients_keys;
     "copy_hubs_keys" usebundle => ha_hub_copy_hubs_keys;
@@ -49,21 +52,37 @@ bundle agent ha_manage_mp_status_file
                  correct HA status.";
 }
 
+bundle agent ha_manage_notification_scripts_dir
+{
+ files:
+    "/opt/cfengine/notification_scripts/." -> { "Mission Portal" }
+     create => "true",
+     perms => mog("0755",$(def.cf_apache_user),$(def.cf_apache_group)),
+     comment => "This directory is used by Mission Portal to store custom
+                 user-defined scripts. Having HA set up we need to synchronize
+                 content of this directory between active and passive hubs. 
+                 In case of no user-scripts being defined directory may not
+                 exist on active hub.
+                 To avoid policy synchronizing content of this directory
+                 being not kept we are creating directory in advance.";
+}
+
+
 bundle agent ha_hub_sync_config_data
 {
  files:
   "$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php"
-     copy_from => no_backup_scp("$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php", $(sys.hub_active_ip)),
+     copy_from => ha_no_backup_scp("$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php", $(sys.hub_active_ip)),
      comment => "Synchronize cf_robot configuration",
      handle => "ha_sync_robot_config";
 
   "$(sys.workdir)/share/GUI/application/config/appsettings.php"
-     copy_from => no_backup_scp("$(sys.workdir)/share/GUI/application/config/appsettings.php", $(sys.hub_active_ip)),
+     copy_from => ha_no_backup_scp("$(sys.workdir)/share/GUI/application/config/appsettings.php", $(sys.hub_active_ip)),
      comment => "Synchronize appsetings configuration",
      handle => "ha_sync_appsettings_config";
 
   "/opt/cfengine/notification_scripts"
-      copy_from => no_backup_scp("/opt/cfengine/notification_scripts", $(sys.hub_active_ip)),
+      copy_from => ha_no_backup_scp("/opt/cfengine/notification_scripts", $(sys.hub_active_ip)),
       comment => "Copy MP notification scripts",
       handle => "ha_copy_notification_scripts",
       depth_search => recurse("1");
@@ -87,7 +106,7 @@ bundle agent update_master_ip_server
  files:
  !policy_server::
   "$(sys.workdir)/policy_server.dat"
-     copy_from => u_rcp("$(sys.workdir)/state/master_hub.dat", @(def.policy_servers)),
+     copy_from => ha_rcp("$(sys.workdir)/state/master_hub.dat", @(def.policy_servers)),
      comment => "Update master hub IP on CFEngine node",
      handle => "ha_cfengine_node_update_master";
 }
@@ -98,7 +117,7 @@ bundle agent ha_hub_sync_clients_keys
    "exclude_files" slist => {"localhost.priv", "localhost.pub", @(ha_def.hub_shas)};
  files:
    "$(ha_def.ppkeys_staging)"
-      copy_from => no_backup_scp("$(sys.workdir)/ppkeys", @(ha_main.connected_servers)),
+      copy_from => ha_no_backup_scp("$(sys.workdir)/ppkeys", @(ha_main.connected_servers)),
       file_select => ex_list(@(exclude_files)),
       comment => "Distribute all client keys between replica set servers",
       handle => "ha_copy_client_keys_between_replica_set_servers",
@@ -123,9 +142,9 @@ bundle agent ha_node_sync_hub_keys
   files:
    !policy_server::
     "$(sys.workdir)/ppkeys"
-      copy_from => no_backup_scp("$(ha_def.ppkeys_hubs)", @(def.policy_servers)),
+      copy_from => ha_no_backup_scp("$(ha_def.ppkeys_hubs)", @(def.policy_servers)),
       file_select => hub_all_keys,
-      depth_search => u_recurse("inf"),
+      depth_search => ha_recurse("inf"),
       comment => "Distribute all hub keys to clients",
       handle => "ha_copy_hub_keys_to_nodes",
       classes => if_repaired("keys_copied_clients");
@@ -144,13 +163,37 @@ body file_select hubs_keys_select
  file_result => "leaf_name";
 }
 
-
-body copy_from no_backup_scp(from,server)
+body copy_from ha_no_backup_scp(from,server)
 {
  servers     => { "$(server)" };
  source      => "$(from)";
  compare     => "digest";
  copy_backup => "false";
  encrypt     => "true";
+}
+
+body copy_from ha_rcp(from,server)
+{
+ source      => "$(from)";
+ compare     => "digest";
+ trustkey    => "false";
+
+ !am_policy_hub::
+   servers => { "$(server)" };
+
+ cfengine_internal_encrypt_transfers::
+  encrypt => "true";
+
+ cfengine_internal_purge_policies::
+   purge => "true";
+
+ cfengine_internal_preserve_permissions::
+   preserve => "true";
+}
+
+body depth_search ha_recurse(d)
+{
+ depth => "$(d)";
+ exclude_dirs => { "\.svn", "\.git", "git-core" };
 }
 

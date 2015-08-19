@@ -334,7 +334,7 @@ def repo_install():
 
 
 def remove():
-    cmd_line = [rpm_cmd, "--allmatches"] + rpm_quiet_option + ["-e"]
+    cmd_line = [yum_cmd] + yum_options + ["remove"]
 
     # package_arguments_builder will always return empty second element in case
     # of removals, so just drop it.         |

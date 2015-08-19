@@ -62,7 +62,7 @@ body process_select exclude_procs(x)
 body process_select days_older_than(d)
 {
       stime_range    => irange(ago(0,0,"$(d)",0,0,0),now);
-      process_result => "stime";
+      process_result => "!stime";
 }
 
 ##
