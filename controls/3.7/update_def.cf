@@ -62,7 +62,7 @@ bundle common update_def
         handle => "common_update_def_vars_default_masterfiles_location_3_5_windows",
         comment => "3.5 did not have the sys.masterdir variable, and windows workdir is different";
 
-    windows.cfengine_3_5::
+    windows::
       "masterfiles_location"
         string => "/var/cfengine/masterfiles",
         handle => "common_update_def_vars_default_masterfiles_location_3_5_windows",
