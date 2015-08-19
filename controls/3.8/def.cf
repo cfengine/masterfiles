@@ -218,7 +218,8 @@ bundle common def
     # Disabled by default
 
     enable_cfengine_enterprise_hub_ha::
-      "policy_servers" slist => {"$(sys.policy_hub)", @(ha_def.ips)};
+      "standby_servers" slist => filter("$(sys.policy_hub)", "ha_def.ips", false, true, 10);
+      "policy_servers" slist => { "$(sys.policy_hub)", "@(standby_servers)" };
 
     !enable_cfengine_enterprise_hub_ha::
       "policy_servers" slist => {"$(sys.policy_hub)"};
