@@ -38,6 +38,29 @@ bundle common update_def
       ifvarclass => not(isvariable("override_data_input_name_patterns")),
       meta => { "defvar" };
 
+    !cfengine_3_5::
+      "masterfiles_location"
+        string => "$(sys.masterdir)",
+        handle => "common_update_def_vars_default_masterfiles_location_after_3_5",
+	comment => "CFEngine 3.6 introduced sys.masterdir which sets the
+		    default masterfiles location at compile time. So we want to
+                    use that going forward";
+
+   !windows.cfengine_3_5::
+      "masterfiles_location"
+        string => "$(sys.workdir)/masterfiles",
+        handle => "common_update_def_vars_default_masterfiles_location_3_5_windows",
+        comment => "3.5 did not have the sys.masterdir variable, and windows workdir is different";
+
+    windows.cfengine_3_5::
+      "masterfiles_location"
+        string => "/var/cfengine/masterfiles",
+        handle => "common_update_def_vars_default_masterfiles_location_3_5_windows",
+	comment => "Windows sys.workdir isnt appropirate to select the path to
+		    masterfiles on a remote nix server so we just set it
+                    manually Until we have access to sys.masterdir";
+
+    any::
       # the permissions for your masterfiles, which will propagate to inputs
       "masterfiles_perms_mode" string => "0600",
       handle => "common_def_vars_masterfiles_perms_mode",
