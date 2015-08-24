@@ -2,8 +2,12 @@ bundle common ha_def
 {
  vars:
   enable_cfengine_enterprise_hub_ha::
+   "master_hub_location" string => "/var/cfengine/state/master_hub.dat";
+   "hubs_keys_location" string => "/var/cfengine/ppkeys_hubs";
+   "ppkeys_staging" string => "/var/cfengine/ppkeys_staging";
+
+   #The location of the config file can not be changed!
    "config_file" string => "$(this.promise_dirname)/ha_info.json";
-   "ppkeys_hubs" string => "$(sys.workdir)/ppkeys_hubs";
 
    "config" data => readjson("$(config_file)", "4k");
 
