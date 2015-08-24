@@ -1,10 +1,5 @@
 bundle agent ha_update
 {
- vars:
-      "master_hub_location" string => "/var/cfengine/state/master_hub.dat";
-      "hubs_keys_location" string => "/var/cfengine/ppkeys_hubs";
-      "ppkeys_staging" string => "/var/cfengine/ppkeys_staging";
-
  methods:
   enable_cfengine_enterprise_hub_ha.am_policy_hub::
       "share_keys" usebundle => ha_share_hub_keys;
@@ -21,13 +16,13 @@ bundle agent ha_agent_sync
 {
  files:
   "$(sys.workdir)/policy_server.dat"
-      copy_from => ha_no_backup_scp("$(ha_update.master_hub_location)", @(update_def.policy_servers)),
+      copy_from => ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.policy_servers)),
       handle => "ha_cfengine_node_update_master",
       comment => "Update master hub IP on CFEngine node. This is causing that clients will try 
                   to contact active/master hub first.";
 
   "$(sys.workdir)/ppkeys"
-      copy_from => ha_no_backup_scp("$(ha_update.hubs_keys_location)", @(update_def.policy_servers)),
+      copy_from => ha_no_backup_scp("$(ha_def.hubs_keys_location)", @(update_def.policy_servers)),
       file_select => hub_all_keys,
       depth_search => ha_recurse("inf"),
       handle => "ha_copy_hub_keys_to_nodes",
@@ -56,7 +51,7 @@ bundle agent ha_hub_sync
  vars:
   "exclude_files" slist => {"localhost.priv", "localhost.pub", @(ha_def.hub_shas)};
  files:
-  "$(ha_update.ppkeys_staging)"
+  "$(ha_def.ppkeys_staging)"
       copy_from => ha_no_backup_scp("$(sys.workdir)/ppkeys", @(update_def.standby_servers)),
       file_select => ex_list(@(exclude_files)),
       handle => "ha_copy_client_keys_between_replica_set_servers",
@@ -72,7 +67,7 @@ bundle agent manage_hub_synced_data
 {
  files:
    "$(sys.workdir)/ppkeys"
-      copy_from => no_backup_cp("$(ha_update.ppkeys_staging)"),
+      copy_from => no_backup_cp("$(ha_def.ppkeys_staging)"),
       file_select => plain,
       depth_search => recurse("1"),
       handle => "ha_copy_staged_client_keys",

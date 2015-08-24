@@ -124,7 +124,7 @@ bundle server access_rules()
 
       # When HA is enabled clients are updating active hub IP address
       # using data stored in master_hub.dat file.
-      "$(sys.workdir)/state/master_hub.dat"
+      "$(ha_def.master_hub_location)"
       handle => "server_access_grant_access_policy_server_dat",
       comment => "Grant access to policy_server.dat",
       admit => { @(def.acl) };
@@ -133,7 +133,7 @@ bundle server access_rules()
       # In order to perform failover while active hub is down clients needs to
       # have all hubs keys. This gives ability to connect to slave hub promoted to active role
       # once active is down.
-      "$(sys.workdir)/ppkeys_hubs"
+      "$(ha_def.hubs_keys_location)"
       handle => "server_access_grant_access_to_clients",
       comment => "Grant access to hubs' keys to clients",
       admit => { @(def.acl) };
