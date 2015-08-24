@@ -8,6 +8,7 @@ body common control
 {
       bundlesequence => {
                           "update_def",
+                          "u_cfengine_enterprise",
                           @(u_cfengine_enterprise.def),
                           "cfe_internal_dc_workflow",
                           "cfe_internal_update_policy",
@@ -19,7 +20,7 @@ body common control
 
       inputs => {
                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def.cf",
-                  @(u_cfengine_enterprise.inputs),
+                  "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def_inputs.cf",
                   "cfe_internal/update/update_bins.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
@@ -41,32 +42,6 @@ body agent control
 }
 
 #############################################################################
-
-
-
-bundle common u_cfengine_enterprise
-# @brief Inputs specific to CFEngine Enterpise
-{
-  vars:
-    enable_cfengine_enterprise_hub_ha::
-      "input[ha_main]"
-        string => "cfe_internal/ha/ha.cf";
-      "input[ha_def]"
-        string => "cfe_internal/ha/ha_def.cf";
-
-      "def"
-        slist => { "ha_def" };
-
-      "bundles"
-        slist => { "ha_main" };
-
-      "inputs" slist => getindices(input);
-
-    !enable_cfengine_enterprise_hub_ha::
-      "inputs" slist => { };
-      "def" slist => { "$(this.bundle)" };
-      "bundles" slist => { "$(this.bundle)" };
-}
 
 body classes u_kept_successful_command
 # @brief Set command to "kept" instead of "repaired" if it returns 0

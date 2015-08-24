@@ -1,0 +1,136 @@
+bundle agent ha_update
+{
+ methods:
+  enable_cfengine_enterprise_hub_ha.am_policy_hub::
+      "share_keys" usebundle => ha_share_hub_keys;
+      "sync_hub_data" usebundle => ha_hub_sync;
+
+  enable_cfengine_enterprise_hub_ha.!am_policy_hub::
+      "sync_agent_data" usebundle => ha_agent_sync;
+
+  enable_cfengine_enterprise_hub_ha.hub_data_synced::
+      "manage_keys" usebundle => manage_hub_synced_data;
+}
+
+bundle agent ha_agent_sync
+{
+ files:
+  "$(sys.workdir)/policy_server.dat"
+      copy_from => ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.policy_servers)),
+      handle => "ha_cfengine_node_update_master",
+      comment => "Update master hub IP on CFEngine node. This is causing that clients will try 
+                  to contact active/master hub first.";
+
+  "$(sys.workdir)/ppkeys"
+      copy_from => ha_no_backup_scp("$(ha_def.hubs_keys_location)", @(update_def.policy_servers)),
+      file_select => hub_all_keys,
+      depth_search => ha_recurse("inf"),
+      handle => "ha_copy_hub_keys_to_nodes",
+      comment => "Download keys of all hubs working in HA cluster and store in client's ppkeys directory.
+                  This is important for establishing trusted connection  with standby hub(s) in 
+                  case of failover.";
+}
+
+bundle agent ha_share_hub_keys
+{
+ files:
+   "$(ha_def.ppkeys_hubs)"
+      copy_from => no_backup_cp("$(sys.workdir)/ppkeys"),
+      file_select => hubs_keys_select,
+      handle => "ha_copy_hubs_keys",
+      depth_search => recurse("1"),
+      comment => "Clients need to be able to download keys of all hubs working in
+                  HA cluster. This is needed to establish trusted connection
+                  with standby hubs in case of failover. In order to limit possibility
+                  of copying wrong keys hub keys are copied to separate directory first
+                  and only ppkeys_hubs is accessible by clients.";
+}
+
+bundle agent ha_hub_sync
+{
+ vars:
+  "exclude_files" slist => {"localhost.priv", "localhost.pub", @(ha_def.hub_shas)};
+ files:
+  "$(ha_def.ppkeys_staging)"
+      copy_from => ha_no_backup_scp("$(sys.workdir)/ppkeys", @(update_def.standby_servers)),
+      file_select => ex_list(@(exclude_files)),
+      handle => "ha_copy_client_keys_between_replica_set_servers",
+      depth_search => recurse("1"),
+      classes => if_repaired("hub_data_synced"),
+      comment => "Distribute all client keys between replica set servers. This is
+                  important in case of failover. Once clients keys are synchronized
+                  between all hubs working in HA cluster, clients will be able
+                  to authenticate and establish connection with all hubs working in HA cluster.";
+}
+
+bundle agent manage_hub_synced_data
+{
+ files:
+   "$(sys.workdir)/ppkeys"
+      copy_from => no_backup_cp("$(ha_def.ppkeys_staging)"),
+      file_select => plain,
+      depth_search => recurse("1"),
+      handle => "ha_copy_staged_client_keys",
+      comment => "Copy staged client keys to ppkeys. First client keys are copied
+                  to ppkeys_staging directory and then to ppkeys. Only clients which
+                  keys are copied to ppkeys will be able to authenticate and connect
+                  to hub.";
+}
+
+body file_select hub_all_keys
+{
+  leaf_name => {".*.pub"};
+  file_result => "leaf_name";
+}
+
+body file_select hubs_keys_select
+{
+ search_size => irange("426", "426");
+ leaf_name => {escape("root-SHA=$(ha_def.config[$(update_def.standby_servers)][sha]).pub")};
+ file_result => "leaf_name";
+}
+
+body copy_from ha_no_backup_scp(from,server)
+{
+ servers     => { "$(server)" };
+ source      => "$(from)";
+ compare     => "digest";
+ copy_backup => "false";
+ encrypt     => "true";
+}
+
+body depth_search ha_recurse(d)
+{
+ depth => "$(d)";
+ exclude_dirs => { "\.svn", "\.git", "git-core" };
+}
+
+body depth_search recurse(d)
+{
+      depth => "$(d)";
+      xdev  => "true";
+}
+
+body classes if_repaired(x)
+{
+      promise_repaired => { "$(x)" };
+}
+
+body file_select ex_list(names)
+{
+      leaf_name  => { @(names)};
+      file_result => "!leaf_name";
+}
+
+body file_select plain
+{
+      file_types  => { "plain" };
+      file_result => "file_types";
+}
+
+body copy_from no_backup_cp(from)
+{
+      source      => "$(from)";
+      copy_backup => "false";
+}
+
