@@ -150,6 +150,9 @@ bundle common update_def
       "enable_cfengine_enterprise_hub_ha" expression => "!any";
       #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
 
+      # Enable failover to node which is outside cluster
+      #"failover_to_replication_node_enabled" expression => "enterprise_edition";
+
   reports:
     DEBUG|DEBUG_update_def::
       "DEBUG: $(this.bundle)";
