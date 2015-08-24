@@ -1,0 +1,25 @@
+bundle common u_cfengine_enterprise
+# @brief Inputs specific to CFEngine Enterpise
+{
+  vars:
+    enable_cfengine_enterprise_hub_ha::
+      "input[ha_update]"
+        string => "cfe_internal/enterprise/ha/ha_update.cf";
+      "input[ha_def]"
+        string => "cfe_internal/enterprise/ha/ha_def.cf";
+
+      "def"
+        slist => { "ha_def", "ha_update" };
+
+      "inputs" slist => getvalues(input);
+
+    !enable_cfengine_enterprise_hub_ha::
+      "inputs" slist => { };
+      "def" slist => { "$(this.bundle)" };
+}
+
+body file control
+{
+      inputs => { @(u_cfengine_enterprise.inputs) };
+}
+
