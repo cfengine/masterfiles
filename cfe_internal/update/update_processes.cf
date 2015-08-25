@@ -122,6 +122,14 @@ bundle agent maintain_cfe_hub_process
       comment => "Check for $(sys.workdir)/inputs/promises.cf",
       handle => "cfe_internal_maintain_cfe_hub_process_classes_files_ok";
 
+    am_policy_hub.enable_cfengine_enterprise_hub_ha::
+      "ha_run_hub_process" or =>
+        { "!ha_replication_only_node", "ha_replication_only_node.failover_to_replication_node_enabled" };
+
+     "ha_kill_hub_process" or =>
+        { "ha_replication_only_node.!failover_to_replication_node_enabled" };
+
+
       #
 
   processes:
@@ -154,11 +162,16 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_postgres",
       ifvarclass => "nova|enterprise";
 
-    am_policy_hub.files_ok.!windows::
+    am_policy_hub.!enable_cfengine_enterprise_hub_ha.files_ok.!windows|ha_run_hub_process::
       "cf-hub"      restart_class => "start_hub",
       comment => "Monitor cf-hub process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
       ifvarclass => "(nova|enterprise).no_vacuumdb";
+
+    am_policy_hub.ha_kill_hub_process::
+      "cf-hub"      signals => { "term" },
+      comment => "Terminate cf-hub on backup HA node outside cluster",
+      handle => "cfe_internal_kill_hub_process_on_inactive_ha_node";
 
       #
 
@@ -196,7 +209,6 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf-consumer";
 
     !windows.am_policy_hub.start_hub::
-
       "$(sys.cf_hub)"
       comment => "Start cf-hub process",
       classes => u_kept_successful_command,

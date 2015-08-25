@@ -10,6 +10,9 @@ bundle agent ha_update
 
   enable_cfengine_enterprise_hub_ha.hub_data_synced::
       "manage_keys" usebundle => manage_hub_synced_data;
+
+  enable_cfengine_enterprise_hub_ha.ha_replication_only_node::
+      "syncronize_master_hub_dat" usebundle => sync_master_hub_dat;
 }
 
 bundle agent ha_agent_sync
@@ -76,6 +79,17 @@ bundle agent manage_hub_synced_data
                   keys are copied to ppkeys will be able to authenticate and connect
                   to hub.";
 }
+
+bundle agent sync_master_hub_dat
+{
+ files:
+    "$(ha_def.master_hub_location)"
+      copy_from => ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.standby_servers)),
+      comment => "Update master hub IP on CFEngine node",
+      handle => "ha_cfengine_node_update_master";
+
+}
+
 
 body file_select hub_all_keys
 {

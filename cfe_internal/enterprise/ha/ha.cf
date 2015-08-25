@@ -2,7 +2,7 @@ bundle agent ha_main
 {
  classes:
    enable_cfengine_enterprise_hub_ha::
-    "ha_master_valid" expression => isvariable("sys.hub_active_ip");
+    "have_ha_hub_active_ip" expression => isvariable("sys.hub_active_ip");
 
  methods:
   policy_server.enterprise::
@@ -11,7 +11,7 @@ bundle agent ha_main
   policy_server.enable_cfengine_enterprise_hub_ha.hub_active::
     "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_notification_scripts_dir;
 
-  policy_server.enable_cfengine_enterprise_hub_ha.!hub_active.ha_master_valid::
+  policy_server.!hub_active.have_ha_hub_active_ip::
     "sync_config_data" usebundle => ha_hub_sync_config_data;
 }
 

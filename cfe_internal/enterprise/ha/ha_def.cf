@@ -22,6 +22,18 @@ bundle common ha_def
      slist => getvalues("hub_sha"),
      comment => "We use the list of hub key files for restricting clients access only to those";
 
+
+   "replication_only_node[$(ips)]"
+      string => "dummy", ifvarclass => strcmp("$(config[$(ips)][is_in_cluster])", "false");
+
+   "replication_only_nodes"
+      slist => getindices("replication_only_node");
+
+
+  classes:
+      "ha_replication_only_node" expression => some($(sys.policy_hub), replication_only_nodes);
+
+
   reports:
     verbose_mode::
       "HA hub $(ips) $(config[$(ips)][sha])";
