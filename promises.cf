@@ -211,8 +211,6 @@ bundle common cfengine_stdlib
       "$(this.bundle): defining inputs='$(inputs)'";
 }
 
-      #
-
 bundle common cfengine_controls
 {
   vars:
