@@ -288,6 +288,9 @@ bundle common def
       "enable_cfengine_enterprise_hub_ha" expression => "!any";
       #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
 
+      # Enable failover to node which is outside cluster
+      #"failover_to_replication_node_enabled" expression => "enterprise_edition";
+
       # Enable cleanup of agent report diffs when they exceed
       # `def.max_client_history_size`
       "enable_cfe_internal_cleanup_agent_reports" -> { "cf-hub", "CFEngine Enterprise" }
