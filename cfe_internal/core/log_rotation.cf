@@ -10,15 +10,30 @@ bundle agent cfe_internal_log_rotation
 # @brief Manage CFEngine log files so they don't fill up disks
 # See def.cf to enable rotation
 {
-
   methods:
 
     cfengine_internal_rotate_logs::
       # CFEngine generates internal log files that need to be rotated.
       # Have a look at def.cf to enable rotation of these files
-      "rotate_promise_summary" usebundle => logrotate("@(def.cfe_log_files)", "1m", "10"),
-                               comment   => "Rotate log files once their size reach 1MB, keep 10 versions";
+      "Rotate CFEngine log files"
+        handle    => "cfe_internal_log_rotation_rotate_log_files",
+        usebundle => logrotate( @(def.cfe_log_files), 1M, 10 ),
+	comment   => "To keep the disk from getting to full we want to rotate
+		      log files when they reach 1MB in size. So that we have
+                      some history , we keep 10 versions.";
 
-      "rotate_outputs"         usebundle => prunedir("@(def.cfe_log_dirs)", "30"),
-                               comment   => "Delete outputs/* files older than 30 days";
+      "Prune old log files"
+        handle    => "cfe_internal_log_rotation_prune_log_dirs",
+        usebundle => prunedir( @(def.cfe_log_dirs), 30 ),
+	comment   => "Scheduled activities like agent runs and reports can
+		      create log files or reports that stack up over time. So
+		      that we dont fill the disk, but have some historical
+		      information available locally we purge log files older
+                      than 30 days.";
+
+  reports:
+
+    DEBUG|DEBUG_cfe_internal_log_rotation::
+      "DEBUG $(this.bundle): Check CFEngine log file for rotation '$(def.cfe_log_files)'";
+      "DEBUG $(this.bundle): Check CFEngine log directory for old logs '$(def.cfe_log_dirs)'";
 }
