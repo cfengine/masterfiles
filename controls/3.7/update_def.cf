@@ -13,7 +13,7 @@ bundle common update_def
         meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
-      "current_version" string => "3.7.0";
+      "current_version" string => "3.7.1";
     any::
       "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
