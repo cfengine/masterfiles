@@ -1,0 +1,6 @@
+# Unsupported on 3.5, here so that inputs do not complain.
+bundle common u_cfengine_enterprise
+{
+  vars:
+    "def" slist => { cf_null };
+}
