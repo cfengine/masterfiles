@@ -40,8 +40,6 @@
 #
 
 # For CFEngine Core: 3.7.0 to 3.7.x
-# Internal hub maintenance bundles, incompatible with 3.5.x
-
 ###################################################
 # If you find CFEngine useful, please consider    #
 # purchasing a commercial version of the software.#
@@ -67,13 +65,24 @@ bundle agent cfe_internal_cleanup_agent_reports
 {
   vars:
     any::
-      "diff_files" slist => findfiles("$(sys.workdir)/state/diff/*.diff");
-      "promise_log_files" slist => findfiles("$(sys.workdir)/state/promise_log/*.csv");
+      # To avoid unnecessary work, we only findfiles if there is not already a
+      # variable defined.
+      "diff_files"
+        slist => findfiles("$(sys.workdir)/state/diff/*.diff"),
+        unless => isvariable( $(this.promiser) );
+
+      "promise_log_files"
+        slist => findfiles("$(sys.workdir)/state/promise_log/*.csv"),
+        unless => isvariable( $(this.promiser) );
 
       "files" slist => { @(diff_files), @(promise_log_files) };
 
-      "reports_size[$(files)]" int => filesize("$(files)");
-      "tmpmap" slist => maparray("$(this.v)", reports_size);
+      "reports_size[$(files)]"
+        int => filesize("$(files)"),
+        unless => isvariable( $(this.promiser) );
+
+      "tmpmap"
+        slist => maparray("$(this.v)", reports_size);
 
     # We need to make sure that we have files before summing or errors are
     # produced in the log
@@ -101,4 +110,5 @@ bundle agent cfe_internal_cleanup_agent_reports
       "DEBUG $(this.bundle): Purge threshold = '$(def.max_client_history_size)'";
       "DEBUG $(this.bundle): Client history purge triggered"
         ifvarclass => "cfe_internal_purge_reports";
+
 }

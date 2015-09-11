@@ -39,9 +39,7 @@
 # the online docs
 #
 
-# For CFEngine Core: 3.7.0 to 3.7.x
-# Internal hub maintenance bundles, incompatible with 3.5.x
-
+# For CFEngine Core: 3.8.0 to 3.8.x
 ###################################################
 # If you find CFEngine useful, please consider    #
 # purchasing a commercial version of the software.#
@@ -67,26 +65,50 @@ bundle agent cfe_internal_cleanup_agent_reports
 {
   vars:
     any::
-      "report_files" slist => findfiles("$(sys.workdir)/state/diff/*.diff");
-      "reports_size[$(report_files)]" int => filesize("$(report_files)");
-      "tmpmap" slist => maparray("$(this.v)", reports_size);
+      # To avoid unnecessary work, we only findfiles if there is not already a
+      # variable defined.
+      "diff_files"
+        slist => findfiles("$(sys.workdir)/state/diff/*.diff"),
+        unless => isvariable( $(this.promiser) );
 
-    # We need to make sure that we have diff files before summing or errors are
-    # produced in the log. It's not possible to sum cf_null
-    have_diff_files::
+      "promise_log_files"
+        slist => findfiles("$(sys.workdir)/state/promise_log/*.csv"),
+        unless => isvariable( $(this.promiser) );
+
+      "files" slist => { @(diff_files), @(promise_log_files) };
+
+      "reports_size[$(files)]"
+        int => filesize("$(files)"),
+        unless => isvariable( $(this.promiser) );
+
+      "tmpmap"
+        slist => maparray("$(this.v)", reports_size);
+
+    # We need to make sure that we have files before summing or errors are
+    # produced in the log
+    have_files::
       "total_report_size" real => sum(tmpmap);
 
   classes:
-      "cfe_internal_purge_diff_reports"
+      "cfe_internal_purge_reports"
         expression => isgreaterthan("$(total_report_size)","$(def.max_client_history_size)"),
-        comment => "Determine if the current sum of report diffs exceeds the max desired";
+        comment => "Determine if the current sum of reports exceeds the max desired";
 
-      "have_diff_files"
+      "have_files"
         expression => isgreaterthan(length(tmpmap), 0);
 
   files:
-    cfe_internal_purge_diff_reports::
-      "$(report_files)"
+    cfe_internal_purge_reports::
+      "$(files)"
         delete => tidy,
-        handle => "cf_cleanup_agent_reports_$(report_files)";
+        handle => "cf_cleanup_agent_reports_$(files)";
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_cleanup_agent_reports::
+      "DEBUG $(this.bundle): Size of '$(files)' =  '$(reports_size[$(files)])'";
+      "DEBUG $(this.bundle): Size of all reports = '$(total_report_size)'";
+      "DEBUG $(this.bundle): Purge threshold = '$(def.max_client_history_size)'";
+      "DEBUG $(this.bundle): Client history purge triggered"
+        ifvarclass => "cfe_internal_purge_reports";
+
 }
