@@ -31,8 +31,7 @@ body common control
 
       inputs => {
                  # File definition for global variables and classes
-                  "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
-                  "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def_inputs.cf",
+                  @(cfengine_controls.def_inputs),
 
                 # Inventory policy
                   @(inventory.inputs),
@@ -208,8 +207,19 @@ bundle common cfengine_stdlib
       };
 
     !cfengine_3_5::
-      # CFEngine 3.6 and higher can include through a secondary file
+      # CFEngine 3.6 can include through a secondary file
+      # CFEngine version 3.6 and prior use the split library to avoid syntax
+      # errors introduced by new functionality. For example new functions.
+      # This also works for 3.8 because local_libdir should be set to lib
+      # instead of lib/3.8
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
+
+    cfengine_3_7::
+      # CFEngine 3.7 has local_libdir set to $(sys.inputdir)/lib/3.7, but with
+      # the @if macro support we can re-unify the split library for 3.7+ so we
+      # specify the unified lib instead of local_libdir.
+      "inputs" slist => { "lib/stdlib.cf" };
+
 
   reports:
     verbose_mode::
@@ -219,7 +229,14 @@ bundle common cfengine_stdlib
 bundle common cfengine_controls
 {
   vars:
-    any::
+    # 3.7+ uses the re-unified controls
+    cfengine_3_5|cfenigne_3_6::
+      "def_inputs"
+        slist => {
+                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
+                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def_inputs.cf",
+                 },
+        comment => "We strictly order the def inputs because they should be parsed first";
 
       "input[cf_agent]"
         string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_agent.cf",
@@ -241,7 +258,7 @@ bundle common cfengine_controls
         string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_runagent.cf",
         comment => "Runagent (remote activation request) control options";
 
-    enterprise_edition::
+    enterprise_edition.(cfengine_3_5|cfengine_3_6)::
 
       "input[cf_hub]" -> { "CFEngine Enterprise" }
         string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_hub.cf",
@@ -250,6 +267,48 @@ bundle common cfengine_controls
       "input[reports]" -> { "CFEngine Enterprise" }
         string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/reports.cf",
         comment => "Report collection options";
+
+
+    # 3.7+ uses the re-unified controls
+    !cfengine_3_5|cfenigne_3_6::
+      "def_inputs"
+        slist => {
+                   "controls/def.cf",
+                   "controls/def_inputs.cf",
+                 },
+        comment => "We strictly order the def inputs because they should be parsed first";
+
+
+      "input[cf_agent]"
+        string => "controls/cf_agent.cf",
+        comment => "Agent control options";
+
+      "input[cf_execd]"
+        string => "controls/cf_execd.cf",
+        comment => "Executor (scheduler) control options";
+
+      "input[cf_monitord]"
+        string => "controls/cf_monitord.cf",
+        comment => "Monitor/Measurement control options";
+
+      "input[cf_serverd]"
+        string => "controls/cf_serverd.cf",
+        comment => "Server control options";
+
+      "input[cf_runagent]"
+        string => "controls/cf_runagent.cf",
+        comment => "Runagent (remote activation request) control options";
+
+    enterprise_edition.!(cfengine_3_5|cfengine_3_6)::
+
+      "input[cf_hub]" -> { "CFEngine Enterprise" }
+        string => "controls/cf_hub.cf",
+        comment => "Hub (agent report collection) control options";
+
+      "input[reports]" -> { "CFEngine Enterprise" }
+        string => "controls/reports.cf",
+        comment => "Report collection options";
+
 
     any::
 
@@ -269,10 +328,22 @@ bundle common services_autorun
       "found_inputs" slist => {};
       "bundles" slist => { "services_autorun" }; # run self
 
-    !cfengine_3_5::
-      "inputs" slist => { "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/autorun.cf" };
+    (cfengine_3_6|cfengine_3_8)!services_autorun::
+      # Both 3.6 and 3.8+ can use local_libdir
+      # 3.6 will use the split library in the version specific path
+      # 3.8+ will use the common lib as it supports the @if macro
+      "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
+
+    cfengine_3_7|!services_autorun::
+      # We have to bypass using sys.local_libdir as in 3.7 binaries it is set
+      # to a version specific path. However since 3.7 knows about the @if macro
+      # it is safe to share the same policy as 3.8+
+      "inputs" slist => { "lib/autorun.cf" };
+      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
+      "bundles" slist => { "autorun" }; # run loaded bundles
+
 
   reports:
     DEBUG|DEBUG_services_autorun::
