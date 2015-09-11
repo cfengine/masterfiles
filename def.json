@@ -1,0 +1,7 @@
+{
+    "classes":
+    {
+        "enable_phased_rollout": [ "any" ],
+	"services_autorun" : [ "any" ]
+    }
+}

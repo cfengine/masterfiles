@@ -1,0 +1,29 @@
+bundle agent inventory_cf_promises_release_id
+{
+  meta:
+    "tags" slist => { "autorun" };
+
+    "description"
+      string => "Inventory the releaseId from
+		 $(sys.inputdir)/cf_promises_release_id.json. This value can
+		 be correlated back to your version control system, and can
+		 assist in determining the specific policy which an agent is
+		 using and can help track a policy release across an
+                 infrastructure.";
+  vars:
+    "data_file" string => "$(sys.inputdir)/cf_promises_release_id";
+
+    "data"
+      data => readjson( $(data_file), inf),
+      ifvarclass => fileexists( $(data_file) );
+
+    "release_id"
+      string => "$(data[releaseId])",
+      meta => { "inventory", "attribute_name=Policy Release ID" };
+
+  reports:
+    DEBUG|DEBUG_inventory_cf_promises_release_id::
+      "DEBUG $(this.bundle): Data File = '$(data_file)'";
+      "DEBUG $(this.bundle): Policy Release ID = '$(release_id)'";
+      
+}

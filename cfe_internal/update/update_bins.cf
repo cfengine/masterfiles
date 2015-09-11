@@ -13,9 +13,67 @@
 #  - CFEngine binary update (native packages)
 #
 ################################################################################
+bundle agent cfe_internal_bin_perms
+{
+  vars:
+    any::
+      "component[cf-agent]"    string => "cf-agent";
+      "component[cf-runagent]" string => "cf-agent";
+      "component[cf-key]"      string => "cf-key";
+      "component[cf-monitord]" string => "cf-monitord";
+      "component[cf-promises]" string => "cf-promises";
+      "component[cf-serverd]"  string => "cf-serverd";
+
+    enterprise_edition.policy_server::
+      "component[cf-hub]"  string => "cf-hub";
+      "component[cf-consumer]"  string => "cf-consumer";
+
+    any::
+      "agents" slist => getvalues(component);
+
+    !cfengine_3_5::
+      "dir_bin"
+        string => translatepath("$(sys.bindir)"),
+        comment => "Directory containing CFEngine binaries",
+        handle => "cfe_internal_update_policy_vars_dir_bin";
+
+    cfengine_3_5::
+      "dir_bin"
+        string => translatepath("$(sys.workdir)/bin"),
+        comment => "Directory containing CFEngine binaries",
+        handle => "cfe_internal_update_policy_vars_dir_bin_backport";
+
+  files:
+   !windows::
+
+      "$(sys.workdir)/bin"
+      comment => "Make sure cfengine binaries have right file permissions",
+      handle => "cfe_internal_update_policy_files_sys_workdir_bin",
+      perms => u_m("755"),
+      depth_search => u_recurse_basedir("inf"),
+      ifvarclass => and(strcmp($(sys.workdir), "/var/cfengine")),
+      action => u_immediate;
+
+      "$(sys.workdir)/lib"
+      comment => "Make sure cfengine libraries have right file permissions",
+      handle => "cfe_internal_update_policy_files_sys_workdir_lib",
+      perms => u_shared_lib_perms,
+      depth_search => u_recurse_basedir("inf"),
+      action => u_immediate;
+
+      "/usr/local/sbin/$(agents)"
+      comment => "Create symlinks of CFE binaries in /usr/local/sbin",
+      handle => canonify("cfe_internal_update_policy_files_sbin_$(agents)"),
+      move_obstructions => "true",
+      link_from => u_ln_s("$(sys.workdir)/bin/$(agents)");
+
+      "/usr/local/sbin/$(agents).cfsaved"
+      comment => "Remove all .cfsaved file extension",
+      handle => canonify("cfe_internal_update_policy_files_remove_$(agent)_cfsaved"),
+      delete => u_tidy;
+}
 
 bundle agent cfe_internal_update_bins
-
 {
 
   vars:

@@ -11,6 +11,8 @@ body common control
                           "u_cfengine_enterprise",
                           @(u_cfengine_enterprise.def),
                           "cfe_internal_dc_workflow",
+                          "stage_masterfiles",
+                          "cfe_internal_bin_perms", # Previously intermingled in the policy update bundle(now copy_policy)
                           "cfe_internal_update_policy",
                           "cfe_internal_update_bins",
                           "cfe_internal_update_processes",
@@ -22,10 +24,12 @@ body common control
                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def.cf",
                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def_inputs.cf",
                   "cfe_internal/update/update_bins.cf",
+                  "cfe_internal/update/stage_masterfiles.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
+                  "cfe_internal/update/cfe_internal_copy_policy.cf",
                   "cfe_internal/update/update_processes.cf"
       };
 

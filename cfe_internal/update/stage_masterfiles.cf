@@ -1,0 +1,24 @@
+bundle agent stage_masterfiles
+{
+  vars:
+      policy_server::
+      "staging_script"
+        string => "/vagrant/multimasterfiles/masterfiles-stage.sh";
+
+      "param_location"
+        string => "/vagrant/multimasterfiles";
+
+      "masterfiles_destination"
+        string => "/var/cfengine/policychannel";
+
+      "policy_channels"
+        slist => { "production_1", "production_2", "development", "tag" };
+
+  commands:
+      policy_server::
+      # masterfiles-stage.sh DESTINATION PARAMS
+      # TODO: FIX every time this runs the cf_promises_validated is updated, see staging script
+      "$(staging_script)"
+        args => "$(masterfiles_destination)/$(policy_channels) $(param_location)/$(policy_channels).sh",
+        comment => "We want to try and update each policy channel based on the current settings";
+}

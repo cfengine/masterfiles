@@ -33,6 +33,7 @@ body common control
                  # File definition for global variables and classes
                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def_inputs.cf",
+                  "cfe_internal/update/stage_masterfiles.cf", # this is needed so that the access rules are picked up, probably put them elseshwere later
 
                 # Inventory policy
                   @(inventory.inputs),

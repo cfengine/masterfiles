@@ -5,6 +5,12 @@ bundle common update_def
       "$(override_classes)" expression => "any", meta => { "override" };
 
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
+      "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
+
+    have_augments_classes::
+      "$(augments_classes_data_keys)"
+        expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
+        meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
       "current_version" string => "3.7.0";
@@ -20,6 +26,10 @@ bundle common update_def
       "override_classes" slist => getvalues("augments[classes]");
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
+
+    have_augments_classes::
+      "augments_classes_data" data => mergedata("augments[classes]");
+      "augments_classes_data_keys" slist => getindices("augments_classes_data");
 
     any::
       # Begin change
@@ -38,6 +48,29 @@ bundle common update_def
       ifvarclass => not(isvariable("override_data_input_name_patterns")),
       meta => { "defvar" };
 
+    !cfengine_3_5::
+      "masterfiles_location"
+        string => "$(sys.masterdir)",
+        handle => "common_update_def_vars_default_masterfiles_location_after_3_5",
+	comment => "CFEngine 3.6 introduced sys.masterdir which sets the
+		    default masterfiles location at compile time. So we want to
+                    use that going forward";
+
+   !windows.cfengine_3_5::
+      "masterfiles_location"
+        string => "$(sys.workdir)/masterfiles",
+        handle => "common_update_def_vars_default_masterfiles_location_3_5_windows",
+        comment => "3.5 did not have the sys.masterdir variable, and windows workdir is different";
+
+    windows::
+      "masterfiles_location"
+        string => "/var/cfengine/masterfiles",
+        handle => "common_update_def_vars_default_masterfiles_location_3_5_windows",
+	comment => "Windows sys.workdir isnt appropirate to select the path to
+		    masterfiles on a remote nix server so we just set it
+                    manually Until we have access to sys.masterdir";
+
+    any::
       # the permissions for your masterfiles, which will propagate to inputs
       "masterfiles_perms_mode" string => "0600",
       handle => "common_def_vars_masterfiles_perms_mode",
