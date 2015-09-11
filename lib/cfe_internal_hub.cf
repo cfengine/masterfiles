@@ -261,7 +261,7 @@ bundle agent cfe_internal_postgresql_maintenance
       comment => "Vacuum Full PostgreSQL (database: cfdb)",
       handle => "cfe_internal_postgresql_maintenance_vacuum_full";
 
-    policy_server.enterprise.!cfengine_3_5::
+    policy_server.enterprise::
       "cf_consumer_pid" string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
       comment => "Read cf-consumer.pid for the main cf-consumer PID";
 
