@@ -7,7 +7,6 @@
 ###############################################################################
 
 body server control
-
 {
       # List of ciphers the server accepts. For Syntax help see man page
       # for "openssl ciphers". Default is "AES256-GCM-SHA384:AES256-SHA"
@@ -37,6 +36,13 @@ body server control
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
 
+    enterprise.!policy_server::
+      listen => "false";
+
+    enterprise::
+      call_collect_interval => "5";
+      collect_window => "50";
+
     windows::
       cfruncommand => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
 
@@ -47,17 +53,15 @@ body server control
       cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     solaris::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
 
     !(windows|hpux|aix|solaris)::
       cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
-
 }
 
 ###############################################################################
 
 bundle server access_rules()
-
 {
   access:
 
@@ -94,6 +98,11 @@ bundle server access_rules()
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
       admit => { @(def.policy_servers) };
+
+    enterprise.policy_server::
+      "collect_calls"
+        resource_type => "query",
+        admit_ips => { @{def.acl} };
 
     policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/ppkeys"
@@ -150,5 +159,4 @@ bundle server access_rules()
       # define certain soft-classes when running cf-agent on this host
 
       ".*" authorize => { "root" };
-
 }
