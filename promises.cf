@@ -217,8 +217,8 @@ bundle common cfengine_stdlib
     cfengine_3_7::
       # CFEngine 3.7 has local_libdir set to $(sys.inputdir)/lib/3.7, but with
       # the @if macro support we can re-unify the split library for 3.7+ so we
-      # specify the unified lib instead of local_libdir.
-      "inputs" slist => { "lib/stdlib.cf" };
+      # specify the unified lib relative to local_libdir.
+      "inputs" slist => { "$(sys.local_libdir)/../stdlib.cf" };
 
 
   reports:
