@@ -16,12 +16,7 @@
 bundle common cfe_internal_process_knowledge
 {
   vars:
-    !windows.cfengine_3_5::
-
-      "bindir"      string => "$(sys.workdir)/bin",
-      comment => "Use a real path";
-
-    !windows.!cfengine_3_5::
+    !windows::
 
       "bindir"      string => "$(sys.bindir)",
       comment => "Use a system variable";
@@ -142,7 +137,7 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
       ifvarclass => "nova|enterprise";
 
-   am_policy_hub.!cfengine_3_5::
+   am_policy_hub::
       "$(cfe_internal_process_knowledge.bindir)/redis-server"
       restart_class => "start_redis_server",
       comment => "Monitor redis-server process",

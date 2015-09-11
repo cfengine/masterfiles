@@ -463,9 +463,8 @@ body package_method u_generic(repo)
     debian::
       package_add_command        => "/usr/bin/dpkg --force-confdef --force-confnew --install";
       package_delete_command     => "/usr/bin/dpkg --purge";
-    debian.cfengine_3_5::
-      package_update_command     => "/usr/bin/dpkg --force-confdef --force-confnew --install";
-    debian.!cfengine_3_5::
+
+    debian::
       package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     redhat|SuSE|suse::
@@ -490,9 +489,7 @@ body package_method u_generic(repo)
       package_delete_command     => "/bin/rpm -e --nodeps";
       package_verify_command     => "/bin/rpm -V";
       package_noverify_regex     => ".*[^\s].*";
-    (redhat|SuSE|suse).cfengine_3_5::
-      package_update_command     => "/bin/rpm -Uvh";
-    (redhat|SuSE|suse).!cfengine_3_5::
+    (redhat|SuSE|suse)::
       package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     redhat.!redhat_4::
@@ -581,9 +578,7 @@ body package_method u_generic(repo)
       # Cfengine appends path to package and package name below, respectively
       package_add_command        => "/bin/sh $(repo)/add_scr $(repo)/admin_file";
       package_delete_command     => "/usr/sbin/pkgrm -n -a $(repo)/admin_file";
-    (solarisx86|solaris).cfengine_3_5::
-      package_update_command     => "/bin/sh $(repo)/upg_scr $(repo)/admin_file";
-    (solarisx86|solaris).!cfengine_3_5::
+    (solarisx86|solaris)::
       package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     aix::

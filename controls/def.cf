@@ -235,8 +235,11 @@ bundle common def
       # Internal CFEngine log files rotation
       "cfengine_internal_rotate_logs" expression => "any";
 
-      # Enable agent email output (also see mailto, mailfrom and smtpserver)
+      # Enable or disable agent email output (also see mailto, mailfrom and
+      # smtpserver)
       "cfengine_internal_agent_email" expression => "any";
+      "cfengine_internal_disable_agent_email" expression => "!any";
+
 
 
       # Enable or disable external watchdog to ensure cf-execd is running
