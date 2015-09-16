@@ -260,6 +260,7 @@ bundle common paths
       "path[svcs]"     string => "/usr/bin/svcs";
       "path[svcadm]"   string => "/usr/sbin/svcadm";
       "path[svccfg]"   string => "/usr/sbin/svccfg";
+      "path[svcprop]"  string => "/usr/bin/svcprop";
       "path[netadm]"   string => "/usr/sbin/netadm";
       "path[dladm]"    string => "/usr/sbin/dladm";
       "path[ipadm]"    string => "/usr/sbin/ipadm";
