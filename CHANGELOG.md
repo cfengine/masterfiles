@@ -1,7 +1,7 @@
 # Changelog
 Notable changes to the framework should be documented here
 
-## [Unreleased][unreleased]
+## 3.8 (Unreleased)
 ### Added
  - External watchdog policy to ensure that cf-execd is running so that policy will be
    run on schedule.
@@ -12,6 +12,21 @@ Notable changes to the framework should be documented here
      cfe_internal_core_watchdog_enabled, or disabled by defining
      cfe_internal_core_watchdog_disabled. In the event both classes are defined
      at the same time enabled wins.
+
+### Changed
+ - Reunify version split stdlib (Redmine: #7559)
+
+### Removed
+ - Removed support for version 3.5 from masterfiles
+
+## 3.7.2 (Unreleased)
+## Added
+   - svcprop to stdlib paths
+
+## Changed
+   - inform_mode classes changed to DEBUG|DEBUG_$(this.bundle):: (Redmine: #7191)
+
+## 3.7.1
 ### Fixed
    - Augmenting inputs from the augments_file (Redmine #7420)
 
