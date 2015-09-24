@@ -19,8 +19,7 @@ body common control
       version => "update.cf $(update_def.current_version)";
 
       inputs => {
-                  "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def.cf",
-                  "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def_inputs.cf",
+                  @(cfengine_update_controls.update_def_inputs),
                   "cfe_internal/update/update_bins.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
@@ -34,6 +33,29 @@ body common control
 }
 
 #############################################################################
+bundle common cfengine_update_controls
+{
+  vars:
+    # 3.6 uses the split controls
+    cfengine_3_6::
+      "update_def_inputs"
+        slist => {
+                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def.cf",
+                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def_inputs.cf",
+                 };
+
+    # 3.7+ uses the re-unified controls
+    !cfengine_3_6::
+       "update_def_inputs"
+        slist => {
+                   "controls/update_def.cf",
+                   "controls/update_def_inputs.cf",
+                 };
+
+  reports:
+    DEBUG|DEBUG_cfengine_update_controls::
+      "DEBUG $(this.bundle): update def inputs='$(update_def_inputs)'";
+}
 
 body agent control
 {
