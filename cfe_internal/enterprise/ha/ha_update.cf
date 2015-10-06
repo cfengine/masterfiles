@@ -20,7 +20,7 @@ bundle agent ha_agent_sync
  files:
   "$(sys.workdir)/policy_server.dat"
       copy_from => ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.policy_servers)),
-      handle => "ha_cfengine_node_update_master",
+      handle => "ha_cfengine_node_update_master_ip",
       comment => "Update master hub IP on CFEngine node. This is causing that clients will try 
                   to contact active/master hub first.";
 
@@ -37,7 +37,7 @@ bundle agent ha_agent_sync
 bundle agent ha_share_hub_keys
 {
  files:
-   "$(ha_def.ppkeys_hubs)"
+   "$(ha_def.hubs_keys_location)"
       copy_from => no_backup_cp("$(sys.workdir)/ppkeys"),
       file_select => hubs_keys_select,
       handle => "ha_copy_hubs_keys",
@@ -86,7 +86,7 @@ bundle agent sync_master_hub_dat
     "$(ha_def.master_hub_location)"
       copy_from => ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.standby_servers)),
       comment => "Update master hub IP on CFEngine node",
-      handle => "ha_cfengine_node_update_master";
+      handle => "ha_cfengine_hub_update_master_ip";
 
 }
 
