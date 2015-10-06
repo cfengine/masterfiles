@@ -1,7 +1,11 @@
 # Changelog
 Notable changes to the framework should be documented here
 
-## [Unreleased][unreleased]
+## 3.7.2 (unreleased)
+### Changed
+   - inform_mode classes changed to DEBUG|DEBUG_$(this.bundle):: (Redmine: #7191)
+
+## 3.7.1
 ### Fixed
    - Augmenting inputs from the augments_file (Redmine #7420)
 
@@ -39,6 +43,7 @@ Notable changes to the framework should be documented here
    bundle being activated by default if there is no bundlesequence specified.
  - Reduce benchmarks sample history to 1 day.
  - Update policy no longer generates a keypair if one is not found. (Redmine: #7167)
+<<<<<<< HEAD
  - Relocate cfe_internal_postgresql_maintenance bundle to lib/VER/
  - Set postgresql_monitoring_maintenance only for versions 3.6.0 and 3.6.1
  - Move hub specific bundles from lib/VER/cfe_internal.cf into lib/VER/cfe_internal_hub.cf
@@ -47,6 +52,8 @@ Notable changes to the framework should be documented here
  - inform_mode classes changed to DEBUG|DEBUG_$(this.bundle):: (Redmine: #7191)
  - Enabled limit_robot_agents in order to work around multiple cf-execd
    processes after upgrade. (Redmine #7185)
+=======
+>>>>>>> 6f58db5... Change: Switch inform_mode reports to DEBUG|DEBUG_bundlename
 
 ### Deprecated
 
