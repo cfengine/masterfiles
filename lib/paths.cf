@@ -218,6 +218,7 @@ bundle common paths
 
       "path[getfacl]"  string => "/bin/getfacl";
       "path[dtrace]"   string => "/usr/sbin/dtrace";
+      "path[service]"  string => "/usr/sbin/service";
       "path[zpool]"    string => "/sbin/zpool";
       "path[zfs]"      string => "/sbin/zfs";
 
