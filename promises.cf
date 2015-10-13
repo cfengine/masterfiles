@@ -146,6 +146,10 @@ bundle common cfe_internal_inputs
         comment => "This policy ensures that various cfengine log files
                     do not grow without bound and fill up the disk";
 
+      "input[cfe_internal_failsafe_copy]"
+        string => "cfe_internal/failsafe/failsafe_copy.cf",
+        comment => "Ensure failsafe.cf is in inputs for fallback";
+
       "input[core_host_info_report]"
         string => "cfe_internal/core/host_info_report.cf",
         comment => "This policy produces a text based host info report

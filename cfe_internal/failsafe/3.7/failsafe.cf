@@ -1,0 +1,313 @@
+#
+#  Copyright (C) CFEngine AS
+#
+#  This file is part of CFEngine 3 - written and maintained by CFEngine AS.
+#
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU General Public License as published by the
+#  Free Software Foundation; version 3.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+#
+# To the extent this program is licensed as part of the Enterprise
+# versions of CFEngine, the applicable Commercial Open Source License
+# (COSL) may apply to this file if you as a licensee so wish it. See
+# included file COSL.txt.
+
+########## CFEngine Bootstrap / Failsafe Policy ##############################
+# This file (failsafe.cf) is re-generated inside "inputs" directory every time
+# you bootstrap. This means that custom changes will be overwritten.
+#
+# The role of this standalone policy file is to fetch the main promises from
+# the policy hub for the first time when bootstrapping, and to recover the
+# system by fetching policies in case the standard agent run fails.
+##############################################################################
+
+
+body common control
+{
+      bundlesequence => {
+                          "cfe_internal_checkkeys",
+                          "cfe_internal_update",
+                          "cfe_internal_call_update"
+                        };
+}
+
+body agent control
+{
+      skipidentify => "true";
+
+      # Bootstrapping can't continue without keys
+      abortclasses => { "no_ppkeys_ABORT" };
+}
+
+################################################################################
+
+bundle agent cfe_internal_checkkeys
+{
+  classes:
+      "have_ppkeys"
+        expression => fileexists("$(sys.workdir)/ppkeys/localhost.pub"),
+        handle     => "cfe_internal_bootstrap_checkkeys_classes_have_ppkeys";
+
+  reports:
+    !have_ppkeys::
+      "No public/private key pair is loaded, please create one by running \"cf-key\""
+        classes => kept("no_ppkeys_ABORT");
+}
+
+################################################################################
+
+bundle agent cfe_internal_update
+{
+  vars:
+
+    policy_server::
+
+      # policy server cannot use shortcut feature to resolve masterfiles since cf-serverd is not yet up
+      "masterfiles_dir_remote" string => "$(sys.masterdir)";
+
+    !policy_server::
+
+      "masterfiles_dir_remote" string => "masterfiles";
+
+
+  classes:
+
+    any::
+
+      "have_promises_cf"
+      expression => fileexists("$(sys.inputdir)/promises.cf"),
+      handle => "cfe_internal_bootstrap_update_classes_have_promises_cf";
+
+
+  files:
+
+      "$(sys.inputdir)"
+      handle => "cfe_internal_bootstrap_update_files_sys_workdir_inputs_shortcut",
+      copy_from => u_scp("$(masterfiles_dir_remote)"),
+      depth_search => u_recurse("inf"),
+      classes => repaired("got_policy");
+
+    !windows.got_policy_failed::
+
+      "$(sys.inputdir)"
+      handle => "cfe_internal_bootstrap_update_files_sys_workdir_inputs_not_windows",
+      copy_from => u_scp("$(sys.masterdir)"),
+      depth_search => u_recurse("inf"),
+      classes => repaired("got_policy");
+
+    windows.got_policy_failed::
+
+      "$(sys.inputdir)"
+      handle => "cfe_internal_bootstrap_update_files_sys_workdir_inputs_windows",
+      copy_from => u_scp("/var/cfengine/masterfiles"), # Not $(sys.masterdir) when referring to remote host.
+      depth_search => u_recurse("inf"),
+      classes => repaired("got_policy");
+
+    windows::
+
+      "$(sys.workdir)\\bin-twin\\."
+      handle => "cfe_internal_bootstrap_update_files_sys_workdir_bin_twin_windows",
+      comment => "Make sure we maintain a clone of the binaries and libraries for updating",
+      copy_from => u_cp("$(sys.workdir)\\bin\\."),
+      depth_search => u_recurse("1");
+
+
+  processes:
+
+    !windows.got_policy::
+
+      "cf-execd" restart_class => "start_exec",
+      handle => "cfe_internal_bootstrap_update_processes_start_cf_execd";
+
+    am_policy_hub.got_policy::
+
+      "cf-serverd" restart_class => "start_server",
+      handle => "cfe_internal_bootstrap_update_processes_start_cf_serverd";
+
+
+  commands:
+
+    start_exec.!windows.!systemd::
+
+      "$(sys.cf_execd)"
+      handle => "cfe_internal_bootstrap_update_commands_check_sys_cf_execd_start",
+      classes => repaired("executor_started");
+
+    start_server.!systemd::
+
+      "$(sys.cf_serverd)"
+      handle => "cfe_internal_bootstrap_update_commands_check_sys_cf_serverd_start",
+      action => ifwin_bg,
+      classes => repaired("server_started");
+
+    start_exec.systemd::
+
+      # We explicitly use "restart", because it is possible that cf-serverd
+      # is running, even if cf-execd isn't, for example. Here we want to be
+      # sure we relaunch everything.
+
+      "/bin/systemctl restart cfengine3"
+      handle => "cfe_internal_bootstrap_update_commands_systemd_cfe_start",
+      classes => repaired_two("executor_started", "server_started");
+
+
+  services:
+
+    windows.got_policy::
+
+      "CfengineNovaExec"
+      handle => "cfe_internal_bootstrap_update_services_windows_executor",
+      service_policy => "start",
+      service_method => bootstart,
+      classes => repaired("executor_started");
+
+
+  reports:
+
+    !bootstrap_mode::
+      "Built-in failsafe policy triggered"
+        handle => "cfe_internal_bootstrap_update_reports_failsafe_notification",
+	comment => "Be sure to inform the user that the failsafe policy has
+		    been triggered. This typically indicates that the agent has
+		    recieved broken policy. It may also indicate legacy
+                    configuration in body executor control.";
+
+    bootstrap_mode::
+      "Bootstrapping from host '$(sys.policy_server)' via built-in policy '$(this.promise_filename)'"
+        handle => "cfe_internal_bootstrap_update_reports_bootstrap_notification",
+        comment => "Be sure to inform the user that they have triggerd a bootstrap.";
+
+    bootstrap_mode.am_policy_hub::
+
+      "This host assumes the role of policy server"
+      handle => "cfe_internal_bootstrap_update_reports_assume_policy_hub";
+
+    bootstrap_mode.!am_policy_hub::
+
+      "This autonomous node assumes the role of voluntary client"
+      handle => "cfe_internal_bootstrap_update_reports_assume_voluntary_client";
+
+    got_policy::
+
+      "Updated local policy from policy server"
+      handle => "cfe_internal_bootstrap_update_reports_got_policy";
+
+    !got_policy.!have_promises_cf::
+
+      "Failed to copy policy from policy server at $(sys.policy_hub):$(sys.masterdir)
+       Please check
+       * cf-serverd is running on $(sys.policy_hub)
+       * CFEngine version on the policy hub is 3.6.0 or latest - otherwise you need to tweak the protocol_version setting
+       * network connectivity to $(sys.policy_hub) on port 5308
+       * masterfiles 'body server control' - in particular allowconnects, trustkeysfrom and skipverify
+       * masterfiles 'bundle server' -> access: -> masterfiles -> admit/deny
+       It is often useful to restart cf-serverd in verbose mode (cf-serverd -v) on $(sys.policy_hub) to diagnose connection issues.
+       When updating masterfiles, wait (usually 5 minutes) for files to propagate to inputs on $(sys.policy_hub) before retrying."
+      handle => "cfe_internal_bootstrap_update_reports_did_not_get_policy";
+
+    server_started::
+
+      "Started the server"
+      handle => "cfe_internal_bootstrap_update_reports_started_serverd";
+
+    am_policy_hub.!server_started.!have_promises_cf::
+
+      "Failed to start the server"
+      handle => "cfe_internal_bootstrap_update_reports_failed_to_start_serverd";
+
+    executor_started::
+
+      "Started the scheduler"
+      handle => "cfe_internal_bootstrap_update_reports_started_execd";
+
+    !executor_started.!have_promises_cf::
+
+      "Did not start the scheduler"
+      handle => "cfe_internal_bootstrap_update_reports_failed_to_start_execd";
+
+}
+
+################################################################################
+bundle agent cfe_internal_call_update
+{
+  commands:
+
+    # On Windows we need cf-execd to call update.cf, otherwise the daemons will
+    # not run under the SYSTEM account.
+    !windows::
+
+      "$(sys.cf_agent) -f update.cf"
+      handle => "cfe_internal_call_update_commands_call_update_cf";
+}
+############################################
+body classes kept(x)
+{
+      promise_kept => {"$(x)"};
+}
+############################################
+body classes repaired(x)
+{
+      promise_repaired => {"$(x)"};
+      repair_failed => {"$(x)_failed"};
+}
+############################################
+body classes repaired_two(x,y)
+{
+      promise_repaired => {"$(x)", "$(y)"};
+      repair_failed => {"$(x)_failed"};
+}
+############################################
+body perms u_p(p)
+{
+      mode  => "$(p)";
+}
+#############################################
+body copy_from u_scp(from)
+{
+      source      => "$(from)";
+      compare     => "digest";
+    # This class is always set when bootstrapping. You can deactivate
+    # this class with --trust-server=no when bootstrapping
+    trust_server::
+      trustkey    => "true";
+    !am_policy_hub::
+      servers => { "$(sys.policy_hub)" };
+}
+############################################
+body action u_background
+{
+      background => "true";
+}
+############################################
+body depth_search u_recurse(d)
+{
+      depth => "$(d)";
+      exclude_dirs => { "\.svn", "\.git" };
+}
+############################################
+body service_method bootstart
+{
+      service_autostart_policy => "boot_time";
+}
+############################################
+body action ifwin_bg
+{
+    windows::
+      background => "true";
+}
+############################################
+body copy_from u_cp(from)
+{
+      source          => "$(from)";
+      compare         => "digest";
+      copy_backup     => "false";
+}
