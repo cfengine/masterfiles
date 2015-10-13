@@ -23,6 +23,10 @@ bundle agent cfe_internal_management
         string => "cfe_internal_core_main",
         comment => "Activate policies related to basic CFEngine operations";
 
+      "policy[cfe_internal_failsafe_copy]"
+        string => "cfe_internal_failsafe_copy",
+        comment => "Ensure failsafe.cf exists in inputs for fallback";
+
     enterprise_edition::
       "policy[cfe_internal_enterprise_main]"
         string => "cfe_internal_enterprise_main",
