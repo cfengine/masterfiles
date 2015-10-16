@@ -293,6 +293,12 @@ bundle agent cfe_internal_update_bins
       comment => "Create an empty file after successfully upgrade the binary",
       handle => "cfe_internal_update_bins_files_update_from_log",
       create => "true";
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_update_bins::
+      "DEBUG $(this.bundle): Evaluating binaries for upgrade using internal update mechanism"
+        ifvarclass => "trigger_upgrade";
+        
 }
 
 ################################################################################
