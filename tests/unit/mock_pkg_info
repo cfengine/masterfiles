@@ -1,0 +1,56 @@
+#!/bin/sh -e
+
+case "$*" in
+    "-X pkg_install")
+        cat << EOF
+CONFLICTS=audit-packages-[0-9]*
+PKGNAME=pkg_install-20150508
+COMMENT=Package management and administration tools for pkgsrc
+SIZE_PKG=2707598
+BUILD_DATE=2015-07-17 12:28:33 +0100
+CATEGORIES=pkgtools
+HOMEPAGE=http://www.pkgsrc.org/
+LICENSE=modified-bsd
+MACHINE_ARCH=x86_64
+OPSYS=Darwin
+OS_VERSION=13.4.0
+PKGPATH=pkgtools/pkg_install
+PKGTOOLS_VERSION=20091115
+PKG_OPTIONS=inet6 openssl
+REQUIRES=/usr/lib/libSystem.B.dylib
+REQUIRES=/usr/lib/libbz2.1.0.dylib
+REQUIRES=/usr/lib/libcrypto.0.9.8.dylib
+REQUIRES=/usr/lib/liblzma.5.dylib
+REQUIRES=/usr/lib/libssl.0.9.8.dylib
+REQUIRES=/usr/lib/libz.1.dylib
+DESCRIPTION=pkg_install contains the core package management and administration
+DESCRIPTION=utilities for pkgsrc, a multi-platform source and binary package
+DESCRIPTION=system developed and maintained by The NetBSD Project and volunteers
+DESCRIPTION=from around the globe.
+DESCRIPTION=
+DESCRIPTION=The following tools are included:
+DESCRIPTION=
+DESCRIPTION=pkg_add     install and upgrade binary packages
+DESCRIPTION=pkg_admin   perform various pkgsrc administrative tasks
+DESCRIPTION=pkg_create  create software package distributions
+DESCRIPTION=pkg_delete  delete installed packages
+DESCRIPTION=pkg_info    display information about installed or binary packages
+DESCRIPTION=
+DESCRIPTION=For the following tools compatibility wrappers are included:
+DESCRIPTION=
+DESCRIPTION=audit-packages  audit installed packages for security vulnerabilities
+DESCRIPTION=download-vulnerability-list download the latest vulnerabilities list
+DESCRIPTION=
+DESCRIPTION=Homepage:
+DESCRIPTION=http://www.pkgsrc.org/
+
+EOF
+    ;;
+    "-pq pkg_install")
+        echo "@cwd /opt/local"
+        ;;
+    *)
+        echo "Invalid call"
+        exit 1
+        ;;
+esac

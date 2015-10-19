@@ -1,0 +1,156 @@
+#! /bin/sh
+
+export PATH=tests/stubs:$PATH
+export MODULE=../../modules/packages/pkgsrc
+export CFENGINE_TEST_PKGSRC_MOCK=1
+
+setUp()
+{
+  unset ASSERT_MAKE_RUNS
+  unset ASSERT_CWD
+  unset ASSERT_PORTS_UPDATED
+}
+
+testApiVersion()
+{
+  actual=`echo | $MODULE supports-api-version`
+
+  assertEquals "exit code" 0 $?
+  assertEquals 1 "$actual"
+}
+
+testInvalidCommand()
+{
+  actual=`echo | $MODULE invalid`
+
+  assertEquals "exit code" 2 $?
+  assertEquals "ErrorMessage=Invalid operation" "$actual"
+}
+
+testGetData()
+{
+  input="File=xz
+Version=5.2.1"
+  expected="PackageType=repo
+Name=xz
+Version=5.2.1
+Architecture=x86_64"
+
+  actual=`echo "$input" | $MODULE get-package-data`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "$expected" "$actual"
+}
+
+testListPackages()
+{
+  expected="Name=bmake
+Version=20140314
+Architecture=x86_64
+Name=bootstrap-mk-files
+Version=20141122
+Architecture=x86_64
+Name=bzip2
+Version=1.0.6nb1
+Architecture=x86_64"
+
+  actual=`echo | $MODULE list-installed`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "$expected" "$actual"
+}
+
+testInstallPackage()
+{
+  input="Name=xz
+Version=5.2.1
+Architecture=x86_64"
+  export ASSERT_MAKE_RUNS=install
+
+  actual=`echo "$input" | $MODULE repo-install`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "" "$actual"
+}
+
+testListUpdates()
+{
+  expected="Name=curl
+Version=7.42.1nb2
+Architecture=x86_64
+Name=tmux
+Version=1.9a
+Architecture=x86_64"
+  export ASSERT_PORTS_UPDATED=1
+
+  actual=`echo | $MODULE list-updates`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "$expected" "$actual"
+}
+
+
+testListUpdatesLocal()
+{
+  expected="Name=curl
+Version=7.42.1nb2
+Architecture=x86_64
+Name=tmux
+Version=1.9a
+Architecture=x86_64"
+  export ASSERT_PORTS_UPDATED=1
+
+  actual=`echo | $MODULE list-updates-local`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "$expected" "$actual"
+}
+
+testUpdatePackage()
+{
+  input="Name=curl
+Version=7.42.1nb2"
+  export ASSERT_MAKE_RUNS="deinstall reinstall"
+
+  actual=`echo "$input" | $MODULE repo-install`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "" "$actual"
+}
+
+testInstallWrongVersion()
+{
+  input="Name=nano
+Version=2.4.3
+Architecture=amd64"
+
+  actual=`echo "$input" | $MODULE repo-install`
+
+  assertEquals "exit code" 2 $?
+  assertEquals "ErrorMessage=Error installing nano-2.4.3" "$actual"
+}
+
+testInstallAnyVersion()
+{
+  input="Name=xz
+Architecture=amd64"
+  export ASSERT_MAKE_RUNS=install
+
+  actual=`echo "$input" | $MODULE repo-install`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "" "$actual"
+}
+
+testRemove()
+{
+  input="Name=nano"
+  export ASSERT_MAKE_RUNS=deinstall
+
+  actual=`echo "$input" | $MODULE remove`
+
+  assertEquals "exit code" 0 $?
+  assertEquals "" "$actual"
+}
+
+. `which shunit2`
