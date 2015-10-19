@@ -207,7 +207,7 @@ bundle common cfengine_controls
 {
   vars:
     # 3.7+ uses the re-unified controls
-    cfenigne_3_6::
+    cfengine_3_6::
       "def_inputs"
         slist => {
                    "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
@@ -247,7 +247,7 @@ bundle common cfengine_controls
 
 
     # 3.7+ uses the re-unified controls
-    !cfenigne_3_6::
+    !cfengine_3_6::
       "def_inputs"
         slist => {
                    "controls/def.cf",
