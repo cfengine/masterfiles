@@ -320,16 +320,40 @@ bundle agent git(repo_path, subcmd, args)
       comment => "So that we don't mess up permissions, we will just execute
                     all commands as the current group of .git";
 
+      # We get the passwd entry from the user that owns the repo so
+      # that we can extract the home directory for later use.
+      "repo_uid_passwd_ent"
+        string => execresult("$(paths.getent) passwd $(repo_uid)", noshell),
+        comment => "We need to extract the home directory of the repo
+                    owner so that it can be used to avoid errors from
+                    unprivledged execution trying to access the root
+                    users git config.";
+
   classes:
       "am_root" expression => strcmp($(this.promiser_uid), "0");
       "need_to_drop" not => strcmp($(this.promiser_uid), $(repo_uid));
 
+    am_root.need_to_drop::
+      # This regular expression could be tightened up
+      # Extract the home directory from the owner of the repository
+      # into $(repo_uid_passwd[1])
+      "extracted_repo_uid_home"
+        expression => regextract( ".*:.*:\d+:\d+:.*:(.*):.*",
+                                  $(repo_uid_passwd_ent),
+                                  "repo_uid_passwd" ),
+        ifvarclass => isvariable("repo_uid_passwd_ent");
+
   commands:
     am_root.need_to_drop::
-      "$(oneliner)"
-      args => "$(subcmd) $(args)",
-      classes => kept_successful_command,
-      contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) );
+      # Because cfengine does not inherit the shell environment when
+      # executing commands, git will look for the root users git
+      # config and error when the executing user does not have
+      # access. So we need to set the home directory of the executing
+      # user.
+      "$(paths.env) HOME=$(repo_uid_passwd[1]) $(oneliner)"
+        args => "$(subcmd) $(args)",
+        classes => kept_successful_command,
+        contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) );
 
     !am_root|!need_to_drop::
       "$(oneliner)"
@@ -339,7 +363,8 @@ bundle agent git(repo_path, subcmd, args)
 
   reports:
     "DEBUG|DEBUG_$(this.bundle).am_root.need_to_drop"::
-      "DEBUG $(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'";
+      "DEBUG $(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(paths.env) HOME=\"$(repo_uid_passwd[1])\" $(oneliner) $(subcmd) $(args)'"
+        ifvarclass => isvariable("repo_uid_passwd[1]");
 
     "DEBUG|DEBUG_$(this.bundle).(!am_root|!need_to_drop)"::
       "DEBUG $(this.bundle): with current privileges, in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'";
