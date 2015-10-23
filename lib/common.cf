@@ -273,6 +273,61 @@ body classes classes_generic(x)
       promise_kept => { "promise_kept_$(x)", "$(x)_kept", "$(x)_ok", "$(x)_reached" };
 }
 
+body classes results(scope, class_prefix)
+# @brief Define classes prefixed with `class_prefix` and suffixed with
+# appropriate outcomes { _kept, _repaired, _not_kept, _error, _failed,
+# _denied, _timeout, _reached }
+#
+# **See also:** `scope`
+#
+# @param scope The scope in which the class should be defined
+# @param class_prefix The unique part of the classes to be defined
+#
+# This is a more concise version of `scoped_classes_generic`.
+# Key difference is that only suffixed classes are defined, and only for
+# outcomes that we can know. For example _ok is not defined by this bundle, as
+# a promsie could be both kept and failed at the same time.
+#
+# **Suffix Notes:**
+# * _reached indicates the promise was tried. Any outcome will result in a
+#   class with this suffix being defined.
+# * _kept indicates some aspect of the promise was kept
+# * _repaired indicates some aspect of the promise was repaired
+# * _not_kept indicates some aspect of the promise was not kept.  error,
+#   failed, denied and timeout outcomes will result in a 
+#   class with this suffix being defined 
+# * _error indicates the promise errored
+# * _failed indicates the promise failed
+# * _denided indicates the promsie was denied
+# * _timeout indicates the promise timed out
+#
+# **Example:**
+# ```cf3
+# bundle agent example
+# {
+#   commands:
+#     "/bin/true"
+#       classes => results("bundle", "my_class_prefix");
+# 
+#   reports:
+#     my_class_prefix_kept::
+#       "My promise was kept";
+# 
+#     my_class_prefix_repaired::
+#       "My promise was repaired";
+# }
+# ```
+# **See also:** `scoped_classes_generic`
+{
+      scope => "$(scope)";
+
+      promise_kept     => { "$(class_prefix)_reached", "$(class_prefix)_kept" };
+      promise_repaired => { "$(class_prefix)_reached", "$(class_prefix)_repaired" };
+      repair_failed    => { "$(class_prefix)_reached", "$(class_prefix)_error", "$(class_prefix)_not_kept", "$(class_prefix)_failed" };
+      repair_denied    => { "$(class_prefix)_reached", "$(class_prefix)_error", "$(class_prefix)_not_kept", "$(class_prefix)_denied" };
+      repair_timeout   => { "$(class_prefix)_reached", "$(class_prefix)_error", "$(class_prefix)_not_kept", "$(class_prefix)_timeout" };
+}
+
 body classes scoped_classes_generic(scope, x)
 # @brief Define `x` prefixed/suffixed with promise outcome
 # **See also:** `scope`
