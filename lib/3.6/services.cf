@@ -403,8 +403,6 @@ bundle agent classic_services(service,state)
 #    "pattern[rhnsd]"        string => "rhnsd";
 # ```
 #
-# ---
-#
 # If *any* of the `(re)?(start|load|stop)command` variables are set for
 # your service, they take _priority_ in case there's conflict of intent
 # with other data.
