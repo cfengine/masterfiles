@@ -10,7 +10,7 @@ AC_PREREQ(2.59)
 
 define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
 
-AC_INIT([cfengine-masterfiles], [3.8.0a1.revision])
+AC_INIT([cfengine-masterfiles], [3.8.0b1])
 
 AC_CANONICAL_TARGET
 
