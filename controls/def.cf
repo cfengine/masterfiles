@@ -44,25 +44,20 @@ bundle common def
     any::
       # Begin change
 
+      # Email settings are currently unable to be set from def.json, and must
+      # be set directly. 
       # Your domain name, for use in access control
-      "domain"  string => ifelse(isvariable("override_data_domain"), "$(override_data_domain)",
-                                "$(sys.domain)"), # this default may be inaccurate!
+      # Note: this default may be inaccurate!
+      "domain"  string => "$(sys.domain)",
       comment => "Define a global domain for all hosts",
-      handle => "common_def_vars_domain",
-      meta => { "defvar" };
+      handle => "common_def_vars_domain";
 
       # Mail settings used by body executor control found in controls/cf_execd.cf
-      "mailto" string => ifelse(isvariable("override_data_mailto"), "$(override_data_mailto)",
-                               "root@$(def.domain)"),
-      meta => { "defvar" };
+      "mailto" string => "root@$(def.domain)";
 
-      "mailfrom" string => ifelse(isvariable("override_data_mailfrom"), "$(override_data_mailfrom)",
-                                 "root@$(sys.uqhost).$(def.domain)"),
-      meta => { "defvar" };
+      "mailfrom" string => "root@$(sys.uqhost).$(def.domain)";
 
-      "smtpserver" string => ifelse(isvariable("override_data_smtpserver"), "$(override_data_smtpserver)",
-                                   "localhost"),
-      meta => { "defvar" };
+      "smtpserver" string => "localhost";
 
       # List here the IP masks that we grant access to on the server
 
