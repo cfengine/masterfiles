@@ -17,11 +17,6 @@
     "vars": {
         "acl": [ ".*$(def.domain)", "$(sys.policy_hub)/16" ],
 
-        "domain": "mydomain-com",
-        "mailto": "people@mydomain-com",
-        "mailfrom": "me@mydomain-com",
-        "smtpserver": "smtp.mydomain-com",
-
         "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
                                  "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ]
