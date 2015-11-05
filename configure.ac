@@ -169,6 +169,11 @@ do
     done
 done
 
+dnl The lib/3.7/README.md is special, so that 3.7 agents can load the stdlib after the version split reunion
+for i in lib/3.7/README.md
+do
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $i"
+done
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
 
 
