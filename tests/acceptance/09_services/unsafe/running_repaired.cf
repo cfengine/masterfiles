@@ -23,7 +23,16 @@ body common control
 bundle agent init
 {
   meta:
-    "test_skip_needs_work" string => "!(redhat_6|centos_6)";
+
+    # TODO fix this test to not mess with the ntp service - it is
+    #      currently provisioned by CFEngine on the buildslave itself,
+    #      thus creating test inconsistensies every 5 minutes.
+    #          + Ideally this test would introduce its own dummy
+    #      initscript in the chroot's /etc/init.d, so it wouldn't mess
+    #      with the hosting buildslave.
+    #          + Or it should be converted to a deployment test to
+    #      be run on a fresh VM.
+    "test_skip_needs_work" string => "any";
 
   methods:
     "" usebundle => service_stop( $(service_common.service_name) );
