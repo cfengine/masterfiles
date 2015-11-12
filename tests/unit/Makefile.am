@@ -20,7 +20,8 @@ EXTRA_DIST = \
 	mock_dpkg \
 	mock_dpkg_deb \
 	mock_dpkg_query \
-	mock_pkgsrc \
+	mock_pkgin \
+	mock_pkg_info \
 	mock_rpm \
 	mock_yum
 
