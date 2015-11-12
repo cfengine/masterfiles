@@ -7,8 +7,10 @@ check_SCRIPTS += \
 	test_package_module_yum
 endif
 
-if SHUNIT
+if HAVE_PKG_INSTALL
+if HAVE_SHUNIT2
 check_SCRIPTS += test_package_module_pkgsrc
+endif
 endif
 
 TESTS = $(check_SCRIPTS)
