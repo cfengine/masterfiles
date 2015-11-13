@@ -119,6 +119,12 @@ dnl ######################################################################
 
 m4_include([m4/cf3_platforms.m4])
 
+AC_CHECK_PROG([ac_cv_pkg_install], [pkg_install], [yes], [no])
+AC_CHECK_PROG([ac_cv_shunit2], [shunit2], [yes], [no])
+
+AM_CONDITIONAL([HAVE_PKG_INSTALL], [test "$ac_cv_pkg_install" = "yes"])
+AM_CONDITIONAL([HAVE_SHUNIT2], [test "$ac_cv_shunit2" = "yes"])
+
 dnl ######################################################################
 dnl Print summary
 dnl ######################################################################

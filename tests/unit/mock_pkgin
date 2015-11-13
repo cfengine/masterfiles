@@ -1,0 +1,26 @@
+#!/bin/sh -e
+
+case "$*" in
+    "-p list")
+    cat << EOF
+bmake-20140314;Portable (autoconf) version of NetBSD 'make' utility
+bootstrap-mk-files-20141122;*.mk files for the bootstrap bmake utility
+bzip2-1.0.6nb1;Block-sorting file compressor
+EOF
+    ;;
+    "-pl < ls")
+        cat << EOF
+curl-7.42.1nb2;<;Client that groks URLs
+tmux-1.9a;<;BSD-licensed terminal multiplexer (GNU Screen alternative)
+EOF
+        ;;
+    "-pP avail")
+        echo "xz-5.2.1;XZ utilities"
+        ;;
+    "-y in nano-"*)
+        printf "calculating dependencies... done.\nnothing to do.\n"
+        exit 1
+        ;;
+    *)
+        ;;
+esac
