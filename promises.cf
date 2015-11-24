@@ -56,7 +56,7 @@ body common control
                   "services/main.cf",
       };
 
-      version => "CFEngine Promises.cf 3.7.1";
+      version => "CFEngine Promises.cf 3.7.2";
 
       # From 3.7 onwards there is a new package promise implementation using package
       # modules in which you MUST provide package modules used to generate
