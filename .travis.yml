@@ -1,0 +1,11 @@
+env:
+- CF_VERSION=3.7.1
+- CF_VERSION=3.6.6
+
+install:
+- wget https://cfengine-package-repos.s3.amazonaws.com/community_binaries/cfengine-community_$CF_VERSION-1_amd64.deb
+- sudo dpkg -i cfengine-community_$CF_VERSION-1_amd64.deb
+- ls
+
+script:
+- /var/cfengine/bin/cf-promises -f $TRAVIS_BUILD_DIR/promises.cf
