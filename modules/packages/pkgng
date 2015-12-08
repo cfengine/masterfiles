@@ -1,0 +1,118 @@
+#!/bin/sh
+
+## Licensed under:
+## MIT Public License
+## http://www.opensource.org/licenses/MIT
+
+## Copyright (c) 2015, Franz Bettag <franz@bett.ag>
+
+## pkgng package module for cfengine
+
+# Set up mock environment if necessary
+if [ -n $CFENGINE_TEST_PKGNG_MOCK ]; then
+    alias pkgin='./mock_pkgngin'
+    alias pkgng_info='./mock_pkgng_info'
+fi
+
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+export MACHINE_ARCH=$(uname -m)
+export PKG_ROOT=/usr/local
+
+LEVEL=0
+
+fatal () {
+    echo "ErrorMessage=$@"
+    exit 2
+}
+
+warn () {
+    [ $LEVEL -gt 0 ] && echo "[TRACE]: $*" >&2
+}
+
+supports_api_version () {
+    echo 1
+}
+
+repo_install () {
+    # If a version number is specified, insert a dash between the name and
+    # version
+    [ -n "$Version" ] && ver="-$Version"
+    pkg install -fy "${Name}${ver}" > /dev/null
+    if [ $? -gt 0 ]; then
+        fatal "Error installing ${Name}${ver}"
+    fi
+}
+
+file_install () {
+    pkg add -f "$File" > /dev/null
+    if [ $? -gt 0 ]; then
+        echo "Error installing ${File}"
+    fi
+}
+
+remove () {
+    # If a version number is specified, insert a dash between the name and
+    # version
+    [ -n "$Version" ] && ver="-$Version"
+    pkg remove -y "${Name}${ver}" > /dev/null
+}
+
+list_installed () {
+    pkg query -a "Name=%n\nVersion=%v\nArchitecture=$MACHINE_ARCH"
+}
+
+list_updates () {
+    pkg update -f > /dev/null
+    IFS=$'\n'
+    for pkginfo in $(pkg version -vL= | egrep -e '[><]'); do
+        name=$(echo $pkginfo | egrep -oe '(\w[^-]+-)+' | sed -e 's;-$;;')
+        version=$(echo $pkginfo | egrep -oe 'remote has .*\)' | sed -e "s;remote has ;;g" -e 's;)$;;g')
+        echo "Name=$name"
+        echo "Version=$version"
+        echo "Architecture=$MACHINE_ARCH"
+    done
+}
+
+list_updates_local () {
+    IFS=$'\n'
+    for pkginfo in $(pkg version -vL= | egrep -e '[><]'); do
+        name=$(echo $pkginfo | egrep -oe '(\w[^-]+-)+' | sed -e 's;-$;;')
+        version=$(echo $pkginfo | egrep -oe 'remote has .*\)' | sed -e "s;remote has ;;g" -e 's;)$;;g')
+        echo "Name=$name"
+        echo "Version=$version"
+        echo "Architecture=$MACHINE_ARCH"
+    done
+}
+
+get_package_data () {
+    if echo "$File" | grep '/' >/dev/null; then
+        echo "PackageType=file"
+        echo "Name=$(echo "$File" | sed 's/.*\///g')"
+    else
+        echo "PackageType=repo"
+        echo "Name=$File"
+    fi
+}
+
+# Cfengine passes data on STDIN. Absorb that and convert to shell variables.
+while IFS= read -r line; do
+  eval "$line"
+  # options can be passed multiple times so we need to avoid clobbering
+  # previous instances. Plus, what we really want to eval is the value of
+  # each option.
+  if [ -n "$options" ]; then
+    eval "$options"
+  fi
+done
+
+case "$1" in
+    supports-api-version) supports_api_version;;
+    repo-install) repo_install;;
+    file-install) file_install;;
+    remove) remove;;
+    list-installed) list_installed;;
+    list-updates) list_updates;;
+    list-updates-local) list_updates_local;;
+    get-package-data) get_package_data;;
+    *) fatal "Invalid operation";;
+esac
