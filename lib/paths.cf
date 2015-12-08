@@ -414,6 +414,8 @@ bundle common paths
       "path[aptitude]"            string => "/usr/bin/aptitude";
       "path[dpkg]"                string => "/usr/bin/dpkg";
       "path[groupadd]"            string => "/usr/sbin/groupadd";
+      "path[groupdel]"            string => "/usr/sbin/groupdel";
+      "path[groupmod]"            string => "/usr/sbin/groupmod";
       "path[ifconfig]"            string => "/sbin/ifconfig";
       "path[ip]"                  string => "/sbin/ip";
       "path[service]"             string => "/usr/sbin/service";
@@ -421,6 +423,8 @@ bundle common paths
       "path[update_alternatives]" string => "/usr/bin/update-alternatives";
       "path[update_rc_d]"         string => "/usr/sbin/update-rc.d";
       "path[useradd]"             string => "/usr/sbin/useradd";
+      "path[userdel]"             string => "/usr/sbin/userdel";
+      "path[usermod]"             string => "/usr/sbin/usermod";
 
     archlinux||darwin::
 
