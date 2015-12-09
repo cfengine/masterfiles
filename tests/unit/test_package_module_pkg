@@ -1,0 +1,249 @@
+#! /bin/sh
+
+export PATH=tests/stubs:$PATH
+export MODULE=../../modules/packages/pkg
+export CFENGINE_TEST_PKGNG_MOCK=1
+export CURRENT_ARCH=`uname -m`
+
+setUp()
+{
+    unset ASSERT_MAKE_RUNS
+    unset ASSERT_CWD
+    unset ASSERT_PORTS_UPDATED
+}
+
+testApiVersion()
+{
+    actual=`echo | $MODULE supports-api-version`
+    
+    assertEquals "exit code" 0 $?
+    assertEquals 1 "$actual"
+}
+
+testInvalidCommand()
+{
+    actual=`echo | $MODULE invalid`
+
+    assertEquals "exit code" 1 $?
+    assertEquals "ErrorMessage=Command 'invalid' is either not valid or not implemented." "$actual"
+}
+
+testGetData()
+{
+    input="File=xz
+Version=5.2.1"
+    expected="PackageType=repo
+Name=xz"
+
+    actual=`echo "$input" | $MODULE get-package-data`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "$expected" "$actual"
+}
+
+testGetDataWithHyphen()
+{
+    input="File=net-snmp"
+    expected="PackageType=repo
+Name=net-snmp"
+    
+    actual=`echo "$input" | $MODULE get-package-data`
+    
+    assertEquals "exit code" 0 $?
+    assertEquals "$expected" "$actual"
+}
+
+testListPackages()
+{
+    expected="Name=apache24
+Version=2.4.17
+Architecture=amd64
+Name=apr
+Version=1.5.2.1.5.4
+Architecture=amd64
+Name=bash-static
+Version=4.3.42
+Architecture=amd64
+Name=cfengine37
+Version=3.7.0_1
+Architecture=amd64
+Name=emacs-nox11
+Version=24.5_1,3
+Architecture=amd64
+Name=expat
+Version=2.1.0_3
+Architecture=amd64
+Name=gdbm
+Version=1.11_2
+Architecture=amd64
+Name=gettext-runtime
+Version=0.19.6
+Architecture=amd64
+Name=libgcrypt
+Version=1.6.4_1
+Architecture=amd64
+Name=libgpg-error
+Version=1.20_1
+Architecture=amd64
+Name=libiconv
+Version=1.14_9
+Architecture=amd64
+Name=libxml2
+Version=2.9.2_3
+Architecture=amd64
+Name=libxslt
+Version=1.1.28_7
+Architecture=amd64
+Name=lmdb
+Version=0.9.16
+Architecture=amd64
+Name=mod_php56
+Version=5.6.14
+Architecture=amd64
+Name=pcre
+Version=8.37_4
+Architecture=amd64
+Name=perl5
+Version=5.20.3_8
+Architecture=amd64
+Name=php56
+Version=5.6.14
+Architecture=amd64
+Name=pkg
+Version=1.6.1_2
+Architecture=amd64
+Name=vim-lite
+Version=7.4.922
+Architecture=amd64"
+
+    actual=`echo | $MODULE list-installed`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "$expected" "$actual"
+}
+
+testInstallPackage()
+{
+    input="Name=xz
+Version=5.2.1
+Architecture=${CURRENT_ARCH}"
+    export ASSERT_MAKE_RUNS=install
+
+    actual=`echo "$input" | $MODULE repo-install`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "" "$actual"
+}
+
+testInstallPackageWithRepository()
+{
+    input="options=repository=FreeBSD
+Name=bash-static"
+
+    actual=`echo "$input" | $MODULE repo-install`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "" "$actual"
+}
+
+testListUpdates()
+{
+    expected="Name=bash-static
+Version=4.3.42_1
+Architecture=${CURRENT_ARCH}
+Name=cfengine37
+Version=3.7.2
+Architecture=${CURRENT_ARCH}
+Name=curl
+Version=7.46.0_1
+Architecture=${CURRENT_ARCH}
+Name=emacs-nox11
+Version=24.5_2,3
+Architecture=${CURRENT_ARCH}
+Name=libgcrypt
+Version=1.6.4_2
+Architecture=${CURRENT_ARCH}"
+    
+    export ASSERT_PORTS_UPDATED=1
+
+    actual=`echo | $MODULE list-updates`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "$expected" "$actual"
+}
+
+
+testListUpdatesLocal()
+{
+    expected="Name=bash-static
+Version=4.3.42_1
+Architecture=${CURRENT_ARCH}
+Name=cfengine37
+Version=3.7.2
+Architecture=${CURRENT_ARCH}
+Name=curl
+Version=7.46.0_1
+Architecture=${CURRENT_ARCH}
+Name=emacs-nox11
+Version=24.5_2,3
+Architecture=${CURRENT_ARCH}
+Name=libgcrypt
+Version=1.6.4_2
+Architecture=${CURRENT_ARCH}"
+    
+    export ASSERT_PORTS_UPDATED=1
+
+    actual=`echo | $MODULE list-updates-local`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "$expected" "$actual"
+}
+
+testUpdatePackage()
+{
+    input="Name=curl
+Version=7.46.0_1"
+    export ASSERT_MAKE_RUNS="deinstall reinstall"
+
+    actual=`echo "$input" | $MODULE repo-install`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "" "$actual"
+}
+
+testInstallWrongVersion()
+{
+    input="Name=curl
+Version=7.45.9
+Architecture=${CURRENT_ARCH}"
+
+    actual=`echo "$input" | $MODULE repo-install`
+
+    assertEquals "exit code" 1 $?
+    assertEquals "ErrorMessage=Package manager error" "$actual"
+}
+
+testInstallAnyVersion()
+{
+    input="Name=xz
+Architecture=${CURRENT_ARCH}"
+    export ASSERT_MAKE_RUNS=install
+
+    actual=`echo "$input" | $MODULE repo-install`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "" "$actual"
+}
+
+testRemove()
+{
+    input="Name=nano"
+    export ASSERT_MAKE_RUNS=deinstall
+
+    actual=`echo "$input" | $MODULE remove`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "" "$actual"
+}
+
+. `which shunit2`
