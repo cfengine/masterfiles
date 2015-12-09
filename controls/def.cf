@@ -22,7 +22,7 @@ bundle common def
   vars:
 
     any::
-      "augments_file" string => "$(this.promise_dirname)/../../def.json";
+      "augments_file" string => "$(this.promise_dirname)/../def.json";
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
