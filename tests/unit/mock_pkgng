@@ -1,0 +1,99 @@
+#!/bin/sh
+
+CMD="$1"
+shift
+
+case "${CMD}" in
+    query)
+        PARAM="$1"
+        shift
+        if [ "${PARAM}" = '-a' ] ; then
+            cat <<EOF
+Name=apache24
+Version=2.4.17
+Architecture=freebsd:10:x86:64
+Name=apr
+Version=1.5.2.1.5.4
+Architecture=freebsd:10:x86:64
+Name=bash-static
+Version=4.3.42
+Architecture=freebsd:10:x86:64
+Name=cfengine37
+Version=3.7.0_1
+Architecture=freebsd:10:x86:64
+Name=emacs-nox11
+Version=24.5_1,3
+Architecture=freebsd:10:x86:64
+Name=expat
+Version=2.1.0_3
+Architecture=freebsd:10:x86:64
+Name=gdbm
+Version=1.11_2
+Architecture=freebsd:10:x86:64
+Name=gettext-runtime
+Version=0.19.6
+Architecture=freebsd:10:x86:64
+Name=libgcrypt
+Version=1.6.4_1
+Architecture=freebsd:10:x86:64
+Name=libgpg-error
+Version=1.20_1
+Architecture=freebsd:10:x86:64
+Name=libiconv
+Version=1.14_9
+Architecture=freebsd:10:x86:64
+Name=libxml2
+Version=2.9.2_3
+Architecture=freebsd:10:x86:64
+Name=libxslt
+Version=1.1.28_7
+Architecture=freebsd:10:x86:64
+Name=lmdb
+Version=0.9.16
+Architecture=freebsd:10:x86:64
+Name=mod_php56
+Version=5.6.14
+Architecture=freebsd:10:x86:64
+Name=pcre
+Version=8.37_4
+Architecture=freebsd:10:x86:64
+Name=perl5
+Version=5.20.3_8
+Architecture=freebsd:10:x86:64
+Name=php56
+Version=5.6.14
+Architecture=freebsd:10:x86:64
+Name=pkg
+Version=1.6.1_2
+Architecture=freebsd:10:x86:64
+Name=vim-lite
+Version=7.4.922
+Architecture=freebsd:10:x86:64
+
+EOF
+        else
+            echo "\$PARAM \ '${PARAM}'."
+        fi
+        ;;
+    version)
+        cat <<EOF
+bash-static-4.3.42                 <   needs updating (remote has 4.3.42_1)
+cfengine37-3.7.0_1                 <   needs updating (remote has 3.7.2)
+curl-7.45.0                        <   needs updating (remote has 7.46.0_1)
+emacs-nox11-24.5_1,3               <   needs updating (remote has 24.5_2,3)
+libgcrypt-1.6.4_1                  <   needs updating (remote has 1.6.4_2)
+EOF
+        ;;
+    install)
+        while [ -n "`echo $1 | grep '^-'`" ] ; do
+            shift
+        done
+        PKG="$1"
+        shift
+        if [ "${PKG}" = 'curl-7.45.9' ] ; then
+            exit 70
+        fi
+        ;;
+    delete)
+        ;;
+esac

@@ -14,6 +14,12 @@ check_SCRIPTS += test_package_module_pkgsrc
 endif
 endif
 
+if FREEBSD
+if HAVE_SHUNIT2
+check_SCRIPTS += test_package_module_pkg
+endif
+endif
+
 TESTS = $(check_SCRIPTS)
 
 EXTRA_DIST = \
@@ -25,6 +31,7 @@ EXTRA_DIST = \
 	mock_pkgin \
 	mock_pkg_info \
 	mock_freebsd_pkg \
+	mock_pkgng \
 	mock_rpm \
 	mock_yum
 
