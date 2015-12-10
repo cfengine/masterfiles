@@ -15,9 +15,13 @@ body executor control
       splaytime  => "4"; # activity will be spread over this many time slices
 
     cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
-      mailto     => "$(def.mailto)";
-      mailfrom   => "$(def.mailfrom)";
-      smtpserver => "$(def.smtpserver)";
+    # Unfortunately, body executor control is unable to dereference varibles
+    # from def.cf in time to use anything loaded from def.json or the default
+    # overrides so we need to set these directly for the time being. Ref:
+    # https://dev.cfengine.com/issues/7607
+      mailto     => "root@localhost";
+      mailfrom   => "root@$(sys.fqhost)";
+      smtpserver => "localhost";
 
     any::
 
