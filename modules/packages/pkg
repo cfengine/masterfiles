@@ -173,6 +173,7 @@ case "${CMD}" in
         fi
         pkg version ${LOCALUPDATE} -vl'<' | \
             awk 'BEGIN { cmd="uname -m"; cmd | getline arch} 
+/ repositor(y|ies) / { next; }
 { 
   pkgname = $1; 
   pkgver  = $7; 
