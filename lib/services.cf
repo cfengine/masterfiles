@@ -97,9 +97,11 @@ body service_method standard_services
 # By default this service_method is *not* used. The call for standard_services
 # is within the core and not here. In case you use a promise like:
 #
-## services:
-##     "ssh"
-##       service_policy => "start";
+# ```cf3
+# services:
+#     "ssh"
+#       service_policy => "start";
+# ```
 #
 # Then this method is skipped and CFEngine calls standard_services bundle
 # directly. This is here as a helper in case you wan't to be explicit
@@ -118,7 +120,7 @@ body service_method standard_services
 #       service_method => standard_services;
 # ```
 {
-      service_bundle => standard_services("$(this.promiser)","$(this.service_policy)");
+        service_bundle => standard_services( $(this.promiser), $(this.service_policy) );
 }
 
 ##
