@@ -91,6 +91,38 @@ body service_method force_deps
       service_type => "windows";
 }
 
+body service_method standard_services
+# @brief Default services_method for when you wan't to call it explicitly
+#
+# By default this service_method is *not* used. The call for standard_services
+# is within the core and not here. In case you use a promise like:
+#
+# ```cf3
+# services:
+#     "ssh"
+#       service_policy => "start";
+# ```
+#
+# Then this method is skipped and CFEngine calls standard_services bundle
+# directly. This is here as a helper in case you wan't to be explicit
+# with your service promise and point it to standard_services (for readability,
+# documentation, etc).
+#
+# Do note that any options defined in this method does not apply to service
+# promises without explicit template_method call for standard_services.
+#
+# **Example:**
+#
+# ```cf3
+# services:
+#     "ssh"
+#       service_policy => "start",
+#       service_method => standard_services;
+# ```
+{
+        service_bundle => standard_services( $(this.promiser), $(this.service_policy) );
+}
+
 ##
 
 bundle agent standard_services(service,state)
