@@ -109,6 +109,7 @@ bundle common paths
       "path[lsattr]"        string => "/usr/bin/lsattr";
       "path[tar]"           string => "/bin/tar";
       "path[pgrep]"         string => "/usr/bin/pgrep";
+      "path[getent]"        string => "/usr/bin/getent";
 
     aix::
 
