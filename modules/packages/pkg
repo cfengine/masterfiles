@@ -136,7 +136,18 @@ get_package_data() {
         if [ "${TYP}" = 'repo' ] ; then
             PKGNAM=`basename "${PKG}" | sed -r -e 's/^([A-Za-z0-9_-]+)-[0-9a-z.,_]+/\1/'`
             PKGVER=`basename "${PKG}" | sed -r -e 's/^[A-Za-z0-9_-]+-([0-9a-z.,_]+)/\1/' -e 's/\.(tgz|(tar\.)?gz|txz|zip)$//'`
+            if [ -z "`echo ${PKGVER} | grep -E '[0-9]'`" ] ; then 
+                if [ "${PKGNAM}" != "${PKGVER}" ] ;  then
+                    PKGNAM="${PKGNAM}-${PKGVER}"
+                fi
+                PKGVER=''
+            fi
             echo "Name=${PKGNAM}"
+            # Returning version for PackageType=repo is not advised
+            # https://docs.cfengine.com/latest/reference-standard-library-package_modules.html
+            # if [ -n "${PKGVER}" ] ; then 
+            #     echo "Version=${PKGVER}"
+            # fi
         else
             pkg query --file "${PKG}"  'Name=%n\nVersion=%v\nArchitecture=%q' | \
                                       sed -e 's/=freebsd:[0-9]*:/=:/' \

@@ -41,6 +41,18 @@ Name=xz"
     assertEquals "$expected" "$actual"
 }
 
+testGetDataWithHyphen()
+{
+    input="File=net-snmp"
+    expected="PackageType=repo
+Name=net-snmp"
+    
+    actual=`echo "$input" | $MODULE get-package-data`
+    
+    assertEquals "exit code" 0 $?
+    assertEquals "$expected" "$actual"
+}
+
 testListPackages()
 {
     expected="Name=apache24

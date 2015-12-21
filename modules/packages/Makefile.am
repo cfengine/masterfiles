@@ -1,3 +1,3 @@
 package_modulesdir = $(prefix)/modules/packages
 
-dist_package_modules_SCRIPTS = apt_get yum pkgsrc freebsd_ports
+dist_package_modules_SCRIPTS = apt_get yum pkgsrc freebsd_ports pkg
