@@ -38,19 +38,19 @@ body server control
       denybadclocks         => "false";
 
     windows::
-      cfruncommand => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
+      cfruncommand => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -I -D cfruncommand";
 
     hpux::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent) -I -D cfruncommand";
 
     aix::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent) -I -D cfruncommand";
 
     solaris::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent) -I -D cfruncommand";
 
     !(windows|hpux|aix|solaris)::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent) -I -D cfruncommand";
 
 }
 
