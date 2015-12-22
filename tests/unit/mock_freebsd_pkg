@@ -1,0 +1,177 @@
+#!/bin/sh -e
+
+case "$*" in
+"info -f -a")
+  cat <<EOF
+autoconf-2.69
+Name           : autoconf
+Version        : 2.69
+Installed on   : Tue Aug 18 01:11:54 UTC 2015
+Origin         : devel/autoconf
+Architecture   : freebsd:10:x86:64
+Prefix         : /usr/local
+Categories     : devel
+Licenses       :
+Maintainer     : tijl@FreeBSD.org
+WWW            : http://www.gnu.org/software/autoconf/
+Comment        : Automatically configure source code on many Un*x platforms
+Annotations    :
+Flat size      : 2.90MiB
+Description    :
+Autoconf is an extensible package of m4 macros that produce shell
+scripts to automatically configure software source code packages.
+These scripts can adapt the packages to many kinds of UNIX-like
+systems without manual user intervention.  Autoconf creates a
+configuration script for a package from a template file that lists the
+operating system features that the package can use, in the form of m4
+macro calls.
+
+WWW: http://www.gnu.org/software/autoconf/
+
+autoconf-wrapper-20131203
+Name           : autoconf-wrapper
+Version        : 20131203
+Installed on   : Tue Aug 18 01:11:53 UTC 2015
+Origin         : devel/autoconf-wrapper
+Architecture   : freebsd:10:x86:64
+Prefix         : /usr/local
+Categories     : devel
+Licenses       :
+Maintainer     : tijl@FreeBSD.org
+WWW            : UNKNOWN
+Comment        : Wrapper script for GNU autoconf
+Annotations    :
+Flat size      : 2.93KiB
+Description    :
+This port installs a wrapper script for autoconf, with symlinks to the
+unversioned name of each tool included with autoconf.  This allows the
+correct version to be selected depending on the user's requirements.
+
+cfengine-3.7.0_1
+Name           : cfengine
+Version        : 3.7.0_1
+Installed on   : Tue Sep 29 23:21:28 UTC 2015
+Origin         : sysutils/cfengine
+Architecture   : freebsd:10:x86:64
+Prefix         : /usr/local
+Categories     : sysutils
+Licenses       : GPLv3
+Maintainer     : cy@FreeBSD.org
+WWW            : http://www.cfengine.org/
+Comment        : Systems administration tool for networks
+Options        :
+	LIBVIRT        : off
+	MYSQL          : off
+	PGSQL          : off
+Shared Libs required:
+	libpcre.so.1
+	libssl.so.8
+	liblmdb.so
+	libcrypto.so.8
+Shared Libs provided:
+	libpromises.so.3
+Annotations    :
+	cpe            : cpe:2.3:a:gnu:cfengine:3.7.0:::::freebsd10:x64:1
+Flat size      : 2.38MiB
+Description    :
+Cfengine is an automated suite of programs for configuring and
+maintaining Unix-like computers. It has been used on computing arrays
+of between 1 and 20,000 computers since 1993 by a wide range of
+organizations. Cfengine is supported by active research and was the
+first autonomic, hands-free management system for Unix-like operating
+systems. Cfengine is an autonomic maintenance system not merely a
+change management roll-out tool. Cfengine has a history of security
+and adaptability.
+
+WWW: http://www.cfengine.org/
+
+gettext-tools-0.19.5.1
+Name           : gettext-tools
+Version        : 0.19.5.1
+Installed on   : Sun Aug 16 05:35:50 UTC 2015
+Origin         : devel/gettext-tools
+Architecture   : freebsd:10:x86:64
+Prefix         : /usr/local
+Categories     : devel
+Licenses       : GPLv3
+Maintainer     : tijl@FreeBSD.org
+WWW            : http://www.gnu.org/software/gettext/
+Comment        : GNU gettext development and translation tools
+Options        :
+	DOCS           : on
+	THREADS        : on
+Shared Libs required:
+	libintl.so.8
+	libexpat.so.1
+Shared Libs provided:
+	libgettextpo.so.0
+	libgettextlib-0.19.5.1.so
+	libgettextsrc-0.19.5.1.so
+Annotations    :
+	cpe            : cpe:2.3:a:gnu:gettext:0.19.5.1:::::freebsd10:x64
+Flat size      : 9.78MiB
+Description    :
+GNU gettext is a framework of libraries and tools for internationalisation
+and localisation of software.
+
+This package contains development and translation tools.
+
+WWW: http://www.gnu.org/software/gettext/
+sudo-1.8.14p3
+Name           : sudo
+Version        : 1.8.14p3
+Installed on   : Sun Aug 16 05:36:05 UTC 2015
+Origin         : security/sudo
+Architecture   : freebsd:10:x86:64
+Prefix         : /usr/local
+Categories     : security
+Licenses       : sudo
+Maintainer     : garga@FreeBSD.org
+WWW            : http://www.sudo.ws/
+Comment        : Allow others to run commands as root
+Options        :
+	AUDIT          : on
+	DISABLE_AUTH   : off
+	DISABLE_ROOT_SUDO: off
+	DOCS           : on
+	INSULTS        : on
+	LDAP           : off
+	NLS            : on
+	NOARGS_SHELL   : on
+	OPIE           : off
+	SSSD           : off
+Shared Libs required:
+	libintl.so.8
+Shared Libs provided:
+	libsudo_util.so.0
+Annotations    :
+	cpe            : cpe:2.3:a:todd_miller:sudo:1.8.14p3:::::freebsd10:x64
+Flat size      : 3.33MiB
+Description    :
+This is the CU version of sudo.
+
+Sudo is a program designed to allow a sysadmin to give limited root
+privileges to users and log root activity.  The basic philosophy is to
+give as few privileges as possible but still allow people to get their
+work done.
+
+WWW: http://www.sudo.ws/
+EOF
+;;
+
+"version -v -l <")
+  cat <<EOF
+ca_root_nss-3.19.3                 <   needs updating (index has 3.20_1)
+portmaster-3.17.7                  <   needs updating (index has 3.17.8)
+EOF
+;;
+
+"info -e ca_root_nss")
+  exit 0
+;;
+
+"info -e nano")
+  exit 1
+;;
+
+esac

@@ -94,6 +94,29 @@ body package_module yum
     #default_options => {};
 }
 
+body package_module freebsd_ports
+# @brief Define details used when interfacing with the freebsd ports package
+# module.
+#
+# **Note:** Ports are expected to be setup prior to trying to use the packages
+# promise. You may need to ensure that `portsnap extract` has been run, e.g.
+# fileexists("/usr/ports/Mk/bsd.port.mk")
+#
+# **Example:**
+# ```cf3
+# bundle agent main
+# {
+#   packages:
+#     freebsd::
+#       "vim"
+#         policy => "present",
+#         package_module => freebsd_ports;
+# }
+# ```
+{
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
+}
 
 bundle common packages_common
 # @ignore
