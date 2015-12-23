@@ -38,19 +38,15 @@ body server control
       denybadclocks         => "false";
 
     windows::
-      cfruncommand => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent)";
+      cfruncommand => "$(sys.cf_agent) -I -D cfruncommand -f \"$(sys.update_policy_path)\"  &
+                       $(sys.cf_agent) -I -D cfruncommand";
 
-    hpux::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
-
-    aix::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
-
-    solaris::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)"; 
-
-    !(windows|hpux|aix|solaris)::
-      cfruncommand => "$(def.cf_runagent_shell) -c \"$(sys.cf_agent) -f $(sys.update_policy_path)\" ; $(sys.cf_agent)";
+    !windows::
+      # last single quote in cfruncommand is left open, so that
+      # arguments (like -K and --remote-bundles) are properly appended.
+      cfruncommand => "$(def.cf_runagent_shell) -c \'
+                           $(sys.cf_agent) -I -D cfruncommand -f $(sys.update_policy_path)  ;
+                           $(sys.cf_agent) -I -D cfruncommand";
 
 }
 
