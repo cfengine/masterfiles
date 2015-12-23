@@ -1,0 +1,97 @@
+#!/bin/sh -e
+
+whereis() {
+  case "$*" in
+  "-sq nano")
+    echo "/usr/ports/editors/nano"
+  ;;
+  "-sq ca_root_nss")
+    echo "/usr/ports/security/ca_root_nss"
+  ;;
+  "-sq madeup")
+  ;;
+  *)
+    >&2 echo "ERROR: whereis incorrect args: $*"
+    exit 1
+  ;;
+  esac
+}
+
+cd() {
+  CD_ARGS="$*"
+}
+
+make() {
+  if [ "$BATCH" != "1" ]
+  then
+    >&2 echo "ERROR: Make: BATCH != 1"
+    exit 1
+  fi
+
+  if [ "$CD_ARGS" != "$ASSERT_CWD" ]
+  then
+    >&2 echo "ASSERT:make expected to be run in directory:<$ASSERT_CWD> but ran in:<$CD_ARGS>"
+    exit 1
+  fi
+
+  if [ "$*" = "-V PKGVERSION" ]
+  then
+    case $CD_ARGS in
+    /usr/ports/editors/nano)
+      echo "2.4.2"
+    ;;
+    /usr/ports/security/ca_root_nss)
+      echo "3.20_1"
+    ;;
+    esac
+    return 0
+  fi
+
+  echo "Make output"
+
+  MAKE_RAN="$*"
+}
+
+portsnap() {
+  PORTSNAP_RAN=1
+  echo "Portsnap output"
+  expected="--interactive fetch update"
+  if [ "$*" != "$expected" ]
+  then
+    >&2 echo "ASSERT:portsnap expected:<$expected> but was:<$*>"
+    exit 1
+  fi
+}
+
+finish_and_assert() {
+  if [ "$ASSERT_MAKE_RUNS" ]
+  then
+    if [ ! "$MAKE_RAN" ]
+    then
+      >&2 echo "ASSERT:make was expected to run:<$ASSERT_MAKE_RUNS> but did not run"
+      exit 1
+    elif [ "$MAKE_RAN" != "$ASSERT_MAKE_RUNS" ]
+    then
+      >&2 echo "ASSERT:make task expected:<$ASSERT_MAKE_RUNS> but was:<$MAKE_RAN>"
+      exit 1
+    fi
+  elif [ "$MAKE_RAN" ]
+  then
+    >&2 echo "ASSERT:make was not expected to run but ran:<$MAKE_RAN>"
+    exit 1
+  fi
+
+  if [ "$ASSERT_PORTS_UPDATED" -a ! "$PORTSNAP_RAN" ]
+  then
+    >&2 echo "ASSERT:portsnap was expected to be run but it was not"
+    exit 1
+  fi
+}
+
+pkg() {
+  ./mock_freebsd_pkg "$@"
+}
+
+trap finish_and_assert EXIT
+
+. ../../modules/packages/freebsd_ports
