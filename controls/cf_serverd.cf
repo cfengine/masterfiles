@@ -42,10 +42,11 @@ body server control
                        $(sys.cf_agent) -I -D cfruncommand";
 
     !windows::
+      # last single quote in cfruncommand is left open, so that
+      # arguments (like -K and --remote-bundles) are properly appended.
       cfruncommand => "$(def.cf_runagent_shell) -c \'
                            $(sys.cf_agent) -I -D cfruncommand -f $(sys.update_policy_path)  ;
-                           $(sys.cf_agent) -I -D cfruncommand\'
-                      ";
+                           $(sys.cf_agent) -I -D cfruncommand";
 
 }
 
