@@ -202,7 +202,7 @@ bundle agent cfe_internal_update_bins
 
   packages:
 
-    !am_policy_hub.linux.enterprise.trigger_upgrade::
+    !am_policy_hub.linux.enterprise.trigger_upgrade.!bootstrap_mode::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
@@ -215,7 +215,7 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    !am_policy_hub.(solaris|solarisx86).enterprise.trigger_upgrade::
+    !am_policy_hub.(solaris|solarisx86).enterprise.trigger_upgrade.!bootstrap_mode::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
@@ -228,7 +228,7 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    !am_policy_hub.windows.enterprise.trigger_upgrade::
+    !am_policy_hub.windows.enterprise.trigger_upgrade.!bootstrap_mode::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
@@ -241,7 +241,7 @@ bundle agent cfe_internal_update_bins
       ifvarclass => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
-    !am_policy_hub.aix.enterprise.trigger_upgrade::
+    !am_policy_hub.aix.enterprise.trigger_upgrade.!bootstrap_mode::
 
       "$(novapkg)"
       comment => "Update Nova package to a newer version (package is there)",
@@ -351,7 +351,7 @@ bundle agent cfe_internal_update_bins
     DEBUG|DEBUG_cfe_internal_update_bins::
       "DEBUG $(this.bundle): Evaluating binaries for upgrade using internal update mechanism"
         ifvarclass => "trigger_upgrade";
-        
+
 }
 
 ################################################################################
@@ -460,7 +460,7 @@ exit 0";
 body edit_defaults u_empty_no_backup
 {
   empty_file_before_editing => "true";
-  edit_backup => "false";  
+  edit_backup => "false";
 }
 
 ################################################################################
