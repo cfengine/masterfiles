@@ -1,25 +1,26 @@
 bundle common update_def
 {
   classes:
+    !feature_augments::
       # all override classes are defined true
       "$(override_classes)" expression => "any", meta => { "override" };
 
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
       "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
 
-    have_augments_classes::
+    have_augments_classes.!feature_augments::
       "$(augments_classes_data_keys)"
         expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
         meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
       "current_version" string => "3.7.2";
-    any::
+    !feature_augments::
       "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
       "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
 
-    have_augments_file::
+    have_augments_file.!feature_augments::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "override_vars" slist => getindices("augments[vars]");
@@ -27,7 +28,7 @@ bundle common update_def
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
-    have_augments_classes::
+    have_augments_classes.!feature_augments::
       "augments_classes_data" data => mergedata("augments[classes]");
       "augments_classes_data_keys" slist => getindices("augments_classes_data");
 
