@@ -49,66 +49,81 @@ bundle common def
       # Begin change
 
       # Email settings are currently unable to be set from def.json, and must
-      # be set directly. 
+      # be set directly.
       # Your domain name, for use in access control
       # Note: this default may be inaccurate!
-      "domain"  string => "$(sys.domain)",
-      comment => "Define a global domain for all hosts",
-      handle => "common_def_vars_domain";
+      "domain"
+        string => "$(sys.domain)",
+        comment => "Define a global domain for all hosts",
+        handle => "common_def_vars_domain",
+        ifvarclass => not(isvariable("domain"));
 
       # Mail settings used by body executor control found in controls/cf_execd.cf
-      "mailto" string => "root@$(def.domain)";
+      "mailto"
+        string => "root@$(def.domain)",
+        ifvarclass => not(isvariable("mailto"));
 
-      "mailfrom" string => "root@$(sys.uqhost).$(def.domain)";
+      "mailfrom"
+        string => "root@$(sys.uqhost).$(def.domain)",
+        ifvarclass => not(isvariable("mailfrom"));
 
-      "smtpserver" string => "localhost";
+      "smtpserver"
+        string => "localhost",
+        ifvarclass => not(isvariable("smtpserver"));
 
       # List here the IP masks that we grant access to on the server
 
-      "acl"     slist => getvalues("override_data_acl"),
-      comment => "JSON-sourced: Define an acl for the machines to be granted accesses",
-      handle => "common_def_json_vars_acl",
-      ifvarclass => isvariable("override_data_acl"),
-      meta => { "defvar" };
+      # Only define here if we are not capable of parsing augments from C
+      "acl"
+        slist => getvalues("override_data_acl"),
+        comment => "JSON-sourced: Define an acl for the machines to be granted accesses",
+        handle => "common_def_json_vars_acl",
+        ifvarclass => and(isvariable("override_data_acl"), "!feature_augments"),
+        meta => { "defvar" };
 
-      "acl"     slist => {
-                           # Allow everything in my own domain.
+      "acl"
+        slist => {
+                   # Allow everything in my own domain.
 
-                           # Note that this:
-                           # 1. requires def.domain to be correctly set
-                           # 2. will cause a DNS lookup for every access
-                           # ".*$(def.domain)",
+                   # Note that this:
+                   # 1. requires def.domain to be correctly set
+                   # 2. will cause a DNS lookup for every access
+                   # ".*$(def.domain)",
 
-                           # Assume /16 LAN clients to start with
-                           "$(sys.policy_hub)/16",
+                   # Assume /16 LAN clients to start with
+                   "$(sys.policy_hub)/16",
 
-                           # Uncomment below if HA is used
-                           #"@(def.policy_servers)"
+                   # Uncomment below if HA is used
+                   #"@(def.policy_servers)"
 
-                           #  "2001:700:700:3.*",
-                           #  "217.77.34.18",
-                           #  "217.77.34.19",
-      },
-      comment => "Define an acl for the machines to be granted accesses",
-      handle => "common_def_vars_acl",
-      ifvarclass => not(isvariable("override_data_acl")),
-      meta => { "defvar" };
+                   #  "2001:700:700:3.*",
+                   #  "217.77.34.18",
+                   #  "217.77.34.19",
+        },
+        comment => "Define an acl for the machines to be granted accesses",
+        handle => "common_def_vars_acl",
+        ifvarclass => and(not(isvariable("override_data_acl")), not(isvariable("acl"))),
+        meta => { "defvar" };
 
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  This is open by default for bootstrapping.
 
-      "trustkeysfrom" slist => getvalues("override_data_trustkeysfrom"),
-      comment => "JSON-sourced: define from which machines keys can be trusted",
-      ifvarclass => isvariable("override_data_trustkeysfrom"),
-      meta => { "defvar" };
+      # Only define here if we are not capable of parsing augments from C
+      "trustkeysfrom"
+        slist => getvalues("override_data_trustkeysfrom"),
+        comment => "JSON-sourced: define from which machines keys can be trusted",
+        ifvarclass => and(isvariable("override_data_trustkeysfrom"), "!feature_augments"),
+        meta => { "defvar" };
 
-      "trustkeysfrom" slist => {
-                                 # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
-                                 "0.0.0.0/0", # allow any IP
-      },
-      comment => "Define from which machines keys can be trusted",
-      ifvarclass => not(isvariable("override_data_trustkeysfrom")),
-      meta => { "defvar" };
+      "trustkeysfrom"
+        slist => {
+                   # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
+                   "0.0.0.0/0", # allow any IP
+        },
+        comment => "Define from which machines keys can be trusted",
+        ifvarclass => and(not(isvariable("override_data_trustkeysfrom")),
+                          not(isvariable("trustkeysfrom"))),
+        meta => { "defvar" };
 
     debian::
       "environment_vars"
