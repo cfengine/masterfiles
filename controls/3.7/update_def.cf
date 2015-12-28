@@ -35,19 +35,40 @@ bundle common update_def
     any::
       # Begin change
 
-      "input_name_patterns" slist => getvalues("override_data_input_name_patterns"),
-      comment => "JSON-sourced filename patterns to match when updating the policy (see update/update_policy.cf)",
-      handle => "common_def_json_vars_input_name_patterns",
-      ifvarclass => isvariable("override_data_input_name_patterns"),
-      meta => { "defvar" };
+      # When parsing the augments_file from policy, we set input_name_patterns
+      # based on the data extracted from within policy
+      "input_name_patterns"
+        slist => getvalues("override_data_input_name_patterns"),
+        comment => "JSON-sourced filename patterns to match when updating the policy
+                    (see update/update_policy.cf)",
+        handle => "common_def_json_vars_input_name_patterns_without_feature_augments",
+        ifvarclass => and(isvariable("override_data_input_name_patterns"), "!feature_augments"),
+        meta => { "defvar" };
 
-      "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
-                                       ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
-                                       "cf_promises_release_id", ".*\.json", ".*\.yaml" },
-      comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
-      handle => "common_def_vars_input_name_patterns",
-      ifvarclass => not(isvariable("override_data_input_name_patterns")),
-      meta => { "defvar" };
+      # Default the input name patterns, if we don't find it defined in def
+      # (from the augments_file).
+      "input_name_patterns"
+        slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
+                   ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
+                   "cf_promises_release_id", ".*\.json", ".*\.yaml" },
+        comment => "Filename patterns to match when updating the policy
+                    (see update/update_policy.cf)",
+        handle => "common_def_vars_input_name_patterns_policy_default",
+        ifvarclass => and(and(not(isvariable("override_data_acl")),
+                          not(isvariable("input_name_patterns"))),
+                          not(isvariable("def.input_name_patterns"))),
+        meta => { "defvar" };
+
+      # define based on data in def (which comes from augments file), if
+      # present and input_name_patterns is not yet defined.).
+      "input_name_patterns"
+        slist => { @(def.input_name_patterns) },
+        comment => "Filename patterns to match when updating the policy
+                    (see update/update_policy.cf)",
+        handle => "common_def_vars_input_name_patterns_from_def_with_feature_augments",
+        ifvarclass => and( isvariable("def.input_name_patterns"),
+                           not(isvariable("input_name_patterns"))),
+        meta => { "defvar" };
 
       # the permissions for your masterfiles, which will propagate to inputs
       "masterfiles_perms_mode" string => "0600",
