@@ -326,6 +326,10 @@ bundle common def
       ifvarclass => "$(augments_classes_data_keys)";
 
       "$(const.t) $(defvars) = $($(defvars))";
+      "DEBUG $(this.bundle): Agent parsed augments_file"
+        ifvarclass => "have_augments_file.feature_augments";
+      "DEBUG $(this.bundle): Policy parsed augments_file"
+        ifvarclass => "have_augments_file.!feature_augments";
 }
 
 bundle common inventory_control

@@ -189,4 +189,9 @@ bundle common update_def
 
       "$(const.t) override class $(override_classes)";
       "$(const.t) $(defvars) = $($(defvars))";
+      "DEBUG $(this.bundle): Agent parsed augments_file"
+        ifvarclass => "have_augments_file.feature_augments";
+      "DEBUG $(this.bundle): Policy parsed augments_file"
+        ifvarclass => "have_augments_file.!feature_augments";
+      "DEBUG $(this.bundle): input_name_pattern = '$(input_name_patterns)'";
 }
