@@ -1,26 +1,26 @@
 bundle common update_def
 {
   classes:
-    !feature_augments::
+    !feature_def_json_preparse::
       # all override classes are defined true
       "$(override_classes)" expression => "any", meta => { "override" };
 
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
       "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
 
-    have_augments_classes.!feature_augments::
+    have_augments_classes.!feature_def_json_preparse::
       "$(augments_classes_data_keys)"
         expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
         meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
       "current_version" string => "3.7.2";
-    !feature_augments::
+    !feature_def_json_preparse::
       "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
       "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
 
-    have_augments_file.!feature_augments::
+    have_augments_file.!feature_def_json_preparse::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "override_vars" slist => getindices("augments[vars]");
@@ -28,7 +28,7 @@ bundle common update_def
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
-    have_augments_classes.!feature_augments::
+    have_augments_classes.!feature_def_json_preparse::
       "augments_classes_data" data => mergedata("augments[classes]");
       "augments_classes_data_keys" slist => getindices("augments_classes_data");
 
@@ -41,8 +41,8 @@ bundle common update_def
         slist => getvalues("override_data_input_name_patterns"),
         comment => "JSON-sourced filename patterns to match when updating the policy
                     (see update/update_policy.cf)",
-        handle => "common_def_json_vars_input_name_patterns_without_feature_augments",
-        ifvarclass => and(isvariable("override_data_input_name_patterns"), "!feature_augments"),
+        handle => "common_def_json_vars_input_name_patterns_without_feature_def_json_preparse",
+        ifvarclass => and(isvariable("override_data_input_name_patterns"), "!feature_def_json_preparse"),
         meta => { "defvar" };
 
       # Default the input name patterns, if we don't find it defined in def
@@ -65,7 +65,7 @@ bundle common update_def
         slist => { @(def.input_name_patterns) },
         comment => "Filename patterns to match when updating the policy
                     (see update/update_policy.cf)",
-        handle => "common_def_vars_input_name_patterns_from_def_with_feature_augments",
+        handle => "common_def_vars_input_name_patterns_from_def_with_feature_def_json_preparse",
         ifvarclass => and( isvariable("def.input_name_patterns"),
                            not(isvariable("input_name_patterns"))),
         meta => { "defvar" };
@@ -190,8 +190,8 @@ bundle common update_def
       "$(const.t) override class $(override_classes)";
       "$(const.t) $(defvars) = $($(defvars))";
       "DEBUG $(this.bundle): Agent parsed augments_file"
-        ifvarclass => "have_augments_file.feature_augments";
+        ifvarclass => "have_augments_file.feature_def_json_preparse";
       "DEBUG $(this.bundle): Policy parsed augments_file"
-        ifvarclass => "have_augments_file.!feature_augments";
+        ifvarclass => "have_augments_file.!feature_def_json_preparse";
       "DEBUG $(this.bundle): input_name_pattern = '$(input_name_patterns)'";
 }

@@ -9,7 +9,7 @@ bundle common def
   classes:
     # If the augments_file is parsed from C then we do not need to do this work
     # from policy.
-    !feature_augments::
+    !feature_def_json_preparse::
       # all override classes are defined true
       "$(override_classes)" expression => "any", meta => { "override" };
 
@@ -17,19 +17,19 @@ bundle common def
       "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
       "have_augments_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
 
-    have_augments_classes.!feature_augments::
+    have_augments_classes.!feature_def_json_preparse::
       "$(augments_classes_data_keys)"
         expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
         meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
 
-    !feature_augments::
+    !feature_def_json_preparse::
       "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
-    have_augments_file.!feature_augments::
+    have_augments_file.!feature_def_json_preparse::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "augments_inputs" slist => getvalues("augments[inputs]");
@@ -38,10 +38,10 @@ bundle common def
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
-    !have_augments_file.!feature_augments::
+    !have_augments_file.!feature_def_json_preparse::
       "augments_inputs" slist => {};
 
-    have_augments_classes.!feature_augments::
+    have_augments_classes.!feature_def_json_preparse::
       "augments_classes_data" data => mergedata("augments[classes]");
       "augments_classes_data_keys" slist => getindices("augments_classes_data");
 
@@ -78,7 +78,7 @@ bundle common def
         slist => getvalues("override_data_acl"),
         comment => "JSON-sourced: Define an acl for the machines to be granted accesses",
         handle => "common_def_json_vars_acl",
-        ifvarclass => and(isvariable("override_data_acl"), "!feature_augments"),
+        ifvarclass => and(isvariable("override_data_acl"), "!feature_def_json_preparse"),
         meta => { "defvar" };
 
       "acl"
@@ -112,7 +112,7 @@ bundle common def
       "trustkeysfrom"
         slist => getvalues("override_data_trustkeysfrom"),
         comment => "JSON-sourced: define from which machines keys can be trusted",
-        ifvarclass => and(isvariable("override_data_trustkeysfrom"), "!feature_augments"),
+        ifvarclass => and(isvariable("override_data_trustkeysfrom"), "!feature_def_json_preparse"),
         meta => { "defvar" };
 
       "trustkeysfrom"
@@ -327,9 +327,9 @@ bundle common def
 
       "$(const.t) $(defvars) = $($(defvars))";
       "DEBUG $(this.bundle): Agent parsed augments_file"
-        ifvarclass => "have_augments_file.feature_augments";
+        ifvarclass => "have_augments_file.feature_def_json_preparse";
       "DEBUG $(this.bundle): Policy parsed augments_file"
-        ifvarclass => "have_augments_file.!feature_augments";
+        ifvarclass => "have_augments_file.!feature_def_json_preparse";
 }
 
 bundle common inventory_control
