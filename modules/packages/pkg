@@ -199,13 +199,13 @@ case "${CMD}" in
         process_inputs "${CMD}" "${INPUTLIST}"
         case "${CMD}" in
             repo-install)
-                pkg install -qy ${REPO} ${PKG} 2>/dev/null
+                pkg install -qy ${REPO} ${PKG} 2>/dev/null >/dev/null
                 ;;
             file-install)
-                pkg install -qy ${PKG} 2>/dev/null
+                pkg install -qy ${PKG} 2>/dev/null >/dev/null
                 ;;
             remove)
-                pkg delete -Rqy ${PKG} 2>/dev/null
+                pkg delete -Rqy ${PKG} 2>/dev/null >/dev/null
                 ;;
         esac
         RC=$?

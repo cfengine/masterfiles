@@ -135,6 +135,17 @@ Architecture=${CURRENT_ARCH}"
     assertEquals "" "$actual"
 }
 
+testInstallPackageWithRepository()
+{
+    input="options=repository=FreeBSD
+Name=bash-static"
+
+    actual=`echo "$input" | $MODULE repo-install`
+
+    assertEquals "exit code" 0 $?
+    assertEquals "" "$actual"
+}
+
 testListUpdates()
 {
     expected="Name=bash-static
