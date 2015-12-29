@@ -12,6 +12,49 @@ bundle agent cfe_internal_masterfiles_stage
 {
   commands:
       "$(update_def.dc_scripts)/masterfiles-stage.sh"
-      classes => u_kept_successful_command,
-      handle => "masterfiles_update_stage";
+        classes => u_kept_successful_command_results("bundle", "masterfiles_deploy"),
+        handle => "masterfiles_update_stage";
+
+  reports:
+    masterfiles_deploy_not_kept::
+      "Masterfiles deployment failed, for more info see '$(sys.workdir)/outputs/dc-scripts.log'";
+
+    (DEBUG|DEBUG_cfe_internal_masterfiles_stage).(masterfiles_deploy_kept|masterfiles_deploy_repaired)::
+      "DEBUG $(this.bundle): Masterfiles deployed successfully";
+}
+
+body classes u_kept_successful_command_results(scope, class_prefix)
+# @brief Set command to "kept" instead of "repaired" if it returns 0 and define
+# classes suffixed with the appropriate outcomes.
+#
+# @param scope The scope in which the class should be defined (`bundle` or `namespace`)
+# @param class_prefix The prefix for the classes defined
+#
+# **See also:** `scope`, `scoped_classes_generic`, `classes_generic`, `results`
+{
+  kept_returncodes => { "0" };
+  failed_returncodes => { "1" };
+
+  scope => "$(scope)";
+
+  promise_kept => { "$(class_prefix)_reached",
+                    "$(class_prefix)_kept" };
+
+  promise_repaired => { "$(class_prefix)_reached",
+                        "$(class_prefix)_repaired" };
+
+  repair_failed => { "$(class_prefix)_reached",
+                     "$(class_prefix)_error",
+                     "$(class_prefix)_not_kept",
+                     "$(class_prefix)_failed" };
+
+  repair_denied => { "$(class_prefix)_reached",
+                     "$(class_prefix)_error",
+                     "$(class_prefix)_not_kept",
+                     "$(class_prefix)_denied" };
+
+  repair_timeout => { "$(class_prefix)_reached",
+                      "$(class_prefix)_error",
+                      "$(class_prefix)_not_kept",
+                      "$(class_prefix)_timeout" };
 }
