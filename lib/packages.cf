@@ -90,15 +90,14 @@ body package_module pkgsrc
     query_updates_ifelapsed => "14400";
 }
 
-body package_module pkg
+body package_module yum
 {
     query_installed_ifelapsed => "60";
     query_updates_ifelapsed => "1440";
     #default_options => {};
 }
 
-
-body package_module yum
+body package_module pkg
 {
     query_installed_ifelapsed => "60";
     query_updates_ifelapsed => "1440";
