@@ -112,7 +112,7 @@ process_inputs() {
 get_package_data() {
     if [ -n "${PKG}" ] ; then
         case "${PKG}" in
-            /*|./*|../) # File Path.  It's a file
+            /*) # File Path.  It's a file
                 TYP='file'
                 if [ ! -e "${PKG}" ] ; then
                     fatal "No such file: '${PKG}'."
@@ -120,13 +120,6 @@ get_package_data() {
                 ;;
             http://*|ftp://|file://) # URL, it's a file.
                 TYP='file'
-                ;;
-            */*)
-                if [ -e "${PKG}" ] ; then
-                    TYP='file'
-                else
-                    TYP='repo'
-                fi
                 ;;
             *)
                 TYP='repo'
