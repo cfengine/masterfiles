@@ -382,6 +382,80 @@ bundle agent cmerge(name, varlist)
       "$(name)_str" string => format("%S", $(name)),    policy => "free";
 }
 
+bundle agent collect_vars(name, tag, flatten)
+# @brief bundle to collect tagged variables into a data container
+# @param name the variable name to create inside `collect_vars`
+# @param tag the tag regex string to match e.g. "beta,gamma=.*"
+# @param flatten to flatten variable values, set to "any" or "true" or "1"
+#
+# The result will be a map in `collect.$(name)`. You can also use
+# `cmerge.$(name)_str` for a string version of the merged containers
+# (if it fits in a CFEngine string).
+#
+# The name is variable so you can call this bundle for more than one
+# collection.
+#
+# Every found variable will be a key in the map, unless you specify
+# `flatten`, in which case they'll be flattened into a top-level array
+# of data.
+#
+# The `flatten` parameter can be "any" or "true" or "1" to be true.
+#
+# **Example:**
+#
+# ```cf3
+# body common control
+# {
+#       inputs => { "$(sys.libdir)/stdlib.cf" };
+# }
+#
+# bundle agent main
+# {
+#   vars:
+#       # the "mymerge" tag is user-defined
+#       "a" data  => parsejson('{ "mark": "burgess" }'), meta => { "mymerge" };
+#       "b" data  => parsejson('{ "volker": "hilsheimer" }'), meta => { "mymerge" };
+#
+#   methods:
+#       # merge a, b into container collect_vars.all
+#       "go" usebundle => collect_vars("all", "mymerge", "");
+#       # flatten a, b into container collect_vars.flattened
+#       "go_flatten" usebundle => collect_vars("flattened", "mymerge", "true");
+#
+#   reports:
+#       # merged = {"default:main.a":{"mark":"burgess"},"default:main.b":{"volker":"hilsheimer"}}
+#       "merged = $(collect_vars.all_str)";
+#       # flattened = {"mark":"burgess","volker":"hilsheimer"}
+#       "flattened = $(collect_vars.flattened_str)";
+# }
+# ```
+{
+  classes:
+      "flatten" expression => strcmp($(flatten), "any");
+      "flatten" expression => strcmp($(flatten), "1");
+      "flatten" expression => strcmp($(flatten), "true");
+
+  vars:
+      "todo_$(name)"    slist => variablesmatching(".*", $(tag));
+
+    !flatten::
+      "$(name)" data => parsejson('{}'),            policy => "free";
+
+      # this iterates!
+      "$(name)" data => mergedata($(name), '{ "$(todo_$(name))": $(todo_$(name)) }'),
+        policy => "free";
+
+    flatten::
+      "$(name)" data => parsejson('[]'),            policy => "free";
+
+      # this iterates!
+      "$(name)" data => mergedata($(name), "$(todo_$(name))"),
+        policy => "free";
+
+    any::
+      "$(name)_str" string => format("%S", $(name)),    policy => "free";
+}
+
 bundle agent run_ifdefined(namespace, mybundle)
 # @brief bundle to maybe run another bundle dynamically
 # @param namespace the namespace, usually `$(this.namespace)`
