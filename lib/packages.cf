@@ -57,6 +57,9 @@ bundle common package_module_knowledge
     debian::
       "platform_default" string => "apt_get";
 
+    freebsd::
+      "platform_default" string => "pkgng";
+
     redhat::
       "platform_default" string => "yum";
 }
@@ -86,6 +89,14 @@ body package_module pkgsrc
     query_installed_ifelapsed => "60";
     query_updates_ifelapsed => "14400";
 }
+
+body package_module pkgng
+{
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
+    #default_options => {};
+}
+
 
 body package_module yum
 {
