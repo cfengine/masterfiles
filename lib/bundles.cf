@@ -439,21 +439,29 @@ bundle agent collect_vars(name, tag, flatten)
       "todo_$(name)"    slist => variablesmatching(".*", $(tag));
 
     !flatten::
-      "$(name)" data => parsejson('{}'),            policy => "free";
+      "$(name)"
+        data => parsejson('{}'),
+        policy => "free";
 
       # this iterates!
-      "$(name)" data => mergedata($(name), '{ "$(todo_$(name))": $(todo_$(name)) }'),
+      "$(name)"
+        data => mergedata($(name), '{ "$(todo_$(name))": $(todo_$(name)) }'),
         policy => "free";
 
     flatten::
-      "$(name)" data => parsejson('[]'),            policy => "free";
+      "$(name)"
+        data => parsejson('[]'),
+        policy => "free";
 
       # this iterates!
-      "$(name)" data => mergedata($(name), "$(todo_$(name))"),
+      "$(name)"
+        data => mergedata($(name), "$(todo_$(name))"),
         policy => "free";
 
     any::
-      "$(name)_str" string => format("%S", $(name)),    policy => "free";
+      "$(name)_str"
+        string => format("%S", $(name)),
+        policy => "free";
 }
 
 bundle agent run_ifdefined(namespace, mybundle)
