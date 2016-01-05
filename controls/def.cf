@@ -7,6 +7,9 @@
 bundle common def
 {
   classes:
+    # If the augments_file is parsed from C then we do not need to do this work
+    # from policy.
+    !feature_def_json_preparse::
       # all override classes are defined true
       "$(override_classes)" expression => "any", meta => { "override" };
 
@@ -14,19 +17,19 @@ bundle common def
       "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
       "have_augments_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
 
-    have_augments_classes::
+    have_augments_classes.!feature_def_json_preparse::
       "$(augments_classes_data_keys)"
         expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
         meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
 
-    any::
+    !feature_def_json_preparse::
       "augments_file" string => "$(this.promise_dirname)/../def.json";
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
-    have_augments_file::
+    have_augments_file.!feature_def_json_preparse::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "augments_inputs" slist => getvalues("augments[inputs]");
@@ -35,10 +38,10 @@ bundle common def
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
-    !have_augments_file::
+    !have_augments_file.!feature_def_json_preparse::
       "augments_inputs" slist => {};
 
-    have_augments_classes::
+    have_augments_classes.!feature_def_json_preparse::
       "augments_classes_data" data => mergedata("augments[classes]");
       "augments_classes_data_keys" slist => getindices("augments_classes_data");
 
@@ -46,66 +49,81 @@ bundle common def
       # Begin change
 
       # Email settings are currently unable to be set from def.json, and must
-      # be set directly. 
+      # be set directly.
       # Your domain name, for use in access control
       # Note: this default may be inaccurate!
-      "domain"  string => "$(sys.domain)",
-      comment => "Define a global domain for all hosts",
-      handle => "common_def_vars_domain";
+      "domain"
+        string => "$(sys.domain)",
+        comment => "Define a global domain for all hosts",
+        handle => "common_def_vars_domain",
+        ifvarclass => not(isvariable("domain"));
 
       # Mail settings used by body executor control found in controls/cf_execd.cf
-      "mailto" string => "root@$(def.domain)";
+      "mailto"
+        string => "root@$(def.domain)",
+        ifvarclass => not(isvariable("mailto"));
 
-      "mailfrom" string => "root@$(sys.uqhost).$(def.domain)";
+      "mailfrom"
+        string => "root@$(sys.uqhost).$(def.domain)",
+        ifvarclass => not(isvariable("mailfrom"));
 
-      "smtpserver" string => "localhost";
+      "smtpserver"
+        string => "localhost",
+        ifvarclass => not(isvariable("smtpserver"));
 
       # List here the IP masks that we grant access to on the server
 
-      "acl"     slist => getvalues("override_data_acl"),
-      comment => "JSON-sourced: Define an acl for the machines to be granted accesses",
-      handle => "common_def_json_vars_acl",
-      ifvarclass => isvariable("override_data_acl"),
-      meta => { "defvar" };
+      # Only define here if we are not capable of parsing augments from C
+      "acl"
+        slist => getvalues("override_data_acl"),
+        comment => "JSON-sourced: Define an acl for the machines to be granted accesses",
+        handle => "common_def_json_vars_acl",
+        ifvarclass => and(isvariable("override_data_acl"), "!feature_def_json_preparse"),
+        meta => { "defvar" };
 
-      "acl"     slist => {
-                           # Allow everything in my own domain.
+      "acl"
+        slist => {
+                   # Allow everything in my own domain.
 
-                           # Note that this:
-                           # 1. requires def.domain to be correctly set
-                           # 2. will cause a DNS lookup for every access
-                           # ".*$(def.domain)",
+                   # Note that this:
+                   # 1. requires def.domain to be correctly set
+                   # 2. will cause a DNS lookup for every access
+                   # ".*$(def.domain)",
 
-                           # Assume /16 LAN clients to start with
-                           "$(sys.policy_hub)/16",
+                   # Assume /16 LAN clients to start with
+                   "$(sys.policy_hub)/16",
 
-                           # Uncomment below if HA is used
-                           #"@(def.policy_servers)"
+                   # Uncomment below if HA is used
+                   #"@(def.policy_servers)"
 
-                           #  "2001:700:700:3.*",
-                           #  "217.77.34.18",
-                           #  "217.77.34.19",
-      },
-      comment => "Define an acl for the machines to be granted accesses",
-      handle => "common_def_vars_acl",
-      ifvarclass => not(isvariable("override_data_acl")),
-      meta => { "defvar" };
+                   #  "2001:700:700:3.*",
+                   #  "217.77.34.18",
+                   #  "217.77.34.19",
+        },
+        comment => "Define an acl for the machines to be granted accesses",
+        handle => "common_def_vars_acl",
+        ifvarclass => and(not(isvariable("override_data_acl")), not(isvariable("acl"))),
+        meta => { "defvar" };
 
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  This is open by default for bootstrapping.
 
-      "trustkeysfrom" slist => getvalues("override_data_trustkeysfrom"),
-      comment => "JSON-sourced: define from which machines keys can be trusted",
-      ifvarclass => isvariable("override_data_trustkeysfrom"),
-      meta => { "defvar" };
+      # Only define here if we are not capable of parsing augments from C
+      "trustkeysfrom"
+        slist => getvalues("override_data_trustkeysfrom"),
+        comment => "JSON-sourced: define from which machines keys can be trusted",
+        ifvarclass => and(isvariable("override_data_trustkeysfrom"), "!feature_def_json_preparse"),
+        meta => { "defvar" };
 
-      "trustkeysfrom" slist => {
-                                 # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
-                                 "0.0.0.0/0", # allow any IP
-      },
-      comment => "Define from which machines keys can be trusted",
-      ifvarclass => not(isvariable("override_data_trustkeysfrom")),
-      meta => { "defvar" };
+      "trustkeysfrom"
+        slist => {
+                   # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
+                   "0.0.0.0/0", # allow any IP
+        },
+        comment => "Define from which machines keys can be trusted",
+        ifvarclass => and(not(isvariable("override_data_trustkeysfrom")),
+                          not(isvariable("trustkeysfrom"))),
+        meta => { "defvar" };
 
     debian::
       "environment_vars"
@@ -315,6 +333,10 @@ bundle common def
       ifvarclass => "$(augments_classes_data_keys)";
 
       "$(const.t) $(defvars) = $($(defvars))";
+      "DEBUG $(this.bundle): Agent parsed augments_file"
+        ifvarclass => "have_augments_file.feature_def_json_preparse";
+      "DEBUG $(this.bundle): Policy parsed augments_file"
+        ifvarclass => "have_augments_file.!feature_def_json_preparse";
 }
 
 bundle common inventory_control
