@@ -20,7 +20,7 @@ clean-local:
 check-local: create-env
 	MAKE=$(MAKE) ./testall
 
-CLEANFILES  = testall.env summary.log test.log test.xml
+CLEANFILES  = testall.env summary.log test.log test.xml Makefile.testall
 #These are created by running the submakefile
 CLEANFILES += dcs.cf.sub default.cf.sub plucked.cf.sub
 
