@@ -62,6 +62,9 @@ bundle common package_module_knowledge
 
     redhat::
       "platform_default" string => "yum";
+
+    aix::
+      "platform_default" string => "nimclient";
 }
 
 body package_module apt_get
@@ -71,6 +74,31 @@ body package_module apt_get
     #default_options =>  {};
 }
 
+body package_module nimclient
+# @brief Define details used when interfacing with nimclient package
+# module
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent example_nimclient
+# {
+#   packages:
+#       "expect.base"
+#         policy => "present",
+#         options => { "lpp_source=lppaix71034" },
+#         package_module => nimclient;
+# }
+# ```
+{
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "14400";
+
+    # This would likey be customized based on your infrastructure specifics
+    # you may for example want to default the lpp_source based on something
+    # like `oslevel -s` output.
+    #default_options =>  {};
+}
 body package_module pkgsrc
 # @brief Define details used when interfacing with the pkgsrc package
 # module.
@@ -103,6 +131,7 @@ body package_module pkg
     query_updates_ifelapsed => "1440";
     #default_options => {};
 }
+
 
 body package_module freebsd_ports
 # @brief Define details used when interfacing with the freebsd ports package
