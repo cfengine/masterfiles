@@ -1,5 +1,5 @@
 env:
-- CF_VERSION=3.7.1
+- CF_VERSION=3.7.2
 - CF_VERSION=3.6.6
 
 install:
