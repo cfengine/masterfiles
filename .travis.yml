@@ -10,3 +10,4 @@ install:
 
 script:
 - /var/cfengine/bin/cf-promises -f $TRAVIS_BUILD_DIR/promises.cf
+- /var/cfengine/bin/cf-promises -f $TRAVIS_BUILD_DIR/update.cf
