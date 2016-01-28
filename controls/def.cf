@@ -35,8 +35,12 @@ bundle common def
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
-    !have_augments_file.!feature_def_json_preparse::
-      "augments_inputs" slist => {};
+    any::
+      "augments_inputs"
+        slist => {},
+        ifvarclass => not( isvariable( "augments_inputs" ) ),
+        comment => "It's important that we define this list, even if it's empty
+                    or we get errors about the list being unresolved.";
 
     have_augments_classes.!feature_def_json_preparse::
       "augments_classes_data" data => mergedata("augments[classes]");
