@@ -198,17 +198,23 @@ bundle agent standard_services(service,state)
     chkconfig.have_init::
       "running" expression => returnszero("$(init) status > /dev/null", "useshell");
 
-    chkconfig::
+    chkconfig.SuSE::
       "onboot"
-      expression => returnszero("$(paths.chkconfig) $(service)", "noshell"),
-      comment => "We need to know if the service is configured to start at boot or not";
+        expression => returnszero("$(paths.chkconfig) $(service) | $(paths.grep) 'on$' >/dev/null", "usehell"),
+        comment => "SuSE chkconfig outputs current state to stdout rather than as an exit code";
+
+    chkconfig.!SuSE::
+      "onboot"
+        expression => returnszero("$(paths.chkconfig) $(service)", "noshell"),
+        comment => "We need to know if the service is configured to start at boot or not";
 
       # We redirect stderr and stdout to dev null so that we do not create noise in the logs
       "chkconfig_$(c_service)_unregistered"
-      not => returnszero("$(paths.chkconfig) --list $(service) &> /dev/null", "useshell"),
-      comment => "We need to know if the service is registered with chkconfig so that we can
-      perform other chkconfig operations, if the service is not registered it must be added.
-      Note we do not automatically try to add the service at this time.";
+        not => returnszero("$(paths.chkconfig) --list $(service) &> /dev/null", "useshell"),
+        comment => "We need to know if the service is registered with chkconfig
+                    so that we can perform other chkconfig operations, if the
+                    service is not registered it must be added.  Note we do not
+                    automatically try to add the service at this time.";
 
 ### BEGIN ###
 # @brief probe the state of a systemd service
