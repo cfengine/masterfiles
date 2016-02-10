@@ -197,6 +197,7 @@ bundle common def
         "$(sys.workdir)/cf_repair.log",
         "$(sys.workdir)/state/cf_value.log",
         "$(sys.workdir)/outputs/dc-scripts.log",
+        "$(sys.workdir)/state/promise_log.jsonl",
       };
 
       "hub_log_files" slist =>
