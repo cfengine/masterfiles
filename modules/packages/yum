@@ -82,8 +82,8 @@ def get_package_data():
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
         return subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string])
-    elif re.search("([:,]|-[0-9])", pkg_string):
-        # Contains either a version number or an illegal symbol.
+    elif re.search("[:,]", pkg_string):
+        # Contains an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
         return 1
     else:
