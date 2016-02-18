@@ -1,0 +1,1404 @@
+DirectorCommonAgent:DirectorCommonAgent:6.3.3.1::I:T:::::N:All required files of Director Common Agent, including JRE, LWI::::0::
+DirectorPlatformAgent:DirectorPlatformAgent:6.3.3.1::I:C:::::N:Director Platform Agent for IBM Systems Director on AIX::::0::
+ICU4C.adt:ICU4C.adt:7.1.2.0::I:T:::::N:ICU Application Developer's Toolkit ::::0:1241:
+ICU4C.rte:ICU4C.rte:7.1.3.0::I:C:::::N:International Components for Unicode ::::0:1341:
+ILMT-TAD4D-agent:ILMT-TAD4D-agent:7.2.2.2::I:T:::::N:IBM License Metric Tool and IBM Tivoli Asset Discovery for Distributed agent::::1::
+Java5.ext:Java5.ext.commapi:5.0.0.175::I:T:::::N:Java SDK 32-bit Comm API Extension ::::1::
+Java5.ext:Java5.ext.java3d:5.0.0.175::I:T:::::N:Java SDK 32-bit Java3D ::::1::
+Java5.samples:Java5.samples:5.0.0.455::I:T:::::N:Java SDK 32-bit Samples ::::1::
+Java5.sdk:Java5.sdk:5.0.0.570::I:C:::::N:Java SDK 32-bit ::::1::
+Java5.source:Java5.source:5.0.0.570::I:T:::::N:Java SDK 32-bit Source ::::1::
+Java5_64.sdk:Java5_64.sdk:5.0.0.570::I:C:::::N:Java SDK 64-bit ::::1::
+Java6.sdk:Java6.sdk:6.0.0.445::I:C:::::N:Java SDK 32-bit ::::1::
+Java6_64.samples:Java6_64.samples.demo:6.0.0.445::I:T:::::N:Java SDK 64-bit Demo Samples ::::1::
+Java6_64.samples:Java6_64.samples.jnlp:6.0.0.445::I:T:::::N:Java SDK 64-bit jnlp Samples ::::1::
+Java6_64.sdk:Java6_64.sdk:6.0.0.445::I:T:::::N:Java SDK 64-bit ::::1::
+Java6_64.source:Java6_64.source:6.0.0.445::I:T:::::N:Java SDK 64-bit Source ::::1::
+Java7.docs:Java7.docs:7.0.0.110::I:T:::::N:Java SDK 32-bit Docs ::::1::
+Java7.jclsource:Java7.jclsource:7.0.0.120::I:T:::::N:Java SDK 32-bit Java Class Library Source ::::1::
+Java7.jre:Java7.jre:7.0.0.120::I:T:::::N:Java SDK 32-bit Java Runtime Environment ::::1::
+Java7.samples:Java7.samples.demo:7.0.0.120::I:T:::::N:Java SDK 32-bit Demo Samples ::::1::
+Java7.samples:Java7.samples.jmx:7.0.0.120::I:T:::::N:Java SDK 32-bit JMX and other Samples ::::1::
+Java7.samples:Java7.samples.jnlp:7.0.0.120::I:T:::::N:Java SDK 32-bit JNLP Samples ::::1::
+Java7.sampsource:Java7.sampsource:7.0.0.120::I:T:::::N:Java SDK 32-bit Source Files For Samples ::::1::
+Java7.sdk:Java7.sdk:7.0.0.120::I:T:::::N:Java SDK 32-bit Development Kit ::::1::
+Java7_64.docs:Java7_64.docs:7.0.0.110::I:T:::::N:Java SDK 64-bit Docs ::::1::
+Java7_64.jclsource:Java7_64.jclsource:7.0.0.120::I:T:::::N:Java SDK 64-bit Java Class Library Source ::::1::
+Java7_64.jre:Java7_64.jre:7.0.0.120::I:T:::::N:Java SDK 64-bit Java Runtime Environment ::::1::
+Java7_64.samples:Java7_64.samples.demo:7.0.0.120::I:T:::::N:Java SDK 64-bit Demo Samples ::::1::
+Java7_64.samples:Java7_64.samples.jmx:7.0.0.120::I:T:::::N:Java SDK 64-bit JMX and other Samples ::::1::
+Java7_64.samples:Java7_64.samples.jnlp:7.0.0.120::I:T:::::N:Java SDK 64-bit JNLP Samples ::::1::
+Java7_64.sampsource:Java7_64.sampsource:7.0.0.120::I:T:::::N:Java SDK 64-bit Source Files For Samples ::::1::
+Java7_64.sdk:Java7_64.sdk:7.0.0.120::I:T:::::N:Java SDK 64-bit Development Kit ::::1::
+OpenGL.OpenGL_X.adt:OpenGL.OpenGL_X.adt.include:7.1.0.0::I:T:::::N:OpenGL Application Development Toolkit Include Files::::0:1036:
+OpenGL.OpenGL_X.adt:OpenGL.OpenGL_X.adt.samples:7.1.0.0::I:T:::::N:OpenGL Application Development Toolkit Samples::::0:1036:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14101b02.PPC:7.1.2.15::I:T:::::N:OpenGL GXT6500P Device Dependent Software - PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14101b02.PPC64:7.1.2.15::I:T:::::N:OpenGL GXT6500P Device Dependent Software - 64-bit PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14101c02.PPC:7.1.2.15::I:T:::::N:OpenGL GXT4500P Device Dependent Software - PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14101c02.PPC64:7.1.2.15::I:T:::::N:OpenGL GXT4500P Device Dependent Software - 64-bit PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14106e01.PPC:7.1.2.15::I:T:::::N:OpenGL GXT4000P Device Dependent Software - PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14106e01.PPC64:7.1.2.15::I:T:::::N:OpenGL GXT4000P Device Dependent Software - 64-bit PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14107001.PPC:7.1.2.15::I:T:::::N:OpenGL GXT6000P Device Dependent Software - PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.pci.14107001.PPC64:7.1.2.15::I:T:::::N:OpenGL GXT6000P Device Dependent Software - 64-bit PowerPC ::::0:1316:
+OpenGL.OpenGL_X.dev:OpenGL.OpenGL_X.dev.vfb:7.1.3.15::I:T:::::N:OpenGL Virtual Frame Buffer Support ::::0:1415:
+OpenGL.OpenGL_X.rte:OpenGL.OpenGL_X.rte.base:7.1.3.15::I:T:::::N:OpenGL Base Runtime Environment ::::0:1415:
+OpenGL.OpenGL_X.rte:OpenGL.OpenGL_X.rte.base+:7.1.2.15::I:T:::::N:OpenGL Enhanced Geometry Pipeline ::::0:1316:
+OpenGL.OpenGL_X.rte:OpenGL.OpenGL_X.rte.pipe++:7.1.2.15::I:T:::::N:Enhanced OpenGL Graphics Pipeline ::::0:1316:
+OpenGL.OpenGL_X.rte:OpenGL.OpenGL_X.rte.pipe64++:7.1.2.15::I:T:::::N:Enhanced OpenGL Graphics Pipeline - 64-bit ::::0:1316:
+OpenGL.OpenGL_X.rte:OpenGL.OpenGL_X.rte.soft:7.1.3.15::I:T:::::N:OpenGL Soft Runtime Environment ::::0:1415:
+OpenGL.OpenGL_X.tools:OpenGL.OpenGL_X.tools.base:7.1.0.0::I:T:::::N:OpenGL Base Tools ::::0:1115:
+OpenGL.OpenGL_X.tools:OpenGL.OpenGL_X.tools.debugger:7.1.2.15::I:T:::::N:OpenGL Debugger ::::0:1316:
+PEX_PHIGS.dev:PEX_PHIGS.dev.pci.14101b02:7.1.2.15::I:T:::::N:PEX/graPHIGS GXT6500P Device Dependent Software ::::0:1316:
+PEX_PHIGS.dev:PEX_PHIGS.dev.pci.14101c02:7.1.2.15::I:T:::::N:PEX/graPHIGS GXT4500P Device Dependent Software ::::0:1316:
+PEX_PHIGS.dev:PEX_PHIGS.dev.pci.14106e01:7.1.2.15::I:T:::::N:PEX/graPHIGS GXT4000P Device Dependent Software ::::0:1316:
+PEX_PHIGS.dev:PEX_PHIGS.dev.pci.14107001:7.1.2.15::I:T:::::N:PEX/graPHIGS GXT6000P Device Dependent Software ::::0:1316:
+PEX_PHIGS.graPHIGS.adt:PEX_PHIGS.graPHIGS.adt.clients:7.1.0.0::I:T:::::N:graPHIGS Application Development Toolkit Clients::::0:1036:
+PEX_PHIGS.graPHIGS.adt:PEX_PHIGS.graPHIGS.adt.gks:7.1.0.0::I:T:::::N:graPHIGS Application Development Toolkit GKS Library::::0:1036:
+PEX_PHIGS.graPHIGS.adt:PEX_PHIGS.graPHIGS.adt.include:7.1.0.0::I:T:::::N:graPHIGS Application Development Toolkit Include Files::::0:1036:
+PEX_PHIGS.graPHIGS.adt:PEX_PHIGS.graPHIGS.adt.samples:7.1.0.0::I:T:::::N:graPHIGS Application Development Toolkit Samples::::0:1036:
+PEX_PHIGS.graPHIGS.adt:PEX_PHIGS.graPHIGS.adt.tutor:7.1.0.0::I:T:::::N:graPHIGS Application Development Toolkit Tutorial::::0:1036:
+PEX_PHIGS.graPHIGS.fnt:PEX_PHIGS.graPHIGS.fnt.JP:7.1.0.0::I:T:::::N:graPHIGS Kanji (Japanese) Fonts::::0:1036:
+PEX_PHIGS.graPHIGS.fnt:PEX_PHIGS.graPHIGS.fnt.KR:7.1.0.0::I:T:::::N:graPHIGS Hangul (Korean) Fonts::::0:1036:
+PEX_PHIGS.graPHIGS.fnt:PEX_PHIGS.graPHIGS.fnt.SC_EUC:7.1.0.0::I:T:::::N:graPHIGS Simplified Chinese Font, EUC based::::0:1036:
+PEX_PHIGS.graPHIGS.fnt:PEX_PHIGS.graPHIGS.fnt.TW:7.1.0.0::I:T:::::N:graPHIGS Traditional Chinese Fonts::::0:1036:
+PEX_PHIGS.graPHIGS.fnt:PEX_PHIGS.graPHIGS.fnt.uni:7.1.0.0::I:T:::::N:graPHIGS Unicode Fonts::::0:1036:
+PEX_PHIGS.graPHIGS.rte:PEX_PHIGS.graPHIGS.rte.6098:7.1.0.0::I:T:::::N:graPHIGS 6098 Support ::::0:1140:
+PEX_PHIGS.graPHIGS.rte:PEX_PHIGS.graPHIGS.rte.base:7.1.3.30::I:T:::::N:graPHIGS Base Runtime Environment ::::0:1441:
+PEX_PHIGS.graPHIGS.rte:PEX_PHIGS.graPHIGS.rte.pipe:7.1.2.15::I:T:::::N:graPHIGS Pipeline Runtime Environment ::::0:1316:
+PEX_PHIGS.graPHIGS.rte:PEX_PHIGS.graPHIGS.rte.plot:7.1.0.15::I:T:::::N:graPHIGS IBM/CALCOMP/VERSATEC Plotter Support ::::0:1140:
+PEX_PHIGS.graPHIGS.rte:PEX_PHIGS.graPHIGS.rte.rnuc:7.1.0.0::I:T:::::N:graPHIGS Remote Nucleus Support ::::0:1140:
+PEX_PHIGS.graPHIGS.rte:PEX_PHIGS.graPHIGS.rte.soft:7.1.2.15::I:T:::::N:graPHIGS Soft Runtime Environment ::::0:1316:
+PEX_PHIGS.msg.EN_US:PEX_PHIGS.msg.EN_US.graPHIGS.rte.6098:7.1.1.0::I:T:::::N:graPHIGS 6098 Support Messages - U.S. English (UTF)::::0::
+PEX_PHIGS.msg.en_US:PEX_PHIGS.msg.en_US.graPHIGS.rte.6098:7.1.0.0::I:T:::::N:graPHIGS 6098 Support Messages - U.S. English::::0:1036:
+Tivoli_Management_Agent.client:Tivoli_Management_Agent.client.rte:3.7.1.0::I:T:::::N:Management Framework Endpoint Runtime"::::0::
+X11.Dt:X11.Dt.ToolTalk:7.1.3.15::I:C:::::N:AIX CDE ToolTalk Support ::::0:1415:
+X11.Dt:X11.Dt.adt:7.1.3.0::I:C:::::N:AIX CDE Application Developers' Toolkit ::::0:1341:
+X11.Dt:X11.Dt.bitmaps:7.1.0.0::I:C:::::N:AIX CDE Bitmaps ::::0:1140:
+X11.Dt:X11.Dt.compat:7.1.0.0::I:C:::::N:AIX CDE Compatibility ::::0:1115:
+X11.Dt:X11.Dt.helpinfo:7.1.1.0::I:C:::::N:AIX CDE Help Files and Volumes ::::0:1140:
+X11.Dt:X11.Dt.helpmin:7.1.0.0::I:C:::::N:AIX CDE Minimum Help Files ::::0:1140:
+X11.Dt:X11.Dt.helprun:7.1.0.15::I:C:::::N:AIX CDE Runtime Help ::::0:1140:
+X11.Dt:X11.Dt.lib:7.1.3.30::I:C:::::N:AIX CDE Runtime Libraries ::::0:1441:
+X11.Dt:X11.Dt.rte:7.1.3.30::I:C:::::N:AIX Common Desktop Environment (CDE) 1.0 ::::0:1441:
+X11.Dt:X11.Dt.xdt2cde:7.1.0.0::I:C:::::N:AIX CDE Migration Tool ::::0:1115:
+X11.adt:X11.adt.bitmaps:7.1.0.0::I:C:::::N:AIXwindows Application Development Toolkit Bitmap Files ::::0:1115:
+X11.adt:X11.adt.ext:7.1.0.0::I:T:::::N:AIXwindows Application Development Toolkit for X Extensions ::::0:1115:
+X11.adt:X11.adt.imake:7.1.0.0::I:C:::::N:AIXwindows Application Development Toolkit imake ::::0:1115:
+X11.adt:X11.adt.include:7.1.3.30::I:C:::::N:AIXwindows Application Development Toolkit Include Files ::::0:1441:
+X11.adt:X11.adt.lib:7.1.2.15::I:C:::::N:AIXwindows Application Development Toolkit Libraries ::::0:1316:
+X11.adt:X11.adt.motif:7.1.3.0::I:C:::::N:AIXwindows Application Development Toolkit Motif ::::0:1341:
+X11.apps:X11.apps.aixterm:7.1.3.30::I:C:::::N:AIXwindows aixterm Application ::::0:1441:
+X11.apps:X11.apps.clients:7.1.0.15::I:C:::::N:AIXwindows Client Applications ::::0:1115:
+X11.apps:X11.apps.config:7.1.3.0::I:C:::::N:AIXwindows Configuration Applications ::::0:1341:
+X11.apps:X11.apps.custom:7.1.0.0::I:C:::::N:AIXwindows Customizing Tool ::::0:1115:
+X11.apps:X11.apps.msmit:7.1.2.15::I:C:::::N:AIXwindows msmit Application ::::0:1316:
+X11.apps:X11.apps.rte:7.1.3.30::I:C:::::N:AIXwindows Runtime Configuration Applications ::::0:1441:
+X11.apps:X11.apps.util:7.1.0.0::I:C:::::N:AIXwindows Utility Applications ::::0:1115:
+X11.apps:X11.apps.xdm:7.1.3.30::I:C:::::N:AIXwindows xdm Application ::::0:1441:
+X11.apps:X11.apps.xterm:7.1.3.30::I:C:::::N:AIXwindows xterm Application ::::0:1441:
+X11.base:X11.base.common:7.1.0.0::I:C:::::N:AIXwindows Runtime Common Directories ::::0:1140:
+X11.base:X11.base.lib:7.1.3.30::I:C:::::N:AIXwindows Runtime Libraries ::::0:1441:
+X11.base:X11.base.rte:7.1.3.30::I:C:::::N:AIXwindows Runtime Environment ::::0:1441:
+X11.base:X11.base.smt:7.1.3.0::I:C:::::N:AIXwindows Runtime Shared Memory Transport ::::0:1341:
+X11.base:X11.base.xpconfig:7.1.0.0::I:C:::::N:Xprint Configuration Files ::::0:1140:
+X11.compat:X11.compat.adt.Motif12:7.1.0.0::I:T:::::N:AIXwindows Motif 1.2 Compatibility Development Toolkit ::::0:1115:
+X11.compat:X11.compat.lib.Motif10:7.1.0.0::I:T:::::N:AIXwindows Motif 1.0 Libraries Compatibility ::::0:1115:
+X11.compat:X11.compat.lib.Motif114:7.1.0.0::I:T:::::N:AIXwindows Motif 1.1.4 Libraries Compatibility ::::0:1115:
+X11.compat:X11.compat.lib.X11R3:7.1.0.0::I:T:::::N:AIXwindows X11R3 Libraries Compatibility ::::0:1115:
+X11.compat:X11.compat.lib.X11R4:7.1.0.0::I:T:::::N:AIXwindows X11R4 Libraries Compatibility ::::0:1115:
+X11.compat:X11.compat.lib.X11R5:7.1.3.0::I:C:::::N:AIXwindows X11R5 Compatibility Libraries ::::0:1341:
+X11.compat:X11.compat.lib.X11R6:7.1.3.0::I:C:::::N:AIXwindows X11R6 Compatibility Libraries ::::0:1341:
+X11.compat:X11.compat.lib.X11R6_motif:7.1.3.0::I:C:::::N:AIXwindows X11R6 Motif 1.2 & 2.1 Compatibility ::::0:1341:
+X11.fnt:X11.fnt.Gr_Cyr_T1:7.1.0.0::I:T:::::N:AIXwindows Greek-Cyrillic Type1 Fonts ::::0:1115:
+X11.fnt:X11.fnt.coreX:7.1.0.0::I:C:::::N:AIXwindows X Consortium Fonts ::::0:1115:
+X11.fnt:X11.fnt.defaultFonts:7.1.0.0::I:C:::::N:AIXwindows Default Fonts ::::0:1115:
+X11.fnt:X11.fnt.deform_JP:7.1.0.0::I:T:::::N:AIXwindows Japanese PCF Deformed Fonts ::::0:1115:
+X11.fnt:X11.fnt.fontServer:7.1.3.15::I:T:::::N:AIXwindows Font Server ::::0:1415:
+X11.fnt:X11.fnt.ibm1046:7.1.0.0::I:T:::::N:AIXwindows Arabic Fonts ::::0:1115:
+X11.fnt:X11.fnt.ibm1046_T1:7.1.0.0::I:T:::::N:AIXwindows Arabic Type1 Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso1:7.1.0.0::I:C:::::N:AIXwindows Latin 1 Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso2:7.1.0.0::I:T:::::N:AIXwindows Latin 2 Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso3:7.1.0.0::I:T:::::N:AIXwindows Latin 3 Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso4:7.1.0.0::I:T:::::N:AIXwindows Latin 4 Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso5:7.1.0.0::I:T:::::N:AIXwindows Cyrillic Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso7:7.1.0.0::I:T:::::N:AIXwindows Greek Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso8:7.1.0.0::I:T:::::N:AIXwindows Hebrew Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso8_T1:7.1.0.0::I:T:::::N:AIXwindows Hebrew Type1 Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso9:7.1.0.0::I:T:::::N:AIXwindows Turkish Fonts ::::0:1115:
+X11.fnt:X11.fnt.iso_T1:7.1.0.0::I:C:::::N:AIXwindows Latin Type1 Fonts ::::0:1115:
+X11.fnt:X11.fnt.ksc5601.ttf:7.1.0.0::I:T:::::N:AIXwindows Korean KSC5601 TrueType Fonts ::::0:1115:
+X11.fnt:X11.fnt.ucs.cjk:7.1.0.0::I:T:::::N:AIXwindows Unicode CJK Fonts ::::0:1115:
+X11.fnt:X11.fnt.ucs.com:7.1.0.0::I:C:::::N:AIXwindows Common Fonts Unicode ::::0:1115:
+X11.fnt:X11.fnt.util:7.1.0.0::I:T:::::N:AIXwindows Font Utilities ::::0:1115:
+X11.fnt.helv_ttf:X11.fnt.helv_ttf:7.1.0.0::I:T:::::N:Helvetica Linotype TrueType Fonts::::0:1036:
+X11.fnt.ucs.ttf:X11.fnt.ucs.ttf:7.1.3.30::I:C:::::N:AIXwindows Unicode TrueType Fonts ::::0:1441:
+X11.fnt.ucs.ttf_CN:X11.fnt.ucs.ttf_CN:7.1.3.0::I:T:::::N:AIXwindows Unicode TrueType Fonts - CJK China ::::0:1341:
+X11.fnt.ucs.ttf_HK:X11.fnt.ucs.ttf_HK:7.1.3.0::I:T:::::N:AIXwindows Unicode TrueType Fonts - CJK Hong Kong ::::0:1341:
+X11.fnt.ucs.ttf_KR:X11.fnt.ucs.ttf_KR:7.1.3.0::I:T:::::N:AIXwindows Unicode TrueType Fonts - CJK Korea ::::0:1341:
+X11.fnt.ucs.ttf_ME:X11.fnt.ucs.ttf_ME:7.1.3.0::I:T:::::N:AIXwindows Unicode TrueType Fonts - Middle East ::::0:1341:
+X11.fnt.ucs.ttf_TW:X11.fnt.ucs.ttf_TW:7.1.3.0::I:T:::::N:AIXwindows Unicode TrueType Fonts - CJK Taiwan ::::0:1341:
+X11.fnt.ucs.ttf_extb:X11.fnt.ucs.ttf_extb:7.1.3.0::I:C:::::N:AIXwindows Unicode TrueType Fonts - Extension B ::::0:1341:
+X11.fnt.xorg:X11.fnt.xorg.bh-ttf:7.1.0.0::I:T:::::N:X.Org Bigelow and Holmes Inc. TrueType fonts::::0:1036:
+X11.fnt.xorg:X11.fnt.xorg.misc-misc:7.1.0.0::I:T:::::N:X.Org misc-misc bitmap fonts::::0:1036:
+X11.help.EN_US:X11.help.EN_US.Dt.helpinfo:7.1.0.0::I:T:::::N:AIX CDE Help Files and Volumes - U.S. English (UTF)::::0::
+X11.help.en_US:X11.help.en_US.Dt.helpinfo:7.1.0.0::I:T:::::N:AIX CDE Help Files and Volumes - U.S. English::::0:1036:
+X11.loc.EN_US:X11.loc.EN_US.Dt.rte:7.1.1.0::I:C:::::N:CDE Locale Configuration - U. S. English (UTF)::::0::
+X11.loc.EN_US:X11.loc.EN_US.base.lib:7.1.1.0::I:C:::::N:AIXwindows Client Locale Config - U. S. English (UTF)::::0::
+X11.loc.EN_US:X11.loc.EN_US.base.rte:7.1.1.0::I:C:::::N:AIXwindows Locale Configuration - U. S. English (UTF)::::0::
+X11.loc.en_US:X11.loc.en_US.Dt.rte:7.1.0.0::I:T:::::N:CDE Locale Configuration - U.S. English::::0:1036:
+X11.loc.en_US:X11.loc.en_US.base.lib:7.1.0.0::I:C:::::N:AIXwindows Client Locale Config - U.S. English::::0:1036:
+X11.loc.en_US:X11.loc.en_US.base.rte:7.1.0.0::I:C:::::N:AIXwindows Locale Configuration - U.S. English::::0:1036:
+X11.man.en_US:X11.man.en_US.Dt.adt:7.1.0.0::I:T:::::N:AIX CDE Toolkit Man Pages - U.S. English::::0:1036:
+X11.man.en_US:X11.man.en_US.Dt.rte:7.1.0.0::I:T:::::N:AIX CDE Man Pages - U.S. English::::0:1036:
+X11.motif:X11.motif.lib:7.1.3.0::I:C:::::N:AIXwindows Motif Libraries ::::0:1341:
+X11.motif:X11.motif.mwm:7.1.1.0::I:C:::::N:AIXwindows Motif Window Manager ::::0:1140:
+X11.msg.EN_US:X11.msg.EN_US.Dt.helpmin:7.1.3.0::I:C:::::N:AIX CDE Minimum Help Files - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.Dt.rte:7.1.3.0::I:C:::::N:AIX CDE Messages - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.adt.ext:7.1.3.0::I:T:::::N:AIXwindows X Extensions Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.adt.imake:7.1.3.0::I:C:::::N:AIXwindows imake Messages - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.apps.aixterm:7.1.3.0::I:C:::::N:AIXwindows aixterm Messages - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.apps.clients:7.1.3.0::I:C:::::N:AIXwindows Client Apps Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.apps.config:7.1.3.0::I:C:::::N:AIXwindows Config Apps Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.apps.custom:7.1.3.0::I:C:::::N:AIXwindows Custom Tool Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.apps.rte:7.1.3.0::I:C:::::N:AIXwindows Runtime Config Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.apps.xdm:7.1.3.0::I:C:::::N:AIXwindows xdm Messages - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.base.common:7.1.3.0::I:C:::::N:AIXwindows Common Messages - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.base.rte:7.1.3.0::I:C:::::N:AIXwindows Runtime Env. Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.fnt.fontServer:7.1.3.0::I:T:::::N:AIXwindows Font Server Messages - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.fnt.util:7.1.3.0::I:T:::::N:AIXwindows Font Utilities Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.motif.lib:7.1.3.0::I:C:::::N:AIXwindows Motif Lib. Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.motif.mwm:7.1.3.0::I:C:::::N:AIX Motif Window Mgr Msgs - U.S. English (UTF)::::0::
+X11.msg.EN_US:X11.msg.EN_US.vsm.rte:7.1.3.0::I:C:::::N:Visual Sys Mgmt. Helps & Msgs - U.S. English (UTF)::::0::
+X11.msg.en_US:X11.msg.en_US.Dt.helpmin:7.1.3.0::I:T:::::N:AIX CDE Minimum Help Files - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.Dt.rte:7.1.3.0::I:T:::::N:AIX CDE Messages - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.adt.ext:7.1.3.0::I:T:::::N:AIXwindows X Extensions Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.adt.imake:7.1.3.0::I:C:::::N:AIXwindows imake Messages - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.apps.aixterm:7.1.3.0::I:C:::::N:AIXwindows aixterm Messages - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.apps.clients:7.1.3.0::I:C:::::N:AIXwindows Client Apps Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.apps.config:7.1.3.0::I:C:::::N:AIXwindows Config Apps Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.apps.custom:7.1.3.0::I:C:::::N:AIXwindows Custom Tool Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.apps.rte:7.1.3.0::I:C:::::N:AIXwindows Runtime Config Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.apps.xdm:7.1.3.0::I:C:::::N:AIXwindows xdm Messages - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.base.common:7.1.3.0::I:C:::::N:AIXwindows Common Messages - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.base.rte:7.1.3.0::I:C:::::N:AIXwindows Runtime Env. Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.fnt.fontServer:7.1.3.0::I:T:::::N:AIXwindows Font Server Messages - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.fnt.util:7.1.3.0::I:T:::::N:AIXwindows Font Utilities Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.motif.lib:7.1.3.0::I:C:::::N:AIXwindows Motif Lib. Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.motif.mwm:7.1.3.0::I:C:::::N:AIX Motif Window Mgr Msgs - U.S. English ::::0:1341:
+X11.msg.en_US:X11.msg.en_US.vsm.rte:7.1.3.0::I:C:::::N:Visual Sys Mgmt. Helps & Msgs - U.S. English ::::0:1341:
+X11.samples:X11.samples.apps.aixclients:7.1.0.0::I:T:::::N:AIXwindows Sample AIX Clients Source ::::0:1115:
+X11.samples:X11.samples.apps.clients:7.1.3.30::I:C:::::N:AIXwindows Sample X Consortium Clients Binary/Source ::::0:1441:
+X11.samples:X11.samples.apps.demos:7.1.3.30::I:T:::::N:AIXwindows Sample X Consortium Demos Source ::::0:1441:
+X11.samples:X11.samples.apps.motifdemos:7.1.2.15::I:T:::::N:AIXwindows Sample Motif Demos Source ::::0:1316:
+X11.samples:X11.samples.common:7.1.0.0::I:C:::::N:AIXwindows Imakefile Structure for Samples ::::0:1115:
+X11.samples:X11.samples.doc:7.1.0.0::I:T:::::N:AIXwindows Sample Documents Source ::::0:1115:
+X11.samples:X11.samples.ext:7.1.0.0::I:T:::::N:AIXwindows Sample X Extensions Source ::::0:1115:
+X11.samples:X11.samples.fnt.util:7.1.3.30::I:T:::::N:AIXwindows Sample Font Server Utilities Source ::::0:1441:
+X11.samples:X11.samples.lib.Core:7.1.3.30::I:C:::::N:AIXwindows Sample X Consortium Core Libraries Binary/Source ::::0:1441:
+X11.samples:X11.samples.rgb:7.1.0.0::I:T:::::N:AIXwindows Sample Color Database Source ::::0:1115:
+X11.vfb:X11.vfb:7.1.3.0::I:T:::::N:Virtual Frame Buffer Software for AIXwindows ::::0:1341:
+X11.vsm:X11.vsm.lib:7.1.0.0::I:C:::::N:Visual System Managment Library::::0:1036:
+adde.v2.common:adde.v2.common.ddk:7.1.3.30::I:T:::::b:ADDE Common Device Development Kit ::::0:1441:
+adde.v2.common:adde.v2.common.rte:7.1.3.0::I:T:::::b:ADDE Common Device Runtime Environment ::::0:1341:
+adde.v2.diag:adde.v2.diag.ddk:7.1.3.15::I:T:::::b:ADDE Diagnostic Development Kit ::::0:1415:
+adde.v2.ethernet:adde.v2.ethernet.ddk:7.1.3.30::I:T:::::b:ADDE Ethernet Device Development Kit ::::0:1441:
+adde.v2.ethernet:adde.v2.ethernet.rte:7.1.3.30::I:T:::::b:ADDE Ethernet Device Runtime Environment ::::0:1441:
+adde.v2.rdma:adde.v2.rdma.ddk:7.1.3.30::I:T:::::b:ADDE RDMA Device Development Kit ::::0:1441:
+adde.v2.rdma:adde.v2.rdma.rte:7.1.3.30::I:T:::::b:ADDE RDMA Device Runtime Environment ::::0:1441:
+artex.base:artex.base.agent:7.1.3.0::I:T:::::N:AIX Runtime Expert CAS agent ::::0:1341:
+artex.base:artex.base.rte:7.1.3.30::I:C:::::N:AIX Runtime Expert ::::0:1441:
+artex.base:artex.base.samples:7.1.3.30::I:C:::::N:AIX Runtime Expert sample profiles ::::0:1441:
+bos:bos.rte:7.1.3.30::S:C:::::N:Base Operating System Runtime::::0:1441:
+bos:bos.rte.ILS:7.1.3.0::S:C:::::N:International Language Support::::0:1341:
+bos:bos.rte.SRC:7.1.3.30::S:C:::::N:System Resource Controller::::0:1441:
+bos:bos.rte.aio:7.1.3.15::S:C:::::N:Asynchronous I/O Extension::::0:1415:
+bos:bos.rte.archive:7.1.3.30::S:C:::::N:Archive Commands::::0:1441:
+bos:bos.rte.bind_cmds:7.1.3.30::S:C:::::N:Binder and Loader Commands::::0:1441:
+bos:bos.rte.boot:7.1.3.30::S:C:::::b:Boot Commands::::0:1441:
+bos:bos.rte.bosinst:7.1.3.30::S:C:::::N:Base OS Install Commands::::0:1441:
+bos:bos.rte.commands:7.1.3.30::S:C:::::b:Commands::::0:1441:
+bos:bos.rte.console:7.1.1.0::S:C:::::N:Console::::0:1140:
+bos:bos.rte.control:7.1.3.15::S:T:::::N:System Control Commands::::0:1415:
+bos:bos.rte.control:7.1.3.30::S:C:::::N:System Control Commands::::0:1441:
+bos:bos.rte.cron:7.1.3.30::S:C:::::N:Batch Operations::::0:1441:
+bos:bos.rte.date:7.1.3.30::S:C:::::N:Date Control Commands::::0:1441:
+bos:bos.rte.devices:7.1.3.30::S:C:::::b:Base Device Drivers::::0:1441:
+bos:bos.rte.devices_msg:7.1.3.15::S:C:::::N:Device Driver Messages::::0:1415:
+bos:bos.rte.diag:7.1.3.15::S:C:::::N:Diagnostics::::0:1415:
+bos:bos.rte.edit:7.1.3.30::S:C:::::N:Editors::::0:1441:
+bos:bos.rte.filesystem:7.1.3.30::S:C:::::b:Filesystem Administration::::0:1441:
+bos:bos.rte.iconv:7.1.3.15::S:C:::::N:Language Converters::::0:1415:
+bos:bos.rte.ifor_ls:7.1.2.0::S:C:::::N:iFOR/LS Libraries::::0:1241:
+bos:bos.rte.install:7.1.3.30::SF:C:::::N:LPP Install Commands::::0:1441:
+bos:bos.rte.jfscomp:7.1.3.0::S:C:::::N:JFS Compression::::0:1341:
+bos:bos.rte.libc:7.1.3.15::S:T:::::N:libc Library::::0:1415:
+bos:bos.rte.libc:7.1.3.30::S:C:::::N:libc Library::::0:1441:
+bos:bos.rte.libcfg:7.1.3.0::S:C:::::N:libcfg Library::::0:1341:
+bos:bos.rte.libcur:7.1.3.0::S:C:::::N:libcurses Library::::0:1341:
+bos:bos.rte.libpthreads:7.1.3.15::S:C:::::N:libpthreads Library::::0:1415:
+bos:bos.rte.loc:7.1.2.15::S:C:::::N:Base Locale Support::::0:1316:
+bos:bos.rte.lvm:7.1.3.30::S:C:::::b:Logical Volume Manager::::0:1441:
+bos:bos.rte.man:7.1.3.30::S:C:::::N:Man Commands::::0:1441:
+bos:bos.rte.methods:7.1.3.30::S:C:::::b:Device Config Methods::::0:1441:
+bos:bos.rte.misc_cmds:7.1.3.0::S:C:::::b:Miscellaneous Commands::::0:1341:
+bos:bos.rte.mlslib:7.1.2.15::S:C:::::N:Trusted AIX Libraries::::0:1316:
+bos:bos.rte.net:7.1.3.0::S:C:::::N:Network::::0:1341:
+bos:bos.rte.odm:7.1.3.30::S:C:::::N:Object Data Manager::::0:1441:
+bos:bos.rte.printers:7.1.3.30::S:C:::::N:Front End Printer Support::::0:1441:
+bos:bos.rte.security:7.1.3.30::S:C:::::b:Base Security Function::::0:1441:
+bos:bos.rte.serv_aid:7.1.3.30::S:C:::::N:Error Log Service Aids::::0:1441:
+bos:bos.rte.shell:7.1.3.30::S:C:::::b:Shells (bsh, ksh, csh)::::0:1441:
+bos:bos.rte.streams:7.1.2.15::S:C:::::N:Streams Libraries::::0:1316:
+bos:bos.rte.tty:7.1.3.30::S:C:::::b:Base TTY Support and Commands::::0:1441:
+bos.64bit:bos.64bit:7.1.3.30::I:C:::::b:Base Operating System 64 bit Runtime ::::0:1441:
+bos.INed:bos.INed:7.1.0.0::I:T:::::N:INed Editor::::0:1036:
+bos.acct:bos.acct:7.1.3.30::I:C:::::N:Accounting Services ::::0:1441:
+bos.adt:bos.adt.base:7.1.3.30::I:C:::::N:Base Application Development Toolkit ::::0:1441:
+bos.adt:bos.adt.data:7.1.0.0::I:T:::::N:Base Application Development Toolkit Data::::0:1036:
+bos.adt:bos.adt.debug:7.1.3.15::I:C:::::N:Base Application Development Debuggers ::::0:1415:
+bos.adt:bos.adt.graphics:7.1.0.0::I:T:::::N:Base Application Development Graphics Include Files ::::0:1140:
+bos.adt:bos.adt.include:7.1.3.30::I:C:::::N:Base Application Development Include Files ::::0:1441:
+bos.adt:bos.adt.include:7.1.3.30::S:C:::::N:Base Application Development Include Files::::0:1441:
+bos.adt:bos.adt.insttools:7.1.3.15::I:T:::::N:Tool to Create installp Packages ::::0:1415:
+bos.adt:bos.adt.lib:7.1.2.15::I:C:::::N:Base Application Development Libraries ::::0:1316:
+bos.adt:bos.adt.libm:7.1.3.0::I:C:::::N:Base Application Development Math Library ::::0:1341:
+bos.adt:bos.adt.libmio:7.1.2.15::I:T:::::N:Modular IO Library ::::0:1316:
+bos.adt:bos.adt.prof:7.1.3.15::S:T:::::N:Base Profiling Support::::0:1415:
+bos.adt:bos.adt.prof:7.1.3.30::I:T:::::N:Base Profiling Support ::::0:1441:
+bos.adt:bos.adt.prt_tools:7.1.0.0::I:T:::::N:Printer Support Development Toolkit ::::0:1140:
+bos.adt:bos.adt.samples:7.1.3.0::I:T:::::N:Base Operating System Samples ::::0:1341:
+bos.adt:bos.adt.sccs:7.1.3.0::I:T:::::N:SCCS Application Development Toolkit ::::0:1341:
+bos.adt:bos.adt.syscalls:7.1.3.30::I:T:::::N:System Calls Application Development Toolkit ::::0:1441:
+bos.adt:bos.adt.utils:7.1.2.0::I:T:::::N:Base Application Development Utilities - lex and yacc ::::0:1241:
+bos.ae:bos.ae:7.1.1.15::I:C:::::N:Activation Engine ::::0:1216:
+bos.ahafs:bos.ahafs:7.1.3.30::I:C:::::N:Aha File System ::::0:1441:
+bos.aixpert.cmds:bos.aixpert.cmds:7.1.3.30::I:C:::::N:AIX Security Hardening ::::0:1441:
+bos.alt_disk_install:bos.alt_disk_install.boot_images:7.1.3.30::I:C:::::N:Alternate Disk Installation Disk Boot Images ::::0:1441:
+bos.alt_disk_install:bos.alt_disk_install.rte:7.1.3.30::I:C:::::N:Alternate Disk Installation Runtime ::::0:1441:
+bos.aso:bos.aso:7.1.3.30::I:C:::::N:Active System Optimizer ::::0:1441:
+bos.atm:bos.atm.atmle:7.1.3.0::I:T:::::N:ATM LAN Emulation Client Support ::::0:1341:
+bos.cdat:bos.cdat:7.1.0.15::I:C:::::N:Cluster Data Aggregation Tool ::::0:1115:
+bos.cdmount:bos.cdmount:7.1.0.0::I:C:::::N:CD/DVD Automount Facility::::0:1036:
+bos.cifs_fs:bos.cifs_fs.rte:7.1.3.30::I:T:::::b:Runtime for SMBFS ::::0:1441:
+bos.cifs_fs:bos.cifs_fs.smit:7.1.0.0::I:T:::::b:SMIT Interface for SMBFS ::::0:1140:
+bos.cluster:bos.cluster.rte:7.1.3.30::I:C:::::b:Cluster Aware AIX ::::0:1441:
+bos.clvm:bos.clvm.enh:7.1.3.30::I:C:::::b:Enhanced Concurrent Logical Volume Manager ::::0:1441:
+bos.compat:bos.compat.cmds:7.1.3.0::I:T:::::N:AIX 3.2 Compatibility Commands ::::0:1341:
+bos.compat:bos.compat.libs:7.1.0.0::I:T:::::N:AIX 3.2 Compatibility Libraries ::::0:1115:
+bos.compat:bos.compat.links:7.1.3.0::I:T:::::N:AIX 3.2 to 4 Compatibility Links ::::0:1341:
+bos.compat:bos.compat.net:7.1.0.0::I:T:::::N:AIX 3.2 TCP/IP Compatability Commands ::::0:1115:
+bos.compat:bos.compat.termcap:7.1.0.0::I:T:::::N:AIX 3.2 Termcap Source and Library ::::0:1115:
+bos.compat:bos.compat.termcap.data:7.1.0.0::I:T:::::N:AIX 3.2 Termcap Source Data::::0:1036:
+bos.content_list:bos.content_list:7.1.0.0::I:T:::::N:AIX Release Content List::::0:1036:
+bos.cpr:bos.cpr:7.1.3.15::I:T:::::N:Checkpoint/Restart Runtime and Tools ::::0:1415:
+bos.data:bos.data:7.1.0.15::I:T:::::N:Base Operating System Data ::::0:1115:
+bos.diag:bos.diag.com:7.1.3.30::I:C:::::N:Common Hardware Diagnostics ::::0:1441:
+bos.diag:bos.diag.ecc:7.1.1.0::I:C:::::N:Inventory Scout ECC Client ::::0:1140:
+bos.diag:bos.diag.rte:7.1.3.30::I:C:::::N:Hardware Diagnostics ::::0:1441:
+bos.diag:bos.diag.util:7.1.3.30::I:C:::::N:Hardware Diagnostics Utilities ::::0:1441:
+bos.dlc:bos.dlc.8023:7.1.3.0::I:T:::::N:IEEE Ethernet (802.3) Data Link Control ::::0:1341:
+bos.dlc:bos.dlc.com:7.1.0.0::I:T:::::N:Common Data Link Control files ::::0:1140:
+bos.dlc:bos.dlc.com_enet:7.1.0.0::I:T:::::N:Common Ethernet Data Link files ::::0:1140:
+bos.dlc:bos.dlc.ether:7.1.3.0::I:T:::::N:Standard Ethernet Data Link Control ::::0:1341:
+bos.dlc:bos.dlc.fddi:7.1.3.0::I:T:::::N:FDDI Data Link Control ::::0:1341:
+bos.dlc:bos.dlc.qllc:7.1.3.15::I:T:::::N:X.25 QLLC Data Link Control ::::0:1415:
+bos.dlc:bos.dlc.sdlc:7.1.3.0::I:T:::::N:SDLC Data Link Control ::::0:1341:
+bos.dlc:bos.dlc.token:7.1.3.0::I:T:::::N:Token-Ring Data Link Control ::::0:1341:
+bos.dosutil:bos.dosutil:7.1.0.0::I:T:::::N:DOS Utilities::::0:1036:
+bos.ecc_client:bos.ecc_client.rte:7.1.3.15::I:C:::::N:Electronic Customer Care Runtime ::::0:1415:
+bos.eim:bos.eim.adt:7.1.0.0::I:T:::::N:Enterprise Identity Mapping Toolkit ::::0:1115:
+bos.eim:bos.eim.rte:7.1.3.15::I:T:::::N:Enterprise Identity Mapping ::::0:1415:
+bos.esagent:bos.esagent:7.1.3.30::I:C:::::N:Electronic Service Agent ::::0:1441:
+bos.games:bos.games:7.1.3.0::I:T:::::N:Games ::::1:1341:
+bos.help.msg.EN_US:bos.help.msg.EN_US.com:7.1.1.0::I:C:::::N:WebSM/SMIT Context Helps - U.S. English (UTF)::::0::
+bos.help.msg.en_US:bos.help.msg.en_US.com:7.1.1.15::I:C:::::N:WebSM/SMIT Context Helps - U.S. English ::::0::
+bos.help.msg.en_US:bos.help.msg.en_US.smit:7.1.3.15::I:C:::::N:SMIT Context Helps - U.S. English::::0::
+bos.iconv:bos.iconv.Vi_VN:7.1.0.0::I:T:::::N:ASCII Language Converters - Vietnamese ::::0:1115:
+bos.iconv:bos.iconv.Zh_TW:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - T-Chinese (big5) ::::0:1115:
+bos.iconv:bos.iconv.ar_AA:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Arabic ::::0:1115:
+bos.iconv:bos.iconv.com:7.1.3.0::I:C:::::N:Common Language to Language Converters ::::0:1341:
+bos.iconv:bos.iconv.da_DK:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Danish ::::0:1115:
+bos.iconv:bos.iconv.de_DE:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - German ::::0:1115:
+bos.iconv:bos.iconv.el_GR:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Greek ::::0:1115:
+bos.iconv:bos.iconv.en_GB:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - U.K. English ::::0:1115:
+bos.iconv:bos.iconv.es_ES:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Spanish ::::0:1115:
+bos.iconv:bos.iconv.fr_FR:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - French ::::0:1115:
+bos.iconv:bos.iconv.is_IS:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Icelandic ::::0:1115:
+bos.iconv:bos.iconv.iso2:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Latin 2 Countries ::::0:1115:
+bos.iconv:bos.iconv.iso5:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Cyrillic Countries ::::0:1115:
+bos.iconv:bos.iconv.it_IT:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Italian ::::0:1115:
+bos.iconv:bos.iconv.iw_IL:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Hebrew ::::0:1115:
+bos.iconv:bos.iconv.ja_JP:7.1.3.15::I:T:::::N:EBCDIC & ASCII Language Converters - Japanese ::::0:1415:
+bos.iconv:bos.iconv.ko_KR:7.1.3.0::I:T:::::N:EBCDIC & ASCII Language Converters - Korean ::::0:1341:
+bos.iconv:bos.iconv.tr_TR:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Turkish ::::0:1115:
+bos.iconv:bos.iconv.ucs.ZH_CN:7.1.0.0::I:T:::::N:Unicode Converters for Simplified Chinese ::::0:1115:
+bos.iconv:bos.iconv.ucs.Zh_CN:7.1.0.0::I:T:::::N:Unicode Converters for Simplified Chinese (GB18030) ::::0:1115:
+bos.iconv:bos.iconv.ucs.baltic:7.1.0.0::I:T:::::N:Unicode Converters for Baltic Countries ::::0:1115:
+bos.iconv:bos.iconv.ucs.com:7.1.3.15::I:C:::::N:Unicode Base Converters for AIX Code Sets/Fonts ::::0:1415:
+bos.iconv:bos.iconv.ucs.ebcdic:7.1.3.15::I:T:::::N:Unicode Converters for EBCDIC Code Sets ::::0:1415:
+bos.iconv:bos.iconv.ucs.pc:7.1.3.15::I:T:::::N:Unicode Converters for Additional PC Code Sets ::::0:1415:
+bos.iconv:bos.iconv.zh_CN:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Simplified Chinese ::::0:1115:
+bos.iconv:bos.iconv.zh_TW:7.1.0.0::I:T:::::N:EBCDIC & ASCII Language Converters - Traditional Chinese ::::0:1115:
+bos.installers:bos.installers.si:7.1.3.30::I:T:::::N:Solution Install software ::::0:1441:
+bos.iocp:bos.iocp.rte:7.1.3.0::I:C:::::N:I/O Completion Ports API ::::0:1341:
+bos.loc.adt:bos.loc.adt.iconv:7.1.3.15::I:T:::::N:Language Converter Development Toolkit ::::0:1415:
+bos.loc.adt:bos.loc.adt.imk:7.1.3.0::I:T:::::N:Keymap Development Toolkit ::::0:1341:
+bos.loc.adt:bos.loc.adt.locale:7.1.3.0::I:T:::::N:Locale Development Toolkit ::::0:1341:
+bos.loc.com.AR:bos.loc.com.AR:7.1.0.0::I:T:::::N:Common Locale Support - Arabic::::0:1036:
+bos.loc.com.CN:bos.loc.com.CN:7.1.0.0::I:T:::::N:Common Locale Support - Simplified Chinese::::0:1036:
+bos.loc.com.EE:bos.loc.com.EE:7.1.0.0::I:T:::::N:Common Locale Support - Eastern Europe::::0:1036:
+bos.loc.com.IW:bos.loc.com.IW:7.1.0.0::I:T:::::N:Common Locale Support - Hebrew::::0:1036:
+bos.loc.com.JP:bos.loc.com.JP:7.1.3.15::I:T:::::N:Common Locale Support - Japanese ::::0:1415:
+bos.loc.com.bidi:bos.loc.com.bidi:7.1.0.15::I:T:::::N:Common Locale Support - Bidirectional Languages ::::0:1115:
+bos.loc.com.utf:bos.loc.com.utf:7.1.3.0::I:C:::::N:Common Locale Support - UTF-8 ::::0:1341:
+bos.loc.fnt:bos.loc.fnt.iso1:7.1.0.0::I:T:::::N:Optional Fonts - Latin 1::::0:1036:
+bos.loc.fnt:bos.loc.fnt.iso7:7.1.0.0::I:T:::::N:Optional Fonts - Greek::::0:1036:
+bos.loc.fnt:bos.loc.fnt.iso9:7.1.0.0::I:T:::::N:Optional Fonts - Turkish::::0:1036:
+bos.loc.iso:bos.loc.iso.Zh_CN:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - S-Chinese (GB18030) ::::0:1341:
+bos.loc.iso:bos.loc.iso.Zh_HK:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - Traditional Chinese (BIG5-HKSCS) ::::0:1341:
+bos.loc.iso:bos.loc.iso.Zh_TW:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - T-Chinese (big5) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_AU:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - Australian English ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_BE:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - Belgian English ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_CA:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - English (Canada) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_GB:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - U.K. English ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_HK:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - English (Hong Kong) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_IE:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - English (Ireland) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_IN:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - English (India) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_NZ:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - English (New Zealand) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_PH:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - English (Philippines) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_SG:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - English (Singapore) ::::0:1341:
+bos.loc.iso:bos.loc.iso.en_US:7.1.1.0::I:C:::::N:Base System Locale ISO Code Set - U.S. English ::::0:1140:
+bos.loc.iso:bos.loc.iso.en_ZA:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - South African English ::::0:1341:
+bos.loc.iso:bos.loc.iso.ko_KR:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - Korean ::::0:1341:
+bos.loc.iso:bos.loc.iso.zh_CN:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - Simplified Chinese ::::0:1341:
+bos.loc.iso:bos.loc.iso.zh_TW:7.1.3.0::I:T:::::N:Base System Locale ISO Code Set - Traditional Chinese ::::0:1341:
+bos.loc.utf.EN_US:bos.loc.utf.EN_US:7.1.3.0::I:C:::::N:Base System Locale UTF Code Set - U. S. English ::::0:1341:
+bos.loc.utf.HI_IN:bos.loc.utf.HI_IN:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Hindi ::::0:1341:
+bos.loc.utf.ZH_CN:bos.loc.utf.ZH_CN:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Simplified Chinese ::::0:1341:
+bos.loc.utf.af:bos.loc.utf.af:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Afrikaans ::::0:1341:
+bos.loc.utf.am:bos.loc.utf.am:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Amharic ::::0:1341:
+bos.loc.utf.ar:bos.loc.utf.ar:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Arabic ::::0:1341:
+bos.loc.utf.bn_BD:bos.loc.utf.bn_BD:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Bengali ::::0:1341:
+bos.loc.utf.eu:bos.loc.utf.eu:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Basque ::::0:1341:
+bos.loc.utf.fil:bos.loc.utf.fil:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Filipino ::::0:1341:
+bos.loc.utf.fr_SN:bos.loc.utf.fr_SN:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - UTF8 ::::0:1341:
+bos.loc.utf.gl:bos.loc.utf.gl:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Galician ::::0:1341:
+bos.loc.utf.ha:bos.loc.utf.ha:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Hausa ::::0:1341:
+bos.loc.utf.hy:bos.loc.utf.hy:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Armenian ::::0:1341:
+bos.loc.utf.ig:bos.loc.utf.ig:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Igbo ::::0:1341:
+bos.loc.utf.ka:bos.loc.utf.ka:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Georgian ::::0:1341:
+bos.loc.utf.km:bos.loc.utf.km:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Khmer ::::0:1341:
+bos.loc.utf.kok:bos.loc.utf.kok:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Konkani ::::0:1341:
+bos.loc.utf.lg:bos.loc.utf.lg:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Ganda ::::0:1341:
+bos.loc.utf.nb:bos.loc.utf.nb:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Norwegian(Bokmal) ::::0:1341:
+bos.loc.utf.ne:bos.loc.utf.ne:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Nepali ::::0:1341:
+bos.loc.utf.nn:bos.loc.utf.nn:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Norwegian(Nynorsk) ::::0:1341:
+bos.loc.utf.om:bos.loc.utf.om:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Oromo ::::0:1341:
+bos.loc.utf.rw:bos.loc.utf.rw:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Kinyarwanda ::::0:1341:
+bos.loc.utf.si:bos.loc.utf.si:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Sinhala ::::0:1341:
+bos.loc.utf.sr:bos.loc.utf.sr:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Serbian ::::0:1341:
+bos.loc.utf.sw:bos.loc.utf.sw:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Swahili ::::0:1341:
+bos.loc.utf.uz:bos.loc.utf.uz:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Uzbek ::::0:1341:
+bos.loc.utf.yo:bos.loc.utf.yo:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Yoruba ::::0:1341:
+bos.loc.utf.zu:bos.loc.utf.zu:7.1.3.0::I:T:::::N:Base System Locale UTF Code Set - Zulu ::::0:1341:
+bos.lrn:bos.lrn:7.1.0.0::I:T:::::N:Learning Basic Operating System Commands::::0:1036:
+bos.lrn:bos.lrn.data:7.1.0.0::I:T:::::N:Learning Basic Operating System Data::::0:1036:
+bos.mh:bos.mh:7.1.3.0::I:C:::::N:Mail Handler ::::0:1341:
+bos.mls:bos.mls.adt:7.1.0.0::I:T:::::N:Trusted AIX Development Include Files ::::0:1115:
+bos.mls:bos.mls.cfg:7.1.0.0::I:T:::::N:Trusted AIX configuration files ::::0:1115:
+bos.mls:bos.mls.lib:7.1.0.0::I:C:::::N:Trusted AIX Libraries ::::0:1115:
+bos.mls:bos.mls.rte:7.1.3.15::I:T:::::N:Trusted AIX Commands and Utilities ::::0:1415:
+bos.mls:bos.mls.smit:7.1.0.0::I:T:::::N:Trusted AIX SMIT menus ::::0:1115:
+bos.mp64:bos.mp64:7.1.3.30::I:C:::::b:Base Operating System 64-bit Multiprocessor Runtime ::::0:1441:
+bos.mp64:bos.mp64:7.1.3.31::S:C:::::b:Base Operating System 64-bit Multiprocessor Runtime::::0:1442:
+bos.msg.EN_US:bos.msg.EN_US.INed:7.1.3.0::I:T:::::N:INed Editor Messages - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.alt_disk_install.rte:7.1.3.0::I:C:::::N:Alternate Disk Install Msgs - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.diag.rte:7.1.3.0::I:C:::::N:Hardware Diagnostics Messages - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.mls.rte:7.1.3.0::I:T:::::N:Trusted AIX Messages - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.net.ipsec:7.1.3.0::I:C:::::N:IP Security Messages - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.net.tcp.client:7.1.3.0::I:C:::::N:TCP/IP Messages - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.rte:7.1.3.0::I:C:::::N:Base OS Runtime Messages - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.svprint:7.1.3.0::I:T:::::N:System V Print Subsystem Msgs - U.S. English (UTF)::::0::
+bos.msg.EN_US:bos.msg.EN_US.txt.tfs:7.1.3.0::I:C:::::N:Text Formatting Services Msgs - U.S. English (UTF)::::0::
+bos.msg.en_US:bos.msg.en_US.INed:7.1.3.0::I:T:::::N:INed Editor Messages - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.alt_disk_install.rte:7.1.3.0::I:C:::::N:Alternate Disk Install Msgs - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.diag.rte:7.1.3.0::I:C:::::N:Hardware Diagnostics Messages - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.mls.rte:7.1.3.0::I:T:::::N:Trusted AIX Messages - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.net.ipsec:7.1.3.0::I:C:::::N:IP Security Messages - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.net.tcp.client:7.1.3.0::I:C:::::N:TCP/IP Messages - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.rte:7.1.3.0::I:C:::::N:Base OS Runtime Messages - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.svprint:7.1.3.0::I:T:::::N:System V Print Subsystem Msgs - U.S. English ::::0:1341:
+bos.msg.en_US:bos.msg.en_US.txt.tfs:7.1.3.0::I:C:::::N:Text Formatting Services Msgs - U.S. English ::::0:1341:
+bos.net:bos.net.ate:7.1.0.0::I:T:::::N:Asynchronous Terminal Emulator ::::0:1140:
+bos.net:bos.net.ewlm.rte:7.1.3.15::I:T:::::N:netWLM ::::0:1415:
+bos.net:bos.net.ipsec.keymgt:7.1.3.30::I:C:::::N:IP Security Key Management ::::0:1441:
+bos.net:bos.net.ipsec.rte:7.1.3.30::I:C:::::N:IP Security ::::0:1441:
+bos.net:bos.net.mobip6.rte:7.1.3.0::I:T:::::N:IPv6 Mobility ::::0:1341:
+bos.net:bos.net.ncs:7.1.2.15::I:C:::::N:Network Computing System 1.5.1 ::::0:1316:
+bos.net:bos.net.nfs.adt:7.1.3.15::I:T:::::N:Network File System Development Toolkit ::::0:1415:
+bos.net:bos.net.nfs.cachefs:7.1.3.30::I:T:::::b:CacheFS File System ::::0:1441:
+bos.net:bos.net.nfs.client:7.1.3.30::I:C:::::b:Network File System Client ::::0:1441:
+bos.net:bos.net.nfs.server:7.1.0.0::I:T:::::Y:Network File System Server ::::0:1140:
+bos.net:bos.net.nis.client:7.1.3.0::I:C:::::Y:Network Information Service Client ::::0:1341:
+bos.net:bos.net.nis.server:7.1.3.0::I:T:::::Y:Network Information Service Server ::::0:1341:
+bos.net:bos.net.nisplus:7.1.3.15::I:T:::::N:Network Information Services Plus (NIS+) ::::0:1415:
+bos.net:bos.net.ppp:7.1.3.0::I:T:::::N:Async Point to Point Protocol ::::0:1341:
+bos.net:bos.net.sctp:7.1.3.30::I:T:::::N:Stream Control Transmission Protocol ::::0:1441:
+bos.net:bos.net.snapp:7.1.3.0::I:C:::::N:System Networking Analysis and Performance Pilot ::::0:1341:
+bos.net:bos.net.tcp.adt:7.1.3.15::I:C:::::N:TCP/IP Application Toolkit ::::0:1415:
+bos.net:bos.net.tcp.client:7.1.3.30::I:C:::::b:TCP/IP Client Support ::::0:1441:
+bos.net:bos.net.tcp.client:7.1.3.30::S:C:::::b:TCP/IP Client Support::::0:1441:
+bos.net:bos.net.tcp.server:7.1.3.30::I:C:::::B:TCP/IP Server ::::0:1441:
+bos.net:bos.net.tcp.smit:7.1.3.0::I:C:::::N:TCP/IP SMIT Support ::::0:1341:
+bos.net:bos.net.uucp:7.1.3.0::I:C:::::N:Unix to Unix Copy Program ::::0:1341:
+bos.perf:bos.perf.diag_tool:7.1.2.15::I:C:::::N:Performance Diagnostic Tool ::::0:1316:
+bos.perf:bos.perf.libperfstat:7.1.3.30::I:C:::::N:Performance Statistics Library Interface ::::0:1441:
+bos.perf:bos.perf.perfstat:7.1.3.30::I:C:::::b:Performance Statistics Interface ::::0:1441:
+bos.perf:bos.perf.proctools:7.1.3.30::I:C:::::N:Proc Filesystem Tools ::::0:1441:
+bos.perf:bos.perf.tools:7.1.3.30::I:C:::::N:Base Performance Tools ::::0:1441:
+bos.perf:bos.perf.tune:7.1.3.30::S:C:::::N:Performance Tuning Support::::0:1441:
+bos.perf:bos.perf.tune:7.1.3.30::I:C:::::N:Performance Tuning Support ::::0:1441:
+bos.perf.fdpr:bos.perf.fdpr:7.1.3.30::I:C:::::N:Feedback Directed Program Restructuring performance tool ::::0:1441:
+bos.perf.gtools:bos.perf.gtools.perfwb:7.1.0.0::I:T:::::N:Performance Workbench ::::0:1115:
+bos.perf.gtools:bos.perf.gtools.procmon:7.1.3.15::I:T:::::N:Procmon plugin for Performance Workbench ::::0:1415:
+bos.perf.pmaix:bos.perf.pmaix:7.1.3.15::I:C:::::N:Performance Management ::::0:1415:
+bos.pmapi:bos.pmapi.events:7.1.3.30::I:C:::::N:Performance Monitor API Event Codes ::::0:1441:
+bos.pmapi:bos.pmapi.lib:7.1.3.15::S:T:::::N:Performance Monitor API Library::::0:1415:
+bos.pmapi:bos.pmapi.lib:7.1.3.30::I:C:::::N:Performance Monitor API Library ::::0:1441:
+bos.pmapi:bos.pmapi.pmsvcs:7.1.3.30::I:C:::::N:Performance Monitor API Kernel Extension ::::0:1441:
+bos.pmapi:bos.pmapi.pmsvcs:7.1.3.30::S:C:::::N:Performance Monitor API Kernel Extension::::0:1441:
+bos.pmapi:bos.pmapi.samples:7.1.3.15::I:C:::::N:Performance Monitor API Samples ::::0:1415:
+bos.pmapi:bos.pmapi.tools:7.1.3.30::I:C:::::N:Performance Monitor API Tools ::::0:1441:
+bos.suma:bos.suma:7.1.3.0::I:C:::::N:Service Update Management Assistant (SUMA) ::::0:1341:
+bos.svpkg:bos.svpkg:7.1.0.15::I:T:::::N:System V Packaging and Installation Tools ::::0:1115:
+bos.svprint:bos.svprint.dir_enabled:7.1.0.0::I:T:::::N:System V Directory-enabled Commands ::::0:1115:
+bos.svprint:bos.svprint.fonts:7.1.0.0::I:T:::::N:System V Print Fonts ::::0:1115:
+bos.svprint:bos.svprint.hpnp:7.1.0.0::I:T:::::N:System V Hewlett-Packard JetDirect ::::0:1115:
+bos.svprint:bos.svprint.ps:7.1.0.0::I:T:::::N:System V Print Postscript ::::0:1115:
+bos.svprint:bos.svprint.rte:7.1.3.15::I:T:::::N:System V Print Subsystem ::::0:1415:
+bos.svprint:bos.svprint.trans:7.1.0.0::I:T:::::N:System V Print Translation ::::0:1115:
+bos.swma:bos.swma:7.1.2.15::I:C:::::N:Software Maintenance Agreement ::::0:1316:
+bos.sysmgt:bos.sysmgt.loginlic:7.1.3.0::I:C:::::N:License Management ::::0:1341:
+bos.sysmgt:bos.sysmgt.nim.client:7.1.3.30::I:C:::::N:Network Install Manager - Client Tools ::::0:1441:
+bos.sysmgt:bos.sysmgt.nim.master:7.1.3.30::I:T:::::N:Network Install Manager - Master Tools ::::0:1441:
+bos.sysmgt:bos.sysmgt.nim.spot:7.1.3.30::I:T:::::N:Network Install Manager - SPOT ::::0:1441:
+bos.sysmgt:bos.sysmgt.quota:7.1.3.30::I:C:::::N:Filesystem Quota Commands ::::0:1441:
+bos.sysmgt:bos.sysmgt.serv_aid:7.1.3.30::I:C:::::N:Software Error Logging and Dump Service Aids ::::0:1441:
+bos.sysmgt:bos.sysmgt.smit:7.1.3.15::I:C:::::N:System Management Interface Tool (SMIT) ::::0:1415:
+bos.sysmgt:bos.sysmgt.sysbr:7.1.3.30::I:C:::::N:System Backup and BOS Install Utilities ::::0:1441:
+bos.sysmgt:bos.sysmgt.trace:7.1.3.30::I:C:::::N:Software Trace Service Aids ::::0:1441:
+bos.sysmgt:bos.sysmgt.trace:7.1.3.30::S:C:::::N:Software Trace Service Aids::::0:1441:
+bos.sysmgt:bos.sysmgt.trcgui_samp:7.1.3.0::I:T:::::N:Trace Report GUI ::::0:1341:
+bos.terminfo:bos.terminfo.adds.data:7.1.0.0::I:T:::::N:ADDS Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.annarbor.data:7.1.0.0::I:T:::::N:Annarbor Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.ansi.data:7.1.0.0::I:C:::::N:Amer National Stds Institute Terminal Defs::::0:1036:
+bos.terminfo:bos.terminfo.att.data:7.1.0.0::I:T:::::N:AT&T Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.beehive.data:7.1.0.0::I:T:::::N:Beehive Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.bull.data:7.1.0.0::I:T:::::N:Bull Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.cdc.data:7.1.0.0::I:T:::::N:Control Data Corp. Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.colorscan.data:7.1.0.0::I:T:::::N:Datamedia Colorscan Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.com.data:7.1.0.0::I:C:::::N:Common Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.datamedia.data:7.1.0.0::I:T:::::N:Datamedia Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.dec.data:7.1.0.0::I:C:::::N:Digital Equipment Corp. Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.diablo.data:7.1.0.0::I:T:::::N:Generic Daisy Wheel Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.falco.data:7.1.0.0::I:T:::::N:Falco Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.fortune.data:7.1.0.0::I:T:::::N:Fortune Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.general.data:7.1.0.0::I:T:::::N:General Terminal Corp. Term Definitions::::0:1036:
+bos.terminfo:bos.terminfo.hardcopy.data:7.1.0.0::I:T:::::N:Hard Copy Terminals Definitions::::0:1036:
+bos.terminfo:bos.terminfo.hazeltine.data:7.1.0.0::I:T:::::N:Hazeltine Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.hds.data:7.1.0.0::I:T:::::N:Human Designed Systems Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.heath.data:7.1.0.0::I:T:::::N:Heathkit and Zenith Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.homebrew.data:7.1.0.0::I:T:::::N:Home-made Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.hp.data:7.1.0.0::I:T:::::N:Hewlett-Packard Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.ibm.data:7.1.0.0::I:C:::::N:IBM Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.lsi.data:7.1.0.0::I:T:::::N:Lear Siegler Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.microterm.data:7.1.0.0::I:T:::::N:Microterm Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.misc.data:7.1.0.0::I:T:::::N:Miscellaneous Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.pc.data:7.1.0.0::I:C:::::N:Personal Computer Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.pci.data:7.1.0.0::I:T:::::N:DOS Server Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.perkinelmer.data:7.1.0.0::I:T:::::N:Perkin Elmer Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.pmcons.data:7.1.0.0::I:T:::::N:PMAX Console Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.print.data:7.1.0.0::I:C:::::N:Generic Line Printer Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.rte:7.1.0.0::I:C:::::N:Run-time Environment for AIX Terminals::::0:1036:
+bos.terminfo:bos.terminfo.special.data:7.1.0.0::I:T:::::N:Special Generic Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.sperry.data:7.1.0.0::I:T:::::N:Sperry Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.svprint.data:7.1.0.0::I:T:::::N:System V Printer Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.tektronix.data:7.1.0.0::I:T:::::N:Tektronix Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.teleray.data:7.1.0.0::I:T:::::N:Teleray Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.televideo.data:7.1.0.0::I:C:::::N:Televideo Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.ti.data:7.1.0.0::I:T:::::N:Texas Instruments Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.tymshare.data:7.1.0.0::I:T:::::N:Tymshare Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.visual.data:7.1.0.0::I:T:::::N:Visual Terminal Definitions::::0:1036:
+bos.terminfo:bos.terminfo.wyse.data:7.1.0.0::I:C:::::N:Wyse Terminal Definitions::::0:1036:
+bos.txt:bos.txt.bib:7.1.0.0::I:T:::::N:Bibliography Support ::::0:1115:
+bos.txt:bos.txt.bib.data:7.1.0.0::I:T:::::N:Bibliography Support Data::::0:1036:
+bos.txt:bos.txt.hplj.fnt:7.1.0.0::I:T:::::N:Fonts for Hewlett Packard Laser Jet Printers ::::0:1115:
+bos.txt:bos.txt.ibm3812.fnt:7.1.0.0::I:T:::::N:Fonts for IBM 3812 Printer ::::0:1115:
+bos.txt:bos.txt.ibm3816.fnt:7.1.0.0::I:T:::::N:Fonts for IBM 3816 Printer ::::0:1115:
+bos.txt:bos.txt.spell:7.1.0.0::I:C:::::N:Writer's Tools Commands ::::0:1115:
+bos.txt:bos.txt.spell.data:7.1.0.0::I:C:::::N:Writer's Tools Data::::0:1036:
+bos.txt:bos.txt.tfs:7.1.3.30::I:C:::::N:Text Formatting Services Commands ::::0:1441:
+bos.txt:bos.txt.tfs.data:7.1.0.0::I:C:::::N:Text Formatting Services Data::::0:1036:
+bos.txt:bos.txt.ts:7.1.3.0::I:T:::::N:TranScript Tools ::::0:1341:
+bos.txt:bos.txt.xpv.rte:7.1.0.0::I:T:::::N:Troff Xpreviewer ::::0:1115:
+bos.wpars:bos.wpars:7.1.3.30::I:C:::::N:AIX Workload Partitions ::::0:1441:
+cas.agent:cas.agent:1.4.2.403::I:T:::::N:Common Agent Services Agent::::1::
+cdrtools.base:cdrtools.base:1.9.0.9::I:C:::::N:CD/DVD recorder::::0::
+cdrtools.man.en_US:cdrtools.man.en_US:1.9.0.9::I:C:::::N:CD/DVD recorder man page documentation::::0::
+clic.rte:clic.rte.kernext:4.10.0.1::I:C:::::N:CryptoLite for C Kernel::::0::
+clic.rte:clic.rte.lib:4.10.0.1::I:C:::::N:CryptoLite for C Library::::0::
+devices.artic960:devices.artic960.diag:7.1.0.0::I:C:::::B:IBM ARTIC960 Adapter Diagnostics ::::0:1140:
+devices.artic960:devices.artic960.rte:7.1.3.15::I:C:::::B:IBM ARTIC960 Runtime Support ::::0:1415:
+devices.artic960:devices.artic960.ucode:7.1.0.0::I:C:::::B:IBM ARTIC960 Adapter Software ::::0:1140:
+devices.chrp.AT97SC3201_r:devices.chrp.AT97SC3201_r.rte:7.1.0.0::I:C:::::b:Trusted Platform Module Device Software::::0:1036:
+devices.chrp.IBM.HFI:devices.chrp.IBM.HFI.rte:1.1.1.0::I:C:::::b:IBM Host Fabric Interface (HFI) Runtime::::0::
+devices.chrp.IBM.lhca:devices.chrp.IBM.lhca.rte:7.1.3.15::I:C:::::N:Infiniband Logical HCA Runtime Environment ::::0:1415:
+devices.chrp.IBM.lhea:devices.chrp.IBM.lhea.diag:7.1.0.0::I:C:::::N:Host Ethernet Adapter Diagnostics ::::0:1140:
+devices.chrp.IBM.lhea:devices.chrp.IBM.lhea.rte:7.1.3.30::I:C:::::b:Host Ethernet Adapter (HEA) Runtime Environment ::::0:1441:
+devices.chrp.base:devices.chrp.base.ServiceRM:1.5.3.0::I:C:::::N:RSCT Service Resource Manager::::0::
+devices.chrp.base:devices.chrp.base.diag:7.1.3.30::I:C:::::N:RISC CHRP Base System Device Diagnostics ::::0:1441:
+devices.chrp.base:devices.chrp.base.rte:7.1.3.30::I:C:::::b:RISC PC Base System Device Software (CHRP) ::::0:1441:
+devices.chrp.pci:devices.chrp.pci.rte:7.1.3.30::I:C:::::b:PCI Bus Software (CHRP) ::::0:1441:
+devices.chrp.pciex:devices.chrp.pciex.rte:7.1.0.0::I:C:::::b:PCI Express Bus Software (CHRP)::::0:1036:
+devices.chrp.vdevice:devices.chrp.vdevice.rte:7.1.3.30::I:C:::::b:Virtual I/O Bus Support ::::0:1441:
+devices.chrp_lpar.base:devices.chrp_lpar.base.ras:7.1.3.0::I:C:::::N:CHRP LPAR RAS Support ::::0:1341:
+devices.common.IBM.async:devices.common.IBM.async.diag:7.1.0.0::I:C:::::N:Common Serial Adapter Diagnostics::::0:1036:
+devices.common.IBM.atm:devices.common.IBM.atm.rte:7.1.3.15::I:C:::::B:Common ATM Software ::::0:1415:
+devices.common.IBM.crypt:devices.common.IBM.crypt.rte:7.1.0.0::I:C:::::N:Cryptographic Common Runtime Environment::::0:1036:
+devices.common.IBM.cx:devices.common.IBM.cx.rte:7.1.3.0::I:C:::::b:CX Common Adapter Software ::::0:1341:
+devices.common.IBM.disk:devices.common.IBM.disk.rte:7.1.3.30::I:C:::::N:Common IBM Disk Software ::::0:1441:
+devices.common.IBM.ethernet:devices.common.IBM.ethernet.rte:7.1.3.30::I:C:::::b:Common Ethernet Software ::::0:1441:
+devices.common.IBM.fc:devices.common.IBM.fc.hba-api:7.1.3.15::I:C:::::N:Common HBA API Library ::::0:1415:
+devices.common.IBM.fc:devices.common.IBM.fc.rte:7.1.3.30::I:C:::::b:Common IBM FC Software ::::0:1441:
+devices.common.IBM.fda:devices.common.IBM.fda.diag:7.1.0.0::I:C:::::N:Common Diskette Adapter and Device Diagnostics ::::0:1115:
+devices.common.IBM.fda:devices.common.IBM.fda.rte:7.1.3.0::I:C:::::N:Common Diskette Device Software ::::0:1341:
+devices.common.IBM.hdlc:devices.common.IBM.hdlc.rte:7.1.3.15::I:C:::::b:Common HDLC Software ::::0:1415:
+devices.common.IBM.hdlc:devices.common.IBM.hdlc.sdlc:7.1.3.0::I:C:::::b:SDLC COMIO Device Driver Emulation ::::0:1341:
+devices.common.IBM.hfi:devices.common.IBM.hfi.rte:1.1.1.0::I:C:::::b:IBM Host Fabric Interface (HFI) files::::0::
+devices.common.IBM.ib:devices.common.IBM.ib.rte:7.1.3.30::I:C:::::N:Infiniband Common Runtime Environment ::::0:1441:
+devices.common.IBM.ide:devices.common.IBM.ide.rte:7.1.0.0::I:C:::::b:Common IDE I/O Controller Software::::0:1036:
+devices.common.IBM.iscsi:devices.common.IBM.iscsi.rte:7.1.3.15::I:C:::::N:Common iSCSI Files ::::0:1415:
+devices.common.IBM.ktm_std:devices.common.IBM.ktm_std.diag:7.1.0.0::I:C:::::N:Common Keyboard, Mouse, and Tablet Device Diagnostics ::::0:1115:
+devices.common.IBM.ktm_std:devices.common.IBM.ktm_std.rte:7.1.3.0::I:C:::::b:Common Keyboard, Tablet, and Mouse Software ::::0:1341:
+devices.common.IBM.ml:devices.common.IBM.ml:1.5.1.0::I:C:::::b:Multi Link Interface Runtime::::0::
+devices.common.IBM.ml:devices.common.IBM.ml:1.5.1.3::S:C:::::b:Multi Link Interface Runtime::::0::
+devices.common.IBM.modemcfg:devices.common.IBM.modemcfg.data:7.1.0.0::I:C:::::N:Sample Service Processor Modem Configuration Files::::0:1036:
+devices.common.IBM.mpio:devices.common.IBM.mpio.rte:7.1.3.30::I:C:::::b:MPIO Disk Path Control Module ::::0:1441:
+devices.common.IBM.mpt2:devices.common.IBM.mpt2.diag:7.1.2.0::I:C:::::N:MPT SAS Device Diagnostics ::::0:1241:
+devices.common.IBM.mpt2:devices.common.IBM.mpt2.rte:7.1.3.15::I:C:::::b:MPT SAS Device Software ::::0:1415:
+devices.common.IBM.ppa:devices.common.IBM.ppa.diag:7.1.0.0::I:C:::::N:Common Parallel Printer Adapter Diagnostics ::::0:1115:
+devices.common.IBM.ppa:devices.common.IBM.ppa.rte:7.1.3.0::I:C:::::N:Common Parallel Printer Adapter Software ::::0:1341:
+devices.common.IBM.scsi:devices.common.IBM.scsi.rte:7.1.3.30::I:C:::::b:Common SCSI I/O Controller Software ::::0:1441:
+devices.common.IBM.sissas:devices.common.IBM.sissas.rte:7.1.3.30::I:C:::::b:Common IBM SAS RAID Software ::::0:1441:
+devices.common.IBM.sissas:devices.common.IBM.sissas.rte:7.1.3.31::S:C:::::b:Common IBM SAS RAID Software::::0:1442:
+devices.common.IBM.son:devices.common.IBM.son.diag:7.1.2.0::I:C:::::N:GXT Common Graphics Adapter Diagnostics I ::::0:1241:
+devices.common.IBM.storfwork:devices.common.IBM.storfwork.rte:7.1.3.30::I:C:::::b:Storage Framework Module ::::0:1441:
+devices.common.IBM.tokenring:devices.common.IBM.tokenring.rte:7.1.3.15::I:C:::::b:Common Token Ring Software ::::0:1415:
+devices.common.IBM.usb:devices.common.IBM.usb.diag:7.1.3.15::I:C:::::b:Common USB Adapter Diagnostics ::::0:1415:
+devices.common.IBM.usb:devices.common.IBM.usb.rte:7.1.3.30::I:C:::::b:USB System Software ::::0:1441:
+devices.common.IBM.xhci:devices.common.IBM.xhci.rte:7.1.3.30::I:C:::::b:Common xHCI Adapter Device Software ::::0:1441:
+devices.common.base:devices.common.base.diag:7.1.0.0::I:C:::::N:Common Base System Diagnostics::::0:1036:
+devices.common.rspcbase:devices.common.rspcbase.rte:7.1.3.0::I:C:::::b:RISC PC Common Base System Device Software ::::0:1341:
+devices.ethernet.ct3:devices.ethernet.ct3.cdli:7.1.3.30::I:C:::::b:10 Gigabit Ethernet Adapter Software ::::0:1441:
+devices.ethernet.ct3:devices.ethernet.ct3.rte:7.1.3.30::I:C:::::b:10 Gigabit Ethernet PCI-Express Host Bus Adapter Software ::::0:1441:
+devices.ethernet.lnc:devices.ethernet.lnc.rte:7.1.3.30::I:C:::::b:10 Gigabit Ethernet PCI-Express Adapter Software (lnc) ::::0:1441:
+devices.ethernet.mlx:devices.ethernet.mlx.diag:7.1.3.30::I:C:::::N:RoCE Converged Network Adapter Diagnostics ::::0:1441:
+devices.ethernet.mlx:devices.ethernet.mlx.rte:7.1.3.30::I:C:::::b:RoCE Converged Network Adapter ::::0:1441:
+devices.ethernet.mlx:devices.ethernet.mlx.rte:7.1.3.31::S:C:::::b:RoCE Converged Network Adapter::::0:1442:
+devices.ethernet.shi:devices.ethernet.shi.rte:7.1.3.30::I:C:::::b:10 Gigabit Ethernet PCI-Express Adapter Software (shi) ::::0:1441:
+devices.ethernet.shi:devices.ethernet.shi.rte:7.1.3.31::S:C:::::b:10 Gigabit Ethernet PCI-Express Adapter Software (shi)::::0:1442:
+devices.fcp.disk:devices.fcp.disk.rte:7.1.3.30::I:C:::::b:FC SCSI CD-ROM, Disk, Read/Write Optical Device Software ::::0:1441:
+devices.fcp.disk.array:devices.fcp.disk.array.diag:7.1.0.0::I:C:::::N:Fibre Channel RAID Device Diagnostics ::::0:1140:
+devices.fcp.disk.array:devices.fcp.disk.array.rte:7.1.3.30::I:C:::::b:FC SCSI RAIDiant Array Device Support Software ::::0:1441:
+devices.fcp.tape:devices.fcp.tape.rte:7.1.3.30::I:C:::::b:FC SCSI Tape Device Software ::::0:1441:
+devices.graphics:devices.graphics.com:7.1.3.15::I:C:::::N:Graphics Adapter Common Software ::::0:1415:
+devices.graphics:devices.graphics.voo:7.1.0.0::I:C:::::N:Graphics Adapter VOO and Stereo Software ::::0:1140:
+devices.ide.cdrom:devices.ide.cdrom.diag:7.1.3.15::I:C:::::N:IDE CDROM, Cdrom Device Diagnostics ::::0:1415:
+devices.ide.cdrom:devices.ide.cdrom.rte:7.1.3.0::I:C:::::b:IDE CDROM Device Software ::::0:1341:
+devices.ide.disk:devices.ide.disk.diag:7.1.0.0::I:C:::::N:IDE Disk Device Diagnostics ::::0:1140:
+devices.ide.disk:devices.ide.disk.rte:7.1.3.0::I:C:::::b:IDE Disk Device Software ::::0:1341:
+devices.isa_sio.IBM0017:devices.isa_sio.IBM0017.diag:7.1.0.0::I:C:::::N:Audio Device Diagnostics ::::0:1140:
+devices.isa_sio.IBM0017:devices.isa_sio.IBM0017.rte:7.1.3.0::I:C:::::b:Audio Device ::::0:1341:
+devices.isa_sio.IBM0019:devices.isa_sio.IBM0019.diag:7.1.0.0::I:C:::::N:ISA Tablet Software (IBM0019) Diagnostics ::::0:1140:
+devices.isa_sio.IBM0019:devices.isa_sio.IBM0019.rte:7.1.3.0::I:C:::::b:ISA Tablet Software (IBM0019) ::::0:1341:
+devices.isa_sio.chrp.8042:devices.isa_sio.chrp.8042.diag:7.1.0.0::I:C:::::b:ISA Keyboard & Mouse Diagnostics (CHRP) ::::0:1140:
+devices.isa_sio.chrp.8042:devices.isa_sio.chrp.8042.rte:7.1.3.0::I:C:::::b:ISA Keyboard & Mouse Software (CHRP) ::::0:1341:
+devices.isa_sio.chrp.ecp:devices.isa_sio.chrp.ecp.diag:7.1.0.0::I:C:::::N:CHRP IEEE 1284 Parallel Port Adapter Diagnostics ::::0:1140:
+devices.isa_sio.chrp.ecp:devices.isa_sio.chrp.ecp.rte:7.1.3.0::I:C:::::N:CHRP IEEE1284 Parallel Port Adapter Software ::::0:1341:
+devices.isa_sio.pnpPNP.501:devices.isa_sio.pnpPNP.501.diag:7.1.0.0::I:C:::::N:CHRP Serial Adapter Diagnostics (pnpPNP.501) ::::0:1140:
+devices.isa_sio.pnpPNP.501:devices.isa_sio.pnpPNP.501.rte:7.1.3.0::I:C:::::b:CHRP Serial Adapter Software (pnpPNP.501) ::::0:1341:
+devices.isa_sio.pnpPNP.700:devices.isa_sio.pnpPNP.700.diag:7.1.0.0::I:C:::::N:CHRP Diskette Adapter Diagnostic Software (pnpPNP.700) ::::0:1140:
+devices.isa_sio.pnpPNP.700:devices.isa_sio.pnpPNP.700.rte:7.1.3.0::I:C:::::N:CHRP Diskette Adapter Software (pnpPNP.700) ::::0:1341:
+devices.iscsi.disk:devices.iscsi.disk.rte:7.1.0.15::I:C:::::b:iSCSI Disk Software ::::0:1115:
+devices.iscsi.tape:devices.iscsi.tape.rte:7.1.0.0::I:C:::::b:iSCSI Tape Software::::0:1036:
+devices.iscsi_sw:devices.iscsi_sw.rte:7.1.3.15::I:C:::::N:iSCSI Software Device Driver ::::0:1415:
+devices.loopback:devices.loopback.rte:7.1.3.30::I:C:::::N:Loopback Device Driver ::::0:1441:
+devices.msg.EN_US:devices.msg.EN_US.base.com:7.1.3.0::I:C:::::N:Base Sys Device Software Msg - U.S. English (UTF)::::0::
+devices.msg.EN_US:devices.msg.EN_US.diag.rte:7.1.3.0::I:C:::::N:Device Diagnostics Messages - U.S. English (UTF)::::0::
+devices.msg.EN_US:devices.msg.EN_US.rspc.base.com:7.1.3.0::I:C:::::N:RISC PC Software Messages - U.S. English (UTF)::::0::
+devices.msg.EN_US:devices.msg.EN_US.sys.mca.rte:7.1.3.0::I:C:::::N:Micro Channel Bus Software Msg - U.S. English (UTF)::::0::
+devices.msg.en_US:devices.msg.en_US.base.com:7.1.3.0::I:C:::::N:Base Sys Device Software Msg - U.S. English ::::0:1341:
+devices.msg.en_US:devices.msg.en_US.diag.rte:7.1.3.0::I:C:::::N:Device Diagnostics Messages - U.S. English ::::0:1341:
+devices.msg.en_US:devices.msg.en_US.rspc.base.com:7.1.3.0::I:C:::::N:RISC PC Software Messages - U.S. English ::::0:1341:
+devices.msg.en_US:devices.msg.en_US.sys.mca.rte:7.1.3.0::I:C:::::N:Micro Channel Bus Software Msg - U.S. English ::::0:1341:
+devices.msg.en_US.chrp.IBM.HFI:devices.msg.en_US.chrp.IBM.HFI.rte:1.1.1.0::I:C:::::N:HFI Rte Msgs - U.S. English::::0::
+devices.msg.en_US.common.IBM.hfi:devices.msg.en_US.common.IBM.hfi.rte:1.1.1.0::I:C:::::N:HFI Runtime Messages - U.S. English::::0::
+devices.msg.en_US.common.IBM.ml:devices.msg.en_US.common.IBM.ml:1.5.1.0::I:C:::::N:Multi Link Interface Runtime - U.S. English::::0::
+devices.pci.00100100:devices.pci.00100100.com:7.1.3.0::I:C:::::b:Common Symbios PCI SCSI I/O Controller Software ::::0:1341:
+devices.pci.00100b00:devices.pci.00100b00.diag:7.1.0.0::I:C:::::N:SYM53C896 Dual Channel PCI-2 Ultra2 SCSI Adapter Diagnostics::::0:1036:
+devices.pci.00100b00:devices.pci.00100b00.rte:7.1.0.0::I:C:::::b:SYM53C896 Dual Channel PCI SCSI I/O Controller::::0:1036:
+devices.pci.00100c00:devices.pci.00100c00.diag:7.1.0.0::I:C:::::N:SYM53C895 LVD PCI SCSI I/O Controller Diagnostics::::0:1036:
+devices.pci.00100c00:devices.pci.00100c00.rte:7.1.0.0::I:C:::::b:SYM53C895 PCI SCSI I/O Controller Software::::0:1036:
+devices.pci.00100f00:devices.pci.00100f00.diag:7.1.3.0::I:C:::::N:SYM53C8xxA PCI SCSI I/O Controller Diagnostics ::::0:1341:
+devices.pci.00100f00:devices.pci.00100f00.rte:7.1.3.0::I:C:::::b:SYM53C8xxA PCI SCSI I/O Controller Software ::::0:1341:
+devices.pci.00102100:devices.pci.00102100.diag:7.1.0.0::I:C:::::N:SYM53C1010 Dual Channel PCI Ultra3 SCSI Adapter Diagnostics::::0:1036:
+devices.pci.00102100:devices.pci.00102100.rte:7.1.0.0::I:C:::::b:SYM53C1010 PCI Ultra-3 SCSI I/O Controller Software::::0:1036:
+devices.pci.00105000:devices.pci.00105000.com:7.1.3.0::I:C:::::b:Common SAS Expansion Card Device Software ::::0:1341:
+devices.pci.00105000:devices.pci.00105000.diag:7.1.2.0::I:C:::::N:LSI SAS Adapter Diagnostics ::::0:1241:
+devices.pci.00105000:devices.pci.00105000.rte:7.1.0.0::I:C:::::b:SAS Expansion Card Device Software (00105000) ::::0:1140:
+devices.pci.02105e51:devices.pci.02105e51.X11:7.1.1.15::I:C:::::N:AIXwindows Native Display Adapter Software ::::0:1216:
+devices.pci.02105e51:devices.pci.02105e51.diag:7.1.2.15::I:C:::::N:Native Display Graphics Adapter Diagnostics ::::0:1316:
+devices.pci.02105e51:devices.pci.02105e51.rte:7.1.3.0::I:C:::::N:Native Display Adapter Software ::::0:1341:
+devices.pci.13100560:devices.pci.13100560.diag:7.1.3.0::I:C:::::N:PCI Audio Adapter Diagnostics ::::0:1341:
+devices.pci.13100560:devices.pci.13100560.rte:7.1.3.0::I:C:::::N:PCI Audio Adapter (13100560) Runtime Software ::::0:1341:
+devices.pci.14100401:devices.pci.14100401.diag:7.1.3.0::I:C:::::N:Gigabit Ethernet-SX PCI Adapter Diagnostics ::::0:1341:
+devices.pci.14100401:devices.pci.14100401.rte:7.1.3.0::I:C:::::b:Gigabit Ethernet-SX PCI Adapter Software ::::0:1341:
+devices.pci.14100c03:devices.pci.14100c03.diag:7.1.0.0::I:C:::::N:PCI-XDDR Auxiliary Cache Adapter Diagnostics (14100c03)::::0:1036:
+devices.pci.14100c03:devices.pci.14100c03.rte:7.1.0.0::I:C:::::b:PCI-XDDR Auxiliary Cache Adapter Software (14100c03)::::0:1036:
+devices.pci.14100d03:devices.pci.14100d03.diag:7.1.0.0::I:C:::::N:PCI-XDDR Auxiliary Cache Adapter Diagnostics::::0:1036:
+devices.pci.14100d03:devices.pci.14100d03.rte:7.1.0.0::I:C:::::b:PCI-XDDR Auxiliary Cache Adapter Software::::0:1036:
+devices.pci.14101103:devices.pci.14101103.diag:7.1.0.0::I:C:::::N:4-Port 10/100/1000 Base-TX PCI-X Adapter Diagnostics ::::0:1115:
+devices.pci.14101103:devices.pci.14101103.rte:7.1.3.0::I:C:::::b:4-Port 10/100/1000 Base-TX PCI-X Adapter Software ::::0:1341:
+devices.pci.14101403:devices.pci.14101403.diag:7.1.0.0::I:C:::::N:Gigabit Ethernet-SX Adapter Diagnostics ::::0:1140:
+devices.pci.14101403:devices.pci.14101403.rte:7.1.3.0::I:C:::::b:Gigabit Ethernet-SX Adapter Software ::::0:1341:
+devices.pci.14101b02:devices.pci.14101b02.X11:7.1.1.15::I:C:::::N:AIXwindows GXT6500P Graphics Adapter Software ::::0:1216:
+devices.pci.14101b02:devices.pci.14101b02.diag:7.1.0.0::I:C:::::N:GXT6500P Graphics Adapter Diagnostics ::::0:1140:
+devices.pci.14101b02:devices.pci.14101b02.rte:7.1.3.0::I:C:::::b:GXT6500P Graphics Adapter Software ::::0:1341:
+devices.pci.14101c02:devices.pci.14101c02.X11:7.1.1.15::I:C:::::N:AIXwindows GXT4500P Graphics Adapter Software ::::0:1216:
+devices.pci.14101c02:devices.pci.14101c02.diag:7.1.0.0::I:C:::::N:GXT4500P Graphics Adapter Diagnostics ::::0:1140:
+devices.pci.14101c02:devices.pci.14101c02.rte:7.1.3.0::I:C:::::b:GXT4500P Graphics Adapter Software ::::0:1341:
+devices.pci.14102203:devices.pci.14102203.diag:7.1.0.0::I:C:::::N:IBM 1 Gigabit-TX iSCSI TOE PCI-X Adapter Diagnostics::::0:1036:
+devices.pci.14102203:devices.pci.14102203.rte:7.1.0.0::I:C:::::b:IBM 1 Gigabit-TX iSCSI TOE PCI-X Adapter::::0:1036:
+devices.pci.14102e00:devices.pci.14102e00.diag:7.1.3.0::I:C:::::N:IBM PCI SCSI RAID Adapter Diagnostics Support ::::0:1341:
+devices.pci.14102e00:devices.pci.14102e00.rte:7.1.3.30::I:C:::::N:IBM PCI SCSI RAID Adapter Device Software Support ::::0:1441:
+devices.pci.14103302:devices.pci.14103302.X11:7.1.1.0::I:C:::::N:AIXwindows GXT135P Graphics Adapter Software ::::0:1140:
+devices.pci.14103302:devices.pci.14103302.diag:7.1.2.15::I:C:::::N:GXT135P Graphics Adapter Diagnostics ::::0:1316:
+devices.pci.14103302:devices.pci.14103302.rte:7.1.3.0::I:C:::::b:GXT135P Graphics Adapter Software ::::0:1341:
+devices.pci.14103e00:devices.pci.14103e00.diag:7.1.3.0::I:C:::::N:IBM PCI Tokenring Adapter (14103e00) Diagnostics ::::0:1341:
+devices.pci.14103e00:devices.pci.14103e00.rte:7.1.3.0::I:C:::::b:IBM PCI Token-Ring Adapter Software ::::0:1341:
+devices.pci.14104e00:devices.pci.14104e00.diag:7.1.0.0::I:C:::::N:PCI ATM Adapter (14104e00) Diagnostics::::0:1036:
+devices.pci.14104e00:devices.pci.14104e00.rte:7.1.0.0::I:C:::::b:PCI ATM Adapter (14104e00) Software::::0:1036:
+devices.pci.14104f00:devices.pci.14104f00.diag:7.1.0.0::I:C:::::N:PCI ATM Adapter (14104f00) Diagnostics::::0:1036:
+devices.pci.14104f00:devices.pci.14104f00.rte:7.1.0.0::I:C:::::b:PCI ATM Adapter (14104f00) Software::::0:1036:
+devices.pci.14105000:devices.pci.14105000.diag:7.1.0.0::I:C:::::N:PCI ATM Adapter (14105000) Diagnostics::::0:1036:
+devices.pci.14105000:devices.pci.14105000.rte:7.1.0.0::I:C:::::b:PCI ATM Adapter (14105000) Software::::0:1036:
+devices.pci.14105e01:devices.pci.14105e01.com:7.1.3.0::I:C:::::b:622Mbps ATM PCI Adapter Common Software ::::0:1341:
+devices.pci.14105e01:devices.pci.14105e01.diag:7.1.3.0::I:C:::::N:622Mbps ATM PCI Adapter Diagnostics ::::0:1341:
+devices.pci.14105e01:devices.pci.14105e01.rte:7.1.0.0::I:C:::::b:622Mbps ATM PCI Adapter Software ::::0:1140:
+devices.pci.14106001:devices.pci.14106001.diag:7.1.0.0::I:C:::::N:64bit/66MHz PCI ATM 155 MMF Adapter Diagnostics::::0:1036:
+devices.pci.14106001:devices.pci.14106001.rte:7.1.0.0::I:C:::::b:64bit/66MHz PCI ATM 155 MMF Adapter Software::::0:1036:
+devices.pci.14106402:devices.pci.14106402.diag:7.1.0.0::I:C:::::N:PCI-X Quad Channel U320 SCSI RAID Adapter Diagnostics::::0:1036:
+devices.pci.14106402:devices.pci.14106402.rte:7.1.0.0::I:C:::::b:PCI-X Quad Channel U320 SCSI RAID Adapter Software::::0:1036:
+devices.pci.14106402:devices.pci.14106402.ucode:7.1.0.0::I:C:::::N:PCI-X Quad Channel U320 SCSI RAID Adapter Microcode::::0:1036:
+devices.pci.14106602:devices.pci.14106602.diag:7.1.0.0::I:C:::::N:PCI-X Dual Channel SCSI Adapter Diagnostics ::::0:1140:
+devices.pci.14106602:devices.pci.14106602.rte:7.1.3.0::I:C:::::b:PCI-X Dual Channel SCSI Adapter Device Software ::::0:1341:
+devices.pci.14106602:devices.pci.14106602.ucode:7.1.2.15::I:C:::::N:PCI-X Dual Channel SCSI Adapter Microcode ::::0:1316:
+devices.pci.14106703:devices.pci.14106703.diag:7.1.0.0::I:C:::::N:PCI-X Gigabit Ethernet-SX Adapter Diagnostics (14106703)::::0:1036:
+devices.pci.14106703:devices.pci.14106703.rte:7.1.0.0::I:C:::::b:Gigabit Ethernet-SX PCI-X Adapter Software::::0:1036:
+devices.pci.14106802:devices.pci.14106802.diag:7.1.0.0::I:C:::::N:Gigabit Ethernet-SX PCI-X Adapter Diagnostics ::::0:1115:
+devices.pci.14106802:devices.pci.14106802.rte:7.1.3.0::I:C:::::b:Gigabit Ethernet-SX PCI-X Adapter Software ::::0:1341:
+devices.pci.14106902:devices.pci.14106902.diag:7.1.3.0::I:C:::::N:10/100/1000 Base-TX PCI-X Adapter Diagnostics ::::0:1341:
+devices.pci.14106902:devices.pci.14106902.rte:7.1.3.30::I:C:::::b:10/100/1000 Base-TX PCI-X Adapter Software ::::0:1441:
+devices.pci.14106e01:devices.pci.14106e01.X11:7.1.1.15::I:C:::::N:AIXwindows GXT4000P Graphics Adapter Software ::::0:1216:
+devices.pci.14106e01:devices.pci.14106e01.diag:7.1.0.0::I:C:::::N:GXT4000P Graphics Adapter Diagnostics ::::0:1140:
+devices.pci.14106e01:devices.pci.14106e01.rte:7.1.3.0::I:C:::::b:GXT4000P Graphics Adapter Software ::::0:1341:
+devices.pci.14107001:devices.pci.14107001.X11:7.1.1.15::I:C:::::N:AIXwindows GXT6000P Graphics Adapter Software ::::0:1216:
+devices.pci.14107001:devices.pci.14107001.diag:7.1.0.0::I:C:::::N:GXT6000P Graphics Adapter Diagnostics ::::0:1140:
+devices.pci.14107001:devices.pci.14107001.rte:7.1.3.0::I:C:::::b:GXT6000P Graphics Adapter Software ::::0:1341:
+devices.pci.14107802:devices.pci.14107802.diag:7.1.0.0::I:C:::::N:PCI-X Dual Channel Ultra320 SCSI RAID Adapter Diagnostics ::::0:1140:
+devices.pci.14107802:devices.pci.14107802.rte:7.1.3.30::I:C:::::b:PCI-X Dual Channel Ultra320 SCSI RAID Adapter Software ::::0:1441:
+devices.pci.14107802:devices.pci.14107802.ucode:7.1.2.15::I:C:::::N:PCI-X Dual Channel Ultra320 SCSI RAID Adapter Microcode ::::0:1316:
+devices.pci.14107c00:devices.pci.14107c00.com:7.1.3.0::I:C:::::b:Common ATM Adapter Software ::::0:1341:
+devices.pci.14107c00:devices.pci.14107c00.diag:7.1.3.0::I:C:::::N:PCI ATM Adapter (14107c00) Diagnostics ::::0:1341:
+devices.pci.14107c00:devices.pci.14107c00.rte:7.1.0.0::I:C:::::b:PCI ATM Adapter (14107c00) Software ::::0:1140:
+devices.pci.14108802:devices.pci.14108802.diag:7.1.0.0::I:C:::::N:Gigabit-SX Ethernet PCI-X Adapter Diagnostics ::::0:1115:
+devices.pci.14108802:devices.pci.14108802.rte:7.1.3.0::I:C:::::b:2-Port Gigabit Ethernet-SX PCI-X Adapter Software ::::0:1341:
+devices.pci.14108902:devices.pci.14108902.diag:7.1.0.0::I:C:::::N:10/100/1000 Base-TX PCI-X Adapter Diagnostics ::::0:1115:
+devices.pci.14108902:devices.pci.14108902.rte:7.1.3.0::I:C:::::b:2-Port 10/100/1000 Base-TX PCI-X Adapter Software ::::0:1341:
+devices.pci.14108c00:devices.pci.14108c00.rte:7.1.3.0::I:C:::::b:ARTIC960Hx 4-Port Selectable PCI Adapter Runtime Software ::::0:1341:
+devices.pci.14108d02:devices.pci.14108d02.diag:7.1.0.0::I:C:::::N:PCI-X DDR Dual Channel SAS RAID Adapter Diagnostics::::0:1036:
+devices.pci.14108d02:devices.pci.14108d02.rte:7.1.0.0::I:C:::::b:PCI-XDDR Dual Channel SAS RAID Adapter Software::::0:1036:
+devices.pci.14109f00:devices.pci.14109f00.diag:7.1.2.0::I:C:::::N:IBM PCI 4758 Cryptographic Coprocessor Card Diagnostics ::::0:1241:
+devices.pci.14109f00:devices.pci.14109f00.rte:7.1.3.0::I:C:::::N:IBM 4758 PCI Cryptographic Coprocessor ::::0:1341:
+devices.pci.1410a803:devices.pci.1410a803.diag:7.1.0.0::I:C:::::N:4-port Asynchronous EIA-232 PCI-E Adapter Diagnostics ::::0:1115:
+devices.pci.1410a803:devices.pci.1410a803.rte:7.1.2.0::I:C:::::b:4 Port Async EIA-232 PCIe Adapter Software ::::0:1241:
+devices.pci.1410ba02:devices.pci.1410ba02.diag:7.1.0.0::I:C:::::N:10 Gigabit-SR Ethernet PCI-X Adapter Diagnostics::::0:1036:
+devices.pci.1410ba02:devices.pci.1410ba02.rte:7.1.0.0::I:C:::::N:10 Gigabit-SR Ethernet PCI-X Adapter Software::::0:1036:
+devices.pci.1410bb02:devices.pci.1410bb02.diag:7.1.3.0::I:C:::::N:10 Gigabit-LR Ethernet PCI-X Adapter Diagnostics ::::0:1341:
+devices.pci.1410bb02:devices.pci.1410bb02.rte:7.1.3.0::I:C:::::b:10 Gigabit-LR Ethernet PCI-X Adapter Software ::::0:1341:
+devices.pci.1410bd02:devices.pci.1410bd02.diag:7.1.3.0::I:C:::::N:PCI-X266 3GB SAS RAID Adapter Diagnostics ::::0:1341:
+devices.pci.1410bd02:devices.pci.1410bd02.rte:7.1.1.0::I:C:::::b:PCI-X266 Dual-x4 3Gb SAS RAID Adapter Software ::::0:1140:
+devices.pci.1410be02:devices.pci.1410be02.diag:7.1.0.0::I:C:::::N:PCI-X DDR Dual Channel U320 SCSI RAID Adapter Diagnostics::::0:1036:
+devices.pci.1410be02:devices.pci.1410be02.rte:7.1.0.0::I:C:::::b:PCI-XDDR Dual Channel U320 SCSI RAID Adapter Software::::0:1036:
+devices.pci.1410bf02:devices.pci.1410bf02.diag:7.1.0.0::I:C:::::N:PCI-X DDR Quad Channel U320 SCSI RAID Adapter Diagnostics::::0:1036:
+devices.pci.1410bf02:devices.pci.1410bf02.rte:7.1.0.0::I:C:::::b:PCI-XDDR Quad Channel U320 SCSI RAID Adapter Software::::0:1036:
+devices.pci.1410c002:devices.pci.1410c002.diag:7.1.0.0::I:C:::::N:PCI-X DDR Dual Channel U320 SCSI Adapter Diagnostics::::0:1036:
+devices.pci.1410c002:devices.pci.1410c002.rte:7.1.0.0::I:C:::::b:PCI-XDDR Dual Channel U320 SCSI Adapter Software::::0:1036:
+devices.pci.1410c101:devices.pci.1410c101.diag:7.1.0.0::I:C:::::N:64bit/66MHz PCI ATM 155 UTP Adapter Diagnostics::::0:1036:
+devices.pci.1410c101:devices.pci.1410c101.rte:7.1.0.0::I:C:::::b:64bit/66MHz PCI ATM 155 UTP Adapter Software::::0:1036:
+devices.pci.1410c302:devices.pci.1410c302.diag:7.1.0.0::I:C:::::N:PCI-X266 Ext Tri-x4 3Gb SAS RAID Adapter Diagnostics ::::0:1115:
+devices.pci.1410c302:devices.pci.1410c302.rte:7.1.1.0::I:C:::::b:PCI-X266 Ext Tri-x4 3Gb SAS RAID Adapter Software ::::0:1140:
+devices.pci.1410cf02:devices.pci.1410cf02.diag:7.1.0.0::I:C:::::N:1000 Base-SX PCI-X iSCSI TOE Adapter Device Diagnostics::::0:1036:
+devices.pci.1410cf02:devices.pci.1410cf02.rte:7.1.0.0::I:C:::::b:1000 Base-SX PCI-X iSCSI TOE Adapter Device Software::::0:1036:
+devices.pci.1410d002:devices.pci.1410d002.com:7.1.3.15::I:C:::::b:Common PCI iSCSI TOE Adapter Device Software ::::0:1415:
+devices.pci.1410d002:devices.pci.1410d002.diag:7.1.3.0::I:C:::::N:1000 Base-TX PCI-X iSCSI TOE Adapter Device Diagnostics ::::0:1341:
+devices.pci.1410d002:devices.pci.1410d002.rte:7.1.0.0::I:C:::::b:1000 Base-TX PCI-X iSCSI TOE Adapter Device Software ::::0:1140:
+devices.pci.1410d302:devices.pci.1410d302.diag:7.1.0.0::I:C:::::N:PCI-X Dual Channel Ultra320 SCSI Adapter Diagnostics::::0:1036:
+devices.pci.1410d302:devices.pci.1410d302.rte:7.1.0.0::I:C:::::b:PCI-X Dual Channel U320 SCSI Adapter Software::::0:1036:
+devices.pci.1410d402:devices.pci.1410d402.diag:7.1.0.0::I:C:::::N:PCI-X Dual Channel U320 SCSI RAID Adapter Diagnostics::::0:1036:
+devices.pci.1410d402:devices.pci.1410d402.rte:7.1.0.0::I:C:::::b:PCI-X Dual Channel U320 SCSI RAID Adapter Software::::0:1036:
+devices.pci.1410d403:devices.pci.1410d403.rte:7.1.1.15::I:C:::::N:Native 1-Port Asynchronous EIA-232 PCI Adapter Software ::::0:1216:
+devices.pci.1410d502:devices.pci.1410d502.diag:7.1.0.0::I:C:::::N:PCI-X DDR Quad Channel U320 SCSI RAID Adapter Diagnostics::::0:1036:
+devices.pci.1410d502:devices.pci.1410d502.rte:7.1.0.0::I:C:::::b:PCI-XDDR Quad Channel U320 SCSI RAID Adapter Software::::0:1036:
+devices.pci.1410e202:devices.pci.1410e202.diag:7.1.0.0::I:C:::::N:IBM 1 Gigabit-SX iSCSI TOE PCI-X Adapter Diagnostics::::0:1036:
+devices.pci.1410e202:devices.pci.1410e202.rte:7.1.0.0::I:C:::::b:IBM 1 Gigabit-SX iSCSI TOE PCI-X Adapter::::0:1036:
+devices.pci.1410e501:devices.pci.1410e501.diag:7.1.0.0::I:C:::::N:IBM PCI-X 4764 Cryptographic Coprocessor Card Diagnostics ::::0:1140:
+devices.pci.1410e501:devices.pci.1410e501.rte:7.1.3.0::I:C:::::b:IBM PCI-X Cryptographic Coprocessor ::::0:1341:
+devices.pci.1410e601:devices.pci.1410e601.diag:7.1.0.0::I:C:::::N:IBM Cryptographic Accelerator Diagnostics ::::0:1140:
+devices.pci.1410e601:devices.pci.1410e601.rte:7.1.3.0::I:C:::::B:IBM Crypto Accelerator Adapter Software ::::0:1341:
+devices.pci.1410eb02:devices.pci.1410eb02.diag:7.1.3.0::I:C:::::N:10 Gigabit Ethernet-SR PCI-X 2.0 DDR Adapter Diagnostics ::::0:1341:
+devices.pci.1410eb02:devices.pci.1410eb02.rte:7.1.0.15::I:C:::::N:10 Gigabit Ethernet-SR PCI-X 2.0 DDR Adapter Software ::::0:1140:
+devices.pci.1410ec02:devices.pci.1410ec02.diag:7.1.0.0::I:C:::::N:10 Gigabit Ethernet-LR PCI-X 2.0 DDR Adapter Diagnostics ::::0:1140:
+devices.pci.1410ec02:devices.pci.1410ec02.rte:7.1.3.15::I:C:::::b:10 Gigabit Ethernet-LR PCI-X 2.0 DDR Adapter Software ::::0:1415:
+devices.pci.1410ff01:devices.pci.1410ff01.diag:7.1.3.0::I:C:::::N:10/100 Mbps Ethernet PCI Adapter II Diagnostics ::::0:1341:
+devices.pci.1410ff01:devices.pci.1410ff01.rte:7.1.3.0::I:C:::::b:10/100 Mbps Ethernet PCI Adapter II Software ::::0:1341:
+devices.pci.22106474:devices.pci.22106474.diag:7.1.0.0::I:C:::::N:USB Host Controller (22106474) Diagnostics ::::0:1140:
+devices.pci.22106474:devices.pci.22106474.rte:7.1.3.30::I:C:::::b:USB Host Controller (22106474) Software ::::0:1441:
+devices.pci.22106974:devices.pci.22106974.rte:7.1.0.0::I:C:::::b:IDE Adapter Driver for AMD 8111 Chip Software::::0:1036:
+devices.pci.23100020:devices.pci.23100020.diag:7.1.3.0::I:C:::::N:IBM PCI 10/100 Mb Ethernet Adapter (23100020) Diagnostics ::::0:1341:
+devices.pci.23100020:devices.pci.23100020.rte:7.1.3.0::I:C:::::b:IBM PCI 10/100 Ethernet Adapter Software ::::0:1341:
+devices.pci.2b102725:devices.pci.2b102725.X11:7.1.1.0::I:C:::::N:AIXwindows GXT145 Graphics Adapter Software ::::0:1140:
+devices.pci.2b102725:devices.pci.2b102725.diag:7.1.2.15::I:C:::::N:GXT145 2D Graphics Adapter Diagnostics ::::0:1316:
+devices.pci.2b102725:devices.pci.2b102725.rte:7.1.3.30::I:C:::::b:GXT145 Graphics Adapter Software ::::0:1441:
+devices.pci.33103500:devices.pci.33103500.diag:7.1.0.0::I:C:::::N:USB Host Controller (33103500) Diagnostics ::::0:1140:
+devices.pci.33103500:devices.pci.33103500.rte:7.1.3.30::I:C:::::b:USB Host Controller (33103500) Software ::::0:1441:
+devices.pci.3310e000:devices.pci.3310e000.diag:7.1.0.0::I:C:::::N:USB Enhanced Host Controller (3310e000) Diagnostics ::::0:1140:
+devices.pci.3310e000:devices.pci.3310e000.rte:7.1.3.30::I:C:::::b:USB Enhanced Host Controller Adapter (3310e000) Software ::::0:1441:
+devices.pci.331121b9:devices.pci.331121b9.com:7.1.3.0::I:C:::::b:IBM PCI 2-Port Multiprotocol Common Software ::::0:1341:
+devices.pci.331121b9:devices.pci.331121b9.diag:7.1.3.0::I:C:::::N:PCI 2-Port Multiprotocol Adapter (331121b9) Diagnostics ::::0:1341:
+devices.pci.331121b9:devices.pci.331121b9.rte:7.1.3.0::I:C:::::b:IBM PCI 2-Port Multiprotocol Device Driver ::::0:1341:
+devices.pci.4f111100:devices.pci.4f111100.asw:7.1.0.0::I:C:::::N:PCI 8-Port Asynchronous Adapter Software ::::0:1140:
+devices.pci.4f111100:devices.pci.4f111100.com:7.1.3.0::I:C:::::N:Common PCI Asynchronous Adapter Software ::::0:1341:
+devices.pci.4f111100:devices.pci.4f111100.diag:7.1.3.0::I:C:::::N:RISC PC PCI Async 8 Port Adapter Diagnostics ::::0:1341:
+devices.pci.4f111100:devices.pci.4f111100.rte:7.1.0.0::I:C:::::b:PCI 8-Port Asynchronous Adapter Software ::::0:1140:
+devices.pci.4f111b00:devices.pci.4f111b00.asw:7.1.0.0::I:C:::::N:PCI 128-Port Asynchronous Adapter Software::::0:1036:
+devices.pci.4f111b00:devices.pci.4f111b00.diag:7.1.0.0::I:C:::::N:RISC PC PCI Async 128 Port Adapter Diagnostics::::0:1036:
+devices.pci.4f111b00:devices.pci.4f111b00.rte:7.1.0.0::I:C:::::b:PCI 128-Port Asynchronous Adapter Software::::0:1036:
+devices.pci.4f11c800:devices.pci.4f11c800.diag:7.1.3.0::I:C:::::N:2-port Asynchronous EIA-232 PCI Adapter Diagnostics ::::0:1341:
+devices.pci.4f11c800:devices.pci.4f11c800.rte:7.1.3.30::I:C:::::b:2-Port Asynchronous EIA-232 PCI Adapter Software ::::0:1441:
+devices.pci.5a107512:devices.pci.5a107512.rte:7.1.0.0::I:C:::::b:IDE Adapter Driver for Promise 275 Chip Software::::0:1036:
+devices.pci.77101223:devices.pci.77101223.com:7.1.3.0::I:C:::::b:PCI FC Adapter (77101223) Common Software ::::0:1341:
+devices.pci.77101223:devices.pci.77101223.diag:7.1.3.0::I:C:::::N:PCI FC Adapter (77101223) Diagnostics ::::0:1341:
+devices.pci.77101223:devices.pci.77101223.rte:7.1.0.0::I:C:::::b:PCI FC Adapter (77101223) Runtime Software ::::0:1140:
+devices.pci.77102224:devices.pci.77102224.com:7.1.3.30::I:C:::::b:PCI-X FC Adapter (77102224) Common Software ::::0:1441:
+devices.pci.77102224:devices.pci.77102224.diag:7.1.2.0::I:C:::::N:PCI-X FC Adapter (77102224) Diagnostics ::::0:1241:
+devices.pci.77102224:devices.pci.77102224.rte:7.1.2.0::I:C:::::b:PCI-X FC Adapter (77102224) Runtime Software ::::0:1241:
+devices.pci.77102e01:devices.pci.77102e01.diag:7.1.0.0::I:C:::::N:1000 Base-TX PCI-X iSCSI TOE Adapter Device Diagnostics::::0:1036:
+devices.pci.77102e01:devices.pci.77102e01.rte:7.1.0.0::I:C:::::b:PCI-X 1000 Base-TX iSCSI TOE Adapter Device Software::::0:1036:
+devices.pci.99172604:devices.pci.99172604.diag:7.1.0.0::I:C:::::N:USB Enhanced Host Controller (99172604) Diagnostics ::::0:1140:
+devices.pci.99172604:devices.pci.99172604.rte:7.1.3.15::I:C:::::b:USB Enhanced Host Controller Adapter (99172604) Software ::::0:1415:
+devices.pci.99172704:devices.pci.99172704.diag:7.1.0.0::I:C:::::N:USB Host Controller (99172704) Diagnostics ::::0:1140:
+devices.pci.99172704:devices.pci.99172704.rte:7.1.3.30::I:C:::::b:USB Host Controller (99172704) Software ::::0:1441:
+devices.pci.a8135201:devices.pci.a8135201.diag:7.1.0.0::I:C:::::N:2-port Asynchronous EIA-232 PCI Adapter Diagnostics ::::0:1115:
+devices.pci.a8135201:devices.pci.a8135201.rte:7.1.1.15::I:C:::::N:Native 2-Port Asynchronous EIA-232 PCI Adapter Software ::::0:1216:
+devices.pci.ad100501:devices.pci.ad100501.rte:7.1.3.0::I:C:::::b:IDE Adapter Driver for Winbond 553F Chip Software ::::0:1341:
+devices.pci.c1110358:devices.pci.c1110358.diag:7.1.0.0::I:C:::::N:USB Open Host Controller Adapter Diagnostics ::::0:1140:
+devices.pci.c1110358:devices.pci.c1110358.rte:7.1.3.30::I:C:::::b:USB Host Controller (c1110358) Software ::::0:1441:
+devices.pci.df1000f7:devices.pci.df1000f7.com:7.1.3.30::I:C:::::b:Common PCI FC Adapter Device Software ::::0:1441:
+devices.pci.df1000f7:devices.pci.df1000f7.diag:7.1.3.15::I:C:::::N:PCI FC Adapter Device Diagnostics ::::0:1415:
+devices.pci.df1000f7:devices.pci.df1000f7.rte:7.1.0.0::I:C:::::b:PCI FC Adapter Device Software ::::0:1140:
+devices.pci.df1000f9:devices.pci.df1000f9.diag:7.1.0.0::I:C:::::N:64-bit PCI FC Adapter Device Diagnostics::::0:1036:
+devices.pci.df1000f9:devices.pci.df1000f9.rte:7.1.0.0::I:C:::::b:64-bit PCI FC Adapter Device Software::::0:1036:
+devices.pci.df1000fa:devices.pci.df1000fa.diag:7.1.0.0::I:C:::::N:FC PCI-X Adapter Device Diagnostics::::0:1036:
+devices.pci.df1000fa:devices.pci.df1000fa.rte:7.1.0.0::I:C:::::b:FC PCI-X Adapter Device Software::::0:1036:
+devices.pci.df1000fd:devices.pci.df1000fd.diag:7.1.0.0::I:C:::::N:FC PCI-X Adapter Device Diagnostics::::0:1036:
+devices.pci.df1000fd:devices.pci.df1000fd.rte:7.1.0.0::I:C:::::b:4Gb PCI-X FC Adapter Device Software::::0:1036:
+devices.pci.df1023fd:devices.pci.df1023fd.diag:7.1.0.0::I:C:::::N:4Gb PCI-X FC Adapter (df1023fd) Device Diagnostics::::0:1036:
+devices.pci.df1023fd:devices.pci.df1023fd.rte:7.1.0.0::I:C:::::b:4Gb PCI-X FC Adapter (df1023fd) Device Software::::0:1036:
+devices.pci.df1080f9:devices.pci.df1080f9.diag:7.1.0.0::I:C:::::N:PCI-X FC Adapter Device Diagnostics::::0:1036:
+devices.pci.df1080f9:devices.pci.df1080f9.rte:7.1.0.0::I:C:::::b:PCI-X FC Adapter Device Software::::0:1036:
+devices.pci.e414a816:devices.pci.e414a816.diag:7.1.3.0::I:C:::::N:Gigabit Ethernet Adapter Diagnostics ::::0:1341:
+devices.pci.e414a816:devices.pci.e414a816.rte:7.1.3.0::I:C:::::b:Gigabit Ethernet-SX Adapter Software ::::0:1341:
+devices.pci.isa:devices.pci.isa.rte:7.1.3.0::I:C:::::b:ISA Bus Bridge Software (CHRP) ::::0:1341:
+devices.pci.pci:devices.pci.pci.rte:7.1.0.0::I:C:::::b:PCI Bus Bridge Software (CHRP)::::0:1036:
+devices.pciex.001072001410ea03:devices.pciex.001072001410ea03.diag:7.1.2.15::I:C:::::N:PCIe2 SAS Adapter Dual-port 6Gb Device Diagnostics ::::0:1316:
+devices.pciex.001072001410ea03:devices.pciex.001072001410ea03.rte:7.1.2.15::I:C:::::b:PCIe2 SAS Adapter Dual-port 6Gb Device Software ::::0:1316:
+devices.pciex.001072001410f603:devices.pciex.001072001410f603.diag:7.1.2.15::I:C:::::N:PCIe2 SAS Adapter Quad-port 6Gb Device Diagnostics ::::0:1316:
+devices.pciex.001072001410f603:devices.pciex.001072001410f603.rte:7.1.2.15::I:C:::::b:PCIe2 SAS Adapter Quad-port 6Gb Device Software ::::0:1316:
+devices.pciex.14103903:devices.pciex.14103903.diag:7.1.3.0::I:C:::::N:PCI Express 3Gb SAS RAID Adapter Diagnostics ::::0:1341:
+devices.pciex.14103903:devices.pciex.14103903.rte:7.1.1.0::I:C:::::b:PCI Express 3GB SAS RAID Adapter Software ::::0:1140:
+devices.pciex.14103d03:devices.pciex.14103d03.diag:7.1.3.15::I:C:::::N:PCI Express 6GB SAS RAID Adapter Diagnostics ::::0:1415:
+devices.pciex.14103d03:devices.pciex.14103d03.rte:7.1.1.15::I:C:::::b:PCI Express 6GB SAS RAID Adapter Software ::::0:1216:
+devices.pciex.14103f03:devices.pciex.14103f03.diag:7.1.3.0::I:C:::::N:2-Port Gigabit Ethernet-SX PCI-Express Adapter Diagnostics ::::0:1341:
+devices.pciex.14103f03:devices.pciex.14103f03.rte:7.1.3.0::I:C:::::b:2-Port Gigabit Ethernet-SX PCI-Express Adapter Software ::::0:1341:
+devices.pciex.14104003:devices.pciex.14104003.diag:7.1.0.0::I:C:::::N:2-Port 10/100/1000 Base-TX PCI-Express Adapter Diagnostics ::::0:1115:
+devices.pciex.14104003:devices.pciex.14104003.rte:7.1.3.0::I:C:::::b:2-Port 10/100/1000 Base-TX PCI-Express Adapter Software ::::0:1341:
+devices.pciex.14104a03:devices.pciex.14104a03.diag:7.1.3.15::I:C:::::N:PCIe3 6GB SAS RAID Adapter Diagnostics ::::0:1415:
+devices.pciex.14104a03:devices.pciex.14104a03.rte:7.1.3.0::I:C:::::b:PCIe3 6GB SAS RAID Adapter Software ::::0:1341:
+devices.pciex.14104b0414104b04:devices.pciex.14104b0414104b04.com:7.1.3.30::I:C:::::b:Common PCIe FPGA Accelerator Adapter Device Software ::::0:1441:
+devices.pciex.14104b0414104b04:devices.pciex.14104b0414104b04.diag:7.1.3.15::I:C:::::N:PCIe FPGA Accelrator Adapter Diagnostics ::::0:1415:
+devices.pciex.14104b0414104b04:devices.pciex.14104b0414104b04.rte:7.1.3.15::I:C:::::b:PCIe FPGA Accelrator Adapter Device Software ::::0:1415:
+devices.pciex.14106803:devices.pciex.14106803.diag:7.1.0.0::I:C:::::N:4-Port 10/100/1000 Base-TX PCI Express Adapter Diagnostics ::::0:1115:
+devices.pciex.14106803:devices.pciex.14106803.rte:7.1.3.0::I:C:::::b:4-Port 10/100/1000 Base-TX PCI-Express Adapter Software ::::0:1341:
+devices.pciex.14107a0314107b03:devices.pciex.14107a0314107b03.diag:7.1.0.0::I:C:::::N:IBM Y4 PCI-E Cryptographic CoProcessor Model 4765 (14107a0314107b03) Diagnostics ::::0:1140:
+devices.pciex.14107a0314107b03:devices.pciex.14107a0314107b03.rte:7.1.3.30::I:C:::::b:IBM Y4 PCI-E Cryptographic Coprocessor (14107a0314107b03) Device Software ::::0:1441:
+devices.pciex.151438c1:devices.pciex.151438c1.diag:7.1.3.0::I:C:::::N:PCIe Async EIA-232 Controller Diagnostics ::::0:1341:
+devices.pciex.151438c1:devices.pciex.151438c1.rte:7.1.2.0::I:C:::::b:PCIe Async EIA-232 Controller ::::0:1241:
+devices.pciex.2514300014108c03:devices.pciex.2514300014108c03.diag:7.1.3.0::I:C:::::N:10 Gigabit Ethernet-SR PCI Express Adapter Diagnostics Software (2514300014108c03) ::::0:1341:
+devices.pciex.2514300014108c03:devices.pciex.2514300014108c03.rte:7.1.2.15::I:C:::::b:10 Gigabit Ethernet-SR PCI-Express Host Bus Adapter ::::0:1316:
+devices.pciex.251430001410a303:devices.pciex.251430001410a303.diag:7.1.0.0::I:C:::::N:10 Gigabit Ethernet-CX4 PCI Express Adapter Diagnostics Software (251430001410a303) ::::0:1115:
+devices.pciex.251430001410a303:devices.pciex.251430001410a303.rte:7.1.2.15::I:C:::::b:10 Gigabit Ethernet-CX4 PCI-Express Host Bus Adapter ::::0:1316:
+devices.pciex.2514310025140100:devices.pciex.2514310025140100.diag:7.1.0.0::I:C:::::N:10 Gigabit Ethernet PCI-Express Host Bus Adapter Diagnostics Software (2514310025140100) ::::0:1115:
+devices.pciex.2514310025140100:devices.pciex.2514310025140100.rte:7.1.2.15::I:C:::::b:10 Gigabit Ethernet PCI-Express Host Bus Adapter ::::0:1316:
+devices.pciex.4c10418214109e04:devices.pciex.4c10418214109e04.diag:7.1.3.15::I:C:::::b:PCIe2 USB 3.0 xHCI 4-Port Adapter Device Diagnostics ::::0:1415:
+devices.pciex.4c10418214109e04:devices.pciex.4c10418214109e04.rte:7.1.3.30::I:C:::::b:PCIe2 USB 3.0 xHCI 4-Port Adapter Device Software ::::0:1441:
+devices.pciex.4c1041821410b204:devices.pciex.4c1041821410b204.diag:7.1.3.15::I:C:::::b:Integrated PCIe2 USB 3.0 xHCI Controller Device Diagnostics ::::0:1415:
+devices.pciex.4c1041821410b204:devices.pciex.4c1041821410b204.rte:7.1.3.30::I:C:::::b:Integrated PCIe2 USB 3.0 xHCI Controller Device Software ::::0:1441:
+devices.pciex.4f11f60014102204:devices.pciex.4f11f60014102204.diag:7.1.1.0::I:C:::::N:PCIe 2-port Async EIA-232 Adapter Diagnostics ::::0:1140:
+devices.pciex.4f11f60014102204:devices.pciex.4f11f60014102204.rte:7.1.2.0::I:C:::::b:PCIe 2-port Async EIA-232 Adapter ::::0:1241:
+devices.pciex.771000801410b003:devices.pciex.771000801410b003.diag:7.1.0.0::I:C:::::N:10 Gb FCoE PCI Express Dual Port Adapter Diagnostics ::::0:1140:
+devices.pciex.771000801410b003:devices.pciex.771000801410b003.rte:7.1.3.30::I:C:::::b:10 Gb Ethernet-SR PCI Express Dual Port Adapter Software ::::0:1441:
+devices.pciex.7710008077108001:devices.pciex.7710008077108001.diag:7.1.0.0::I:C:::::N:10 Gb FCoE PCI Express Dual Port Adapter Diagnostics::::0:1036:
+devices.pciex.7710008077108001:devices.pciex.7710008077108001.rte:7.1.0.0::I:C:::::b:10 Gb Ethernet PCI Express Dual Port Adapter Software::::0:1036:
+devices.pciex.771001801410af03:devices.pciex.771001801410af03.diag:7.1.3.15::I:C:::::N:10 Gb FCoE PCI Express Dual Port Adapter (771001801410af03) Diagnostics ::::0:1415:
+devices.pciex.771001801410af03:devices.pciex.771001801410af03.rte:7.1.3.15::I:C:::::b:10 Gb FCoE PCI Express Dual Port Adapter (771001801410af03) Device Software ::::0:1415:
+devices.pciex.7710018077107f01:devices.pciex.7710018077107f01.diag:7.1.2.0::I:C:::::N:10 Gb FCoE PCIe Blade Expansion Card (7710018077107f01) Diagnostics ::::0:1241:
+devices.pciex.7710018077107f01:devices.pciex.7710018077107f01.rte:7.1.2.0::I:C:::::b:10 Gb FCoE PCIe Blade Expansion Card (7710018077107f01) Device Software ::::0:1241:
+devices.pciex.77103224:devices.pciex.77103224.diag:7.1.2.0::I:C:::::N:PCI Express FC Adapter Diagnostics (77103224) ::::0:1241:
+devices.pciex.77103224:devices.pciex.77103224.rte:7.1.0.0::I:C:::::b:PCI Express 4Gb FC Adapter (77103224) Device Software ::::0:1115:
+devices.pciex.7710322514101e04:devices.pciex.7710322514101e04.diag:7.1.1.15::I:C:::::N:Low Profile 8Gb 4-Port PCIe2 FC (7710322514101e04) Diagnostic Software ::::0:1216:
+devices.pciex.7710322514101e04:devices.pciex.7710322514101e04.rte:7.1.3.15::I:C:::::b:Low Profile 8Gb 4-Port PCIe2 FC (7710322514101e04) Device Software ::::0:1415:
+devices.pciex.7710322577106501:devices.pciex.7710322577106501.diag:7.1.2.0::I:C:::::N:4Gb PCIe FC Blade Expansion Card (7710322577106501) Diagnostics ::::0:1241:
+devices.pciex.7710322577106501:devices.pciex.7710322577106501.rte:7.1.2.0::I:C:::::b:4Gb PCIe FC Blade Expansion Card (7710322577106501) Device Software ::::0:1241:
+devices.pciex.7710322577106601:devices.pciex.7710322577106601.diag:7.1.2.0::I:C:::::N:8Gb PCIe FC Blade Expansion Card (7710322577106601) Diagnostic Software ::::0:1241:
+devices.pciex.7710322577106601:devices.pciex.7710322577106601.rte:7.1.2.0::I:C:::::b:8Gb PCIe FC Blade Expansion Card (7710322577106601) Device Software ::::0:1241:
+devices.pciex.7710322577106801:devices.pciex.7710322577106801.diag:7.1.2.0::I:C:::::N:8Gb PCIe FC Blade Expansion Card (7710322577106801) Diagnostics ::::0:1241:
+devices.pciex.7710322577106801:devices.pciex.7710322577106801.rte:7.1.2.0::I:C:::::b:8Gb PCIe FC Blade Expansion Card (7710322577106801) Device Software ::::0:1241:
+devices.pciex.7710322577107501:devices.pciex.7710322577107501.diag:7.1.2.0::I:C:::::N:Dual Port 8Gb FC Mezzanine Card (7710322577107501) Diagnostic Software ::::0:1241:
+devices.pciex.7710322577107501:devices.pciex.7710322577107501.rte:7.1.3.15::I:C:::::b:Dual Port 8Gb FC Mezzanine Card (7710322577107501) Device Software ::::0:1415:
+devices.pciex.7710322577107601:devices.pciex.7710322577107601.diag:7.1.2.0::I:C:::::N:8Gb PCIe FC Blade Expansion Card (7710322577107601) Diagnostics ::::0:1241:
+devices.pciex.7710322577107601:devices.pciex.7710322577107601.rte:7.1.2.0::I:C:::::b:8Gb PCIe FC Blade Expansion Card (7710322577107601) Device Software ::::0:1241:
+devices.pciex.8680c71014108003:devices.pciex.8680c71014108003.diag:7.1.3.0::I:C:::::N:10 Gigabit Ethernet-LR PCI-Express Adapter Diagnostics ::::0:1341:
+devices.pciex.8680c71014108003:devices.pciex.8680c71014108003.rte:7.1.3.30::I:C:::::b:10 Gigabit Ethernet-LR PCI-Express Adapter Software ::::0:1441:
+devices.pciex.a219100714100904:devices.pciex.a219100714100904.diag:7.1.1.0::I:C:::::N:Int Multifunction Card w/ SR Optical 10GbE Adapter Diagnostics ::::0:1140:
+devices.pciex.a219100714100904:devices.pciex.a219100714100904.rte:7.1.3.0::I:C:::::b:Int Multifunction Card w/ SR Optical 10GbE Adapter Software ::::0:1341:
+devices.pciex.a219100714100a04:devices.pciex.a219100714100a04.diag:7.1.1.0::I:C:::::N:Int Multifunction Card w/ Copper SFP+ 10GbE Adapter Diagnostics ::::0:1140:
+devices.pciex.a219100714100a04:devices.pciex.a219100714100a04.rte:7.1.3.0::I:C:::::b:Int Multifunction Card w/ Copper SFP+ 10GbE Adapter Software ::::0:1341:
+devices.pciex.a21910071410d003:devices.pciex.a21910071410d003.diag:7.1.3.15::I:C:::::N:PCIe2 2-port 10GbE SR Adapter Diagnostics ::::0:1415:
+devices.pciex.a21910071410d003:devices.pciex.a21910071410d003.rte:7.1.3.30::I:C:::::b:PCIe2 2-port 10GbE SR Adapter Software ::::0:1441:
+devices.pciex.a21910071410d103:devices.pciex.a21910071410d103.diag:7.1.0.0::I:C:::::N:PCIe2 2-port 10GbE SFP Copper Adapter Diagnostics ::::0:1140:
+devices.pciex.a21910071410d103:devices.pciex.a21910071410d103.rte:7.1.3.0::I:C:::::b:PCIe2 2-port 10GbE SFP+Copper Adapter Software ::::0:1341:
+devices.pciex.a21910071410d203:devices.pciex.a21910071410d203.diag:7.1.1.0::I:C:::::N:Int Multifunction Card w/ Base-TX Adapter Diagnostics ::::0:1140:
+devices.pciex.a21910071410d203:devices.pciex.a21910071410d203.rte:7.1.3.30::I:C:::::b:Int Multifunction Card w/ Base-TX 10/100/1000 1GbE Adapter Software ::::0:1441:
+devices.pciex.a2191007df1033e7:devices.pciex.a2191007df1033e7.diag:7.1.1.0::I:C:::::N:10GbE 4 port PCIe2 Mezz Adapter Diagnostics ::::0:1140:
+devices.pciex.a2191007df1033e7:devices.pciex.a2191007df1033e7.rte:7.1.3.0::I:C:::::b:10GbE 4-port PCIe2 Mezz Adapter Software ::::0:1341:
+devices.pciex.b31503101410b504:devices.pciex.b31503101410b504.diag:7.1.3.15::I:C:::::b:RoCE Host Bus Adapter Diagnostics (b31503101410b504) ::::0:1415:
+devices.pciex.b31503101410b504:devices.pciex.b31503101410b504.rte:7.1.3.15::I:C:::::b:RoCE Host Bus Adapter (b31503101410b504) ::::0:1415:
+devices.pciex.b3153c67:devices.pciex.b3153c67.diag:7.1.2.0::I:C:::::N:PCIe Dual Port HCA QDR Infiniband Device Diagnostics ::::0:1241:
+devices.pciex.b3153c67:devices.pciex.b3153c67.rte:7.1.3.30::I:C:::::b:4X PCI-E QDR Infiniband Device Driver ::::0:1441:
+devices.pciex.b3154a63:devices.pciex.b3154a63.diag:7.1.3.15::I:C:::::N:PCI-E 4X DDR Infiniband Device Diagnostics ::::0:1415:
+devices.pciex.b3154a63:devices.pciex.b3154a63.rte:7.1.3.30::I:C:::::b:4X PCI-E DDR Infiniband Device Driver ::::0:1441:
+devices.pciex.b315506714101604:devices.pciex.b315506714101604.diag:7.1.2.15::I:C:::::N:RoCE Host Bus Adapter Diagnostics (b315506714101604) ::::0:1316:
+devices.pciex.b315506714101604:devices.pciex.b315506714101604.rte:7.1.3.15::S:T:::::b:RoCE Host Bus Adapter (b315506714101604)::::0:1415:
+devices.pciex.b315506714101604:devices.pciex.b315506714101604.rte:7.1.3.30::I:C:::::b:RoCE Host Bus Adapter (b315506714101604) ::::0:1441:
+devices.pciex.b315506714106104:devices.pciex.b315506714106104.diag:7.1.2.0::I:C:::::N:RoCE Host Bus Adapter Diagnostics (b315506714106104) ::::0:1316:
+devices.pciex.b315506714106104:devices.pciex.b315506714106104.rte:7.1.3.15::S:T:::::b:RoCE Host Bus Adapter (b315506714106104)::::0:1415:
+devices.pciex.b315506714106104:devices.pciex.b315506714106104.rte:7.1.3.30::I:C:::::b:RoCE Host Bus Adapter (b315506714106104) ::::0:1441:
+devices.pciex.b3155067b3157265:devices.pciex.b3155067b3157265.diag:7.1.2.0::I:C:::::N:RoCE Host Bus Adapter Diagnostics (b3155067b3157265) ::::0:1241:
+devices.pciex.b3155067b3157265:devices.pciex.b3155067b3157265.rte:7.1.3.15::S:T:::::b:RoCE Host Bus Adapter (b3155067b3157265)::::0:1415:
+devices.pciex.b3155067b3157265:devices.pciex.b3155067b3157265.rte:7.1.3.30::I:C:::::b:RoCE Host Bus Adapter (b3155067b3157265) ::::0:1441:
+devices.pciex.b3155067b3157365:devices.pciex.b3155067b3157365.diag:7.1.2.0::I:C:::::N:RoCE Host Bus Adapter Diagnostics (b3155067b3157365) ::::0:1241:
+devices.pciex.b3155067b3157365:devices.pciex.b3155067b3157365.rte:7.1.3.15::S:T:::::b:RoCE Host Bus Adapter (b3155067b3157365)::::0:1415:
+devices.pciex.b3155067b3157365:devices.pciex.b3155067b3157365.rte:7.1.3.30::I:C:::::b:RoCE Host Bus Adapter (b3155067b3157365) ::::0:1441:
+devices.pciex.df1000e214105e04:devices.pciex.df1000e214105e04.diag:7.1.2.0::I:C:::::N:GX++ 16Gb FC 2 Port Adapter Diagnostics ::::0:1241:
+devices.pciex.df1000e214105e04:devices.pciex.df1000e214105e04.rte:7.1.3.0::I:C:::::b:GX++ 16Gb FC 2 Port Adapter Device Software ::::0:1341:
+devices.pciex.df1000e21410f103:devices.pciex.df1000e21410f103.diag:7.1.2.0::I:C:::::N:16Gb FC PCIe2 2 Port Adapter Diagnostics ::::0:1216:
+devices.pciex.df1000e21410f103:devices.pciex.df1000e21410f103.rte:7.1.3.0::I:C:::::b:16Gb FC PCIe2 2 Port Adapter Device Software ::::0:1341:
+devices.pciex.df1000e2df1002e2:devices.pciex.df1000e2df1002e2.diag:7.1.2.0::I:C:::::N:PCIe2 2-Port 16Gb FC Mezzanine Adapter Diagnostics ::::0:1241:
+devices.pciex.df1000e2df1002e2:devices.pciex.df1000e2df1002e2.rte:7.1.3.0::I:C:::::b:PCIe2 2-Port 16Gb FC Mezzanine Adapter Device Software ::::0:1341:
+devices.pciex.df1000e2df1082e2:devices.pciex.df1000e2df1082e2.diag:7.1.2.15::I:C:::::N:4-Port 16Gb FC Mezzanine Adapter Device Diagnostics ::::0:1316:
+devices.pciex.df1000e2df1082e2:devices.pciex.df1000e2df1082e2.rte:7.1.3.15::I:C:::::b:4-Port 16Gb FC Mezzanine Adapter Device Software ::::0:1415:
+devices.pciex.df1000f114100104:devices.pciex.df1000f114100104.diag:7.1.1.0::I:C:::::N:8Gb FC PCI Express Quad Port Adapter Device Diagnostics ::::0:1115:
+devices.pciex.df1000f114100104:devices.pciex.df1000f114100104.rte:7.1.3.15::I:C:::::b:8Gb FC PCI Express Quad Port Adapter Device Software ::::0:1415:
+devices.pciex.df1000f114108a03:devices.pciex.df1000f114108a03.diag:7.1.0.0::I:C:::::N:8Gb PCI-E FC Adapter (df1000f114108a03) Device Diagnostics ::::0:1115:
+devices.pciex.df1000f114108a03:devices.pciex.df1000f114108a03.rte:7.1.3.15::I:C:::::b:8Gb FC PCI Express Dual Port Adapter Device Software ::::0:1415:
+devices.pciex.df1000f1df1024f1:devices.pciex.df1000f1df1024f1.diag:7.1.0.0::I:C:::::N:8Gb PCI-E FC Adapter (df1000f1df1024f1) Device Diagnostics::::0:1036:
+devices.pciex.df1000f1df1024f1:devices.pciex.df1000f1df1024f1.rte:7.1.0.0::I:C:::::b:8Gb PCIe FC Blade Expansion Card (df1000f1df1024f1) Device Software::::0:1036:
+devices.pciex.df1000fe:devices.pciex.df1000fe.diag:7.1.0.0::I:C:::::N:4Gb FC PCI Express Adapter Device Diagnostics ::::0:1115:
+devices.pciex.df1000fe:devices.pciex.df1000fe.rte:7.1.3.15::I:C:::::b:4Gb FC PCI Express Adapter Device Software ::::0:1415:
+devices.pciex.df1020e214100f04:devices.pciex.df1020e214100f04.diag:7.1.2.0::I:C:::::N:PCIe2 10GbE SFP+ SR Adapter Diagnostics ::::0:1241:
+devices.pciex.df1020e214100f04:devices.pciex.df1020e214100f04.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE SFP+ SR Adapter Software ::::0:1341:
+devices.pciex.df1020e214103604:devices.pciex.df1020e214103604.diag:7.1.2.15::I:C:::::N:PCIe2 10GbE SFP+ SR 4-port Adapter Diagnostics ::::0:1316:
+devices.pciex.df1020e214103604:devices.pciex.df1020e214103604.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE SFP+ SR 4-port Adapter Software ::::0:1341:
+devices.pciex.df1020e214103804:devices.pciex.df1020e214103804.diag:7.1.2.15::I:C:::::N:PCIe2 10GBaseT 4-port Adapter Diagnostics ::::0:1316:
+devices.pciex.df1020e214103804:devices.pciex.df1020e214103804.rte:7.1.3.0::I:C:::::b:PCIe2 10GBaseT 4-port Adapter Software ::::0:1341:
+devices.pciex.df1020e214103904:devices.pciex.df1020e214103904.diag:7.1.2.15::I:C:::::N:PCIe2 10GbE SFP+ Cu 4-port Adapter Diagnostics ::::0:1316:
+devices.pciex.df1020e214103904:devices.pciex.df1020e214103904.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE SFP+ Cu 4-port Adapter Software ::::0:1341:
+devices.pciex.df1020e214103b04:devices.pciex.df1020e214103b04.diag:7.1.2.15::I:C:::::N:PCIe2 10GBaseT 4-port Adapter Diagnostics ::::0:1316:
+devices.pciex.df1020e214103b04:devices.pciex.df1020e214103b04.rte:7.1.3.0::I:C:::::b:PCIe2 10GBaseT 4-port Adapter Software ::::0:1341:
+devices.pciex.df1020e214103c04:devices.pciex.df1020e214103c04.diag:7.1.2.0::I:C:::::N:PCIe2 10/100/1000 Base-TX Adapter Diagnostics ::::0:1241:
+devices.pciex.df1020e214103c04:devices.pciex.df1020e214103c04.rte:7.1.3.0::I:C:::::b:PCIe2 10/100/1000 Base-TX Adapter Software ::::0:1341:
+devices.pciex.df1020e214103d04:devices.pciex.df1020e214103d04.diag:7.1.3.0::I:C:::::N:PCIe2 10GbE SFP+ Cu 4-port Adapter Diagnostics ::::0:1341:
+devices.pciex.df1020e214103d04:devices.pciex.df1020e214103d04.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE SFP+ Cu Adapter Software ::::0:1341:
+devices.pciex.df1020e214103f04:devices.pciex.df1020e214103f04.diag:7.1.3.0::I:C:::::N:PCIe2 1GbaseT SFP+ Cu 4-port Adapter Diagnostics ::::0:1341:
+devices.pciex.df1020e214103f04:devices.pciex.df1020e214103f04.rte:7.1.3.0::I:C:::::b:PCIe2 100/1000 Base-TX Adapter Software ::::0:1341:
+devices.pciex.df1020e214104004:devices.pciex.df1020e214104004.diag:7.1.3.15::I:C:::::N:PCIe2 10GbE SFP+ LR 4-port Adapter Diagnostics ::::0:1415:
+devices.pciex.df1020e214104004:devices.pciex.df1020e214104004.rte:7.1.3.15::I:C:::::b:PCIe2 10GbE SFP+ LR Adapter Software ::::0:1415:
+devices.pciex.df1020e214104204:devices.pciex.df1020e214104204.diag:7.1.3.15::I:C:::::N:PCIe2 100/1000 Base-TX Adapter Diagnostics ::::0:1415:
+devices.pciex.df1020e214104204:devices.pciex.df1020e214104204.rte:7.1.3.15::I:C:::::b:PCIe2 100/1000 Base-TX Adapter Software ::::0:1415:
+devices.pciex.df1020e214105104:devices.pciex.df1020e214105104.diag:7.1.2.0::I:C:::::N:PCIe2 10GbE Mezz Adapter Diagnostics ::::0:1241:
+devices.pciex.df1020e214105104:devices.pciex.df1020e214105104.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE Mezz Adapter Software ::::0:1341:
+devices.pciex.df1020e214105d04:devices.pciex.df1020e214105d04.diag:7.1.2.0::I:C:::::N:PCIe2 10GbE 2-port GX++ Gen2 Converged Network Adapter Diagnostics ::::0:1241:
+devices.pciex.df1020e214105d04:devices.pciex.df1020e214105d04.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE 2-port GX++ Gen2 Converged Network Adapter Software ::::0:1341:
+devices.pciex.df1028e214100f04:devices.pciex.df1028e214100f04.diag:7.1.3.0::I:C:::::N:PCIe2 10GbE SFP+ SR VF Adapter Diagnostics ::::0:1241:
+devices.pciex.df1028e214100f04:devices.pciex.df1028e214100f04.rte:7.1.3.30::I:C:::::b:PCIe2 10GbE SFP+ SR VF Adapter Software ::::0:1441:
+devices.pciex.df1028e214103604:devices.pciex.df1028e214103604.diag:7.1.3.0::I:C:::::N:PCIe2 10GbE SFP+ SR 4-port VF Adapter Diagnostics ::::0:1341:
+devices.pciex.df1028e214103604:devices.pciex.df1028e214103604.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE SFP+ SR 4-port VF Adapter Software ::::0:1341:
+devices.pciex.df1028e214103804:devices.pciex.df1028e214103804.diag:7.1.3.0::I:C:::::N:PCIe2 10GBaseT 4-port VF Adapter Diagnostics ::::0:1341:
+devices.pciex.df1028e214103804:devices.pciex.df1028e214103804.rte:7.1.3.0::I:C:::::b:PCIe2 10GBaseT 4-port VF Adapter Software ::::0:1341:
+devices.pciex.df1028e214103904:devices.pciex.df1028e214103904.diag:7.1.3.0::I:C:::::N:PCIe2 10GbE SFP+ Cu 4-port VF Adapter Diagnostics ::::0:1341:
+devices.pciex.df1028e214103904:devices.pciex.df1028e214103904.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE SFP+ Cu 4-port VF Adapter Software ::::0:1341:
+devices.pciex.df1028e214103b04:devices.pciex.df1028e214103b04.diag:7.1.3.0::I:C:::::N:PCIe2 10GBaseT 4-port VF Adapter Diagnostics ::::0:1341:
+devices.pciex.df1028e214103b04:devices.pciex.df1028e214103b04.rte:7.1.3.0::I:C:::::b:PCIe2 10GBaseT 4-port VF Adapter Software ::::0:1341:
+devices.pciex.df1028e214103c04:devices.pciex.df1028e214103c04.diag:7.1.3.0::I:C:::::N:PCIe2 10/100/1000 Base-TX VF Adapter Diagnostics ::::0:1241:
+devices.pciex.df1028e214103c04:devices.pciex.df1028e214103c04.rte:7.1.3.30::I:C:::::b:PCIe2 10/100/1000 Base-TX VF Adapter Software ::::0:1441:
+devices.pciex.df1028e214103d04:devices.pciex.df1028e214103d04.diag:7.1.3.0::I:C:::::N:PCIe2 10GbE SFP+ Cu 4-port VF Adapter Diagnostics ::::0:1341:
+devices.pciex.df1028e214103d04:devices.pciex.df1028e214103d04.rte:7.1.3.30::I:C:::::b:PCIe2 10GbE SFP+ Cu VF Adapter Software ::::0:1441:
+devices.pciex.df1028e214103f04:devices.pciex.df1028e214103f04.diag:7.1.3.0::I:C:::::N:PCIe2 1GbaseT SFP+ Cu 4-port VF Adapter Diagnostics ::::0:1341:
+devices.pciex.df1028e214103f04:devices.pciex.df1028e214103f04.rte:7.1.3.30::I:C:::::b:PCIe2 100/1000 Base-TX VF Adapter Software ::::0:1441:
+devices.pciex.df1028e214104004:devices.pciex.df1028e214104004.diag:7.1.3.15::I:C:::::N:PCIe2 10GbE SFP+ LR VF Adapter Diagnostics ::::0:1415:
+devices.pciex.df1028e214104004:devices.pciex.df1028e214104004.rte:7.1.3.15::I:C:::::b:PCIe2 10GbE SFP+ LR VF Adapter Software ::::0:1415:
+devices.pciex.df1028e214104204:devices.pciex.df1028e214104204.diag:7.1.3.15::I:C:::::N:PCIe2 100/1000 Base-TX VF Adapter Diagnostics ::::0:1415:
+devices.pciex.df1028e214104204:devices.pciex.df1028e214104204.rte:7.1.3.15::I:C:::::b:PCIe2 100/1000 Base-TX VF Adapter Software ::::0:1415:
+devices.pciex.df1028e214105104:devices.pciex.df1028e214105104.diag:7.1.3.0::I:C:::::N:PCIe2 10GbE VF Mezz Adapter Diagnostics ::::0:1341:
+devices.pciex.df1028e214105104:devices.pciex.df1028e214105104.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE VF Mezz Adapter Software ::::0:1341:
+devices.pciex.df1028e214105d04:devices.pciex.df1028e214105d04.rte:7.1.3.0::I:C:::::b:PCIe2 10GbE 2-port GX++ Gen2 Converged Network VF Adapter Software ::::0:1341:
+devices.pciex.df1060e214101004:devices.pciex.df1060e214101004.diag:7.1.2.0::I:C:::::N:PCIe2 10GbE FCoE 4 Port Adapter Diagnostics ::::0:1216:
+devices.pciex.df1060e214101004:devices.pciex.df1060e214101004.rte:7.1.3.0::I:C:::::b:10Gb FCoE PCIe2 4 Port Adapter Device Software ::::0:1341:
+devices.pciex.df1060e214103404:devices.pciex.df1060e214103404.com:7.1.3.30::I:C:::::b:Common PCIe2 FC Adapter Device Software ::::0:1441:
+devices.pciex.df1060e214103404:devices.pciex.df1060e214103404.diag:7.1.3.30::I:C:::::N:PCIe2 10Gb 4-Port FCoE Mezzanine Adapter Device Diagnostics ::::0:1441:
+devices.pciex.df1060e214103404:devices.pciex.df1060e214103404.rte:7.1.2.0::I:C:::::b:PCIe2 10Gb 4-Port FCoE Mezzanine Adapter Device Software ::::0:1241:
+devices.pciex.df1060e214103704:devices.pciex.df1060e214103704.diag:7.1.3.0::I:C:::::N:Integrated 10Gb 4-Port FCoE Adapter Device Diagnostics ::::0:1341:
+devices.pciex.df1060e214103704:devices.pciex.df1060e214103704.rte:7.1.3.0::I:C:::::b:Integrated 10Gb 4-Port FCoE Adapter Device Software ::::0:1341:
+devices.pciex.df1060e214103a04:devices.pciex.df1060e214103a04.diag:7.1.3.0::I:C:::::N:Integrated 10Gb Cu 4-Port FCoE Adapter Device Diagnostics ::::0:1341:
+devices.pciex.df1060e214103a04:devices.pciex.df1060e214103a04.rte:7.1.3.0::I:C:::::b:Integrated 10Gb Cu 4-Port FCoE Adapter Device Software ::::0:1341:
+devices.pciex.df1060e214103e04:devices.pciex.df1060e214103e04.diag:7.1.3.15::I:C:::::N:PCIe2 10GbE Cu 4-port FCoE Adapter Diagnostics ::::0:1415:
+devices.pciex.df1060e214103e04:devices.pciex.df1060e214103e04.rte:7.1.3.15::I:C:::::b:PCIe2 10Gb Cu 4-Port FCoE Adapter Device Software ::::0:1415:
+devices.pciex.df1060e214104104:devices.pciex.df1060e214104104.diag:7.1.3.15::I:C:::::N:PCIe2 10Gb LR 4-Port FCoE Adapter Device Diagnostics ::::0:1415:
+devices.pciex.df1060e214104104:devices.pciex.df1060e214104104.rte:7.1.3.15::I:C:::::b:PCIe2 10Gb LR 4-Port FCoE Adapter Device Software ::::0:1415:
+devices.pciex.df1060e214105204:devices.pciex.df1060e214105204.diag:7.1.2.0::I:C:::::N:PCIe2 10GbE FCoE Mezz Adapter Diagnostics ::::0:1241:
+devices.pciex.df1060e214105204:devices.pciex.df1060e214105204.rte:7.1.3.0::I:C:::::b:PCIe2 10Gb FCoE Mezzanine Adapter Device Software ::::0:1341:
+devices.pciex.df1060e214105f04:devices.pciex.df1060e214105f04.diag:7.1.2.0::I:C:::::N:GX++ 10Gb FCoE Adapter Diagnostics ::::0:1241:
+devices.pciex.df1060e214105f04:devices.pciex.df1060e214105f04.rte:7.1.3.0::I:C:::::b:GX++ 10Gb FCoE Adapter Device Software ::::0:1341:
+devices.pciex.e4143a161410a003:devices.pciex.e4143a161410a003.diag:7.1.0.0::I:C:::::N:2-Port Gigabit Ethernet Combo PCI-Express Adapter Diagnostics ::::0:1115:
+devices.pciex.e4143a161410a003:devices.pciex.e4143a161410a003.rte:7.1.0.0::I:C:::::b:2-Port Gigabit Ethernet Combo PCI-Express Adapter Software ::::0:1115:
+devices.pciex.e4143a161410ed03:devices.pciex.e4143a161410ed03.diag:7.1.0.0::I:C:::::N:2-Port Integrated Gigabit Ethernet PCI-Express Adapter Diagnostics ::::0:1115:
+devices.pciex.e4143a161410ed03:devices.pciex.e4143a161410ed03.rte:7.1.0.0::I:C:::::b:2-Port Integrated Gigabit Ethernet PCI-Express Adapter Software ::::0:1115:
+devices.pciex.e4143a16e4140909:devices.pciex.e4143a16e4140909.diag:7.1.0.0::I:C:::::N:2-Port Gigabit Ethernet PCI-Express Adapter Diagnostics::::0:1036:
+devices.pciex.e4143a16e4140909:devices.pciex.e4143a16e4140909.rte:7.1.0.0::I:C:::::b:2-Port Gigabit Ethernet PCI-Express Adapter Software::::0:1036:
+devices.pciex.e4143a16e4143009:devices.pciex.e4143a16e4143009.diag:7.1.3.0::I:C:::::N:4-Port Gigabit Ethernet PCI-Express Adapter Diagnostics ::::0:1341:
+devices.pciex.e4143a16e4143009:devices.pciex.e4143a16e4143009.rte:7.1.3.0::I:C:::::b:4-Port Gigabit Ethernet PCI-Express Adapter Software ::::0:1341:
+devices.pciex.e4145616e4140518:devices.pciex.e4145616e4140518.diag:7.1.3.30::I:C:::::N:2-Port Gigabit Ethernet PCI-Express Adapter Diagnostics ::::0:1441:
+devices.pciex.e4145616e4140518:devices.pciex.e4145616e4140518.rte:7.1.3.30::I:C:::::b:2-Port Gigabit Ethernet PCI-Express Adapter Software ::::0:1441:
+devices.pciex.e4145616e4140528:devices.pciex.e4145616e4140528.diag:7.1.2.0::I:C:::::N:2-Port Gigabit Ethernet PCI-Express Adapter Diagnostics ::::0:1241:
+devices.pciex.e4145616e4140528:devices.pciex.e4145616e4140528.rte:7.1.3.30::I:C:::::b:2-Port Gigabit Ethernet PCI-Express Adapter Software ::::0:1441:
+devices.pciex.e414571614102004:devices.pciex.e414571614102004.diag:7.1.1.15::I:C:::::N:4-Port Gigabit Ethernet PCI-Express Adapter Diagnostics ::::0:1216:
+devices.pciex.e414571614102004:devices.pciex.e414571614102004.rte:7.1.3.30::I:C:::::b:4-Port Gigabit Ethernet PCI-Express Adapter Software ::::0:1441:
+devices.pciex.e4148a1614109304:devices.pciex.e4148a1614109304.diag:7.1.3.15::I:C:::::N:PCIe2 4-Port (10GbE SFP+ & 1GbE RJ45) Adapter Diagnostics ::::0:1415:
+devices.pciex.e4148a1614109304:devices.pciex.e4148a1614109304.rte:7.1.3.30::I:C:::::b:PCIe2 4-Port (10GbE SFP+ & 1GbE RJ45) Adapter ::::0:1441:
+devices.pciex.e4148a1614109404:devices.pciex.e4148a1614109404.diag:7.1.3.15::I:C:::::N:PCIe2 4-Port (10GbE SFP+ & 1GbE RJ45) Adapter Diagnostics ::::0:1415:
+devices.pciex.e4148a1614109404:devices.pciex.e4148a1614109404.rte:7.1.3.30::I:C:::::b:PCIe2 4-Port (10GbE SFP+ & 1GbE RJ45) Adapter ::::0:1441:
+devices.pciex.e4148e1614109204:devices.pciex.e4148e1614109204.diag:7.1.3.30::I:C:::::N:PCIe2 2-Port 10GbE Base-T Adapter Diagnostics ::::0:1441:
+devices.pciex.e4148e1614109204:devices.pciex.e4148e1614109204.rte:7.1.3.30::I:C:::::b:PCIe2 2-Port 10GbE Base-T Adapter ::::0:1441:
+devices.sas:devices.sas.diag:7.1.3.30::I:C:::::N:Serial Attached SCSI Device Diagnostics ::::0:1441:
+devices.sas:devices.sas.rte:7.1.3.30::I:C:::::b:Serial Attached SCSI Device Software ::::0:1441:
+devices.sata:devices.sata.diag:7.1.2.0::I:C:::::N:Serial ATA Device Diagnostics ::::0:1241:
+devices.sata:devices.sata.rte:7.1.0.15::I:C:::::b:Serial ATA Device Software ::::0:1115:
+devices.scsi.disk:devices.scsi.disk.diag.com:7.1.3.30::I:C:::::N:Common Disk Diagnostic Service Aid ::::0:1441:
+devices.scsi.disk:devices.scsi.disk.diag.rte:7.1.0.15::I:C:::::N:SCSI CD_ROM, Disk Device Diagnostics ::::0:1140:
+devices.scsi.disk:devices.scsi.disk.rspc:7.1.0.0::I:C:::::b:RISC PC SCSI CD-ROM, Disk, Read/Write Optical Software ::::0:1140:
+devices.scsi.disk:devices.scsi.disk.rte:7.1.3.30::I:C:::::b:SCSI CD-ROM, Disk, Read/Write Optical Device Software ::::0:1441:
+devices.scsi.safte:devices.scsi.safte.diag:7.1.0.0::I:C:::::N:SCSI Accessed Fault-Tolerant Enclosure Device Diagnostics::::0:1036:
+devices.scsi.safte:devices.scsi.safte.rte:7.1.0.0::I:C:::::b:SCSI Accessed Fault-Tolerant Enclosure Device Software::::0:1036:
+devices.scsi.ses:devices.scsi.ses.diag:7.1.3.15::I:C:::::N:SCSI Enclosure Services Device Diagnostics ::::0:1415:
+devices.scsi.ses:devices.scsi.ses.rte:7.1.3.0::I:C:::::b:SCSI Enclosure Device Software ::::0:1341:
+devices.scsi.tape:devices.scsi.tape.diag:7.1.1.15::I:C:::::N:SCSI Tape Device Diagnostics ::::0:1216:
+devices.scsi.tape:devices.scsi.tape.rspc:7.1.0.0::I:C:::::b:RISC PC SCSI Tape Device Software ::::0:1140:
+devices.scsi.tape:devices.scsi.tape.rte:7.1.3.30::I:C:::::b:SCSI Tape Device Software ::::0:1441:
+devices.scsi.tm:devices.scsi.tm.rte:7.1.3.0::I:C:::::N:SCSI Target Mode Software ::::0:1341:
+devices.serial.sb1:devices.serial.sb1.X11:7.1.0.0::I:C:::::N:AIXwindows 6094-030 Spaceball 3-D Input Device Software::::0:1036:
+devices.serial.tablet1:devices.serial.tablet1.X11:7.1.0.0::I:C:::::N:AIXwindows Serial Tablet Input Device Software::::0:1036:
+devices.tty:devices.tty.rte:7.1.3.0::I:C:::::b:TTY Device Driver Support Software ::::0:1341:
+devices.usbif.010100:devices.usbif.010100.rte:7.1.3.15::I:C:::::N:USB Audio Device Driver ::::0:1415:
+devices.usbif.03000008:devices.usbif.03000008.rte:7.1.3.15::I:C:::::b:USB 3D Mouse Client Driver ::::0:1415:
+devices.usbif.030101:devices.usbif.030101.rte:7.1.3.15::I:C:::::b:USB Keyboard Client Driver ::::0:1415:
+devices.usbif.030102:devices.usbif.030102.rte:7.1.3.15::I:C:::::b:USB Mouse Client Driver ::::0:1415:
+devices.usbif.08025002:devices.usbif.08025002.diag:7.1.3.30::I:C:::::N:USB Mass Storage Diagnostics ::::0:1441:
+devices.usbif.08025002:devices.usbif.08025002.rte:7.1.3.30::I:C:::::b:USB Mass Storage Device Software ::::0:1441:
+devices.usbif.080400:devices.usbif.080400.diag:7.1.0.0::I:C:::::N:USB Diskette Diagnostics ::::0:1140:
+devices.usbif.080400:devices.usbif.080400.rte:7.1.3.15::I:C:::::b:USB Diskette Client Driver ::::0:1415:
+devices.vdevice.IBM.l-lan:devices.vdevice.IBM.l-lan.rte:7.1.3.30::I:C:::::b:Virtual I/O Ethernet Software ::::0:1441:
+devices.vdevice.IBM.v-scsi:devices.vdevice.IBM.v-scsi.rte:7.1.3.30::I:C:::::b:Virtual SCSI Client Support ::::0:1441:
+devices.vdevice.IBM.vfc-client:devices.vdevice.IBM.vfc-client.rte:7.1.3.30::I:C:::::b:Virtual Fibre Channel Client Support ::::0:1441:
+devices.vdevice.hvterm-protocol:devices.vdevice.hvterm-protocol.rte:7.1.0.0::I:C:::::N:Virtual Terminal Physical Support::::0:1036:
+devices.vdevice.hvterm1:devices.vdevice.hvterm1.rte:7.1.3.15::I:C:::::b:Virtual Terminal Devices ::::0:1415:
+devices.vdevice.vty-server:devices.vdevice.vty-server.rte:7.1.3.0::I:C:::::N:Virtual Terminal Devices ::::0:1341:
+dsm:dsm.core:7.1.3.30::I:T:::::N:Distributed Systems Management Core ::::0:1441:
+dsm:dsm.dsh:7.1.3.30::I:T:::::N:Distributed Systems Management Dsh ::::0:1441:
+eclipse2.rte:eclipse2.rte:2.1.3.0::I:T:::::N:Eclipse Integrated Tool Platform Runtime::::0:1036:
+expect.base:expect.base:5.42.1.0::I:C:::::N:Binary executable files of Expect::::0::
+expect.man.en_US:expect.man.en_US:5.42.1.0::I:C:::::N:Expect man page documentation::::0::
+glvm.rpv:glvm.rpv.client:7.1.3.0::I:T:::::N:Remote Physical Volume Client ::::0:0743:
+glvm.rpv:glvm.rpv.server:7.1.3.0::I:T:::::N:Remote Physical Volume Server ::::0:0743:
+glvm.rpv:glvm.rpv.util:7.1.3.0::I:T:::::N:Geographic LVM Utilities ::::0:0743:
+glvm.rpv.man.en_US:glvm.rpv.man.en_US:7.1.3.0::I:T:::::N:Geographic LVM Man Pages - U.S. English ::::0:0743:
+glvm.rpv.msg.en_US:glvm.rpv.msg.en_US:7.1.3.0::I:T:::::N:RPV Messages - U.S. English ::::0:0743:
+idsldap.clt32bit62:idsldap.clt32bit62.rte:6.2.0.32::I:T:::::N:Directory Server - 32 bit Client::::0::
+idsldap.clt64bit62:idsldap.clt64bit62.rte:6.2.0.32::I:T:::::N:Directory Server - 64 bit Client::::0::
+idsldap.clt_max_crypto32bit62:idsldap.clt_max_crypto32bit62.rte:6.2.0.32::I:T:::::N:Directory Server - 32 bit Client (SSL)::::0::
+idsldap.clt_max_crypto64bit62:idsldap.clt_max_crypto64bit62.rte:6.2.0.32::I:T:::::N:Directory Server - 64 bit Client (SSL)::::0::
+idsldap.cltbase62:idsldap.cltbase62.adt:6.2.0.32::I:T:::::N:Directory Server - Base Client::::0::
+idsldap.cltbase62:idsldap.cltbase62.rte:6.2.0.32::I:T:::::N:Directory Server - Base Client::::0::
+idsldap.cltjava62:idsldap.cltjava62.rte:6.2.0.32::I:T:::::N:Directory Server - Java Client::::0::
+idsldap.ent62:idsldap.ent62.rte:6.2.0.3::I:T:::::N:Directory Server - Entitlement::::0::
+idsldap.msg:idsldap.msg62.en_US:6.2.0.32::I:T:::::N:Directory Server - Messages - U.S. English (en)::::0::
+idsldap.srv64bit62:idsldap.srv64bit62.rte:6.2.0.32::I:T:::::N:Directory Server - 64 bit Server::::0::
+idsldap.srv_max_cryptobase64bit62:idsldap.srv_max_cryptobase64bit62.rte:6.2.0.32::I:T:::::N:Directory Server - base Server (SSL)::::0::
+idsldap.srvbase64bit62:idsldap.srvbase64bit62.rte:6.2.0.32::I:T:::::N:Directory Server - Base Server::::0::
+idsldap.srvproxy64bit62:idsldap.srvproxy64bit62.rte:6.2.0.32::I:T:::::N:Directory Server - 64 bit Proxy Server::::0::
+idsldap.webadmin62:idsldap.webadmin62.rte:6.2.0.32::I:T:::::N:Directory Server - Web Administration::::0::
+idsldap.webadmin_max_crypto62:idsldap.webadmin_max_crypto62.rte:6.2.0.32::I:T:::::N:Directory Server - Web Administration (SSL)::::0::
+infocenter.man.EN_US.commands:infocenter.man.EN_US.commands:7.1.3.30::I:C:::::N:AIX manual commands - U.S. English::::0::
+infocenter.man.EN_US.files:infocenter.man.EN_US.files:7.1.3.30::I:C:::::N:AIX manual files - U.S. English::::0::
+infocenter.man.EN_US.libs:infocenter.man.EN_US.libs:7.1.3.30::I:C:::::N:AIX manual libs - U.S. English::::0::
+invscout.com:invscout.com:2.2.0.1::I:C:::::N:Inventory Scout Microcode Catalog::::0::
+invscout.ldb:invscout.ldb:2.2.0.2::I:C:::::N:Inventory Scout Logic Database::::0::
+invscout.msg.EN_US:invscout.msg.EN_US.rte:2.1.0.2::I:C:::::N:Inventory Scout Messages - U.S. English (UTF)::::0::
+invscout.msg.en_US:invscout.msg.en_US.rte:2.1.0.2::I:C:::::N:Inventory Scout Messages - U.S. English::::0::
+invscout.rte:invscout.rte:2.2.0.20::I:C:::::N:Inventory Scout Runtime::::0::
+lsof.base:lsof.base:6.1.0.4850::I:T:::::N:List Of Open Files::::0::
+lsof.license:lsof.license:6.1.0.4850::I:T:::::N:List Of Open Files::::0::
+lsof.man.en_US:lsof.man.en_US:6.1.0.4850::I:T:::::N:List Of Open Files Documentation - U.S. English::::0::
+lwi:lwi.runtime:7.1.3.0::I:C:::::N:Lightweight Infrastructure Runtime ::::0:1341:
+mcr.rte:mcr.rte:7.1.3.30::I:C:::::N:Metacluster Checkpoint and Restart ::::0:1441:
+ndaf.base:ndaf.base.admin:7.1.2.15::I:T:::::N:Network Data Administration Facility admin server ::::0:1316:
+ndaf.base:ndaf.base.client:7.1.2.15::I:T:::::N:Network Data Administration Facility client ::::0:1316:
+ndaf.base:ndaf.base.server:7.1.3.0::I:T:::::N:Network Data Administration Facility server ::::0:1341:
+ofed.core:ofed.core.rte:7.1.3.30::I:T:::::N:OFED Core Runtime Environment ::::0:1441:
+openpts.collector:openpts.collector:1.0.0.0::I:T:::::N:Open Platform Trust Services - collector::::0::
+openssh.base:openssh.base.client:6.0.0.6103::I:C:::::N:Open Secure Shell Commands::::0::
+openssh.base:openssh.base.server:6.0.0.6103::I:C:::::N:Open Secure Shell Server::::0::
+openssh.license:openssh.license:6.0.0.6103::I:C:::::N:Open Secure Shell License::::0::
+openssh.man.en_US:openssh.man.en_US:6.0.0.6103::I:C:::::N:Open Secure Shell Documentation - U.S. English::::0::
+openssh.msg.EN_US:openssh.msg.EN_US:6.0.0.6103::I:C:::::N:Open Secure Shell Messages - U.S. English (UTF)::::0::
+openssh.msg.en_US:openssh.msg.en_US:6.0.0.6103::I:C:::::N:Open Secure Shell Messages - U.S. English::::0::
+openssl.base:openssl.base:1.0.1.510::I:C:::::N:Open Secure Socket Layer::::0::
+openssl.license:openssl.license:1.0.1.510::I:C:::::N:Open Secure Socket License::::0::
+openssl.man.en_US:openssl.man.en_US:1.0.1.510::I:C:::::N:Open Secure Socket Layer::::0::
+perfagent.server:perfagent.server:7.1.3.0::I:C:::::N:Performance Agent Daemons & Utilities ::::0:1341:
+perfagent.tools:perfagent.tools:7.1.3.30::I:C:::::N:Local Performance Analysis & Control Commands ::::0:1441:
+perl.libext:perl.libext:2.3.0.15::I:C:::::N:Perl Library Extensions ::::0:1115:
+perl.man.en_US:perl.man.en_US:5.10.1.250::I:T:::::N:Perl Documentation - U.S. English::::0:1115:
+perl.rte:perl.rte:5.10.1.250::I:C:::::N:Perl Version 5 Runtime Environment::::0:1115:
+ppe.xprofiler:ppe.xprofiler:4.1.0.0::I:T:::::N:xprofiler Motif/Xwindow Style Performance Profiler::::0::
+printers:printers.bull1015.com:7.1.0.0::I:T:::::N:BULL Common Generic for HP-pcl5 and HP-pgl2 Emulations ::::0:1115:
+printers:printers.bull1015.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 1015 ::::0:1115:
+printers:printers.bull1021.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 1021 ::::0:1115:
+printers:printers.bull1025.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 1025 ::::0:1115:
+printers:printers.bull1070.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 1070 ::::0:1115:
+printers:printers.bull1625.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 1625 ::::0:1115:
+printers:printers.bull200.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 200 ::::0:1115:
+printers:printers.bull201.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 201 ::::0:1115:
+printers:printers.bull411.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 411 ::::0:1115:
+printers:printers.bull413.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 413 ::::0:1115:
+printers:printers.bull422.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 422 ::::0:1115:
+printers:printers.bull451.rte:7.1.0.0::I:T:::::N:Bull Compuprint 4/51 ::::0:1115:
+printers:printers.bull454.rte:7.1.0.0::I:T:::::N:Bull Compuprint 4/54 ::::0:1115:
+printers:printers.bull721.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 721 ::::0:1115:
+printers:printers.bull815.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 815 ::::0:1115:
+printers:printers.bull825.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 825 ::::0:1115:
+printers:printers.bull9142.rte:7.1.0.0::I:T:::::N:Bull Compuprint 914 ::::0:1115:
+printers:printers.bull9148.rte:7.1.0.0::I:T:::::N:Bull Compuprint 914 N ::::0:1115:
+printers:printers.bull922.com:7.1.0.0::I:T:::::N:BULL Common Generic Epson predef File ::::0:1115:
+printers:printers.bull922.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 922 ::::0:1115:
+printers:printers.bull923.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 923 ::::0:1115:
+printers:printers.bull924.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 924 ::::0:1115:
+printers:printers.bull924N.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 924 N ::::0:1115:
+printers:printers.bull956.rte:7.1.0.0::I:T:::::N:Bull Compuprint 956 ::::0:1115:
+printers:printers.bull970.com:7.1.0.0::I:T:::::N:Common Bull 970/1070 Fonts ::::0:1115:
+printers:printers.bull970.rte:7.1.0.0::I:T:::::N:Bull Compuprint PageMaster 970 ::::0:1115:
+printers:printers.bullpr88-vfu.rte:7.1.3.0::I:T:::::N:Bull PR-88 VFU Handling ::::0:1341:
+printers:printers.bullpr88.rte:7.1.0.0::I:T:::::N:Bull PR-88 ::::0:1115:
+printers:printers.bullpr90.rte:7.1.0.0::I:T:::::N:Bull PR-90 ::::0:1115:
+printers:printers.canlbp-A404F_JP.rte:7.1.0.0::I:T:::::N:Canon Laser Shot LBP-A404F Japan Data Stream::::0:1036:
+printers:printers.canlbp-A404PS.rte:7.1.0.0::I:T:::::N:Canon Laser Shot LBP-A404PS/Lite::::0:1036:
+printers:printers.canlbp-B406G.rte:7.1.0.0::I:T:::::N:Canon Laser Shot LBP-B406G::::0:1036:
+printers:printers.canlbp.rte:7.1.0.0::I:T:::::N:Canon Laser Shot LBP-B406/S/D,A404::::0:1036:
+printers:printers.dp2000.rte:7.1.0.0::I:T:::::N:Dataproducts BP2000 Line Printer::::0:1036:
+printers:printers.dp2665.rte:7.1.0.0::I:T:::::N:Dataproducts LZR 2665 Laser Printer::::0:1036:
+printers:printers.epsonLQ1600K_CN.rte:7.1.0.0::I:T:::::N:Epson LQ1600K Chinese (Simplified) Data Stream ::::0:1115:
+printers:printers.escpj84_JP.rte:7.1.3.0::I:T:::::N:ESC/P J84 Printer Support Japan Data Stream ::::0:1341:
+printers:printers.hindi.rte:7.1.0.0::I:T:::::N:Hindi UTF-8 Datastream Printing::::0:1036:
+printers:printers.hpJetDirect.attach:7.1.0.0::I:T:::::N:Hewlett-Packard JetDirect Network Printer Attachment ::::0:1115:
+printers:printers.hplj-2.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet II ::::0:1115:
+printers:printers.hplj-2500C.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 2500C Color Printer ::::0:1115:
+printers:printers.hplj-2p_CN.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet IIP Simplified Chinese Data Stream ::::0:1115:
+printers:printers.hplj-3.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet III ::::0:1115:
+printers:printers.hplj-3005.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 3005 ::::0:1115:
+printers:printers.hplj-3si.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet IIISi ::::0:1115:
+printers:printers.hplj-4+.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 4 Plus ::::0:1115:
+printers:printers.hplj-4+_KR.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 4+ Korean Data Stream ::::0:1115:
+printers:printers.hplj-4.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 4 ::::0:1115:
+printers:printers.hplj-4000.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 4000 ::::0:1115:
+printers:printers.hplj-4000_KR.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 4000 Korean Data Stream ::::0:1115:
+printers:printers.hplj-4250.rte:7.1.1.0::I:T:::::N:Hewlett-Packard LaserJet 4250 ::::0:1115:
+printers:printers.hplj-4500.rte:7.1.0.0::I:T:::::N:Hewlett-Packard Color LaserJet 4500 ::::0:1115:
+printers:printers.hplj-4700.rte:7.1.0.0::I:T:::::N:Hewlett-Packard Color LaserJet 4700 ::::0:1115:
+printers:printers.hplj-4_KR.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 4 Korean Data Stream ::::0:1115:
+printers:printers.hplj-4si.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 4si ::::0:1115:
+printers:printers.hplj-4si_KR.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 4si Korean Data Stream ::::0:1115:
+printers:printers.hplj-4v.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 4V ::::0:1115:
+printers:printers.hplj-4v_KR.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 4V Korean Data Stream ::::0:1115:
+printers:printers.hplj-5200.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 5200 ::::0:1115:
+printers:printers.hplj-5si.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 5si ::::0:1115:
+printers:printers.hplj-5siMopier.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 5si Mopier ::::0:1115:
+printers:printers.hplj-5siMopier_KR.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 5siMopier Korean Data Stream ::::0:1115:
+printers:printers.hplj-5si_KR.rte:7.1.0.0::I:T:::::N:Hewlett-Packard 5si Korean Data Stream ::::0:1115:
+printers:printers.hplj-8000.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 8000 ::::0:1115:
+printers:printers.hplj-8060.rte:7.1.1.0::I:T:::::N:Hewlett-Packard Color LaserJet 8060 ::::0:1115:
+printers:printers.hplj-8100.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 8100 ::::0:1115:
+printers:printers.hplj-8500.rte:7.1.0.0::I:T:::::N:Hewlett-Packard Color LaserJet 8500 ::::0:1115:
+printers:printers.hplj-D640.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet 5000 D640 Printer ::::0:1115:
+printers:printers.hplj-UTF8.rte:7.1.0.0::I:T:::::N:Hewlett Packard LaserJet IIp UTF-8 Data Stream ::::0:1115:
+printers:printers.hplj-c.rte:7.1.0.0::I:T:::::N:Hewlett-Packard LaserJet Color ::::0:1115:
+printers:printers.ibm-pages_JP.rte:7.1.0.0::I:T:::::N:IBM PAGES Printers Japan Data Stream::::0:1036:
+printers:printers.ibm2380-2.rte:7.1.0.0::I:T:::::N:IBM 2380 Plus printer (Model 2)::::0:1036:
+printers:printers.ibm2380.rte:7.1.0.0::I:T:::::N:IBM 2380 Personal Printer II::::0:1036:
+printers:printers.ibm2381-2.rte:7.1.0.0::I:T:::::N:IBM 2381 Plus printer (Model 2)::::0:1036:
+printers:printers.ibm2381.rte:7.1.0.0::I:T:::::N:IBM 2381 Personal Printer II::::0:1036:
+printers:printers.ibm2390-2.rte:7.1.0.0::I:T:::::N:IBM 2390 Plus printer (Model 2)::::0:1036:
+printers:printers.ibm2390.rte:7.1.0.0::I:T:::::N:IBM 2390 Personal Printer II::::0:1036:
+printers:printers.ibm2391-2.rte:7.1.0.0::I:T:::::N:IBM 2391 Plus printer (Model 2)::::0:1036:
+printers:printers.ibm2391.rte:7.1.0.0::I:T:::::N:IBM 2391 Personal Printer II::::0:1036:
+printers:printers.ibm3112.rte:7.1.0.0::I:T:::::N:IBM 3112 Page Printer::::0:1036:
+printers:printers.ibm3116.rte:7.1.0.0::I:T:::::N:IBM 3116 Page Printer::::0:1036:
+printers:printers.ibm3130.rte:7.1.0.0::I:T:::::N:IBM 3130 LaserPrinter::::0:1036:
+printers:printers.ibm3812-2.rte:7.1.0.0::I:T:::::N:IBM 3812 Model 2 Page Printer::::0:1036:
+printers:printers.ibm3816.rte:7.1.0.0::I:T:::::N:IBM 3816 Page Printer::::0:1036:
+printers:printers.ibm4019.rte:7.1.0.0::I:T:::::N:IBM 4019 LaserPrinter::::0:1036:
+printers:printers.ibm4019_AR.rte:7.1.0.0::I:T:::::N:IBM 4019 LaserPrinter Arabic Printer Fonts::::0:1036:
+printers:printers.ibm4019_JP.rte:7.1.0.0::I:T:::::N:IBM 4019 LaserPrinter Japanese Data Stream::::0:1036:
+printers:printers.ibm4019_KR.rte:7.1.0.0::I:T:::::N:IBM 4019 LaserPrinter Korean Data Stream::::0:1036:
+printers:printers.ibm4029.rte:7.1.0.0::I:T:::::N:IBM 4029 LaserPrinter::::0:1036:
+printers:printers.ibm4029_JP.rte:7.1.0.0::I:T:::::N:IBM 4029 LaserPrinter Japanese Data Stream::::0:1036:
+printers:printers.ibm4037.rte:7.1.0.0::I:T:::::N:IBM 4037 LP printer::::0:1036:
+printers:printers.ibm4039.rte:7.1.0.0::I:T:::::N:IBM 4039 LaserPrinter::::0:1036:
+printers:printers.ibm4070.rte:7.1.0.0::I:T:::::N:IBM 4070 IJ Printer::::0:1036:
+printers:printers.ibm4072.rte:7.1.0.0::I:T:::::N:IBM 4072 ExecJet::::0:1036:
+printers:printers.ibm4076.rte:7.1.0.0::I:T:::::N:IBM 4076 IJ printer::::0:1036:
+printers:printers.ibm4079.rte:7.1.0.0::I:T:::::N:IBM 4079 Color Jetprinter PS::::0:1036:
+printers:printers.ibm4201-2.rte:7.1.0.0::I:T:::::N:IBM 4201 Model 2 Proprinter II::::0:1036:
+printers:printers.ibm4201-3.rte:7.1.0.0::I:T:::::N:IBM 4201 Model 3 Proprinter III::::0:1036:
+printers:printers.ibm4202-2.rte:7.1.0.0::I:T:::::N:IBM 4202 Model 2 Proprinter II XL::::0:1036:
+printers:printers.ibm4202-3.rte:7.1.0.0::I:T:::::N:IBM 4202 Model 3 Proprinter III XL::::0:1036:
+printers:printers.ibm4207-2.rte:7.1.0.0::I:T:::::N:IBM 4207 Model 2 Proprinter X24E::::0:1036:
+printers:printers.ibm4208-2.rte:7.1.0.0::I:T:::::N:IBM 4208 Model 2 Proprinter XL24E::::0:1036:
+printers:printers.ibm4208-502.rte:7.1.0.0::I:T:::::N:IBM 4208 Model 502 Proprinter XL24EK::::0:1036:
+printers:printers.ibm4212.rte:7.1.0.0::I:T:::::N:IBM 4212 Proprinter 24P::::0:1036:
+printers:printers.ibm4216-31.rte:7.1.0.0::I:T:::::N:IBM 4216 Personal Page Printer, Model 031::::0:1036:
+printers:printers.ibm4216-510.rte:7.1.0.0::I:T:::::N:IBM 4216 Model 510::::0:1036:
+printers:printers.ibm4224.rte:7.1.0.0::I:T:::::N:IBM 4224 Printer, Models 301, 302, 3C2, 3E3::::0:1036:
+printers:printers.ibm4226.rte:7.1.0.0::I:T:::::N:IBM 4226 Printer::::0:1036:
+printers:printers.ibm4234.rte:7.1.0.0::I:T:::::N:IBM 4234 Dot Band Printer, Model 013::::0:1036:
+printers:printers.ibm4234_AR.rte:7.1.0.0::I:T:::::N:IBM 4234 Dot Band Printer, Model 13 Arabic Printer Fonts::::0:1036:
+printers:printers.ibm4247.rte:7.1.0.0::I:T:::::N:IBM 4247 Printer::::0:1036:
+printers:printers.ibm4247_HI.rte:7.1.0.0::I:T:::::N:IBM 4247 Printer - Hindi UTF-8 Datastream::::0:1036:
+printers:printers.ibm4303.rte:7.1.0.0::I:T:::::N:IBM Network Color Printer ::::0:1115:
+printers:printers.ibm4312.rte:7.1.0.0::I:T:::::N:IBM Network Printer 12 ::::0:1115:
+printers:printers.ibm4317.rte:7.1.0.0::I:T:::::N:IBM Network Printer 17 ::::0:1115:
+printers:printers.ibm4320.rte:7.1.0.0::I:T:::::N:IBM InfoPrint 20 ::::0:1115:
+printers:printers.ibm4324.rte:7.1.0.0::I:T:::::N:IBM Network Printer 24 ::::0:1115:
+printers:printers.ibm4332.rte:7.1.0.0::I:T:::::N:IBM InfoPrint 32 ::::0:1115:
+printers:printers.ibm4332_HI.rte:7.1.0.0::I:T:::::N:IBM InfoPrint32 Hindi UTF-8 Datastream ::::0:1115:
+printers:printers.ibm4340.rte:7.1.0.0::I:T:::::N:IBM InfoPrint 40 ::::0:1115:
+printers:printers.ibm5202.rte:7.1.0.0::I:T:::::N:IBM 5202 Quietwriter III::::0:1036:
+printers:printers.ibm5204.rte:7.1.0.0::I:T:::::N:IBM 5204 Quickwriter::::0:1036:
+printers:printers.ibm5327.rte:7.1.0.0::I:T:::::N:IBM 5327 Model 011::::0:1036:
+printers:printers.ibm5572.rte:7.1.0.0::I:T:::::N:IBM 5572 Model B02::::0:1036:
+printers:printers.ibm5573.rte:7.1.0.0::I:T:::::N:IBM 5573 Model H02::::0:1036:
+printers:printers.ibm5575.com:7.1.0.0::I:T:::::N:IBM 5575 Model B02/F02 Device Driver::::0:1036:
+printers:printers.ibm5575_KR.rte:7.1.0.0::I:T:::::N:IBM 5575 Model B02/F02 Korean Data Stream::::0:1036:
+printers:printers.ibm5575_TW.rte:7.1.0.0::I:T:::::N:IBM 5575 Model B02/F02 Traditional Chinese Data Stream::::0:1036:
+printers:printers.ibm5577.com:7.1.0.0::I:T:::::N:IBM 5577 Model B02/F02/H02/G02/FU2/J02/K02 Device Driver::::0:1036:
+printers:printers.ibm5577_KR.rte:7.1.0.0::I:T:::::N:IBM 5577 Model B02/F02/H02/G02/FU2 Korean Data Stream::::0:1036:
+printers:printers.ibm5577_TW.rte:7.1.0.0::I:T:::::N:IBM 5577 Model B02/F02/H02/G02/FU2 Trad. Chinese Data Stream::::0:1036:
+printers:printers.ibm5579.rte:7.1.0.0::I:T:::::N:IBM 5579 Model H02/K02::::0:1036:
+printers:printers.ibm5584.rte:7.1.0.0::I:T:::::N:IBM 5584 Model G02/H02::::0:1036:
+printers:printers.ibm5585.com:7.1.0.0::I:T:::::N:IBM 5585 Model H01 Device Driver::::0:1036:
+printers:printers.ibm5585_TW.rte:7.1.0.0::I:T:::::N:IBM 5585 Model H01 Traditional Chinese Data Stream::::0:1036:
+printers:printers.ibm5587.rte:7.1.0.0::I:T:::::N:IBM 5587 Model G01::::0:1036:
+printers:printers.ibm5587H.rte:7.1.0.0::I:T:::::N:IBM 5587 Model H01::::0:1036:
+printers:printers.ibm5589.rte:7.1.0.0::I:T:::::N:IBM 5589 Model H01::::0:1036:
+printers:printers.ibm6180.rte:7.1.0.0::I:T:::::N:IBM 6180 Color Plotter::::0:1036:
+printers:printers.ibm6182.rte:7.1.0.0::I:T:::::N:IBM 6182 Auto Feed Color Plotter::::0:1036:
+printers:printers.ibm6184.rte:7.1.0.0::I:T:::::N:IBM 6184 Color Plotter::::0:1036:
+printers:printers.ibm6185-1.rte:7.1.0.0::I:T:::::N:IBM 6185-1 Color Plotter::::0:1036:
+printers:printers.ibm6185-2.rte:7.1.0.0::I:T:::::N:IBM 6185-2 Color Plotter::::0:1036:
+printers:printers.ibm6186.rte:7.1.0.0::I:T:::::N:IBM 6186 Color Plotter::::0:1036:
+printers:printers.ibm6252.rte:7.1.0.0::I:T:::::N:IBM 6252 Impactwriter::::0:1036:
+printers:printers.ibm6262.rte:7.1.0.0::I:T:::::N:IBM 6262 Printer::::0:1036:
+printers:printers.ibm6400.rte:7.1.0.0::I:T:::::N:IBM 6400 Printer::::0:1036:
+printers:printers.ibm6400_HI.rte:7.1.0.0::I:T:::::N:IBM 6400 Printer - Hindi UTF-8 Datastream::::0:1036:
+printers:printers.ibm7372.rte:7.1.0.0::I:T:::::N:IBM 7372 Color Plotter::::0:1036:
+printers:printers.ibmNetColor.attach:7.1.0.0::I:T:::::N:IBM Network Color Printer Attachment ::::0:1115:
+printers:printers.ibmNetPrinter.attach:7.1.0.0::I:T:::::N:IBM Network Printer Attachment ::::0:1115:
+printers:printers.ibmgb18030_CN.rte:7.1.2.0::I:T:::::N:General Printer GB18030 Data Stream ::::0:1241:
+printers:printers.ibmuniversal.rte:7.1.1.15::I:T:::::N:Universal Printer UTF-8 Data Stream ::::0:1215:
+printers:printers.lex2380-3.rte:7.1.0.0::I:T:::::N:Lexmark 2380 Plus printer (Model 3)::::0:1036:
+printers:printers.lex2381-3.rte:7.1.0.0::I:T:::::N:Lexmark 2381 Plus printer (Model 3)::::0:1036:
+printers:printers.lex2390-3.rte:7.1.0.0::I:T:::::N:Lexmark 2390 Plus printer (Model 3)::::0:1036:
+printers:printers.lex2391-3.rte:7.1.0.0::I:T:::::N:Lexmark 2391 Plus printer (Model 3)::::0:1036:
+printers:printers.lex4039+.rte:7.1.0.0::I:T:::::N:Lexmark 4039 plus LaserPrinter::::0:1036:
+printers:printers.lex4047.rte:7.1.0.0::I:T:::::N:Lexmark ValueWriter 600::::0:1036:
+printers:printers.lex4049.rte:7.1.0.0::I:T:::::N:Lexmark Optra LaserPrinter::::0:1036:
+printers:printers.lex4076-2c.rte:7.1.0.0::I:T:::::N:Lexmark ExecJet IIc::::0:1036:
+printers:printers.lex4079+.rte:7.1.0.0::I:T:::::N:Lexmark 4079 Color Jetprinter Plus::::0:1036:
+printers:printers.lex4227.rte:7.1.0.0::I:T:::::N:Lexmark Forms Printer 4227::::0:1036:
+printers:printers.lexOptra+.rte:7.1.0.0::I:T:::::N:Lexmark Optra Plus Laser Printer::::0:1036:
+printers:printers.lexOptraC.rte:7.1.0.0::I:T:::::N:Lexmark Optra C Color Laser Printer::::0:1036:
+printers:printers.lexOptraC1200.rte:7.1.0.0::I:T:::::N:Lexmark Optra Color 1200 Printer::::0:1036:
+printers:printers.lexOptraC40.rte:7.1.0.0::I:T:::::N:Lexmark Optra Color 40 Printer::::0:1036:
+printers:printers.lexOptraC45.rte:7.1.0.0::I:T:::::N:Lexmark Optra Color 45 Printer::::0:1036:
+printers:printers.lexOptraE.rte:7.1.0.0::I:T:::::N:Lexmark Optra E Laser Printer::::0:1036:
+printers:printers.lexOptraE310.rte:7.1.0.0::I:T:::::N:Lexmark Optra E310 Laser Printer::::0:1036:
+printers:printers.lexOptraEp.rte:7.1.0.0::I:T:::::N:Lexmark Optra Ep Laser Printer::::0:1036:
+printers:printers.lexOptraK12.rte:7.1.0.0::I:T:::::N:Lexmark Optra K 1220 Laser Printer::::0:1036:
+printers:printers.lexOptraM410.rte:7.1.0.0::I:T:::::N:Lexmark Optra M410 Laser Printer::::0:1036:
+printers:printers.lexOptraN.rte:7.1.0.0::I:T:::::N:Lexmark Optra N Laser Printer::::0:1036:
+printers:printers.lexOptraS.rte:7.1.0.0::I:T:::::N:Lexmark Optra S Laser Printer::::0:1036:
+printers:printers.lexOptraSC.rte:7.1.0.0::I:T:::::N:Lexmark Optra SC Color Laser Printer::::0:1036:
+printers:printers.lexOptraSe.rte:7.1.0.0::I:T:::::N:Lexmark Optra Se Laser Printer::::0:1036:
+printers:printers.lexOptraT.rte:7.1.0.0::I:T:::::N:Lexmark Optra T Laser Printer Family::::0:1036:
+printers:printers.lexOptraW810.rte:7.1.0.0::I:T:::::N:Lexmark Optra W810 Laser Printer::::0:1036:
+printers:printers.lips4_JP.rte:7.1.0.0::I:T:::::N:LIPS4 Printers Japan Data Stream::::0:1036:
+printers:printers.oki400ps2_JP.rte:7.1.0.0::I:T:::::N:OKI Japanese PostScript Printers Japan Data Stream::::0:1036:
+printers:printers.oki801ps.rte:7.1.0.0::I:T:::::N:OKI Microline 801PS, 801PS-F, 801PSII/-F, 800PSIILT::::0:1036:
+printers:printers.p9012.rte:7.1.0.0::I:T:::::N:Printronix P9012 Line Printer::::0:1036:
+printers:printers.qms100.rte:7.1.0.0::I:T:::::N:QMS ColorScript 100, Model 20::::0:1036:
+printers:printers.starAR2463_CN.rte:7.1.0.0::I:T:::::N:Star AR2463 Chinese (Simplified) Data Stream::::0:1036:
+printers:printers.ti2115.rte:7.1.0.0::I:T:::::N:Texas Instruments OmniLaser 2115 Page Printer::::0:1036:
+printers.msg.EN_US:printers.msg.EN_US.rte:7.1.3.0::I:C:::::N:Printer Backend Messages - U.S. English (UTF)::::0::
+printers.msg.en_US:printers.msg.en_US.rte:7.1.3.0::I:C:::::N:Printer Backend Messages - U.S. English ::::0:1341:
+printers.rte:printers.rte:7.1.3.30::I:C:::::N:Printer Backend ::::0:1441:
+radius.base:radius.base.rte:7.1.3.0::I:T:::::N:RADIUS Runtime ::::0:1341:
+rpm.rte:rpm.rte:3.0.5.52::I:C:::::N:RPM Package Manager::::0::
+rsct.basic:rsct.basic.hacmp:3.2.0.0::I:C:::::N:RSCT Basic Function (HACMP/ES Support)::::0::
+rsct.basic:rsct.basic.rte:3.2.0.0::I:C:::::N:RSCT Basic Function::::0::
+rsct.basic:rsct.basic.sp:3.2.0.0::I:C:::::N:RSCT Basic Function (PSSP Support)::::0::
+rsct.compat.basic:rsct.compat.basic.hacmp:3.2.0.0::I:C:::::N:RSCT Event Management Basic Function (HACMP/ES Support)::::0::
+rsct.compat.basic:rsct.compat.basic.rte:3.2.0.0::I:C:::::N:RSCT Event Management Basic Function::::0::
+rsct.compat.basic:rsct.compat.basic.sp:3.2.0.0::I:C:::::N:RSCT Event Management Basic Function (PSSP Support)::::0::
+rsct.compat.clients:rsct.compat.clients.hacmp:3.2.0.0::I:C:::::N:RSCT Event Management Client Function (HACMP/ES Support)::::0::
+rsct.compat.clients:rsct.compat.clients.rte:3.2.0.0::I:C:::::N:RSCT Event Management Client Function::::0::
+rsct.compat.clients:rsct.compat.clients.sp:3.2.0.0::I:C:::::N:RSCT Event Management Client Function (PSSP Support)::::0::
+rsct.core:rsct.core.auditrm:3.2.0.0::I:C:::::N:RSCT Audit Log Resource Manager::::0::
+rsct.core:rsct.core.errm:3.2.0.0::I:C:::::N:RSCT Event Response Resource Manager::::0::
+rsct.core:rsct.core.fsrm:3.2.0.0::I:C:::::N:RSCT File System Resource Manager::::0::
+rsct.core:rsct.core.gui:3.2.0.0::I:C:::::N:RSCT Graphical User Interface::::0::
+rsct.core:rsct.core.hostrm:3.2.0.0::I:C:::::N:RSCT Host Resource Manager::::0::
+rsct.core:rsct.core.lprm:3.2.0.0::I:C:::::N:RSCT Least Privilege Resource Manager::::0::
+rsct.core:rsct.core.microsensor:3.2.0.0::I:C:::::N:RSCT MicroSensor Resource Manager::::0::
+rsct.core:rsct.core.rmc:3.2.0.0::I:C:::::N:RSCT Resource Monitoring and Control::::0::
+rsct.core:rsct.core.sec:3.2.0.0::I:C:::::N:RSCT Security::::0::
+rsct.core:rsct.core.sensorrm:3.2.0.0::I:C:::::N:RSCT Sensor Resource Manager::::0::
+rsct.core:rsct.core.sr:3.2.0.0::I:C:::::N:RSCT Registry::::0::
+rsct.core:rsct.core.utils:3.2.0.0::I:C:::::N:RSCT Utilities::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.basic.rte:3.1.0.0::I:C:::::N:RSCT Basic Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.auditrm:3.1.0.0::I:C:::::N:RSCT Audit Log RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.errm:3.1.0.0::I:C:::::N:RSCT Event Response RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.fsrm:3.1.0.0::I:C:::::N:RSCT File System RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.gui:3.1.0.0::I:C:::::N:RSCT GUI Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.hostrm:3.1.0.0::I:C:::::N:RSCT Host RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.lprm:3.1.0.0::I:C:::::N:RSCT LPRM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.microsensorrm:3.1.0.0::I:C:::::N:RSCT MicorSensor RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.rmc:3.1.0.0::I:C:::::N:RSCT RMC Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.sec:3.1.0.0::I:C:::::N:RSCT Security Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.sensorrm:3.1.0.0::I:C:::::N:RSCT Sensor RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.sr:3.1.0.0::I:C:::::N:RSCT Registry Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.core.utils:3.1.0.0::I:C:::::N:RSCT Utilities Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.exp.cimrm:3.1.0.0::I:T:::::N:RSCT CIM RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.EN_US:rsct.msg.EN_US.opt.storagerm:3.1.0.0::I:C:::::N:RSCT Storage RM Msgs - U.S. English (UTF)::::0::
+rsct.msg.en_US:rsct.msg.en_US.basic.rte:3.1.0.0::I:C:::::N:RSCT Basic Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.auditrm:3.1.0.0::I:C:::::N:RSCT Audit Log RM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.errm:3.1.0.0::I:C:::::N:RSCT Event Response RM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.fsrm:3.1.0.0::I:C:::::N:RSCT File System RM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.gui:3.1.0.0::I:C:::::N:RSCT GUI Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.gui.com:3.1.0.0::I:C:::::N:RSCT GUI JAVA Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.hostrm:3.1.0.0::I:C:::::N:RSCT Host RM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.lprm:3.1.0.0::I:C:::::N:RSCT LPRM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.microsensorrm:3.1.0.0::I:C:::::N:RSCT MicorSensor RM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.rmc:3.1.0.0::I:C:::::N:RSCT RMC Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.rmc.com:3.1.0.0::I:C:::::N:RSCT RMC JAVA Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.sec:3.1.0.0::I:C:::::N:RSCT Security Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.sensorrm:3.1.0.0::I:C:::::N:RSCT Sensor RM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.sr:3.1.0.0::I:C:::::N:RSCT Registry Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.core.utils:3.1.0.0::I:C:::::N:RSCT Utilities Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.exp.cimrm:3.1.0.0::I:T:::::N:RSCT CIM RM Msgs - U.S. English::::0::
+rsct.msg.en_US:rsct.msg.en_US.opt.storagerm:3.1.0.0::I:C:::::N:RSCT Storage RM Msgs - U.S. English::::0::
+rsct.opt.fence:rsct.opt.fence.blade:3.2.0.0::I:T:::::N:RSCT BLADE Fence Agent::::0::
+rsct.opt.fence:rsct.opt.fence.hmc:3.2.0.0::I:T:::::N:RSCT Fence Agent::::0::
+rsct.opt.stackdump:rsct.opt.stackdump:3.2.0.0::I:C:::::N:RSCT Stackdump module::::0::
+rsct.opt.storagerm:rsct.opt.storagerm:3.2.0.0::I:C:::::N:RSCT Storage Resource Manager::::0::
+security.acf:security.acf:7.1.3.30::I:C:::::b:ACF/PKCS11 Device Driver ::::0:1441:
+security.pkcs11:security.pkcs11:7.1.3.15::I:T:::::N:PKCS11 Libraries ::::0:1415:
+security.pkcs11.tools:security.pkcs11.tools:7.1.1.15::I:T:::::N:PKCS11 Key Management Tool ::::0:1216:
+sysmgt.cfgassist:sysmgt.cfgassist:7.1.3.0::I:C:::::N:Configuration Assistant ::::0:1341:
+sysmgt.cim.providers:sysmgt.cim.providers.metrics:1.2.9.65::I:C:::::N:Metrics Providers for AIX OS::::0::
+sysmgt.cim.providers:sysmgt.cim.providers.osbase:1.2.9.65::I:C:::::N:Base Providers for AIX OS::::0::
+sysmgt.cim.providers:sysmgt.cim.providers.scc:1.2.9.65::I:C:::::N:Security Control Compliance Providers for AIX OS::::0::
+sysmgt.cim.providers:sysmgt.cim.providers.smash:1.2.9.65::I:C:::::N:Smash Providers for AIX OS::::0::
+sysmgt.cim.smisproviders:sysmgt.cim.smisproviders.hba_hdr:1.2.2.65::I:C:::::N:SMI-S HBA&HDR Providers for AIX OS::::0::
+sysmgt.cim.smisproviders:sysmgt.cim.smisproviders.hhr:1.2.2.65::I:C:::::N:SMI-S HHR Providers for AIX OS::::0::
+sysmgt.cim.smisproviders:sysmgt.cim.smisproviders.vblksrv:1.2.2.65::I:C:::::N:SMI-S Storage Virtualizer Providers for AIX OS::::0::
+sysmgt.cimserver.pegasus:sysmgt.cimserver.pegasus.rte:2.9.1.65::I:C:::::N:Pegasus CIM Server Runtime Environment::::0::
+sysmgt.pconsole:sysmgt.pconsole.apps.pda:7.1.3.0::I:C:::::N:System P Console - Problem Determination Advisor ::::0:1341:
+sysmgt.pconsole:sysmgt.pconsole.apps.wdcem:7.1.3.0::I:C:::::N:System P Console - Web-Based DCEM ::::0:1341:
+sysmgt.pconsole:sysmgt.pconsole.apps.wrbac:7.1.3.0::I:C:::::N:System P Console - Web-Based RBAC ::::0:1341:
+sysmgt.pconsole:sysmgt.pconsole.apps.wsmit:7.1.3.15::I:C:::::N:System P Console - Web-Based SMIT ::::0:1415:
+sysmgt.pconsole:sysmgt.pconsole.rte:7.1.3.30::I:C:::::N:System P Console Runtime ::::0:1441:
+sysmgtlib.framework:sysmgtlib.framework.core:7.1.3.0::I:C:::::N:System Management Service Libraries Common Code ::::0:1341:
+sysmgtlib.libraries:sysmgtlib.libraries.apps:7.1.3.0::I:C:::::N:System Management Service Libraries Application Code ::::0:1341:
+tcl.base:tcl.base:8.4.7.0::I:C:::::N:Binary executable files of Tcl::::0::
+tcl.man.en_US:tcl.man.en_US:8.4.7.0::I:C:::::N:Tcl man page documentation::::0::
+tivoli.tivguid:tivoli.tivguid:1.3.4.1::I:T:::::N:IBM Tivoli GUID on AIX::::0::
+tk.base:tk.base:8.4.7.0::I:C:::::N:Binary executable files of Tk::::0::
+tk.man.en_US:tk.man.en_US:8.4.7.0::I:C:::::N:Tk man page documentation::::0::
+udapl:udapl.rte:7.1.3.30::I:T:::::N:uDAPL ::::0:1441:
+wio.common:wio.common:7.1.3.30::I:C:::::N:Common I/O Support for Workload Partitions ::::0:1441:
+wio.fcp:wio.fcp:7.1.3.15::I:C:::::N:FC I/O Support for Workload Partitions ::::0:1415:
+wio.vscsi:wio.vscsi:7.1.1.15::I:C:::::N:VSCSI I/O Support for Workload Partitions ::::0:1216:
+xlC.aix61:xlC.aix61.rte:12.1.0.1::I:C:::::N:IBM XL C++ Runtime for AIX 6.1 and 7.1 ::::0::
+xlC.cpp:xlC.cpp:9.0.0.0::I:C:::::N:C for AIX Preprocessor::::0::
+xlC.msg.EN_US.cpp:xlC.msg.EN_US.cpp:9.0.0.0::I:C:::::N:C for AIX Preprocessor Messages--U.S. English UTF::::0::
+xlC.msg.en_US:xlC.msg.en_US.rte:12.1.0.1::I:C:::::N:IBM XL C++ Runtime Messages--U.S. English ::::0::
+xlC.msg.en_US.cpp:xlC.msg.en_US.cpp:9.0.0.0::I:C:::::N:C for AIX Preprocessor Messages--U.S. English::::0::
+xlC.rte:xlC.rte:12.1.0.1::I:C:::::N:IBM XL C++ Runtime for AIX ::::0::
+xlC.sup.aix50.rte:xlC.sup.aix50.rte:9.0.0.1::I:C:::::N:XL C/C++ Runtime for AIX 5.2::::0::
+xlfrte:xlfrte:14.1.0.3::I:T:::::N:XL Fortran Runtime Environment ::::0::
+xlfrte.aix53:xlfrte.aix53:14.1.0.3::I:T:::::N:XL Fortran Runtime Environment AIX 5.3 Libraries ::::0::
+xlfrte.msg.EN_US:xlfrte.msg.EN_US:14.1.0.3::I:T:::::N:XL Fortran Runtime Environment Messages - U.S. English UTF-8 ::::0::
+xlfrte.msg.en_US:xlfrte.msg.en_US:14.1.0.3::I:T:::::N:XL Fortran Runtime Messages - U.S. English ::::0::
+xlsmp.aix53.rte:xlsmp.aix53.rte:3.1.0.6::I:C:::::N:SMP Runtime Libraries for AIX 5.3 ::::0::
+xlsmp.msg.EN_US.rte:xlsmp.msg.EN_US.rte:3.1.0.6::I:C:::::N:XL SMP Runtime Messages - U.S. English UTF-8 ::::0::
+xlsmp.msg.en_US.rte:xlsmp.msg.en_US.rte:3.1.0.6::I:C:::::N:XL SMP Runtime Messages - U.S. English ::::0::
+xlsmp.rte:xlsmp.rte:3.1.0.6::I:C:::::N:SMP Runtime Library ::::0::
