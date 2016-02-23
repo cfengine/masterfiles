@@ -28,6 +28,15 @@ bundle common inventory_linux
       # this is the same as the original file for non-links
       "proc_1_process" string => filestat($(proc_1_cmdline), "linktarget");
 
+    any::
+      "proc_routes" data => data_readstringarrayidx("/proc/net/route",
+                                                    "#[^\n]*","\s+",40,4k),
+        ifvarclass => fileexists("/proc/net/route");
+      "routeidx" slist => getindices("proc_routes");
+      "dgw_ipv4_iface" string => "$(proc_routes[$(routeidx)][0])",
+        comment => "Name of the interface where default gateway is routed",
+        ifvarclass => strcmp("$(proc_routes[$(routeidx)][1])", "00000000");
+
   classes:
 
     any::
