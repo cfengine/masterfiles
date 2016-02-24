@@ -9,7 +9,7 @@
 ## pkgsrc package module for cfengine
 
 # Set up mock environment if necessary
-if [ -n $CFENGINE_TEST_PKGSRC_MOCK ]; then
+if [ -n "$CFENGINE_TEST_PKGSRC_MOCK" ]; then
     alias pkgin='./mock_pkgin'
     alias pkg_info='./mock_pkg_info'
 fi
