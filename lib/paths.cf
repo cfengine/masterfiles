@@ -94,6 +94,7 @@ bundle common paths
       "path[npm]"      string => "/usr/local/bin/npm";
       "path[pip]"      string => "/usr/local/bin/pip";
       "path[virtualenv]" string => "/usr/local/bin/virtualenv";
+      "path[automount]" string => "/usr/sbin/automount";
 
     _have_bin_env::
       "path[env]"      string => "/bin/env";
