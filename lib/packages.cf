@@ -1494,7 +1494,7 @@ body package_method freebsd
       package_changes => "individual";
 
       # Could use rpm for this
-      package_list_command => "/usr/sbin/pkg_info";
+      package_list_command => "/usr/sbin/pkg info";
 
       # Remember to escape special characters like |
 
@@ -1508,8 +1508,8 @@ body package_method freebsd
 
       package_name_convention => "$(name)-$(version)";
 
-      package_add_command => "/usr/sbin/pkg_add -r";
-      package_delete_command => "/usr/sbin/pkg_delete";
+      package_add_command => "/usr/sbin/pkg install -y";
+      package_delete_command => "/usr/sbin/pkg delete -y";
 }
 
 body package_method freebsd_portmaster
@@ -1537,7 +1537,7 @@ body package_method freebsd_portmaster
 {
       package_changes => "individual";
 
-      package_list_command => "/usr/sbin/pkg_info";
+      package_list_command => "/usr/sbin/pkg info";
 
       package_list_name_regex    => "([^\s]+)-.*";
       package_list_version_regex => "[^\s]+-([^\s]+).*";
@@ -1860,15 +1860,15 @@ body package_method generic
 
     freebsd::
       package_changes => "individual";
-      package_list_command => "/usr/sbin/pkg_info";
+      package_list_command => "/usr/sbin/pkg info";
       package_list_name_regex    => "([^\s]+)-.*";
       package_list_version_regex => "[^\s]+-([^\s]+).*";
       package_name_regex    => "([^\s]+)-.*";
       package_version_regex => "[^\s]+-([^\s]+).*";
       package_installed_regex => ".*";
       package_name_convention => "$(name)-$(version)";
-      package_add_command => "/usr/sbin/pkg_add -r";
-      package_delete_command => "/usr/sbin/pkg_delete";
+      package_add_command => "/usr/sbin/pkg install -y";
+      package_delete_command => "/usr/sbin/pkg delete";
 
     alpinelinux::
       package_changes => "bulk";

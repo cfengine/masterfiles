@@ -59,12 +59,19 @@ read_options() {
                     fi
                     continue
                     ;;
+                PackageType*)
+                    TYP="${VALUE}"
+                    ;;
                 *)
                     fatal "Invalid input: '${KEYWORD}'."
                     ;;
             esac
             if [ -n "${KEYWORD}" ] && [ -n "${VALUE}" ] ; then
-                INPUTLIST="${INPUTLIST} ${KEYWORD}=${VALUE}"
+                if [ -n "${INPUTLIST}" ] ; then
+                    INPUTLIST="${INPUTLIST} ${KEYWORD}=${VALUE}"
+                else
+                    INPUTLIST="${KEYWORD}=${VALUE}"
+                fi
             fi
         fi
     done
@@ -102,6 +109,9 @@ process_inputs() {
                     fatal "Bad Input: Architecture ${VALUE} does not match ${DEFARCH}."
                 fi
                 ;;
+            PackageType*)
+                TYP="${VALUE}"
+                ;;
             *)
                 fatal "Invalid input: '${INPUT}'."
                 ;;
@@ -110,6 +120,9 @@ process_inputs() {
 }
 
 get_package_data() {
+    if [ -n "${NAM}" ] && [ -z "${PKG}" ] ; then
+        PKG="${NAM}"
+    fi
     if [ -n "${PKG}" ] ; then
         case "${PKG}" in
             /*) # File Path.  It's a file
@@ -129,7 +142,7 @@ get_package_data() {
         if [ "${TYP}" = 'repo' ] ; then
             PKGNAM=`basename "${PKG}" | sed -r -e 's/^([A-Za-z0-9_-]+)-[0-9a-z.,_]+/\1/'`
             PKGVER=`basename "${PKG}" | sed -r -e 's/^[A-Za-z0-9_-]+-([0-9a-z.,_]+)/\1/' -e 's/\.(tgz|(tar\.)?gz|txz|zip)$//'`
-            if [ -z "`echo ${PKGVER} | grep -E '[0-9]'`" ] ; then 
+            if [ -z "`echo ${PKGVER} | grep -E '^[0-9]'`" ] ; then 
                 if [ "${PKGNAM}" != "${PKGVER}" ] ;  then
                     PKGNAM="${PKGNAM}-${PKGVER}"
                 fi
