@@ -415,6 +415,7 @@ bundle common paths
       "path[apt_key]"             string => "/usr/bin/apt-key";
       "path[aptitude]"            string => "/usr/bin/aptitude";
       "path[dpkg]"                string => "/usr/bin/dpkg";
+      "path[dpkg_divert]"         string => "/usr/bin/dpkg-divert";
       "path[groupadd]"            string => "/usr/sbin/groupadd";
       "path[groupdel]"            string => "/usr/sbin/groupdel";
       "path[groupmod]"            string => "/usr/sbin/groupmod";
