@@ -8,9 +8,25 @@ dnl ##########################################################################
 
 AC_PREREQ(2.59)
 
-define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
+m4_define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
 
-AC_INIT([cfengine-masterfiles], [3.8.2])
+m4_define([version_from_env], m4_esyscmd_s([echo $EXPLICIT_VERSION]))
+m4_ifblank(version_from_env, [
+    m4_define([version_from_detect], m4_esyscmd_s([3rdparty/core/determine-version.py]))
+    m4_if(m4_sysval, 0, [], [
+        m4_fatal([Could not determine CFEngine version. Please set EXPLICIT_VERSION in the environment.])
+    ])
+    m4_define([version], version_from_detect[]a1.revision)
+    m4_undefine([version_from_detect])
+], [
+    m4_define([version], version_from_env)
+])
+
+AC_INIT([cfengine-masterfiles], version)
+
+m4_undefine([revision])
+m4_undefine([version])
+m4_undefine([version_from_env])
 
 AC_CANONICAL_TARGET
 
@@ -152,13 +168,37 @@ do
 done
 AC_SUBST(MASTERFILES_TESTS)
 
-MASTERFILES_INSTALL_TARGETS=`echo $srcdir/*.cf`
+MASTERFILES_INSTALL_TARGETS=
+for j in `echo $srcdir/*.cf`
+do
+    # Only add those that don't have a corresponding .in file.
+    # They will be added later.
+    if ! test -f "$j.in"
+    then
+        MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
+    fi
+done
+for j in `echo $srcdir/*.cf.in`
+do
+    # Add .in files, but without the .in suffix.
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $j | sed -e 's/\.in$//'`"
+done
 
-for i in cfe_internal controls inventory lib services sketches/meta update
+for i in cfe_internal controls inventory lib services sketches/meta
 do
     for j in `find "$srcdir/$i" -name '*.cf'`
     do
-        MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
+        # Only add those that don't have a corresponding .in file.
+        # They will be added later.
+        if ! test -f "$j.in"
+        then
+            MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
+        fi
+    done
+    for j in `find "$srcdir/$i" -name '*.cf.in'`
+    do
+        # Add .in files, but without the .in suffix.
+        MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $j | sed -e 's/\.in$//'`"
     done
 done
 for i in templates
@@ -182,9 +222,13 @@ dnl Now make the Makefiles
 dnl ######################################################################
 
 AC_CONFIG_FILES([Makefile
+                controls/3.6/update_def.cf
+                controls/update_def.cf
                 modules/packages/Makefile
+                promises.cf
                 tests/acceptance/Makefile
-                tests/unit/Makefile])
+                tests/unit/Makefile
+])
 
 AC_OUTPUT
 

@@ -1,38 +1,71 @@
 bundle common update_def
 {
   classes:
+    !feature_def_json_preparse::
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
+      "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
+
+    have_augments_classes.!feature_def_json_preparse::
+      "$(augments_classes_data_keys)"
+        expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
+        meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
-      "current_version" string => "3.8.2";
-    any::
+      "current_version" string => "@VERSION@";
+
+    !feature_def_json_preparse::
       "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
       "defvars" slist => variablesmatching("default:update_def\..*", "defvar");
 
-    have_augments_file::
+    have_augments_file.!feature_def_json_preparse::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "override_vars" slist => getindices("augments[vars]");
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
+    have_augments_classes.!feature_def_json_preparse::
+      "augments_classes_data" data => mergedata("augments[classes]");
+      "augments_classes_data_keys" slist => getindices("augments_classes_data");
+
     any::
       # Begin change
 
-      "input_name_patterns" slist => getvalues("override_data_input_name_patterns"),
-      comment => "JSON-sourced filename patterns to match when updating the policy (see update/update_policy.cf)",
-      handle => "common_def_json_vars_input_name_patterns",
-      ifvarclass => isvariable("override_data_input_name_patterns"),
-      meta => { "defvar" };
+      # When parsing the augments_file from policy, we set input_name_patterns
+      # based on the data extracted from within policy
+      "input_name_patterns"
+        slist => getvalues("override_data_input_name_patterns"),
+        comment => "JSON-sourced filename patterns to match when updating the policy
+                    (see update/update_policy.cf)",
+        handle => "common_def_json_vars_input_name_patterns_without_feature_def_json_preparse",
+        ifvarclass => and(isvariable("override_data_input_name_patterns"), "!feature_def_json_preparse"),
+        meta => { "defvar" };
 
-      "input_name_patterns" slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
-                                       ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
-                                       "cf_promises_release_id", ".*\.json" },
-      comment => "Filename patterns to match when updating the policy (see update/update_policy.cf)",
-      handle => "common_def_vars_input_name_patterns",
-      ifvarclass => not(isvariable("override_data_input_name_patterns")),
-      meta => { "defvar" };
+      # Default the input name patterns, if we don't find it defined in def
+      # (from the augments_file).
+      "input_name_patterns"
+        slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
+                   ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb",
+                   "cf_promises_release_id", ".*\.json", ".*\.yaml" },
+        comment => "Filename patterns to match when updating the policy
+                    (see update/update_policy.cf)",
+        handle => "common_def_vars_input_name_patterns_policy_default",
+        ifvarclass => and(and(not(isvariable("override_data_acl")),
+                          not(isvariable("input_name_patterns"))),
+                          not(isvariable("def.input_name_patterns"))),
+        meta => { "defvar" };
+
+      # define based on data in def (which comes from augments file), if
+      # present and input_name_patterns is not yet defined.).
+      "input_name_patterns"
+        slist => { @(def.input_name_patterns) },
+        comment => "Filename patterns to match when updating the policy
+                    (see update/update_policy.cf)",
+        handle => "common_def_vars_input_name_patterns_from_def_with_feature_def_json_preparse",
+        ifvarclass => and( isvariable("def.input_name_patterns"),
+                           not(isvariable("input_name_patterns"))),
+        meta => { "defvar" };
 
       # the permissions for your masterfiles, which will propagate to inputs
       "masterfiles_perms_mode" string => "0600",
@@ -88,7 +121,7 @@ bundle common update_def
 
       # NOTE THAT ENABLING THIS BY DEFAULT *WILL* OVERWRITE THE HUB'S $(sys.workdir)/masterfiles
 
-      #"cfengine_internal_masterfiles_update" expression => "enterprise_edition";
+      #"cfengine_internal_masterfiles_update" expression => "enterprise.!(cfengine_3_4|cfengine_3_5)";
       "cfengine_internal_masterfiles_update" expression => "!any";
 
       # Transfer policies and binaries with encryption
@@ -136,6 +169,9 @@ bundle common update_def
       "enable_cfengine_enterprise_hub_ha" expression => "!any";
       #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
 
+      # Enable failover to node which is outside cluster
+      #"failover_to_replication_node_enabled" expression => "enterprise_edition";
+
   reports:
     DEBUG|DEBUG_update_def::
       "DEBUG: $(this.bundle)";
@@ -149,4 +185,9 @@ bundle common update_def
         ifvarclass => "$(roles_byrole_keys)";
 
       "$(const.t) $(defvars) = $($(defvars))";
+      "DEBUG $(this.bundle): Agent parsed augments_file"
+        ifvarclass => "have_augments_file.feature_def_json_preparse";
+      "DEBUG $(this.bundle): Policy parsed augments_file"
+        ifvarclass => "have_augments_file.!feature_def_json_preparse";
+      "DEBUG $(this.bundle): input_name_pattern = '$(input_name_patterns)'";
 }
