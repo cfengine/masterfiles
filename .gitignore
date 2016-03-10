@@ -10,6 +10,9 @@ stamp-h1
 /config.status
 /config.sub
 /configure
+/controls/3.5/update_def.cf
+/controls/3.6/update_def.cf
+/controls/3.7/update_def.cf
 /depcomp
 /install-sh
 /libtool
@@ -17,6 +20,7 @@ stamp-h1
 /m4/libtool.m4
 /m4/lt*.m4
 /missing
+/promises.cf
 /revision
 /ylwrap
 /test-driver
