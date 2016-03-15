@@ -67,9 +67,6 @@ body common control
       #    package_inventory => { $(package_module_knowledge.platform_default) };
       #    package_module => $(package_module_knowledge.platform_default);
 
-      # Uncomment to connect to the hub using latest protocol.
-      #protocol_version => "latest";
-
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 }
