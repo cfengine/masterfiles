@@ -331,7 +331,15 @@ bundle agent git(repo_path, subcmd, args)
 
   classes:
       "am_root" expression => strcmp($(this.promiser_uid), "0");
-      "need_to_drop" not => strcmp($(this.promiser_uid), $(repo_uid));
+
+      # $(repo_uid) must be defined before we try to test this or we will end up
+      # having at least one pass during evaluation the agent will not know it
+      # needs to drop privileges, leading to some files like .git/index being
+      # created with elevated privileges, and subsequently causing the agent to
+      # not be able to commit as a normal user.
+      "need_to_drop"
+        not => strcmp($(this.promiser_uid), $(repo_uid)),
+        ifvarclass => isvariable( repo_uid );
 
     am_root.need_to_drop::
       # This regular expression could be tightened up
