@@ -28,9 +28,6 @@ body common control
                   "cfe_internal/update/update_policy.cf",
                   "cfe_internal/update/update_processes.cf"
       };
-
-      # Uncomment to connect to the hub using latest protocol.
-      #protocol_version => "latest";
 }
 
 #############################################################################
