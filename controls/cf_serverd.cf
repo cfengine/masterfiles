@@ -32,10 +32,11 @@ body server control
       # Suggested value >= total number of hosts
       maxconnections        => "200";
 
-      allowusers            => { "root" };
-
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
+
+    !policy_server::
+      allowusers            => { "root" };
 
     windows::
       cfruncommand => "$(sys.cf_agent) -I -D cfruncommand -f \"$(sys.update_policy_path)\"  &
