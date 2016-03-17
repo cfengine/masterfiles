@@ -1,0 +1,62 @@
+# Tests that the default masterfiles will include files that def.json lists
+# in its "inputs" section.
+#
+# Heavily inspired by the inputs.cf test in core. The key difference is that
+# this test does not explicitly refer to the variable defined in def.json, but
+# relies on the masterfiles policies to do it.
+
+body common control
+{
+      inputs => { "../../default.cf.sub" };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent test
+{
+  vars:
+      # This is bad, see below.
+      "files_to_copy" slist => {
+          "cfe_internal",
+          "controls",
+          "inventory",
+          "lib",
+          "promises.cf",
+          "services",
+          "sketches",
+      };
+
+  files:
+      "$(sys.inputdir)/."
+        create => "true";
+      # Ideally this should be a complete subdir copy, but masterfiles files are
+      # currently mixed with other files, including this directory that we're
+      # in, so we would get an infinitely deep copy in that case.
+      "$(sys.inputdir)/$(files_to_copy)"
+        copy_from => dcs_sync("$(this.promise_dirname)/../../../../$(files_to_copy)"),
+        depth_search => recurse("inf");
+
+  methods:
+      "" usebundle => file_make("$(sys.inputdir)/secondary.cf", '
+bundle common x
+{
+  classes:
+    "test_class_4f862c89e9bc62fa6da0ca3c782678893c0dc246" expression => "any";
+}
+');
+
+      "" usebundle => file_copy("$(this.promise_filename).json", "$(sys.inputdir)/def.json");
+}
+
+#######################################################
+
+bundle agent check
+{
+  vars:
+    "command" string => "$(sys.cf_promises) --show-classes -f $(sys.inputdir)/promises.cf|$(G.grep) test_class";
+
+  methods:
+      "" usebundle => dcs_passif_output("test_class_4f862c89e9bc62fa6da0ca3c782678893c0dc246\s+source=promise", "", $(command), $(this.promise_filename));
+}
