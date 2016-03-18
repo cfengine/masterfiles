@@ -33,7 +33,6 @@ bundle common def
 
       "augments_inputs" slist => getvalues("augments[inputs]");
       "override_vars" slist => getindices("augments[vars]");
-      "override_classes" slist => getindices("augments[classes]");
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
