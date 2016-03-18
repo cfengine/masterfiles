@@ -7,7 +7,7 @@ bundle common update_def
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
 
   vars:
-      "current_version" string => "3.7.2";
+      "current_version" string => "3.7.3";
     any::
       "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
