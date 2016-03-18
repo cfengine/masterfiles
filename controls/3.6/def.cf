@@ -12,9 +12,6 @@ body file control
 bundle common def
 {
   classes:
-      # all override classes are defined true
-      "$(override_classes)" expression => "any", meta => { "override" };
-
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
       "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
       "have_augments_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
