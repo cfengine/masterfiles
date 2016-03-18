@@ -2,9 +2,6 @@ bundle common update_def
 {
   classes:
     !feature_def_json_preparse::
-      # all override classes are defined true
-      "$(override_classes)" expression => "any", meta => { "override" };
-
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
       "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
 
@@ -25,7 +22,6 @@ bundle common update_def
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "override_vars" slist => getindices("augments[vars]");
-      "override_classes" slist => getvalues("augments[classes]");
       "override_data_$(override_vars)" data => mergedata("augments[vars][$(override_vars)]");
       "override_data_s_$(override_vars)" string => format("%S", "override_data_$(override_vars)");
 
@@ -188,7 +184,6 @@ bundle common update_def
       "$(const.t) defined class role/byrole $(roles_byrole_keys) because of classmatch('$(extra_roles[byrole][$(roles_byrole_keys)])')"
         ifvarclass => "$(roles_byrole_keys)";
 
-      "$(const.t) override class $(override_classes)";
       "$(const.t) $(defvars) = $($(defvars))";
       "DEBUG $(this.bundle): Agent parsed augments_file"
         ifvarclass => "have_augments_file.feature_def_json_preparse";
