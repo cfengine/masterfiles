@@ -13,6 +13,9 @@ rpm_output_format = "Name=%{name}\nVersion=%{version}-%{release}\nArchitecture=%
 yum_cmd = os.environ.get('CFENGINE_TEST_YUM_CMD', "/usr/bin/yum")
 yum_options = ["--quiet", "-y"]
 
+NULLFILE = open(os.devnull, 'w')
+
+
 redirection_is_broken_cached = -1
 
 def redirection_is_broken():
@@ -287,19 +290,19 @@ def repo_install():
         cmd_line = [yum_cmd] + yum_options + ["install"]
         cmd_line.extend(single_cmd_args)
 
-        ret = subprocess_call(cmd_line, stdout=sys.stderr)
+        ret = subprocess_call(cmd_line, stdout=NULLFILE)
 
     if multi_cmd_args:
         for block in multi_cmd_args:
             # Try to upgrade.
             cmd_line = [yum_cmd] + yum_options + ["upgrade"] + block
-            subprocess_call(cmd_line, stdout=sys.stderr)
+            subprocess_call(cmd_line, stdout=NULLFILE)
 
             # See if it succeeded.
             success = True
             for item in block:
                 cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-                if subprocess_call(cmd_line, stdout=sys.stderr) != 0:
+                if subprocess_call(cmd_line, stdout=NULLFILE) != 0:
                     success = False
                     break
 
@@ -308,13 +311,13 @@ def repo_install():
 
             # Try to downgrade.
             cmd_line = [yum_cmd] + yum_options + ["downgrade"] + block
-            subprocess_call(cmd_line, stdout=sys.stderr)
+            subprocess_call(cmd_line, stdout=NULLFILE)
 
             # See if it succeeded.
             success = True
             for item in block:
                 cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-                if subprocess_call(cmd_line, stdout=sys.stderr) != 0:
+                if subprocess_call(cmd_line, stdout=NULLFILE) != 0:
                     success = False
                     break
 
@@ -323,7 +326,7 @@ def repo_install():
 
             # Try to plain install.
             cmd_line = [yum_cmd] + yum_options + ["install"] + block
-            subprocess_call(cmd_line, stdout=sys.stderr)
+            subprocess_call(cmd_line, stdout=NULLFILE)
 
             # No final check. CFEngine will figure out that it's missing
             # if it failed.
@@ -342,7 +345,7 @@ def remove():
     args = package_arguments_builder(False)[0]
 
     if args:
-        return subprocess_call(cmd_line + args, stdout=sys.stderr)
+        return subprocess_call(cmd_line + args, stdout=NULLFILE)
     return 0
 
 
@@ -357,7 +360,7 @@ def file_install():
     if not found:
         return 0
 
-    return subprocess_call(cmd_line, stdout=sys.stderr)
+    return subprocess_call(cmd_line, stdout=NULLFILE)
 
 
 def main():
