@@ -189,10 +189,12 @@ def one_package_argument(name, arch, version, is_apt_install):
     if arch:
         archs.append(arch)
     else:
-        # If we have existing architectures, operate on those, instead of the
-        # platform default.
+        # If we have existing architectures, operate on those, instead
+        # of the platform default. stderr is suppressed to avoid
+        # message pollution if the package is not be installed
         process = subprocess_Popen([dpkg_query_cmd, "--showformat", "${Architecture}=${Status}\n",
-                                "-W", name + ":*"], stdout=subprocess.PIPE)
+                                    "-W", name + ":*"],
+                                   stdout=subprocess.PIPE, stderr=NULLFILE)
         for line in process.stdout:
             # The space before "installed" is important, because it can be "not-installed".
             if "=" in line:
