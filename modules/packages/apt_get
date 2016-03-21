@@ -43,7 +43,11 @@ def redirection_is_broken():
 
 
 def subprocess_Popen(cmd, stdout=None, stderr=None):
-    if not redirection_is_broken() or (stdout is None and stderr is None) or stdout == subprocess.PIPE or stderr == subprocess.PIPE:
+    if ((not redirection_is_broken())
+        or (stdout is None and stderr is None)
+        or (stdout == subprocess.PIPE)
+        or (stderr == subprocess.PIPE)):
+
         return subprocess.Popen(cmd, stdout=stdout, stderr=stderr)
 
     old_stdout_fd = -1
