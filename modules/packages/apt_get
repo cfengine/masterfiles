@@ -5,6 +5,7 @@ import os
 import subprocess
 import re
 
+
 dpkg_cmd = os.environ.get('CFENGINE_TEST_DPKG_CMD', "/usr/bin/dpkg")
 dpkg_deb_cmd = os.environ.get('CFENGINE_TEST_DPKG_DEB_CMD', "/usr/bin/dpkg-deb")
 dpkg_query_cmd = os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD', "/usr/bin/dpkg-query")
@@ -20,6 +21,9 @@ apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
 
 os.environ['DEBIAN_FRONTEND'] = "noninteractive"
 os.environ['LC_ALL'] = "C"
+
+NULLFILE = open(os.devnull, 'w')
+
 
 redirection_is_broken_cached = -1
 
@@ -43,7 +47,11 @@ def redirection_is_broken():
 
 
 def subprocess_Popen(cmd, stdout=None, stderr=None):
-    if not redirection_is_broken() or (stdout is None and stderr is None) or stdout == subprocess.PIPE or stderr == subprocess.PIPE:
+    if ((not redirection_is_broken())
+        or (stdout is None and stderr is None)
+        or (stdout == subprocess.PIPE)
+        or (stderr == subprocess.PIPE)):
+
         return subprocess.Popen(cmd, stdout=stdout, stderr=stderr)
 
     old_stdout_fd = -1
@@ -127,7 +135,7 @@ def list_updates(online):
     sys.stdin.readlines()
 
     if online:
-        result = subprocess_call([apt_get_cmd] + apt_get_options + ["update"], stdout=sys.stderr)
+        result = subprocess_call([apt_get_cmd] + apt_get_options + ["update"], stdout=NULLFILE)
         if result != 0:
             return result
 
@@ -181,10 +189,12 @@ def one_package_argument(name, arch, version, is_apt_install):
     if arch:
         archs.append(arch)
     else:
-        # If we have existing architectures, operate on those, instead of the
-        # platform default.
+        # If we have existing architectures, operate on those, instead
+        # of the platform default. stderr is suppressed to avoid
+        # message pollution if the package is not be installed
         process = subprocess_Popen([dpkg_query_cmd, "--showformat", "${Architecture}=${Status}\n",
-                                "-W", name + ":*"], stdout=subprocess.PIPE)
+                                    "-W", name + ":*"],
+                                   stdout=subprocess.PIPE, stderr=NULLFILE)
         for line in process.stdout:
             # The space before "installed" is important, because it can be "not-installed".
             if "=" in line:
@@ -262,7 +272,7 @@ def repo_install():
     # For 'repo_insrtall' both 'a1' and 'a2' should be equal so we can operate
     # on 'a1' elements only. 
     if a1:
-        return subprocess_call(cmd_line + a1, stdout=sys.stderr)
+        return subprocess_call(cmd_line + a1, stdout=NULLFILE)
     return 0
 
 def remove():
@@ -285,9 +295,9 @@ def remove():
     # native OS architecture we are trying first to remove packages providing
     # just a package name and if this call is failing we are trying 
     # 'package_name:architecture' approach.
-    ret = subprocess_call(cmd_line + a1, stdout=sys.stderr)
+    ret = subprocess_call(cmd_line + a1, stdout=NULLFILE)
     if ret != 0 and a1 != a2:
-        ret = subprocess_call(cmd_line + a2, stdout=sys.stderr)
+        ret = subprocess_call(cmd_line + a2, stdout=NULLFILE)
 
     return ret
 
@@ -303,7 +313,7 @@ def file_install():
     if (not found):
         return 0
 
-    return subprocess_call(cmd_line, stdout=sys.stderr)
+    return subprocess_call(cmd_line, stdout=NULLFILE)
 
 
 def main():
