@@ -2165,6 +2165,67 @@ bundle agent file_make_mog(file, str, mode, owner, group)
       ifvarclass => "summarize";
 }
 
+bundle agent file_make_mustache(file, template, data)
+# @brief Make a file from a mustache template
+# @param file Target file to render
+# @param template Path to mustache template
+# @param data Data container to use
+#
+# **Example:**
+#
+# ```cf3
+# vars:
+#   "state" data => datastate();
+#
+# methods:
+#      "" usebundle => file_make_mustache( "/tmp/z.txt", "/tmp/z.mustache", @(state) );
+# ```
+{
+  files:
+      "$(file)"
+        create => "true",
+        edit_template => "$(template)",
+        template_method => "mustache",
+        template_data => @(state);
+
+  reports:
+      "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): rendering $(file) with template '$(template)'";
+}
+
+bundle agent file_make_mustache_with_perms(file, template, data, mode, owner, group)
+# @brief Make a file from a mustache template
+# @param file Target file to render
+# @param template Path to mustache template
+# @param data Data container to use
+# @param mode File permissions
+# @param owner Target file owner
+# @param group Target file group
+#
+# **Example:**
+#
+# ```cf3
+# vars:
+#   "state" data => datastate();
+#
+# methods:
+#      "" usebundle => file_make_mustache( "/tmp/z.txt", "/tmp/z.mustache", @(state),
+#                                          600, "root", "root" );
+# ```
+{
+  files:
+      "$(file)"
+        create => "true",
+        edit_template => "$(template)",
+        template_method => "mustache",
+        perms => mog( $(mode), $(owner), $(group) ),
+        template_data => @(state);
+
+  reports:
+      "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): rendering $(file) with template '$(template)'";
+}
+
 bundle agent file_empty(file)
 # @brief Make an empty file
 # @param file target
