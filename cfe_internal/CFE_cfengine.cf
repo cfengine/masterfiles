@@ -28,6 +28,11 @@ bundle agent cfe_internal_management
         string => "cfe_internal_enterprise_main",
         comment => "Activate policies related to CFEngne Enterprise operations";
 
+    # TODO: Scope this more tightly to mission portal role
+    enterprise_edition.policy_server::
+      "policy[cfe_internal_enterprise_mission_portal]"
+        string => "Activate policies related to CFEngine Enterprise Mission Portal";
+
     any::
       "bundles" slist => getindices(policy);
 
