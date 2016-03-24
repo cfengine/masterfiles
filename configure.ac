@@ -207,7 +207,7 @@ do
         MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $j | sed -e 's/\.in$//'`"
     done
 done
-for i in templates
+for i in templates cfe_internal
 do
     for j in `find "$srcdir/$i" -name '*.mustache'`
     do

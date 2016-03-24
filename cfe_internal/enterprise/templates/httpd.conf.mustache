@@ -173,11 +173,11 @@ AddType    application/x-httpd-php-source php5
   <IfModule rewrite_module>
     RewriteEngine On
 
-    {{#classes.cfe_enterprise_mission_portal_http_redirect_https}}
+    {{^classes.cfe_enterprise_enable_plain_http}}
     # Force https with redirection
     RewriteCond %{HTTPS} off
     RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-    {{/classes.cfe_enterprise_mission_portal_http_redirect_https}}
+    {{/classes.cfe_enterprise_enable_plain_http}}
 
     RewriteCond %{REQUEST_FILENAME} -s [OR]
     RewriteCond %{REQUEST_FILENAME} -l [OR]
