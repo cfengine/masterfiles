@@ -18,11 +18,36 @@ bundle common cfe_internal_hub_vars
 {
   vars:
 
-    linux::
+    policy_server::
 
       "docroot" string => "$(sys.workdir)/httpd/htdocs",
-      comment => "Root directory of Enterprise Web interface",
-      handle => "cfe_internal_hub_vars_docroot";
+        comment => "Root directory of Enterprise Web interface",
+        handle => "cfe_internal_hub_vars_docroot";
+
+
+      # TODO Consider tagging these files for file integrity monitoring.
+
+      "SSLCertificateFile"
+        string => "$(sys.workdir)/httpd/ssl/certs/$(sys.fqhost).cert";
+
+      "SSLCertificateKeyFile"
+        string => "$(sys.workdir)/httpd/ssl/private/$(sys.fqhost).key";
+
+      "SSLCertificatePasswdKeyFile"
+        string => "$(sys.workdir)/httpd/ssl/private/$(sys.fqhost).pass.key";
+
+      "SSLCertificateSigningRequest"
+        string => "$(sys.workdir)/httpd/ssl/private/$(sys.fqhost).csr";
+
+      "SSLCnf"
+        string => "$(sys.workdir)/ssl/openssl.cnf";
+
+      "access_log" string => "$(sys.workdir)/httpd/logs/access_log";
+      "error_log"  string => "$(sys.workdir)/httpd/logs/error_log";
+      "ssl_request_log" string => "$(sys.workdir)/httpd/logs/ssl_request_log";
+
+      "SSLCertificateKeySize" string => "4096";
+      "SSLCertificateDaysValid" string => "3650";
 
 }
 

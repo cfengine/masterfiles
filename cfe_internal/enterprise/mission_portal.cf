@@ -173,3 +173,67 @@ bundle agent cfe_internal_webserver(state)
       contain => in_shell;
 
 }
+
+bundle agent cfe_enterprise_selfsigned_cert
+{
+
+  meta:
+
+      "description"
+        string => "Generate a self signed SSL certificate for secure hub communications.";
+
+  vars:
+
+    policy_server::
+
+      "SSLCertificateFile"           string => "$(cfe_internal_hub_vars.SSLCertificateFile)";
+      "SSLCertificateKeyFile"        string => "$(cfe_internal_hub_vars.SSLCertificateKeyFile)";
+      "SSLCertificatePasswdKeyFile"  string => "$(cfe_internal_hub_vars.SSLCertificatePasswdKeyFile)";
+      "SSLCertificateKeySize"        string => "$(cfe_internal_hub_vars.SSLCertificateKeySize)";
+      "SSLCertificateSigningRequest" string => "$(cfe_internal_hub_vars.SSLCertificateSigningRequest)";
+      "SSLCnf"                       string => "$(cfe_internal_hub_vars.SSLCnf)";
+      "SSLCertificateDaysValid"      string => "$(cfe_internal_hub_vars.SSLCertificateDaysValid)";
+
+      "openssl"  string => "$(sys.workdir)/bin/openssl";
+
+      "_generated_files" slist => {
+                                    $(SSLCertificateFile),
+                                    $(SSLCertificateKeyFile),
+                                    $(SSLCertificatePasswdKeyFile),
+                                    $(SSLCertificateSigningRequest),
+                                  };
+
+
+  classes:
+      "_cfe_enterprise_selfsigned_cert_regenerate_certificate" not => filesexist( @(_generated_files) );
+
+  commands:
+
+    policy_server._cfe_enterprise_selfsigned_cert_regenerate_certificate::
+
+      "$(openssl)"
+        args => "genrsa -passout pass:x -out $(SSLCertificatePasswdKeyFile) $(SSLCertificateKeySize)";
+
+      # Strip password from key in ${CFENGINE_MP_PASS_KEY} and produce ${CFENGINE_MP_KEY}
+      "$(openssl)"
+        args => "rsa -passin pass:x -in $(SSLCertificatePasswdKeyFile) -out $(SSLCertificateKeyFile)";
+
+      # Generate a CSR in ${CFENGINE_MP_CSR} with key ${CFENGINE_MP_KEY}
+      "$(openssl)"
+        args => 'req -utf8 -sha256 -nodes -new -subj "/CN=$(sys.fqhost)" -key $(SSLCertificateKeyFile) -out $(SSLCertificateSigningRequest) -config $(SSLCnf)';
+
+      # Generate CRT
+      "$(openssl)"
+        args => "x509 -req -days $(SSLCertificateDaysValid) -in $(SSLCertificateSigningRequest) -signkey $(SSLCertificateKeyFile) -out $(SSLCertificateFile)";
+
+
+  reports:
+
+    DEBUG|DEBUG_cfe_enterprise_selfsigned_cert::
+
+      "DEBUG $(this.bundle): Certificate Generation Requested"
+        ifvarclass => "_cfe_enterprise_selfsigned_cert_regenerate_certificate";
+
+      "DEBUG $(this.bundle): No Certificate Generation Requested"
+        ifvarclass => "!_cfe_enterprise_selfsigned_cert_regenerate_certificate";
+}
