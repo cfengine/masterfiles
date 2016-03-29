@@ -836,11 +836,11 @@ bundle edit_line set_config_values_matching(v,pat)
       "^\s*($(index)\s+(?!$($(v)[$(index)])).*|# ?$(index)\s+.*)$"
       comment => "Correct the value",
       replace_with => value("$(index) $($(v)[$(index)])"),
-      classes => always("replace_attempted_$(cindex[$(index)])");
+      classes => results("bundle", "replace_attempted_$(cindex[$(index)])");
 
   insert_lines:
       "$(index) $($(v)[$(index)])"
-      ifvarclass => "replace_attempted_$(cindex[$(index)])";
+      ifvarclass => "replace_attempted_$(cindex[$(index)])_reached";
 
 }
 
