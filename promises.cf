@@ -259,18 +259,24 @@ bundle common cfengine_controls
 bundle common services_autorun
 {
   vars:
+    !cfengine_3_5|services_autorun::
+      "inputs" slist => { "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/autorun.cf" };
+      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
+      "bundles" slist => { "autorun" }; # run loaded bundles
+
     cfengine_3_5|!services_autorun::
       "inputs" slist => { };
       "found_inputs" slist => {};
       "bundles" slist => { "services_autorun" }; # run self
 
-    !cfengine_3_5::
-      "inputs" slist => { "lib/$(sys.cf_version_major).$(sys.cf_version_minor)/autorun.cf" };
-      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
-      "bundles" slist => { "autorun" }; # run loaded bundles
-
   reports:
     DEBUG|DEBUG_services_autorun::
+      "DEBUG $(this.bundle): Services Autorun Disabled"
+        ifvarclass => "!services_autorun";
+
+      "DEBUG $(this.bundle): Services Autorun Enabled"
+        ifvarclass => "services_autorun";
+
       "DEBUG $(this.bundle): adding input='$(inputs)'"
         ifvarclass => isvariable("inputs");
 
