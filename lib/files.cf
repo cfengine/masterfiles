@@ -770,15 +770,15 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
       "^$(cp)($(i)$(bp).*|$(i))$"
              comment => "Uncommented the value '$(i)'",
         replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
-          ifvarclass => "!exists_$(ci[$(i)]).!replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)])",
-             classes => always("uncommented_$(ci[$(i)])");
+          ifvarclass => "!exists_$(ci[$(i)]).!replace_attempted_$(ci[$(i)])_reached.!multiple_comments_$(ci[$(i)])",
+             classes => results("bundle", "uncommented_$(ci[$(i)])");
 
       # If the line is there with the wrong value, replace with
       # the correct value
       "^\s*($(i)$(bp)(?!$(ev[$(i)])$).*|$(i))$"
            comment => "Correct the value '$(i)'",
       replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
-           classes => always("replace_attempted_$(ci[$(i)])");
+           classes => results("bundle", "replace_attempted_$(ci[$(i)])");
 
   insert_lines:
       # If the line doesn't exist, or there is more than one occurrence
@@ -787,19 +787,18 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
       "$(i)$(sep)$($(v)[$(i)])"
          comment => "Insert the value, marker '$(i)' exists",
         location => after("^$(cp)($(i)$(bp).*|$(i))$"),
-      ifvarclass => "replace_attempted_$(ci[$(i)]).multiple_comments_$(ci[$(i)])";
+      ifvarclass => "replace_attempted_$(ci[$(i)])_reached.multiple_comments_$(ci[$(i)])";
 
       # If the line doesn't exist and there are no occurrences
       # of the LHS commented out, insert a new line at the eof
       "$(i)$(sep)$($(v)[$(i)])"
          comment => "Insert the value, marker '$(i)' doesn't exist",
-      ifvarclass => "replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)]).!exists_$(ci[$(i)])";
+      ifvarclass => "replace_attempted_$(ci[$(i)])_reached.!multiple_comments_$(ci[$(i)]).!exists_$(ci[$(i)])";
 
   reports:
     verbose_mode|EXTRA::
       "$(this.bundle): Line for '$(i)' exists" ifvarclass => "exists_$(ci[$(i)])";
       "$(this.bundle): Line for '$(i)' does not exist" ifvarclass => "!exists_$(ci[$(i)])";
-
 }
 
 bundle edit_line set_config_values_matching(v,pat)
