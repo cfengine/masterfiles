@@ -542,13 +542,13 @@ bundle edit_line set_quoted_values(v)
       # match a line starting like the key = something
       "\s*$(index)\s*=.*"
       edit_field => col("=","2",'"$($(v)[$(index)])"',"set"),
-      classes    => if_ok("$(cindex[$(index)])_in_file"),
+      classes    => results("bundle", "$(cindex[$(index)])_in_file"),
       comment    => "Match a line starting like key = something";
 
   insert_lines:
       '$(index)="$($(v)[$(index)])"'
       comment    => "Insert a variable definition",
-      ifvarclass => "!$(cindex[$(index)])_in_file";
+        ifvarclass => "!($(cindex[$(index)])_in_file_kept|$(cindex[$(index)])_in_file_repaired)";
 }
 
 ##
