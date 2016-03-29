@@ -1037,7 +1037,7 @@ bundle edit_line replace_or_add(pattern,line)
       "^(?!$(eline)$)$(pattern)$"
       comment => "Replace a pattern here",
       replace_with => value("$(line)"),
-      classes => scoped_classes_generic("bundle", "replace_$(cline)");
+      classes => results("bundle", "replace_$(cline)");
 
   insert_lines:
       "$(line)"
