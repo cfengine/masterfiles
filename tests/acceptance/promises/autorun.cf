@@ -46,7 +46,7 @@ update this test to allow it to pass.";
 
       "test_soft_fail"
         string => "any",
-        meta => { "jiraCFE2135"};
+        meta => { "redmine7572", "jiraCFE2135"};
 
   files:
       "$(init.def_cf_path)" edit_line => enable_autorun;
