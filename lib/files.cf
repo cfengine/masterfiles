@@ -574,7 +574,7 @@ bundle edit_line set_variable_values(v)
 #
 #     files:
 #        "myfile"
-#          edit_line => set_quoted_values(stuff)
+#          edit_line => set_variable_values(stuff)
 # ```
 #
 # **See also:** `set_quoted_values()`
