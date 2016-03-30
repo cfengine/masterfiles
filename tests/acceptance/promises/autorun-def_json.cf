@@ -25,37 +25,25 @@ bundle agent init
       "promises_cf_path" string => nth(promises_cf_slist, 0);
 
       "masterfiles_path" string => dirname("$(promises_cf_path)");
-      "def_cf_path"      string => concat("$(masterfiles_path)", "/controls/def.cf");
+      "def_json_path"    string => concat("$(masterfiles_path)", "/def.json");
 }
 
 bundle agent test
 {
   meta:
+    "description" string => "Test that def.json can enable autorun as expected.";
 
-
-      "description"
-        string => "Test that enabling autorun from policy is not sufficient for activation.
-
-In order to prevent the parsing of files unnecessarily we guard that with the
-definition of the services_autorun class. If that class is defined from
-policy, as in this test it currently happens too late in order to pick up
-the policy in the services/autorun directory. It would be OK for this
-behavior to change so that defining from policy worked as desired. This
-test is intended to track that specific case and if ever fixed, simply
-update this test to allow it to pass.";
-
-      "test_soft_fail"
-        string => "any",
-        meta => { "redmine7572", "jiraCFE2135"};
-
+  # We need to lay down the def.json that will enable autorun.
   files:
-      "$(init.def_cf_path)" edit_line => enable_autorun;
+      "$(init.def_json_path)"
+        create => "true",
+        edit_line => enable_autorun;
 }
 
 bundle edit_line enable_autorun
 {
   insert_lines:
-      'bundle common __autorun_enable { classes: "services_autorun" expression => "any"; }';
+      '{ "classes": { "services_autorun": ["any"] } }';
 }
 
 #######################################################
