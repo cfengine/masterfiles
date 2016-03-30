@@ -35,7 +35,9 @@ bundle agent test
 
   # We need to lay down the def.json that will enable autorun.
   files:
-      "$(init.def_json_path)" edit_line => enable_autorun;
+      "$(init.def_json_path)"
+        create => "true",
+        edit_line => enable_autorun;
 }
 
 bundle edit_line enable_autorun
