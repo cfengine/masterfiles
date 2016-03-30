@@ -297,7 +297,7 @@ bundle common cfengine_controls
 bundle common services_autorun
 {
   vars:
-    !cfengine_3_7.services_autorun::
+    !cfengine_3_7::
       # Both 3.6 and 3.8+ can use local_libdir
       # 3.6 will use the split library in the version specific path
       # 3.8+ will use the common lib as it supports the @if macro
@@ -305,7 +305,7 @@ bundle common services_autorun
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
 
-    cfengine_3_7.services_autorun::
+    cfengine_3_7::
       # We have to point 3.7 at the unified library because sys.local_libdir in
       # 3.7 binaries it is set to a version specific path. However since 3.7
       # knows about the @if macro it is safe to share the same policy as 3.8+
