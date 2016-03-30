@@ -22,7 +22,10 @@ Uptime: {{vars.sys.uptime}} minutes
 
 ## Hardware
 No. CPUs: {{vars.sys.cpus}}
-{{! Redmine:4505 https://cfengine.com/dev/issues/4505 }}
+Total Memory: {{{vars.mon.value_mem_total}}} MB
+Total Swap: {{{vars.mon.value_mem_swap}}} MB
+Free Memory: {{{vars.mon.value_mem_free}}} MB
+Free Swap: {{{vars.mon.value_mem_freeswap}}} MB
 
 ## Network
 
