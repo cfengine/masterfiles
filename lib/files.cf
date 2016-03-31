@@ -647,22 +647,31 @@ bundle edit_line set_config_values(v)
       "ev[$(index)]" string => escape("$($(v)[$(index)])");
 
       # Do we have more than one line commented out?
-      "index_comment_matches_$(cindex[$(index)])" int => countlinesmatching("^\s*#\s*($(index)\s+.*|$(index))$","$(edit.filename)");
+      "index_comment_matches_$(cindex[$(index)])"
+        int => countlinesmatching("^\s*#\s*($(index)\s+.*|$(index))$","$(edit.filename)");
 
 
   classes:
       # Check to see if this line exists
-      "line_exists_$(cindex[$(index)])" expression => regline("^\s*($(index)\s.*|$(index))$","$(edit.filename)");
+      "line_exists_$(cindex[$(index)])"
+        expression => regline("^\s*($(index)\s.*|$(index))$","$(edit.filename)"),
+        scope => "bundle";
 
       # if there's more than one comment, just add new (don't know who to use)
-      "multiple_comments_$(cindex[$(index)])" expression => isgreaterthan("$(index_comment_matches_$(cindex[$(index)]))","1");
-
+      "multiple_comments_$(cindex[$(index)])"
+        expression => isgreaterthan("$(index_comment_matches_$(cindex[$(index)]))","1"),
+        scope => "bundle";
 
   replace_patterns:
       # If the line is commented out, uncomment and replace with
       # the correct value
       "^\s*#\s*($(index)\s+.*|$(index))$"
-             comment => "Uncommented the value $(index)",
+        comment => "If we find a single commented entry we can uncomment it to
+                    keep the settings near any inline documentation. If there
+                    are multiple comments, then we don't try to replace them and
+                    instead will later append the new value after the first
+                    commented occurance of $(index).",
+        handle => "set_config_values_replace_commented_line",
         replace_with => value("$(index) $($(v)[$(index)])"),
           ifvarclass => "!line_exists_$(cindex[$(index)]).!replace_attempted_$(cindex[$(index)])_reached.!multiple_comments_$(cindex[$(index)])",
              classes => results("bundle", "uncommented_$(cindex[$(index)])");
