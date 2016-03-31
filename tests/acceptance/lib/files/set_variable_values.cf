@@ -16,10 +16,17 @@ body common control
 bundle agent init
 {
   files:
-      "$(G.testfile).expected"
+      "$(G.testfile)-1.expected"
       copy_from => local_cp("$(this.promise_filename).finish");
-      "$(G.testfile).actual"
+      "$(G.testfile)-1.actual"
       copy_from => local_cp("$(this.promise_filename).start");
+
+      "$(G.testfile)-2.expected"
+        copy_from => local_cp("$(this.promise_filename).finish");
+      "$(G.testfile)-2.actual"
+        copy_from => local_cp("$(this.promise_filename).start");
+
+
 }
 
 #######################################################
@@ -38,16 +45,44 @@ bundle agent test
       "config[blank option]" string => "";
 
   files:
-      "$(G.testfile).actual"
+      "$(G.testfile)-1.actual"
       edit_line => set_variable_values("test.config");
+
+      "$(G.testfile)-2.actual"
+        edit_line => set_variable_values("test.config");
 }
 
 #######################################################
 
 bundle agent check
 {
+  vars:
+      "files" slist => { "1", "2" };
+
+  classes:
+      "pass" and => { "1_pass", "2_pass" };
+
   methods:
-      "any" usebundle => sorted_check_diff("$(G.testfile).actual",
-                                           "$(G.testfile).expected",
-                                           "$(this.promise_filename)");
+      "sort actual"
+        usebundle => dcs_sort("$(G.testfile)-$(files).actual", "$(G.testfile)-$(files).actual.sort");
+
+      "sort expected"
+        usebundle => dcs_sort("$(G.testfile)-$(files).expected", "$(G.testfile)-$(files).expected.sort");
+      "check"
+        usebundle => dcs_if_diff( "$(G.testfile)-$(files).actual.sort", "$(G.testfile)-$(files).expected.sort",
+                                  "$(files)_pass", "$(files)_fail");
+
+      # Fail the test if any of the files fail.
+      "fail"
+        usebundle => dcs_fail( $(this.promise_filename) ),
+        ifvarclass => "$(files)_fail";
+
+    pass::
+      "pass"
+        usebundle => dcs_pass( $(this.promise_filename) );
+
+  reports:
+    DEBUG::
+      "$(files)_fail"
+        ifvarclass => "$(files)_fail";
 }
