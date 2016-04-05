@@ -66,6 +66,7 @@ bundle common stdlib_common
       "input[monitor]"                    string => "$(this.promise_dirname)/monitor.cf";
       "input[guest_environments]"         string => "$(this.promise_dirname)/guest_environments.cf";
       "input[bundles]"                    string => "$(this.promise_dirname)/bundles.cf";
+      "input[reports]"                    string => "$(this.promise_dirname)/reports.cf";
       "input[cfe_internal]"               string => "$(this.promise_dirname)/cfe_internal.cf";
       "input[cfe_internal_hub]"           string => "$(this.promise_dirname)/cfe_internal_hub.cf";
       "input[cfengine_enterprise_hub_ha]" string => "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf";
