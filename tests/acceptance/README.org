@@ -1,0 +1,160 @@
+* Writing tests against the stdlib
+
+The test framework for masterfiles piggy backs on the test framework from core.
+It's important to note =plucked.cf.sub= comes from the core repository and that
+it includes bodies and bundles from the stdlib which are useful in writing tests
+in core. This presents a problem for writing tests in the masterfiles framework
+because =plucked.cf.sub= is included and simply including the stdlib could
+result in duplicate definition of bundle errors.
+
+To work around this complication you can create a subtest that includes the
+stdlib directly, but does not include the rest of the test framework.
+
+** Example test
+
+This is the main test. Note how it includes =default.cf.sub= and runs the
+typical test bundlesequence. The test passes based on the *OUTPUT* of the
+subtest which runs from a policy file with the same name suffixed with =.sub=.
+
+#+Name: lib/reports/head.cf
+#+BEGIN_SRC cfengine3
+body common control
+{
+        inputs => { '../../default.cf.sub' };
+        bundlesequence  => { default("$(this.promise_filename)") };
+        version => "1.0";
+}
+
+bundle agent test
+{
+  meta:
+      "description" string => "
+Test that body printfile head works as expected";
+
+}
+bundle agent check
+{
+  vars:
+      "pass_reg" string => ".*R: My first line
+R: line 0
+R: line 1
+R: line 2
+R: line 3
+R: line 4
+R: line 5
+R: line 6
+R: line 7
+R: line 8
+R: line 9";
+
+      "command" string => "$(sys.cf_agent) -K -f $(this.promise_filename).sub";
+
+  methods:
+      "" usebundle => dcs_passif_output("$(pass_reg)", "", $(command), $(this.promise_filename));
+}
+#+END_SRC
+
+This is the subtest itself. Note how it *does not include the test framework*
+(=default.cf.sub=) but instead includes the part of the standard library that it
+needs for the test. In this case the subtest outputs information that the main
+test inspects for pass or failure. The main test could also inspect data in
+other files. Consider writing a data file containing the =datastate()= or
+=bundlestate()= of the subtest and having the main test use that to determine
+pass or failure.
+
+#+Name: lib/reports/head.cf.sub
+#+BEGIN_SRC cfengine3
+body file control
+{
+      # Include the stdlib directly so that we are always testing the most
+      # recent version
+        inputs => { '../../../../lib/reports.cf' };
+}
+
+bundle agent main
+{
+  reports:
+    "My first line"
+      printfile => head( "$(this.promise_dirname)/printfile.txt");
+}
+#+END_SRC
+
+#+Name: Example Test Run
+#+BEGIN_EXAMPLE
+> $ ./testall --printlog ./lib/reports/head.cf
+======================================================================
+Testsuite started at 2016-04-06 08:31:05
+----------------------------------------------------------------------
+Total tests: 1
+
+CRASHING_TESTS: enabled
+NETWORK_TESTS: enabled
+STAGING_TESTS: disabled
+UNSAFE_TESTS: disabled
+LIBXML2_TESTS: enabled
+
+./lib/reports/head.cf Pass
+
+======================================================================
+Testsuite finished at 2016-04-06 08:31:06 (1 seconds)
+
+Passed tests:  1
+Failed tests:  0
+Skipped tests: 0
+Soft failures: 0
+Total tests:   1
+======================================================================
+Testsuite started at 2016-04-06 08:31:05
+----------------------------------------------------------------------
+Total tests: 1
+
+CRASHING_TESTS: enabled
+NETWORK_TESTS: enabled
+STAGING_TESTS: disabled
+UNSAFE_TESTS: disabled
+LIBXML2_TESTS: enabled
+
+----------------------------------------------------------------------
+./lib/reports/head.cf
+----------------------------------------------------------------------
+/home/nickanderson/CFEngine/core/cf-agent/.libs/lt-cf-agent: /var/cfengine/lib/libssl.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+/home/nickanderson/CFEngine/core/cf-agent/.libs/lt-cf-agent: /var/cfengine/lib/libcrypto.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+   error: UNTRUSTED: Module directory /home/nickanderson/CFEngine/masterfiles/tests/acceptance/workdir/__lib_reports_head_cf/modules (mode 775) was not private!
+/home/nickanderson/CFEngine/core/cf-promises/.libs/lt-cf-promises: /var/cfengine/lib/libssl.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+/home/nickanderson/CFEngine/core/cf-promises/.libs/lt-cf-promises: /var/cfengine/lib/libcrypto.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+   error: UNTRUSTED: Module directory /home/nickanderson/CFEngine/masterfiles/tests/acceptance/workdir/__lib_reports_head_cf/modules (mode 775) was not private!
+R: test description:
+Test that body printfile head works as expected
+R: /home/nickanderson/CFEngine/masterfiles/tests/acceptance/./lib/reports/head.cf Pass
+R: dcs_passif_output: the output of command '"/home/nickanderson/CFEngine/masterfiles/tests/acceptance/workdir/__lib_reports_head_cf/bin/cf-agent" -K -f /home/nickanderson/CFEngine/masterfiles/tests/acceptance/./lib/reports/head.cf.sub' was: '/home/nickanderson/CFEngine/core/cf-agent/.libs/lt-cf-agent: /var/cfengine/lib/libssl.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+/home/nickanderson/CFEngine/core/cf-agent/.libs/lt-cf-agent: /var/cfengine/lib/libcrypto.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+   error: UNTRUSTED: Module directory /home/nickanderson/CFEngine/masterfiles/tests/acceptance/workdir/__lib_reports_head_cf/modules (mode 775) was not private!
+/home/nickanderson/CFEngine/core/cf-promises/.libs/lt-cf-promises: /var/cfengine/lib/libssl.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+/home/nickanderson/CFEngine/core/cf-promises/.libs/lt-cf-promises: /var/cfengine/lib/libcrypto.so.1.0.0: no version information available (required by /home/nickanderson/CFEngine/core/libpromises/.libs/libpromises.so.3)
+   error: UNTRUSTED: Module directory /home/nickanderson/CFEngine/masterfiles/tests/acceptance/workdir/__lib_reports_head_cf/modules (mode 775) was not private!
+R: My first line
+R: line 0
+R: line 1
+R: line 2
+R: line 3
+R: line 4
+R: line 5
+R: line 6
+R: line 7
+R: line 8
+R: line 9'
+
+Return code is 0.
+
+  ==> Pass
+
+
+======================================================================
+Testsuite finished at 2016-04-06 08:31:06 (1 seconds)
+
+Passed tests:  1
+Failed tests:  0
+Skipped tests: 0
+Soft failures: 0
+Total tests:   1
+#+END_EXAMPLE
