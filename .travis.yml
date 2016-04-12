@@ -9,5 +9,8 @@ install:
 - ls
 
 script:
-- /var/cfengine/bin/cf-promises -f $TRAVIS_BUILD_DIR/promises.cf
-- /var/cfengine/bin/cf-promises -f $TRAVIS_BUILD_DIR/update.cf
+- cd $TRAVIS_BUILD_DIR
+- ./autogen.sh --without-core --prefix=$TRAVIS_BUILD_DIR/install
+- make install
+- /var/cfengine/bin/cf-promises -f $TRAVIS_BUILD_DIR/install/masterfiles/promises.cf
+- /var/cfengine/bin/cf-promises -f $TRAVIS_BUILD_DIR/install/masterfiles/update.cf
