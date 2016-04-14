@@ -395,7 +395,7 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
       "$(index)\s*=.*"
       edit_field => col("=","2","$($(tab)[$(sectionName)][$(index)])","set"),
       select_region => INI_section("$(sectionName)"),
-      classes => if_ok("manage_variable_values_ini_not_$(cindex[$(index)])"),
+      classes => results("bundle", "manage_variable_values_ini_not_$(cindex[$(index)])"),
       ifvarclass => "edit_$(cindex[$(index)])";
 
   delete_lines:
@@ -410,7 +410,7 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
 
       "$(index)=$($(tab)[$(sectionName)][$(index)])"
       select_region => INI_section("$(sectionName)"),
-      ifvarclass => "!manage_variable_values_ini_not_$(cindex[$(index)]).edit_$(cindex[$(index)])";
+        ifvarclass => "!(manage_variable_values_ini_not_$(cindex[$(index)])_kept|manage_variable_values_ini_not_$(cindex[$(index)])_repaired).edit_$(cindex[$(index)])";
 
 }
 
@@ -452,7 +452,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
       "$(index)\s*=.*"
       edit_field => col("=","2","$($(tab)[$(sectionName)][$(index)])","set"),
       select_region => INI_section("$(sectionName)"),
-      classes => if_ok("set_variable_values_ini_not_$(cindex[$(index)])"),
+      classes => results("bundle", "set_variable_values_ini_not_$(cindex[$(index)])"),
       ifvarclass => "edit_$(cindex[$(index)])";
 
   insert_lines:
@@ -462,7 +462,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
       "$(index)=$($(tab)[$(sectionName)][$(index)])"
       select_region => INI_section("$(sectionName)"),
-      ifvarclass => "!set_variable_values_ini_not_$(cindex[$(index)]).edit_$(cindex[$(index)])";
+        ifvarclass => "!(set_variable_values_ini_not_$(cindex[$(index)])_kept|set_variable_values_ini_not_$(cindex[$(index)])_repaired).edit_$(cindex[$(index)])";
 
 }
 
@@ -542,13 +542,13 @@ bundle edit_line set_quoted_values(v)
       # match a line starting like the key = something
       "\s*$(index)\s*=.*"
       edit_field => col("=","2",'"$($(v)[$(index)])"',"set"),
-      classes    => if_ok("$(cindex[$(index)])_in_file"),
+      classes    => results("bundle", "$(cindex[$(index)])_in_file"),
       comment    => "Match a line starting like key = something";
 
   insert_lines:
       '$(index)="$($(v)[$(index)])"'
       comment    => "Insert a variable definition",
-      ifvarclass => "!$(cindex[$(index)])_in_file";
+        ifvarclass => "!($(cindex[$(index)])_in_file_kept|$(cindex[$(index)])_in_file_repaired)";
 }
 
 ##
@@ -574,7 +574,7 @@ bundle edit_line set_variable_values(v)
 #
 #     files:
 #        "myfile"
-#          edit_line => set_quoted_values(stuff)
+#          edit_line => set_variable_values(stuff)
 # ```
 #
 # **See also:** `set_quoted_values()`
@@ -604,7 +604,7 @@ bundle edit_line set_variable_values(v)
       "\s*$(index)\s*=.*"
 
       edit_field => col("\s*$(index)\s*=","2","$($(v)[$(index)])","set"),
-      classes => if_ok("$(cv)_$(cindex[$(index)])_in_file"),
+      classes => results("bundle", "$(cv)_$(cindex[$(index)])_in_file"),
       comment => "Match a line starting like key = something";
 
   insert_lines:
@@ -612,7 +612,7 @@ bundle edit_line set_variable_values(v)
       "$(index)=$($(v)[$(index)])"
 
       comment => "Insert a variable definition",
-      ifvarclass => "!$(cv)_$(cindex[$(index)])_in_file";
+        ifvarclass => "!($(cv)_$(cindex[$(index)])_in_file_kept|$(cv)_$(cindex[$(index)])_in_file_repaired)";
 }
 
 bundle edit_line set_config_values(v)
@@ -664,15 +664,15 @@ bundle edit_line set_config_values(v)
       "^\s*#\s*($(index)\s+.*|$(index))$"
              comment => "Uncommented the value $(index)",
         replace_with => value("$(index) $($(v)[$(index)])"),
-          ifvarclass => "!line_exists_$(cindex[$(index)]).!replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])",
-             classes => always("uncommented_$(cindex[$(index)])");
-      
+          ifvarclass => "!line_exists_$(cindex[$(index)]).!replace_attempted_$(cindex[$(index)])_reached.!multiple_comments_$(cindex[$(index)])",
+             classes => results("bundle", "uncommented_$(cindex[$(index)])");
+
       # If the line is there with the wrong value, replace with
       # the correct value
       "^\s*($(index)\s+(?!$(ev[$(index)])$).*|$(index))$"
            comment => "Correct the value $(index)",
       replace_with => value("$(index) $($(v)[$(index)])"),
-           classes => always("replace_attempted_$(cindex[$(index)])");
+           classes => results("bundle", "replace_attempted_$(cindex[$(index)])");
 
   insert_lines:
       # If the line doesn't exist, or there is more than one occurance
@@ -681,13 +681,13 @@ bundle edit_line set_config_values(v)
       "$(index) $($(v)[$(index)])"
          comment => "Insert the value, marker exists $(index)",
         location => after("^\s*#\s*($(index)\s+.*|$(index))$"),
-      ifvarclass => "replace_attempted_$(cindex[$(index)]).multiple_comments_$(cindex[$(index)])";
+      ifvarclass => "replace_attempted_$(cindex[$(index)])_reached.multiple_comments_$(cindex[$(index)])";
 
-      # If the line doesn't exist and there are no occurances
+      # If the line doesn't exist and there are no occurrences
       # of the LHS commented out, insert a new line at the eof
       "$(index) $($(v)[$(index)])"
          comment => "Insert the value, marker doesn't exist $(index)",
-      ifvarclass => "replace_attempted_$(cindex[$(index)]).!multiple_comments_$(cindex[$(index)])";
+      ifvarclass => "replace_attempted_$(cindex[$(index)])_reached.!multiple_comments_$(cindex[$(index)])";
 
 }
 
@@ -770,15 +770,15 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
       "^$(cp)($(i)$(bp).*|$(i))$"
              comment => "Uncommented the value '$(i)'",
         replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
-          ifvarclass => "!exists_$(ci[$(i)]).!replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)])",
-             classes => always("uncommented_$(ci[$(i)])");
+          ifvarclass => "!exists_$(ci[$(i)]).!replace_attempted_$(ci[$(i)])_reached.!multiple_comments_$(ci[$(i)])",
+             classes => results("bundle", "uncommented_$(ci[$(i)])");
 
       # If the line is there with the wrong value, replace with
       # the correct value
       "^\s*($(i)$(bp)(?!$(ev[$(i)])$).*|$(i))$"
            comment => "Correct the value '$(i)'",
       replace_with => value("$(i)$(sep)$($(v)[$(i)])"),
-           classes => always("replace_attempted_$(ci[$(i)])");
+           classes => results("bundle", "replace_attempted_$(ci[$(i)])");
 
   insert_lines:
       # If the line doesn't exist, or there is more than one occurrence
@@ -787,19 +787,18 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
       "$(i)$(sep)$($(v)[$(i)])"
          comment => "Insert the value, marker '$(i)' exists",
         location => after("^$(cp)($(i)$(bp).*|$(i))$"),
-      ifvarclass => "replace_attempted_$(ci[$(i)]).multiple_comments_$(ci[$(i)])";
+      ifvarclass => "replace_attempted_$(ci[$(i)])_reached.multiple_comments_$(ci[$(i)])";
 
       # If the line doesn't exist and there are no occurrences
       # of the LHS commented out, insert a new line at the eof
       "$(i)$(sep)$($(v)[$(i)])"
          comment => "Insert the value, marker '$(i)' doesn't exist",
-      ifvarclass => "replace_attempted_$(ci[$(i)]).!multiple_comments_$(ci[$(i)]).!exists_$(ci[$(i)])";
+      ifvarclass => "replace_attempted_$(ci[$(i)])_reached.!multiple_comments_$(ci[$(i)]).!exists_$(ci[$(i)])";
 
   reports:
     verbose_mode|EXTRA::
       "$(this.bundle): Line for '$(i)' exists" ifvarclass => "exists_$(ci[$(i)])";
       "$(this.bundle): Line for '$(i)' does not exist" ifvarclass => "!exists_$(ci[$(i)])";
-
 }
 
 bundle edit_line set_config_values_matching(v,pat)
@@ -837,11 +836,11 @@ bundle edit_line set_config_values_matching(v,pat)
       "^\s*($(index)\s+(?!$($(v)[$(index)])).*|# ?$(index)\s+.*)$"
       comment => "Correct the value",
       replace_with => value("$(index) $($(v)[$(index)])"),
-      classes => always("replace_attempted_$(cindex[$(index)])");
+      classes => results("bundle", "replace_attempted_$(cindex[$(index)])");
 
   insert_lines:
       "$(index) $($(v)[$(index)])"
-      ifvarclass => "replace_attempted_$(cindex[$(index)])";
+      ifvarclass => "replace_attempted_$(cindex[$(index)])_reached";
 
 }
 
@@ -1038,7 +1037,7 @@ bundle edit_line replace_or_add(pattern,line)
       "^(?!$(eline)$)$(pattern)$"
       comment => "Replace a pattern here",
       replace_with => value("$(line)"),
-      classes => scoped_classes_generic("bundle", "replace_$(cline)");
+      classes => results("bundle", "replace_$(cline)");
 
   insert_lines:
       "$(line)"
