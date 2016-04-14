@@ -33,13 +33,7 @@ body executor control
     windows::
       exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -Dcf_execd_initiated";
 
-    hpux::
-      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dcf_execd_initiated";
-
-    aix::
-      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dcf_execd_initiated";
-
-    !(windows|hpux|aix)::
+    !windows::
       exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dcf_execd_initiated";
 
 }
