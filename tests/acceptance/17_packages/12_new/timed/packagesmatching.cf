@@ -1,0 +1,87 @@
+# Test packagesmatching and packageupdatesmatching functions.
+
+body common control
+{
+    inputs => { "../../../default.cf.sub" };
+    bundlesequence => { default($(this.promise_filename)) };
+
+    package_inventory => { test_module };
+}
+
+body package_module test_module
+{
+    query_updates_ifelapsed => "5";
+    query_installed_ifelapsed => "5";
+}
+
+bundle agent init
+{
+  meta:
+    "test_skip_needs_work" string => "!linux";
+
+  files:
+    test_pass_1::
+      "$(sys.workdir)/modules/packages/test_module"
+        copy_from => local_cp("$(this.promise_dirname)/test_module"),
+        perms => m("0755");
+
+   packages:
+    test_pass_3::
+      "cfe-present-package"
+        policy => "present",
+        version => "latest",
+        package_module => test_module;
+}
+
+bundle agent test
+{
+  vars:
+    test_pass_2|test_pass_3::
+      "all_packages" data => packagesmatching(".*", ".*", ".*", ".*");
+      "all_packages_print" string => format("%S", "all_packages");
+      "test_module_packages" data => packagesmatching(".*", ".*", ".*", "test_module");
+      "test_module_packages_print" string => format("%S", "test_module_packages");
+      "all_updates" data => packageupdatesmatching(".*", ".*", ".*", ".*");
+      "all_updates_print" string => format("%S", "all_updates");
+      "test_module_updates" data => packageupdatesmatching(".*", ".*", ".*", "test_module");
+      "test_module_updates_print" string => format("%S", "test_module_updates");
+
+   reports:
+    test_pass_2|test_pass_3::
+      "Packagesmatching test: $(all_packages_print) $(test_module_packages_print) $(all_updates_print) $(test_module_updates_print)";
+
+}
+
+bundle agent check
+{
+  methods:
+    test_pass_1::
+      "any" usebundle => dcs_wait($(this.promise_filename), 0);
+    test_pass_2.ok_pass2::
+      "any" usebundle => dcs_wait($(this.promise_filename), 0);
+
+
+  classes:
+    test_pass_2::
+      "installed_ok" expression => strcmp("$(test.all_packages_print)", '[{"arch":"amd64","method":"test_module","name":"cfe-present-package","version":"1"}]');
+      "module_installed_ok" expression => strcmp("$(test.test_module_packages_print)", '[{"arch":"amd64","method":"test_module","name":"cfe-present-package","version":"1"}]');
+      "updates_ok" expression => strcmp("$(test.all_updates_print)", '[{"arch":"amd64","method":"test_module","name":"cfe-present-package","version":"3"}]');
+      "module_updates_ok" expression => strcmp("$(test.test_module_updates_print)", '[{"arch":"amd64","method":"test_module","name":"cfe-present-package","version":"3"}]');
+
+      "ok_pass2" and => { "installed_ok", "module_installed_ok", "updates_ok", "module_updates_ok" };
+
+    test_pass_3::
+      "installed_ok" expression => strcmp("$(test.all_packages_print)", '[{"arch":"amd64","method":"test_module","name":"cfe-present-package","version":"3"}]');
+      "module_installed_ok" expression => strcmp("$(test.test_module_packages_print)", '[{"arch":"amd64","method":"test_module","name":"cfe-present-package","version":"3"}]');
+      "updates_ok" expression => strcmp("$(test.all_updates_print)", "[]");
+      "module_updates_ok" expression => strcmp("$(test.test_module_updates_print)", "[]");
+
+      "ok_pass3" and => { "installed_ok", "module_installed_ok", "updates_ok", "module_updates_ok" };
+
+  reports:
+    ok_pass3::
+      "$(this.promise_filename) Pass";
+    test_pass_3.!ok_pass3::
+      "$(this.promise_filename) FAIL";
+}
+
