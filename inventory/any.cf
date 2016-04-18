@@ -560,8 +560,7 @@ bundle agent cfe_autorun_inventory_packages
   packages:
     # From 3.7 onwards there is a new package promise implementation using package
     # modules, in which case installing non_existing_package is not needed any more.
-    #(cfengine_3_5|cfengine_3_6).debian::
-    debian::
+    (cfengine_3_5|cfengine_3_6).debian::
       "cfe_internal_non_existing_package"
       package_policy => "add",
       package_method => inventory_apt_get($(refresh)),
@@ -569,8 +568,7 @@ bundle agent cfe_autorun_inventory_packages
 
     # From 3.7 onwards there is a new package promise implementation using package
     # modules, in which case installing non_existing_package is not needed any more.
-    #(cfengine_3_5|cfengine_3_6).redhat::
-    redhat::
+    (cfengine_3_5|cfengine_3_6).redhat::
       "cfe_internal_non_existing_package"
       package_policy => "add",
       package_method => inventory_yum_rpm($(refresh)),

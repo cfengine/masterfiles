@@ -61,11 +61,9 @@ body common control
       # modules in which you MUST provide package modules used to generate
       # software inventory reports. You can also provide global default package module 
       # instead of specifying it in all package promises.
-      # Please also note that software inventory reports is CFEngine enterprise only
-      # feature and core users can remove package_inventory line.
-      #debian|redhat::
-      #    package_inventory => { $(package_module_knowledge.platform_default) };
-      #    package_module => $(package_module_knowledge.platform_default);
+      debian|redhat::
+          package_inventory => { $(package_module_knowledge.platform_default) };
+          package_module => $(package_module_knowledge.platform_default);
 
       #   goal_categories => { "goals", "targets", "milestones" };
       #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
