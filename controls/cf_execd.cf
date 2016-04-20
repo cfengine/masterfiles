@@ -19,6 +19,10 @@ body executor control
       mailfrom   => "$(def.mailfrom)";
       smtpserver => "$(def.smtpserver)";
 
+      # Filter log entries in emails based on regular expressions.
+      # mailfilter_include => { ".*include pattern.*" };
+      # mailfilter_exclude => { ".*exclude pattern.*" };
+
     any::
 
       # Default:
