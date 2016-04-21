@@ -15,6 +15,7 @@ body common control
                           "cfe_internal_update_policy",
                           "cfe_internal_update_bins",
                           "cfe_internal_update_processes",
+                          "jb_update_policy3",
       };
 
       version => "update.cf $(update_def.current_version)";
@@ -26,7 +27,8 @@ body common control
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
-                  "cfe_internal/update/update_processes.cf"
+                  "cfe_internal/update/update_processes.cf",
+                  "cfe_internal/update/jb_update_policy3.cf"
       };
 }
 
