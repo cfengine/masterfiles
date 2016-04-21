@@ -144,6 +144,12 @@ bundle common def
       comment => "Define masterfiles path",
       handle => "common_def_vars_dir_masterfiles";
 
+# repository path definition
+      "jb_dir_repository" string => translatepath("$(sys.workdir)/repository"),
+      comment => "Define repository path",
+      handle => "common_def_vars_jb_dir_repository";
+# end repository path definition
+
       "dir_reports"     string => translatepath("$(sys.workdir)/reports"),
       comment => "Define reports path",
       handle => "common_def_vars_dir_reports";
