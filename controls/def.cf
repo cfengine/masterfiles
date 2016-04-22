@@ -7,27 +7,29 @@
 bundle common def
 {
   classes:
-    # If the augments_file is parsed from C then we do not need to do this work
-    # from policy.
-    !feature_def_json_preparse::
+    "_workaround_CFE_2333" -> { "https://tracker.mender.io/browse/CFE-2333" }
+      or => { "cfengine_3_7_3", "cfengine_3_8_1", "cfengine_3_8_2" };
 
+    # If the augments_file is parsed from C then we do not need ot do this work
+    # from policy
+    !(feature_def_json_preparse)|(_workaround_CFE_2333)::
       "have_augments_file" expression => fileexists($(augments_file)), scope => "bundle";
       "have_augments_classes" expression => isvariable("augments[classes]"), scope => "bundle";
       "have_augments_inputs" expression => isvariable("augments[inputs]"), scope => "bundle";
 
-    have_augments_classes.!feature_def_json_preparse::
+    have_augments_classes.!(feature_def_json_preparse)|(_workaround_CFE_2333)::
       "$(augments_classes_data_keys)"
         expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
         meta => { "augments_class", "derived_from=$(augments_file)" };
 
   vars:
 
-    !feature_def_json_preparse::
-      "augments_file" string => "$(this.promise_dirname)/../def.json";
+    !(feature_def_json_preparse)|(_workaround_CFE_2333)::
+      "augments_file" string => "$(this.promise_dirname)/../../def.json";
 
       "defvars" slist => variablesmatching("default:def\..*", "defvar");
 
-    have_augments_file.!feature_def_json_preparse::
+    have_augments_file.!feature_def_json_preparse|(_workaround_CFE_2333)::
       "augments" data => readjson($(augments_file), 100k), ifvarclass => "have_augments_file";
 
       "augments_inputs" slist => getvalues("augments[inputs]");
@@ -42,15 +44,13 @@ bundle common def
         comment => "It's important that we define this list, even if it's empty
                     or we get errors about the list being unresolved.";
 
-    have_augments_classes.!feature_def_json_preparse::
+    have_augments_classes.!(feature_def_json_preparse)|(_workaround_CFE_2333)::
       "augments_classes_data" data => mergedata("augments[classes]");
       "augments_classes_data_keys" slist => getindices("augments_classes_data");
 
     any::
       # Begin change
 
-      # Email settings are currently unable to be set from def.json, and must
-      # be set directly.
       # Your domain name, for use in access control
       # Note: this default may be inaccurate!
       "domain"
