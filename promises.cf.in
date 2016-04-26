@@ -170,6 +170,9 @@ bundle common cfe_internal_inputs
         string => "cfe_internal/enterprise/file_change.cf",
         comment => "This policy monitors critical system files for change";
 
+      "input[enterprise_mission_portal]"
+        string => "cfe_internal/enterprise/mission_portal.cf",
+        comment => "This policy manages Mission Portal related configurations.";
 
     any::
       "inputs" slist => getvalues("input");

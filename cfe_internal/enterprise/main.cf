@@ -22,10 +22,6 @@ bundle agent cfe_internal_enterprise_main
         comment   => "So that we do not fill up the disk we need to purge scheduled
                       reports after some time.";
 
-      "hub" usebundle => cfe_internal_webserver("on"),
-      handle => "cfe_internal_management_web_server",
-      comment => "Manage Apache Web server (on/off)";
-
       "hub" usebundle => cfe_internal_setup_knowledge,
       handle => "cfe_internal_management_setup_knowledge",
       comment => "Manage CFE Knowledge Map";
@@ -33,10 +29,6 @@ bundle agent cfe_internal_enterprise_main
       "hub" usebundle => cfe_internal_apache_sudoer,
       handle => "cfe_internal_management_apache_sudoer",
       comment => "Permit Apache user to run passwordless sudo cf-runagent";
-
-      "hub" usebundle => cfe_internal_httpd_related,
-      handle => "cfe_internal_management_httpd_related",
-      comment => "To run MP on another TCP port (80 by default)";
 
       "hub" usebundle => cfe_internal_php_runalerts,
       handle => "cfe_internal_management_php_runalerts",

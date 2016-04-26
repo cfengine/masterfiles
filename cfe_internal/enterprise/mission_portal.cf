@@ -1,0 +1,239 @@
+bundle agent cfe_internal_enterprise_mission_portal
+{
+  meta:
+
+      "description" string => "Manage mission portal configuration";
+
+  classes:
+
+      # We start rendering the httpd config automatically with mustache
+      # beginning with 3.9
+
+      "_cfe_enterprise_mission_portal_enable_render_httpd_with_mustache"
+        expression => "!(cfengine_3_4|cfenigne_3_5|cfenigne_3_6|cfengine_3_7|cfengine_3_8)";
+
+  methods:
+
+    policy_server._cfe_enterprise_mission_portal_enable_render_httpd_with_mustache::
+      "Apache Configuration" -> { "CFEngine Enterprise", "Mission Portal" }
+        usebundle => cfe_internal_enterprise_mission_portal_apache;
+
+    policy_server::
+      "Apache Service" -> { "CFEngine Enterprise", "Mission Portal" }
+        usebundle => cfe_internal_webserver("on"),
+        handle => "cfe_internal_management_web_server",
+        comment => "Manage Apache Web server (on/off)";
+
+}
+
+bundle agent cfe_internal_enterprise_mission_portal_apache
+{
+  vars:
+
+    "template"
+      string => "$(this.promise_dirname)/templates/httpd.conf.mustache",
+      comment => "The template used to render the apache config file.";
+
+    "config"
+      string => "$(sys.workdir)/httpd/conf/httpd.conf",
+      comment => "This is the location of the apache config file.";
+
+    "staged_config"
+      string => "$(config).staged",
+      comment => "This is the temporary file we will render the config and
+		  valid against before deploying to the final $(config)
+                  location.";
+
+    # TODO: Consider collecting the classes and variables used based on a tag
+    # to prepare a smaller subset of data
+    "data"
+      data => datastate();
+
+  methods:
+
+      "Stage Apache Config"
+        usebundle => file_make_mustache( $(staged_config), $(template), @(data) ),
+        comment => "We render the config to a staging location so that it can be
+                    validated before deploying the final apache config so that we
+                    don't end up with a broken service.";
+
+      "Manage Final Apache Config"
+        usebundle => mission_portal_apache_from_stage( $(config), $(staged_config) );
+}
+
+bundle agent mission_portal_apache_from_stage(config, staged_config)
+# @brief Make sure the live Apache config is based on a staged config that has
+# been validated.
+# @param config Path to the live config
+# @param staged_config Path to the staged configuration
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent example
+# {
+#   vars:
+#
+#       "config"
+#         string => "$(sys.workdir)/httpd/conf/httpd.conf",
+#         comment => "This is the location of the apache config file.";
+#
+#       "staged_config"
+#         string => "$(config).staged",
+#         comment => "This is the temporary file we will render the config and
+#                     valid against before deploying to the final $(config)
+#                     location.";
+#
+#   methods:
+#
+#       "Manage Final Apache Config"
+#         usebundle => mission_portal_apache_from_stage( $(config), $(staged_config) );
+# }
+#```
+{
+  meta:
+
+      "description"
+        string => "Configure apache based on successfully staged config";
+
+  vars:
+
+      "validate_config"
+        string => "$(sys.workdir)/httpd/bin/httpd -t -f $(staged_config)";
+
+  files:
+
+    "$(config)"
+      create => "true",
+      comment => "Without an apache config, Mission Mortal and Enterprise API
+                  services will not work";
+
+    "$(config)"
+      copy_from => local_dcp( $(staged_config) ),
+      ifvarclass => returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
+      classes => results("bundle", "mission_portal_apache_config"),
+      comment => "We make sure that the deployed config is a copy of the staged
+                  config if the staged config passes a syntax check. We redirect
+                  the output to keep policy runs clean and not generate lots of
+                  unnecessary email.";
+
+  commands:
+
+    mission_portal_apache_config_repaired::
+      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
+        args => "restart",
+        classes => kept_successful_command,
+        contain => in_shell,
+        comment => "We have to restart apache after a config change in order
+                    for the changes to take effect.";
+}
+
+##################################################################
+#
+# cfe_internal_webserver(on/off)
+#
+##################################################################
+
+bundle agent cfe_internal_webserver(state)
+{
+  meta:
+      "description" string => "Manage the Mission Portal webserver state";
+
+  classes:
+
+      "on"       expression => strcmp("$(state)","on"),
+      comment => "Check if a keyword \"on\" is inputs",
+      handle => "cfe_internal_webserver_classes_on";
+
+      "off"      expression => strcmp("$(state)","off"),
+      comment => "Check if a keyword \"off\" is inputs",
+      handle => "cfe_internal_webserver_classes_off";
+
+      #
+
+  processes:
+
+    am_policy_hub.on::
+
+      ".*$(sys.workdir)/httpd/bin/httpd.*"
+      restart_class => "start_cfe_httpd",
+      comment => "Check if CFE httpd process exists or not",
+      handle => "cfe_internal_webserver_processes_start_cfe_httpd";
+
+      #
+
+  commands:
+
+    start_cfe_httpd::
+
+      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl start"
+      comment => "Start CFE httpd process if not exist",
+      classes => kept_successful_command,
+      handle => "cfe_internal_webserver_commands_start_cfe_httpd",
+      contain => in_shell;
+
+}
+
+bundle agent cfe_enterprise_selfsigned_cert
+{
+
+  meta:
+
+      "description"
+        string => "Generate a self signed SSL certificate for secure hub communications.";
+
+  vars:
+
+    policy_server::
+
+      "SSLCertificateFile"           string => "$(cfe_internal_hub_vars.SSLCertificateFile)";
+      "SSLCertificateKeyFile"        string => "$(cfe_internal_hub_vars.SSLCertificateKeyFile)";
+      "SSLCertificatePasswdKeyFile"  string => "$(cfe_internal_hub_vars.SSLCertificatePasswdKeyFile)";
+      "SSLCertificateKeySize"        string => "$(cfe_internal_hub_vars.SSLCertificateKeySize)";
+      "SSLCertificateSigningRequest" string => "$(cfe_internal_hub_vars.SSLCertificateSigningRequest)";
+      "SSLCnf"                       string => "$(cfe_internal_hub_vars.SSLCnf)";
+      "SSLCertificateDaysValid"      string => "$(cfe_internal_hub_vars.SSLCertificateDaysValid)";
+
+      "openssl"  string => "$(sys.workdir)/bin/openssl";
+
+      "_generated_files" slist => {
+                                    $(SSLCertificateFile),
+                                    $(SSLCertificateKeyFile),
+                                    $(SSLCertificatePasswdKeyFile),
+                                    $(SSLCertificateSigningRequest),
+                                  };
+
+
+  classes:
+      "_cfe_enterprise_selfsigned_cert_regenerate_certificate" not => filesexist( @(_generated_files) );
+
+  commands:
+
+    policy_server._cfe_enterprise_selfsigned_cert_regenerate_certificate::
+
+      "$(openssl)"
+        args => "genrsa -passout pass:x -out $(SSLCertificatePasswdKeyFile) $(SSLCertificateKeySize)";
+
+      # Strip password from key in ${CFENGINE_MP_PASS_KEY} and produce ${CFENGINE_MP_KEY}
+      "$(openssl)"
+        args => "rsa -passin pass:x -in $(SSLCertificatePasswdKeyFile) -out $(SSLCertificateKeyFile)";
+
+      # Generate a CSR in ${CFENGINE_MP_CSR} with key ${CFENGINE_MP_KEY}
+      "$(openssl)"
+        args => 'req -utf8 -sha256 -nodes -new -subj "/CN=$(sys.fqhost)" -key $(SSLCertificateKeyFile) -out $(SSLCertificateSigningRequest) -config $(SSLCnf)';
+
+      # Generate CRT
+      "$(openssl)"
+        args => "x509 -req -days $(SSLCertificateDaysValid) -in $(SSLCertificateSigningRequest) -signkey $(SSLCertificateKeyFile) -out $(SSLCertificateFile)";
+
+
+  reports:
+
+    DEBUG|DEBUG_cfe_enterprise_selfsigned_cert::
+
+      "DEBUG $(this.bundle): Certificate Generation Requested"
+        ifvarclass => "_cfe_enterprise_selfsigned_cert_regenerate_certificate";
+
+      "DEBUG $(this.bundle): No Certificate Generation Requested"
+        ifvarclass => "!_cfe_enterprise_selfsigned_cert_regenerate_certificate";
+}

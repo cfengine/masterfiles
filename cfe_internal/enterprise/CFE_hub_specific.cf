@@ -18,11 +18,36 @@ bundle common cfe_internal_hub_vars
 {
   vars:
 
-    linux::
+    policy_server::
 
       "docroot" string => "$(sys.workdir)/httpd/htdocs",
-      comment => "Root directory of Enterprise Web interface",
-      handle => "cfe_internal_hub_vars_docroot";
+        comment => "Root directory of Enterprise Web interface",
+        handle => "cfe_internal_hub_vars_docroot";
+
+
+      # TODO Consider tagging these files for file integrity monitoring.
+
+      "SSLCertificateFile"
+        string => "$(sys.workdir)/httpd/ssl/certs/$(sys.fqhost).cert";
+
+      "SSLCertificateKeyFile"
+        string => "$(sys.workdir)/httpd/ssl/private/$(sys.fqhost).key";
+
+      "SSLCertificatePasswdKeyFile"
+        string => "$(sys.workdir)/httpd/ssl/private/$(sys.fqhost).pass.key";
+
+      "SSLCertificateSigningRequest"
+        string => "$(sys.workdir)/httpd/ssl/private/$(sys.fqhost).csr";
+
+      "SSLCnf"
+        string => "$(sys.workdir)/ssl/openssl.cnf";
+
+      "access_log" string => "$(sys.workdir)/httpd/logs/access_log";
+      "error_log"  string => "$(sys.workdir)/httpd/logs/error_log";
+      "ssl_request_log" string => "$(sys.workdir)/httpd/logs/ssl_request_log";
+
+      "SSLCertificateKeySize" string => "4096";
+      "SSLCertificateDaysValid" string => "3650";
 
 }
 
@@ -151,143 +176,7 @@ bundle edit_line apache_sudoer
 
 }
 
-##################################################################
-#
-# cfe_internal_webserver(on/off)
-#  ***this is a new one***
-##################################################################
 
-bundle agent cfe_internal_webserver(state)
-{
-
-  classes:
-
-      "on"       expression => strcmp("$(state)","on"),
-      comment => "Check if a keyword \"on\" is inputs",
-      handle => "cfe_internal_webserver_classes_on";
-
-      "off"      expression => strcmp("$(state)","off"),
-      comment => "Check if a keyword \"off\" is inputs",
-      handle => "cfe_internal_webserver_classes_off";
-
-      #
-
-  processes:
-
-    am_policy_hub.on::
-
-      ".*$(sys.workdir)/httpd/bin/httpd.*"
-      restart_class => "start_cfe_httpd",
-      comment => "Check if CFE httpd process exists or not",
-      handle => "cfe_internal_webserver_processes_start_cfe_httpd";
-
-      #
-
-  commands:
-
-    start_cfe_httpd::
-
-      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl start"
-      comment => "Start CFE httpd process if not exist",
-      classes => kept_successful_command,
-      handle => "cfe_internal_webserver_commands_start_cfe_httpd",
-      contain => in_shell;
-
-}
-
-##################################################################
-#
-# cfe_internal_httpd_related
-#  - to change default TCP (80) port of MP
-#
-##################################################################
-
-bundle agent cfe_internal_httpd_related
-{
-  vars:
-
-    am_policy_hub::
-
-      "tcp_port" string => "80",
-      comment => "TCP port that MP is using",
-      handle => "cfe_internal_httpd_related_vars_tcp_port";
-
-      #
-
-  files:
-
-    am_policy_hub::
-
-      "$(sys.workdir)/httpd/conf/httpd.conf"
-      comment => "Change TCP port on CFEngine httpd configuration",
-      handle => "cfe_internal_httpd_related_files_httpd_conf",
-      edit_line => change_port("$(tcp_port)"),
-      classes => if_repaired("restart_cfe_httpd");
-
-      "$(sys.workdir)/httpd/htdocs/application/config/appsettings.php"
-      comment => "Add TCP port to MP setting",
-      handle => "cfe_internal_httpd_related_files_appsettings_php",
-      edit_line => change_appsettings("$(tcp_port)");
-
-      #
-
-  commands:
-
-    restart_cfe_httpd::
-
-      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl restart"
-      comment => "Restart CFEngine httpd if there is a change on configuration",
-      classes => kept_successful_command,
-      handle => "cfe_internal_httpd_related_commands_apachectl_restart",
-      contain => in_shell;
-
-}
-
-      #
-
-bundle edit_line change_port(p)
-{
-  replace_patterns:
-
-    any::
-
-      "^\s*Listen(\s+)(?!$(p)$).*$"
-      comment => "Match Listen line and replace",
-      handle => "cfe_internal_change_port_edit_line_listen_port",
-      replace_with => value("Listen $(p)");
-
-}
-
-      #
-
-bundle edit_line change_appsettings(p)
-{
-  classes:
-
-    any::
-
-      "original_config"
-      expression => strcmp("$(p)","80"),
-      comment => "If the port is 80 then create a class",
-      handle => "cfe_internal_change_appsettings_classes_port_80";
-
-      #
-
-  replace_patterns:
-
-    original_config::
-      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+'localhost'\s+\.\s+'(?!/api).*"
-      comment => "Match a line and replace",
-      handle => "cfe_internal_change_appsetting_replace_patterns_port_80",
-      replace_with => value("    $config['rest_server'] = $protocol . 'localhost' . '/api';");
-
-    !original_config::
-      "\s+\$config\['rest_server'\]\s+=\s+\$protocol\s+\.\s+'localhost'\s+\.\s+'(?!\:$(p)/api).*"
-      comment => "Match a line and replace",
-      handle => "cfe_internal_change_appsetting_replace_patterns_not_port_80",
-      replace_with => value("    $config['rest_server'] = $protocol . 'localhost' . ':$(p)/api';");
-
-}
 
 bundle agent cfe_internal_php_runalerts
 #@brief create and run PHP alerts
