@@ -349,7 +349,15 @@ bundle common inventory_control
 # are disabled.
 {
   vars:
-      "lldpctl_exec" string => "/usr/bin/lldpctl";
+      "lldpctl_exec" string => ifelse(fileexists("/usr/sbin/lldpctl"), "/usr/sbin/lldpctl",
+                                     fileexists("/usr/local/bin/lldpctl"), "/usr/local/bin/lldpctl",
+                                     "/usr/sbin/lldpctl");
+
+      "lldpctl_json" string => "$(lldpctl_exec) -f json",
+        unless => isvariable("def.lldpctl_json");
+      "lldpctl_json" string => "$(def.lldpctl_json)",
+        if => isvariable("def.lldpctl_json");
+
       "lsb_exec" string => "/usr/bin/lsb_release";
       "mtab" string => "/etc/mtab";
       "proc" string => "/proc";

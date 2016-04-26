@@ -531,11 +531,9 @@ bundle agent cfe_autorun_inventory_LLDP
   classes:
       "disable_inventory_LLDP" not => fileexists($(inventory_control.lldpctl_exec));
 
-  commands:
+  vars:
     !disable_inventory_LLDP::
-      "$(inventory_control.lldpctl_exec) | perl -n -e 'my ($k, $v) = m/([^=]+)=(.*)/; $k =~ s/\W/_/g; print \"=$k=$v\";"
-      classes => kept_successful_command,
-      module => "true";
+      "info" data => parsejson(execresult($(inventory_control.lldpctl_json), "noshell"));
 }
 
 bundle agent cfe_autorun_inventory_packages
