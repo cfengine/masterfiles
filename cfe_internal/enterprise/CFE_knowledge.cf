@@ -65,7 +65,7 @@ bundle agent cfe_internal_setup_knowledge
       create => "true",
       depth_search => recurse_basedir("inf"),
       file_select => cfe_internal_exclude_index_html,
-      perms => mog("0440", "root", $(def.cf_apache_group) );
+      perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group) );
 
       "$(cfe_internal_hub_vars.docroot)/application"
       comment => "No one should be able to write to the application, and only
@@ -90,7 +90,6 @@ bundle agent cfe_internal_setup_knowledge
       comment => "The scripts need to be executable, but only by the
                   webserver and root users.";
 
-
       "$(cfe_internal_hub_vars.docroot)/api/static/."
       perms => mog("0660", "root", $(def.cf_apache_group) ),
       comment => "This is where exported PDF and CSV reports from Mission
@@ -107,7 +106,7 @@ bundle agent cfe_internal_setup_knowledge
       comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
       handle => "cfe_internal_setup_knowledge_files_httpd_logs",
       create => "true",
-      perms => mog("0660", "root", $(def.cf_apache_group));
+      perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/ssl/."
         depth_search => recurse_basedir("inf"),
