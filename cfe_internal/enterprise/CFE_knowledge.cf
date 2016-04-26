@@ -43,13 +43,6 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI/Apache-htaccess");
 
-      "$(cfe_internal_hub_vars.docroot)/hub/."
-      comment => "Create a necessary folder for cf-hub",
-      handle => "cfe_internal_setup_knowledge_files_doc_root_hub",
-      create => "true",
-      depth_search => recurse_basedir("inf"),
-      perms => mog("0440","root", $(def.cf_apache_group) );
-
       "$(cfe_internal_hub_vars.docroot)/scripts/."
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/scripts",
       handle => "cfe_internal_setup_knowledge_files_doc_root_scripts",
@@ -109,13 +102,6 @@ bundle agent cfe_internal_setup_knowledge
       depth_search => recurse("inf"),
       file_select => cfe_internal_docroot_api_static_perms,
       perms => mog("0440", "root", $(def.cf_apache_group) );
-
-      "$(cfe_internal_hub_vars.docroot)/sql_lite/."
-      comment => "Create a directory sql_lite for analytic to be working",
-      handle => "cfe_internal_setup_knowledge_files_doc_root_sql_lite",
-      create => "true",
-      depth_search => recurse_basedir("inf"),
-      perms => mog("0640", "root", $(def.cf_apache_group));
 
       "$(sys.workdir)/httpd/logs/."
       comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
