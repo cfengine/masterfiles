@@ -176,7 +176,7 @@ bundle agent maintain_cfe_hub_process
       comment => "Ensure postgres.log file is there with right permissions",
       handle => "cfe_internal_maintain_cfe_hub_process_files_create_postgresql_log",
       create => "true",
-      perms => u_mo("0644","cfpostgres");
+      perms => u_mo("0600","cfpostgres");
 
       #
 
