@@ -33,8 +33,23 @@ bundle agent init
 
 bundle agent test
 {
+  packages:
+    # Old way of forcing package updates, for the legacy packages promise.
+    debian::
+      "cfe_internal_non_existing_package"
+      package_policy => "add",
+      package_method => inventory_apt_get($(cfe_autorun_inventory_packages.refresh)),
+      action => if_elapsed_day;
+
+    redhat::
+      "cfe_internal_non_existing_package"
+      package_policy => "add",
+      package_method => inventory_yum_rpm($(cfe_autorun_inventory_packages.refresh)),
+      action => if_elapsed_day;
+
   methods:
-      "any" usebundle => inventory_autorun;
+      # Previous way, when the legacy package promise was the default.
+      #"any" usebundle => inventory_autorun;
 }
 
 bundle agent check

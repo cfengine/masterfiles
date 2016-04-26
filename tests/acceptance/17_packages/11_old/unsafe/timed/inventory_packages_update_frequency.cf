@@ -1,4 +1,5 @@
-# Test that we don't refresh the package updates too often.
+# Test that we don't refresh the package updates too often in the legacy package
+# promise.
 
 body common control
 {
@@ -8,6 +9,23 @@ body common control
                 "../../../../../../$(sys.local_libdir)/packages.cf"
               };
     bundlesequence  => { "inventory_autorun", default("$(this.promise_filename)") };
+}
+
+bundle agent init
+{
+  packages:
+    # Old way of forcing package updates, for the legacy packages promise.
+    debian::
+      "cfe_internal_non_existing_package"
+      package_policy => "add",
+      package_method => inventory_apt_get($(cfe_autorun_inventory_packages.refresh)),
+      action => if_elapsed_day;
+
+    redhat::
+      "cfe_internal_non_existing_package"
+      package_policy => "add",
+      package_method => inventory_yum_rpm($(cfe_autorun_inventory_packages.refresh)),
+      action => if_elapsed_day;
 }
 
 bundle agent test
