@@ -10,23 +10,23 @@ AC_PREREQ(2.59)
 
 m4_define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
 
-m4_define([version_from_env], m4_esyscmd_s([echo $EXPLICIT_VERSION]))
-m4_ifblank(version_from_env, [
-    m4_define([version_from_detect], m4_esyscmd_s([3rdparty/core/determine-version.py]))
+m4_define([cfversion_from_env], m4_esyscmd_s([echo $EXPLICIT_VERSION]))
+m4_ifblank(cfversion_from_env, [
+    m4_define([cfversion_from_detect], m4_esyscmd_s([3rdparty/core/determine-version.py]))
     m4_if(m4_sysval, 0, [], [
         m4_fatal([Could not determine CFEngine version. Please set EXPLICIT_VERSION in the environment.])
     ])
-    m4_define([version], version_from_detect[]a1.revision)
-    m4_undefine([version_from_detect])
+    m4_define([cfversion], cfversion_from_detect[]a1.revision)
+    m4_undefine([cfversion_from_detect])
 ], [
-    m4_define([version], version_from_env)
+    m4_define([cfversion], cfversion_from_env)
 ])
 
-AC_INIT([cfengine-masterfiles], version)
+AC_INIT([cfengine-masterfiles], cfversion)
 
 m4_undefine([revision])
-m4_undefine([version])
-m4_undefine([version_from_env])
+m4_undefine([cfversion])
+m4_undefine([cfversion_from_env])
 
 AC_CANONICAL_TARGET
 
