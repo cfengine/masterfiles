@@ -121,6 +121,23 @@ bundle edit_line comment_lines_matching(regex,comment)
 
 ##
 
+bundle edit_line contains_literal_string(string)
+# @brief Ensure the literal string is present in the promised file
+# @description If the string is not found in the file it is inserted according
+# to CFEngine defaults.
+# @param string The string (potentially multiline) to ensure exists in the
+# promised file.
+{
+
+   insert_lines:
+     "$(string)"
+       insert_type => "preserve_block",
+       expand_scalars => "false",
+       whitespace_policy => { "exact_match" };
+}
+
+##
+
 bundle edit_line uncomment_lines_matching(regex,comment)
 # @brief Uncomment lines of the file where the regex matches
 # the entire text after the comment string
