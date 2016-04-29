@@ -168,6 +168,7 @@ bundle agent standard_services(service,state)
 {
   vars:
       "call_systemctl" string => "$(paths.systemctl) --no-ask-password --global --system";
+      "systemd_properties" string => "-pLoadState,CanStop,UnitFileState,ActiveState,LoadState,CanStart,CanReload";
       "init" string => "/etc/init.d/$(service)";
       "c_service" string => canonify("$(service)");
 
@@ -180,8 +181,7 @@ bundle agent standard_services(service,state)
       "svcadm_mode" string => "disable";
 
     systemd::
-      # On my systems, I'm seeing 115 or so lines of output... giving some wiggle room
-      "systemd_service_info" slist => string_split(execresult("$(call_systemctl) show $(service)", "noshell"), "\n", "150");
+      "systemd_service_info" slist => string_split(execresult("$(call_systemctl) $(systemd_properties) show $(service)", "noshell"), "\n", "10");
 
   classes:
       # define a class named after the desired state
@@ -228,6 +228,7 @@ bundle agent standard_services(service,state)
       "service_enabled" expression => reglist(@(systemd_service_info), "UnitFileState=enabled");
       "service_active"  expression => reglist(@(systemd_service_info), "ActiveState=active");
       "service_loaded"  expression => reglist(@(systemd_service_info), "LoadState=loaded");
+      "service_notfound" expression => reglist(@(systemd_service_info), "LoadState=not-found");
 
       "can_stop_service"   expression => reglist(@(systemd_service_info), "CanStop=yes");
       "can_start_service"  expression => reglist(@(systemd_service_info), "CanStart=yes");
@@ -337,6 +338,9 @@ bundle agent standard_services(service,state)
       "$(this.bundle): using Solaris SMF to $(state) $(service) (svcadm mode $(svcadm_mode))";
     verbose_mode.fallback::
       "$(this.bundle): falling back to classic_services to $(state) $(service)";
+
+    systemd.service_notfound::
+        "$(this.bundle): Could not find service: $(service)";
 }
 
 bundle agent classic_services(service,state)
