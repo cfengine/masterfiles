@@ -529,10 +529,10 @@ bundle agent cfe_autorun_inventory_LLDP
 # testing, and your Friendly Network Admin may be of help too.
 {
   classes:
-      "disable_inventory_LLDP" not => fileexists($(inventory_control.lldpctl_exec));
+      "lldpctl_exec_exists" expression => fileexists($(inventory_control.lldpctl_exec));
 
   vars:
-    !disable_inventory_LLDP::
+    !disable_inventory_LLDP.lldpctl_exec_exists::
       "info" data => parsejson(execresult($(inventory_control.lldpctl_json), "noshell"));
 }
 
