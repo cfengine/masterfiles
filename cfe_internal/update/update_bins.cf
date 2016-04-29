@@ -431,7 +431,7 @@ bundle edit_line u_install_script
 {
   insert_lines:
 
-    redhat::
+    redhat|suse::
 
       "#!/bin/sh
 
