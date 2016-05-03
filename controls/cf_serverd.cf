@@ -24,8 +24,8 @@ body server control
       # following ones.  SEE COMMENTS IN def.cf
       trustkeysfrom         => { @(def.trustkeysfrom) };
 
-      ## List of hosts that we'll accept connections not using latest protocol
-      ## (absence of this option means allow all, empty list means allow none)
+      ## List of the hosts not using the latest protocol that we'll accept connections from
+      ## (absence of this option or empty list means allow none)
       # allowlegacyconnects   => { };
 
       # Maximum number of concurrent connections.
