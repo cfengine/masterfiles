@@ -1,4 +1,4 @@
-# This file is managed by CFEngine
+# This file is rendered by CFEngine
 # manual edits will be reverted.
 
 ServerName {{{vars.sys.fqhost}}}
@@ -6,17 +6,16 @@ ServerRoot "/var/cfengine/httpd"
 Listen 80
 
 # Modules
+
 LoadModule authn_file_module modules/mod_authn_file.so
 LoadModule authn_dbm_module modules/mod_authn_dbm.so
 LoadModule authn_anon_module modules/mod_authn_anon.so
 LoadModule authn_dbd_module modules/mod_authn_dbd.so
-LoadModule authn_default_module modules/mod_authn_default.so
 LoadModule authz_host_module modules/mod_authz_host.so
 LoadModule authz_groupfile_module modules/mod_authz_groupfile.so
 LoadModule authz_user_module modules/mod_authz_user.so
 LoadModule authz_dbm_module modules/mod_authz_dbm.so
 LoadModule authz_owner_module modules/mod_authz_owner.so
-LoadModule authz_default_module modules/mod_authz_default.so
 LoadModule auth_basic_module modules/mod_auth_basic.so
 LoadModule auth_digest_module modules/mod_auth_digest.so
 LoadModule dbd_module modules/mod_dbd.so
@@ -32,10 +31,8 @@ LoadModule log_forensic_module modules/mod_log_forensic.so
 LoadModule logio_module modules/mod_logio.so
 LoadModule env_module modules/mod_env.so
 LoadModule mime_magic_module modules/mod_mime_magic.so
-LoadModule cern_meta_module modules/mod_cern_meta.so
 LoadModule expires_module modules/mod_expires.so
 LoadModule headers_module modules/mod_headers.so
-LoadModule ident_module modules/mod_ident.so
 LoadModule usertrack_module modules/mod_usertrack.so
 LoadModule unique_id_module modules/mod_unique_id.so
 LoadModule setenvif_module modules/mod_setenvif.so
@@ -50,7 +47,6 @@ LoadModule dav_fs_module modules/mod_dav_fs.so
 LoadModule vhost_alias_module modules/mod_vhost_alias.so
 LoadModule negotiation_module modules/mod_negotiation.so
 LoadModule dir_module modules/mod_dir.so
-LoadModule imagemap_module modules/mod_imagemap.so
 LoadModule actions_module modules/mod_actions.so
 LoadModule speling_module modules/mod_speling.so
 LoadModule alias_module modules/mod_alias.so
@@ -58,6 +54,18 @@ LoadModule rewrite_module modules/mod_rewrite.so
 LoadModule authnz_ldap_module modules/mod_authnz_ldap.so
 LoadModule ldap_module modules/mod_ldap.so
 LoadModule ssl_module modules/mod_ssl.so
+
+# Required to drop privledges
+LoadModule unixd_module modules/mod_unixd.so
+
+# Required for use of Order and Require commands
+LoadModule access_compat_module modules/mod_access_compat.so
+
+# Required for SSL Session Caching
+LoadModule socache_shmcb_module modules/mod_socache_shmcb.so
+
+# Required to log into mission portal
+LoadModule authz_core_module modules/mod_authz_core.so
 
 <IfModule userdir_module>
 # This module should not be loaded, this is just an extra measure.
@@ -107,8 +115,6 @@ LogLevel warn
     CustomLog "logs/access_log" common
 </IfModule>
 
-DefaultType text/plain
-
 <IfModule mime_module>
     TypesConfig conf/mime.types
     AddType application/x-compress .Z
@@ -125,7 +131,6 @@ DefaultType text/plain
   SSLPassPhraseDialog  builtin
   SSLSessionCache        "shmcb:/var/cfengine/httpd/logs/ssl_scache(512000)"
   SSLSessionCacheTimeout  300
-  SSLMutex  "file:/var/cfengine/httpd/logs/ssl_mutex"
 
   <VirtualHost _default_:443>
     DocumentRoot "{{{vars.cfe_internal_hub_vars.docroot}}}"
@@ -168,7 +173,7 @@ AddType    application/x-httpd-php-source php5
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}">
 
-    Options -Indexes FollowSymLinks MultiViews
+    Options -Indexes +FollowSymLinks +MultiViews
     Order deny,allow
 
     AllowOverride None
