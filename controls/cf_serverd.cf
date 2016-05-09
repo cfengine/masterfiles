@@ -78,6 +78,7 @@ bundle server access_rules()
 
       "$(def.dir_modules)"
       handle => "server_access_grant_access_modules",
+      shortcut => "modules",
       comment => "Grant access to modules directory",
       admit => { @(def.acl) };
 
