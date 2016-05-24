@@ -35,9 +35,9 @@ body executor control
       # cf-twin needs its own safe environment because of the update mechanism
 
     windows::
-      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -Dcf_execd_initiated";
+      exec_command => "$(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated";
 
     !windows::
-      exec_command => "$(sys.cf_agent) -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dcf_execd_initiated";
+      exec_command => "$(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated";
 
 }
