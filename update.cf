@@ -10,11 +10,8 @@ body common control
                           "update_def",
                           "u_cfengine_enterprise",
                           @(u_cfengine_enterprise.def),
-                          "cfe_internal_dc_workflow",
-                          "cfe_internal_bins",
-                          "cfe_internal_update_policy",
-                          "cfe_internal_update_bins",
-                          "cfe_internal_update_processes",
+                          "mpf_update",
+
       };
 
       version => "update.cf $(update_def.current_version)";
@@ -31,6 +28,45 @@ body common control
 }
 
 #############################################################################
+
+bundle agent mpf_update
+# @brief Masterfiles Policy Framework Update Policy
+#
+# @description These policies are related to ensuring the environment is
+# configured properly before a policy run. This includes publishing policy with
+# the masterfiles-stage tooling, making sure that $(sys.inputdir) is updated
+# from its upstream masterfiles, updating CFEngine packages, and ensuring the
+# necessary CFEngine components are running,
+{
+  methods:
+
+      "Design Center"
+        usebundle => cfe_internal_dc_workflow,
+        comment => "Policy related to the design center workflow. This includes
+                    publishing policy changes from hubs using the
+                    masterfiles-stage tooling";
+
+      "CFEngine Binaries"
+        usebundle => cfe_internal_bins,
+        comment => "Policy to manage binary and library permissions and symlinks
+                    into common PATH";
+
+      "Policy Inputs"
+        usebundle => cfe_internal_update_policy,
+        comment => "Policy related to updating $(sys.inputdir) from published
+                    masterfiles";
+
+      "CFEngine Package"
+        usebundle => cfe_internal_update_bins,
+        comment => "Policy to manage the internal binary upgrade process.";
+
+      "CFEngine Processes"
+        usebundle => cfe_internal_update_processes,
+        comment => "Policy to make sure the appropriate CFEngine components are
+                    running.";
+
+}
+
 bundle common cfengine_update_controls
 {
   vars:
