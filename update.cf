@@ -39,6 +39,19 @@ bundle agent mpf_update
 # from its upstream masterfiles, updating CFEngine packages, and ensuring the
 # necessary CFEngine components are running,
 {
+  vars:
+      "sorted_update_bundlesequence_end"
+        meta => { "defvar" },
+        slist => sort( @(def.update_bundlesequence_end), "lex" );
+
+      "num_custom_bundles" int => length( "sorted_update_bundlesequence_end" );
+
+  classes:
+      # TODO After 3.10 is no longer supported compress into a single promise
+      # nesting functions
+      "_have_custom_update_bundles"
+        expression => isgreaterthan( $(num_custom_bundles), 0);
+
   methods:
 
       "Design Center"
@@ -66,6 +79,11 @@ bundle agent mpf_update
         comment => "Policy to make sure the appropriate CFEngine components are
                     running.";
 
+    _have_custom_update_bundles::
+      "Custom Update Policy"
+        usebundle => $(sorted_update_bundlesequence_end),
+        comment => "We want users to be able to easily define additional bundles
+                    to be actuated as part of the update policy";
 }
 
 bundle common cfengine_update_controls
