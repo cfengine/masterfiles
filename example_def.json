@@ -20,6 +20,7 @@
 
         "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
-                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ]
+                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ],
+        "update_inputs": [ "services/myorg/my_custom_policy.cf" ],
     }
 }

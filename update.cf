@@ -18,6 +18,7 @@ body common control
 
       inputs => {
                   @(cfengine_update_controls.update_def_inputs),
+                  @(update_def.inputs),
                   "cfe_internal/update/update_bins.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
