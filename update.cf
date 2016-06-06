@@ -68,7 +68,8 @@ bundle agent mpf_update
       "Policy Inputs"
         usebundle => cfe_internal_update_policy,
         comment => "Policy related to updating $(sys.inputdir) from published
-                    masterfiles";
+                    masterfiles",
+        action => u_ifelapsed( $(update_def.update_inputs_ifelapsed) );
 
       "CFEngine Package"
         usebundle => cfe_internal_update_bins,
@@ -108,6 +109,12 @@ bundle common cfengine_update_controls
   reports:
     DEBUG|DEBUG_cfengine_update_controls::
       "DEBUG $(this.bundle): update def inputs='$(update_def_inputs)'";
+}
+
+body action u_ifelapsed(x)
+{
+      ifelapsed => "$(x)";
+      expireafter => "$(x)";
 }
 
 body agent control

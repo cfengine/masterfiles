@@ -118,6 +118,25 @@ bundle common update_def
                     $(sys.update_policy_path) )",
         ifvarclass => isvariable("def.update_inputs");
 
+      # Default update frequency and tolerated update time
+      "update_inputs_ifelapsed"
+        string => "1",
+        handle => "common_def_vars_default_update_inputs_ifelapsed",
+        comment => "This controls how frequently in seconds the agent should try
+                    to update $(sys.inputdir) from upstream policy. Note:
+                    Setting this value to 0 is interpreted as run once and never
+                    again.",
+        ifvarclass => not(isvariable("def.update_inputs_ifelapsed"));
+
+      "update_inputs_ifelapsed"
+        string => "$(def.update_inputs_ifelapsed)",
+        handle => "common_def_vars_custom_update_inputs_ifelapsed",
+        comment => "This controls how frequently in seconds the agent should try
+                    to update $(sys.inputdir) from upstream policy. Note:
+                    Setting this value to 0 is interpreted as run once and never
+                    again.",
+        ifvarclass => isvariable("def.update_inputs_ifelapsed");
+
     # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 
