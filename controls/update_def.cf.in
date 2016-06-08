@@ -96,19 +96,16 @@ bundle common update_def
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_group";
 
-    !(cfengine_3_6|cfengine_3_7|cfengine_3_8)::
-      # Default the update_inputs to an empty list if no user
-      # defined is found.
-
+      # To avoid errors about unresolved inputs without having to enable body
+      # common control ignore_missing_inputs we handle updates defined from the
+      # augments file specially.
       "inputs"
         slist => {},
-        handle => "common_def_vars_default_update_inputs_3_9",
-        comment => "This allows users to define additional policy files that
-                    should be included by the update policy (
-                    $(sys.update_policy_path) )",
+        handle => "common_def_vars_default_update_inputs",
+        comment => "Defining an empty list when no update related inputs are
+                    found avoids errors related to unresolved inputs.",
         ifvarclass => not(isvariable("def.update_inputs"));
 
-    any::
       # Define the user specified inputs for the update policy
       "inputs"
         slist => { @(def.update_inputs) },

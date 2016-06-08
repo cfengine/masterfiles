@@ -18,7 +18,12 @@ body common control
 
       inputs => {
                   @(cfengine_update_controls.update_def_inputs),
+
+                  # To avoid errors about unresolved variables inputs defined
+                  # from the augments file are handled in bundle common
+                  # update_def
                   @(update_def.inputs),
+
                   "cfe_internal/update/update_bins.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
