@@ -144,6 +144,12 @@ bundle common def
       comment => "Define masterfiles path",
       handle => "common_def_vars_dir_masterfiles";
 
+# JB repository path definition
+      "jb_dir_repository" string => translatepath("$(sys.workdir)/repository"),
+      comment => "Define JB repository path",
+      handle => "common_def_vars_jb_dir_repository";
+# end JB repository path definition
+
       "dir_reports"     string => translatepath("$(sys.workdir)/reports"),
       comment => "Define reports path",
       handle => "common_def_vars_dir_reports";
@@ -246,8 +252,8 @@ bundle common def
       ### Enable special features policies. Set to "any" to enable.
 
       # Auto-load files in "services/autorun" and run bundles tagged "autorun".
-      # Disabled by default!
-      "services_autorun" expression => "!any";
+      # Disabled by default - enabled by JB!
+      "services_autorun" expression => "any";
 
       # Internal CFEngine log files rotation
       "cfengine_internal_rotate_logs" expression => "any";

@@ -69,6 +69,13 @@ bundle server access_rules()
       comment => "Grant access to the policy updates",
       admit => { @(def.acl) };
 
+# JB repository access grant
+      "$(def.jb_dir_repository)"
+      handle => "server_access_grant_access_jb_repository",
+      comment => "Grant access to the JB repository",
+      admit   => { @(def.acl) };
+# end JB repository access grant
+
       "$(def.dir_software)"
       handle => "server_access_grant_access_datafiles",
       comment => "Grant access to software updates",
