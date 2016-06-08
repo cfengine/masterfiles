@@ -47,7 +47,7 @@ bundle agent mpf_update
   vars:
       "sorted_update_bundlesequence_end"
         meta => { "defvar" },
-        slist => sort( @(def.update_bundlesequence_end), "lex" );
+        slist => sort( "def.update_bundlesequence_end", "lex" );
 
   classes:
       "_have_custom_update_bundles"
