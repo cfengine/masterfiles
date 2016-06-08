@@ -22,6 +22,9 @@
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
                                  "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ],
         "update_inputs": [ "services/myorg/my_custom_policy.cf" ],
-        "update_inputs_ifelapsed": 1440
+        "update_inputs_ifelapsed": 1440,
+        "cfengine_internal_max_log_size": "1k",
+        "cfengine_internal_max_log_rotations": 1,
+        "cfengine_internal_max_log_keep_days": 5
     }
 }
