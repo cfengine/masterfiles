@@ -19,18 +19,18 @@ bundle agent ha_agent_sync
 {
  files:
   "$(sys.workdir)/policy_server.dat"
-      copy_from => ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.policy_servers)),
+      copy_from => ha_update_ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.policy_servers)),
       handle => "ha_cfengine_node_update_master_ip",
-      comment => "Update master hub IP on CFEngine node. This is causing that clients will try 
+      comment => "Update master hub IP on CFEngine node. This is causing that clients will try
                   to contact active/master hub first.";
 
   "$(sys.workdir)/ppkeys"
-      copy_from => ha_no_backup_scp("$(ha_def.hubs_keys_location)", @(update_def.policy_servers)),
+      copy_from => ha_update_ha_no_backup_scp("$(ha_def.hubs_keys_location)", @(update_def.policy_servers)),
       file_select => hub_all_keys,
-      depth_search => ha_recurse("inf"),
+      depth_search => ha_update_ha_recurse("inf"),
       handle => "ha_copy_hub_keys_to_nodes",
       comment => "Download keys of all hubs working in HA cluster and store in client's ppkeys directory.
-                  This is important for establishing trusted connection  with standby hub(s) in 
+                  This is important for establishing trusted connection  with standby hub(s) in
                   case of failover.";
 }
 
@@ -38,10 +38,10 @@ bundle agent ha_share_hub_keys
 {
  files:
    "$(ha_def.hubs_keys_location)"
-      copy_from => no_backup_cp("$(sys.workdir)/ppkeys"),
+      copy_from => ha_update_no_backup_cp("$(sys.workdir)/ppkeys"),
       file_select => hubs_keys_select,
       handle => "ha_copy_hubs_keys",
-      depth_search => recurse("1"),
+      depth_search => ha_update_recurse("1"),
       comment => "Clients need to be able to download keys of all hubs working in
                   HA cluster. This is needed to establish trusted connection
                   with standby hubs in case of failover. In order to limit possibility
@@ -55,11 +55,11 @@ bundle agent ha_hub_sync
   "exclude_files" slist => {"localhost.priv", "localhost.pub", @(ha_def.hub_shas)};
  files:
   "$(ha_def.ppkeys_staging)"
-      copy_from => ha_no_backup_scp("$(sys.workdir)/ppkeys", @(update_def.standby_servers)),
-      file_select => ex_list(@(exclude_files)),
+      copy_from => ha_update_ha_no_backup_scp("$(sys.workdir)/ppkeys", @(update_def.standby_servers)),
+      file_select => ha_update_ex_list(@(exclude_files)),
       handle => "ha_copy_client_keys_between_replica_set_servers",
-      depth_search => recurse("1"),
-      classes => if_repaired("hub_data_synced"),
+      depth_search => ha_update_recurse("1"),
+      classes => ha_update_if_repaired("hub_data_synced"),
       comment => "Distribute all client keys between replica set servers. This is
                   important in case of failover. Once clients keys are synchronized
                   between all hubs working in HA cluster, clients will be able
@@ -70,9 +70,9 @@ bundle agent manage_hub_synced_data
 {
  files:
    "$(sys.workdir)/ppkeys"
-      copy_from => no_backup_cp("$(ha_def.ppkeys_staging)"),
-      file_select => plain,
-      depth_search => recurse("1"),
+      copy_from => ha_update_no_backup_cp("$(ha_def.ppkeys_staging)"),
+      file_select => ha_update_plain,
+      depth_search => ha_update_recurse("1"),
       handle => "ha_copy_staged_client_keys",
       comment => "Copy staged client keys to ppkeys. First client keys are copied
                   to ppkeys_staging directory and then to ppkeys. Only clients which
@@ -84,7 +84,7 @@ bundle agent sync_master_hub_dat
 {
  files:
     "$(ha_def.master_hub_location)"
-      copy_from => ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.standby_servers)),
+      copy_from => ha_update_ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.standby_servers)),
       comment => "Update master hub IP on CFEngine node",
       handle => "ha_cfengine_hub_update_master_ip";
 
@@ -104,7 +104,7 @@ body file_select hubs_keys_select
  file_result => "leaf_name";
 }
 
-body copy_from ha_no_backup_scp(from,server)
+body copy_from ha_update_ha_no_backup_scp(from,server)
 {
  servers     => { "$(server)" };
  source      => "$(from)";
@@ -113,38 +113,37 @@ body copy_from ha_no_backup_scp(from,server)
  encrypt     => "true";
 }
 
-body depth_search ha_recurse(d)
+body depth_search ha_update_ha_recurse(d)
 {
  depth => "$(d)";
  exclude_dirs => { "\.svn", "\.git", "git-core" };
 }
 
-body depth_search recurse(d)
+body depth_search ha_update_recurse(d)
 {
       depth => "$(d)";
       xdev  => "true";
 }
 
-body classes if_repaired(x)
+body classes ha_update_if_repaired(x)
 {
       promise_repaired => { "$(x)" };
 }
 
-body file_select ex_list(names)
+body file_select ha_update_ex_list(names)
 {
       leaf_name  => { @(names)};
       file_result => "!leaf_name";
 }
 
-body file_select plain
+body file_select ha_update_plain
 {
       file_types  => { "plain" };
       file_result => "file_types";
 }
 
-body copy_from no_backup_cp(from)
+body copy_from ha_update_no_backup_cp(from)
 {
       source      => "$(from)";
       copy_backup => "false";
 }
-
