@@ -140,7 +140,7 @@ LogLevel warn
     TransferLog "{{{vars.cfe_internal_hub_vars.access_log}}}"
     SSLEngine on
     SSLProtocol all -SSLv2 -SSLv3
-    SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5
+    SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5:!RC4
     SSLCertificateFile "{{{vars.cfe_internal_hub_vars.SSLCertificateFile}}}"
     SSLCertificateKeyFile "{{{vars.cfe_internal_hub_vars.SSLCertificateKeyFile}}}"
 
