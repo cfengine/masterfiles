@@ -144,6 +144,10 @@ LogLevel warn
     SSLCertificateFile "{{{vars.cfe_internal_hub_vars.SSLCertificateFile}}}"
     SSLCertificateKeyFile "{{{vars.cfe_internal_hub_vars.SSLCertificateKeyFile}}}"
 
+    # Enable Strict Transport Security to prevent HTTPS users from
+    # accessing http content.
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+
     <FilesMatch "\.(cgi|shtml|phtml|php)$">
         SSLOptions +StdEnvVars
     </FilesMatch>
