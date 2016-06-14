@@ -44,4 +44,8 @@ bundle agent cfe_internal_management
 
       "CFEngine_Internals"
         usebundle => "$(bundles)";
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_management::
+      "DEBUG $(this.bundle): Should actuate $(bundles)";
 }
