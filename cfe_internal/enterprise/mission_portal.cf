@@ -24,6 +24,14 @@ bundle agent cfe_internal_enterprise_mission_portal
         handle => "cfe_internal_management_web_server",
         comment => "Manage Apache Web server (on/off)";
 
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_enterprise_mission_portal::
+      "DEBUG $(this.bundle): Managing apache config with mustache template"
+        ifvarclass => "_cfe_enterprise_mission_portal_enable_render_httpd_with_mustache";
+
+      "DEBUG $(this.bundle): *Not* managing apache config with mustache template"
+        ifvarclass => not("_cfe_enterprise_mission_portal_enable_render_httpd_with_mustache");
 }
 
 bundle agent cfe_internal_enterprise_mission_portal_apache
@@ -59,6 +67,10 @@ bundle agent cfe_internal_enterprise_mission_portal_apache
 
       "Manage Final Apache Config"
         usebundle => mission_portal_apache_from_stage( $(config), $(staged_config) );
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_enterprise_mission_portal_apache::
+      "DEBUG $(this.bundle): Should stage '$(staged_config)' from '$(template)'.";
 }
 
 bundle agent mission_portal_apache_from_stage(config, staged_config)
@@ -126,6 +138,14 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
         contain => in_shell,
         comment => "We have to restart apache after a config change in order
                     for the changes to take effect.";
+
+  reports:
+    DEBUG|DEBUG_mission_portal_apache_from_stage::
+      "DEBUG $(this.bundle): '$(config)' should be a copy of '$(staged_config)' because it validates with '$(validate_config)'"
+      ifvarclass => returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell");
+
+      "DEBUG $(this.bundle): '$(config)' should *not* be a copy of '$(staged_config)' because it failed to validate with '$(validate_config)'"
+      ifvarclass => not(returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"));
 }
 
 ##################################################################
