@@ -10,7 +10,7 @@ bundle agent cfe_internal_enterprise_mission_portal
       # beginning with 3.9
 
       "_cfe_enterprise_mission_portal_enable_render_httpd_with_mustache"
-        expression => "!(cfengine_3_4|cfenigne_3_5|cfenigne_3_6|cfengine_3_7|cfengine_3_8)";
+        expression => "!(cfengine_3_4|cfengine_3_5|cfengine_3_6|cfengine_3_7|cfengine_3_8)";
 
   methods:
 
