@@ -216,7 +216,7 @@ bundle common def
         "$(sys.workdir)/reports",
       };
 
-    # enable_cfengine_enterprise_hub_ha is defined below 
+    # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 
     enable_cfengine_enterprise_hub_ha::
@@ -305,7 +305,8 @@ bundle common def
     DEBUG|DEBUG_def::
       "DEBUG: $(this.bundle)";
 
-      "$(const.t) def.json was found at $(augments_file)";
+      "$(const.t) def.json was found at $(augments_file)"
+        ifvarclass => fileexists( $(augments_file) );
 
       "$(const.t) override request $(override_vars) to '$(override_data_s_$(override_vars))'; new value '$($(override_vars))'"
       ifvarclass => isvariable("override_data_$(override_vars)");
