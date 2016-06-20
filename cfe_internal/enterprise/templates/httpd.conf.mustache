@@ -1,6 +1,8 @@
 # This file is rendered by CFEngine
 # manual edits will be reverted.
 
+ServerSignature Off
+ServerTokens ProductOnly
 ServerName {{{vars.sys.fqhost}}}
 ServerRoot "/var/cfengine/httpd"
 Listen 80
