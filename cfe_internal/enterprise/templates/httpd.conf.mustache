@@ -69,6 +69,12 @@ LoadModule socache_shmcb_module modules/mod_socache_shmcb.so
 # Required to log into mission portal
 LoadModule authz_core_module modules/mod_authz_core.so
 
+
+# TRACE can be useful for debugging, but can be abused to perform Cross-Site
+# Tracing (XST) attacheks in order to obtain access to user cooking via
+# malicious scripting on the client side.
+TraceEnable off
+
 <IfModule userdir_module>
 # This module should not be loaded, this is just an extra measure.
   UserDir disabled
