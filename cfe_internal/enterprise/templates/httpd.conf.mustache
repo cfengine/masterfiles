@@ -133,12 +133,47 @@ LogLevel warn
   # Include conf/extra/httpd-ssl.conf
   # This content used to be included from an external file
   # /var/cfengine/httpd/conf/extra/httpd-ssl.conf
+
   Listen 443
+
   AddType application/x-x509-ca-cert .crt
   AddType application/x-pkcs7-crl    .crl
+
   SSLPassPhraseDialog  builtin
   SSLSessionCache        "shmcb:/var/cfengine/httpd/logs/ssl_scache(512000)"
   SSLSessionCacheTimeout  300
+  SSLSessionTickets Off
+
+  # OCSP stapling is an extension that aims to improve SSL negotiation
+  # performance while mainting visitor privacy.
+
+  SSLUseStapling on
+  SSLStaplingCache "shmcb:logs/stabling-cache(150000)"
+
+  # TLS Compression should be disabled to avoid CRIME
+  # https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-4929
+  SSLCompression off
+
+  # This is not explicitly enabled to allow the requesting client the first
+  # choice of support ciphers
+  #  SSLHonorCipherOrder On
+
+  # We expect that openssl is upgraded with each release and that the most
+  # recent openssl version possible will be used and that it defines ciphers
+  # considered HIGH appropriately. We use HIGH to get a good balance between
+  # browser compatibility and security. Use ~{{vars.sys.workdir}}/openssl ciphers
+  # -v HIGH~ to see what ciphers are considered HIGH security.
+
+  SSLCipherSuite HIGH
+
+  # A more secure setting might be:
+  # SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+
+  # Some versions of SSL are known to be insecure
+  SSLProtocol all -SSLv2 -SSLv3
+
+  SSLRandomSeed startup builtin
+  SSLRandomSeed connect builtin
 
   <VirtualHost _default_:443>
     DocumentRoot "{{{vars.cfe_internal_hub_vars.docroot}}}"
@@ -146,15 +181,16 @@ LogLevel warn
     # ServerAdmin root@localhost
     ErrorLog "{{{vars.cfe_internal_hub_vars.error_log}}}"
     TransferLog "{{{vars.cfe_internal_hub_vars.access_log}}}"
+
     SSLEngine on
-    SSLProtocol all -SSLv2 -SSLv3
-    SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5:!RC4
     SSLCertificateFile "{{{vars.cfe_internal_hub_vars.SSLCertificateFile}}}"
     SSLCertificateKeyFile "{{{vars.cfe_internal_hub_vars.SSLCertificateKeyFile}}}"
 
     # Enable Strict Transport Security to prevent HTTPS users from
     # accessing http content.
     Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+    Header always set X-Frame-Options DENY
+    Header always set X-Content-Type-Options nosniff
 
     <FilesMatch "\.(cgi|shtml|phtml|php)$">
         SSLOptions +StdEnvVars
@@ -173,8 +209,6 @@ LogLevel warn
           "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
   </VirtualHost>
 
-  SSLRandomSeed startup builtin
-  SSLRandomSeed connect builtin
 </IfModule>
 
 
