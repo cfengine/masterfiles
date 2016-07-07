@@ -1322,6 +1322,7 @@ body copy_from remote_dcp(from,server)
 #
 # @param from The location of the file on the remote server
 # @param server The hostname or IP of the server from which to download
+# **See Also:** `local_dcp()`
 {
       servers     => { "$(server)" };
       source      => "$(from)";
@@ -1333,8 +1334,17 @@ body copy_from remote_dcp(from,server)
 body copy_from local_cp(from)
 # @brief Copy a file if the modification time or creation time of the source
 # file is newer (the default comparison mechanism).
-#
 # @param from The path to the source file.
+# **Example:**
+# ```cf3
+# bundle agent example
+# {
+#   files:
+#       "/tmp/file.bak"
+#         copy_from => local_cp("/tmp/file");
+# }
+# ```
+# **See Also:** `local_dcp()`
 {
       source      => "$(from)";
 }
@@ -1343,8 +1353,17 @@ body copy_from local_cp(from)
 
 body copy_from local_dcp(from)
 # @brief Copy a local file if the hash on the source file differs.
-#
 # @param from The path to the source file.
+# **Example:**
+# ```cf3
+# bundle agent example
+# {
+#   files:
+#       "/tmp/file.bak"
+#       copy_from => local_dcp("/tmp/file");
+# }
+# ```
+# **See Also:** `local_cp()`, `remote_dcp()`
 {
       source      => "$(from)";
       compare     => "digest";
@@ -1387,6 +1406,19 @@ body copy_from seed_cp(from)
 # @brief Copy a local file if the file does not already exist, i.e. seed the
 # placement
 #
+# **Example:**
+# ```cf3
+# bundle agent home_dir_init
+# {
+#   files:
+#       "/home/mark.burgess/."
+#       copy_from => seed_cp("/etc/skel"),
+#       depth_search => recurse(inf),
+#       file_select => all,
+#       comment => "We want to be sure that the home directory has files that are
+#                   present in the skeleton.";
+# }
+# ```
 # @param from The path to the source file.
 {
       source      => "$(from)";
