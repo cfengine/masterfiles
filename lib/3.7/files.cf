@@ -1396,10 +1396,28 @@ body copy_from seed_cp(from)
 ##
 
 body copy_from sync_cp(from,server)
-# @brief Synchronize a file with a remote server. If the file does not exist on the remote server then it should be purged. Allow types to change (directories to files and vice versa). The mode of the remote file should be preserved. Files are compared using the default comparison (mtime or ctime).
+# @brief Synchronize a file with a remote server.
+#
+# * If the file does not exist on the remote server then it should be purged.
+# * Allow types to change (directories to files and vice versa).
+# * The mode of the remote file should be preserved.
+# * Files are compared using the default comparison (mtime or ctime).
 #
 # @param from The location of the file on the remote server
 # @param server The hostname or IP of the server from which to download
+#
+# **Example**:
+#
+# ```cf3
+# files:
+#   "/tmp/masterfiles/."
+#     copy_from => sync_cp( "/var/cfengine/masterfiles", $(sys.policy_server) ),
+#     depth_search => recurse(inf),
+#     file_select => all,
+#     comment => "Mirror masterfiles from the hub to a temporary directory";
+# ```
+#
+# **See Also:** `dir_sync()`, `copyfrom_sync()`
 {
       servers     => { "$(server)" };
       source      => "$(from)";
