@@ -1291,7 +1291,7 @@ body copy_from secure_cp(from,server)
 #
 # Only copy the file if it is different from the local copy, and verify
 # that the copy is correct.
-# 
+#
 # @param from The location of the file on the remote server
 # @param server The hostname or IP of the server from which to download
 {
@@ -1331,7 +1331,8 @@ body copy_from remote_dcp(from,server)
 ##
 
 body copy_from local_cp(from)
-# @brief Copy a local file.
+# @brief Copy a file if the modification time or creation time of the source
+# file is newer (the default comparison mechanism).
 #
 # @param from The path to the source file.
 {
@@ -1341,7 +1342,7 @@ body copy_from local_cp(from)
 ##
 
 body copy_from local_dcp(from)
-# @brief Copy a local file if it is different from the existing copy.
+# @brief Copy a local file if the hash on the source file differs.
 #
 # @param from The path to the source file.
 {
@@ -1383,7 +1384,8 @@ body copy_from backup_local_cp(from)
 ##
 
 body copy_from seed_cp(from)
-# @brief Copy a local file if the file does not already exist, i.e. seed the placement
+# @brief Copy a local file if the file does not already exist, i.e. seed the
+# placement
 #
 # @param from The path to the source file.
 {
@@ -1394,7 +1396,12 @@ body copy_from seed_cp(from)
 ##
 
 body copy_from sync_cp(from,server)
-# @brief Download a file if the local copy does not already exist, i.e. seed the placement
+# @brief Synchronize a file with a remote server.
+#
+# @* If the file does not exist on the remote server then it should be purged.
+# @* Allow types to change (directories to files and vice versa).
+# @* The mode of the remote file should be preserved.
+# @* Files are compared using the default comparison (mtime or ctime).
 #
 # @param from The location of the file on the remote server
 # @param server The hostname or IP of the server from which to download
@@ -1466,7 +1473,7 @@ body link_from linkchildren(tofile)
 # If the promiser is a directory, children are linked to the source, unless
 # entries with identical names already exist.
 # The link is created even if the source of the link does not exist.
-# 
+#
 # @param tofile The source of the link
 {
       source        => "$(tofile)";
@@ -1570,7 +1577,7 @@ body perms system_owned(mode)
 
 body acl access_generic(acl)
 # @brief Set the `aces` of the access control as specified
-# 
+#
 # Default/inherited ACLs are left unchanged. This body is
 # applicable for both files and directories on all platforms.
 #
@@ -1606,8 +1613,8 @@ body acl ntfs(acl)
 body acl strict
 # @brief Limit file access via ACLs to users with administrator privileges,
 # overwriting existing ACLs.
-# 
-# **Note:** May need to take ownership of file/dir to be sure no-one else is 
+#
+# **Note:** May need to take ownership of file/dir to be sure no-one else is
 # allowed access.
 {
       acl_method => "overwrite";
@@ -1816,7 +1823,7 @@ body file_select older_than(years, months, days, hours, minutes, seconds)
 # @param hours Number of hours
 # @param minutes Number of minutes
 # @param seconds Number of seconds
-# 
+#
 # Generic older_than selection body, aimed to have a common definition handy
 # for every case possible.
 {
@@ -1844,9 +1851,9 @@ body file_select filetype_older_than(filetype, days)
 
 body file_select filetypes_older_than(filetypes, days)
 # @brief Select files of specified types older than specified number of days
-# 
+#
 # This body only takes a list of filetypes
-# 
+#
 # @param filetypes A list of file types
 # @param days Number of days
 #
@@ -1912,7 +1919,7 @@ body changes detect_content
 
 body changes detect_content_using(hash)
 # @brief Detect file content changes using a given hash algorithm.
-# 
+#
 # For times when you only care about content, not file stats e.g. mtime
 # @param hash - supported hashing algorithm (md5, sha1, sha224, sha256, sha384,
 #   sha512, best)
