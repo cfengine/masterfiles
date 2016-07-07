@@ -88,20 +88,6 @@ bundle agent cfe_internal_update_policy
       "cfe_internal_trigger" expression => "local_files_ok",
       classes => u_if_else("files_ok", "files_ok");
 
-      #
-
-  commands:
-
-    am_policy_hub.update_report::
-
-      "$(sys.cf_promises) -r"
-         contain => u_in_shell_and_silent,
-         comment => "Generate config knowledge format after update",
-         classes => u_kept_successful_command,
-         handle => "cfe_internal_update_policy_commands_run_cf_promises_r";
-
-      #
-
   files:
 
     !am_policy_hub::  # policy hub should not alter inputs/ uneccessary
@@ -157,8 +143,7 @@ bundle agent cfe_internal_update_policy
       copy_from => u_rcp("$(master_location)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       file_select  => u_input_files,
-      action => u_immediate,
-      classes => u_if_repaired("update_report");
+      action => u_immediate;
 
     !policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/policy_server.dat"
