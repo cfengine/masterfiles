@@ -71,6 +71,9 @@ bundle common stdlib_common
       "input[cfe_internal_hub]"           string => "$(this.promise_dirname)/cfe_internal_hub.cf";
       "input[cfengine_enterprise_hub_ha]" string => "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf";
 
+      # jUnit and TAP reports
+      "input[testing]"                      string => "$(this.promise_dirname)/testing.cf";
+
     any::
       "inputs" slist => getvalues(input);
 
