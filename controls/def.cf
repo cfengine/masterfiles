@@ -253,7 +253,16 @@ bundle common def
 
       # Auto-load files in "services/autorun" and run bundles tagged "autorun".
       # Disabled by default!
-      "services_autorun" expression => "!any";
+      "services_autorun" -> { "jira:CFE-2135" }
+        comment => "This class enables the automatic parsing running of bundles
+                    tagged with 'autorun'. Evaluation limitations require that
+                    this class is set at the beginning of the agent run, so it
+                    must be defined in the augments file (def.json), or as an
+                    option to the agent with --define or -D. Changing the
+                    expression here will *NOT* work correctly. Setting the class
+                    here will result in an error due to the autorun bundle not
+                    being found.",
+        expression => "!any";
 
       # Internal CFEngine log files rotation
       "cfengine_internal_rotate_logs" expression => "any";
