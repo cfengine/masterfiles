@@ -6,20 +6,20 @@ dnl # Run ./autogen.sh to build configure script
 dnl #
 dnl ##########################################################################
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.63)
 
-m4_define([revision], m4_esyscmd_s([git rev-list -1 --abbrev-commit HEAD]))
+m4_define([revision], m4_normalize(m4_esyscmd([git rev-list -1 --abbrev-commit HEAD])))
 
-m4_define([cfversion_from_env], m4_esyscmd_s([echo $EXPLICIT_VERSION]))
-m4_ifblank(cfversion_from_env, [
-    m4_define([cfversion_from_detect], m4_esyscmd_s([3rdparty/core/determine-version.py]))
+m4_define([cfversion_from_env], m4_normalize(m4_esyscmd([echo $EXPLICIT_VERSION])))
+m4_ifval(cfversion_from_env, [
+    m4_define([cfversion], cfversion_from_env)
+], [
+    m4_define([cfversion_from_detect], m4_normalize(m4_esyscmd([3rdparty/core/determine-version.py])))
     m4_if(m4_sysval, 0, [], [
         m4_fatal([Could not determine CFEngine version. Please set EXPLICIT_VERSION in the environment.])
     ])
     m4_define([cfversion], cfversion_from_detect[]a1.revision)
     m4_undefine([cfversion_from_detect])
-], [
-    m4_define([cfversion], cfversion_from_env)
 ])
 
 AC_INIT([cfengine-masterfiles], cfversion)
