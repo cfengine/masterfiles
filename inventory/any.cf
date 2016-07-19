@@ -437,6 +437,7 @@ bundle agent cfe_autorun_inventory_dmidecode
   "system-serial-number": "System serial number",
   "system-manufacturer": "System manufacturer",
   "system-version": "System version",
+  "system-product-name": "System product name",
 }');
 
       # other dmidecode variables you may want:
@@ -454,7 +455,6 @@ bundle agent cfe_autorun_inventory_dmidecode
       # processor-family
       # processor-frequency
       # processor-manufacturer
-      # system-product-name
       # system-uuid
       #"processor-version": "CPU model" <- Collected by default, but not by iterating over the list
 
@@ -492,7 +492,7 @@ bundle agent cfe_autorun_inventory_dmidecode
       meta => { "inventory", "attribute_name=System version" };
 
       "dmi[processor-version]" string => $(processor_array[1]);
- 
+
       "split_pscomputername"
         slist => string_split($(system_array[1]), "PSComputerName\s.*", 2),
         comment => "Work around weird appearance of PSComputerName into System manufacturer";
