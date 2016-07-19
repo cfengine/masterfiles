@@ -54,7 +54,7 @@ bundle agent cfe_internal_update_processes
 
   methods:
 
-    am_policy_hub.enterprise.!systemd::
+    am_policy_hub.enterprise::
 
       "TAKING CARE CFE HUB PROCESSES"
       usebundle => maintain_cfe_hub_process,
