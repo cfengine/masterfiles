@@ -49,6 +49,12 @@ bundle agent cfe_internal_update_processes
 
   methods:
 
+    systemd::
+      "CFENGINE systemd service"
+      usebundle => maintain_cfe_systemd,
+      comment => "Call a bundle to maintain CFEngine with systemd",
+      handle => "cfe_internal_update_processes_methods_maintain_systemd";
+
     am_policy_hub.enterprise::
 
       "TAKING CARE CFE HUB PROCESSES"
@@ -56,7 +62,7 @@ bundle agent cfe_internal_update_processes
       comment => "Call a bundle to maintian HUB processes",
       handle => "cfe_internal_update_processes_methods_maintain_hub";
 
-    !windows.!systemd::
+    !windows::
 
       "DISABLING CFE AGENTS"
       usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
@@ -80,12 +86,6 @@ bundle agent cfe_internal_update_processes
       usebundle => maintain_cfe_windows,
       comment => "Call a bundle to maintain CFEngine on Windows",
       handle => "cfe_internal_update_processes_methods_maintain_windows";
-
-    systemd::
-      "CFENGINE systemd service"
-      usebundle => maintain_cfe_systemd,
-      comment => "Call a bundle to maintain CFEngine with systemd",
-      handle => "cfe_internal_update_processes_methods_maintain_systemd";
 
   reports:
       "The process $(all_agents) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it or move it to the agents_to_be_disabled list if you want it permanently disabled."
