@@ -73,7 +73,17 @@ LoadModule authz_core_module modules/mod_authz_core.so
 # TRACE can be useful for debugging, but can be abused to perform Cross-Site
 # Tracing (XST) attacheks in order to obtain access to user cooking via
 # malicious scripting on the client side.
+
 TraceEnable off
+
+# The 'HttpOnly' flag makes the cookie inaccessible to client-side scripts,
+# preventing it from being stolen using malicious client side scripts. The
+# absence of this flag increases the likelihood of an attacker being able to
+# compromise the user’s cookie via a malicious script. When the 'secure' flag is
+# used, the cookie is only sent over an encrypted HTTPS channel, and not over
+# unencrypted HTTP.
+
+Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure
 
 <IfModule userdir_module>
 # This module should not be loaded, this is just an extra measure.
