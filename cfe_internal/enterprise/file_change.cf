@@ -57,9 +57,8 @@ bundle agent change_management
       "$(watch_files_report_change)" -> { "InfoSec" }
         changes => detect_content_using("sha256"),
         comment => "Unplanned changes of these files may indicate a security
-                    breach. Diffs are not reported as an guard against leakage
-                    to those haveing access to report on these hosts but should
-                    not have access to shadow entries.";
+                    breach. (Diffs are not reported in case those with access
+                    to this report should not have access to shadow entries.)";
 
       #   "$(watch_dirs)"  -> "goal_infosec"
       #      comment      => "Change detection on important directories",
