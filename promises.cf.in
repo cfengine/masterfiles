@@ -59,7 +59,7 @@ body common control
 
       # From 3.7 onwards there is a new package promise implementation using package
       # modules in which you MUST provide package modules used to generate
-      # software inventory reports. You can also provide global default package module 
+      # software inventory reports. You can also provide global default package module
       # instead of specifying it in all package promises.
       debian|redhat::
           package_inventory => { $(package_module_knowledge.platform_default) };
@@ -338,13 +338,4 @@ bundle common services_autorun
 
       "DEBUG $(this.bundle): adding input='$(found_inputs)'"
         ifvarclass => isvariable("found_inputs");
-}
-
-
-
-# special body for update/*.cf compatibility
-body classes u_kept_successful_command
-# @brief Set command to "kept" instead of "repaired" if it returns 0
-{
-      kept_returncodes => { "0" };
 }
