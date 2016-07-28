@@ -5,7 +5,7 @@
 ###############################################################################
 
 body common control
-
+# @brief Control options common to all agents
 {
 
       bundlesequence => {
@@ -118,6 +118,7 @@ bundle common inventory
       #
 
 bundle common cfe_internal_inputs
+# @brief Include internal self management policies
 {
   vars:
     any::
@@ -179,6 +180,7 @@ bundle common cfe_internal_inputs
 }
 
 bundle common cfengine_stdlib
+# @breif Include the standard library
 {
   vars:
     !cfengine_3_7::
@@ -202,6 +204,7 @@ bundle common cfengine_stdlib
 }
 
 bundle common cfengine_controls
+# @brief Include various agent control policies
 {
   vars:
     # 3.7+ uses the re-unified controls
@@ -296,6 +299,7 @@ bundle common cfengine_controls
 }
 
 bundle common services_autorun
+# @brief Include autorun policy and discover autorun bundles if enabled
 {
   vars:
     !cfengine_3_7.services_autorun::
