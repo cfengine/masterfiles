@@ -137,13 +137,17 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
       ifvarclass => "nova|enterprise";
 
-   am_policy_hub::
+   am_policy_hub.!(cfengine_3_7|cfengine_3_8|cfengine_3_9)::
+
+      # Redis and cf-consumer were retired at 3.10
+      # TODO: Remove this promise after 3.7 is no longer supported.
       "$(cfe_internal_process_knowledge.bindir)/redis-server"
       restart_class => "start_redis_server",
       comment => "Monitor redis-server process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_redis",
       ifvarclass => "nova|enterprise";
 
+      # TODO: Remove this promise after 3.7 is no longer supported.
       "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
       restart_class => "start_cf_consumer",
       comment => "Monitor cf-consumer process",
@@ -182,7 +186,10 @@ bundle agent maintain_cfe_hub_process
 
   commands:
 
-    !windows.am_policy_hub.start_redis_server::
+    !windows.am_policy_hub.start_redis_server.!(cfengine_3_7|cfengine_3_8|cfengine_3_9)::
+
+      # Redis was removed in 3.10
+      # TODO: Remove this promise after 3.7 is no longer supported.
 
      "$(cfe_internal_process_knowledge.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)"
       contain => u_in_shell,
@@ -197,7 +204,11 @@ bundle agent maintain_cfe_hub_process
       classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
 
-    !windows.am_policy_hub.start_cf_consumer::
+    !windows.am_policy_hub.start_cf_consumer.!(cfengine_3_7|cfengine_3_8|cfengine_3_9)::
+
+      # cf-consumer was removed in 3.10
+      # TODO: Remove this promise after 3.7 is no longer supported.
+
      "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
       comment => "Start cf-consumer process",
       classes => u_kept_successful_command,
