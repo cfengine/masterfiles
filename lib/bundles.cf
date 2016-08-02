@@ -93,9 +93,25 @@ bundle agent cronjob(commands,user,hours,mins)
     !(suse|redhat|fedora|freebsd)::
       "crontab" string => "/var/spool/cron/crontabs";
 
+    any::
+      # We escape the user supplied values so that we can search to see if the
+      # entry already exists with slightly different spacing.
+      "e_mins" string => escape("$(mins)");
+      "e_hours" string => escape("$(hours)");
+      "e_commands" string => escape("$(commands)");
+
+  classes:
+    !windows::
+
+      # We tolerate existing entries that differ only in whitespace and avoid
+      # entering duplicate entries.
+
+      "present_with_potentially_different_spacing"
+        expression => regline( "^$(e_mins)\s+$(e_hours)\s+\*\s+\*\s+\*\s+$(e_commands)", "$(crontab)/$(user)");
+
   files:
 
-    !windows::
+    !windows.!present_with_potentially_different_spacing::
       "$(crontab)/$(user)"
 
       comment => "A user's regular batch jobs are added to this file",
