@@ -19,3 +19,15 @@ export TAR_OPTIONS
 # Store the permissions properly in the tarball for acceptance tests to succeed
 dist-hook:
 	find $(distdir) -name '*.cf*' | xargs chmod go-w
+
+tar-package:
+	pkgdir=`mktemp -d`  &&  export pkgdir  &&  \
+	origdir=`pwd`       &&  export origdir &&  \
+	$(MAKE) prefix=$$pkgdir install  &&  \
+	(   cd $$pkgdir  &&  \
+            find . -name '*.cf*' | xargs -n1 chmod go-w  &&  \
+	    tardir=.  &&  $(am__tar) |  \
+	        GZIP=$(GZIP_ENV) gzip -c  \
+	        > "$$origdir"/$(PACKAGE)-$(VERSION).pkg.tar.gz  \
+	)  ;  \
+	[ x$$pkgdir != x ]  &&  rm -rf $$pkgdir
