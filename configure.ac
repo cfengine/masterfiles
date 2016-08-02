@@ -127,7 +127,6 @@ dnl ######################################################################
 AS_IF([test x"$prefix" = xNONE],
     prefix=/var/cfengine
 )
-datadir=${prefix}/masterfiles
 
 dnl ######################################################################
 dnl OS specific stuff

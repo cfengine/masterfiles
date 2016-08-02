@@ -8,7 +8,7 @@ endif
 
 # See configure.ac for MASTERFILES_INSTALL_TARGETS.
 nobase_dist_masterfiles_DATA = @MASTERFILES_INSTALL_TARGETS@
-masterfilesdir=$(datadir)
+masterfilesdir=$(prefix)/masterfiles
 
 EXTRA_DIST = README.md inventory/README.md lib/README.md CONTRIBUTING.md LICENSE
 
