@@ -175,7 +175,7 @@ body file_select cfe_internal_docroot_perms
 body depth_search recurse_exclude(d)
 {
       depth => "$(d)";
-      exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "sql_lite", "rest", "application", "dc-scripts" };
+      exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "rest", "application", "dc-scripts" };
 }
 
 ############################################################################
