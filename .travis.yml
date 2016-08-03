@@ -1,6 +1,6 @@
 env:
-- CF_VERSION=3.9.0
-- CF_VERSION=3.7.3
+- CF_VERSION=3.9.1
+- CF_VERSION=3.7.4
 
 install:
 - wget https://cfengine-package-repos.s3.amazonaws.com/community_binaries/cfengine-community_$CF_VERSION-1_amd64.deb
