@@ -1,0 +1,35 @@
+
+Run check for checks
+     *
+     * @param type $delay - delay for lastCheck time
+     * @param type $limit - how many checks per run
+     * @param type $type  - all, sketch, sql
+#  touch /var/cfengine/httpd/php/runalerts_sql
+Condition /var/cfengine/httpd/php/runalerts_sql
+  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks runalerts 300 20 sql
+
+#  touch /var/cfengine/httpd/php/runalerts_sketch
+
+Condition /var/cfengine/httpd/php/runalerts_sketch
+  /var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks runalerts 300 10 sketch
+
+60s
+
+[Unit]
+Description=CFEngine Enterprise Report Consumer
+After=syslog.target
+ConditionPathExists=/var/cfengine/bin/cf-hub
+PartOf=cfengine3.service
+After=cf-redis-server.service
+Requires=cf-redis-server.service
+
+[Service]
+Type=simple
+ExecStart=/var/cfengine/bin/cf-consumer --no-fork
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=cfengine3.service
+WantedBy=cf-redis-server.service
