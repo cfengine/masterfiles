@@ -1,0 +1,17 @@
+[Unit]
+Description=CFEngine Enterprise Webserver
+After=syslog.target
+ConditionPathExists=/var/cfengine/httpd/bin/apachectl
+PartOf=cfengine3.service
+
+[Service]
+Type=forking
+ExecStart=/var/cfengine/httpd/bin/apachectl start
+ExecStop=/var/cfengine/httpd/bin/apachectl stop
+PIDFile=/var/cfengine/httpd/logs/httpd.pid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=cfengine3.service

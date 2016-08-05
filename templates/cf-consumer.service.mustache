@@ -1,0 +1,19 @@
+[Unit]
+Description=CFEngine Enterprise Report Consumer
+PartOf=cfengine3.service
+After=syslog.target
+ConditionPathExists=/var/cfengine/bin/cf-hub
+BindsTo=cf-redis-server.service
+BindsTo=cf-postgres.service
+
+[Service]
+Type=simple
+ExecStart=/var/cfengine/bin/cf-consumer --no-fork -v
+Restart=always
+RestartSec=10
+PIDFile=/var/cfengine/cf-consumer.pid
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=cfengine3.service
+WantedBy=cf-redis-server.service
