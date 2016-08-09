@@ -1,12 +1,12 @@
 [Unit]
-Description=CFEngine Enterprise Execution Scheduler
+Description=CFEngine Monitor Daemon
 After=syslog.target
-ConditionPathExists=/var/cfengine/bin/cf-execd
+ConditionPathExists=/var/cfengine/bin/cf-monitord
 PartOf=cfengine3.service
 
 [Service]
 Type=simple
-ExecStart=/var/cfengine/bin/cf-execd --no-fork --verbose
+ExecStart=/var/cfengine/bin/cf-monitord --no-fork --verbose
 Restart=always
 RestartSec=10
 

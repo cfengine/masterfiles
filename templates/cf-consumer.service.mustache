@@ -2,13 +2,13 @@
 Description=CFEngine Enterprise Report Consumer
 PartOf=cfengine3.service
 After=syslog.target
-ConditionPathExists=/var/cfengine/bin/cf-hub
+ConditionPathExists=/var/cfengine/bin/cf-consumer
 BindsTo=cf-redis-server.service
 BindsTo=cf-postgres.service
 
 [Service]
 Type=simple
-ExecStart=/var/cfengine/bin/cf-consumer --no-fork -v
+ExecStart=/var/cfengine/bin/cf-consumer --no-fork --verbose
 Restart=always
 RestartSec=10
 PIDFile=/var/cfengine/cf-consumer.pid
