@@ -1,9 +1,8 @@
 [Unit]
 Description=CFEngine Enterprise SQL Alerts
 After=syslog.target
-ConditionPathExists=/var/cfengine/httpd/php/runalerts_sql
-ConditionPathExists=/var/cfengine/httpd/htdocs/index.php
-ConditionPathExists=/var/cfengine/httpd/php/bin/php
+ConditionFileIsExecutable=/var/cfengine/bin/runalerts.sh
+ConditionFileIsExecutable=/var/cfengine/httpd/php/bin/php
 
 PartOf=cfengine3.service
 After=cf-postgres.service
@@ -13,7 +12,7 @@ Requires=cf-postgres.service
 # We simply launch this script every 60 seconds to perform alert related checks
 Type=simple
 User=cfapache
-ExecStart=/var/cfengine/httpd/php/bin/php /var/cfengine/httpd/htdocs/index.php cli_tasks runalerts 300 20 sql
+ExecStart=/var/cfengine/bin/runalerts.sh
 Restart=always
 RestartSec=60
 
