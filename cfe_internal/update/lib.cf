@@ -1,0 +1,248 @@
+
+### The following bodies were plucked from the standard library. They have been
+### prefixed with =u_=.
+
+body classes u_results(scope, class_prefix)
+# @brief Define classes prefixed with `class_prefix` and suffixed with
+# appropriate outcomes: _kept, _repaired, _not_kept, _error, _failed,
+# _denied, _timeout, _reached
+#
+# @param scope The scope in which the class should be defined (`bundle` or `namespace`)
+# @param class_prefix The prefix for the classes defined
+#
+# This body can be applied to any promise and sets global
+# (`namespace`) or local (`bundle`) classes based on its outcome. For
+# instance, with `class_prefix` set to `abc`:
+#
+# * if the promise is to change a file's owner to `nick` and the file
+# was already owned by `nick`, the classes `abc_reached` and
+# `abc_kept` will be set.
+#
+# * if the promise is to change a file's owner to `nick` and the file
+# was owned by `adam` and the change succeeded, the classes
+# `abc_reached` and `abc_repaired` will be set.
+#
+# This body is a simpler, more consistent version of the body
+# `scoped_classes_generic`, which see. The key difference is that
+# fewer classes are defined, and only for outcomes that we can know.
+# For example this body does not define "OK/not OK" outcome classes,
+# since a promise can be both kept and failed at the same time.
+#
+# It's important to understand that promises may do multiple things,
+# so a promise is not simply "OK" or "not OK." The best way to
+# understand what will happen when your specific promises get this
+# body is to test it in all the possible combinations.
+#
+# **Suffix Notes:**
+#
+# * `_reached` indicates the promise was tried. Any outcome will result
+#   in a class with this suffix being defined.
+#
+# * `_kept` indicates some aspect of the promise was kept
+#
+# * `_repaired` indicates some aspect of the promise was repaired
+#
+# * `_not_kept` indicates some aspect of the promise was not kept.
+#   error, failed, denied and timeout outcomes will result in a class
+#   with this suffix being defined
+#
+# * `_error` indicates the promise repair encountered an error
+#
+# * `_failed` indicates the promise failed
+#
+# * `_denied` indicates the promise repair was denied
+#
+# * `_timeout` indicates the promise timed out
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent example
+# {
+#   commands:
+#     "/bin/true"
+#       classes => results("bundle", "my_class_prefix");
+#
+#   reports:
+#     my_class_prefix_kept::
+#       "My promise was kept";
+#
+#     my_class_prefix_repaired::
+#       "My promise was repaired";
+# }
+# ```
+#
+# **See also:** `scope`, `scoped_classes_generic`, `classes_generic`
+{
+  scope => "$(scope)";
+
+  promise_kept => { "$(class_prefix)_reached",
+                    "$(class_prefix)_kept" };
+
+  promise_repaired => { "$(class_prefix)_reached",
+                        "$(class_prefix)_repaired" };
+
+  repair_failed => { "$(class_prefix)_reached",
+                     "$(class_prefix)_error",
+                     "$(class_prefix)_not_kept",
+                     "$(class_prefix)_failed" };
+
+  repair_denied => { "$(class_prefix)_reached",
+                     "$(class_prefix)_error",
+                     "$(class_prefix)_not_kept",
+                     "$(class_prefix)_denied" };
+
+  repair_timeout => { "$(class_prefix)_reached",
+                      "$(class_prefix)_error",
+                      "$(class_prefix)_not_kept",
+                      "$(class_prefix)_timeout" };
+}
+
+body depth_search u_cfe_internal_recurse(d)
+{
+      depth => "$(d)";
+      xdev => "true";
+}
+
+body classes u_kept_successful_command_results(scope, class_prefix)
+# @brief Set command to "kept" instead of "repaired" if it returns 0 and define
+# classes suffixed with the appropriate outcomes.
+#
+# @param scope The scope in which the class should be defined (`bundle` or `namespace`)
+# @param class_prefix The prefix for the classes defined
+#
+# **See also:** `scope`, `scoped_classes_generic`, `classes_generic`, `results`
+# TODO After cfengine_3_10 is no longer supported inherit from u_results and add
+# in the return code differences.
+{
+  kept_returncodes => { "0" };
+  failed_returncodes => { "1" };
+
+  scope => "$(scope)";
+
+  promise_kept => { "$(class_prefix)_reached",
+                    "$(class_prefix)_kept" };
+
+  promise_repaired => { "$(class_prefix)_reached",
+                        "$(class_prefix)_repaired" };
+
+  repair_failed => { "$(class_prefix)_reached",
+                     "$(class_prefix)_error",
+                     "$(class_prefix)_not_kept",
+                     "$(class_prefix)_failed" };
+
+  repair_denied => { "$(class_prefix)_reached",
+                     "$(class_prefix)_error",
+                     "$(class_prefix)_not_kept",
+                     "$(class_prefix)_denied" };
+
+  repair_timeout => { "$(class_prefix)_reached",
+                      "$(class_prefix)_error",
+                      "$(class_prefix)_not_kept",
+                      "$(class_prefix)_timeout" };
+}
+
+body service_method u_systemd_services
+{
+      service_autostart_policy => "none";
+      service_dependence_chain => "ignore";
+      service_type => "generic";
+      service_args => "";
+}
+
+bundle agent u_systemd_services(service,state)
+# @brief Manage standard systemd services
+{
+  vars:
+
+    # We explicitly guard for systemd to avoid unnecessary agent time in
+    # pre-eval
+
+    systemd::
+      "systemctl" string => "/bin/systemctl";
+      "call_systemctl" string => "$(systemctl) --no-ask-password --global --system";
+      "systemd_properties" string => "-pLoadState,CanStop,UnitFileState,ActiveState,LoadState,CanStart,CanReload";
+      "systemd_service_info" slist => string_split(execresult("$(call_systemctl) $(systemd_properties) show $(service)", "noshell"), "\n", "10");
+
+  classes:
+
+    systemd::
+
+      # define a class named after the desired state
+      "$(state)" expression => "any";
+      "non_disabling" or => { "start", "stop", "restart", "reload" };
+
+# A collection of classes to determine the capabilities of a given systemd
+# service, then start, stop, etc. the service. Also supports a custom action
+# for anything not supported
+
+      "service_enabled" expression => reglist(@(systemd_service_info), "UnitFileState=enabled");
+      "service_active"  expression => reglist(@(systemd_service_info), "ActiveState=active");
+      "service_loaded"  expression => reglist(@(systemd_service_info), "LoadState=loaded");
+      "service_notfound" expression => reglist(@(systemd_service_info), "LoadState=not-found");
+
+      "can_stop_service"   expression => reglist(@(systemd_service_info), "CanStop=yes");
+      "can_start_service"  expression => reglist(@(systemd_service_info), "CanStart=yes");
+      "can_reload_service" expression => reglist(@(systemd_service_info), "CanReload=yes");
+
+      "request_start"   expression => strcmp("start", "$(state)");
+      "request_stop"    expression => strcmp("stop", "$(state)");
+      "request_reload"  expression => strcmp("reload", "$(state)");
+      "request_restart" expression => strcmp("restart", "$(state)");
+
+      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart)";
+      "action_start"   expression => "request_start.!service_active.can_start_service";
+      "action_stop"    expression => "request_stop.service_active.can_stop_service";
+      "action_reload"  expression => "request_reload.service_active.can_reload_service";
+      "action_restart"         or => {
+                                      "request_restart.service_active",
+
+                                      # Possibly undesirable... if a reload is
+                                      # requested, and the service "can't" be
+                                      # reloaded, then we restart it instead.
+                                      "request_reload.!can_reload_service.service_active",
+                                     };
+
+      # Starting a service implicitly enables it
+      "action_enable"  expression => "request_start.!service_enabled";
+
+      # Respectively, stopping it implicitly disables it
+      "action_disable" expression => "request_stop.service_enabled";
+
+  commands:
+    systemd.service_loaded:: # note this class is defined in `inventory/linux.cf`
+      # conveniently, systemd states map to `services` states, except
+      # for `enable`
+
+      "$(call_systemctl) -q start $(service)"   ifvarclass => "action_start";
+      "$(call_systemctl) -q stop $(service)"    ifvarclass => "action_stop";
+      "$(call_systemctl) -q reload $(service)"  ifvarclass => "action_reload";
+      "$(call_systemctl) -q restart $(service)" ifvarclass => "action_restart";
+      "$(call_systemctl) -q enable $(service)"  ifvarclass => "action_enable";
+      "$(call_systemctl) -q disable $(service)" ifvarclass => "action_disable";
+
+      # Custom action for any of the non-standard systemd actions such a
+      # status, try-restart, isolate, et al.
+      "$(call_systemctl) $(state) $(service)" ifvarclass => "action_custom";
+
+  reports:
+    DEBUG|DEBUG_u_systemd_service::
+      "DEBUG $(this.bundle): using systemd layer to $(state) $(service)";
+
+      "DEBUG $(this.bundle): Service $(service) unit file is not loaded; doing nothing"
+        ifvarclass => "systemd.!service_loaded";
+
+      "DEBUG $(this.bundle): Could not find service: $(service)"
+        ifvarclass => "systemd.service_notfound";
+}
+
+body perms u_mog(mode,user,group)
+# @brief Set the file's mode, owner and group
+# @param mode The new mode
+# @param user The username of the new owner
+# @param group The group name
+{
+      owners => { "$(user)" };
+      groups => { "$(group)" };
+      mode   => "$(mode)";
+}
