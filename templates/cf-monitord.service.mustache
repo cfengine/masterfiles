@@ -1,12 +1,12 @@
 [Unit]
 Description=CFEngine Monitor Daemon
 After=syslog.target
-ConditionPathExists=/var/cfengine/bin/cf-monitord
+ConditionPathExists={{{vars.sys.bindir}}}/cf-monitord
 PartOf=cfengine3.service
 
 [Service]
 Type=simple
-ExecStart=/var/cfengine/bin/cf-monitord --no-fork --verbose
+ExecStart={{{ vars.sys.bindir}}}/cf-monitord --no-fork --verbose
 Restart=always
 RestartSec=10
 

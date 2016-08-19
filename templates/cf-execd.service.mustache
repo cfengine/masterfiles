@@ -1,12 +1,12 @@
 [Unit]
 Description=CFEngine Enterprise Execution Scheduler
 After=syslog.target
-ConditionPathExists=/var/cfengine/bin/cf-execd
+ConditionPathExists={{{vars.sys.bindir}}}/cf-execd
 PartOf=cfengine3.service
 
 [Service]
 Type=simple
-ExecStart=/var/cfengine/bin/cf-execd --no-fork --verbose
+ExecStart={{{vars.sys.bindir}}}/cf-execd --no-fork --verbose
 Restart=always
 RestartSec=10
 
