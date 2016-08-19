@@ -1,7 +1,7 @@
 [Unit]
 Description=CFEngine Enterprise Hub Report Collector
 PartOf=cfengine3.service
-ConditionPathExists=/var/cfengine/bin/cf-hub
+ConditionPathExists={{{vars.sys.bindir}}}/cf-hub
 After=syslog.target
 After=network.target
 After=cf-redis-server.service
@@ -10,7 +10,7 @@ BindsTo=cf-redis-server.service
 
 [Service]
 Type=simple
-ExecStart=/var/cfengine/bin/cf-hub -F
+ExecStart={{{vars.sys.bindir}}}/cf-hub -F --verbose
 Restart=always
 RestartSec=10
 
