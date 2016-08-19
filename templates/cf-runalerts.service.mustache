@@ -1,7 +1,7 @@
 [Unit]
 Description=CFEngine Enterprise SQL Alerts
 After=syslog.target
-ConditionFileIsExecutable={{{vars.sys.bindir }}/runalerts.php
+ConditionFileIsExecutable={{{vars.sys.bindir}}}/runalerts.php
 ConditionFileIsExecutable={{{vars.sys.workdir}}}/httpd/php/bin/php
 
 PartOf=cfengine3.service
