@@ -121,7 +121,7 @@ bundle agent cfe_internal_update_folders
 
   files:
 
-      "$(sys.workdir)/master_software_updates/$(dirs)/." -> { "goal_updated" }
+      "$(sys.workdir)/master_software_updates/$(dirs)/."
       comment => "Prepare binary upgrade folders for all distributions in our environment",
       handle => "cfe_internal_update_folders_files_create_dirs",
       create => "true";
@@ -178,17 +178,20 @@ bundle edit_line apache_sudoer
 
 
 bundle agent cfe_internal_php_runalerts
-#@brief create and run PHP alerts
-#  - Bundle status need to be updated and displayed on MP. We do it
-# by running php binary with some parameters. cfe_internal_php_runalerts
-# is a bundle to create a shell script on the fly and keep running
-# the command by a specific interval (every 60s by default)
+# @brief Manage the runalerts service.
+#
+# - Bundle status need to be updated and displayed on MP. This bundle manages a
+#   small script which runs in a loop.
 {
   vars:
 
     any::
 
-      "runalerts_script" string => "$(sys.workdir)/bin/runalerts.sh",
+      "runalerts_types"
+        comment => "Runalerts is run for different types of alerts",
+        slist => { "sketch", "sql" };
+
+      "runalerts_script" string => "$(sys.bindir)/runalerts.php",
       comment => "location of php runalerts script",
       handle => "cfe_internal_php_runalerts_vars_runalerts_script";
 
@@ -239,12 +242,15 @@ bundle agent cfe_internal_php_runalerts
                     when available. Prior to 3.10 the service is supervised
                     directly by CFEngine policy.";
 
+      # NOTE The `hub_active` class is a hard class defined by the ha_plugin in
+      # the enterprise agent.
       "active_hub"
       comment => "The runalerts service should only run on policy servers that
                   are active.",
       scope => "bundle",
       expression => "policy_server.(!enable_cfengine_enterprise_hub_ha|(enable_cfengine_enterprise_hub_ha.hub_active))";
 
+      # TODO Consider using `hub_passive` instead of `!hub_active`
       "passive_ha_hub"
       comment => "To avoid duplicate alerts the runalerts service should not run
                   on standby hubs.",
@@ -254,6 +260,11 @@ bundle agent cfe_internal_php_runalerts
   files:
 
     any::
+
+      "$(runalerts_stampfiles_dir)/runalerts_$(types)"
+        comment => "The runalerts timestamp files need to be owned by the apache
+                    user or we won't be able to update the timestamps.",
+        perms => mog( "600", $(def.cf_apache_user), $(def.cf_apache_group) );
 
       "$(runalerts_script)"
       comment => "The runalerts script is necessary for the proper functioning
@@ -286,21 +297,18 @@ bundle agent cfe_internal_php_runalerts
       file_select => mins_old("$(stale_time)"),
       classes => results("bundle", "stale_runalerts_timestamp");
 
-      "$(runalerts_stampfiles_dir)/runalerts_sketch"
-      create => "true",
-      perms => mog("600", $(def.cf_apache_user), $(def.cf_apache_group) ),
-      handle => "cfe_enterprise_runalerts_sketch_timestamp_perms",
-      comment => "Sketch alert status timestamp file must be write-able by
-                  $(def.cf_apache_user) or it will log errors on 3.10+.";
-
-      "$(runalerts_stampfiles_dir)/runalerts_sql"
-      create => "true",
-      perms => mog("600", $(def.cf_apache_user), $(def.cf_apache_group) ),
-      handle => "cfe_enterprise_runalerts_sql_timestamp_perms",
-      comment => "SQL alert status timestamp file must be write-able by
-                  $(def.cf_apache_user) or it will log errors on 3.10+";
+      # Cleanup old runalerts script if it's still present
+      "$(sys.bindir)/runalerts.sh"
+        delete => tidy,
+        comment => "The runalerts loop was re-written in php to better work with
+                    systemd service Type=simple.";
 
   processes:
+
+      "$(sys.bindir)/runalerts.sh"
+        comment => "The old runalerts process should be killed if it's running
+                    and replaced with the php version of the loop.",
+        signals => { "kill" };
 
     # Make sure to kill script on non active hub(s).
     stale_runalerts_timestamp_repaired|passive_ha_hub::
@@ -328,7 +336,7 @@ bundle agent cfe_internal_php_runalerts
   commands:
 
     # Don't run the script on systemd hosts
-    !systemd_supervised.runalerts_process_not_running.runalerts_should_be_running::
+    !systemd_supervised.runalerts_process_not_running.active_hub::
 
       "$(runalerts_script) > /dev/null < /dev/null 2>&1 &"
       comment => "Runalerts is needed for proper functioning of Enterprise
