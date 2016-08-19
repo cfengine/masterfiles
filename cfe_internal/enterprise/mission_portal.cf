@@ -195,6 +195,11 @@ bundle agent cfe_internal_webserver(state)
 }
 
 bundle agent cfe_enterprise_selfsigned_cert
+# @brief Generate a self signed certificate for Mission Portal
+#
+# By default this bundle will only regenerate a certificate if one of the
+# necessary files is missing. To force certificate regeneration run with the
+# class '_cfe_enterprise_selfsigned_cert_regenerate_certificate' defined.
 {
 
   meta:
@@ -213,6 +218,7 @@ bundle agent cfe_enterprise_selfsigned_cert
       "SSLCertificateSigningRequest" string => "$(cfe_internal_hub_vars.SSLCertificateSigningRequest)";
       "SSLCnf"                       string => "$(cfe_internal_hub_vars.SSLCnf)";
       "SSLCertificateDaysValid"      string => "$(cfe_internal_hub_vars.SSLCertificateDaysValid)";
+      "SSLCertificateFileSymlink"    string => "$(sys.workdir)/ssl/cert.pem";
 
       "openssl"  string => "$(sys.workdir)/bin/openssl";
 
@@ -225,7 +231,11 @@ bundle agent cfe_enterprise_selfsigned_cert
 
 
   classes:
-      "_cfe_enterprise_selfsigned_cert_regenerate_certificate" not => filesexist( @(_generated_files) );
+
+      "_cfe_enterprise_selfsigned_cert_regenerate_certificate"
+        not => filesexist( @(_generated_files) ),
+	comment => "We only want to automatically regenerate the certificate if
+                    one of the files does not exist.";
 
   commands:
 
@@ -246,6 +256,24 @@ bundle agent cfe_enterprise_selfsigned_cert
       "$(openssl)"
         args => "x509 -req -days $(SSLCertificateDaysValid) -in $(SSLCertificateSigningRequest) -signkey $(SSLCertificateKeyFile) -out $(SSLCertificateFile)";
 
+  files:
+    "$(SSLCertificateFile)" -> { "jira:ENT-760" }
+      perms => mog("644", "root", "root"),
+      comment => "The SSL Certificate File needs to be readable so that it can
+                  be read by other services like Mission Portal.";
+
+    "$(SSLCertificateKeyFile)"
+      perms => mog("600", "root", "root"),
+      comment => "The SSL Certificate Key should only be readable by root.";
+
+    "$(SSLCertificatePasswdKeyFile)"
+      perms => mog("600", "root", "root"),
+      comment => "The SSL Certificate Key should only be readable by root.";
+
+    "$(SSLCertificateFileSymlink)" -> { "jira:ENT-760" }
+      link_from => ln_s( $(SSLCertificateFile) ),
+      comment => "Mission Portal reads the certificate from this stable
+                  location, so it must always point to the current certificate.";
 
   reports:
 
