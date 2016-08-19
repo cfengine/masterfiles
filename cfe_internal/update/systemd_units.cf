@@ -54,7 +54,7 @@ bundle agent cfe_internal_systemd_unit_files
         args => "restart $(service_units).service",
         handle => "cfe_internal_systemd_unit_restart_when_changed",
         if => and(classify("cfe_systemd_service_unit_$(service_units)_repaired"),
-                  returnszero("$(systemctl) status $(service_units)", noshell)),
+                  returnszero("$(systemctl) --quiet is-active $(service_units)", noshell)),
         comment => "We need to restart any units which have been changed in
                     order for the new configuration to be in effect. But we only
                     want to restart them if they are currently running.";
