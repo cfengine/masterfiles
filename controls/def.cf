@@ -126,6 +126,14 @@ bundle common def
                           not(isvariable("trustkeysfrom"))),
         meta => { "defvar" };
 
+      "cf_serverd_maxconnections"
+        string => "200",
+        handle => "def_default_cf_serverd_maxconnections",
+        ifvarclass => not(isvariable("cf_serverd_maxconnections")),
+        comment => "The maximum number of connections allowed by cf-serverd.
+                    Note: operating system open file limits may also need
+                    adjusted in relation to this.";
+
     debian::
       "environment_vars"
         handle => "common_def_vars_environment_vars",

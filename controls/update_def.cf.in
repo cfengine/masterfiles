@@ -96,7 +96,45 @@ bundle common update_def
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_group";
 
-    # enable_cfengine_enterprise_hub_ha is defined below 
+      # To avoid errors about unresolved inputs without having to enable body
+      # common control ignore_missing_inputs we handle updates defined from the
+      # augments file specially.
+      "inputs"
+        slist => {},
+        handle => "common_def_vars_default_update_inputs",
+        comment => "Defining an empty list when no update related inputs are
+                    found avoids errors related to unresolved inputs.",
+        ifvarclass => not(isvariable("def.update_inputs"));
+
+      # Define the user specified inputs for the update policy
+      "inputs"
+        slist => { @(def.update_inputs) },
+        handle => "common_def_vars_custom_update_inputs",
+        comment => "This allows users to define additional policy files that
+                    should be included by the update policy (
+                    $(sys.update_policy_path) )",
+        ifvarclass => isvariable("def.update_inputs");
+
+      # Default update frequency and tolerated update time
+      "update_inputs_ifelapsed"
+        string => "1",
+        handle => "common_def_vars_default_update_inputs_ifelapsed",
+        comment => "This controls how frequently in seconds the agent should try
+                    to update $(sys.inputdir) from upstream policy. Note:
+                    Setting this value to 0 is interpreted as run once and never
+                    again.",
+        ifvarclass => not(isvariable("def.update_inputs_ifelapsed"));
+
+      "update_inputs_ifelapsed"
+        string => "$(def.update_inputs_ifelapsed)",
+        handle => "common_def_vars_custom_update_inputs_ifelapsed",
+        comment => "This controls how frequently in seconds the agent should try
+                    to update $(sys.inputdir) from upstream policy. Note:
+                    Setting this value to 0 is interpreted as run once and never
+                    again.",
+        ifvarclass => isvariable("def.update_inputs_ifelapsed");
+
+    # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 
     enable_cfengine_enterprise_hub_ha::

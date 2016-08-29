@@ -5,11 +5,43 @@
 #
 ##################################################################
 
-
 bundle agent cfe_internal_log_rotation
 # @brief Manage CFEngine log files so they don't fill up disks
 # See def.cf to enable rotation
 {
+  vars:
+      # !supporting_cfengine_3_7::
+      # TODO condense when able to consistently use ifelse(isvariable())
+      "_max_log_size"
+        int => "1M",
+        comment => "By default we will rotate logs when they reach 1M in size.";
+
+      "_max_log_size"
+        int => "$(def.cfengine_internal_max_log_size)",
+        ifvarclass => isvariable("def.cfengine_internal_max_log_size"),
+        comment => "If a user has defined a custom max log size we use that
+                    instead.";
+
+      "_max_log_rotations"
+        int => "10",
+        comment => "By default we will keep up to 30 rotated logs";
+
+      "_max_log_rotations"
+        int => "$(def.cfengine_internal_max_log_rotations)",
+        ifvarclass => isvariable("def.cfengine_internal_max_log_rotations"),
+        comment => "If a user has defined a custom max number of log rotations
+                    to keep we use that instead.";
+
+      "_max_log_keep_days"
+        int => "30",
+        comment => "By default we keep up to 30 days of logs";
+
+      "_max_log_keep_days"
+        int => "$(def.cfengine_internal_max_log_keep_days)",
+        ifvarclass => isvariable("def.cfengine_internal_max_log_keep_days"),
+        comment => "If a user has defined a custom max number of days to keep
+                    logs we use that instead.";
+
   methods:
 
     cfengine_internal_rotate_logs::
@@ -17,23 +49,26 @@ bundle agent cfe_internal_log_rotation
       # Have a look at def.cf to enable rotation of these files
       "Rotate CFEngine log files"
         handle    => "cfe_internal_log_rotation_rotate_log_files",
-        usebundle => logrotate( @(def.cfe_log_files), 1M, 10 ),
-	comment   => "To keep the disk from getting to full we want to rotate
-		      log files when they reach 1MB in size. So that we have
-                      some history , we keep 10 versions.";
+        usebundle => logrotate( @(def.cfe_log_files), $(_max_log_size), $(_max_log_rotations) ),
+        comment   => "To keep the disk from getting to full we want to rotate log
+                      files when they reach 1MB in size. So that we have some
+                      history , we keep 10 versions.";
 
       "Prune old log files"
         handle    => "cfe_internal_log_rotation_prune_log_dirs",
-        usebundle => prunedir( @(def.cfe_log_dirs), 30 ),
-	comment   => "Scheduled activities like agent runs and reports can
-		      create log files or reports that stack up over time. So
-		      that we dont fill the disk, but have some historical
-		      information available locally we purge log files older
-                      than 30 days.";
+        usebundle => prunedir( @(def.cfe_log_dirs), $(_max_log_keep_days) ),
+        comment   => "Scheduled activities like agent runs and reports can create
+                      log files or reports that stack up over time. So that we
+                      dont fill the disk, but have some historical information
+                      available locally we purge log files older than 30 days.";
 
   reports:
 
     DEBUG|DEBUG_cfe_internal_log_rotation::
       "DEBUG $(this.bundle): Check CFEngine log file for rotation '$(def.cfe_log_files)'";
       "DEBUG $(this.bundle): Check CFEngine log directory for old logs '$(def.cfe_log_dirs)'";
+      "DEBUG $(this.bundle): Should purge log files larger than '$(_max_log_size)' bytes";
+      "DEBUG $(this.bundle): Should purge log files older than '$(_max_log_keep_days)' days.";
+      "DEBUG $(this.bundle): Should purge log files after '$(_max_log_rotations)' rotations.";
+
 }

@@ -10,17 +10,20 @@ body common control
                           "update_def",
                           "u_cfengine_enterprise",
                           @(u_cfengine_enterprise.def),
-                          "cfe_internal_dc_workflow",
-                          "cfe_internal_bins",
-                          "cfe_internal_update_policy",
-                          "cfe_internal_update_bins",
-                          "cfe_internal_update_processes",
+                          "mpf_update",
+
       };
 
       version => "update.cf $(update_def.current_version)";
 
       inputs => {
                   @(cfengine_update_controls.update_def_inputs),
+
+                  # To avoid errors about unresolved variables inputs defined
+                  # from the augments file are handled in bundle common
+                  # update_def
+                  @(update_def.inputs),
+
                   "cfe_internal/update/update_bins.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
@@ -31,6 +34,60 @@ body common control
 }
 
 #############################################################################
+
+bundle agent mpf_update
+# @brief Masterfiles Policy Framework Update Policy
+#
+# @description These policies are related to ensuring the environment is
+# configured properly before a policy run. This includes publishing policy with
+# the masterfiles-stage tooling, making sure that $(sys.inputdir) is updated
+# from its upstream masterfiles, updating CFEngine packages, and ensuring the
+# necessary CFEngine components are running,
+{
+  vars:
+      "sorted_update_bundlesequence_end"
+        meta => { "defvar" },
+        slist => sort( "def.update_bundlesequence_end", "lex" );
+
+  classes:
+      "_have_custom_update_bundles"
+        expression => some( '.*', sorted_update_bundlesequence_end );
+
+  methods:
+
+      "Design Center"
+        usebundle => cfe_internal_dc_workflow,
+        comment => "Policy related to the design center workflow. This includes
+                    publishing policy changes from hubs using the
+                    masterfiles-stage tooling";
+
+      "CFEngine Binaries"
+        usebundle => cfe_internal_bins,
+        comment => "Policy to manage binary and library permissions and symlinks
+                    into common PATH";
+
+      "Policy Inputs"
+        usebundle => cfe_internal_update_policy,
+        comment => "Policy related to updating $(sys.inputdir) from published
+                    masterfiles",
+        action => u_ifelapsed( $(update_def.update_inputs_ifelapsed) );
+
+      "CFEngine Package"
+        usebundle => cfe_internal_update_bins,
+        comment => "Policy to manage the internal binary upgrade process.";
+
+      "CFEngine Processes"
+        usebundle => cfe_internal_update_processes,
+        comment => "Policy to make sure the appropriate CFEngine components are
+                    running.";
+
+    _have_custom_update_bundles::
+      "Custom Update Policy"
+        usebundle => $(sorted_update_bundlesequence_end),
+        comment => "We want users to be able to easily define additional bundles
+                    to be actuated as part of the update policy";
+}
+
 bundle common cfengine_update_controls
 {
   vars:
@@ -53,6 +110,12 @@ bundle common cfengine_update_controls
   reports:
     DEBUG|DEBUG_cfengine_update_controls::
       "DEBUG $(this.bundle): update def inputs='$(update_def_inputs)'";
+}
+
+body action u_ifelapsed(x)
+{
+      ifelapsed => "$(x)";
+      expireafter => "$(x)";
 }
 
 body agent control
