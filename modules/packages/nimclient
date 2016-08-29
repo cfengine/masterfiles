@@ -138,7 +138,7 @@ while IFS= read -r line; do
   #   comes through the protocol as options=lpp_source=aix7783
   #   and here we define lpp_source=aix7783
   if [ -n "$options" ]; then
-    eval $options
+    eval "$options"
   fi
 done
 
