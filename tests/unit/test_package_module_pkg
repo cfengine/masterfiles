@@ -15,7 +15,7 @@ setUp()
 testApiVersion()
 {
     actual=`echo | $MODULE supports-api-version`
-    
+
     assertEquals "exit code" 0 $?
     assertEquals 1 "$actual"
 }
@@ -46,9 +46,9 @@ testGetDataWithHyphen()
     input="File=net-snmp"
     expected="PackageType=repo
 Name=net-snmp"
-    
+
     actual=`echo "$input" | $MODULE get-package-data`
-    
+
     assertEquals "exit code" 0 $?
     assertEquals "$expected" "$actual"
 }
@@ -163,7 +163,7 @@ Architecture=${CURRENT_ARCH}
 Name=libgcrypt
 Version=1.6.4_2
 Architecture=${CURRENT_ARCH}"
-    
+
     export ASSERT_PORTS_UPDATED=1
 
     actual=`echo | $MODULE list-updates`
@@ -190,7 +190,7 @@ Architecture=${CURRENT_ARCH}
 Name=libgcrypt
 Version=1.6.4_2
 Architecture=${CURRENT_ARCH}"
-    
+
     export ASSERT_PORTS_UPDATED=1
 
     actual=`echo | $MODULE list-updates-local`

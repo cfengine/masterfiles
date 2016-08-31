@@ -262,7 +262,7 @@ bundle agent cfe_internal_postgresql_maintenance
       handle => "cfe_internal_postgresql_maintenance_vacuum_full";
 
     policy_server.enterprise::
-      "cf_consumer_pid" 
+      "cf_consumer_pid"
         string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
         ifvarclass => fileexists( "$(sys.workdir)/cf-consumer.pid" ),
         comment => "Read cf-consumer.pid for the main cf-consumer PID";
@@ -300,7 +300,7 @@ bundle agent cfe_internal_postgresql_vacuum
 #@brief Vacuum (with analyze) over cfdb database.
 {
   vars:
-      "vacuum_cfdb_cmd" 
+      "vacuum_cfdb_cmd"
       string => "$(sys.bindir)/vacuumdb --analyze --quiet --dbname=cfdb",
       comment => "Vacuum command with update statistics enabled";
 

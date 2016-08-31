@@ -23,8 +23,8 @@ elif [[ ! -r "$REPREPRO_BASE_DIR"/conf/distributions ]] ; then
     exit 1
 else
     : # REPREPRO_BASE_DIR is set and a dir and contains a conf/distributions, nothing to do
-    
-fi 
+
+fi
 
 if [[ ! "$REPREPRO_CODENAMES" ]] ; then
     REPREPRO_CODENAMES=( $(sed -n -E -e '/^Suite:/s/^.* //p' "$REPREPRO_BASE_DIR"/conf/distributions) )
@@ -37,7 +37,7 @@ echo "======================================================"
 WORK_DIR="$(mktemp -d)"
 trap "rm -Rf $WORK_DIR" 0
 
-# if you sign the repo to make apt happy and not for real security then you can put the GPG stuff into 
+# if you sign the repo to make apt happy and not for real security then you can put the GPG stuff into
 # the key subdir and we will use it.
 if [[ -d "$REPREPRO_BASE_DIR"/key ]] ; then
     echo "Using '$REPREPRO_BASE_DIR/key' for GnuPG"
@@ -57,7 +57,7 @@ if [[ "$1" ]] ; then
         echo "Adding '$f':"
 
         for CODENAME in ${REPREPRO_CODENAMES[@]}; do
-            reprepro includedeb $CODENAME "$f"; 
+            reprepro includedeb $CODENAME "$f";
         done
     done
 else

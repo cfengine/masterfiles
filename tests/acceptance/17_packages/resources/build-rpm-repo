@@ -20,8 +20,8 @@ elif [ "$1" = "i386" ]; then
     echo "Requires the reprepro tool."
 elif [ "$1" = "x86_64" ]; then
     echo "Regenerating x86_64 rpm packages and rpm repository."
-    echo "Requires the reprepro tool." 
-else 
+    echo "Requires the reprepro tool."
+else
     echo "Usage: build-deb-repo i386 | x86_64"
     exit 5
 fi

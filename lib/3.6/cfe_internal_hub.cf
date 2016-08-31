@@ -255,7 +255,7 @@ bundle agent cfe_internal_postgresql_vacuum
 #@brief Vacuum (with analyze) over cfdb database.
 {
   vars:
-      "vacuum_cfdb_cmd" 
+      "vacuum_cfdb_cmd"
       string => "$(sys.bindir)/vacuumdb --analyze --quiet --dbname=cfdb",
       comment => "Vacuum command with update statistics enabled";
 
