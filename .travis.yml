@@ -3,6 +3,9 @@ language: c
 matrix:
   include:
 
+    # JOB 0  --  first because it's the fastest
+    - env: STYLE_CHECK_JOB=1
+
     # JOB 1
     - env: CF_VERSION=latest
       addons:
@@ -27,6 +30,7 @@ matrix:
 script:
 - INSTDIR=$HOME/cf_install
 - cd $TRAVIS_BUILD_DIR
+- if [ x$STYLE_CHECK_JOB = x1 ]; then sh tests/style_check.sh; exit; fi
 - ./autogen.sh --without-core --prefix=$INSTDIR
 - make install
 - /var/cfengine/bin/cf-promises --version
