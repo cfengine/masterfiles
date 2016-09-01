@@ -44,7 +44,7 @@ bundle agent ha_manage_notification_scripts_dir
      perms => mog("0755",$(def.cf_apache_user),$(def.cf_apache_group)),
      comment => "This directory is used by Mission Portal to store custom
                  user-defined scripts. Having HA set up we need to synchronize
-                 content of this directory between active and passive hubs. 
+                 content of this directory between active and passive hubs.
                  In case of no user-scripts being defined directory may not
                  exist on active hub.
                  To avoid policy synchronizing content of this directory

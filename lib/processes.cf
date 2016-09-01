@@ -75,7 +75,7 @@ body process_select days_older_than(d)
 body process_select by_owner(u)
 # @brief Select processes owned by user `u`
 # @param u The name of the user
-# 
+#
 # Matches processes against the given username and the given username's uid
 # in case only uid is visible in process list.
 {

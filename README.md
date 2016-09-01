@@ -25,7 +25,7 @@ make install
 ```
 
 If you have downloaded a [release tarball from our website](https://cfengine.com/product/community/)
-(not from github), you don't need to run `autogen.sh`. By default it installs in 
+(not from github), you don't need to run `autogen.sh`. By default it installs in
 `/var/cfengine/masterfiles` but you can override that easily:
 
 ```

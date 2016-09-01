@@ -26,7 +26,7 @@ fatal() {
 
 parse_line() {
     INPUTP="$1"
-    
+
     echo "${INPUTP}" | awk -F= '{print "KEYWORD=" $1 "; VALUE=" $2;}' 2>/dev/null
 
     unset INPUTP
@@ -142,7 +142,7 @@ get_package_data() {
         if [ "${TYP}" = 'repo' ] ; then
             PKGNAM=`basename "${PKG}" | sed -r -e 's/^([A-Za-z0-9_-]+)-[0-9a-z.,_]+/\1/'`
             PKGVER=`basename "${PKG}" | sed -r -e 's/^[A-Za-z0-9_-]+-([0-9a-z.,_]+)/\1/' -e 's/\.(tgz|(tar\.)?gz|txz|zip)$//'`
-            if [ -z "`echo ${PKGVER} | grep -E '^[0-9]'`" ] ; then 
+            if [ -z "`echo ${PKGVER} | grep -E '^[0-9]'`" ] ; then
                 if [ "${PKGNAM}" != "${PKGVER}" ] ;  then
                     PKGNAM="${PKGNAM}-${PKGVER}"
                 fi
@@ -151,7 +151,7 @@ get_package_data() {
             echo "Name=${PKGNAM}"
             # Returning version for PackageType=repo is not advised
             # https://docs.cfengine.com/latest/reference-standard-library-package_modules.html
-            # if [ -n "${PKGVER}" ] ; then 
+            # if [ -n "${PKGVER}" ] ; then
             #     echo "Version=${PKGVER}"
             # fi
         else
@@ -159,7 +159,7 @@ get_package_data() {
                                       sed -e 's/=freebsd:[0-9]*:/=:/' \
                                       -e 's/:x86:32/i386/' \
                                       -e 's/:x86:64/amd64/'
-            
+
         fi
     fi
 }
@@ -180,7 +180,7 @@ case "${CMD}" in
             sed -e 's/=freebsd:[0-9]*:/=:/' \
                 -e 's/:x86:32/i386/' \
                 -e 's/:x86:64/amd64/'
-        
+
         ;;
     list-updates-local|list-updates)
         if [ "${CMD}" = 'list-updates-local' ] ; then
@@ -189,15 +189,15 @@ case "${CMD}" in
             LOCALUPDATE=''
         fi
         pkg version ${LOCALUPDATE} -vl'<' | \
-            awk 'BEGIN { cmd="uname -m"; cmd | getline arch} 
+            awk 'BEGIN { cmd="uname -m"; cmd | getline arch}
 / repositor(y|ies) / { next; }
-{ 
-  pkgname = $1; 
-  pkgver  = $7; 
-  sub(/-[0-9_.,]*$/,"",pkgname); 
-  sub(/\)/, "", pkgver);  
-  print "Name=" pkgname; 
-  print "Version=" pkgver; 
+{
+  pkgname = $1;
+  pkgver  = $7;
+  sub(/-[0-9_.,]*$/,"",pkgname);
+  sub(/\)/, "", pkgver);
+  print "Name=" pkgname;
+  print "Version=" pkgver;
   print "Architecture=" arch;
 }'
         ;;

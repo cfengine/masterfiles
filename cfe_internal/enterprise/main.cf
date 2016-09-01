@@ -34,7 +34,7 @@ bundle agent cfe_internal_enterprise_main
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
 
-    # As passive hub is supposed to run read-only PostgreSQL instance 
+    # As passive hub is supposed to run read-only PostgreSQL instance
     # doing maintenance makes no sense and is not possible at all.
     (am_policy_hub.enterprise.!enable_cfengine_enterprise_hub_ha)||(enable_cfengine_enterprise_hub_ha.hub_active)::
 

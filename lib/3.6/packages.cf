@@ -291,7 +291,7 @@ body package_method pip(flags)
 #     "requests"            package_method => pip(""), package_policy => "verify";
 #
 # ```
-# 
+#
 # **Note:** "Django" with a capital 'D' in the example above.
 # Explicitly match the name of the package, capitalization does count!
 #
@@ -413,7 +413,7 @@ body package_method brew(user)
 #
 # Available commands : add, delete, (add)update (with package_version).
 #
-# @param user The user under which to run the commands 
+# @param user The user under which to run the commands
 #
 # Homebrew expects a regular (non-root) user to install packages.
 # https://github.com/mxcl/homebrew/wiki/FAQ#why-does-homebrew-say-sudo-is-bad
@@ -775,7 +775,7 @@ body package_method windows_feature
 body package_method msi_implicit(repo)
 # @brief Windows MSI method
 # @param repo The package file repository
-# 
+#
 # Uses the whole file name as promiser, e.g. "7-Zip-4.50-x86_64.msi".
 # The name, version and arch is then deduced from the promiser.
 #
@@ -803,7 +803,7 @@ body package_method msi_implicit(repo)
 body package_method msi_explicit(repo)
 # @brief Windows MSI method
 # @param repo The package file repository
-# 
+#
 # Uses software name as promiser, e.g. "7-Zip", and explicitly
 # specify any `package_version` and `package_arch`.
 #
@@ -1058,7 +1058,7 @@ body package_method yum_group
 # Groups must be specified by their groupids, available through `yum
 # grouplist -v` (between parentheses).  For example, below
 # `network-tools` is the groupid.
-# 
+#
 # ```console
 # $ yum grouplist -v|grep Networking|head -n 1
 #   Networking Tools (network-tools)

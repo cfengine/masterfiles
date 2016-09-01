@@ -1,6 +1,6 @@
 body file control
 {
-      # Include the stdlib directly so that we are always testing the most 
+      # Include the stdlib directly so that we are always testing the most
       # recent version
         inputs => { '../../../../lib/reports.cf' };
 }
