@@ -15,7 +15,7 @@ cwd = os.getcwd()
 # Will cause the package module to call these instead.
 os.environ['CFENGINE_TEST_RPM_CMD'] = cwd + "/mock_rpm"
 os.environ['CFENGINE_TEST_YUM_CMD'] = cwd + "/mock_yum"
-mock_log = cwd + "/mock_output.log"
+mock_log = cwd + "/yum_mock_output.log"
 os.environ['CFENGINE_TEST_MOCK_LOG'] = mock_log
 try:
     os.unlink(mock_log)
