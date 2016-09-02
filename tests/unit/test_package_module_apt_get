@@ -17,7 +17,7 @@ os.environ['CFENGINE_TEST_DPKG_CMD'] = cwd + "/mock_dpkg"
 os.environ['CFENGINE_TEST_DPKG_DEB_CMD'] = cwd + "/mock_dpkg_deb"
 os.environ['CFENGINE_TEST_DPKG_QUERY_CMD'] = cwd + "/mock_dpkg_query"
 os.environ['CFENGINE_TEST_APT_GET_CMD'] = cwd + "/mock_apt_get"
-mock_log = cwd + "/mock_output.log"
+mock_log = cwd + "/apt_get_mock_output.log"
 os.environ['CFENGINE_TEST_MOCK_LOG'] = mock_log
 try:
     os.unlink(mock_log)
