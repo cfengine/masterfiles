@@ -88,7 +88,7 @@ bundle agent check
 
         debian::
 
-            "has_pkg_$(test.package_name)" expression => returnszero("dpkg -l | grep ' $(test.package_name) '", "useshell");
+            "has_pkg_$(test.package_name)" expression => returnszero("dpkg -l | egrep ' $(test.package_name)(:amd64)? '", "useshell");
 
         redhat|suse::
 
