@@ -29,6 +29,7 @@ bundle agent test
       "bundles" slist => { "repositories",
                            "signing_keys",
                            "apt_config",
+                           "dpkg_multiarch",
                            "update"
                          };
 
@@ -157,6 +158,21 @@ bundle edit_line no_apt_cache
 {
   insert_lines:
       'Dir::Cache::pkgcache "";';
+}
+
+bundle agent dpkg_multiarch
+{
+  vars:
+    debian.64_bit::
+      "foreign_archs" string => execresult("/usr/bin/dpkg --print-foreign-architectures", "noshell");
+
+  classes:
+    debian.64_bit::
+      "no_multiarch" not => strcmp($(foreign_archs), "i386");
+
+  commands:
+    debian.64_bit.no_multiarch::
+      "/usr/bin/dpkg --add-architecture i386";
 }
 
 bundle agent update
