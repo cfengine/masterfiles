@@ -89,7 +89,7 @@ bundle agent check
     classes:
 
         debian::
-            "has_pkg" expression => returnszero("dpkg -l | grep ' $(test.package_name) ' > /dev/null", "useshell");
+            "has_pkg" expression => returnszero("dpkg -l | egrep ' $(test.package_name)(:amd64)? ' > /dev/null", "useshell");
 
         redhat|suse::
             "has_pkg" expression => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
