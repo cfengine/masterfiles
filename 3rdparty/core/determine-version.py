@@ -114,7 +114,7 @@ else:
 
 
 # If the commit is referenced exactly in a tag, then use that tag as is
-git = subprocess.Popen(["git", "describe", "--tag", "--exact-match", "--abbrev=0", REV],
+git = subprocess.Popen(["git", "describe", "--tags", "--exact-match", "--abbrev=0", REV],
                        stdout=subprocess.PIPE)
 try:
     exact_tag = git.stdout.readlines()[0].strip()
@@ -126,7 +126,7 @@ except IndexError:                          # command returned no output
     pass
 
 # Find the most recent tag reachable from this commit.
-git = subprocess.Popen(["git", "describe", "--tag", "--abbrev=0", REV],
+git = subprocess.Popen(["git", "describe", "--tags", "--abbrev=0", REV],
                        stdout=subprocess.PIPE)
 recent_tag = git.stdout.readlines()[0].strip()
 verbose_print("recent_tag = %s" % recent_tag)
