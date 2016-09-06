@@ -49,9 +49,9 @@ script:
 - /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/update.cf
 - /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/promises.cf
 - make dist
-- export DIST_TARBALL=cfengine-masterfiles-*.tar.gz
+- export DIST_TARBALL=`echo cfengine-masterfiles-*.tar.gz`
 - make tar-package
-- export PKG_TARBALL=cfengine-masterfiles-*.pkg.tar.gz
+- export PKG_TARBALL=`echo cfengine-masterfiles-*.pkg.tar.gz`
 
 
 # We deploy when setting tags only, which basically never happens
@@ -62,7 +62,7 @@ deploy:
   skip_cleanup: true
   provider: releases
   # Remember to set it as private variable in Travis-CI settings
-  api_key: "$GITHUB_RELEASE_TOKEN"
+  api_key: $GITHUB_RELEASE_TOKEN
   file:
   - "$DIST_TARBALL"
   - "$PKG_TARBALL"
