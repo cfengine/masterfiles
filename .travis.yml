@@ -52,6 +52,13 @@ script:
 - export DIST_TARBALL=`echo cfengine-masterfiles-*.tar.gz`
 - make tar-package
 - export PKG_TARBALL=`echo cfengine-masterfiles-*.pkg.tar.gz`
+- if echo $DIST_TARBALL | grep -E -q '[0-9]{1,2}\.[0-9]{1,2}\.tar\.gz';
+  then
+      IS_PRERELEASE=false;
+  else
+      IS_PRERELEASE=true;
+  fi;
+  export IS_PRERELEASE
 
 
 # We deploy when setting tags only, which basically never happens
@@ -63,6 +70,8 @@ deploy:
   provider: releases
   # Remember to set it as private variable in Travis-CI settings
   api_key: $GITHUB_RELEASE_TOKEN
+# Does not work, I get the error that "true" is not a boolean
+#  prerelease: $IS_PRERELEASE
   file:
   - "$DIST_TARBALL"
   - "$PKG_TARBALL"
