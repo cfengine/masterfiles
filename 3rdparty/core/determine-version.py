@@ -44,6 +44,12 @@ import sys
 #   would find 3.8.0). This scenario has no well defined version, so it's a
 #   compromise.
 
+
+# Print debug info to stderr
+global VERBOSE
+VERBOSE=True
+
+
 def usage():
     print("Usage: %s [revision]" % sys.argv[0])
     print()
@@ -51,38 +57,15 @@ def usage():
     print("current tags.")
     sys.exit(1)
 
+def verbose_print(*args, **kwargs):
+    if VERBOSE:
+        print(*args, file=sys.stderr, **kwargs)
+
 def extract_version_components(version):
     match = re.match("^([0-9]+)\\.([0-9]+)\\.([0-9]+)(.*)", version)
     if match is None:
         return None
     return (match.group(1), match.group(2), match.group(3), match.group(4))
-
-if len(sys.argv) < 2:
-    REV = "HEAD"
-else:
-    if sys.argv[1] == "-h" or sys.argv[1] == "--help":
-        usage()
-    REV = sys.argv[1]
-
-# Find the most recent tag reachable from this commit.
-git = subprocess.Popen(["git",
-                        "describe",
-                        "--tag",
-                        "--abbrev=0",
-                        REV],
-                       stdout=subprocess.PIPE)
-recent_tag = git.stdout.readlines()[0].strip()
-git = subprocess.Popen(["git", "rev-parse", recent_tag + "^{}"], stdout=subprocess.PIPE)
-recent_rev = git.stdout.readlines()[0].strip()
-
-# Find its version, if any.
-recent_version = extract_version_components(recent_tag)
-if recent_version is None:
-    (recent_major, recent_minor, recent_patch, recent_extra) = ("0", "0", "0", "")
-    tag_finder = ["git", "tag"]
-else:
-    (recent_major, recent_minor, recent_patch, recent_extra) = recent_version
-    tag_finder = ["git", "tag", "--contains", recent_tag]
 
 def version_cmp(a, b):
     if a[0] > b[0]:
@@ -119,6 +102,51 @@ def version_cmp(a, b):
 
     return 0
 
+
+
+
+if len(sys.argv) < 2:
+    REV = "HEAD"
+else:
+    if sys.argv[1] == "-h" or sys.argv[1] == "--help":
+        usage()
+    REV = sys.argv[1]
+
+
+# If the commit is referenced exactly in a tag, then use that tag as is
+git = subprocess.Popen(["git", "describe", "--tag", "--exact-match", "--abbrev=0", REV],
+                       stdout=subprocess.PIPE)
+try:
+    exact_tag = git.stdout.readlines()[0].strip()
+    verbose_print("exact_tag = %s" % exact_tag)
+    (version_major, version_minor, version_patch, version_extra) = extract_version_components(exact_tag)
+    print("%s.%s.%s%s" % (version_major, version_minor, version_patch, version_extra))
+    exit(0)
+except IndexError:                          # command returned no output
+    pass
+
+# Find the most recent tag reachable from this commit.
+git = subprocess.Popen(["git", "describe", "--tag", "--abbrev=0", REV],
+                       stdout=subprocess.PIPE)
+recent_tag = git.stdout.readlines()[0].strip()
+verbose_print("recent_tag = %s" % recent_tag)
+
+git = subprocess.Popen(["git", "rev-parse", recent_tag + "^{}"],
+                       stdout=subprocess.PIPE)
+recent_rev = git.stdout.readlines()[0].strip()
+verbose_print("recent_rev = %s" % recent_rev)
+
+# Find its version, if any.
+recent_version = extract_version_components(recent_tag)
+verbose_print("recent_version = ", recent_version)
+
+if recent_version is None:
+    (recent_major, recent_minor, recent_patch, recent_extra) = ("0", "0", "0", "")
+    tag_finder = ["git", "tag"]
+else:
+    (recent_major, recent_minor, recent_patch, recent_extra) = recent_version
+    tag_finder = ["git", "tag", "--contains", recent_tag]
+
 git_tag_list = subprocess.Popen(tag_finder, stdout=subprocess.PIPE)
 all_tags = []
 for tag in git_tag_list.stdout.readlines():
@@ -146,4 +174,5 @@ else:
         print("%s.%s.%d" % (recent_major, recent_minor, int(recent_patch)))
     else:
         print("%s.%s.%d" % (recent_major, recent_minor, int(recent_patch) + 1))
+
 sys.exit(0)
