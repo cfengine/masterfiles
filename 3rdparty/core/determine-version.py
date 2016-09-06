@@ -4,6 +4,13 @@ from __future__ import print_function
 import re
 import subprocess
 import sys
+import os
+
+try:
+    from subprocess import DEVNULL # py3k
+except ImportError:
+    DEVNULL = open(os.devnull, 'wb')
+
 
 # Determines which version we should call this build.
 #
@@ -115,7 +122,7 @@ else:
 
 # If the commit is referenced exactly in a tag, then use that tag as is
 git = subprocess.Popen(["git", "describe", "--tags", "--exact-match", "--abbrev=0", REV],
-                       stdout=subprocess.PIPE)
+                       stdout=subprocess.PIPE, stderr=DEVNULL)
 try:
     exact_tag = git.stdout.readlines()[0].strip()
     verbose_print("exact_tag = %s" % exact_tag)
