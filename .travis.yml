@@ -5,14 +5,14 @@ matrix:
   include:
 
     # JOB 1
-    - env: CF_VERSION=latest
+    - env: CF_VERSION=legacy
       addons:
         apt:
           sources:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
             - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
-            - cfengine-community=3.9.1-1
+            - cfengine-community=3.6.7-1
 
     # JOB 2
     - env: CF_VERSION=lts
