@@ -31,18 +31,15 @@ matrix:
 script:
 - INSTDIR=$HOME/cf_install
 - cd $TRAVIS_BUILD_DIR
-#     If we are on a foreign clone, fetch the tags from upstream;
-#     Needed for determine-version.py to work
-- if ! git remote -v | grep ^origin | grep cfengine/masterfiles;
-  then
-      git remote add upstream https://github.com/cfengine/masterfiles.git;
-      git fetch upstream 'refs/tags/*:refs/tags/*';
-  fi
 - if [ x$STYLE_CHECK_JOB = x1 ];
   then
       sh tests/style_check.sh;
       exit;
   fi
+  # Fetch the tags from upstream, even if we are running on a foreign clone;
+  # Needed for determine-version.py to work
+- git remote add upstream https://github.com/cfengine/masterfiles.git;
+  git fetch upstream 'refs/tags/*:refs/tags/*';
 - ./autogen.sh --without-core --prefix=$INSTDIR
 - make install
 - /var/cfengine/bin/cf-promises --version
