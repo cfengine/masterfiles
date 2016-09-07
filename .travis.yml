@@ -1,4 +1,5 @@
 language: c
+sudo: required
 
 matrix:
   include:
@@ -30,16 +31,34 @@ matrix:
 script:
 - INSTDIR=$HOME/cf_install
 - cd $TRAVIS_BUILD_DIR
-- if [ x$STYLE_CHECK_JOB = x1 ]; then sh tests/style_check.sh; exit; fi
+#     If we are on a foreign clone, fetch the tags from upstream;
+#     Needed for determine-version.py to work
+- if ! git remote -v | grep ^origin | grep cfengine/masterfiles;
+  then
+      git remote add upstream https://github.com/cfengine/masterfiles.git;
+      git fetch upstream 'refs/tags/*:refs/tags/*';
+  fi
+- if [ x$STYLE_CHECK_JOB = x1 ];
+  then
+      sh tests/style_check.sh;
+      exit;
+  fi
 - ./autogen.sh --without-core --prefix=$INSTDIR
 - make install
 - /var/cfengine/bin/cf-promises --version
 - /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/update.cf
 - /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/promises.cf
 - make dist
-- export DIST_TARBALL=cfengine-masterfiles-*.tar.gz
+- export DIST_TARBALL=`echo cfengine-masterfiles-*.tar.gz`
 - make tar-package
-- export PKG_TARBALL=cfengine-masterfiles-*.pkg.tar.gz
+- export PKG_TARBALL=`echo cfengine-masterfiles-*.pkg.tar.gz`
+- if echo $DIST_TARBALL | grep -E -q '[0-9]{1,2}\.[0-9]{1,2}\.tar\.gz';
+  then
+      IS_PRERELEASE=false;
+  else
+      IS_PRERELEASE=true;
+  fi;
+  export IS_PRERELEASE
 
 
 # We deploy when setting tags only, which basically never happens
@@ -50,7 +69,9 @@ deploy:
   skip_cleanup: true
   provider: releases
   # Remember to set it as private variable in Travis-CI settings
-  api_key: "$GITHUB_RELEASE_TOKEN"
+  api_key: $GITHUB_RELEASE_TOKEN
+# Does not work, I get the error that "true" is not a boolean
+#  prerelease: $IS_PRERELEASE
   file:
   - "$DIST_TARBALL"
   - "$PKG_TARBALL"
