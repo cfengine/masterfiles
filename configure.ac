@@ -8,7 +8,6 @@ dnl ##########################################################################
 
 AC_PREREQ(2.63)
 
-m4_define([revision], m4_normalize(m4_esyscmd([git rev-list -1 --abbrev-commit HEAD])))
 
 m4_define([cfversion_from_env], m4_normalize(m4_esyscmd([echo $EXPLICIT_VERSION])))
 m4_ifval(cfversion_from_env, [
@@ -18,15 +17,17 @@ m4_ifval(cfversion_from_env, [
     m4_if(m4_sysval, 0, [], [
         m4_fatal([Could not determine CFEngine version. Please set EXPLICIT_VERSION in the environment.])
     ])
-    m4_define([cfversion], cfversion_from_detect[]a1.revision)
+    m4_define([cfversion], cfversion_from_detect)
     m4_undefine([cfversion_from_detect])
 ])
 
 AC_INIT([cfengine-masterfiles], cfversion)
 
-m4_undefine([revision])
+cfengine_version=cfversion
+
 m4_undefine([cfversion])
 m4_undefine([cfversion_from_env])
+
 
 AC_CANONICAL_TARGET
 
@@ -145,7 +146,8 @@ dnl Print summary
 dnl ######################################################################
 
 AC_MSG_RESULT()
-AC_MSG_RESULT(Summary of options:)
+AC_MSG_RESULT(Summary:)
+AC_MSG_RESULT(Version              -> $cfengine_version)
 AM_COND_IF(HAVE_CORE,
     AC_MSG_RESULT(Core directory       -> $core_dir),
     AC_MSG_RESULT(Core directory       -> not set - tests are disabled)
