@@ -112,7 +112,7 @@ bundle agent init
       # No package modules written for platforms besides RedHat and Debian.
       "test_skip_needs_work" string => "!debian.!redhat";
       # The package module does not support RedHat 4 or Debian 4 (Etch).
-      "test_skip_unsupported" string => "redhat_4|debian_4|debian_etch";
+      "test_skip_unsupported" string => "centos_4|redhat_4|debian_4|debian_etch";
 }
 
 bundle agent log_test_case(msg)
