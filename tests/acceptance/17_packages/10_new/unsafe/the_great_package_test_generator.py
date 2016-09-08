@@ -11,8 +11,8 @@ PLATFORM_ARCH_32 = False
 CLASSES = { "new_debians": "(debian.!ubuntu_10.!debian_6)",
             "old_debians_32_bit": "(32_bit.(ubuntu_10|debian_6))", # No multiarch support.
             "old_debians_64_bit": "(64_bit.(ubuntu_10|debian_6))", # No multiarch support.
-            "redhat_5": "redhat_5",
-            "redhat_6_or_newer": "(redhat.!redhat_5)",
+            "redhat_5": "(redhat_5|centos_5)",
+            "redhat_6_or_newer": "(redhat.!redhat_5.!centos_5)",
           }
 
 class PromiseFailureException(Exception):
