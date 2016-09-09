@@ -8,7 +8,6 @@ do
 	if [ -x $python_bin ];
 	then
 		PYTHON_BIN="$python_bin"
-		echo $python_bin
 		break
 	fi
 done
