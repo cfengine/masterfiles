@@ -126,6 +126,12 @@ bundle common def
                           not(isvariable("trustkeysfrom"))),
         meta => { "defvar" };
 
+      # Agent Controls
+
+      "control_agent_maxconnections"
+        int => "30",
+        ifvarclass => not( isvariable( "control_agent_maxconnections" ) );
+
     debian::
       "environment_vars"
         handle => "common_def_vars_environment_vars",
