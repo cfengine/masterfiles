@@ -18,6 +18,9 @@
     "vars": {
         "acl": [ ".*$(def.domain)", "$(sys.policy_hub)/16" ],
         "control_agent_maxconnections": 100,
+
+        "control_common_bundlesequence_end": [ "my_bundle", "my_other_bundle" ],
+
         "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
                                  "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ]
