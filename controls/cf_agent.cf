@@ -38,6 +38,10 @@ body agent control
 
       default_repository => "$(def.control_agent_default_repository)";
 
+      # File patterns which allow a file to be copied over only a single time
+      # per agent run.
+
+      files_single_copy => { @(def.control_agent_files_single_copy) };
 
       # Environment variables based on Distro
 
