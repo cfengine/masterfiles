@@ -157,6 +157,14 @@ bundle common def
 
       "bundlesequence_end" slist => {};
       "bundlesequence_end" slist => getvalues( tbse );
+      # Agent controls
+
+      "control_agent_files_single_copy"
+        slist => { },
+        ifvarclass => not( some( ".*", "control_agent_files_single_copy") ),
+        comment => "Default files_single_copy to an empty list if it is not
+                    defined. It is expected that users can override the default
+                    by setting this value from the augments file (def.json).";
 
     debian::
       "environment_vars"

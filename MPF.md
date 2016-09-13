@@ -345,7 +345,7 @@ of an augments file.
 
 For example:
 
-```
+```json
 {
   "vars":{
     "control_common_bundlesequence_end": [ "mybundle1", "mybundle2" ]
@@ -361,6 +361,24 @@ For example:
 * The agent will error if a named bundle is not part of inputs.
 
 **History**: Added in 3.10.0
+
+### Configure `files_single_copy` via augments
+
+Specify a list of regular expressions that when matched will prevent the agent
+from performing subsequent copy operations on the same promiser.
+
+For example, to only allow any file to be copied a single time:
+
+```json
+{
+  "vars":{
+    "control_agent_files_single_copy": [ ".*" ]
+  }
+
+}
+```
+
+**History**: Added in 3.11.
 
 ### Configure default repository for file backups
 
