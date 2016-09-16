@@ -10,22 +10,26 @@ AC_PREREQ(2.63)
 
 
 m4_define([cfversion_from_env], m4_normalize(m4_esyscmd([echo $EXPLICIT_VERSION])))
+m4_define([cfversion_from_file], m4_normalize(m4_esyscmd([cat CFVERSION])))
 m4_ifval(cfversion_from_env, [
     m4_define([cfversion], cfversion_from_env)
 ], [
-    m4_define([cfversion_from_detect], m4_normalize(m4_esyscmd([3rdparty/core/determine-version.py])))
-    m4_if(m4_sysval, 0, [], [
-        m4_fatal([Could not determine CFEngine version. Please set EXPLICIT_VERSION in the environment.])
+    m4_ifval(cfversion_from_file, [
+        m4_define([cfversion], cfversion_from_file)
+    ], [
+        m4_fatal([Could not determine CFEngine version;
+                  please set EXPLICIT_VERSION in the environment,
+                  or make sure all git tags are up to date and rerun autogen.sh])
     ])
-    m4_define([cfversion], cfversion_from_detect)
-    m4_undefine([cfversion_from_detect])
 ])
+
 
 AC_INIT([cfengine-masterfiles], cfversion)
 
 cfengine_version=cfversion
 
 m4_undefine([cfversion])
+m4_undefine([cfversion_from_file])
 m4_undefine([cfversion_from_env])
 
 
