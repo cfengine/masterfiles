@@ -27,7 +27,7 @@ bundle agent cfe_internal_log_rotation
         usebundle => prunedir( @(def.cfe_log_dirs), 30 ),
 	comment   => "Scheduled activities like agent runs and reports can
 		      create log files or reports that stack up over time. So
-		      that we dont fill the disk, but have some historical
+		      that we don't fill the disk, but have some historical
 		      information available locally we purge log files older
                       than 30 days.";
 

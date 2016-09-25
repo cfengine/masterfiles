@@ -20,7 +20,7 @@ Layout of this `lib` directory:
   - *cfengine_enterprise_hub_ha.cf*: This file defines bodies and bundles that
     are related to managing High Availability on CFEngine Enterprise Hubs.
   - *commands.cf*: This file contains bodies and bundles that are useful when
-    running commands. For example suppressing command output, or controling
+    running commands. For example suppressing command output, or controlling
     which user or group should be executing the command.
   - *common.cf*: This file contains bodies and bundles that are useful across
     the board. For example bodies that help to define classes based on promise

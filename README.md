@@ -46,7 +46,7 @@ Run the host report like so: `cf-agent -b host_info_report`
 You should see output like:
 
 ```
-R: Host info report generated and avilable at '/var/cfengine/reports/host_info_report.txt'
+R: Host info report generated and available at '/var/cfengine/reports/host_info_report.txt'
 ```
 
 Take a look at the resulting file, it has lots of useful information about the system.

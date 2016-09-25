@@ -125,7 +125,7 @@ bundle common cfe_internal_inputs
 
       "input[cfe_internal_management]"
         string => "cfe_internal/CFE_cfengine.cf",
-        comment => "This policy activates internal managment policies
+        comment => "This policy activates internal management policies
                     for both core and enterprise";
 
       "input[core_main]"
@@ -180,7 +180,7 @@ bundle common cfe_internal_inputs
 }
 
 bundle common cfengine_stdlib
-# @breif Include the standard library
+# @brief Include the standard library
 {
   vars:
     !cfengine_3_7::

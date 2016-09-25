@@ -13,7 +13,7 @@ bundle agent cfe_internal_core_main
       "any"
         usebundle => cfe_internal_log_rotation,
         handle => "cfe_internal_management_log_rotation",
-        comment => "Rotate CFEngine logs so we dont fill the disk";
+        comment => "Rotate CFEngine logs so we don't fill the disk";
 
     cfe_internal_core_watchdog_disabled::
 
