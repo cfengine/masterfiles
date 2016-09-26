@@ -278,8 +278,8 @@ body package_method pip(flags)
 #
 # @param flags The command line parameter passed to `pip`
 #
-# Note: "update" command preforms recursive upgrade (of dependencies) by
-# default. Set $flags to "--no-deps" to preform non-recursive upgrade.
+# Note: "update" command performs recursive upgrade (of dependencies) by
+# default. Set $flags to "--no-deps" to perform non-recursive upgrade.
 # http://www.pip-installer.org/en/latest/cookbook.html#non-recursive-upgrades
 #
 # **Example:**

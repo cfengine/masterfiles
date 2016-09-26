@@ -209,7 +209,7 @@ body classes cf2_if_else(yes,no)
 # does not require any repair.
 #
 # @param yes The name of the class that should be defined if the promise is repaired
-# @param no The name of the class that should be defind if teh promise could not be repaired
+# @param no The name of the class that should be defined if the promise could not be repaired
 {
       promise_repaired => { "$(yes)" };
       repair_failed    => { "$(no)" };
@@ -306,7 +306,7 @@ body classes state_repaired(x)
 body classes enumerate(x)
 # @brief Define `x` for 15 minutes if the promise is either kept or repaired
 # This is used by commercial editions to count instances of jobs in a cluster
-# @param x The unqiue part of the class that should be defind
+# @param x The unique part of the class that should be defined
 # The class defined is prefixed with `mXC_`
 {
       promise_repaired => { "mXC_$(x)" };

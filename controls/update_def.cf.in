@@ -161,9 +161,9 @@ bundle common update_def
         expression => "!any",
         comment => "When cf_promises_validated is disabled remote agents will
                    always scan all of masterfiles for changes. Disabling this
-                   is not recomended as it will increase the load on the policy
+                   is not recommended as it will increase the load on the policy
                    server and increases the possibility for remote agents to
-                   recieve broken policy.";
+                   receive broken policy.";
 
       # Enable CFEngine Enterprise HA Policy
       "enable_cfengine_enterprise_hub_ha" expression => "!any";

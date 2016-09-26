@@ -1,5 +1,5 @@
 bundle agent cfe_internal_core_watchdog(state)
-# @breif Configure external watchdog processes to keep cf-execd running
+# @brief Configure external watchdog processes to keep cf-execd running
 # @param state (enabled|disabled) The state to keep the watchdog configuration in
 {
   meta:

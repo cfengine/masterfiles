@@ -64,7 +64,7 @@ list_updates () {
     # NAME=
     # VERSION=
     # ARCHITECUTRE=
-    # If you cant get a list of updates available, then you cant use
+    # If you can't get a list of updates available, then you can't use
     # version=latest and mission portal won't report updates available. If
     # there is no valid cached list, AND it is unable to get a list it should
     # return nothing

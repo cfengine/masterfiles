@@ -218,7 +218,7 @@ bundle agent git_stash(repo_path, stash_name)
 {
   methods:
       "" usebundle => git($(repo_path), "stash", 'save --quiet --include-untracked "$(stash_name)"'),
-      comment => "So that we don't lose any trail of what happend and so that
+      comment => "So that we don't lose any trail of what happened and so that
                     we don't accidentally delete something important we stash any
                     changes.
   Note:
