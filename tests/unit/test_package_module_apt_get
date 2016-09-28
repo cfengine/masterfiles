@@ -117,6 +117,14 @@ dpkg-query --showformat ${Architecture}=${Status}
 apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --force-yes install a:x=1 b:y c=3 netcat:amd64 netcat:i386 netcat:amd64=3 netcat:i386=3 d
 """])
 
+assert check("repo-install", [ "Name=netcat",
+                              "Options=-qq"],
+             0, [], 4, ["""dpkg --print-architecture
+dpkg-query --showformat ${Architecture}=${Status}
+ -W netcat:*
+apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --force-yes -qq install netcat:amd64 netcat:i386
+"""])
+
 assert check("remove", ["Name=a\nVersion=1\nArchitecture=x",
                         "Name=b\nArchitecture=y",
                         "Name=c\nVersion=3",
