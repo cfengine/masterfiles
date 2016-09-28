@@ -369,6 +369,42 @@ body classes results(scope, class_prefix)
                       "$(class_prefix)_timeout" };
 }
 
+@if minimum_version(3.8)
+body classes diff_results(scope, x)
+# @brief Define `x` prefixed/suffixed with promise outcome with command return codes adjusted to align with `diff`.
+# @param scope The scope the class should be defined with [bundle|namespace].
+# @param x The unique part of the classes to be defined.
+#
+# From man diff:
+# Exit status is 0 if inputs are the  same,  1  if
+# different, 2 if trouble.
+#
+# **Example:**
+# ```cf3
+# bundle agent example
+# {
+#   commands:
+#     "/usr/bin/diff"
+#       args => "/tmp/file1 /tmp/file2",
+#       classes => diff_results("diff");
+#
+#   vars:
+#     "c" slist => classesmatching("diff_.*");
+#
+#   reports:
+#     "Found class '$(c)'";
+#     "Files Differ!"
+#        if => "diff_failed|diff_error|diff_not_kept";
+#     "Files are the same."
+#        if => "diff_kept";
+# }
+{
+      inherit_from => results( $(scope), $(x) );
+      kept_returncodes => { "0" };
+      failed_returncodes => { "1","2" };
+}
+@endif
+
 body classes scoped_classes_generic(scope, x)
 # @brief Define `x` prefixed/suffixed with promise outcome
 # **See also:** `scope`
