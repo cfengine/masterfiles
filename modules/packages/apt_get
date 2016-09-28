@@ -251,6 +251,10 @@ def package_arguments_builder(is_apt_install):
         elif line.startswith("Architecture="):
             arch = line.split("=", 1)[1].rstrip()
 
+        elif line.startswith("options="):
+            global apt_get_options
+            apt_get_options.append(line.split("=", 1)[1].rstrip())
+
     if name:
         args.extend(one_package_argument(name, arch, version, is_apt_install))
 
@@ -258,9 +262,9 @@ def package_arguments_builder(is_apt_install):
 
 
 def repo_install():
-    cmd_line = [apt_get_cmd] + apt_get_options + ["install"]
-
     args = package_arguments_builder(True)
+
+    cmd_line = [apt_get_cmd] + apt_get_options + ["install"]
 
     if (not args):
         return 0
@@ -276,9 +280,9 @@ def repo_install():
     return 0
 
 def remove():
-    cmd_line = [apt_get_cmd] + apt_get_options + ["remove"]
-
     args = package_arguments_builder(False)
+
+    cmd_line = [apt_get_cmd] + apt_get_options + ["remove"]
 
     if (not args):
         return 0
