@@ -118,7 +118,7 @@ apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y
 """])
 
 assert check("repo-install", [ "Name=netcat",
-                              "Options=-qq"],
+                              "options=-qq"],
              0, [], 4, ["""dpkg --print-architecture
 dpkg-query --showformat ${Architecture}=${Status}
  -W netcat:*
