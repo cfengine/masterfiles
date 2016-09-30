@@ -103,8 +103,12 @@ def list_installed():
 
 
 def list_updates(online):
-    # Ignore everything.
-    sys.stdin.readlines()
+    for line in sys.stdin:
+        if line.startswith("options="):
+            option = line[8:]
+            if option.startswith(("enablerepo=","disablerepo=")):
+                global yum_options
+                yum_options += ["--" + option]
 
     online_flag = []
     if not online:
