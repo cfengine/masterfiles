@@ -380,6 +380,7 @@ body classes diff_results(scope, x)
 # different, 2 if trouble.
 #
 # **Example:**
+#
 # ```cf3
 # bundle agent example
 # {
@@ -398,6 +399,7 @@ body classes diff_results(scope, x)
 #     "Files are the same."
 #        if => "diff_kept";
 # }
+# ```
 {
       inherit_from => results( $(scope), $(x) );
       kept_returncodes => { "0" };
