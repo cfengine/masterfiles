@@ -106,7 +106,7 @@ def list_updates(online):
     for line in sys.stdin:
         if line.startswith("options="):
             option = line[8:]
-            if option.startswith(("enablerepo=","disablerepo=")):
+            if option.startswith("enablerepo=") or option.startswith("disablerepo="):
                 global yum_options
                 yum_options += ["--" + option]
 
