@@ -74,8 +74,12 @@ bundle agent cfe_autorun_inventory_listening_ports
 # default, as it runs instantly and has no side effects.
 {
   vars:
-      "ports" slist => sort( "mon.listening_ports", "int"),
-      meta => { "inventory", "attribute_name=Ports listening" };
+      "ports" -> { "ENT-150" }
+        slist => sort( "mon.listening_ports", "int"),
+        meta => { "inventory", "attribute_name=Ports listening" },
+        ifvarclass => some("[0-9]+", "mon.listening_ports"),
+        comment => "We only want to inventory the listening ports if we have
+                    values that make sense.";
 }
 
 bundle agent cfe_autorun_inventory_ipv4_addresses
