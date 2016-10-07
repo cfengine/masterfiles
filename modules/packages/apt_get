@@ -16,7 +16,9 @@ dpkg_status_format = "Status=${Status}\n" + dpkg_output_format
 apt_get_options = ["-o", "Dpkg::Options::=--force-confold",
                    "-o", "Dpkg::Options::=--force-confdef",
                    "-y",
-                   "--force-yes"]
+                   "--allow-downgrades",
+                   "--allow-remove-essential",
+                   "--allow-change-held-packages"]
 apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
 
 os.environ['DEBIAN_FRONTEND'] = "noninteractive"
