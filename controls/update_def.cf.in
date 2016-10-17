@@ -9,7 +9,8 @@ bundle common update_def
       "$(augments_classes_data_keys)"
         expression => classmatch("$(augments[classes][$(augments_classes_data_keys)])"),
         meta => { "augments_class", "derived_from=$(augments_file)" };
-
+    any::
+      "sys_policy_hub_port_exists" expression => isvariable("sys.policy_hub_port");
   vars:
       "current_version" string => "@VERSION@";
 
