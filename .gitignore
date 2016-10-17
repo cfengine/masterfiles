@@ -23,6 +23,7 @@ stamp-h1
 /revision
 /ylwrap
 /test-driver
+CFVERSION
 
 # Misc.
 /cf_promises_*
