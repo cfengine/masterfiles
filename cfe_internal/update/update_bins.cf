@@ -323,7 +323,7 @@ bundle agent cfe_internal_update_bins
     !am_policy_hub.enterprise.trigger_upgrade.(cfengine_3_6_0|cfengine_3_6_1)::
       "$(sys.bindir)/cf-upgrade"
       handle => "cfe_internal_update_bins_files_cf_upgrade_i386_linux",
-      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.i386/cf-upgrade", @(update_def.policy_servers)),
+      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.i386/cf-upgrade", @(update_def.policy_servers), "$(sys.policy_hub_port)"),
       perms => u_m("0755"),
       ifvarclass => "linux.i686",
       comment => "The cf-upgrade binary that shipped with 3.6.0 and 3.6.1 was
@@ -333,7 +333,7 @@ bundle agent cfe_internal_update_bins
       "$(sys.workdir)/bin/cf-upgrade"
       comment => "Copy cf-upgrade binary from policy hub for x86_64 linux",
       handle => "cfe_internal_update_bins_files_cf_upgrade_x86_64_linux",
-      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.x86_64/cf-upgrade", @(update_def.policy_servers)),
+      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.x86_64/cf-upgrade", @(update_def.policy_servers), "$(sys.policy_hub_port)"),
       perms => u_m("0755"),
       ifvarclass => "linux.x86_64",
       comment => "The cf-upgrade binary that shipped with 3.6.0 and 3.6.1 was
