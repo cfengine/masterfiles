@@ -33,7 +33,7 @@ bundle agent test
   meta:
       "test_skip_needs_work" string => "!redhat.!debian";
       # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
-      "test_skip_unsupported" string => "redhat_4";
+      "test_skip_unsupported" string => "redhat_4|centos_4";
 
   classes:
       "cache_exists" expression => fileexists("$(sys.workdir)/state/software_update_timestamp_$(pkg_man)"),

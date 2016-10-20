@@ -27,7 +27,7 @@ bundle agent init
       "test_skip_needs_work" string => "!redhat.!debian",
         meta => { "redmine5866" };
       # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
-      "test_skip_unsupported" string => "redhat_4";
+      "test_skip_unsupported" string => "redhat_4|centos_4";
 
   methods:
     "install_package" usebundle => install_package("$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy");
