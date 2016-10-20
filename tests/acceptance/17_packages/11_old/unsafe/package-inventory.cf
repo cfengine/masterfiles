@@ -23,7 +23,7 @@ bundle agent init
       "test_skip_needs_work" string => "!redhat.!debian";
       # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
       # And available patches is an Enterprise feature.
-      "test_skip_unsupported" string => "redhat_4|!enterprise";
+      "test_skip_unsupported" string => "redhat_4|centos_4|!enterprise";
 
   methods:
       "any" usebundle => clear_packages("dummy");
