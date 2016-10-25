@@ -193,7 +193,8 @@ bundle agent cfe_internal_php_runalerts
       comment => "location of php runalerts script",
       handle => "cfe_internal_php_runalerts_vars_runalerts_script";
 
-      "runalerts_stampfiles_dir" string => "$(sys.workdir)/httpd/php",
+      "runalerts_stampfiles_dir"
+      string => "$(sys.workdir)/httpd/php/runalerts-stamp",
       comment => "location of runalerts stamp file directory",
       handle => "cfe_internal_php_runalerts_var_runalerts_stampfiles_dir";
 
@@ -239,6 +240,19 @@ bundle agent cfe_internal_php_runalerts
       edit_defaults => empty,
       edit_line => my_php_runalerts_script("sql","sketch","$(runalerts_stampfiles_dir)","$(sleep_time)");
 
+      # TODO Move runalerts stamp files into $(sys.statedir)
+
+      "$(runalerts_stampfiles_dir)/."
+      create => "true",
+      comment => "We provide a single directory where the runalerts process
+                  should maintain its timestamp tracking.";
+
+      # This promise uses the side effect of cleaning up the timestamp files to
+      # realize when it's time to kill the runalerts script. However, in order
+      # to make sure that runalerts can write to the state files, we will also
+      # make sure they exist with specific perms. This extra churn is probably
+      # unnecessary.
+
       "$(runalerts_stampfiles_dir)/runalerts_.*"
       comment => "sanity check for the run alerts script. if not, restart it.",
       handle => "cfe_internal_php_runalerts_files_status_check",
@@ -246,7 +260,19 @@ bundle agent cfe_internal_php_runalerts
       file_select => mins_old("$(stale_time)"),
       classes => if_repaired("kill_script");
 
-      #
+      "$(runalerts_stampfiles_dir)/runalerts_sketch"
+      create => "true",
+      perms => mog("600", $(def.cf_apache_user), $(def.cf_apache_group) ),
+      handle => "cfe_enterprise_runalerts_sketch_timestamp_perms",
+      comment => "Sketch alert status timestamp file must be write-able by
+                  $(def.cf_apache_user) or it will log errors on 3.10+.";
+
+      "$(runalerts_stampfiles_dir)/runalerts_sql"
+      create => "true",
+      perms => mog("600", $(def.cf_apache_user), $(def.cf_apache_group) ),
+      handle => "cfe_enterprise_runalerts_sql_timestamp_perms",
+      comment => "SQL alert status timestamp file must be write-able by
+                  $(def.cf_apache_user) or it will log errors on 3.10+";
 
   processes:
 
@@ -259,8 +285,10 @@ bundle agent cfe_internal_php_runalerts
       signals => { "term" },
       classes => if_repaired("run_script");
 
-    # Run script only on active hub to not send duplicated alert emails.
-    !enable_cfengine_enterprise_hub_ha||(enable_cfengine_enterprise_hub_ha.hub_active)::
+    # Run script only on active hub to not send duplicated alert emails. When
+    # running on systemd host and cfengine 3.10+ this function is handled by the
+    # cf-runalerts systemd unit.
+    !enable_cfengine_enterprise_hub_ha||(enable_cfengine_enterprise_hub_ha.hub_active).!(cfengine_3_10.systemd)::
 
       "$(runalerts_script)"
       comment => "check if the php runalerts script is running or not",
@@ -272,7 +300,7 @@ bundle agent cfe_internal_php_runalerts
   commands:
 
     # Run script only on active hub to not send duplicated alert emails.
-    (run_script.!enable_cfengine_enterprise_hub_ha)||(run_script.enable_cfengine_enterprise_hub_ha.hub_active)::
+    (run_script.!enable_cfengine_enterprise_hub_ha)||(run_script.enable_cfengine_enterprise_hub_ha.hub_active).!(cfengine_3_10.systemd)::
 
       "$(runalerts_script) > /dev/null < /dev/null 2>&1 &"
       comment => "to run php alerts script",
@@ -310,11 +338,11 @@ bundle edit_line my_php_runalerts_script(v1,v2,sdir,stime)
 
 while true; do
   touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sql[name])
- if [ -f $(sys.workdir)/httpd/php/runalerts_$(cfe_internal_php_runalerts.sql[name]) ]; then
+ if [ -f $(sdir)/runalerts_$(cfe_internal_php_runalerts.sql[name]) ]; then
   $(sys.workdir)/httpd/php/bin/php $(sys.workdir)/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sql[limit]) $(cfe_internal_php_runalerts.sql[running]) $(cfe_internal_php_runalerts.sql[name]) >/dev/null 2>&1
  fi
   touch $(sdir)/runalerts_$(cfe_internal_php_runalerts.sketch[name])
- if [ -f $(sys.workdir)/httpd/php/runalerts_$(cfe_internal_php_runalerts.sketch[name]) ]; then
+ if [ -f $(sdir)/runalerts_$(cfe_internal_php_runalerts.sketch[name]) ]; then
   $(sys.workdir)/httpd/php/bin/php $(sys.workdir)/httpd/htdocs/index.php cli_tasks runalerts $(cfe_internal_php_runalerts.sketch[limit]) $(cfe_internal_php_runalerts.sketch[running]) $(cfe_internal_php_runalerts.sketch[name]) >/dev/null 2>&1
  fi
  sleep $(stime)
