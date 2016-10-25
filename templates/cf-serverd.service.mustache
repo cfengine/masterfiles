@@ -1,0 +1,16 @@
+[Unit]
+Description=CFEngine Enterprise file server
+After=syslog.target
+After=network.target
+ConditionPathExists={{{vars.sys.bindir}}}/cf-serverd
+PartOf=cfengine3.service
+
+[Service]
+Type=simple
+ExecStart={{{vars.sys.bindir}}}/cf-serverd --no-fork --verbose
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=cfengine3.service

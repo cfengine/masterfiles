@@ -20,6 +20,8 @@ body common control
       version => "update.cf $(update_def.current_version)";
 
       inputs => {
+                  "cfe_internal/update/lib.cf",
+                  "cfe_internal/update/systemd_units.cf",
                   @(cfengine_update_controls.update_def_inputs),
                   "cfe_internal/update/update_bins.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",

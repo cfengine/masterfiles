@@ -1,0 +1,15 @@
+[Unit]
+Description=CFEngine Enterprise Execution Scheduler
+After=syslog.target
+ConditionPathExists={{{vars.sys.bindir}}}/cf-execd
+PartOf=cfengine3.service
+
+[Service]
+Type=simple
+ExecStart={{{vars.sys.bindir}}}/cf-execd --no-fork --verbose
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=cfengine3.service

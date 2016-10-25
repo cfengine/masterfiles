@@ -1,0 +1,23 @@
+[Unit]
+Description=CFEngine Enterprise SQL Alerts
+After=syslog.target
+ConditionFileIsExecutable={{{vars.sys.bindir}}}/runalerts.php
+ConditionFileIsExecutable={{{vars.sys.workdir}}}/httpd/php/bin/php
+
+PartOf=cfengine3.service
+After=cf-postgres.service
+Requires=cf-postgres.service
+
+[Service]
+# We simply launch this script every 60 seconds to perform alert related checks
+Type=simple
+# The cfapache user doesn't have the rights to write to {{{vars.sys.workdir}}}/httpd/php/runalerts_*
+User={{{vars.def.cf_apache_user}}}
+ExecStart={{{vars.sys.bindir}}}/runalerts.php
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=cfengine3.service
+WantedBy=cf-postgres.service
