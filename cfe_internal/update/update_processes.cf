@@ -138,11 +138,15 @@ bundle agent cfe_internal_update_processes
 
     systemd_supervised::
 
-      "CFEngine systemd Unit Definitions"
-        usebundle => cfe_internal_systemd_unit_files;
+      # By default when running under systemd supervision, cfengine will not
+      # continue to make sure that the units are enabled or running. To enable
+      # this internal management please uncomment the following.
 
-      "CFEngine systemd Unit States"
-        usebundle => cfe_internal_systemd_service_unit_state;
+    #  "CFEngine systemd Unit Definitions"
+    #    usebundle => cfe_internal_systemd_unit_files;
+
+    #  "CFEngine systemd Unit States"
+    #    usebundle => cfe_internal_systemd_service_unit_state;
 
     am_policy_hub.enterprise.!systemd_supervised::
 
