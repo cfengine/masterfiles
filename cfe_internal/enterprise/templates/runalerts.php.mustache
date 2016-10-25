@@ -10,11 +10,11 @@ if(PHP_SAPI != 'cli')
 while(1 == 1)
 {
   print("Checking for sql alerts");
-  touch ('{{{vars.sys.workdir}}}/httpd/php/runalerts_sql');
+  touch ('{{{vars.cfe_internal_php_runalerts.runalerts_stampfiles_dir}}}/runalerts_sql');
   passthru('{{{vars.sys.workdir}}}/httpd/php/bin/php {{{vars.sys.workdir}}}/httpd/htdocs/index.php cli_tasks runalerts {{{vars.cfe_internal_php_runalerts.sql[limit]}}} {{{vars.cfe_internal_php_runalerts.sql[running]}}} sql');
 
   print("Checking for sketch alerts");
-  touch('{{{vars.sys.workdir}}}/httpd/php/runalerts_sketch');
+  touch('{{{vars.cfe_internal_php_runalerts.runalerts_stampfiles_dir}}}/runalerts_sketch');
   passthru('{{{vars.sys.workdir}}}/httpd/php/bin/php {{{vars.sys.workdir}}}/httpd/htdocs/index.php cli_tasks runalerts {{{vars.cfe_internal_php_runalerts.sketch[limit]}}} {{{vars.cfe_internal_php_runalerts.sketch[running]}}} sketch');
 
   print("Sleeping for {{{vars.cfe_internal_php_runalerts.sleep_time}}} seconds");
