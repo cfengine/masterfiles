@@ -261,14 +261,6 @@ bundle agent cfe_internal_php_runalerts
 
     any::
 
-      "$(runalerts_stampfiles_dir)/runalerts_$(runalerts_types)"
-        handle => "cfe_internal_php_runalerts_state_file_perms",
-        comment => "The runalerts timestamp files need to be owned by the apache
-                    user or we won't be able to update the timestamps from the
-                    runalerts service which is expected to be running as
-                    $(def.cf_apache_user)",
-        perms => mog( "600", $(def.cf_apache_user), $(def.cf_apache_group) );
-
       "$(runalerts_script)"
       comment => "The runalerts script is necessary for the proper functioning
                   of the CFEngine Enterprise alerts.",
@@ -299,6 +291,16 @@ bundle agent cfe_internal_php_runalerts
       delete => tidy,
       file_select => mins_old("$(stale_time)"),
       classes => results("bundle", "stale_runalerts_timestamp");
+
+      "$(runalerts_stampfiles_dir)/runalerts_$(runalerts_types)"
+      create => "true",
+      handle => "cfe_internal_php_runalerts_state_file_perms",
+      comment => "The runalerts timestamp files need to be owned by the apache
+                    user or we won't be able to update the timestamps from the
+                    runalerts service which is expected to be running as
+                    $(def.cf_apache_user)",
+      perms => mog( "600", $(def.cf_apache_user), $(def.cf_apache_group) );
+
 
       # Cleanup old runalerts script if it's still present
       "$(sys.bindir)/runalerts.sh"
