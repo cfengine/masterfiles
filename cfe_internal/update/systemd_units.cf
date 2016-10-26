@@ -13,7 +13,7 @@ bundle agent cfe_internal_systemd_unit_files
       "systemctl" string => "/bin/systemctl";
 
       "unit_dir"
-        string => "/usr/lib/systemd/system",
+        string => "/etc/systemd/system",
         comment => "This is the directory where the systemd units should be
                     placed.";
 
