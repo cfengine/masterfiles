@@ -155,7 +155,7 @@ bundle agent cfe_internal_update_processes
       comment => "Call a bundle to maintian HUB processes",
       handle => "cfe_internal_update_processes_methods_maintain_hub";
 
-    !windows::
+    !windows.!systemd_supervised::
 
       "DISABLING CFE AGENTS"
       usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
