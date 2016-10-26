@@ -337,6 +337,13 @@ body service_method u_bootstart
 
 #########################################################
 
+body contain u_in_dir(s)
+{
+      chdir => "$(s)";
+}
+
+#########################################################
+
 body contain u_silent_in_dir(s)
 {
       chdir => "$(s)";
