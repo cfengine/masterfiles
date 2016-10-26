@@ -9,8 +9,9 @@ Before=cf-hub.service
 Before=cf-consumer.service
 
 [Service]
-Type=simple
+Type=forking
 ExecStart={{{vars.sys.bindir}}}/redis-server {{{vars.sys.workdir}}}/config/redis.conf
+PIDFile={{{vars.sys.workdir}}}/redis-server.pid
 Restart=always
 RestartSec=10
 
