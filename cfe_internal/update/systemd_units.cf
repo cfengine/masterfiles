@@ -1,0 +1,85 @@
+bundle agent cfe_internal_systemd_unit_files
+# @brief This bundle is responsible for ensuring the systemd units are in place
+# with the proper content and permissions. Any time a unit is repaired systemd
+# is reloaded and the repaired unit(s) are restarted. the
+# cfe_internal_systemd_unit_state bundle is responsible for making sure the
+# service units are in the appropriate state. So a service may be restarted
+# because of a change, and subsequently stopped if the desired state was for it
+# to not be running.
+{
+  vars:
+
+    systemd::
+      "systemctl" string => "/bin/systemctl";
+
+      "unit_dir"
+        string => "/etc/systemd/system",
+        comment => "This is the directory where the systemd units should be
+                    placed.";
+
+      "unit_template_dir"
+        string => "$(this.promise_dirname)/../../templates",
+        comment => "This is where the templates for the units exist. In the
+                    templates dir in the root of masterfiles.";
+
+      "service_units"
+        slist => { @(cfe_internal_update_processes.all_agents) },
+        handle => "systemd_core_units",
+        comment => "These are the services which should have systemd units on all systems.";
+
+  files:
+
+    systemd::
+
+      "$(unit_dir)/$(service_units).service"
+        create => "true",
+        edit_template => "$(unit_template_dir)/$(service_units).service.mustache",
+        template_method => "mustache",
+        classes => u_results( "bundle", "cfe_systemd_service_unit_$(service_units)" ),
+        perms => u_mog("644", "root", "root"),
+        comment => "We need to make each service units content is correct.";
+
+  commands:
+
+    systemd::
+
+      "$(systemctl)"
+        args => "daemon-reload",
+        handle => "cfe_internal_systemd_unit_files_reload_when_changed",
+        if => classmatch("cfe_systemd_service_unit_.*_repaired"),
+        comment => "We need to reload the systemd configuration after any unit
+                    is changed in order for systemd to recognize the change.";
+
+      "$(systemctl)"
+        args => "restart $(service_units).service",
+        handle => "cfe_internal_systemd_unit_restart_when_changed",
+        if => and(classify("cfe_systemd_service_unit_$(service_units)_repaired"),
+                  returnszero("$(systemctl) --quiet is-active $(service_units)", noshell)),
+        comment => "We need to restart any units which have been changed in
+                    order for the new configuration to be in effect. But we only
+                    want to restart them if they are currently running.";
+
+}
+
+bundle agent cfe_internal_systemd_service_unit_state
+# @brief This bundle is responsible for managing the various cfengine components
+# units state. It uses information from
+# cfe_internal_update_processes.agents_to_be_enabled,
+# cfe_internal_update_processes.agents_to_be_disabled to determine which units
+# should be running or not.
+{
+  vars:
+
+      "enabled" slist => { @(cfe_internal_update_processes.agents_to_be_enabled) };
+
+      "disabled"
+        slist => { @(cfe_internal_update_processes.agents_to_be_disabled) };
+
+
+  methods:
+      "Disabled Components"
+        usebundle => u_systemd_services( $(disabled), "stop");
+
+      "Enabled Components"
+        usebundle => u_systemd_services( $(enabled), "start" );
+}

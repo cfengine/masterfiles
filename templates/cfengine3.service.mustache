@@ -1,0 +1,13 @@
+[Unit]
+Description=CFEngine 3 umbrella service
+Documentation=https://docs.cfengine.com/
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+ExecReload=/bin/true
+RemainAfterExit=yes

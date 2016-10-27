@@ -1,0 +1,21 @@
+[Unit]
+Description=CFEngine Enterprise PostgreSQL Database
+After=syslog.target
+ConditionPathExists={{{vars.sys.bindir}}}/pg_ctl
+PartOf=cfengine3.service
+
+[Service]
+Type=forking
+WorkingDirectory=/tmp
+User=cfpostgres
+ExecStart={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log start
+ExecStop={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log stop -m fast
+
+ExecReload={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log reload -m fast
+PIDFile={{{vars.sys.statedir}}}/pg/data/postmaster.pid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=cfengine3.service

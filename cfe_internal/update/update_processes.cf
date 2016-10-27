@@ -16,53 +16,146 @@
 bundle common cfe_internal_process_knowledge
 {
   vars:
+
     !windows::
 
       "bindir"      string => "$(sys.bindir)",
       comment => "Use a system variable";
-
 }
 
 bundle agent cfe_internal_update_processes
+# @brief Determine which cfengine components should be managed, and what their
+# state should be.
+#
+# By default all the relevant services will run on each host. For example all
+# hosts will run cf-execd, cf-serverd, and cf-monitord. Individual services can
+# be disabled:
+#
+# * If persistent_disable_COMPONENT ( persistent_disable_cf_serverd,
+#   persistent_disable_cf_monitord) is defined the service will be disabled.
+#
+# * If the component is found in def.agents_to_be_disabled it will be disabled.
 {
+  classes:
+      "systemd_supervised"
+        scope => "bundle",
+        expression => "systemd.!(cfengine_3_6|cfengine_3_7|cfengine_3_8|cfengine_3_9)",
+        comment => "As of 3.10 the runalerts service is supervised by systemd
+                    when available. Prior to 3.10 the service is supervised
+                    directly by CFEngine policy.";
+
   vars:
 
     any::
 
-      "agents_to_be_disabled"   slist => { },
-      comment => "CFE processes that should not be enabled",
-      handle => "cfe_internal_update_processes_vars_agents_to_be_disabled";
+      # By default the core components are expected to be running in all cases.
 
-      "agents_to_be_enabled"    slist => {
-                                          "cf-execd",
-                                          "cf-serverd",
-                                          "cf-monitord",
-      },
-      comment => "CFE processes that should be enabled",
-      handle => "cfe_internal_update_processes_vars_agents_to_be_enable";
+      "agent[cf_execd]" string => "cf-execd";
+      "agent[cf_serverd]" string => "cf-serverd";
+      "agent[cf_monitord]" string => "cf-monitord";
 
-      "all_agents" slist => { @(agents_to_be_enabled), @(agents_to_be_disabled) },
-      comment => "All CFE agents",
-      handle => "cfe_internal_update_processes_vars_all_agents";
+    policy_server.enterprise_edition::
 
-      #
+      "agent[cf_hub]"
+        string => "cf-hub",
+        comment => "cf-hub is only relevant on Enterprise hubs";
+
+    systemd::
+
+      # On systemd hosts the cfengine3 service acts as an umbrella for other
+      # services.
+
+      "agent[cfengine3]"
+        string => "cfengine3",
+        comment => "systemd hosts use the cfengine3 service as an umbrella.
+                    systemd_supervised hosts additionally have individual units
+                    for each managed service.";
+
+
+    systemd_supervised.enterprise_edition.policy_server::
+
+      # Only enterprise systemd supervised hosts these additional service
+      # definitions for each component.
+
+      "agent[cf_postgres]" string => "cf-postgres";
+      "agent[cf_runalerts]" string => "cf-runalerts";
+      "agent[cf_apache]"   string => "cf-apache";
+      "agent[cf_redis_server]" string => "cf-redis-server";
+      "agent[cf_consumer]" string => "cf-consumer";
+
+    any::
+      # We get a consolidated list of all agents for the executing host.
+      "all_agents" slist => getvalues( agent );
+
+      # We use def.agents_to_be_disabled if it exists, otherwise we default to
+      # no agents being disabled.
+
+      "agents_to_be_disabled"
+        comment => "CFE processes that should not be enabled",
+        handle => "cfe_internal_update_processes_vars_agents_to_be_disabled",
+        slist => { @(def.agents_to_be_disabled) },
+        ifvarclass => isvariable( "def.agents_to_be_disabled" );
+
+      "agents_to_be_disabled"
+        comment => "The default agents that should not be enabled.",
+        handle => "cfe_internal_update_processes_vars_default_agents_to_be_disabled",
+        slist => { },
+        ifvarclass => not( isvariable("def.agents_to_be_disabled") );
+
+      # An agent is disabled if there is a persistently defined disablement
+      # class OR if the agent is found in a list of agents to be specifically
+      # disabled.
+
+      "disable[$(all_agents)]"
+        string => "$(all_agents)",
+        ifvarclass => or( canonify( "persistent_disable_$(all_agents)" ),
+                          some( "$(all_agents)", agents_to_be_disabled ));
+
+    systemd_supervised.policy_server.enterprise.hub_passive|(ha_replication_only_node.!failover_to_repliacation_node_enabled)::
+
+      # We want the enterprise components cf-runalerts, and cf-hub to be
+      # disabled if running on a passive hub or replication only hub.
+
+      "disabled[cf_runalerts]" string => "cf-runalerts";
+      "disabled[cf_hub]" string => "cf-hub";
+
+    any::
+
+      # First we get the consolidated list of agents to be disabled.
+      "agents_to_be_disabled" slist => getvalues( disabled );
+
+      # Any agent that is not explicitly disabled should be enabled.
+      "agents_to_be_enabled"  slist => difference( all_agents, agents_to_be_disabled );
 
   methods:
 
-    systemd::
+    systemd.!systemd_supervised::
+
       "CFENGINE systemd service"
       usebundle => maintain_cfe_systemd,
       comment => "Call a bundle to maintain CFEngine with systemd",
       handle => "cfe_internal_update_processes_methods_maintain_systemd";
 
-    am_policy_hub.enterprise::
+    systemd_supervised::
+
+      # By default when running under systemd supervision, cfengine will not
+      # continue to make sure that the units are enabled or running. To enable
+      # this internal management please uncomment the following.
+
+    #  "CFEngine systemd Unit Definitions"
+    #    usebundle => cfe_internal_systemd_unit_files;
+
+    #  "CFEngine systemd Unit States"
+    #    usebundle => cfe_internal_systemd_service_unit_state;
+
+    am_policy_hub.enterprise.!systemd_supervised::
 
       "TAKING CARE CFE HUB PROCESSES"
       usebundle => maintain_cfe_hub_process,
       comment => "Call a bundle to maintian HUB processes",
       handle => "cfe_internal_update_processes_methods_maintain_hub";
 
-    !windows::
+    !windows.!systemd_supervised::
 
       "DISABLING CFE AGENTS"
       usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
@@ -86,10 +179,6 @@ bundle agent cfe_internal_update_processes
       usebundle => maintain_cfe_windows,
       comment => "Call a bundle to maintain CFEngine on Windows",
       handle => "cfe_internal_update_processes_methods_maintain_windows";
-
-  reports:
-      "The process $(all_agents) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it or move it to the agents_to_be_disabled list if you want it permanently disabled."
-      ifvarclass => canonify("persistent_disable_$(all_agents)");
 
 }
 
@@ -118,12 +207,12 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_classes_files_ok";
 
     am_policy_hub.enable_cfengine_enterprise_hub_ha::
-      "ha_run_hub_process" or =>
-        { "!ha_replication_only_node", "ha_replication_only_node.failover_to_replication_node_enabled" };
+      "ha_run_hub_process"
+        or => { "!ha_replication_only_node",
+                "ha_replication_only_node.failover_to_replication_node_enabled" };
 
-     "ha_kill_hub_process" or =>
-        { "ha_replication_only_node.!failover_to_replication_node_enabled" };
-
+      "ha_kill_hub_process"
+        or => { "ha_replication_only_node.!failover_to_replication_node_enabled" };
 
       #
 
@@ -161,7 +250,8 @@ bundle agent maintain_cfe_hub_process
       "cf-hub"      restart_class => "start_hub",
       comment => "Monitor cf-hub process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
-      ifvarclass => "(nova|enterprise).no_vacuumdb";
+      ifvarclass => and( "(nova|enterprise).no_vacuumdb",
+                         "!persistent_disable_cf_hub" ); # Don't start it if it's persistently disabled
 
     am_policy_hub.ha_kill_hub_process::
       "cf-hub"      signals => { "term" },
@@ -243,7 +333,7 @@ bundle agent disable_cfengine_agents(process)
 
       "$(cfe_internal_process_knowledge.bindir)/$(process)"
       signals => { "term" },
-      comment => "Terminate cf-monitord",
+      comment => "Terminate $(process)",
       handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
       ifvarclass => "disable_$(cprocess)";
 
@@ -292,14 +382,17 @@ bundle agent enable_cfengine_agents(process)
       comment => "Restart a process",
       handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
       classes => u_kept_successful_command,
-      ifvarclass => "restart_$(cprocess)";
+      ifvarclass => and( "restart_$(cprocess)",
+                         isvariable( "sys.$(cprocess)" ) );
 
   reports:
       "The process $(process) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."
-      ifvarclass => "persistent_disable_$(cprocess)";
+      ifvarclass => and( "persistent_disable_$(cprocess)",
+                         isvariable( "sys.$(cprocess)" ));
 
       "The process $(process) has been re-enabled.  Run with '-Dset_persistent_disable_$(cprocess)' to disable it persistently again."
-      ifvarclass => "clear_persistent_disable_$(cprocess)",
+      ifvarclass => and( "clear_persistent_disable_$(cprocess)",
+                         isvariable( "sys.$(cprocess)" )),
       classes => u_clear_always("persistent_disable_$(cprocess)");
 
       "The process $(process) has been disabled persistently.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."

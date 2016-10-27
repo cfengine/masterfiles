@@ -216,8 +216,10 @@ body copy_from u_rcp(from,server)
       trustkey    => "false";
 
     !am_policy_hub::
-
       servers => { "$(server)" };
+
+    !am_policy_hub.sys_policy_hub_port_exists::
+      portnumber => "$(sys.policy_hub_port)";
 
     cfengine_internal_encrypt_transfers::
       encrypt => "true";
