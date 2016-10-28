@@ -109,6 +109,10 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
       "description"
         string => "Configure apache based on successfully staged config";
 
+  classes:
+      "systemd_supervised"
+        expression => returnszero("$(paths.systemctl) -q is-enabled cf-apache", "noshell");
+
   vars:
 
       "validate_config"
@@ -132,13 +136,18 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
   commands:
 
-    mission_portal_apache_config_repaired::
+    mission_portal_apache_config_repaired.!systemd_supervised::
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
         args => "restart",
         classes => kept_successful_command,
         contain => in_shell,
         comment => "We have to restart apache after a config change in order
                     for the changes to take effect.";
+
+  services:
+    mission_portal_apache_config_repaired.!systemd_supervised::
+      "cf-apache"
+        service_policy => "restart";
 
   reports:
     DEBUG|DEBUG_mission_portal_apache_from_stage::
