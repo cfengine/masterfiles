@@ -813,7 +813,7 @@ body copy_from inventory_cmdb_copy_from
 {
     !cfe_inventory_cmdb_override_file::
       source      => "me.json";
-      servers     => { "$(sys.policy_hub)" };
+      servers     => { "$(sys.policy_hub_ip)" };
     cfe_inventory_cmdb_override_file::
       source      => "$(sys.inputdir)/me.json";
     any::
