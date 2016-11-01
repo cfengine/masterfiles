@@ -4,15 +4,19 @@ Community editions. The MPF includes policy to manage
 cfengine itself, the stdlib, and policy to inventory
 various aspects of the system.
 
-# Framework Overview
+# Overview
 
 * `update.cf` - The update policy entry.
 * `promises.cf` - The main policy entry.
 * `lib/` - The standard library.
+* `inventory/` - Inventory policy.
 * `services` - User defined custom policy.
 * `services/main.cf` - Contains an empty bundle agent main where custom policy
   can be integrated.
 * `services/autorun/` - Automatically included policy files.
+
+The MPF is continually updated. You can track its development
+on [github](https://github.com/cfengine/masterfiles/).
 
 # Configuration
 
