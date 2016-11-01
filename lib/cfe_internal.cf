@@ -46,7 +46,7 @@
 ###################################################
 
 bundle common cfe_internal_common
-# @ignore
+# @brief Select parts of the standard library that are dependant
 {
   vars:
       "inputs" slist => { "$(this.promise_dirname)/common.cf",
@@ -54,14 +54,13 @@ bundle common cfe_internal_common
 }
 
 body file control
-# @ignore
+# @brief Include necessary parts of stdlib
 {
       inputs => { @(cfe_internal_common.inputs) };
 }
 
 bundle agent cfe_internal_cleanup_agent_reports
-# @ignore
-# @brief cleanup accumulated agent reports if they grow too large
+# @brief Cleanup accumulated agent reports
 {
   vars:
     any::
