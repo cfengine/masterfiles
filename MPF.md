@@ -38,7 +38,7 @@ This will stop the AGENT from starting automatically.
 This augments file will ensure that `cf-monitord` is disabled on hosts that have
 `server1` or the `redhat` class defined.
 
-```json
+```
 {
   "classes": {
     "persistent_disable_cf_monitord": [ "server1", "redhat" ]
@@ -56,7 +56,7 @@ component.
 This augments file will ensure that `cf-monitord` is not disabled on `redhat`
 hosts.
 
-```json
+```
 {
   "classes": {
     "clear_persistent_disable_cf_monitord": [ "redhat" ]
