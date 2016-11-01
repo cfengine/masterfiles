@@ -82,7 +82,6 @@ By default the MPF enforces restrictive permissions for inputs. If the class
 ```cfengine_internal_preserve_permissions``` is defined the permissions of the
 policy server's masterfiles will be preserved when they are copied.
 
-
 ### Enable CFEngine Enterprise HA
 
 When the ```enable_cfengine_enterprise_hub_ha``` class is defined the policy to
@@ -231,3 +230,85 @@ hosts.
 ```
 
 ### Main Policy (promises.cf)
+
+The following settings are defined in `controls/def.cf` can be set from an
+augments file.
+
+#### mailto
+
+The address that `cf-execd` should email agent output to.
+
+#### mailfrom
+
+The address that output mailed from `cf-execd` should come from.
+
+#### smtpserver
+
+The SMTP server that `cf-execd` should use to send emails.
+
+#### acl
+
+This is a list of of network ranges that the hub should allow download of policy
+files from.
+
+#### trustkeysfrom
+
+The list of network ranges that `cf-serverd` should trust keys from. This is
+should only be open on policy servers while new hosts are expected to be
+bootstrapped. It should be empty after your hosts have been bootstrapped to
+avoid unwanted hosts from being able to bootstrap.
+
+### services\_autorun
+
+When the ```services_autorun``` class is defined bundles tagged with
+```autorun``` are actuated in lexical order.
+
+```cf3
+bundle agent example
+{
+  meta:
+    "tags" slist => { "autorun" };
+
+  reports:
+    "I will report when 'services_autorun' is defined."
+}
+```
+
+**Note:** ```.cf``` files located in `services/autorun/` are automatically
+included in inputs even when the ```services_autorun``` class is **not**
+defined. Bundles tagged with ```autorun``` are **not required** to be placed in
+`services/autorun/` in order to be automatically actuated.
+
+### postgresql\_full\_maintenance
+
+On CFEngine Enterprise policy hubs this class is defined by default on Sundays
+at 2am. To adjust when postgres maintenance operations run edit
+`controls/def.cf` directly.
+
+### postgresql\_vacuum
+
+On CFEngine Enterprise policy hubs this class is defined by default at 2am when
+```postgresql_maintenance_supported``` is defined except for Sundays.
+
+To adjust when postgres maintenance operations run edit `controls/def.cf`
+directly.
+
+### enable_cfengine_enterprise_hub_ha
+
+Set this class when you want to enable the CFEngine Enterprise HA policies.
+
+This class can be defined by an augments file. For example:
+
+```
+{
+  "classes" {
+    "enable_cfengine_enterprise_hub_ha": [ "hub001" ]
+  }
+}
+```
+
+### enable\_cfe\_internal\_cleanup\_agent\_reports
+
+This class enables policy that cleans up report diffs when they exceed
+`def.maxclient_history_size`. By default is is **off** unless a CFEngine
+Enterprise agent is detected.
