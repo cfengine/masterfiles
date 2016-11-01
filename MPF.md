@@ -38,13 +38,11 @@ This will stop the AGENT from starting automatically.
 This augments file will ensure that `cf-monitord` is disabled on hosts that have
 `server1` or the `redhat` class defined.
 
-```
-{
-  "classes": {
-    "persistent_disable_cf_monitord": [ "server1", "redhat" ]
-  }
-}
-```
+    {
+      "classes": {
+        "persistent_disable_cf_monitord": [ "server1", "redhat" ]
+      }
+    }
 
 ### clear_persistent\_disable\_*DAEMON*
 
@@ -56,10 +54,8 @@ component.
 This augments file will ensure that `cf-monitord` is not disabled on `redhat`
 hosts.
 
-```
-{
-  "classes": {
-    "clear_persistent_disable_cf_monitord": [ "redhat" ]
-  }
-}
-```
+    {
+      "classes": {
+        "clear_persistent_disable_cf_monitord": [ "redhat" ]
+      }
+    }
