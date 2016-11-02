@@ -1,6 +1,34 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.0:
+	- Add: Classes body tailored for use with diff
+	- Change: Session Cookies use HTTPOnly and secure attribtues (ENT-2781)
+	- Change: Verify transfered files during policy update
+	- Add: Inventory for system product name (model) (ENT-2780)
+	- Add: Ensure appropriate permissions for SSL files (ENT-760)
+	- Fix rare bug that would sometimes prevent redis-server from launching.
+	- Change: Enable strict transport security
+	- Add: Definition of from_cfexecd for cf-execd initiated runs
+	  (CFE-2386)
+	- Add testing jUnit and TAP bundles and include them in stdlib.cf
+	- Change: Rename duplicate bodies in ha_update.cf (ENT-2753)
+	- Change: Disable RC4 Cipher for ssl in Mission Portal
+	- Pass package promise options to underlying apt-get call (#802)
+	  (CFE-2468)
+	- Change: Enable agent component management policy on systemd hosts
+	  (CFE-2429)
+	- Add: Enterprise appliaction log dir to rotation
+	- Change: re-enable hub process maintainance
+	- Add: edit_line contains_literal_string to stdlib
+	- Fix: Services starting or stopping unnecessarily (CFE-2421)
+	- Allow specifying agent maxconnections via def.json (CFE-2461)
+	- Change: Disable http TRACE method
+	- Change: Reduce Enteprise webserver info
+	- Change: cronjob bundle tolerates different spacing
+	- Fix: CFEngine choking on standard services (CFE-2806)
+
+
 ## [Unreleased][unreleased]
 ### Added
  - External watchdog policy to ensure that cf-execd is running so that policy will be
