@@ -316,3 +316,29 @@ This class can be defined by an augments file. For example:
 This class enables policy that cleans up report diffs when they exceed
 `def.maxclient_history_size`. By default is is **off** unless a CFEngine
 Enterprise agent is detected.
+
+
+## Main Policy (promises.cf)
+
+### Append to the main bundlesequence
+
+You can specify bundles which should be run at the end of the default
+bundlesequence by defining ```control_common_bundlesequence_end``` in the vars
+of an augments file.
+
+For example:
+
+```
+{
+  "vars":{
+    "control_common_bundlesequence_end": [ "mybundle1", "mybundle2" ]
+  }
+
+  "inputs": [ "services/mybundles.cf" ]
+}
+```
+
+**Notes:**
+
+* The order in which bundles are actuates is not guaranteed.
+* The agent will error if a named bundle is not part of inputs.
