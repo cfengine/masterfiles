@@ -55,5 +55,5 @@ bundle agent check
     "command" string => "$(sys.cf_agent) -Kf $(sys.inputdir)/promises.cf";
 
   methods:
-      "" usebundle => dcs_passif_output("R: reporting actuation of bundle x", "", $(command), $(this.promise_filename));
+      "" usebundle => dcs_passif_output(".*R: reporting actuation of bundle x.*", "", $(command), $(this.promise_filename));
 }
