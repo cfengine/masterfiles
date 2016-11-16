@@ -38,8 +38,6 @@ bundle agent test
   meta:
     "description" string => "Test that set_config_values works as expected";
 
-    "test_soft_fail" string => "any", meta => { "CFE-2466" };
-
   vars:
        # should create a new line right after existing commented-out Protocol lines
       "config[Protocol]" string => "2";
