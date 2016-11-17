@@ -110,6 +110,17 @@ quite a few inventory modules will be enabled (if appropriate for your
 system). Here's the list of modules and what they provide. Note they
 are all enabled by code in `def.cf` as explained above.
 
+## Package Inventory
+* lives in: `any.cf`
+* applies to: All systems
+* runs: package modules in order to report on packages installed and patches
+  available
+* disable: define the class ```disable_inventory_package_refresh```. Note this
+  also disables the default package inventory used by the new packages promise
+  implementation. This will cause the ```packagesmatching()``` and
+  ```packageupdatesmatching()``` functions to rely on data supplied by the
+  legacy package promise implementation.
+
 ## LSB
 
 * lives in: `lsb.cf`
