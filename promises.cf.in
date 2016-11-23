@@ -62,12 +62,12 @@ body common control
       # modules in which you MUST provide package modules used to generate
       # software inventory reports. You can also provide global default package module
       # instead of specifying it in all package promises.
-      debian|redhat::
+      (debian|redhat).!disable_inventory_package_refresh::
           package_inventory => { $(package_module_knowledge.platform_default) };
+
+      (debian|redhat)::
           package_module => $(package_module_knowledge.platform_default);
 
-      #   goal_categories => { "goals", "targets", "milestones" };
-      #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 }
 
 bundle common inventory
