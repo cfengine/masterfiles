@@ -171,7 +171,7 @@ bundle agent standard_services(service,state)
 
     chkconfig.SuSE::
       "onboot"
-        expression => returnszero("$(paths.chkconfig) $(service) | $(paths.grep) 'on$' >/dev/null", "usehell"),
+        expression => returnszero("$(paths.chkconfig) $(service) | $(paths.grep) 'on$' >/dev/null", "useshell"),
         comment => "SuSE chkconfig outputs current state to stdout rather than as an exit code";
 
     chkconfig.!SuSE::
