@@ -10,6 +10,7 @@ import sys
 import os
 import subprocess
 import re
+from distutils.version import LooseVersion
 
 PY3 = sys.version_info > (3,)
 
@@ -22,11 +23,25 @@ dpkg_query_cmd = os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD', "/usr/bin/dpkg-q
 dpkg_output_format = "Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n"
 dpkg_status_format = "Status=${Status}\n" + dpkg_output_format
 
+apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
+
+# Some options only work with specific versions of apt, so we must know the
+# current version in order to do the right thing.
+apt_version = subprocess.Popen([ apt_get_cmd , '-v'], stdout=subprocess.PIPE).communicate()[0]
+apt_version = apt_version.splitlines()[0].split(' ')[1]
+
 apt_get_options = ["-o", "Dpkg::Options::=--force-confold",
                    "-o", "Dpkg::Options::=--force-confdef",
-                   "-y",
-                   "--force-yes"]
-apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
+                   "-y"]
+
+if LooseVersion(apt_version) < LooseVersion("1.1"):
+    apt_get_options.append("--force-yes")
+
+else:
+    # The --force-yes option was deprecated in apt-get 1.1
+    apt_get_options.extend( [ "--allow-downgrades",
+                              "--allow-remove-essential",
+                              "--allow-change-held-packages"])
 
 os.environ['DEBIAN_FRONTEND'] = "noninteractive"
 os.environ['LC_ALL'] = "C"
