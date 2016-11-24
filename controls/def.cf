@@ -92,7 +92,7 @@ bundle common def
                    # ".*$(def.domain)",
 
                    # Assume /16 LAN clients to start with
-                   "$(sys.policy_hub)/16",
+                   "$(sys.policy_hub_ip)/16",
 
                    # Uncomment below if HA is used
                    #"@(def.policy_servers)"
