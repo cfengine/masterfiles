@@ -16,7 +16,7 @@
 
     "inputs": [ "$(sys.libdir)/bundles.cf" ],
     "vars": {
-        "acl": [ ".*$(def.domain)", "$(sys.policy_hub_ip)/16" ],
+        "acl": [ ".*$(def.domain)", "$(sys.policy_hub)/16" ],
         "control_agent_maxconnections": 100,
 
         "control_common_bundlesequence_end": [ "my_bundle", "my_other_bundle" ],
