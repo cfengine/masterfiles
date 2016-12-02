@@ -155,10 +155,11 @@ LogLevel warn
   SSLSessionTickets Off
 
   # OCSP stapling is an extension that aims to improve SSL negotiation
-  # performance while mainting visitor privacy.
+  # performance while mainting visitor privacy. Disabled because of
+  # issues with self signed certs.
 
-  SSLUseStapling on
-  SSLStaplingCache "shmcb:logs/stabling-cache(150000)"
+  SSLUseStapling off
+  # SSLStaplingCache "shmcb:logs/stabling-cache(150000)"
 
   # TLS Compression should be disabled to avoid CRIME
   # https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-4929

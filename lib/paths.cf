@@ -220,6 +220,7 @@ bundle common paths
 
     freebsd::
 
+      "path[bhyvectl]" string => "/usr/sbin/bhyvectl";
       "path[getfacl]"  string => "/bin/getfacl";
       "path[dtrace]"   string => "/usr/sbin/dtrace";
       "path[service]"  string => "/usr/sbin/service";
