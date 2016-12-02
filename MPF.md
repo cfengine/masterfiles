@@ -71,6 +71,23 @@ As is typical for CFEngine, the policy and the configuration are mixed. In
 to `controls/update_def.cf` as you read this. We are skipping the nonessential
 ones.
 
+### Verify update transfers
+
+Enable additional verrification after file transfers during policy update by
+defining the class ```cfengine_internal_verify_update_transfers```. When this
+class is defined, the update policy will hash the transfered file and compare it
+against the hash given by the server
+
+This augments file will enable this behavior for all clients.
+
+```
+{
+  "classes": {
+    "cfengine_internal_verify_update_transfers": [ "any" ]
+  }
+}
+```
+
 ### Encrypted transfers
 
 **Note:** When using protocol version 2 or greater all communications are
