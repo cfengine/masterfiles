@@ -1209,6 +1209,10 @@ body select_region INI_section(x)
 {
       select_start => "\[$(x)\]\s*";
       select_end => "\[.*\]\s*";
+
+@if minimum_version(3.10)
+      select_end_match_eof => "true";
+@endif
 }
 
 ##-------------------------------------------------------
