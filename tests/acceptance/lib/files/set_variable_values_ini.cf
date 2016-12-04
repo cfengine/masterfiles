@@ -1,0 +1,64 @@
+#######################################################
+#
+# Test bundle set_config_values_ini
+#
+#######################################################
+
+body common control
+{
+      inputs => { '../../default.cf.sub' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent init
+{
+  files:
+
+      "$(G.testfile).actual"
+      copy_from => local_cp("$(this.promise_filename).start");
+
+
+      "$(G.testfile).expected"
+      copy_from => local_cp("$(this.promise_filename).finish");
+
+}
+
+#######################################################
+
+bundle agent test
+{
+  vars:
+      "config[section][keyone]" string => "1";
+      "config[section][keytwo]" string => "two";
+
+  files:
+
+      "$(G.testfile).actual"
+      edit_line => set_variable_values_ini("test.config", "section");
+
+}
+
+#######################################################
+
+bundle agent check
+{
+
+  methods:
+
+      "check"
+        usebundle => dcs_if_diff( "$(G.testfile).actual", "$(G.testfile).expected",
+                                  "pass", "_fail");
+
+      # Fail the test if any of the files fail.
+      "fail"
+        usebundle => dcs_fail( $(this.promise_filename) ),
+        ifvarclass => "_fail";
+
+    pass::
+      "pass"
+        usebundle => dcs_pass( $(this.promise_filename) );
+
+}
