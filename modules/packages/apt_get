@@ -6,6 +6,8 @@ import subprocess
 import re
 
 
+dpkg_options = ["--force-confold", "--force-confdef"]
+
 dpkg_cmd = os.environ.get('CFENGINE_TEST_DPKG_CMD', "/usr/bin/dpkg")
 dpkg_deb_cmd = os.environ.get('CFENGINE_TEST_DPKG_DEB_CMD', "/usr/bin/dpkg-deb")
 dpkg_query_cmd = os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD', "/usr/bin/dpkg-query")
@@ -302,7 +304,7 @@ def remove():
     return ret
 
 def file_install():
-    cmd_line = [dpkg_cmd, "-i"]
+    cmd_line = [dpkg_cmd] + dpkg_options + ["-i"]
 
     found = False
     for line in sys.stdin:
