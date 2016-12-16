@@ -27,7 +27,16 @@ Notable changes to the framework should be documented here
 	- Change: Reduce Enteprise webserver info
 	- Change: cronjob bundle tolerates different spacing
 	- Fix: CFEngine choking on standard services (CFE-2806)
-
+	- Change select_region INI_section to match end of section or end of file
+	  (CFE-2519)
+	- Fix ability to manage INI sections with metachars for
+	  manage_variable_values_ini and set_variable_values_ini (CFE-2519)
+	- Fix apt_get package module incorrectly using interactive mode.
+	- Add ability to append to bundlesequnece with def.json (CFE-2460)
+	- Behaviour change: when used with CFEngine 3.10.0 or greater,
+	  bundles set_config_values() and set_line_based() are appending a
+	  trailing space when inserting a configuration option with empty value.
+	  (CFE-2466)
 
 3.7.0:
  - Support for user specified overring of framework defaults without modifying
