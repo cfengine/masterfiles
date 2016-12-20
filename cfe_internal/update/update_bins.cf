@@ -548,6 +548,10 @@ body package_method u_generic(repo)
       package_delete_command     => "/bin/rpm -e --nodeps";
       package_verify_command     => "/bin/rpm -V";
       package_noverify_regex     => ".*[^\s].*";
+
+      package_version_less_command => "$(sys.bindir)/rpmvercmp '$(v1)' lt '$(v2)'";
+      package_version_equal_command => "$(sys.bindir)/rpmvercmp '$(v1)' eq '$(v2)'";
+
     (redhat|SuSE|suse)::
       package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
