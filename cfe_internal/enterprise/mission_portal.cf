@@ -283,6 +283,7 @@ bundle agent cfe_enterprise_selfsigned_cert
 
     "$(SSLCertificateFileSymlink)" -> { "jira:ENT-760" }
       link_from => ln_s( $(SSLCertificateFile) ),
+      move_obstructions => "true",
       comment => "Mission Portal reads the certificate from this stable
                   location, so it must always point to the current certificate.";
 
