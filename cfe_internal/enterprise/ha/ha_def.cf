@@ -31,7 +31,7 @@ bundle common ha_def
 
 
   classes:
-      "ha_replication_only_node" expression => some($(sys.policy_hub), replication_only_nodes);
+      "ha_replication_only_node" expression => some($(sys.policy_hub_ip), replication_only_nodes);
 
 
   reports:
