@@ -787,8 +787,13 @@ bundle agent inventory_cmdb_load(file)
       "$(ckeys)" expression => "any", scope => "namespace";
 
   vars:
-      "cmdb" data => readjson($(file), "999999");
-      "cmdb_string" string => format("%S", cmdb);
+      "cmdb"
+        data => readjson($(file), "999999"),
+        ifvarclass => fileexists( $(file) );
+
+      "cmdb_string"
+      string => format("%S", cmdb),
+        ifvarclass => isvariable( cmdb );
 
       "bkeys" slist => getindices("cmdb[vars]");
       "vkeys_$(bkeys)" slist => getindices("cmdb[vars][$(bkeys)]");
