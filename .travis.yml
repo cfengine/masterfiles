@@ -12,10 +12,29 @@ matrix:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
             - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
-            - cfengine-community=3.9.1-1
+            - cfengine-community
+
+    - env: CF_VERSION=latest-3.9.x
+      addons:
+        apt:
+          sources:
+            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+          packages:
+            - cfengine-community=3.9.2-1
 
     # JOB 2
     - env: CF_VERSION=lts
+      addons:
+        apt:
+          sources:
+            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+          packages:
+            - cfengine-community=3.10.0-1
+
+    # JOB 3
+    - env: CF_VERSION=oldlts
       addons:
         apt:
           sources:
