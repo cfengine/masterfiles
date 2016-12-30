@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=master)](https://travis-ci.org/cfengine/masterfiles)
+[![Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=3.10.x)](https://travis-ci.org/cfengine/masterfiles/branches)
 
 [![IRC channel](https://kiwiirc.com/buttons/irc.cfengine.com/cfengine.png)](https://kiwiirc.com/client/irc.cfengine.com/#cfengine)
 
