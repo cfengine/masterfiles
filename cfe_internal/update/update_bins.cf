@@ -512,6 +512,9 @@ body package_method u_generic(repo)
       package_installed_regex    => ".*"; # all reported are installed
 
       package_file_repositories  => { "$(repo)" };
+      package_version_equal_command => "/usr/bin/dpkg --compare-versions '$(v1)' eq '$(v2)'";
+      package_version_less_command => "/usr/bin/dpkg --compare-versions '$(v1)' lt '$(v2)'";
+
 
     debian.x86_64::
       package_name_convention    => "$(name)_$(version)_amd64.deb";
