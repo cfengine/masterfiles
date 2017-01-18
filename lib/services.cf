@@ -247,7 +247,7 @@ bundle agent standard_services(service,state)
       "action_stop"    expression => "request_stop.service_active.can_stop_service";
       "action_reload"  expression => "request_reload.service_active.can_reload_service";
       "action_restart"         or => {
-                                      "request_restart.service_active",
+                                      "request_restart",
 
                                       # Possibly undesirable... if a reload is
                                       # requested, and the service "can't" be
