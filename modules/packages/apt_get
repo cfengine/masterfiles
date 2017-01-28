@@ -27,7 +27,8 @@ apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
 
 # Some options only work with specific versions of apt, so we must know the
 # current version in order to do the right thing.
-apt_version = subprocess.Popen([ apt_get_cmd , '-v'], stdout=subprocess.PIPE).communicate()[0]
+apt_version = subprocess.Popen([ apt_get_cmd , '-v'],
+    stdout=subprocess.PIPE, universal_newlines=True).communicate()[0]
 apt_version = apt_version.splitlines()[0].split(' ')[1]
 
 apt_get_options = ["-o", "Dpkg::Options::=--force-confold",
