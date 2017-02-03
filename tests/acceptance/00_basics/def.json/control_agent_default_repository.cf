@@ -1,0 +1,70 @@
+# Tests that MPF allows agent control default_repository to be set from augments.
+
+body common control
+{
+      inputs => { "../../default.cf.sub" };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent test
+{
+  vars:
+      # This is bad, see below.
+      "files_to_copy" slist => {
+          "cfe_internal",
+          "controls",
+          "inventory",
+          "lib",
+          "promises.cf",
+          "services",
+          "sketches",
+      };
+
+  files:
+      "$(sys.inputdir)/."
+        create => "true";
+      # Ideally this should be a complete subdir copy, but masterfiles files are
+      # currently mixed with other files, including this directory that we're
+      # in, so we would get an infinitely deep copy in that case.
+      "$(sys.inputdir)/$(files_to_copy)"
+        copy_from => dcs_sync("$(this.promise_dirname)/../../../../$(files_to_copy)"),
+        depth_search => recurse("inf");
+
+  methods:
+      "" usebundle => file_make("$(sys.inputdir)/secondary.cf", '
+bundle agent x
+{
+  meta:
+    "tags" slist => { "autorun" };
+
+  files:
+    "$(G.testfile)"
+      create => "true";
+
+    "$(G.testfile)"
+      edit_line => append_if_no_line("$(sys.date)");
+
+  reports:
+    "HELLO WORLD";
+}
+');
+
+      "" usebundle => file_copy("$(this.promise_filename).json", "$(sys.inputdir)/def.json");
+}
+
+#######################################################
+
+bundle agent check
+{
+  vars:
+    "command" string => "$(sys.cf_agent) -KIf $(sys.inputdir)/promises.cf";
+
+  methods:
+      "" usebundle => dcs_passif_fileexists("$(sys.workdir)/mybackups/_tmp_TEST_cfengine_cf_before_edit", $(this.promise_filename) );
+
+}
+
+
