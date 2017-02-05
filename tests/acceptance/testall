@@ -78,7 +78,7 @@ FLAGS="--include=$TEST_DIR/../../modules --baseclasses=AUTO,testing_masterfiles_
 
 
 # Was --bindir in the arguments?
-if echo -- "@" | grep '[-][-]bindir' >/dev/null
+if echo -- "$@" | grep '[-][-]bindir' >/dev/null
 then
     # Arguments are where --bindir points to
     "$CORE/tests/acceptance/testall" $FLAGS "$@"
