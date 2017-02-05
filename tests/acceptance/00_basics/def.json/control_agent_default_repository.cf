@@ -31,7 +31,19 @@ bundle agent test
       # in, so we would get an infinitely deep copy in that case.
       "$(sys.inputdir)/$(files_to_copy)"
         copy_from => dcs_sync("$(this.promise_dirname)/../../../../$(files_to_copy)"),
-        depth_search => recurse("inf");
+        depth_search => recurse("inf"),
+        perms => m(600);
+
+      "$(sys.workdir)/modules"
+        perms => m(700);
+
+  vars:
+      "command" string => "$(sys.cf_agent) --workdir $(sys.workdir) -KIf $(sys.inputdir)/promises.cf";
+
+  commands:
+      "$(command)"
+        depends_on => {"make_secondary"};
+
 
   methods:
       "" usebundle => file_make("$(sys.inputdir)/secondary.cf", '
@@ -47,10 +59,8 @@ bundle agent x
     "$(G.testfile)"
       edit_line => append_if_no_line("$(sys.date)");
 
-  reports:
-    "HELLO WORLD";
 }
-');
+'), handle => "make_secondary";
 
       "" usebundle => file_copy("$(this.promise_filename).json", "$(sys.inputdir)/def.json");
 }
@@ -60,11 +70,14 @@ bundle agent x
 bundle agent check
 {
   vars:
-    "command" string => "$(sys.cf_agent) -KIf $(sys.inputdir)/promises.cf";
+      "c_workdir" string => canonify($(sys.workdir));
 
   methods:
-      "" usebundle => dcs_passif_fileexists("$(sys.workdir)/mybackups/_tmp_TEST_cfengine_cf_before_edit", $(this.promise_filename) );
+      "" usebundle => dcs_passif_fileexists("$(sys.workdir)/mybackups/$(c_workdir)_tmp_TEST_cfengine_cf_before_edit", $(this.promise_filename) );
 
+  reports:
+      "$(sys.workdir)/mybackups exists"
+        if => isdir("$(sys.workdir)/mybackups");
 }
 
 
