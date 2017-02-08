@@ -1,6 +1,6 @@
-[![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=master)](https://travis-ci.org/cfengine/masterfiles)
+MPF build status: [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=master)](https://travis-ci.org/cfengine/masterfiles)
 
-[![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=master)](https://travis-ci.org/cfengine/core)
+Core build status: [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=master)](https://travis-ci.org/cfengine/core)
 
 Looking for help?
 
