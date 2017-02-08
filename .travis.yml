@@ -66,6 +66,14 @@ script:
       IS_PRERELEASE=true;
   fi;
   export IS_PRERELEASE
+- cd $TRAVIS_BUILD_DIR/..
+- git clone --depth=1 https://github.com/cfengine/core
+- chmod -R go-w .
+- cp core/tests/acceptance/*.cf.sub masterfiles/tests/acceptance/
+- umask 077
+- cd masterfiles/tests/acceptance
+- echo "CORE=$TRAVIS_BUILD_DIR/../core" > ./testall.env
+- ./testall --agent=/var/cfengine/bin/cf-agent --cfpromises=/var/cfengine/bin/cf-promises --cfserverd=/var/cfengine/bin/cf-serverd --cfrunagent=/var/cfengine/bin/cf-runagent --cfkey=/var/cfengine/bin/cf-key --rpmvercmp=/bin/true --printlog
 
 
 # We deploy when setting tags only, which basically never happens
