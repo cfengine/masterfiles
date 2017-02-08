@@ -359,3 +359,29 @@ For example:
 
 * The order in which bundles are actuates is not guaranteed.
 * The agent will error if a named bundle is not part of inputs.
+
+**History**: Added in 3.10.0
+
+### Configure default repository for file backups
+
+By default the agent creates a backup of a file before it is edited in the same
+directory as the edited file. Defining the
+`mpf_control_agent_default_repository` class will cause these backups to be
+placed in `$(sys.workdir)/backups`. Customize the backup directory by setting
+`def.control_agent_default_backup`.
+
+For example:
+
+```
+{
+  "classes": {
+    "mpf_control_agent_default_repository": [ "any" ]
+  },
+
+  "vars": {
+    "control_agent_default_repository": "/var/cfengine/edit_backups"
+  }
+}
+```
+
+**History**: Added in 3.10.1
