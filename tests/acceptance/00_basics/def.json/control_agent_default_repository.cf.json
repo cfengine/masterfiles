@@ -1,0 +1,10 @@
+{
+ "inputs": [ "$(sys.inputdir)/secondary.cf" ],
+ "classes": { "services_autorun": [ "any" ],
+              "mpf_control_agent_default_repository": [ "any" ] },
+
+ "vars": {
+	 "control_agent_default_repository": "$(sys.workdir)/mybackups",
+	 "control_common_bundlesequence_end": [ "x" ]
+ }
+}
