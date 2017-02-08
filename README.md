@@ -1,4 +1,8 @@
-[![Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=master)](https://travis-ci.org/cfengine/masterfiles)
+[![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=master)](https://travis-ci.org/cfengine/masterfiles)
+
+[![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=master)](https://travis-ci.org/cfengine/core)
+
+Looking for help?
 
 [![IRC channel](https://kiwiirc.com/buttons/irc.cfengine.com/cfengine.png)](https://kiwiirc.com/client/irc.cfengine.com/#cfengine)
 
