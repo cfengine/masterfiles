@@ -11,11 +11,14 @@
         "my_debian_role": [ "debian.*" ],
         "services_autorun": [ "any" ],
         "cfengine_internal_disable_agent_email": [ "enterprise_edition" ],
-        "cfe_internal_core_watchdog_enabled": [ "any" ]
+        "cfe_internal_core_watchdog_enabled": [ "any" ],
+        "mpf_control_agent_default_repository": [ "any" ]
     },
 
     "inputs": [ "$(sys.libdir)/bundles.cf" ],
     "vars": {
+
+        "control_agent_default_repository": "/var/cfengine/edit_backups",
         "acl": [ ".*$(def.domain)", "$(sys.policy_hub)/16" ],
         "control_agent_maxconnections": 100,
 
