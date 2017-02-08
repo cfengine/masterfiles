@@ -11,6 +11,10 @@ body common control
 
 bundle agent test
 {
+  meta:
+      # Feature added in 3.10.x
+      "test_skip_unsupported" string => "cfengine_3_7";
+
   vars:
       # This is bad, see below.
       "files_to_copy" slist => {

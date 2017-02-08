@@ -3,10 +3,21 @@
 
 body common control
 {
+    cfengine_3_7::
+      inputs => {
+                  "../dcs.cf.sub",
+                  "../../../lib/stdlib.cf",
+                  "../../../lib/packages.cf",
+                };
+
+    !cfengine_3_7::
       inputs => { "../dcs.cf.sub",
                   "../../../$(sys.local_libdir)/stdlib.cf",
                   "../../../$(sys.local_libdir)/packages.cf",
-                };
+      };
+
+
+    any::
       bundlesequence => { default($(this.promise_filename)) };
 }
 
@@ -77,7 +88,7 @@ bundle agent test
 {
   meta:
       # Redhat specific issue.
-      "test_skip_unsupported" string => "!redhat|!enterprise";
+      "test_skip_unsupported" string => "!redhat|!enterprise|cfengine_3_7";
 
   packages:
       "dummy-nonexisting-package"
