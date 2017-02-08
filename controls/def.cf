@@ -128,6 +128,12 @@ bundle common def
 
       # Agent Controls
 
+      "control_agent_default_repository"
+        string => ifelse( isvariable( "control_agent_default_repository"),
+                          $(control_agent_default_repository),
+                          "$(sys.workdir)/backups"),
+        if => "mpf_control_agent_default_repository";
+
       "control_agent_maxconnections"
         int => "30",
         ifvarclass => not( isvariable( "control_agent_maxconnections" ) );
