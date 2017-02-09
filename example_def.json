@@ -26,6 +26,8 @@
 
         "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
-                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ]
+                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ],
+
+        "mpf_dir_templates": "/var/cfengine/templates"
     }
 }
