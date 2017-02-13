@@ -1,8 +1,8 @@
 | Version | Core                                                                                                               | MPF                                                                                                                             |
 |---------|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
 |  master | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=master)](https://travis-ci.org/cfengine/core) | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=master)](https://travis-ci.org/cfengine/masterfiles) |
-|  3.10.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.10.x)](https://travis-ci.org/cfengine/core) | [![MPF Build Status](https://travis-ci.org/cfengine/3.10.xfiles.svg?branch=3.10.x)](https://travis-ci.org/cfengine/3.10.xfiles) |
-|   3.7.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.7.x)](https://travis-ci.org/cfengine/core)  | [![MPF Build Status](https://travis-ci.org/cfengine/3.7.xfiles.svg?branch=3.7.x)](https://travis-ci.org/cfengine/3.7.xfiles)    |
+|  3.10.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.10.x)](https://travis-ci.org/cfengine/core) | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=3.10.x)](https://travis-ci.org/cfengine/masterfiles) |
+|   3.7.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.7.x)](https://travis-ci.org/cfengine/core)  | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=3.7.x)](https://travis-ci.org/cfengine/masterfiles)    |
 
 Looking for help?
 
