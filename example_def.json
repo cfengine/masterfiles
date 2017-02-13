@@ -28,6 +28,9 @@
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
                                  "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ],
 
-        "mpf_dir_templates": "/var/cfengine/templates"
+        "server_controls": {
+                    "dir_templates": "/var/cfengine/templates_tests"
+        }
+
     }
 }
