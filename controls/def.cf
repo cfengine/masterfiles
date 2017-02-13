@@ -196,9 +196,9 @@ bundle common def
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";
 
-      "dir_templates"
-        string => ifelse( isvariable( "mpf_dir_templates"),
-                          $(mpf_dir_templates),
+      "server[dir_templates]"
+        string => ifelse( isvariable( "def.server[dir_templates]"),
+                          $(def.server[dir_templates]), 
                           "$(sys.workdir)/templates"),
       comment => "Define templates path",
       handle => "common_def_vars_dir_templates";

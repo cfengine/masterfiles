@@ -87,7 +87,7 @@ bundle server access_rules()
       comment => "Grant access to plugins directory",
       admit => { @(def.acl) };
 
-      "$(def.dir_templates)"
+      "$(def.server[dir_templates])"
       handle => "server_access_grant_access_templates",
       shortcut => "templates",
       comment => "Grant access to templates directory",
