@@ -1,3 +1,5 @@
+git:
+  depth: 9999
 language: c
 sudo: required
 
