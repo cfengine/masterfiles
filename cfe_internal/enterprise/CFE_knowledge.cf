@@ -108,11 +108,27 @@ bundle agent cfe_internal_setup_knowledge
       create => "true",
       perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group));
 
-      "$(cfe_internal_hub_vars.docroot)/ssl/."
-        depth_search => recurse_basedir("inf"),
-        perms => mog("0440", "root", "root" ),
-        comment => "The ssl certificates only need to be readable by root since
-                    the webserver reads them before dropping privileges.";
+      "$(cfe_internal_hub_vars.docroot)/../ssl/."
+        perms => mog("0440", "root", "root" );
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/private/."
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0440", "root", "root"),
+        comment => "Private keys are secrets and should not be accessible by
+                    anyone other than root.";
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/csr/."
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0440", "root", "root"),
+        comment => "Certificate signing requests, while not secrets do not need to
+                    be readable by others.";
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/certs/." -> { "ENT-3050", "Mission Portal" }
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0444", "root", "root"),
+        comment => "Certificates need to be read by any user wishing to validate
+                    a request. For example Mission Portals api.";
+
 
       "$(cfe_internal_hub_vars.docroot)/"
         depth_search => recurse_basedir("inf"),
@@ -126,6 +142,7 @@ bundle agent cfe_internal_setup_knowledge
         depth_search => recurse_basedir("inf"),
         comment => "No Mission Portal code in share needs to be accessed by
                     anyone";
+
 
 }
 
