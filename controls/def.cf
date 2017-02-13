@@ -198,7 +198,7 @@ bundle common def
 
       "server_controls[dir_templates]"
         string => ifelse( isvariable( "def.server_controls[dir_templates]"),
-                          $(def.server_controls[dir_templates]), 
+                          $(def.server_controls[dir_templates]),
                           "$(sys.workdir)/templates"),
       comment => "Define templates path",
       handle => "common_def_vars_dir_templates";
