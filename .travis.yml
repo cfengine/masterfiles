@@ -52,7 +52,6 @@ script:
   # Needed for determine-version.py to work
 - git remote add upstream https://github.com/cfengine/masterfiles.git;
   git fetch upstream 'refs/tags/*:refs/tags/*';
-- git fetch --unshallow
 - ./autogen.sh --without-core --prefix=$INSTDIR
 - make install
 - /var/cfengine/bin/cf-promises --version
