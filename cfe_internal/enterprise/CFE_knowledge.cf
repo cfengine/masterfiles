@@ -113,7 +113,44 @@ bundle agent cfe_internal_setup_knowledge
       comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
       handle => "cfe_internal_setup_knowledge_files_httpd_logs",
       create => "true",
-      perms => mog("0664","root","cfapache");
+      perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group));
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/."
+        perms => mog("0440", "root", "root" );
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/private/."
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0440", "root", "root"),
+        comment => "Private keys are secrets and should not be accessible by
+                    anyone other than root.";
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/csr/."
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0440", "root", "root"),
+        comment => "Certificate signing requests, while not secrets do not need to
+                    be readable by others.";
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/certs/." -> { "ENT-3050", "Mission Portal" }
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0444", "root", "root"),
+        comment => "Certificates need to be read by any user wishing to validate
+                    a request. For example Mission Portals api.";
+
+
+      "$(cfe_internal_hub_vars.docroot)/"
+        depth_search => recurse_basedir("inf"),
+        handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess_perms",
+        file_select => cfe_internal_htaccess,
+        perms => mog("0440", "root", $(def.cf_apache_group) ),
+        comment => ".htaccess files should only be readable by webserver.";
+
+      "$(sys.workdir)/share/GUI/."
+        perms => mog("0400", "root", "root" ),
+        depth_search => recurse_basedir("inf"),
+        comment => "No Mission Portal code in share needs to be accessed by
+                    anyone";
+
+
 }
 
 #############################################################################
