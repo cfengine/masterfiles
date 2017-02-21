@@ -143,7 +143,16 @@ bundle agent cfe_internal_update_policy
       copy_from => u_rcp("$(master_location)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       file_select  => u_input_files,
-      action => u_immediate;
+      action => u_immediate,
+      classes => u_results("bundle", "update_inputs");
+
+    update_inputs_not_kept::
+
+      "$(inputs_dir)/cf_promises_validated" -> { "CFE-2587" }
+        delete => u_tidy,
+        comment => "If there is any problem copying to $(inputs_dir) then purge
+                    the cf_promises_validated file must be purged so that
+                    subsequent agent runs will perform a full scan.";
 
     !policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/policy_server.dat"
