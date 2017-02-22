@@ -222,6 +222,15 @@ body file_select cfe_internal_sh_pl_scripts
 
 ############################################################################
 
+body file_select cfe_internal_htaccess
+# @brief Select only .htaccess files.
+{
+      leaf_name => { "\.htaccess" };
+      file_result => "leaf_name";
+}
+
+############################################################################
+
 body file_select cfe_internal_exclude_index_html
 {
   leaf_name => { "index.html" };
