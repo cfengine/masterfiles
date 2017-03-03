@@ -301,6 +301,39 @@ bundle agent prunedir(dir, max_days)
       depth_search  => recurse("1");
 }
 
+bundle agent prunetree(dir, depth, max_days)
+# @brief Delete files and directories inside "dir" up to "depth" older than "max_days".
+# @depends delete tidy
+# @depends depth_search recurse_with_base
+# @depends file_select days_old
+# @param dir directory to examine for files
+# @param depth How many levels to descend
+# @param max_days maximum number of days old a files mtime is allowed to before deletion
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent example
+# {
+#   vars:
+#     "dirs" slist => { "/tmp/logs", "/tmp/logs2" };
+#
+#   methods:
+#     "prunetree" usebundle => prunetree( @(dirs), inf, "1" );
+# }
+# ```
+{
+  files:
+      "$(dir)"
+      comment => "Delete files and directories under $(dir) up to $(depth)
+                    depth older than $(max_days)",
+
+      delete        => tidy,
+      file_select   => days_old( $(max_days) ),
+      depth_search  => recurse_with_base( $(depth) );
+
+}
+
 bundle agent url_ping(host, method, port, uri)
 # @brief ping HOST:PORT/URI using METHOD
 # @param host the host name
