@@ -1,6 +1,18 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.1:
+	- Ensure MP SSL Cert is readable (ENT-3050)
+	- Change Opportunisticaly monitor file integrity (ENT-3040)
+	- Fix systemd unit restart when not running (CFE-2541)
+	- Make stock policy update more resiliant (CFE-2587)
+	- FixesMake apt_get module compatible with Ubuntu 16.04 (CFE-2445)
+	- Add default report collection exclusion based on promise handle
+	  (ENT-3061)
+	- Fix: Automatic client upgrades for deb hosts
+	- Do not symlink agents to /usr/local/bin on coreos (ENT-3047)
+	- Add: Ability to set default_repository via augments
+
 3.10.0:
 	- Add: Classes body tailored for use with diff
 	- Change: Session Cookies use HTTPOnly and secure attribtues (ENT-2781)
