@@ -42,7 +42,7 @@ bundle agent change_management
 
       "$(watch_files_report_change)" -> { "InfoSec" }
         changes => detect_content_using("sha256"),
-        ifvarclass => fileexists( $(watch_files_report_diffs) ),
+        ifvarclass => fileexists( $(watch_files_report_change) ),
         comment => "Unplanned changes of these files may indicate a security
                     breach. (Diffs are not reported in case those with access
                     to this report should not have access to shadow entries.)";
