@@ -32,6 +32,9 @@ body server control
       # Suggested value >= total number of hosts
       maxconnections        => "200";
 
+      # Bind to all interfaces including ipv6
+      bindtointerface => "::";
+      
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
 
