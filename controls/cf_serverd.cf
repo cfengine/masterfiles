@@ -34,7 +34,7 @@ body server control
 
       # Bind to all interfaces including ipv6
       bindtointerface => "::";
-      
+
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
 
