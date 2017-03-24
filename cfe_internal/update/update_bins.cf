@@ -55,9 +55,8 @@ bundle agent cfe_internal_bins
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 
-    !coreos::
-      "/usr/local/sbin/$(agents)" -> { "ENT-3046" }
-
+    !(coreos|windows)::
+      "/usr/local/sbin/$(agents)" -> { "ENT-3046", "ENT-3082" }
       comment => "Create symlinks of CFE binaries in /usr/local/sbin. But not on
                   coreos hosts since the fs is read only.",
       handle => canonify("cfe_internal_bins_files_sbin_$(agents)"),
