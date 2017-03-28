@@ -196,6 +196,14 @@ bundle common def
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";
 
+      "mpf_dir_templates"
+        string => ifelse( isvariable( "def.mpf_dir_templates"),
+                          $(def.mpf_dir_templates),
+                          "$(sys.workdir)/templates"),
+      comment => "Define templates path",
+      handle => "common_def_vars_dir_templates";
+
+
       "cf_apache_user" string => "cfapache",
       comment => "User that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_user";
