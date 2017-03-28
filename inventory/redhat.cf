@@ -11,4 +11,12 @@ bundle common inventory_redhat
       "redhat_derived" expression => "redhat.!redhat_pure",
       comment => "derived from Red Hat",
       meta => { "inventory", "attribute_name=none" };
+
+      "cfe_yum_package_module_supported" -> { "CFE-2602" }
+        comment => "Here we see if the version of python found is acceptable for
+                    the yum package module. We use this guard to prevent errors
+                    related to missing python modules.",
+        expression => returnszero("python -V 2>&1 | grep ^Python | cut -d' ' -f 2 | ( IFS=. read v1 v2 v3 ; [ $v1 -ge 3 ] || [ $v1 -eq 2 -a $v2 -ge 4 ] )",
+                                  useshell);
+
 }
