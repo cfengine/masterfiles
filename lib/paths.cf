@@ -111,6 +111,7 @@ bundle common paths
       "path[tar]"           string => "/bin/tar";
       "path[pgrep]"         string => "/usr/bin/pgrep";
       "path[getent]"        string => "/usr/bin/getent";
+      "path[mailx]"         string => "/usr/bin/mailx";
 
     aix::
 
@@ -502,6 +503,8 @@ bundle common paths
     freebsd|openbsd|netbsd|darwin::
 
       "path[shadow]"       string => "/etc/master.passwd";
+
+      "path[mailx]"        string => "/usr/bin/mailx";
 
     aix::
 
