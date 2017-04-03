@@ -15,7 +15,7 @@ matrix:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
             - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
-            - cfengine-community=3.10.0-1
+            - cfengine-community=3.10.1-1
 
     # JOB 2
     - env: CF_VERSION=oldlts
@@ -25,7 +25,7 @@ matrix:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
             - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
-            - cfengine-community=3.7.4-1
+            - cfengine-community=3.7.5-1
 
 
 script:
