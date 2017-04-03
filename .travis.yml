@@ -8,16 +8,6 @@ matrix:
     - env: STYLE_CHECK_JOB=1
 
     # JOB 1
-    - env: CF_VERSION=latest
-      addons:
-        apt:
-          sources:
-            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
-            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
-          packages:
-            - cfengine-community
-
-    # JOB 2
     - env: CF_VERSION=lts
       addons:
         apt:
@@ -27,7 +17,7 @@ matrix:
           packages:
             - cfengine-community=3.10.0-1
 
-    # JOB 3
+    # JOB 2
     - env: CF_VERSION=oldlts
       addons:
         apt:
