@@ -64,9 +64,17 @@ body common control
       # instead of specifying it in all package promises.
       # Please also note that software inventory reports is CFEngine enterprise only
       # feature and core users can remove package_inventory line.
-      #debian|redhat::
-      #    package_inventory => { $(package_module_knowledge.platform_default) };
-      #    package_module => $(package_module_knowledge.platform_default);
+
+    # debian.!disable_inventory_package_refresh::
+    #     package_inventory => { $(package_module_knowledge.platform_default) };
+
+    #   # We only define pacakge_invetory on redhat like systems that have a
+    #   # python version that works with the package module.
+    # (redhat|centos).cfe_yum_package_module_supported.!disable_inventory_package_refresh::
+    #     package_inventory => { $(package_module_knowledge.platform_default) };
+
+    # (debian|redhat)::
+    #     package_module => $(package_module_knowledge.platform_default);
 
       # Uncomment to connect to the hub using latest protocol.
       #protocol_version => "latest";
