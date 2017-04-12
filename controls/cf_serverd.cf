@@ -90,6 +90,12 @@ bundle server access_rules()
       comment => "Grant access to plugins directory",
       admit => { @(def.acl) };
 
+      "$(def.dir_templates)"
+      handle => "server_access_grant_access_templates",
+      shortcut => "templates",
+      comment => "Grant access to templates directory",
+      admit => { @(def.acl) };
+
     !windows::
       "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",

@@ -385,3 +385,46 @@ For example:
 ```
 
 **History**: Added in 3.10.1
+
+### Modules
+
+Modules executed by the `usemodule()` function are expected to be found in
+`$(sys.workdir)/modules` the modules are distributed to all remote agents by in
+the default policy.
+
+### Templates
+
+For convenience the `templates` shortcut is provided and by default the path is
+set to `$(sys.workdir/templates)` unless `$(def.template_dir)` is overridden via
+augments.
+
+* **NOTE:** The templates directory is not currently managed by default policy.
+  Unlike modules **templates are not distributed to all hosts by default**.
+
+Copy a template from the templates directory:
+
+```cf3
+  files:
+
+    "$(def.dir_templates)/mytemplate.mustache" -> { "myservice" }
+      copy_from => remote_dcp("templates/mytemplate.mustache", $(sys.policy_server) ),
+      comment => "mytemplate is necessary in order to render myservice configuration file.";
+```
+
+Override the path for `$(def.dir_templates)` by setting `vars.dir_templates` in
+the augments file (`def.json`):
+
+```json
+{
+    "vars": {
+        "dir_templates": "/var/cfengine/mytemplates"
+        }
+}
+```
+
+**Note:** When overriding the templates directory a change to the augments alone
+will not cause `cf-serverd` to reload its configuration and update the access
+control lists as necessary. `cf-serverd` will only automatically reload its
+config when it notices a change in *policy*.
+
+**History**: Added in 3.11.
