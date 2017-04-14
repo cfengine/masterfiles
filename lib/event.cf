@@ -173,6 +173,7 @@ bundle agent event_usage_example
 # **See also:** `event_handle`, `event_register`
 #
 # Expected output with `-KI`:
+#
 # ```
 # R: event_register: creating event event_event_usage_example_restart_apache persistent for 1440 minutes with metadata {  }
 # R: event_register: creating event event_event_usage_example_install_php persistent for 2880 minutes with metadata {  }
