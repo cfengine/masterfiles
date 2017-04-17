@@ -55,5 +55,5 @@ bundle agent check
     "command" string => "$(sys.cf_promises) --show-vars -f $(sys.inputdir)/promises.cf|$(G.grep) -c $(test_dir)";
 
   methods:
-      "" usebundle => dcs_passif_output('1', "", $(command), $(this.promise_filename));
+      "" usebundle => dcs_passif_output('2', "", $(command), $(this.promise_filename));
 }
