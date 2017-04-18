@@ -51,8 +51,8 @@ bundle agent test
 bundle agent check
 {
   vars:
-    "test_dir" string => "var/cfengine/templates_tests";
-    "command" string => "$(sys.cf_promises) --show-vars -f $(sys.inputdir)/promises.cf|$(G.grep) -c $(test_dir)";
+    "test_dir" string => "/var/cfengine/templates_tests";
+    "command" string => "$(sys.cf_promises) --show-vars -f $(sys.inputdir)/promises.cf|$(G.grep) -Ec '^default:def.dir_templates\s+$(test_dir)";
 
   methods:
       "" usebundle => dcs_passif_output('1', "", $(command), $(this.promise_filename));
