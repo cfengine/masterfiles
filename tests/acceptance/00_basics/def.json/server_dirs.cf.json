@@ -1,7 +1,6 @@
 {
-    "vars": {
-        "server_controls": {
-            "dir_templates": "/var/cfengine/templates_tests"
-        }
+    "vars":
+    {
+        "dir_templates": "/var/cfengine/templates_tests"
     }
 }
