@@ -288,7 +288,7 @@ The [augments][Augments] file (```def.json```) can be used to override the
 default setting. For example it can be restricted to ```127.0.0.1``` to prevent
 keys from any foreign host from being automatically accepted.
 
-```json
+```
 {
   "vars": {
     "trustkeysfrom": [ "127.0.0.1" ]
@@ -298,7 +298,7 @@ keys from any foreign host from being automatically accepted.
 
 Prevent automatic trust for any host by specifying an empty value:
 
-```json
+```
 {
   "vars": {
     "trustkeysfrom": [ "" ]
