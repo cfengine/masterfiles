@@ -279,6 +279,33 @@ should only be open on policy servers while new hosts are expected to be
 bootstrapped. It should be empty after your hosts have been bootstrapped to
 avoid unwanted hosts from being able to bootstrap.
 
+By default the MPF configures `cf-serverd` to trust keys from any host. This is
+convenient for simplified bootstrapping. After initial deployment it is
+recommended that this setting be reviewed and adjusted appropriately according
+to the needs of your infrastructure.
+
+The [augments][Augments] file (```def.json```) can be used to override the
+default setting. For example it can be restricted to ```127.0.0.1``` to prevent
+keys from any foreign host from being automatically accepted.
+
+```json
+{
+  "vars": {
+    "trustkeysfrom": [ "127.0.0.1" ]
+    }
+}
+```
+
+Prevent automatic trust for any host by specifying an empty value:
+
+```json
+{
+  "vars": {
+    "trustkeysfrom": [ "" ]
+    }
+}
+```
+
 ### services\_autorun
 
 When the ```services_autorun``` class is defined bundles tagged with
