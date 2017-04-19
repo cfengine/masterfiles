@@ -67,6 +67,8 @@ bundle agent cfe_internal_update_policy
       comment => "File where Postgres database files will be logging -",
       handle => "cfe_internal_update_policy_postgresdb_log_file";
 
+    cfengine_3_7|cfengine_3_8|cfengine_3_8::
+      # TODO: Remove when 3.7 is no longer supported
       "redis_conf_file"  string => translatepath("$(sys.workdir)/config/redis.conf"),
       comment => "Path to Redis configuration file",
       handle => "cfe_internal_update_policy_redis_conf_file";
