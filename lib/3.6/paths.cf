@@ -101,7 +101,7 @@ bundle common paths
     _have_bin_systemctl::
       "path[systemctl]"      string => "/bin/systemctl";
     !_have_bin_systemctl::
-      "path[systemctl]"      string => "/bin/systemctl";
+      "path[systemctl]"      string => "/usr/bin/systemctl";
 
     linux::
       "path[lsattr]"        string => "/usr/bin/lsattr";
