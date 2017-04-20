@@ -101,6 +101,7 @@ Inst libx11-6:i386 [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/p
 Conf libx11-data (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [all])
 Conf libx11-6 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [amd64])
 Conf libx11-6:i386 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])
+Inst rudder-agent [4.1.0~rc1-jessie0] (4.1.0-jessie0 release/4.1.0-2 jessie:jessie [amd64])
 ''')
 
 sys.exit(0)
