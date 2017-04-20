@@ -149,7 +149,7 @@ dpkg-query --showformat ${Architecture}=${Status}
  -W d:*
 apt-get """ + apt_get_options + " remove a:x=1 b:y c=3 d"])
 
-assert check("list-updates", [], 75,
+assert check("list-updates", [], 78,
              ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
               "Name=tzdata-java\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
               "Name=tzdata\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
@@ -174,13 +174,14 @@ assert check("list-updates", [], 75,
               "Name=libx11-data\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=all",
               "Name=libx11-dev\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
               "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
-              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386"],
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386",
+              "Name=rudder-agent\nVersion=4.1.0-jessie0\nArchitecture=amd64"],
              4, ["""apt-get -v
 apt-get -v
 apt-get """ + apt_get_options + """ update
 apt-get """ + apt_get_options + """ -s upgrade"""])
 
-assert check("list-updates-local", [], 75,
+assert check("list-updates-local", [], 78,
              ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
               "Name=tzdata-java\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
               "Name=tzdata\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
@@ -205,7 +206,8 @@ assert check("list-updates-local", [], 75,
               "Name=libx11-data\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=all",
               "Name=libx11-dev\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
               "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
-              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386"],
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386",
+              "Name=rudder-agent\nVersion=4.1.0-jessie0\nArchitecture=amd64"],
              3, ["""apt-get -v
 apt-get -v
 apt-get """ + apt_get_options + """ -s upgrade"""])

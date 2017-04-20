@@ -182,15 +182,18 @@ def list_updates(online):
         # Note multiple repositories in this one:
         #   Inst linux-libc-dev [2.6.32-48squeeze4] (2.6.32-48squeeze6 Debian:6.0.10/oldstable, Debian-Security:6.0/oldoldstable [amd64])
         #
+        # Another example (note the addition of jessie:jessie without a comma):
+        #   Inst rudder-agent [4.1.0~rc1-jessie0] (4.1.0-jessie0 release/4.1.0-2 jessie:jessie [amd64])
+        #
         #                               name                   old version       new version
         #                                 |                         |                 |
         #                         /-------+-------\              /--+--\       /------+-------\
         match = re.match("^Inst\s+(?P<name>[^\s:]+)(?::\S+)?\s+\[[^]\s]+\]\s+\((?P<version>\S+)" +
 
-        #                         repository(ies)                arch (might be optional)
-        #                               |                          |
-        #                    /----------+----------\     /---------+---------\
-                         "\s+[^,\s]+(?:,\s+[^,\s]+)*(\s+\[(?P<arch>[^]\s]+)\])?\).*", line)
+        #                repository(ies)      arch (might be optional)
+        #                       |               |
+        #                    /--+-\   /---------+---------\
+                         "\s+[^[)]*(\s\[(?P<arch>[^]\s]+)\])?\).*", line)
 
         if match is not None:
             sys.stdout.write("Name=" + match.group("name") + "\n")
