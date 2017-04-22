@@ -149,6 +149,7 @@ except IndexError:                          # command returned no output
 # Find the most recent tag reachable from this commit.
 git = subprocess.Popen(["git", "describe", "--tags", "--abbrev=0", REV],
                        stdout=subprocess.PIPE)
+verbose_print("git describe --tags --abbrev=0  is %s" % git.stdout)
 recent_tag = git.stdout.readlines()[0].strip()
 verbose_print("recent_tag = %s" % recent_tag)
 
