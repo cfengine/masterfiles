@@ -146,7 +146,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
                     for the changes to take effect.";
 
   services:
-    mission_portal_apache_config_repaired.!systemd_supervised::
+    mission_portal_apache_config_repaired.systemd_supervised::
       "cf-apache"
         service_policy => "restart";
 
