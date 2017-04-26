@@ -386,6 +386,9 @@ bundle common def
                     the disk may fill up or cause additional collection
                     issues.";
 
+      # Enable paths to POSIX tools instead of native tools when possible.
+      "mpf_stdlib_use_posix_utils" expression => "any";
+
   reports:
     DEBUG|DEBUG_def::
       "DEBUG: $(this.bundle)";
