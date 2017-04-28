@@ -1,0 +1,79 @@
+bundle agent inventory_aix
+# @brief Red Hat inventory bundle
+#
+# This agent bundle is for AIX inventory work.
+{
+  methods:
+    "oslevel"
+      usebundle => inventory_aix_oslevel;
+}
+
+bundle agent inventory_aix_oslevel
+# @brief Inventory oslevel
+# @description This policy inventories oslevel on aix. It caches the information
+# for up to 1 day before re-discovering.
+{
+  vars:
+
+    "oslevel"
+      string => ifelse( isvariable( "paths.oslevel" ), $(paths.oslevel),
+                        "/usr/bin/oslevel" );
+
+  commands:
+
+    aix::
+
+      "$(oslevel)"
+        handle => "cache_aix_oslevel_s",
+        args => "-s > $(sys.statedir)/aix-oslevel-s",
+        if => not( fileexists( "$(sys.statedir)/aix-oslevel-s" ) ),
+        contain => in_shell,
+        comment => "We cache the highest service pack reached to avoid
+                    unnecessary command executions.";
+
+      "$(oslevel)"
+        handle => "cache_aix_oslevel_r",
+        args => "-r > $(sys.statedir)/aix-oslevel-r",
+        if => not( fileexists( "$(sys.statedir)/aix-oslevel-r" ) ),
+        contain => in_shell,
+        comment => "We cache the highest technology level reached to avoid
+                    unnecessary command executions.";
+
+  files:
+
+    aix::
+
+      "$(sys.statedir)/aix-oslevel-r"
+        handle => "cache_expire_aix_oslevel_r",
+        delete => tidy,
+        file_select => days_old( 1 ),
+        comment => "We regularly clear the cache to avoid stale data";
+
+      "$(sys.statedir)/aix-oslevel-s"
+        handle => "cache_expire_aix_oslevel_s",
+        delete => tidy,
+        file_select => days_old( 1 ),
+        comment => "We regularly clear the cache to avoid stale data";
+
+ vars:
+
+    aix::
+
+     "oslevel_s"
+       string => readfile("$(sys.statedir)/aix-oslevel-s", 1K ),
+       if => fileexists("$(sys.statedir)/aix-oslevel-s"),
+       meta => { "inventory", "attribute_name=Highest Service Pack" };
+
+     "oslevel_r"
+       string => readfile("$(sys.statedir)/aix-oslevel-r", 1K),
+       if => fileexists("$(sys.statedir)/aix-oslevel-r"),
+       meta => { "inventory", "attribute_name=Highest Technology Level" };
+
+ reports:
+
+   DEBUG::
+
+     "Highest Service Pack: $(oslevel_s)";
+     "Highest Technology Level: $(oslevel_r)";
+}
+
