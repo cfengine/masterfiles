@@ -295,6 +295,11 @@ bundle common def
     !enable_cfengine_enterprise_hub_ha::
       "policy_servers" slist => {"$(sys.policy_hub)"};
 
+    enterprise_edition.policy_server::
+      "control_hub_exclude_hosts"
+        slist => {},
+        unless => isvariable(control_hub_exclude_hosts);
+
     enterprise_edition.enable_client_initiated_reporting::
       "control_server_call_collect_interval"
         string => "5",
