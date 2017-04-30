@@ -11,8 +11,9 @@ body hub control
 
 {
 
-    am_policy_hub::
+    enterprise_edition.policy_server::
 
+      exclude_hosts => { @(def.control_hub_exclude_hosts) };
       # exclude_hosts => { "192.168.12.21", "10.10", "10.12.*" };
 
       # cf-hub collects up reports from registered hosts every 5 minutes.
