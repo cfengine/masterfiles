@@ -96,6 +96,11 @@ bundle server access_rules()
       comment => "Grant access to templates directory",
       admit => { @(def.acl) };
 
+      enterprise_edition.policy_server::
+        "collect_calls"
+          resource_type => "query",
+          admit_ips => { @(def.mpf_access_rules_collect_calls_admit_ips) };
+
     !windows::
       "$(def.cf_runagent_shell)"
       handle => "server_access_grant_access_shell_cmd",
