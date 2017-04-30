@@ -300,6 +300,10 @@ bundle common def
         slist => {},
         unless => isvariable(control_hub_exclude_hosts);
 
+      "mpf_access_rules_collect_calls_admit_ips"
+        slist => { @(def.acl) },
+        unless => isvariable(mpf_access_rules_collect_calls_admit_ips);
+
     enterprise_edition.enable_client_initiated_reporting::
       "control_server_call_collect_interval"
         string => "5",
