@@ -388,7 +388,7 @@ periodically polls agents that are bootstrapped to collect reports. Sometimes it
 may be desirable or necessary for the client to initiate report collection.
 
 To enable client initiated reporting define the class
-`enable_client_initiated_reporting`. You may also want to configure the report
+`client_initiated_reporting_enabled`. You may also want to configure the report
 interval (how frequently an agent will try to report it's data to the hub) by default it is set to 5. The
 reporting interval `def.control_server_call_collect_interval` and the class can
 be defined in an augments file.
@@ -398,7 +398,7 @@ For example:
 ```
 {
   "classes" {
-    "enable_client_initiated_reporting": [ "any" ]
+    "client_initiated_reporting_enabled": [ "any" ]
   },
   "vars": {
     "control_server_call_collect_interval": "1",
