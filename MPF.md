@@ -405,6 +405,23 @@ For example:
   }
 }
 ```
+### Configure networks allowed to make collect_calls (client initiated reporting)
+
+By default the hub allows collect calls (client initiated reporting) from the
+networks defined in `def.acl` To configure which networks are allowed to
+initiate report collection define
+`def.mpf_access_rules_collect_calls_admit_ips`.
+
+For example to allow client initiated reporting for hosts coming from
+`24.124.0.0/16`:
+
+```
+{
+  "vars": {
+    "mpf_access_rules_collect_calls_admit_ips": "24.124.0.0/16",
+  }
+}
+```
 
 ### Configure Enterprise Measurement/Monitoring Collection
 
