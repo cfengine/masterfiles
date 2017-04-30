@@ -387,8 +387,8 @@ For example:
     "control_server_call_collect_interval": "1",
   }
 }
+```
 
-=======
 ### Configure Enterprise Measurement/Monitoring Collection
 
 Metrics recorded by measurement promises in `cf-monitord` are only collected by
