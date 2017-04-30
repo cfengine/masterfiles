@@ -295,6 +295,12 @@ bundle common def
     !enable_cfengine_enterprise_hub_ha::
       "policy_servers" slist => {"$(sys.policy_hub)"};
 
+
+    enterprise_edition.enable_client_initiated_reporting::
+      "control_server_call_collect_interval"
+        string => "5",
+        unless => isvariable(control_server_call_collect_interval);
+
   classes:
 
       ### Enable special features policies. Set to "any" to enable.
