@@ -297,7 +297,7 @@ bundle common def
 
     enterprise_edition.policy_server::
       "control_hub_exclude_hosts"
-        slist => {},
+        slist => { "" },
         unless => isvariable(control_hub_exclude_hosts);
 
       "mpf_access_rules_collect_calls_admit_ips"
