@@ -364,6 +364,23 @@ Enterprise agent is detected.
 
 ## Main Policy (promises.cf)
 
+### Exclude hosts from hub initiated report collection
+
+You may want to exclude some hosts like community agents, hosts behind NAT, and
+hosts using client initiated reporting from hub initiated report collection. To
+exclude hosts from hub initiated report collection define
+`def.control_hub_exclude_hosts` in an augments file.
+
+For example to completely disable hub initiated report collection:
+
+```
+{
+  "vars": {
+    "control_hub_exclude_hosts": [ "0.0.0.0/0" ]
+  }
+}
+```
+
 ### Enable client initiated reporting
 
 In the default configuration for Enterprise report collection the hub
