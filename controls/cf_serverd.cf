@@ -35,7 +35,7 @@ body server control
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
 
-    enterprise_edition.enable_client_initiated_reporting::
+    enterprise_edition.client_initiated_reporting_enabled::
       call_collect_interval => "$(def.control_server_call_collect_interval)";
 
     !policy_server::
