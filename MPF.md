@@ -405,6 +405,7 @@ For example:
   }
 }
 ```
+
 ### Configure networks allowed to make collect_calls (client initiated reporting)
 
 By default the hub allows collect calls (client initiated reporting) from the
