@@ -81,7 +81,7 @@ body report_data_select default_data_select_host
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
       promise_handle_exclude => { "noreport_.*" };
-      monitoring_include => { "" };
+      monitoring_include => { @(def.default_data_select_host_monitoring_include) };
 }
 
 body report_data_select default_data_select_policy_hub
@@ -94,5 +94,5 @@ body report_data_select default_data_select_policy_hub
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
       promise_handle_exclude => { "noreport_.*" };
-      monitoring_include => { "" };
+      monitoring_include => { @(def.default_data_select_policy_hub_monitoring_include) };
 }
