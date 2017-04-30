@@ -363,6 +363,24 @@ Enterprise agent is detected.
 
 
 ## Main Policy (promises.cf)
+### Configure Enterprise Measurement/Monitoring Collection
+
+Metrics recorded by measurement promises in `cf-monitord` are only collected by
+default for policy servers. In order to collect metrics for non policy servers
+simply define `default_data_select_host_monitoring_include` via in an augments
+file.
+
+For example to collect all measurements for remote agents and only cpu and
+memory related probes on policy servers:
+
+```
+{
+  "vars": {
+    "default_data_select_host_monitoring_include": [ ".*" ],
+    "default_data_select_policy_hub_monitoring_include": [ "mem_.*", "cpu_.*" ]
+  }
+}
+```
 
 ### Append to the main bundlesequence
 

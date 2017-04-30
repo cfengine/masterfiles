@@ -295,6 +295,17 @@ bundle common def
     !enable_cfengine_enterprise_hub_ha::
       "policy_servers" slist => {"$(sys.policy_hub)"};
 
+    enterprise_edition.policy_server::
+      "default_data_select_host_monitoring_include"
+        comment => "Most people have monitoring systems, so instead of collecting data people won't use we save the work unless its requested.",
+        slist => { },
+        unless => isvariable( default_data_select_host_monitoring_include );
+
+      "default_data_select_policy_hub_monitoring_include"
+        comment => "Collect all the monitoring data from the hub itself. It can be useful in diagnostics.",
+        slist => { ".*" },
+        unless => isvariable( default_data_select_policy_hub_monitoring_include );
+
   classes:
 
       ### Enable special features policies. Set to "any" to enable.
