@@ -247,14 +247,14 @@ bundle agent cfe_internal_update_bins
      (trigger_upgrade.enterprise_edition.linux._use_package_module).!(bootstrap_mode|policy_server)::
       "$(local_software_dir)/$(novapkg)-$(update_def.current_version)-1.$(pkgarch).rpm"
         comment => "Ensure that CFEngine '$(update_def.current_version)-1' is installed",
-        handle => "cfe_internal_update_bins_packages_nova_update_linux_package_module",
+        handle => "cfe_internal_update_bins_packages_nova_update_linux_package_module_yum",
         package_module => yum,
         policy => "present",
         ifvarclass => "redhat|centos";
 
       "$(local_software_dir)/$(novapkg)_$(update_def.current_version)-1.$(pkgarch).deb"
         comment => "Ensure that CFEngine '$(update_def.current_version)-1' is installed",
-        handle => "cfe_internal_update_bins_packages_nova_update_linux_package_module",
+        handle => "cfe_internal_update_bins_packages_nova_update_linux_package_module_apt_get",
         package_module => apt_get,
         policy => "present",
         ifvarclass => "debian|ubuntu";
