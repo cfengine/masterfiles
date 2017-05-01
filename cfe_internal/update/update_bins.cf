@@ -13,6 +13,18 @@
 #  - CFEngine binary update (native packages)
 #
 ################################################################################
+body package_module yum
+{
+      query_installed_ifelapsed => "60";
+      query_updates_ifelapsed => "1440";
+      #default_options => {};
+}
+body package_module apt_get
+{
+      query_installed_ifelapsed => "60";
+      query_updates_ifelapsed => "1440";
+      #default_options =>  {};
+}
 
 bundle agent cfe_internal_bins
 # @brief Ensure various component binaries and libraries have proper
