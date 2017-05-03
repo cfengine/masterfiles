@@ -257,6 +257,7 @@ bundle common def
 
       "max_client_history_size" -> { "cf-hub", "CFEngine Enterprise" }
         int => "50M",
+        unless => isvariable(max_client_history_size),
         comment => "The threshold of report diffs which will trigger purging of
                     diff files.";
 
