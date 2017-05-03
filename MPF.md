@@ -364,6 +364,23 @@ Enterprise agent is detected.
 
 ## Main Policy (promises.cf)
 
+### Adjust the maximum amount of client side report data to retain (CFEngine Enterprise)
+
+Enterprise agents cache detailed information about each agent run locally. The
+data is purged when the data is reported to a hub. If the volume of data exceeds
+`def.max_client_history_size` then the client will purge the local data in order
+to keep report collection from timing out.
+
+The default 50M threshold can be configured using an augments file, for example:
+
+```
+{
+  "vars": {
+    "max_client_history_size": "5M"
+  }
+}
+```
+
 ### Exclude hosts from hub initiated report collection
 
 You may want to exclude some hosts like community agents, hosts behind NAT, and
