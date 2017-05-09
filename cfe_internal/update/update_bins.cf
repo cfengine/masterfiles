@@ -408,7 +408,7 @@ bundle edit_line u_backup_script
       "#!/bin/sh
 
 if [ $(const.dollar)1 = \"BACKUP\" ]; then
- tar cfz $(const.dollar)2 $(sys.workdir) > /dev/null
+ tar cfzS $(const.dollar)2 $(sys.workdir) > /dev/null
 fi
 if [ $(const.dollar)1 = \"RESTORE\" ]; then
  tar xfz $(const.dollar)2
