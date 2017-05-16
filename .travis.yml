@@ -64,7 +64,7 @@ script:
 - umask 077
 - cd masterfiles/tests/acceptance
 - echo "CORE=$TRAVIS_BUILD_DIR/../core" > ./testall.env
-- ./testall --agent=/var/cfengine/bin/cf-agent --cfpromises=/var/cfengine/bin/cf-promises --cfserverd=/var/cfengine/bin/cf-serverd --cfexecd=/var/cfengine/bin/cf-execd --cfrunagent=/var/cfengine/bin/cf-runagent --cfkey=/var/cfengine/bin/cf-key --rpmvercmp=/bin/true --printlog
+- DEFRPMVERCMP=/bin/true  ./testall  --printlog  --bindir=/var/cfengine/bin
 
 
 # We deploy when setting tags only, which basically never happens
