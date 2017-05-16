@@ -527,6 +527,24 @@ For example:
 
 **History**: Added in 3.10.1
 
+### Enable logging of Enterprise License utilization
+
+If the class `enable_log_cfengine_enterprise_license_utilization` is defined on
+an enterprise hub license utilization will be logged by the hub in
+`$(sys.workdir)/log/license_utilization.log`
+
+Example enabling the class from an augments file:
+
+```
+{
+  "classes": {
+    "enable_log_cfengine_enterprise_license_utilization": ["policy_server"]
+  }
+}
+```
+
+**History**: Added in 3.11, 3.10.2
+
 ### Modules
 
 Modules executed by the `usemodule()` function are expected to be found in
