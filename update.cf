@@ -11,7 +11,6 @@ body common control
                           "u_cfengine_enterprise",
                           @(u_cfengine_enterprise.def),
                           "cfe_internal_dc_workflow",
-                          "cfe_internal_bins",
                           "cfe_internal_update_policy",
                           "cfe_internal_update_bins",
                           "cfe_internal_update_processes",
