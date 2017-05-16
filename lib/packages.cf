@@ -63,6 +63,9 @@ bundle common package_module_knowledge
     redhat::
       "platform_default" string => "yum";
 
+    suse::
+      "platform_default" string => "zypper";
+
     aix::
       "platform_default" string => "nimclient";
 }
@@ -72,6 +75,13 @@ body package_module apt_get
     query_installed_ifelapsed => "60";
     query_updates_ifelapsed => "1440";
     #default_options =>  {};
+}
+
+body package_module zypper
+{
+      query_installed_ifelapsed => "60";
+      query_updates_ifelapsed => "1440";
+      #default_options =>  {};
 }
 
 body package_module nimclient
