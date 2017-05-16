@@ -237,6 +237,7 @@ AC_CONFIG_FILES([Makefile
                 controls/update_def.cf
                 modules/packages/Makefile
                 promises.cf
+                standalone_self_upgrade.cf
                 tests/acceptance/Makefile
                 tests/unit/Makefile
 ])
