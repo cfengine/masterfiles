@@ -41,6 +41,7 @@ matrix:
 
 
 script:
+- sudo apt-get install -y fakeroot
 - INSTDIR=$HOME/cf_install
 - cd $TRAVIS_BUILD_DIR
 - if [ x$STYLE_CHECK_JOB = x1 ];
@@ -75,7 +76,7 @@ script:
 - umask 077
 - cd masterfiles/tests/acceptance
 - echo "CORE=$TRAVIS_BUILD_DIR/../core" > ./testall.env
-- ./testall --agent=/var/cfengine/bin/cf-agent --cfpromises=/var/cfengine/bin/cf-promises --cfserverd=/var/cfengine/bin/cf-serverd --cfrunagent=/var/cfengine/bin/cf-runagent --cfkey=/var/cfengine/bin/cf-key --rpmvercmp=/bin/true --printlog
+- DEFRPMVERCMP=/bin/true  ./testall  --printlog  --bindir=/var/cfengine/bin
 
 
 # We deploy when setting tags only, which basically never happens
