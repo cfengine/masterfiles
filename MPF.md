@@ -492,7 +492,7 @@ from performing subsequent copy operations on the same promiser.
 
 For example, to only allow any file to be copied a single time:
 
-```json
+```
 {
   "vars":{
     "control_agent_files_single_copy": [ ".*" ]
@@ -501,7 +501,7 @@ For example, to only allow any file to be copied a single time:
 }
 ```
 
-**History**: Added in 3.11.
+**History**: Added in 3.11.0, 3.10.2
 
 ### Configure default repository for file backups
 
