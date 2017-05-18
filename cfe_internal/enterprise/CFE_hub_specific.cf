@@ -397,3 +397,57 @@ bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
       comment => "Mission Portals scheduled reports are written here. They need
                   to be purged after some time so that they do not fill the disk.";
 }
+
+bundle agent log_cfengine_enterprise_license_utilization
+# @brief Log the number of hosts seen within the last 24 hours and the number of
+# hosts reported to have the "cfengine" class. Note any hosts that has been
+# successfully collected from is expected to have the "cfengine" class. This
+# policy will not do anything unless the class
+# `enable_log_cfengine_enterprise_license_utilization` is defined.
+{
+  reports:
+
+    policy_server.enterprise_edition.(DEBUG|DEBUG_log_cfengine_enterprise_license_utilization|inform_mode)::
+
+      "Hosts reported: $(count_reporting)";
+
+  vars:
+
+      "log_frequency" int => "720";
+
+    policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+
+      "log_dir" string => "$(sys.workdir)/log";
+
+      # Using address for reporting hosts because hostseen() will incur
+      # undesirable reverse dns lookups if name is used and we need to be able
+      # to find unique hosts from a combined list.
+
+      # The cfengine class is always reported, and a reliable way to find hosts
+      # that have reported.
+      "hosts_reporting" slist => hostswithclass("cfengine", "address");
+      "count_reporting" int => length(hosts_reporting);
+
+      # We are counting hosts seen within the last day.
+      "hosts_seen" slist => hostsseen("24", "lastseen", "address");
+      "count_seen" int => length(hosts_seen);
+
+  files:
+
+    policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+      "$(log_dir)/."
+        create => "true",
+        comment => "The log dir must exist in order to write to a file.";
+
+  reports:
+
+    policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+
+      "$(sys.date), hosts_reporting=$(count_reporting), hosts_seen=$(count_seen)"
+        report_to_file => "$(sys.workdir)/log/license_utilization.log",
+        action => if_elapsed( $(log_frequency) );
+
+    policy_server.enterprise_edition.!enable_log_cfengine_enterprise_license_utilization::
+
+      "WARNING $(this.bundle) is actuated but not enabled. enable_$(this.bundle) is not defined.";
+}

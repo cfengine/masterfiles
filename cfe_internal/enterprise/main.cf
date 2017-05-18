@@ -34,6 +34,13 @@ bundle agent cfe_internal_enterprise_main
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
 
+    am_policy_hub.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+
+      "hub" -> { "ENT-3186" }
+        usebundle => log_cfengine_enterprise_license_utilization,
+        handle => "log_cfengine_enterprise_license_utilization",
+        comment => "Log license utilization information";
+
     # As passive hub is supposed to run read-only PostgreSQL instance
     # doing maintenance makes no sense and is not possible at all.
     (am_policy_hub.enterprise.!enable_cfengine_enterprise_hub_ha)||(enable_cfengine_enterprise_hub_ha.hub_active)::
