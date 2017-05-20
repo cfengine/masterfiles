@@ -247,6 +247,7 @@ bundle common def
         "$(sys.workdir)/outputs/dc-scripts.log",
         "$(sys.workdir)/state/promise_log.jsonl",
         "$(sys.workdir)/state/classes.jsonl",
+        "/var/log/postgresql.log",
       };
 
       "hub_log_files" slist =>
