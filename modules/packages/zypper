@@ -41,6 +41,16 @@ zypper_options = ["--quiet", "-n"]
 NULLFILE = open(os.devnull, 'w')
 
 
+# Suse zypper "--oldpackage" option is only supported greater that 1.6.169
+import rpm
+from distutils.version import StrictVersion
+
+ZYPPER_SUPPORTS_OLDPACKAGE=False
+package_zypper = rpm.TransactionSet().dbMatch('name', "zypper").next()
+if StrictVersion(package_zypper['version']) >= StrictVersion("1.6.169"):
+    ZYPPER_SUPPORTS_OLDPACKAGE=True
+
+
 redirection_is_broken_cached = -1
 
 def redirection_is_broken():
@@ -190,10 +200,10 @@ def one_package_argument(name, arch, version, is_zypper_install):
 
     version_suffix = ""
     if version:
-        version_suffix = "-" + version
+        version_suffix = "=" + version
 
     if archs:
-        args += [name + version_suffix + "." + arch for arch in archs]
+        args += [name + "." + arch + version_suffix  for arch in archs]
     else:
         args.append(name + version_suffix)
 
@@ -313,7 +323,12 @@ def repo_install():
     single_cmd_args, multi_cmd_args = package_arguments_builder(True)
 
     if single_cmd_args:
-        cmd_line = [zypper_cmd] + zypper_options + ["install"] + ["--oldpackage"]
+
+        cmd_line = [zypper_cmd] + zypper_options + ["install"]
+
+        if ZYPPER_SUPPORTS_OLDPACKAGE:
+            cmd_line += ["--oldpackage"]
+
         cmd_line.extend(single_cmd_args)
 
         ret = subprocess_call(cmd_line, stdout=NULLFILE)
@@ -336,7 +351,14 @@ def repo_install():
                 continue
 
             # Try to plain install.
-            cmd_line = [zypper_cmd] + zypper_options + ["install"] + ["--oldpackage"] + block
+
+            cmd_line = [zypper_cmd] + zypper_options + ["install"]
+
+            if ZYPPER_SUPPORTS_OLDPACKAGE:
+                cmd_line += ["--oldpackage"]
+
+            cmd_line += block
+
             subprocess_call(cmd_line, stdout=NULLFILE)
 
             # No final check. CFEngine will figure out that it's missing
