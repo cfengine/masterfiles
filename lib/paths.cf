@@ -331,7 +331,7 @@ bundle common paths
       "path[tr]"            string => "/usr/bin/tr";
       "path[wc]"            string => "/usr/bin/wc";
       "path[wget]"          string => "/usr/bin/wget";
-      "path[realpath]"      string => "/usr/bin/realpath";
+      "path[realpath]"      string => "/usr/bin/readlink -e";
 
       #
       "path[chkconfig]" string => "/sbin/chkconfig";
