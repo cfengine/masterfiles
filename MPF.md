@@ -423,6 +423,21 @@ For example:
 }
 ```
 
+### Configure maxconnections for cf-serverd
+
+`maxconnections` in `body server control` configures the maximum number of
+connections allowed by cf-serverd. Recommended to be set greater than the number
+of hosts bootstrapped.
+
+This can be configured via augments:
+
+```
+{
+  "vars":{
+      "control_serverd_maxconnections": "1000"
+}
+```
+
 ### Configure networks allowed to make collect_calls (client initiated reporting)
 
 By default the hub allows collect calls (client initiated reporting) from the
