@@ -30,7 +30,7 @@ body server control
 
       # Maximum number of concurrent connections.
       # Suggested value >= total number of hosts
-      maxconnections        => "200";
+      maxconnections        => "$(def.control_server_maxconnections)";
 
       # Bind to all interfaces including ipv6
       bindtointerface => "::";
