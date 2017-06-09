@@ -166,6 +166,11 @@ bundle common def
                     defined. It is expected that users can override the default
                     by setting this value from the augments file (def.json).";
 
+      "control_server_maxconnections"
+        int => "200",
+        ifvarclass => not( isvariable( "control_server_maxconnections" ) );
+
+
     debian::
       "environment_vars"
         handle => "common_def_vars_environment_vars",
