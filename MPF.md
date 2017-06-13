@@ -423,6 +423,27 @@ For example:
 }
 ```
 
+### Configure MPF to automatically restart components on relevant data change
+
+While the agent itsef will reload its config upon notice of policy change this
+bundle specifically handles changes to variables used in the MPF which may come
+from external data sources which are unknown to the components themselves.
+
+Note currently only `cf-serverd` and `cf-monitord` are handled. `cf-execd` is
+**NOT** automatically restarted.
+
+To enable this functionality define the class **`mpf_augments_control_enabled`**
+
+```
+{
+  "classes":{
+      "mpf_augments_control_enabled": [ "any" ]
+  }
+}
+```
+
+**History:** Added 3.11.0
+
 ### Configure maxconnections for cf-serverd
 
 `maxconnections` in `body server control` configures the maximum number of
@@ -435,8 +456,11 @@ This can be configured via augments:
 {
   "vars":{
       "control_serverd_maxconnections": "1000"
+  }
 }
 ```
+
+**History:** Added 3.11.0
 
 ### Configure networks allowed to make collect_calls (client initiated reporting)
 
