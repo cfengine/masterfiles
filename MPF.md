@@ -78,7 +78,7 @@ defining the class ```cfengine_internal_verify_update_transfers```. When this
 class is defined, the update policy will hash the transfered file and compare it
 against the hash given by the server
 
-This augments file will enable this behavior for all clients.
+This [augments file][Augments] will enable this behavior for all clients.
 
 ```
 {
@@ -133,7 +133,7 @@ If the class ```cfengine_internal_purge_policies``` is defined the update
 behavior to change from only copying changed files down to performing a
 synchronization by purging files on the client that do not exist on the server.
 
-This augments file will enable this behavior for all clients.
+This [augments file][Augments] will enable this behavior for all clients.
 
 ```
 {
@@ -173,7 +173,7 @@ install packages when the ```trigger_upgrade``` class is defined during a run of
 
 **Note:** This policy is specific to CFEngine Enterprise.
 
-This augments file would define the ```trigger_upgrade``` class if the
+This [augments file][Augments] would define the ```trigger_upgrade``` class if the
 `testhost5` class is defined.
 
 ```
@@ -190,7 +190,7 @@ This augments file would define the ```trigger_upgrade``` class if the
 The default update policy only copies files that match regular expressions
 listed in ```def.input_name_patterns```.
 
-This augments file ensures that only files ending in ```.cf```, ```.dat```,
+This [augments file][Augments] ensures that only files ending in ```.cf```, ```.dat```,
 ```.mustache```, ```.json```, ```.yaml``` and the file
 ```cf_promises_release_id``` will be considered by the default update policy.
 
@@ -221,7 +221,7 @@ used and it decides which files should be copied.
 
 This will stop the AGENT from starting automatically.
 
-This augments file will ensure that `cf-monitord` is disabled on hosts that have
+This [augments file][Augments] will ensure that `cf-monitord` is disabled on hosts that have
 `server1` or the `redhat` class defined.
 
 ```
@@ -239,7 +239,7 @@ component.
 
 `DAEMON` can be one of `cf_execd`, `cf_monitord` or `cf_serverd`.
 
-This augments file will ensure that `cf-monitord` is not disabled on `redhat`
+This [augments file][Augments] will ensure that `cf-monitord` is not disabled on `redhat`
 hosts.
 
 ```
@@ -253,7 +253,7 @@ hosts.
 ### Main Policy (promises.cf)
 
 The following settings are defined in `controls/def.cf` can be set from an
-augments file.
+[augments file][Augments].
 
 #### mailto
 
@@ -345,7 +345,7 @@ directly.
 
 Set this class when you want to enable the CFEngine Enterprise HA policies.
 
-This class can be defined by an augments file. For example:
+This class can be defined by an [augments file][Augments]. For example:
 
 ```
 {
@@ -371,7 +371,7 @@ data is purged when the data is reported to a hub. If the volume of data exceeds
 `def.max_client_history_size` then the client will purge the local data in order
 to keep report collection from timing out.
 
-The default 50M threshold can be configured using an augments file, for example:
+The default 50M threshold can be configured using an [augments file][Augments], for example:
 
 ```
 {
@@ -386,7 +386,7 @@ The default 50M threshold can be configured using an augments file, for example:
 You may want to exclude some hosts like community agents, hosts behind NAT, and
 hosts using client initiated reporting from hub initiated report collection. To
 exclude hosts from hub initiated report collection define
-`def.control_hub_exclude_hosts` in an augments file.
+`def.control_hub_exclude_hosts` in an [augments file][Augments].
 
 For example to completely disable hub initiated report collection:
 
@@ -408,7 +408,7 @@ To enable client initiated reporting define the class
 `client_initiated_reporting_enabled`. You may also want to configure the report
 interval (how frequently an agent will try to report it's data to the hub) by default it is set to 5. The
 reporting interval `def.control_server_call_collect_interval` and the class can
-be defined in an augments file.
+be defined in an [augments file][Augments].
 
 For example:
 
@@ -450,7 +450,7 @@ To enable this functionality define the class **`mpf_augments_control_enabled`**
 connections allowed by cf-serverd. Recommended to be set greater than the number
 of hosts bootstrapped.
 
-This can be configured via augments:
+This can be configured via [augments][Augments]:
 
 ```
 {
@@ -484,8 +484,7 @@ For example to allow client initiated reporting for hosts coming from
 
 Metrics recorded by measurement promises in `cf-monitord` are only collected by
 default for policy servers. In order to collect metrics for non policy servers
-simply define `default_data_select_host_monitoring_include` via in an augments
-file.
+simply define `default_data_select_host_monitoring_include` via in an [augments file][Augments].
 
 For example to collect all measurements for remote agents and only cpu and
 memory related probes on policy servers:
@@ -503,7 +502,7 @@ memory related probes on policy servers:
 
 You can specify bundles which should be run at the end of the default
 bundlesequence by defining ```control_common_bundlesequence_end``` in the vars
-of an augments file.
+of an  [augments file][Augments].
 
 For example:
 
@@ -572,7 +571,7 @@ If the class `enable_log_cfengine_enterprise_license_utilization` is defined on
 an enterprise hub license utilization will be logged by the hub in
 `$(sys.workdir)/log/license_utilization.log`
 
-Example enabling the class from an augments file:
+Example enabling the class from an [augments file][Augments]:
 
 ```
 {
@@ -594,7 +593,7 @@ the default policy.
 
 For convenience the `templates` shortcut is provided and by default the path is
 set to `$(sys.workdir/templates)` unless `$(def.template_dir)` is overridden via
-augments.
+[augments][Augments].
 
 * **NOTE:** The templates directory is not currently managed by default policy.
   Unlike modules **templates are not distributed to all hosts by default**.
@@ -610,7 +609,7 @@ Copy a template from the templates directory:
 ```
 
 Override the path for `$(def.dir_templates)` by setting `vars.dir_templates` in
-the augments file (`def.json`):
+the  [augments file][Augments] (`def.json`):
 
 ```json
 {
@@ -620,7 +619,7 @@ the augments file (`def.json`):
 }
 ```
 
-**Note:** When overriding the templates directory a change to the augments alone
+**Note:** When overriding the templates directory a change to the [augments][Augments] alone
 will not cause `cf-serverd` to reload its configuration and update the access
 control lists as necessary. `cf-serverd` will only automatically reload its
 config when it notices a change in *policy*.
