@@ -8,14 +8,15 @@ matrix:
     - env: STYLE_CHECK_JOB=1
 
     # JOB 1
-    - env: CF_VERSION=master
-      addons:
-        apt:
-          sources:
-            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
-            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
-          packages:
-            - cfengine-community
+    # - env: CF_VERSION=master
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+    #         - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+    #       packages:
+    #         - cfengine-community
+    # Enable this when we have a master that works with latest
 
     # JOB 2
     - env: CF_VERSION=3.10.x
