@@ -10,17 +10,18 @@ matrix:
     - env: STYLE_CHECK_JOB=1
 
     # JOB 1
-    - env: CF_VERSION=latest
-      addons:
-        apt:
-          sources:
-            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
-            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
-          packages:
-            - cfengine-community
+    # - env: CF_VERSION=master
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+    #         - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+    #       packages:
+    #         - cfengine-community
+    # Enable this when we have a master that works with latest
 
     # JOB 2
-    - env: CF_VERSION=lts
+    - env: CF_VERSION=3.10.x
       addons:
         apt:
           sources:
@@ -30,7 +31,7 @@ matrix:
             - cfengine-community=3.10.1-1
 
     # JOB 3
-    - env: CF_VERSION=oldlts
+    - env: CF_VERSION=3.7.x
       addons:
         apt:
           sources:
@@ -70,7 +71,7 @@ script:
   fi;
   export IS_PRERELEASE
 - cd $TRAVIS_BUILD_DIR/..
-- git clone --depth=1 https://github.com/cfengine/core
+- git clone --depth=1 --branch $CF_VERSION https://github.com/cfengine/core
 - chmod -R go-w .
 - cp core/tests/acceptance/*.cf.sub masterfiles/tests/acceptance/
 - umask 077
@@ -96,4 +97,4 @@ deploy:
   on:
     tags: true
     # Avoid upload from all the multiple parallel matrix jobs
-    condition: "$CF_VERSION = latest"
+    condition: "$CF_VERSION = master"
