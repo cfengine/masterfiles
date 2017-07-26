@@ -67,8 +67,27 @@ bundle agent ha_hub_sync
 }
 
 bundle agent manage_hub_synced_data
+# @brief Manage trust of clients bootstrapped other hubs in cluster
+#
+# Ensures keys collected from other hubs are present in ppkeys so that the
+# agents bootstrapped to other hubs are trusted.
 {
  files:
+
+   # Ensure that localhost.pub and localhost.priv are not in the directory of
+   # keys collected from standby hubs
+
+   "$(ha_def.ppkeys_staging)/localhost.*" -> { "ENT-3303" }
+      delete => tidy,
+      handle => "manage_hub_synced_data_ppkeys_staging_localhost_absent",
+      comment => "We don't want localhost related key files from a standby
+                  server to end up over-writing the active hubs key. That will
+                  cause an identity crisis and trust issues.";
+
+   # Ensure that keys collected from standby hubs are present in this hubs
+   # ppkeys directory so that agents bootstrapped to standby hubs will be
+   # trusted.
+
    "$(sys.workdir)/ppkeys"
       copy_from => ha_update_no_backup_cp("$(ha_def.ppkeys_staging)"),
       file_select => ha_update_plain,
@@ -89,7 +108,6 @@ bundle agent sync_master_hub_dat
       handle => "ha_cfengine_hub_update_master_ip";
 
 }
-
 
 body file_select hub_all_keys
 {
