@@ -23,6 +23,7 @@ dist-hook:
 tar-package:
 	pkgdir=`mktemp -d`  &&  export pkgdir  &&  \
 	origdir=`pwd`       &&  export origdir &&  \
+	umask 0022          &&  chmod 755 $$pkgdir && \
 	$(MAKE) prefix=$$pkgdir install  &&  \
 	(   cd $$pkgdir  &&  \
             find . -name '*.cf*' | xargs -n1 chmod go-w  &&  \
