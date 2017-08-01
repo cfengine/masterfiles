@@ -143,6 +143,11 @@ bundle agent cfe_internal_setup_knowledge
         comment => "No Mission Portal code in share needs to be accessed by
                     anyone";
 
+      "$(sys.workdir)/." -> { "ENT-3299" }
+        perms => mog("755", "root", "root"),
+        comment => "Ensure that others (like cfpostgres and cfapache) are able
+                    to enter and read from cfengines workdir";
+
 
 }
 
