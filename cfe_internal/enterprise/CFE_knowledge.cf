@@ -148,7 +148,10 @@ bundle agent cfe_internal_setup_knowledge
         comment => "Ensure that others (like cfpostgres and cfapache) are able
                     to enter and read from cfengines workdir";
 
-
+      "$(sys.workdir)/modules/."
+        perms => mog("755", "root", "root"),
+        comment => "The agent will complain if any other users (group or other)
+                    have write access to the modules directory.";
 }
 
 #############################################################################
