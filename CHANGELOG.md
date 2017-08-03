@@ -1,7 +1,7 @@
 # Changelog
 Notable changes to the framework should be documented here
 
-3.11.0b1:
+3.11.0:
 	- Rename enable_client_initiated_reporting to client_initiated_reporting_enabled
 	- Directories for ubuntu 16 and centos 7 should exist in master_software_updates
 	  (ENT-3136)
@@ -65,6 +65,15 @@ Notable changes to the framework should be documented here
 	- Make apt_get package module version aware (CFE-2360)
 	- Fix: suppress error about unknown lvalue
 	- Allow specification of files_single_copy via augments (CFE-2458)
+	- Pass --oldpackage to zypper to allow downgrading packages, but check first if the zypper version supports it.
+	  (CFE-2643)
+	- zendesk#3432: fix zypper package downgrade failing
+	- Add postgres.log to enterprise log file rotation (ENT-3191)
+	- Change: Do not silence Enterprise hub maintenance
+	- server control maxconnections can be configured via augments
+	  (CFE-2660)
+	- Add bundle to track component variables to restart when necessary
+	  (CFE-2326)
 
 3.10.0:
 	- Add: Classes body tailored for use with diff
