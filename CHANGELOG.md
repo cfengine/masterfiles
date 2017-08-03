@@ -1,6 +1,47 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.2:
+	- Disable package inventory via modules on redhat like systems with unsupported python versions
+	  (CFE-2602)
+	- Pass --oldpackage to zypper to allow downgrading packages, but check first if the zypper version supports it.
+	  (CFE-2643)
+	- Rename enable_client_initiated_reporting to client_initiated_reporting_enabled
+	- Add postgres.log to enterprise log file rotation (ENT-3191)
+	- Add: prunetree bundle to stdlib
+	  The prunetree bundle allws you to delete files and directories up to a
+	  sepcified depth older than a specified number of days.
+	- Add the path to mailx on Linux, Darwin, OpenBSD, NetBSD and FreeBSD
+	- Add aix OOTB oslevel inventory (ENT-3117)
+	- Configure networks allowed to initiate report collection (client initiated reporting) via augments (#910)
+	  (CFE-2624)
+	- Add templates shortcut (CFE-2582)
+	- Fix: suppress error about unknown lvalue
+	- Configure call_collect_interval from augments (enable_client_initiated_reporting) (#905)
+	  (CFE-2623)
+	- Allow specification of files_single_copy via augments (CFE-2458)
+	- Add zypper package module (CFE-2533)
+	- zendesk#3432: fix zypper package downgrade
+	- Enable settig def.max_client_history_size via augments (CFE-2560)
+	- Enable specification of monitoring_include via augments (CFE-2505)
+	- Include previous_state and untracked reports when client clear a buildup of unreported data
+	  (ENT-3161)
+	- Configure exclude_hosts in body hub control via augments (CFE-2622)
+	- Change self upgrade now uses standalone policy (ENT-3155)
+	- Directories for ubuntu 16 and centos 7 should exist in master_software_updates
+	  (ENT-3136)
+	- Add oslevel to well known paths. (ENT-3121)
+	- server control maxconnections can be configured via augments
+	  (CFE-2660)
+	- Fix command to restart apache on config change (ENT-3134)
+	- Add policy to track CFEngine Enterprise license utilization
+	  (ENT-3186)
+	- apt_get package module: Fix bug which prevented updates
+	  from being picked up if there was more than one source listed in the
+	  'apt upgrade' output, without a comma in between. (CFE-2605)
+	- Change: Do not silence Enterprise hub maintenance
+	- Remove bundle agent cfe_internal_bins (CFE-2636)
+
 3.10.1:
 	- Ensure MP SSL Cert is readable (ENT-3050)
 	- Change Opportunisticaly monitor file integrity (ENT-3040)
