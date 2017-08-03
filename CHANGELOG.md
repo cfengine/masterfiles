@@ -1,6 +1,26 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+## 3.7.6
+ - apt_get package module: Fix bug which prevented updates
+   from being picked up if there was more than one source listed in the
+   'apt upgrade' output, without a comma in between. (CFE-2605)
+ - Add aix OOTB oslevel inventory (ENT-3117)
+ - Add the path to mailx on Linux, Darwin, OpenBSD, NetBSD and FreeBSD
+ - Avoid permission flip flop in webapp (ENT-3101)
+ - Add oslevel to well known paths. (ENT-3121)
+ - Include previous_state and untracked reports when client clear a buildup of unreported data
+   (ENT-3161)
+ - Update stubbed example package module controls (CFE-2602)
+ - Change: Do not silence Enterprise hub maintenance
+ - Add: prunetree bundle to stdlib
+   The prunetree bundle allws you to delete files and directories up to a
+   sepcified depth older than a specified number of days.
+ - Ensure postgresql.log is rotated (ENT-3191)
+
+## 3.7.3 .. 3.7.5
+Changes are included in Core's Changelog.
+
 ## 3.7.2 (unreleased)
 ### Changed
    - inform_mode classes changed to DEBUG|DEBUG_$(this.bundle):: (Redmine: #7191)
