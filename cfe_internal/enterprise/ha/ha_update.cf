@@ -1,6 +1,15 @@
 bundle agent ha_update
 {
  methods:
+
+  enable_cfengine_enterprise_hub_ha::
+
+      "Hubs have am_policy_hub marker"
+        usebundle => ha_hubs_have_am_policy_hub_marker,
+        comment => "All hubs should have the am_policy_hub marker. This bundle
+                    ensures that standby hubs get this marker even though they are not
+                    bootstrapped to themselves";
+
   enable_cfengine_enterprise_hub_ha.am_policy_hub::
       "share_keys" usebundle => ha_share_hub_keys;
       "sync_hub_data" usebundle => ha_hub_sync;
@@ -13,6 +22,25 @@ bundle agent ha_update
 
   enable_cfengine_enterprise_hub_ha.ha_replication_only_node::
       "syncronize_master_hub_dat" usebundle => sync_master_hub_dat;
+}
+
+bundle agent ha_hubs_have_am_policy_hub_marker
+# @brief Ensure that all ha hub members have the am_policy_hub state marker
+{
+  classes:
+      # We know we need the am_policy_hub marker if any of our ips are found in the ha definition
+      "ha_hub_member" expression => iprange( $(ha_def.ips) );
+
+  files:
+
+    ha_hub_member::
+
+      "$(sys.statedir)/am_policy_hub" -> { "ENT-3328" }
+        create => "true",
+        comment => "This file is automatically created when bootstrapping to
+                    self, but in a clustered environment standby hubs bootstrap to the
+                    primary and this marker will not be automatically created.";
+
 }
 
 bundle agent ha_agent_sync
