@@ -68,7 +68,7 @@ bundle server report_access_rules
       comment => "Grant $(query_types) reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
-      admit => { @(def.policy_servers) };
+      admit => { "127.0.0.1", @(def.policy_servers) };
 }
 
 body report_data_select default_data_select_host
