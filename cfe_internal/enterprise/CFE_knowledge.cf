@@ -90,12 +90,18 @@ bundle agent cfe_internal_setup_knowledge
       comment => "The scripts need to be executable, but only by the
                   webserver and root users.";
 
+      "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "ENT-3313" }
+      handle => "cfe_internal_setup_knowledge_files_doc_root_api_static_dir_perms",
+      comment => "This directory needs to be readable and writeable by the
+                  webserver for exported reports (pdf/csv) to function",
+      perms => mog("0770", "root", $(def.cf_apache_group) );
+
       "$(cfe_internal_hub_vars.docroot)/api/static/."
       comment => "Exported reports only need to be readable by the webserver.",
       handle => "cfe_internal_setup_knowledge_files_doc_root_api_static",
       depth_search => recurse("inf"),
       file_select => cfe_internal_docroot_api_static_perms,
-      perms => mog("0440", "root", $(def.cf_apache_group) );
+      perms => mog("0770", "root", $(def.cf_apache_group) );
 
       "$(sys.workdir)/httpd/logs/."
       comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
@@ -203,9 +209,11 @@ body process_count check_process(in,out)
 ############################################################################
 
 body file_select cfe_internal_exclude_sh_pl_scripts
+# @brief Select plain files that do not end in sh or pl
 {
   leaf_name => { ".*\.sh",".*\.pl"};
-  file_result => "!leaf_name";
+  file_types => { "plain" };
+  file_result => "!leaf_name.file_types";
 }
 
 ############################################################################
