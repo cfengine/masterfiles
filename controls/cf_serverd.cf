@@ -26,7 +26,7 @@ body server control
 
       ## List of the hosts not using the latest protocol that we'll accept connections from
       ## (absence of this option or empty list means allow none)
-      # allowlegacyconnects   => { };
+      allowlegacyconnects   => { @(def.control_server_allowlegacyconnects) };
 
       # Maximum number of concurrent connections.
       # Suggested value >= total number of hosts
