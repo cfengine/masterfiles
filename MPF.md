@@ -475,7 +475,7 @@ For example to allow client initiated reporting for hosts coming from
 ```
 {
   "vars": {
-    "mpf_access_rules_collect_calls_admit_ips": "24.124.0.0/16",
+    "mpf_access_rules_collect_calls_admit_ips": [ "24.124.0.0/16" ]
   }
 }
 ```
