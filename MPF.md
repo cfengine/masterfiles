@@ -364,6 +364,20 @@ Enterprise agent is detected.
 
 ## Main Policy (promises.cf)
 
+### Allow connections from the classic/legacy protocol
+
+By default since 3.9.0 `cf-serverd` disallows connections from the classic protocol by default. To allow clients using the legacy protocol (versions prior to 3.7.0 by default) define ```control_server_allowlegacyconnects``` as a list of networks.
+
+Example definition in augments file:
+
+```
+{
+  "vars": {
+    "control_server_allowlegacyconnects": [ "0.0.0.0/0" ]
+  }
+}
+```
+
 ### Adjust the maximum amount of client side report data to retain (CFEngine Enterprise)
 
 Enterprise agents cache detailed information about each agent run locally. The
