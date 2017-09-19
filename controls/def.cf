@@ -126,6 +126,13 @@ bundle common def
                           not(isvariable("trustkeysfrom"))),
         meta => { "defvar" };
 
+      ## List of the hosts not using the latest protocol that we'll accept connections from
+      ## (absence of this option or empty list means allow none)
+      "control_server_allowlegacyconnects"
+        slist => {},
+        ifvarclass => not( isvariable( "control_server_allowlegacyconnects" ) );
+
+
       # Agent Controls
 
       "control_agent_default_repository"
