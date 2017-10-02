@@ -451,3 +451,15 @@ bundle agent log_cfengine_enterprise_license_utilization
 
       "WARNING $(this.bundle) is actuated but not enabled. enable_$(this.bundle) is not defined.";
 }
+
+bundle agent cfe_internal_refresh_inventory_view
+#@brief Refresh materialized view every 5 minutes
+
+{
+  commands:
+    any::
+      "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh"
+      comment => "Refresh materialized view every 5 minutes",
+      classes => kept_successful_command,
+      handle  => "cfe_internal_inventory_refresh_mp";
+}

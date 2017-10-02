@@ -34,6 +34,10 @@ bundle agent cfe_internal_enterprise_main
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
 
+      "hub" usebundle => cfe_internal_refresh_inventory_view,
+      handle => "cfe_internal_management_refresh_inventory_view",
+      comment => "Refresh inventory view";
+
     am_policy_hub.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
 
       "hub" -> { "ENT-3186" }
