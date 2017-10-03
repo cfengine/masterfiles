@@ -566,7 +566,7 @@ Example enabling the class from an [augments file][Augments]:
 ```
 {
   "classes": {
-    "enable_log_cfengine_enterprise_license_utilization": ["policy_server"]
+    "enable_log_cfengine_enterprise_license_utilization": [ "enterprise_edition" ]
   }
 }
 ```

@@ -445,9 +445,20 @@ bundle agent log_cfengine_enterprise_license_utilization
 
       "$(sys.date), hosts_reporting=$(count_reporting), hosts_seen=$(count_seen)"
         report_to_file => "$(sys.workdir)/log/license_utilization.log",
-        action => if_elapsed( $(log_frequency) );
+        if => not("cfe_internal_logged_utilization"),
+        classes => cfe_internal_log_utilization($(log_frequency));
 
     policy_server.enterprise_edition.!enable_log_cfengine_enterprise_license_utilization::
 
       "WARNING $(this.bundle) is actuated but not enabled. enable_$(this.bundle) is not defined.";
+}
+
+body classes cfe_internal_log_utilization(time)
+# @brief Define persistent class for period of time to control log volume
+{
+        promise_repaired => { "cfe_internal_logged_utilization" };
+        promise_kept => { "cfe_internal_logged_utilization" };
+
+        scope => "namespace";
+        persist_time => "$(time)";
 }
