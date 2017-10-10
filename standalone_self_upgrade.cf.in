@@ -9,6 +9,16 @@ bundle agent main
 # software to remote clients, and managing the version of cfengine installed on
 # non hubs.
 {
+  classes:
+
+      "policy_server_dat_unstable"
+        expression => isnewerthan( "$(sys.workdir)/policy_server.dat", "$(sys.workdir)/outputs" ),
+        comment => "If $(sys.workdir)/policy_server.dat is newer than the
+                    outputs directory, it can indicate that the current agent
+                    execution is a result of bootstrap. For stability we want to
+                    skip upgrades during bootstrap. The outputs directory should
+                    be newer than the policy_server.dat on the next agent run
+                    and allow upgrade then.";
 
   reports:
       "Running $(this.promise_filename)";
@@ -22,7 +32,7 @@ bundle agent main
       "Master Software Repository Data"
         usebundle => cfengine_master_software_content;
 
-    !(am_policy_hub|policy_server)::
+    !(am_policy_hub|policy_server|policy_server_dat_unstable)::
 
       "Local Software Cache"
         usebundle => cfengine_software_cached_locally;
