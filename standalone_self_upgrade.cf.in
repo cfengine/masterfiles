@@ -394,6 +394,7 @@ bundle common cfengine_package_names
 
       "pkg[redhat_5_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el4.x86_64.rpm";
       "pkg[centos_5_x86_64]" string => "$(pkg[redhat_5_x86_64])";
+      "pkg[oracle_5_x86_64]" string => "$(pkg[redhat_5_x86_64])";
       "pkg[SuSE_11_x86_64]" string => "$(pkg[redhat_5_x86_64])";
       "pkg[SuSE_10_x86_64]" string => "$(pkg[redhat_5_x86_64])";
 
@@ -418,8 +419,10 @@ bundle common cfengine_package_names
 
       "pkg[redhat_6_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el6.x86_64.rpm";
       "pkg[centos_6_x86_64]" string => "$(pkg[redhat_6_x86_64])";
+      "pkg[oracle_6_x86_64]" string => "$(pkg[redhat_6_x86_64])";
       "pkg[redhat_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
       "pkg[centos_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
+      "pkg[oracle_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
 
       # Debian 7, 8 and Ubuntu 14, 16 use the same package
 
@@ -486,6 +489,7 @@ bundle agent cfengine_master_software_content
       # Redhat/Centos 4, 5 and SuSE 10, 11 all use the same package
       "dir[redhat_5_x86_64]" string => "agent_rpm_x86_64";
       "dir[centos_5_x86_64]" string => "$(dir[redhat_5_x86_64])";
+      "dir[oracle_5_x86_64]" string => "$(dir[redhat_5_x86_64])";
       "dir[SuSE_11_x86_64]" string => "$(dir[redhat_5_x86_64])";
       "dir[SuSE_10_x86_64]" string => "$(dir[redhat_5_x86_64])";
 
@@ -510,8 +514,10 @@ bundle agent cfengine_master_software_content
 
       "dir[redhat_6_x86_64]" string => "agent_rhel6_x86_64";
       "dir[centos_6_x86_64]" string => "$(dir[redhat_6_x86_64])";
+      "dir[oracle_6_x86_64]" string => "$(dir[redhat_6_x86_64])";
       "dir[redhat_7_x86_64]" string => "$(dir[redhat_6_x86_64])";
       "dir[centos_7_x86_64]" string => "$(dir[redhat_6_x86_64])";
+      "dir[oracle_7_x86_64]" string => "$(dir[redhat_6_x86_64])";
 
       # Debian 7, 8 and Ubuntu 14, 16 use the same package
       "dir[debian_7_x86_64]" string => "agent_debian7_x86_64";
