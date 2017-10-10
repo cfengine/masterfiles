@@ -98,7 +98,7 @@ bundle common cfengine_software
       "package_dir" string => "$(sys.flavour)_$(sys.arch)";
 
 !(cfengine_3_7_1|cfengine_3.7.2|cfengine_3.7.3)::
-# After 3.7.4 a fix to ifelse and isvarinbel allows for actuating the function
+# After 3.7.4 a fix to ifelse and isvarible allows for actuating the function
 # even thought the promise references an unresolved variable.
 
       "pkg_name" string => ifelse( isvariable( "def.cfengine_software_pkg_name" ), $(def.cfengine_software_pkg_name), "cfengine-nova");
