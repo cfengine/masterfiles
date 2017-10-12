@@ -378,6 +378,22 @@ Configure it via augments by defining ```control_executor_splaytime```:
 }
 ```
 
+### Configure agent execution schedule
+
+The execution scheduled is expressesd as a list of classes. If any of the classes are defined when cf-execd wakes up then exec_command is triggered. By default this is set to a list of time based classes for every 5th minute. This results in a 5 minute execution schedule.
+
+Example configuration via augments:
+
+```
+{
+  "vars": {
+    "control_executor_schedule": [ "Min00", "Min30" ]
+  }
+}
+```
+
+The above configuration would result in exec_command being triggered at the top and half hour and sleeping for up to `splaytime` before agent execution.
+
 ### Allow connections from the classic/legacy protocol
 
 By default since 3.9.0 `cf-serverd` disallows connections from the classic protocol by default. To allow clients using the legacy protocol (versions prior to 3.7.0 by default) define ```control_server_allowlegacyconnects``` as a list of networks.
