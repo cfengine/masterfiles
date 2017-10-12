@@ -133,6 +133,16 @@ bundle common def
         ifvarclass => not( isvariable( "control_server_allowlegacyconnects" ) );
 
 
+      # Executor Controls
+
+      # Default splaytime to 4 unless it's already defined (via augments)
+      "control_executor_splaytime"
+        string => "4",
+        if => not( isvariable( "control_executor_splaytime" ) ),
+        comment => "Splaytime controls the number of minutes hosts execution
+                    should be splayed over. This value should be less than the
+                    number of minutes between scheduled executions";
+
       # Agent Controls
 
       "control_agent_default_repository"

@@ -362,6 +362,22 @@ This class enables policy that cleans up report diffs when they exceed
 Enterprise agent is detected.
 
 
+### Configure splaytime
+
+`splaytime` is the maximum number of minutes `exec_commad` should wait before executing.
+
+Note: `splaytime` should be less than the scheduled interval plus agent run time. So for example if your agent run time is over 1 minute and you are running the default execution schedule of 5 mintues your splay time should be set to 3.
+
+Configure it via augments by defining ```control_executor_splaytime```:
+
+```
+{
+  "vars": {
+    "control_executor_splaytime": "3"
+  }
+}
+```
+
 ## Main Policy (promises.cf)
 
 ### Allow connections from the classic/legacy protocol
