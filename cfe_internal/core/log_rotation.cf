@@ -17,10 +17,11 @@ bundle agent cfe_internal_log_rotation
       # Have a look at def.cf to enable rotation of these files
       "Rotate CFEngine log files"
         handle    => "cfe_internal_log_rotation_rotate_log_files",
-        usebundle => logrotate( @(def.cfe_log_files), 1M, 10 ),
-	comment   => "To keep the disk from getting to full we want to rotate
-		      log files when they reach 1MB in size. So that we have
-                      some history , we keep 10 versions.";
+        usebundle => logrotate( @(def.cfe_log_files), $(def.mpf_log_file_max_size), $(def.mpf_log_file_retention) ),
+        comment => "To keep the disk from getting to full we want to rotate log
+                    files when they reach $(def.mpf_log_file_max_size) in size.
+                    So that we have some history , we keep
+                    $(def.mpf_log_file_retention) versions.";
 
       "Prune old log files"
         handle    => "cfe_internal_log_rotation_prune_log_dirs",

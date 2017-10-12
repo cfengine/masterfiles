@@ -410,6 +410,30 @@ Example definition in augments file:
 
 ### Configure retention for files in log directories
 
+By default the MPF rotates managed log files when they reach 1M in size. To configure this limit via augments define `vars.mpf_log_file_max_size`.
+
+For example:
+
+```
+{
+  "vars": {
+    "mpf_log_file_max_size": "10M"
+  }
+}
+```
+
+By default the MPF keeps up to 10 rotated log files. To configure this limit via augments define `vars.mpf_log_file_retention`.
+
+For example:
+
+```
+{
+  "vars": {
+    "mpf_log_file_retention": "5"
+  }
+}
+```
+
 By default the MPF retains log files in log directories (`outputs`, `reports` and application logs in Enterprise) for 30 days. This can be configured by setting `vars.mpf_log_dir_retention` via augments.
 
 For example:
@@ -421,6 +445,7 @@ For example:
   }
 }
 ```
+
 
 ### Adjust the maximum amount of client side report data to retain (CFEngine Enterprise)
 

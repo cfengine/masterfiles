@@ -336,6 +336,18 @@ bundle common def
         comment => "The default log file retention in cfe_log_dirs is 30 days
                     unless it's already been defined (augments).";
 
+      "mpf_log_file_retention"
+        string => "10",
+        if => not( isvariable( mpf_log_file_retention) ),
+        comment => "This is the number of rotated versions of mpf log files to
+                    save";
+
+      "mpf_log_file_max_size"
+        string => "1M",
+        if => not( isvariable( mpf_log_file_max_size) ),
+        comment => "When individual mpf log files reach this size they should be
+                    rotated so that we don't fill up the disk";
+
   # Enterprise HA Related configuration
   # enable_cfengine_enterprise_hub_ha is defined below
   # Disabled by default
