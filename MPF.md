@@ -408,6 +408,20 @@ Example definition in augments file:
 }
 ```
 
+### Configure retention for files in log directories
+
+By default the MPF retains log files in log directories (`outputs`, `reports` and application logs in Enterprise) for 30 days. This can be configured by setting `vars.mpf_log_dir_retention` via augments.
+
+For example:
+
+```
+{
+  "vars": {
+    "mpf_log_dir_retention": "7"
+  }
+}
+```
+
 ### Adjust the maximum amount of client side report data to retain (CFEngine Enterprise)
 
 Enterprise agents cache detailed information about each agent run locally. The

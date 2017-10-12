@@ -24,16 +24,16 @@ bundle agent cfe_internal_log_rotation
 
       "Prune old log files"
         handle    => "cfe_internal_log_rotation_prune_log_dirs",
-        usebundle => prunedir( @(def.cfe_log_dirs), 30 ),
-	comment   => "Scheduled activities like agent runs and reports can
-		      create log files or reports that stack up over time. So
-		      that we don't fill the disk, but have some historical
-		      information available locally we purge log files older
-                      than 30 days.";
+        usebundle => prunedir( @(def.cfe_log_dirs), $(def.mpf_log_dir_retention) ),
+        comment => "Scheduled activities like agent runs and reports can create
+                    log files or reports that stack up over time. So that we
+                    don't fill the disk, but have some historical information
+                    available locally we purge log files older than
+                    $(def.mpf_log_dir_retention) days.";
 
   reports:
 
     DEBUG|DEBUG_cfe_internal_log_rotation::
       "DEBUG $(this.bundle): Check CFEngine log file for rotation '$(def.cfe_log_files)'";
-      "DEBUG $(this.bundle): Check CFEngine log directory for old logs '$(def.cfe_log_dirs)'";
+      "DEBUG $(this.bundle): Check CFEngine log directory for old logs in '$(def.cfe_log_dirs)' older than '$(def.mpf_log_dir_retention)' days";
 }
