@@ -378,8 +378,6 @@ Configure it via augments by defining ```control_executor_splaytime```:
 }
 ```
 
-## Main Policy (promises.cf)
-
 ### Allow connections from the classic/legacy protocol
 
 By default since 3.9.0 `cf-serverd` disallows connections from the classic protocol by default. To allow clients using the legacy protocol (versions prior to 3.7.0 by default) define ```control_server_allowlegacyconnects``` as a list of networks.
