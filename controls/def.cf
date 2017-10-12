@@ -328,6 +328,14 @@ bundle common def
     any::
       "cfe_log_dirs" slist => getvalues( log_dir );
 
+  # MPF controls
+
+      "mpf_log_retention"
+        string => "30",
+        if => not( isvariable ( mpf_log_retention ) ),
+        comment => "The default log file retention in cfe_log_dirs is 30 days
+                    unless it's already been defined (augments).";
+
   # Enterprise HA Related configuration
   # enable_cfengine_enterprise_hub_ha is defined below
   # Disabled by default
