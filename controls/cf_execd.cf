@@ -12,7 +12,7 @@ body executor control
 
     any::
 
-      splaytime  => "4"; # activity will be spread over this many time slices
+      splaytime  => "$(def.control_executor_splaytime)"; # activity will be spread over this many time slices
 
     cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
       mailto     => "$(def.mailto)";
