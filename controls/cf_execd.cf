@@ -31,7 +31,7 @@ body executor control
       #               "Min25", "Min30", "Min35", "Min40", "Min45",
       #               "Min50", "Min55" };
 
-      schedule => { @(control_executor_schedule) };
+      schedule => { @(def.control_executor_schedule) };
 
       # The full path and command to the executable run by default (overriding builtin).
       # cf-twin needs its own safe environment because of the update mechanism
