@@ -71,6 +71,27 @@ As is typical for CFEngine, the policy and the configuration are mixed. In
 to `controls/update_def.cf` as you read this. We are skipping the nonessential
 ones.
 
+### Append to the update bundlesequence
+
+You can specify bundles which should be run at the end of the default update
+policy bundlesequence by defining ```control_common_update_bundlesequence_end```
+in the vars of an [augments file][Augments].
+
+For example:
+
+```json
+{
+  "vars":{
+    "control_common_update_bundlesequence_end": [ "my_updatebundle1", "mybundle2" ]
+  }
+}
+```
+
+**Notes:**
+
+* The order in which bundles are actuates is not guaranteed.
+* The agent will error if a named bundle is not part of inputs.
+
 ### Verify update transfers
 
 Enable additional verrification after file transfers during policy update by

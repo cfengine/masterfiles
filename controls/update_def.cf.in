@@ -31,6 +31,29 @@ bundle common update_def
       "augments_classes_data_keys" slist => getindices("augments_classes_data");
 
     any::
+
+      # MPF Controls
+
+      # Because in some versions of cfengine bundlesequence in body common
+      # control does not support does not support iteration over data containers
+      # we must first pick out the bundles into a shallow container that we can
+      # then get a regular list from using getvalues().
+
+      "tbse" data => mergedata( "def.control_common_update_bundlesequence_end" );
+
+      # Since we have @(def.update_bundlesequence_end) in body common control
+      # bundlesequence we must have a list variable defined. It can be empty, but it
+      # must be defined. If it is not defined the agent will error complaining
+      # that '@(def.bundlesequence_end) is not a defined bundle.
+
+      # As noted in CFE-2460 getvalues behaviour varies between versions. 3.7.x
+      # getvalues will return an empty list when run on a non existant data
+      # container.  On 3.9.1 it does not return an empty list.
+      # So we initialize it as an empty list first to be safe.
+
+      "bundlesequence_end" slist => {};
+      "bundlesequence_end" slist => getvalues( tbse );
+
       # Begin change
 
       # When parsing the augments_file from policy, we set input_name_patterns
