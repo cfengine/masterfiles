@@ -144,7 +144,7 @@ bundle common def
                     number of minutes between scheduled executions";
 
       ## Default schedule unless it's already defined (via augments)
-      "control_executor_schedule"
+      "control_executor_schedule_value"
         slist => {
                    "Min00", "Min05", "Min10", "Min15",
                    "Min20", "Min25", "Min30", "Min35",
@@ -153,6 +153,15 @@ bundle common def
         if => not( isvariable( control_executor_schedule) ),
         comment => "This variable defines the list of classes that should
                     trigger exec_command if any of them are defined.";
+
+      # schedule cant use a data structure directly, so we must use an
+      # intermediary variable to convert it to list
+      "control_executor_schedule_value"
+        slist => getvalues(control_executor_schedule),
+        if =>  not( isvariable( control_executor_schedule_value) ),
+        comment => "This variable defines the list of classes that should
+                    trigger exec_command if any of them are defined.";
+
 
       # Agent Controls
 
@@ -569,4 +578,8 @@ bundle common inventory_control
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
       "$(this.bundle): CMDB module enabled";
+
+    DEBUG|DEBUG_def::
+
+      "Executor Schedule: $(def.control_executor_schedule_value)";
 }
