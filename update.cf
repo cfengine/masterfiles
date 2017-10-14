@@ -14,6 +14,7 @@ body common control
                           "cfe_internal_update_policy",
                           "cfengine_internal_standalone_self_upgrade",
                           "cfe_internal_update_processes",
+                          @(update_def.bundlesequence_end), # Define control_common_update_bundlesequnce_end via augments
       };
 
       version => "update.cf $(update_def.current_version)";
@@ -26,7 +27,8 @@ body common control
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
-                  "cfe_internal/update/update_processes.cf"
+                  "cfe_internal/update/update_processes.cf",
+                  @(update_def.augments_inputs)
       };
 }
 

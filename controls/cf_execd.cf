@@ -12,7 +12,7 @@ body executor control
 
     any::
 
-      splaytime  => "4"; # activity will be spread over this many time slices
+      splaytime  => "$(def.control_executor_splaytime)"; # activity will be spread over this many time slices
 
     cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
       mailto     => "$(def.mailto)";
@@ -30,6 +30,8 @@ body executor control
       # schedule => { "Min00", "Min05", "Min10", "Min15", "Min20",
       #               "Min25", "Min30", "Min35", "Min40", "Min45",
       #               "Min50", "Min55" };
+
+      schedule => { @(def.control_executor_schedule_value) };
 
       # The full path and command to the executable run by default (overriding builtin).
       # cf-twin needs its own safe environment because of the update mechanism
