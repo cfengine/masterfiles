@@ -54,6 +54,15 @@ bundle common update_def
       "bundlesequence_end" slist => {};
       "bundlesequence_end" slist => getvalues( tbse );
 
+
+      "augments_inputs"
+        slist => { @(def.update_inputs) },
+        ifvarclass => isvariable( "def.update_inputs" );
+
+      "augments_inputs"
+        slist => {},
+        ifvarclass => not( isvariable( "def.update_inputs" ) );
+
       # Begin change
 
       # When parsing the augments_file from policy, we set input_name_patterns

@@ -71,6 +71,21 @@ As is typical for CFEngine, the policy and the configuration are mixed. In
 to `controls/update_def.cf` as you read this. We are skipping the nonessential
 ones.
 
+### Append to inputs used by update policy
+
+You can append to the inputs used by the update policy via augments by defining
+```vars.update_inputs```. The following example will add the policy file
+```my_updatebundle1.cf``` to the list of policy file inputs during the update policy.
+
+
+```json
+{
+  "vars":{
+    "update_inputs": [ "my_updatebundle1.cf" ]
+  }
+}
+```
+
 ### Append to the update bundlesequence
 
 You can specify bundles which should be run at the end of the default update
