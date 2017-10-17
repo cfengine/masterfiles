@@ -276,6 +276,17 @@ AddType    application/x-httpd-php-source php5
   </IfModule>
 </Directory>
 
+<Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/ldap">
+
+    AllowOverride None
+
+  <IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+  </IfModule>
+</Directory>
+
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/system">
   # Whats in here that got a specific deny?
   Deny from all
