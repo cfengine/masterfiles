@@ -133,6 +133,36 @@ bundle common def
         ifvarclass => not( isvariable( "control_server_allowlegacyconnects" ) );
 
 
+      # Executor Controls
+
+      ## Default splaytime to 4 unless it's already defined (via augments)
+      "control_executor_splaytime"
+        string => "4",
+        if => not( isvariable( "control_executor_splaytime" ) ),
+        comment => "Splaytime controls the number of minutes hosts execution
+                    should be splayed over. This value should be less than the
+                    number of minutes between scheduled executions";
+
+      ## Default schedule unless it's already defined (via augments)
+      "control_executor_schedule_value"
+        slist => {
+                   "Min00", "Min05", "Min10", "Min15",
+                   "Min20", "Min25", "Min30", "Min35",
+                   "Min40", "Min45", "Min50", "Min55",
+                 },
+        if => not( isvariable( control_executor_schedule) ),
+        comment => "This variable defines the list of classes that should
+                    trigger exec_command if any of them are defined.";
+
+      # schedule cant use a data structure directly, so we must use an
+      # intermediary variable to convert it to list
+      "control_executor_schedule_value"
+        slist => getvalues(control_executor_schedule),
+        if =>  not( isvariable( control_executor_schedule_value) ),
+        comment => "This variable defines the list of classes that should
+                    trigger exec_command if any of them are defined.";
+
+
       # Agent Controls
 
       "control_agent_default_repository"
@@ -297,6 +327,26 @@ bundle common def
 
     any::
       "cfe_log_dirs" slist => getvalues( log_dir );
+
+  # MPF controls
+
+      "mpf_log_retention"
+        string => "30",
+        if => not( isvariable ( mpf_log_retention ) ),
+        comment => "The default log file retention in cfe_log_dirs is 30 days
+                    unless it's already been defined (augments).";
+
+      "mpf_log_file_retention"
+        string => "10",
+        if => not( isvariable( mpf_log_file_retention) ),
+        comment => "This is the number of rotated versions of mpf log files to
+                    save";
+
+      "mpf_log_file_max_size"
+        string => "1M",
+        if => not( isvariable( mpf_log_file_max_size) ),
+        comment => "When individual mpf log files reach this size they should be
+                    rotated so that we don't fill up the disk";
 
   # Enterprise HA Related configuration
   # enable_cfengine_enterprise_hub_ha is defined below
@@ -548,4 +598,8 @@ bundle common inventory_control
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
       "$(this.bundle): CMDB module enabled";
+
+    DEBUG|DEBUG_def::
+
+      "Executor Schedule: $(def.control_executor_schedule_value)";
 }
