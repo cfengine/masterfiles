@@ -71,6 +71,42 @@ As is typical for CFEngine, the policy and the configuration are mixed. In
 to `controls/update_def.cf` as you read this. We are skipping the nonessential
 ones.
 
+### Append to inputs used by update policy
+
+You can append to the inputs used by the update policy via augments by defining
+```vars.update_inputs```. The following example will add the policy file
+```my_updatebundle1.cf``` to the list of policy file inputs during the update policy.
+
+
+```json
+{
+  "vars":{
+    "update_inputs": [ "my_updatebundle1.cf" ]
+  }
+}
+```
+
+### Append to the update bundlesequence
+
+You can specify bundles which should be run at the end of the default update
+policy bundlesequence by defining ```control_common_update_bundlesequence_end```
+in the vars of an [augments file][Augments].
+
+For example:
+
+```json
+{
+  "vars":{
+    "control_common_update_bundlesequence_end": [ "my_updatebundle1", "mybundle2" ]
+  }
+}
+```
+
+**Notes:**
+
+* The order in which bundles are actuates is not guaranteed.
+* The agent will error if a named bundle is not part of inputs.
+
 ### Verify update transfers
 
 Enable additional verrification after file transfers during policy update by
@@ -362,7 +398,37 @@ This class enables policy that cleans up report diffs when they exceed
 Enterprise agent is detected.
 
 
-## Main Policy (promises.cf)
+### Configure splaytime
+
+`splaytime` is the maximum number of minutes `exec_commad` should wait before executing.
+
+Note: `splaytime` should be less than the scheduled interval plus agent run time. So for example if your agent run time is over 1 minute and you are running the default execution schedule of 5 mintues your splay time should be set to 3.
+
+Configure it via augments by defining ```control_executor_splaytime```:
+
+```
+{
+  "vars": {
+    "control_executor_splaytime": "3"
+  }
+}
+```
+
+### Configure agent execution schedule
+
+The execution scheduled is expressesd as a list of classes. If any of the classes are defined when cf-execd wakes up then exec_command is triggered. By default this is set to a list of time based classes for every 5th minute. This results in a 5 minute execution schedule.
+
+Example configuration via augments:
+
+```
+{
+  "vars": {
+    "control_executor_schedule": [ "Min00", "Min30" ]
+  }
+}
+```
+
+The above configuration would result in exec_command being triggered at the top and half hour and sleeping for up to `splaytime` before agent execution.
 
 ### Allow connections from the classic/legacy protocol
 
@@ -377,6 +443,45 @@ Example definition in augments file:
   }
 }
 ```
+
+### Configure retention for files in log directories
+
+By default the MPF rotates managed log files when they reach 1M in size. To configure this limit via augments define `vars.mpf_log_file_max_size`.
+
+For example:
+
+```
+{
+  "vars": {
+    "mpf_log_file_max_size": "10M"
+  }
+}
+```
+
+By default the MPF keeps up to 10 rotated log files. To configure this limit via augments define `vars.mpf_log_file_retention`.
+
+For example:
+
+```
+{
+  "vars": {
+    "mpf_log_file_retention": "5"
+  }
+}
+```
+
+By default the MPF retains log files in log directories (`outputs`, `reports` and application logs in Enterprise) for 30 days. This can be configured by setting `vars.mpf_log_dir_retention` via augments.
+
+For example:
+
+```
+{
+  "vars": {
+    "mpf_log_dir_retention": "7"
+  }
+}
+```
+
 
 ### Adjust the maximum amount of client side report data to retain (CFEngine Enterprise)
 
