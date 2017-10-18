@@ -397,22 +397,26 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
       "cindex[$(index)]" string => canonify("$(index)");
 
   classes:
-      "edit_$(cindex[$(index)])"     not => strcmp("$($(tab)[$(sectionName)][$(index)])","dontchange"),
-      comment => "Create conditions to make changes";
+      "edit_$(cindex[$(index)])"
+        not => strcmp("$($(tab)[$(sectionName)][$(index)])","dontchange"),
+        scope => "bundle",
+        comment => "Create conditions to make changes";
 
   field_edits:
 
       # If the line is there, but commented out, first uncomment it
       "#+\s*$(index)\s*=.*"
+      handle => "manage_variable_values_ini_promised_key_is_uncommented_in_section"
       select_region => INI_section(escape("$(sectionName)")),
       edit_field => col("=","1","$(index)","set"),
       ifvarclass => "edit_$(cindex[$(index)])";
 
       # match a line starting like the key something
       "$(index)\s*=.*"
+      handle => "manage_variable_values_ini_existing_key_has_correct_value"
       edit_field => col("=","2","$($(tab)[$(sectionName)][$(index)])","set"),
       select_region => INI_section(escape("$(sectionName)")),
-      classes => results("bundle", "manage_variable_values_ini_not_$(cindex[$(index)])"),
+      classes => results("bundle", "existing_index_$(cindex[$(index)])"),
       ifvarclass => "edit_$(cindex[$(index)])";
 
   delete_lines:
@@ -423,11 +427,12 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
   insert_lines:
       "[$(sectionName)]"
       location => start,
-      comment => "Insert lines";
+      comment => "Ensure promised section is present";
 
       "$(index)=$($(tab)[$(sectionName)][$(index)])"
-      select_region => INI_section(escape("$(sectionName)")),
-        ifvarclass => "!(manage_variable_values_ini_not_$(cindex[$(index)])_kept|manage_variable_values_ini_not_$(cindex[$(index)])_repaired).edit_$(cindex[$(index)])";
+        handle => "manage_variable_values_ini_insert_missing_key_value_in_section",
+        select_region => INI_section(escape( $(sectionName) )),
+        ifvarclass => "!(existing_index_$(cindex[$(index)])_kept|existing_index_$(cindex[$(index)])_repaired).edit_$(cindex[$(index)])";
 
 }
 
