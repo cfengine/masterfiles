@@ -140,6 +140,7 @@ bundle agent cfe_internal_setup_knowledge
       "$(cfe_internal_hub_vars.docroot)/ldap/config/settings.ldap.php" -> { "ENT-3400" }
         handle => "cfe_internal_setup_knowledge_files_ldap_config_settings_perms",
         perms => mog("0600", $(def.cf_apache_user), $(def.cf_apache_group) ),
+        if => fileexists( "$(cfe_internal_hub_vars.docroot)/ldap/config/settings.ldap.php" ),
         comment => "If the ldap settings are not writeable by
                     $(def.cf_apache_user) then users will not be able to change
                     ldap settings.";
