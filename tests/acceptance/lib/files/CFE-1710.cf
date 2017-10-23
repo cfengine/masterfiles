@@ -1,0 +1,95 @@
+body common control
+{
+      inputs => { '../../default.cf.sub' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+#######################################################
+
+bundle agent init
+{
+  files:
+      # The tested file "actual" is copied from our seeded starting position.
+      "$(G.testfile).actual"
+      copy_from => local_cp("$(this.promise_filename).start");
+
+     # Next we place the file which we will compare the final result with.
+     "$(G.testfile).expected"
+      copy_from => local_cp("$(this.promise_filename).finish");
+}
+
+#######################################################
+
+bundle agent test
+{
+  meta:
+      "description" -> { "CFE-1710" }
+        string => "Test that the last section can be managed";
+
+      # The test fails to insert proper lines into LAST section (even though
+      # select_end_match_eof="true" is defined for versions greater than 3.10.0)
+
+      # Additionally the test fails to insert key values in to the newly inserted section at the top of the file.
+
+      "test_soft_fail"
+        string => "any",
+        meta => { "CFE-1710" };
+
+      # At test start:
+      #
+      # section exists with correct keys and bad values
+      # section 2 exists but is unmanaged
+      # section3 exits with a bad key
+      #
+      # At the end of the test:
+      # section should exist with correct values
+      # section2 should exist with its unmanaged values
+      # section3 should exist with keyone=1
+      # section4 should exist with new=section_config
+
+  vars:
+      "config[section][keyone]" string => "1";
+      "config[section][keytwo]" string => "valuetwo";
+      "config[section3][keyone]" string => "1";
+      "config[section4][new]" string => "section_config";
+
+  files:
+
+      # Ensure that section is as expected
+      #
+      # This should ensure keyone=1 instead of keyone=valueone and
+      # keytwo=valuetwo instead of keytwo=value2 in section
+
+      "$(G.testfile).actual"
+      edit_line => manage_variable_values_ini( "test.config", "section" );
+
+      # Ensure that section3 is as expected
+      #
+      # The section should be present and should contain only keyone=1
+      "$(G.testfile).actual"
+        edit_line => manage_variable_values_ini( "test.config", "section3" );
+
+      # section4 should be present and should contain only new=section_config
+      "$(G.testfile).actual"
+        edit_line => manage_variable_values_ini( "test.config", "section4" );
+
+}
+
+#######################################################
+
+bundle agent check
+{
+  methods:
+      "check"
+      usebundle => dcs_if_diff( "$(G.testfile).actual", "$(G.testfile).expected",
+                                "pass", "_fail");
+      # Fail the test if any of the files fail.
+
+      "fail"
+        usebundle => dcs_fail( $(this.promise_filename) ),
+        ifvarclass => "_fail";
+
+    pass::
+      "pass"
+        usebundle => dcs_pass( $(this.promise_filename) );
+}

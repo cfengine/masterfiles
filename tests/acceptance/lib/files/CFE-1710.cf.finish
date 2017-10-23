@@ -1,0 +1,9 @@
+[section4]
+new=section_config
+[section]
+keyone=1
+keytwo=valuetwo
+[section2]
+wat=WUT
+[section3]
+keyone=1
