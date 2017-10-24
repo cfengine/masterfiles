@@ -420,8 +420,7 @@ bundle agent log_cfengine_enterprise_license_utilization
       "log_dir" string => "$(sys.workdir)/log";
 
       # Using address for reporting hosts because hostseen() will incur
-      # undesirable reverse dns lookups if name is used and we need to be able
-      # to find unique hosts from a combined list.
+      # undesirable reverse dns lookups if name is used
 
       # The cfengine class is always reported, and a reliable way to find hosts
       # that have reported.
