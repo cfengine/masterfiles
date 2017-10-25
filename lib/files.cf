@@ -2275,7 +2275,7 @@ bundle agent file_make_mustache(file, template, data)
         create => "true",
         edit_template => "$(template)",
         template_method => "mustache",
-        template_data => @(state);
+        template_data => @(data);
 
   reports:
       "DEBUG|DEBUG_$(this.bundle)"::
@@ -2308,7 +2308,7 @@ bundle agent file_make_mustache_with_perms(file, template, data, mode, owner, gr
         edit_template => "$(template)",
         template_method => "mustache",
         perms => mog( $(mode), $(owner), $(group) ),
-        template_data => @(state);
+        template_data => @(data);
 
   reports:
       "DEBUG|DEBUG_$(this.bundle)"::
