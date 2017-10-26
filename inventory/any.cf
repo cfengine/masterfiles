@@ -4,6 +4,21 @@ bundle common inventory_any
 # This common bundle is for any OS work not handled by specific
 # bundles.
 {
+
+  vars:
+      "release_data" string => "$(this.promise_dirname)/../cf_promises_release_id";
+
+      "data"
+        data => readjson( $(release_data) ),
+        if => fileexists( $(release_data) );
+
+      "id"
+        string => "$(data[releaseId])",
+        meta => { "inventory", "attribute_name=Policy Release Id" };
+
+  reports:
+      "DEBUG|DEBUG_$(this.bundle)"::
+        "DEBUG $(this.bundle): Inventory Policy Release Id=$(id)";
 }
 
 bundle agent inventory_autorun
