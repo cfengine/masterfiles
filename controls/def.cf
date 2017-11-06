@@ -330,9 +330,9 @@ bundle common def
 
   # MPF controls
 
-      "mpf_log_retention"
+      "mpf_log_dir_retention"
         string => "30",
-        if => not( isvariable ( mpf_log_retention ) ),
+        if => not( isvariable ( mpf_log_dir_retention ) ),
         comment => "The default log file retention in cfe_log_dirs is 30 days
                     unless it's already been defined (augments).";
 
