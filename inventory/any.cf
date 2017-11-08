@@ -9,7 +9,7 @@ bundle common inventory_any
       "release_data" string => "$(this.promise_dirname)/../cf_promises_release_id";
 
       "data"
-        data => readjson( $(release_data) ),
+        data => readjson( $(release_data), inf ),
         if => fileexists( $(release_data) );
 
       "id"
