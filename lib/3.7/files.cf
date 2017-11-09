@@ -487,9 +487,10 @@ bundle edit_line insert_ini_section(name, config)
   insert_lines:
       "[$(name)]"
       location => start,
-      comment => "Prepend a line to the file if it doesn't already exist";
+      comment => "Insert an ini section with values if not present";
 
-      "$(k)=$($(config)[$(k)])";
+      "$(k)=$($(config)[$(k)])"
+      location => after("[$(name)]");
 }
 
 
