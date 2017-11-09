@@ -32,6 +32,7 @@ bundle agent test
       "description" -> { "CFE-2721" }
         string => "Test that insert_ini_section works with more than one section";
 
+    cfengine_3_7::
       "test_soft_fail"
         string => "any",
         meta => { "CFE-2721" };
