@@ -66,6 +66,10 @@ fi
 
 . "$TEST_DIR/testall.env"
 
+<<<<<<< HEAD
+"$CORE/tests/acceptance/testall" --agent="$CORE/cf-agent/cf-agent" --cfpromises="$CORE/cf-promises/cf-promises" --cfserverd="$CORE/cf-serverd/cf-serverd" --cfkey="$CORE/cf-key/cf-key" --rpmvercmp="$CORE/ext/rpmvercmp" --include="$TEST_DIR/../../modules" "$@"
+=======
+
 # We have to execute Core's testall, but also give instructions
 # where the binaries are.
 
@@ -90,3 +94,4 @@ else
         --rpmvercmp="$CORE/ext/rpmvercmp" \
         $FLAGS "$@"
 fi
+>>>>>>> 076fc59e5... CFE-2721: Remove soft fail on fixed test
