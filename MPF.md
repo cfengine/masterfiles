@@ -617,6 +617,19 @@ memory related probes on policy servers:
 }
 ```
 
+### Configure Enterprise Mission Portal Docroot
+
+Primarily for developer conveniance, this setting allows you to easily disable the enforcement that the webapp consists of the packaged files in the docroot used for Mission Portal.
+
+
+```
+{
+  "classes": {
+    "mpf_disable_mission_portal_docroot_sync_from_share_gui": [ "any" ]
+  }
+}
+```
+
 ### Append to the main bundlesequence
 
 You can specify bundles which should be run at the end of the default

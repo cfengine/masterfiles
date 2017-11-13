@@ -25,11 +25,14 @@ bundle agent cfe_internal_setup_knowledge
 
   files:
 
+    !mpf_disable_mission_portal_docroot_sync_from_share_gui::
       "$(cfe_internal_hub_vars.docroot)"
       comment => "Copy the basic knowledge base configuration from the installation to doc root",
       handle => "cfe_internal_setup_knowledge_files_doc_root_1",
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI"),
       depth_search => recurse("inf");
+
+    any::
 
       "$(cfe_internal_hub_vars.docroot)"
       comment => "All files in there should be at least 0644",

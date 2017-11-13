@@ -24,7 +24,6 @@ bundle common cfe_internal_hub_vars
         comment => "Root directory of Enterprise Web interface",
         handle => "cfe_internal_hub_vars_docroot";
 
-
       # TODO Consider tagging these files for file integrity monitoring.
 
       "SSLCertificateFile"
