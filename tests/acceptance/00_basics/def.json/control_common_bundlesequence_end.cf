@@ -32,6 +32,7 @@ bundle agent test
       # in, so we would get an infinitely deep copy in that case.
       "$(sys.inputdir)/$(files_to_copy)"
         copy_from => dcs_sync("$(this.promise_dirname)/../../../../$(files_to_copy)"),
+        perms => m(600),
         depth_search => recurse("inf");
 
   methods:
