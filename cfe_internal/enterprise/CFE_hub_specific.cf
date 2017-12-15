@@ -48,6 +48,20 @@ bundle common cfe_internal_hub_vars
       "SSLCertificateKeySize" string => "4096";
       "SSLCertificateDaysValid" string => "3650";
 
+      # Determine the version of PHP that is used
+
+      "php_version"
+        string => ifelse( fileexists( "$(sys.workdir)/httpd/modules/libphp7.so" ), "7",
+                          fileexists( "$(sys.workdir)/httpd/modules/libphp5.so" ), "5",
+                          "UNKNOWN" );
+
+  reports:
+
+    policy_server::
+
+      "ERROR: $(this.bundle): Unable to determine correct PHP version."
+        if => strcmp( $(php_version), "UNKNOWN" );
+
 }
 
 ##################################################################

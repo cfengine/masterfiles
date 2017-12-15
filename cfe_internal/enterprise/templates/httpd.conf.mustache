@@ -223,9 +223,9 @@ LogLevel warn
 </IfModule>
 
 
-LoadModule php5_module       modules/libphp5.so
-AddHandler php5-script       .php
-AddType    application/x-httpd-php-source php5
+LoadModule php{{{vars.cfe_internal_hub_vars.php_version}}}_module       modules/libphp{{{vars.cfe_internal_hub_vars.php_version}}}.so
+AddHandler php{{{vars.cfe_internal_hub_vars.php_version}}}-script       .php
+AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_version}}}
 
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}">
