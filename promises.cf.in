@@ -270,9 +270,8 @@ bundle common services_autorun
 {
   vars:
     !cfengine_3_7.services_autorun::
-      # Both 3.6 and 3.8+ can use local_libdir
-      # 3.6 will use the split library in the version specific path
-      # 3.8+ will use the common lib as it supports the @if macro
+      # 3.8+ can use local_libdir and will use the common lib as it supports the
+      # @if macro
       "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
