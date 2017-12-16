@@ -216,48 +216,7 @@ bundle common cfengine_controls
 # @brief Include various agent control policies
 {
   vars:
-    # 3.7+ uses the re-unified controls
-    cfengine_3_6::
-      "def_inputs"
-        slist => {
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def_inputs.cf",
-                 },
-        comment => "We strictly order the def inputs because they should be parsed first";
 
-      "input[cf_agent]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_agent.cf",
-        comment => "Agent control options";
-
-      "input[cf_execd]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_execd.cf",
-        comment => "Executor (scheduler) control options";
-
-      "input[cf_monitord]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_monitord.cf",
-        comment => "Monitor/Measurement control options";
-
-      "input[cf_serverd]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_serverd.cf",
-        comment => "Server control options";
-
-      "input[cf_runagent]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_runagent.cf",
-        comment => "Runagent (remote activation request) control options";
-
-    enterprise_edition.cfengine_3_6::
-
-      "input[cf_hub]" -> { "CFEngine Enterprise" }
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_hub.cf",
-        comment => "Hub (agent report collection) control options";
-
-      "input[reports]" -> { "CFEngine Enterprise" }
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/reports.cf",
-        comment => "Report collection options";
-
-
-    # 3.7+ uses the re-unified controls
-    !cfengine_3_6::
       "def_inputs"
         slist => {
                    "controls/def.cf",
@@ -286,7 +245,7 @@ bundle common cfengine_controls
         string => "controls/cf_runagent.cf",
         comment => "Runagent (remote activation request) control options";
 
-    enterprise_edition.!cfengine_3_6::
+    enterprise_edition::
 
       "input[cf_hub]" -> { "CFEngine Enterprise" }
         string => "controls/cf_hub.cf",
@@ -295,7 +254,6 @@ bundle common cfengine_controls
       "input[reports]" -> { "CFEngine Enterprise" }
         string => "controls/reports.cf",
         comment => "Report collection options";
-
 
     any::
 
