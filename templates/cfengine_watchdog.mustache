@@ -1,3 +1,7 @@
 # This file is managed by CFEngine
 # If cf-execd is executable and if no process matching cf-execd can be found then restart cf-execd
 * * * * * root [ -x {{{vars.sys.cf_execd}}} ] && if ! {{{vars.paths.pgrep}}} cf-execd > /dev/null; then {{{vars.sys.cf_execd}}}; fi
+
+# If there is a cf-execd process running and promise_summary.log has not been
+# updated in the last 30 minutes then kill and re-start cf-execd
+* * * * * root if find {{{ vars.sys.workdir}}}/promise_summary.log -mmin +30; then if [ $(pgrep -c cf-execd) -gt 0 ]; then echo "cf-execd does not seem to be triggering agent runs, restarting"; pkill cf-execd; {{{sys.cf_execd}}} fi; fi

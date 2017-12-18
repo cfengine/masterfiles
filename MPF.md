@@ -286,7 +286,7 @@ hosts.
 }
 ```
 
-### Main Policy (promises.cf)
+## Main Policy (promises.cf)
 
 The following settings are defined in `controls/def.cf` can be set from an
 [augments file][Augments].
@@ -714,6 +714,26 @@ Example enabling the class from an [augments file][Augments]:
 ```
 
 **History**: Added in 3.11, 3.10.2
+
+### Enable external watchdog
+
+**Note**: This feature is not enabled by default.
+
+If the class `cfe_internal_core_watchdog_enabled` is defined the mustache template `templates/cfengine_watchdog.mustache` is rendered to `/etc/cron.d/cfengine_watchdog`.
+
+By default if enabled the watchdog tries to remediate the following conditions:
+
+- If `cf-execd` is executable and there is no `cf-execd` process running, then
+  `cf-execd` will be launched.
+
+- If there are more than 0 `cf-execd` processes running, but the
+  `promise_summary.log` has not been updated in the last 30 minutes all
+  `cf-execd** processes are killed, and the service is re-started.
+
+**History:**
+
+- start cf-execd if not running (3.8.0)
+- restart if processes not resulting in updated logs (3.12.0)
 
 ### Modules
 
