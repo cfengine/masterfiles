@@ -216,48 +216,7 @@ bundle common cfengine_controls
 # @brief Include various agent control policies
 {
   vars:
-    # 3.7+ uses the re-unified controls
-    cfengine_3_6::
-      "def_inputs"
-        slist => {
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def_inputs.cf",
-                 },
-        comment => "We strictly order the def inputs because they should be parsed first";
 
-      "input[cf_agent]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_agent.cf",
-        comment => "Agent control options";
-
-      "input[cf_execd]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_execd.cf",
-        comment => "Executor (scheduler) control options";
-
-      "input[cf_monitord]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_monitord.cf",
-        comment => "Monitor/Measurement control options";
-
-      "input[cf_serverd]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_serverd.cf",
-        comment => "Server control options";
-
-      "input[cf_runagent]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_runagent.cf",
-        comment => "Runagent (remote activation request) control options";
-
-    enterprise_edition.cfengine_3_6::
-
-      "input[cf_hub]" -> { "CFEngine Enterprise" }
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_hub.cf",
-        comment => "Hub (agent report collection) control options";
-
-      "input[reports]" -> { "CFEngine Enterprise" }
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/reports.cf",
-        comment => "Report collection options";
-
-
-    # 3.7+ uses the re-unified controls
-    !cfengine_3_6::
       "def_inputs"
         slist => {
                    "controls/def.cf",
@@ -286,7 +245,7 @@ bundle common cfengine_controls
         string => "controls/cf_runagent.cf",
         comment => "Runagent (remote activation request) control options";
 
-    enterprise_edition.!cfengine_3_6::
+    enterprise_edition::
 
       "input[cf_hub]" -> { "CFEngine Enterprise" }
         string => "controls/cf_hub.cf",
@@ -295,7 +254,6 @@ bundle common cfengine_controls
       "input[reports]" -> { "CFEngine Enterprise" }
         string => "controls/reports.cf",
         comment => "Report collection options";
-
 
     any::
 
@@ -312,9 +270,8 @@ bundle common services_autorun
 {
   vars:
     !cfengine_3_7.services_autorun::
-      # Both 3.6 and 3.8+ can use local_libdir
-      # 3.6 will use the split library in the version specific path
-      # 3.8+ will use the common lib as it supports the @if macro
+      # 3.8+ can use local_libdir and will use the common lib as it supports the
+      # @if macro
       "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles

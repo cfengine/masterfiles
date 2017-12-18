@@ -240,7 +240,7 @@ bundle agent cfe_internal_php_runalerts
 
       "systemd_supervised"
         scope => "bundle",
-        expression => "systemd.!(cfengine_3_6|cfengine_3_7|cfengine_3_8|cfengine_3_9)",
+        expression => "systemd.!(cfengine_3_7|cfengine_3_8|cfengine_3_9)",
         comment => "As of 3.10 the runalerts service is supervised by systemd
                     when available. Prior to 3.10 the service is supervised
                     directly by CFEngine policy.";

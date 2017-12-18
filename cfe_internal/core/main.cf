@@ -153,7 +153,7 @@ bundle agent mpf_augments_control
 
   reports:
 
-    cfengine_3_7|cfenigne_3_6|cfengine_3_8|cfengine_3_9::
+    cfengine_3_7|cfengine_3_8|cfengine_3_9::
       "WARNING: $(this.bundle) is only compatible with cfengine 3.10.0 and greater.";
       "WARNING: $(this.bundle) Please consider undefining mpf_augments_control_enabled.";
 

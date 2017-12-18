@@ -36,16 +36,6 @@ body common control
 bundle common cfengine_update_controls
 {
   vars:
-    # 3.6 uses the split controls
-    cfengine_3_6::
-      "update_def_inputs"
-        slist => {
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def.cf",
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def_inputs.cf",
-                 };
-
-    # 3.7+ uses the re-unified controls
-    !cfengine_3_6::
        "update_def_inputs"
         slist => {
                    "controls/update_def.cf",

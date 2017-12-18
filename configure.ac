@@ -233,7 +233,6 @@ dnl Now make the Makefiles
 dnl ######################################################################
 
 AC_CONFIG_FILES([Makefile
-                controls/3.6/update_def.cf
                 controls/update_def.cf
                 modules/packages/Makefile
                 promises.cf
