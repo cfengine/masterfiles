@@ -204,7 +204,9 @@ body depth_search recurse_basedir_exclude(d)
 
 body file_select cfe_internal_docroot_perms
 {
-  leaf_name => { "\.htaccess" };
+  leaf_name => { "\.htaccess", "settings.ldap.php" };
+      # htaccess are going the way of the dodo bird
+      # settings.ldap.php permissions are handled explicitly in it's own bundle
   file_result => "!leaf_name";
 }
 
