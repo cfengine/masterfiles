@@ -470,7 +470,8 @@ bundle agent cfe_internal_refresh_inventory_view
 {
   commands:
     (policy_server|am_policy_hub).enterprise_edition::
-      "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh"
+      "$(sys.workdir)/httpd/php/bin/php"
+        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh",
         comment => "This refreshes the inventory view. If the inventory view is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_inventory_view",
         classes => kept_successful_command,
