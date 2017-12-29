@@ -465,17 +465,64 @@ bundle agent log_cfengine_enterprise_license_utilization
       "WARNING $(this.bundle) is actuated but not enabled. enable_$(this.bundle) is not defined.";
 }
 
+bundle agent cfe_internal_enterprise_maintenance
+# @brief Actuate bundles tagged with `enterprise_maintenance` in lexically sorted order
+{
+  vars:
+
+    enterprise_edition::
+
+      "enterprise_maintenance_bundles"
+        slist => sort( bundlesmatching(".*", "enterprise_maintenance"),
+                       lex);
+
+  methods:
+
+    "Enterprise Maintenance"
+      usebundle => $(enterprise_maintenance_bundles);
+}
+
 bundle agent cfe_internal_refresh_inventory_view
 # @brief Refresh materialized view every 5 minutes
 {
-  commands:
+  meta:
+
     (policy_server|am_policy_hub).enterprise_edition::
+
+      "tags" slist => { "enterprise_maintenance" };
+
+  commands:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh",
         comment => "This refreshes the inventory view. If the inventory view is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_inventory_view",
         classes => kept_successful_command,
         if => isdir( "$(cfe_internal_hub_vars.docroot)/api/modules/inventory" );
+
+}
+
+bundle agent cfe_internal_refresh_events_table
+# @brief Refresh materialized view every 5 minutes
+{
+  meta:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "tags" slist => { "enterprise_maintenance" };
+
+  commands:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "$(sys.workdir)/httpd/php/bin/php"
+        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks process_api_events",
+        comment => "This refreshes the events table. If the events table is not refreshed then it will contain stale data.",
+        handle  => "mpf_fresh_events_table",
+        classes => kept_successful_command,
+        if => fileexists( "$(cfe_internal_hub_vars.docroot)/api/resource-v1/Event.php" );
 }
 
 body classes cfe_internal_log_utilization(time)
