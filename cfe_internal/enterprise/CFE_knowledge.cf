@@ -167,23 +167,6 @@ bundle agent cfe_internal_setup_knowledge
                     have write access to the modules directory.";
 }
 
-#############################################################################
-
-body action aggregator
-{
-      ifelapsed => "120";
-      expireafter => "240";
-      background => "true";
-}
-
-############################################################################
-
-body file_select folder(regex)
-{
-      leaf_name  => { ".*$(regex)$"};
-      file_result => "leaf_name";
-}
-
 ############################################################################
 
 body depth_search recurse_basedir(d)
