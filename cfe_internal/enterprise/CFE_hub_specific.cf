@@ -15,6 +15,7 @@
 ##################################################################
 
 bundle common cfe_internal_hub_vars
+# @brief Set hub specific variables
 {
   vars:
 
@@ -72,6 +73,7 @@ bundle common cfe_internal_hub_vars
 ##################################################################
 
 bundle agent cfe_internal_update_folders
+# @brief Ensure that the directory structure exists on the hub for storing packages used in self upgrade
 {
   vars:
 
@@ -153,6 +155,7 @@ bundle agent cfe_internal_update_folders
 ##################################################################
 
 bundle agent cfe_internal_apache_sudoer
+# @brief Ensure that cfapache user can run cf-runagent with elevated privledges
 {
   classes:
 
@@ -182,6 +185,7 @@ bundle agent cfe_internal_apache_sudoer
 #
 
 bundle edit_line apache_sudoer
+# @brief Ensure that the cfapache user can run cf-runagent as root without a password
 {
   insert_lines:
 
@@ -382,6 +386,7 @@ body action cfe_internal_bg
       #
 
 body file_select mins_old(mins)
+# @brief Select files that are older than `mins` minutes old
 {
  mtime       => irange(0,ago(0,0,0,0,"$(mins)",0));
  file_result => "mtime";
@@ -389,7 +394,6 @@ body file_select mins_old(mins)
 
 bundle agent cfe_internal_truncate_events
 #@brief cancel all the pending events once in a day
-
 {
   commands:
     Hr05.Min00_05::
@@ -400,6 +404,7 @@ bundle agent cfe_internal_truncate_events
 }
 
 bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
+# @brief Clean up scheduled reports older than `days` days old
 {
   files:
     "$(cfe_internal_hub_vars.docroot)/tmp/."

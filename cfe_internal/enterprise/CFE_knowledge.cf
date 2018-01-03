@@ -220,6 +220,7 @@ body depth_search recurse_exclude(d)
 ############################################################################
 
 body process_count check_process(in,out)
+# @brief Count processes
 {
       match_range => "1,1";
       in_range_define => { "$(in)" };
@@ -229,6 +230,7 @@ body process_count check_process(in,out)
 ############################################################################
 
 body file_select cfe_internal_exclude_sh_pl_scripts
+# @brief select plain files not ending in `.sh` and `.pl`
 {
   leaf_name => { ".*\.sh",".*\.pl"};
   file_types => { "plain" };
@@ -238,6 +240,7 @@ body file_select cfe_internal_exclude_sh_pl_scripts
 ############################################################################
 
 body file_select cfe_internal_sh_pl_scripts
+# @brief select plain files ending in `.sh` and `.pl`
 {
   leaf_name => { ".*\.sh",".*\.pl" };
   file_types => { "plain" };
@@ -247,6 +250,7 @@ body file_select cfe_internal_sh_pl_scripts
 ############################################################################
 
 body file_select cfe_internal_htaccess
+# @brief select files named `.htaccess`
 {
   leaf_name => { "\.htaccess" };
   file_result => "leaf_name";
