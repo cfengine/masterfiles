@@ -15,6 +15,7 @@
 ##################################################################
 
 bundle agent cfe_internal_setup_knowledge
+# @brief Policy related to enterprise hubs
 {
 
   classes:
@@ -186,6 +187,7 @@ body file_select folder(regex)
 ############################################################################
 
 body depth_search recurse_basedir(d)
+# @brief Search `d` levels deep including the base dir
 {
       depth => "$(d)";
       include_basedir => "true";
@@ -194,6 +196,7 @@ body depth_search recurse_basedir(d)
 ###########################################################################
 
 body depth_search recurse_basedir_exclude(d)
+# @brief Search `d` levels deep including the base dir but exclude some specific dirs
 {
       depth => "$(d)";
       include_basedir => "true";
@@ -203,6 +206,7 @@ body depth_search recurse_basedir_exclude(d)
 ############################################################################
 
 body file_select cfe_internal_docroot_perms
+# @brief Select files not named `.htacces` or `settings.ldap.php`
 {
   leaf_name => { "\.htaccess", "settings.ldap.php" };
       # htaccess are going the way of the dodo bird
@@ -212,6 +216,7 @@ body file_select cfe_internal_docroot_perms
 
 ############################################################################
 body depth_search recurse_exclude(d)
+# @brief Search to a depth of `d` excluding known directories
 {
       depth => "$(d)";
       exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "rest", "application", "dc-scripts" };
