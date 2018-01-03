@@ -219,16 +219,6 @@ body depth_search recurse_exclude(d)
 
 ############################################################################
 
-body process_count check_process(in,out)
-# @brief Count processes
-{
-      match_range => "1,1";
-      in_range_define => { "$(in)" };
-      out_of_range_define => { "$(out)" };
-}
-
-############################################################################
-
 body file_select cfe_internal_exclude_sh_pl_scripts
 # @brief select plain files not ending in `.sh` and `.pl`
 {
