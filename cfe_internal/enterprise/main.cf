@@ -1,4 +1,5 @@
 bundle agent cfe_internal_enterprise_main
+# @brief Drive policy related to CFEngine Enterprise
 {
   methods:
     any::
