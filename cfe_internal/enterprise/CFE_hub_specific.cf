@@ -414,6 +414,16 @@ bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
       file_select => filetype_older_than("plain", $(days) ),
       comment => "Mission Portals scheduled reports are written here. They need
                   to be purged after some time so that they do not fill the disk.";
+
+      "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "ENT-3558" }
+        handle => "cfe_internal_purge_scheduled_reports_files_docroot_api_static",
+        delete => tidy,
+        depth_search => recurse("inf"),
+        file_select => filetype_older_than("plain", $(days) ),
+        comment => "In some versions of Enterprise the async query api and
+                    scheduled reports assets are deposited in this directory.
+                    They need to be cleaned up as to not fill the disk.";
+
 }
 
 bundle agent log_cfengine_enterprise_license_utilization
