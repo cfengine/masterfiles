@@ -127,6 +127,18 @@ bundle agent host_info_report_cfengine
       "I have a policy release ID";
 }
 
+bundle agent host_info_report_inventory
+# @brief Collect information about policy
+{
+
+  vars:
+
+@if minimum_version(3.10)
+      "inventory_vars" data => variablesmatching_as_data( ".*", "inventory" );
+@endif
+
+}
+
 bundle agent host_info_report_render_txt
 # @brief Generates a report with the collected information
 {
