@@ -20,6 +20,7 @@ stamp-h1
 /m4/lt*.m4
 /missing
 /promises.cf
+/standalone_self_upgrade.cf
 /revision
 /ylwrap
 /test-driver
