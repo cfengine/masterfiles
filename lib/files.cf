@@ -126,7 +126,7 @@ bundle edit_line insert_lines(lines)
         comment => "Append lines if they don't exist";
 }
 
-bundle edit_line append_if_no_line(str)
+bundle edit_line append_if_no_line(lines)
 # @brief Alias for `lines_present`
 {
   insert_lines:
@@ -135,7 +135,7 @@ bundle edit_line append_if_no_line(str)
         comment => "Append lines if they don't exist";
 }
 
-bundle edit_line append_if_no_lines(list)
+bundle edit_line append_if_no_lines(lines)
 # @brief Alias for `lines_present`
 {
   insert_lines:
