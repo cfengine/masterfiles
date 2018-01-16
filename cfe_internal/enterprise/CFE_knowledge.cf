@@ -24,6 +24,14 @@ bundle agent cfe_internal_setup_knowledge
       # check when updates arrive, new compared to the database
       #
 
+      "ENT_3572" -> { "ENT-3572" }
+        comment => "Hosts with this class need to be sure that the ssl directory
+                    is readable and executable by other users",
+        or => {
+                "enterprise_3_7_3", "enterprise_3_7_4", "enterprise_3_7_5",
+                "enterprise_3_10_0"
+              };
+
   files:
 
     !mpf_disable_mission_portal_docroot_sync_from_share_gui::
@@ -113,7 +121,14 @@ bundle agent cfe_internal_setup_knowledge
       perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group));
 
       "$(cfe_internal_hub_vars.docroot)/../ssl/."
-        perms => mog("0440", "root", "root" );
+        perms => mog("0440", "root", "root" ),
+        if => not( "ENT_3572" );
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/." -> { "ENT-3572" }
+        perms => mog("0444", "root", "root" ),
+        if => "ENT_3572",
+        comment => "Exported be 0 bytes in some versions if the ssl directory is
+                    not accessible to all users.";
 
       "$(cfe_internal_hub_vars.docroot)/../ssl/private/."
         depth_search => recurse_with_base("inf"),
