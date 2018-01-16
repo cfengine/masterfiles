@@ -40,7 +40,11 @@ bundle agent test
   vars:
       "options[test][test_option_one]" string => "test_option_one_value";
       "options[fake][fake_option_one]" string => "fake_option_one_value";
-      "sections" slist => getindices( options );
+
+      # TODO: refactor after 3.7.x is EOL
+      "sections_indices" slist => getindices(options);
+      "sections_sorted" slist => sort("sections_indices", lex);
+      "sections" slist => reverse("sections_sorted");
 
   files:
       "$(G.testfile).actual"
