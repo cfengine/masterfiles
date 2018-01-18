@@ -1,0 +1,74 @@
+#!/bin/sh -e
+
+command=$1
+
+while read -r line; do
+  export INPUT_$line
+done
+
+get_package_data() {
+  name="${INPUT_File?File must be given to get-package-data}"
+  echo PackageType=repo
+  echo Name=$name
+}
+
+list_installed() {
+  # Example pkg output:
+  # Name         Version  Rev   Developer  Notes
+  # core         16-2.30  3748  canonical  core
+  # hello-world  6.3      27    canonical  -
+  #
+  # After rewrite:
+  # Name=core
+  # Version=16-2.30
+  # Architecture=none
+  snap list | sed 1d | awk '
+{
+    printf("Name=%s\n",$1)
+    printf("Version=%s\n",$2)
+    printf("Architecture=none\n")
+}'
+}
+
+repo_install() {
+  name="${INPUT_Name?Name must be given to repo-install}"
+  # TODO: investigate channel, revision flags
+  snap install "$name" >&2
+}
+
+
+list_updates() {
+  # TODO: anything needed here?
+  true
+}
+
+remove() {
+  name="${INPUT_Name?Name must be given to remove}"
+  snap remove "$name" >&2
+}
+
+case $command in
+  supports-api-version)
+    echo 1
+  ;;
+  get-package-data)
+    get_package_data
+  ;;
+  list-installed)
+    list_installed
+  ;;
+  repo-install)
+    repo_install
+  ;;
+  list-updates)
+    list_updates
+  ;;
+  list-updates-local)
+    list_updates
+  ;;
+  remove)
+    remove
+  ;;
+  *)
+    echo "ErrorMessage=Invalid operation"
+esac
