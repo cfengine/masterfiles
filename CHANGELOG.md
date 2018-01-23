@@ -1,6 +1,57 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.11.0:
+	- Rename enable_client_initiated_reporting to client_initiated_reporting_enabled
+	- Directories for ubuntu 16 and centos 7 should exist in master_software_updates
+	  (ENT-3136)
+	- Fix: Automatic client upgrades for deb hosts
+	- Add AIX OOTB oslevel inventory (ENT-3117)
+	- Disable package inventory via modules on redhat like systems with unsupported python versions
+	  (CFE-2602)
+	- Make stock policy update more resiliant (CFE-2587)
+	- Configure networks allowed to initiate report collection (client initiated reporting) via augments (#910)
+	  (CFE-2624)
+	- apt_get package module: Fix bug which prevented updates
+	  from being picked up if there was more than one source listed in the
+	  'apt upgrade' output, without a comma in between (CFE-2605)
+	- Enable specification of monitoring_include via augments (CFE-2505)
+	- Configure call_collect_interval from augments (enable_client_initiated_reporting) (#905)
+	  (CFE-2623)
+	- Add templates shortcut (CFE-2582)
+	- Behaviour change: when used with CFEngine 3.10.0 or greater,
+	  bundles set_config_values() and set_line_based() are appending a
+	  trailing space when inserting a configuration option with empty value
+	  (CFE-2466)
+	- Add default report collection exclusion based on promise handle
+	  (ENT-3061)
+	- Fix ability to select INI region with metachars (CFE-2519)
+	- Change: Verify transfered files during policy update
+	- Change select_region INI_section to match end of section or end of file
+	  (CFE-2519)
+	- Add class to enable post transfer verrification during policy updates
+	- Add: prunetree bundle to stdlib
+	  The prunetree bundle allws you to delete files and directories up to a
+	  sepcified depth older than a specified number of days
+	- Do not symlink agents to /usr/local/bin on coreos (ENT-3047)
+	- Add: Ability to set default_repository via augments
+	- Enable settig def.max_client_history_size via augments (CFE-2560)
+	- Change self upgrade now uses standalone policy (ENT-3155)
+	- Fix apt_get package module incorrectly using interactive mode
+	- Add ability to append to bundlesequnece with def.json (CFE-2460)
+	- Enable paths to POSIX tools by default instead of native tools
+	- Remove bundle agent cfe_internal_bins (CFE-2636)
+	- Include previous_state and untracked reports when client clear a buildup of unreported data
+	  (ENT-3161)
+	- Fix command to restart apache on config change (ENT-3134)
+	- cf-serverd listens on ipv4 and ipv6 by default (CFE-528)
+	- FixesMake apt_get module compatible with Ubuntu 16.04 (CFE-2445)
+	- Fix rare bug that would sometimes prevent redis-server from launching
+	- Add oslevel to well known paths (ENT-3121)
+	- Add policy to track CFEngine Enterprise license utilization
+	  (ENT-3186)
+	- Ensure MP SSL Cert is readable (ENT-3050)
+
 3.10.0:
 	- Add: Classes body tailored for use with diff
 	- Change: Session Cookies use HTTPOnly and secure attribtues (ENT-2781)
