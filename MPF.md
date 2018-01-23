@@ -171,19 +171,26 @@ the appropriate platform directory. Clients will automatically download and
 install packages when the ```trigger_upgrade``` class is defined during a run of
 `update.cf`.
 
-**Note:** This policy is specific to CFEngine Enterprise.
 
-This [augments file][Augments] would define the ```trigger_upgrade``` class if the
-`testhost5` class is defined.
+This [augments file][Augments] will defines `trigger_upgrade` on hosts with IPv4 addresses in 192.0.2.0/24 or 203.0.113.0/24 or hosts that have a cfengine 3.10 class not for cfengine 3.10.2.
 
-```
+```json
 {
-  "classes": {
-    "trigger_upgrade": [ "testhost5" ]
-  }
-
+   "classes": {
+    "trigger_upgrade": [
+      "ipv4_10_10_1",
+      "ipv4_10_10_2",
+      "cfengine_3_10_(?!2$)\d+"
+    ]
+   }
 }
 ```
+
+**Notes:**
+
+- This policy is specific to CFEngine Enterprise.
+- The negative look ahead regular expression is useful because it automatically
+  turns off on hosts after they reach the target version.
 
 ### Files considered for copy during policy updates
 
