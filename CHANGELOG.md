@@ -1,6 +1,31 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.3:
+	- Add oracle linux support to standalone self upgrade
+	- Fix systemctl path detection
+	- Add support for 32bit rpms in standalone self upgrade (ENT-3377)
+	- make apt_get package module work with repositories containing spaces in the label
+	  (ENT-3438)
+	- Be less noisy when a promised service is not found (CFE-2690)
+	- Fix to frequent logging of enterprise license utilization (ENT-3390)
+	- Include scheduled report assets in self maintenance (ENT-3558)
+	- Allow hubs to collect from themselves over loopback (ENT-3329)
+	- Allow multiple sections in insert_ini_section (CFE-2721)
+	- Ensure HA standby hubs have am_policy_hub state marker (ENT-3328)
+	- fixed an error in the file_make_mustache_*, incorrect variable name used
+	  (CFE-2714)
+	- Add json templates for rendering serial and multiline data (CFE-2713)
+	- Allow configuration of allowlegacyconnects from augments (ENT-3375)
+	- Fix self upgrade for hosts older than 3.7.4 (ENT-3368)
+	- Ignore empty options in apt_get module (CFE-2685)
+	- cf-execd service override template now only kills cf-execd on stop
+	  (ENT-3395)
+	- Policy Release Id is now inventoried by default (CFE-2097)
+	- Avoid triggering self upgrade during bootstrap (ENT-3394)
+	- Maintain access to exported CSV reports in older versions (ENT-3572)
+	- prevent yum from locking in package_methods when possible (CFE-2759)
+
 3.10.2:
 	- Disable package inventory via modules on redhat like systems with unsupported python versions
 	  (CFE-2602)
