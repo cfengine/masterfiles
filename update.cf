@@ -63,16 +63,40 @@ bundle agent cfengine_internal_standalone_self_upgrade
   vars:
 
       "exec_prefix"
-      string => ifelse( isexecutable("/bin/systemd-run"), "/bin/systemd-run --unit=cfengine-upgrade --scope ",
-                        isexecutable( "/usr/bin/systemd-run" ), "/usr/bin/systemd-run --unit=cfengine-upgrade --scope ", ""); # trailing space in commmands important
+        string => ifelse( isexecutable("/bin/systemd-run"), "/bin/systemd-run --unit=cfengine-upgrade --scope ", # trailing space in commands important
+                          isexecutable( "/usr/bin/systemd-run" ), "/usr/bin/systemd-run --unit=cfengine-upgrade --scope ",
+                          "");
+
+      "desired_pkg_data_path" -> { "ENT-3592" }
+        string => "$(sys.statedir)/MPF/desired-cfengine-package-version.json";
+
+      "desired_pkg_data" -> { "ENT-3592" }
+        data => readjson( $(desired_pkg_data_path) ),
+        if => fileexists( $(desired_pkg_data_path) );
+
+  classes:
+      # If we are running the version desired by the self upgrade policy
+      "at_desired_version" -> { "ENT-3592" }
+        expression => strcmp( "$(desired_pkg_data[version])", "$(sys.cf_version)"  );
+
+      # If we are running the version explicitly defined by the user
+      "at_desired_version" -> { "ENT-3592" }
+        expression => strcmp( "$(def.cfengine_software_pkg_version)", "$(sys.cf_version)" );
 
   commands:
 
-    trigger_upgrade::
+    trigger_upgrade.!at_desired_version::
 
       "$(exec_prefix)$(sys.cf_agent)"
       handle => "standalone_self_upgrade",
       args => "--inform --timestamp --file $(this.promise_dirname)/standalone_self_upgrade.cf --define trigger_upgrade,update_cf_initiated";
+
+  reports:
+
+    inform_mode|verbose_mode|DEBUG|DEBUG_cfengine_internal_standalone_self_upgrade::
+      "Skipped self upgrade because we are running the desired version $(sys.cf_version)" -> { "ENT-3592" }
+        if => "at_desired_version";
+
 }
 
 body agent control
