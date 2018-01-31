@@ -1,6 +1,14 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+## 3.7.7
+ - Allow multiple sections in insert_ini_section (CFE-2721)
+ - make apt_get package module work with repositories containing spaces in the label
+   (ENT-3438)
+ - Fix systemctl path detection
+ - Include scheduled report assets in self maintenance (ENT-3558)
+ - prevent yum from locking in package_methods when possible (CFE-2759)
+
 ## 3.7.6
  - apt_get package module: Fix bug which prevented updates
    from being picked up if there was more than one source listed in the
