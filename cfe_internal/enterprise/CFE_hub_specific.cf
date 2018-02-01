@@ -372,8 +372,15 @@ bundle agent cfe_internal_php_runalerts
                   need to ensure it is running.",
       handle => "cfe_internal_php_runalerts_commands_run_php_runalerts_script",
       classes => kept_successful_command,
-      contain => in_shell,
+      contain => run_as_cfapache,
       action => cfe_internal_bg;
+}
+
+body contain run_as_cfapache
+{
+  useshell   => "true";
+  exec_owner => "$(def.cf_apache_user)";
+  exec_group => "$(def.cf_apache_group)";
 }
 
       #
