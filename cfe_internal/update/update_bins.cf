@@ -139,13 +139,9 @@ bundle agent cfe_internal_update_bins
       comment => "Name convention of package arch for other system except Solaris and *BSD",
       handle => "cfe_internal_update_bins_vars_pkgarch_not_solaris_bsd_debian_aix_redhat_32b";
 
-      #
-
   classes:
 
       "have_software_dir" expression => fileexists($(local_software_dir));
-
-      #
 
   packages:
 
@@ -507,6 +503,17 @@ body package_method u_generic(repo)
       package_list_update_command => "/usr/bin/yum check-update";
     SuSE|suse::
       package_list_update_command => "/usr/bin/zypper list-updates";
+
+    # Optimized package versions
+    # Beginning with 3.7.6 rpm package names contain a platform identifier
+
+    (redhat_6|redhat_7|centos_6|centos_7)::
+      # EL6+ uses the el6 optimized version of the package
+        package_name_convention    => "$(name)-$(version).el6.$(arch).rpm";
+
+    (redhat_4|redhat_5|centos_4|centos_5|suse_10|suse_11).x86_64::
+      # Versions before el6 use the el4 package
+        package_name_convention    => "$(name)-$(version).el4.$(arch).rpm";
 
     windows::
 
