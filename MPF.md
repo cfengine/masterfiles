@@ -107,6 +107,28 @@ For example:
 * The order in which bundles are actuates is not guaranteed.
 * The agent will error if a named bundle is not part of inputs.
 
+### Specify the agent bundle used for policy update
+
+The MPF uses `cfe_internal_update_policy_cpv` to update inputs, modules, and
+plugins on remote agents. When new policy is verified by the agent
+`/var/cfengine/masterfiles/cf_promises_validated` is updated with the current
+timestamp. This file is used by remote agents to avoid unnecessary inspection of
+all files each time the update policy is triggered.
+
+Override this bundle by setting `def.mpf_update_policy_bundle` via augments:
+
+```
+{
+    "vars": {
+        "mpf_update_policy_bundle": "MyCustomPolicyUpdateBundle"
+    }
+}
+```
+
+**History:**
+
+- Introduced in 3.12.0
+
 ### Verify update transfers
 
 Enable additional verrification after file transfers during policy update by
