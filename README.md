@@ -70,7 +70,7 @@ Run autogen and make to build masterfiles.
 make
 ```
 
-Optionally configure masterfiles to install to a differnt location (perhaps your
+Optionally configure masterfiles to install to a different location (perhaps your
 own version control checkout)
 
 ```
