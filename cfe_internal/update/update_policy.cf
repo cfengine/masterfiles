@@ -174,10 +174,10 @@ bundle agent cfe_internal_update_policy
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 
-  reports:
-    "CRAIG: sys.workdir: $(sys.workdir)";
-    "CRAIG: redis_conf_file: $(redis_conf_file)";
-    "CRAIG: postgresdb_log: $(postgresdb_log)";
+#  reports:
+#    "CRAIG: sys.workdir: $(sys.workdir)";
+#    "CRAIG: redis_conf_file: $(redis_conf_file)";
+#    "CRAIG: postgresdb_log: $(postgresdb_log)";
 }
 
 #########################################################
