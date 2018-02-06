@@ -19,70 +19,6 @@ bundle agent cfe_internal_update_policy
 # @description Users may define `def.mpf_update_policy_bundle` to override the
 #              default policy update bundle.
 {
-  classes:
-
-      # Define classes if we see a user is requesting a custom policy update bundle
-
-      "have_user_specified_update_bundle"
-        expression => isvariable( "def.mpf_update_policy_bundle" );
-
-      # Define classes if we are able to find the specific bundle they requested
-      # (otherwise we may get an error about undefined bundle)
-
-      "have_found_user_specified_update_bundle"
-        expression  => isgreaterthan( 0, length( "found_matching_user_specified_bundle" ) );
-
-  vars:
-      "default_policy_update_bundle" string => "cfe_internal_update_policy_cpv";
-
-      # Look for a bundle that matches what the user wants
-      "found_matching_user_specified_bundle"
-        slist => bundlesmatching( "$(def.mpf_update_policy_bundle)" );
-
-  methods:
-
-    # Use the user specified bundle when it's found
-    have_found_user_specified_update_bundle::
-
-        "User specified policy update bundle"
-          usebundle => $(found_matching_user_specified_bundle);
-
-
-    # Fall back to stock policy update bundle if we have not found one
-    # specified by user
-
-    !have_found_user_specified_update_bundle::
-
-      "Stock policy update"
-        usebundle => cfe_internal_update_policy_cpv;
-
-  reports:
-
-    inform_mode|verbose_mode|DEBUG|DEBUG_cfe_internal_update_policy::
-      # Report a human readable way to understand the policy behavior
-
-      "Found user specified update bundle."
-        if => "have_user_specified_update_bundle";
-
-      "User specified update bundle: $(def.mpf_update_policy_bundle)"
-        if => "have_user_specified_update_bundle";
-
-      "User specified update bundle MISSING! Falling back to $(default_policy_update_bundle)."
-        if => not( "have_user_specified_update_bundle" );
-}
-
-bundle agent cfe_internal_update_policy_cpv
-# @brief Update inputs from masterfiles when cf_promises_validated changes
-#
-# @description This bundle updates inputdir, modules, and plugins. It uses the
-#              cf_promises_validated file as a gating mechanism to prevent
-#              unnecessary burden on the server from remote agents checking to
-#              see if each individual file needs an update.
-# - The class `validated_updates_ready` is defined when `cf_promsies_validated` is repaired
-# - Executing `cf-agent -KIf update.cf --define validated_updates_ready` will
-#   cause the update policy to scan all files in masterfiles, modules, and
-#   plugins to be scanned for update.
-{
   vars:
       "inputs_dir"         string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
@@ -238,6 +174,10 @@ bundle agent cfe_internal_update_policy_cpv
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 
+#  reports:
+#    "CRAIG: sys.workdir: $(sys.workdir)";
+#    "CRAIG: redis_conf_file: $(redis_conf_file)";
+#    "CRAIG: postgresdb_log: $(postgresdb_log)";
 }
 
 #########################################################
