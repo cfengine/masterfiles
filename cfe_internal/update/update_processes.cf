@@ -299,6 +299,11 @@ bundle agent maintain_cfe_hub_process
       classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf_hub";
 
+  reports:
+    "CRAIG: cfe_internal_update_policy.redis_conf_file: $(cfe_internal_update_policy.redis_conf_file)";
+    "CRAIG: cfe_internal_update_policy_cpv.redis_conf_file: $(cfe_internal_update_policy_cpv.redis_conf_file)";
+
+
 }
 
 #
