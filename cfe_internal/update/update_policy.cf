@@ -37,7 +37,7 @@ bundle agent cfe_internal_update_policy
 
       # Look for a bundle that matches what the user wants
       "found_matching_user_specified_bundle"
-        slist => bundlesmatching( "$(def.mpf_update_policy_bundle" );
+        slist => bundlesmatching( "$(def.mpf_update_policy_bundle)" );
 
   methods:
 
