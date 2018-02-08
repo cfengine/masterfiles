@@ -68,7 +68,9 @@ bundle agent cfe_internal_update_policy
         if => "have_user_specified_update_bundle";
 
       "User specified update bundle MISSING! Falling back to $(default_policy_update_bundle)."
-        if => not( "have_user_specified_update_bundle" );
+        if => and( "have_user_specified_update_bundle",
+                   not( "have_found_user_specified_update_bundle" ));
+
 }
 
 bundle agent cfe_internal_update_policy_cpv
