@@ -515,7 +515,9 @@ bundle edit_line insert_ini_section(name, config)
 # @param config The fully-qualified name of an associative array containing `v[LHS]="rhs"`
 {
   vars:
-      "k" slist => getindices($(config));
+      # TODO: refactor once 3.7.x is EOL
+      "indeces" slist => getindices($(config));
+      "k" slist => sort("indeces", lex);
 
   insert_lines:
       "[$(name)]"
