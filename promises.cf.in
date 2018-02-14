@@ -73,6 +73,11 @@ body common control
     (debian|redhat|suse)::
           package_module => $(package_module_knowledge.platform_default);
 
+    any::
+        ignore_missing_bundles => "$(def.control_common_ignore_missing_bundles)";
+        ignore_missing_inputs => "$(def.control_common_ignore_missing_inputs)";
+
+
 }
 
 bundle common inventory
