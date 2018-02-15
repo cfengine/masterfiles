@@ -84,7 +84,7 @@ bundle common u_common_knowledge
   vars:
       "list_update_ifelapsed_now" string => "10080";
 }
-bundle common cfengine_software
+bundle agent cfengine_software
 #@ brief Variables to control the specifics in desired package selection
 {
   vars:
@@ -148,6 +148,28 @@ bundle common cfengine_software
       "$(this.bundle) pkg_release = $(pkg_release)";
       "$(this.bundle) pkg_arch = $(pkg_arch)";
       "$(this.bundle) package_dir = $(package_dir)";
+
+
+  files:
+      "$(sys.statedir)/MPF/."
+        create => "true";
+      "$(sys.statedir)/MPF/desired-cfengine-package-version.json" -> { "ENT-3592" }
+        edit_line => cfengine_software_version_data;
+}
+
+bundle edit_line cfengine_software_version_data
+# @brief Populate data file with the package information
+# The data this bundle writes is used by the update policy to determine if the
+# standalone self upgrade policy should be run or not.
+# TODO Consider replacing with inline_mustache after 3.10.x is EOL
+{
+      delete_lines: ".*";
+      insert_lines: '{
+"name": "$(cfengine_version.pkg_name)",
+"version": "$(cfengine_version.pkg_version)",
+"release": "$(cfengine_version.pkg_release)",
+"arch" "$(cfengine_version.pkg_arch)"
+}';
 }
 
 bundle agent cfengine_software_cached_locally
