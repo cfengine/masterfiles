@@ -7,7 +7,24 @@ log = open(os.environ['CFENGINE_TEST_MOCK_LOG'], "a")
 log.write("apt-get " + (" ".join(sys.argv[1:])) + "\n")
 log.close()
 
-if sys.argv.count("upgrade"):
+if sys.argv[1] == '-v':
+    sys.stdout.write("""apt 1.2.15 (amd64)
+Supported modules:
+*Ver: Standard .deb
+*Pkg:  Debian dpkg interface (Priority 30)
+ Pkg:  Debian APT solver interface (Priority -1000)
+ S.L: 'deb' Debian binary tree
+ S.L: 'deb-src' Debian source tree
+ Idx: Debian Source Index
+ Idx: Debian Package Index
+ Idx: Debian Translation Index
+ Idx: Debian dpkg status file
+ Idx: Debian deb file
+ Idx: Debian dsc file
+ Idx: Debian control file
+ Idx: EDSP scenario file
+""")
+elif sys.argv.count("upgrade"):
     # Subset of a real run of "apt-get upgrade".
     sys.stdout.write('''NOTE: This is only a simulation!
       apt-get needs root privileges for real execution.
@@ -84,6 +101,7 @@ Inst libx11-6:i386 [2:1.4.99.1-0ubuntu2.2] (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/p
 Conf libx11-data (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [all])
 Conf libx11-6 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [amd64])
 Conf libx11-6:i386 (2:1.4.99.1-0ubuntu2.3 Ubuntu:12.04/precise-updates [i386])
+Inst rudder-agent [4.1.0~rc1-jessie0] (4.1.0-jessie0 release/4.1.0-2 jessie:jessie [amd64])
 ''')
 
 sys.exit(0)

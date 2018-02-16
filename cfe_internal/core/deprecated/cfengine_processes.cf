@@ -92,7 +92,7 @@ bundle agent cfe_internal_processes
 
     restart_cf::
 
-      "Reloaded configuration of all Cfengine components",
+      "Reloaded configuration of all Cfengine components"
       comment => "Alert restarting message",
       handle => "cfe_internal_processes_reports";
 

@@ -1,3 +1,5 @@
+git:
+  depth: 9999
 language: c
 sudo: required
 
@@ -8,7 +10,7 @@ matrix:
     - env: STYLE_CHECK_JOB=1
 
     # JOB 1
-    - env: CF_VERSION=latest
+    - env: CF_VERSION=master
       addons:
         apt:
           sources:
@@ -18,17 +20,28 @@ matrix:
             - cfengine-community
 
     # JOB 2
-    - env: CF_VERSION=lts
+    - env: CF_VERSION=3.10.x
       addons:
         apt:
           sources:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
             - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
-            - cfengine-community=3.7.4-1
+            - cfengine-community=3.10.2-1
+
+    # JOB 3
+    - env: CF_VERSION=3.7.x
+      addons:
+        apt:
+          sources:
+            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+          packages:
+            - cfengine-community=3.7.6-1
 
 
 script:
+- sudo apt-get install -y fakeroot
 - INSTDIR=$HOME/cf_install
 - cd $TRAVIS_BUILD_DIR
 - if [ x$STYLE_CHECK_JOB = x1 ];
@@ -56,6 +69,14 @@ script:
       IS_PRERELEASE=true;
   fi;
   export IS_PRERELEASE
+- cd $TRAVIS_BUILD_DIR/..
+- git clone --depth=1 --branch $CF_VERSION https://github.com/cfengine/core
+- chmod -R go-w .
+- cp core/tests/acceptance/*.cf.sub masterfiles/tests/acceptance/
+- umask 077
+- cd masterfiles/tests/acceptance
+- echo "CORE=$TRAVIS_BUILD_DIR/../core" > ./testall.env
+- DEFRPMVERCMP=/bin/true  ./testall  --printlog  --bindir=/var/cfengine/bin
 
 
 # We deploy when setting tags only, which basically never happens
@@ -75,4 +96,4 @@ deploy:
   on:
     tags: true
     # Avoid upload from all the multiple parallel matrix jobs
-    condition: "$CF_VERSION = latest"
+    condition: "$CF_VERSION = master"

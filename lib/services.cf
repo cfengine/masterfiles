@@ -1,5 +1,5 @@
 ############################################################################
-#  Copyright (C) CFEngine AS
+#  Copyright 2017 Northern.tech AS
 #
 #  This program is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License LGPL as published by the
@@ -203,7 +203,7 @@ bundle agent standard_services(service,state)
 
     chkconfig.SuSE::
       "onboot"
-        expression => returnszero("$(paths.chkconfig) $(service) | $(paths.grep) 'on$' >/dev/null", "usehell"),
+        expression => returnszero("$(paths.chkconfig) $(service) | $(paths.grep) 'on$' >/dev/null", "useshell"),
         comment => "SuSE chkconfig outputs current state to stdout rather than as an exit code";
 
     chkconfig.!SuSE::
@@ -247,7 +247,7 @@ bundle agent standard_services(service,state)
       "action_stop"    expression => "request_stop.service_active.can_stop_service";
       "action_reload"  expression => "request_reload.service_active.can_reload_service";
       "action_restart"         or => {
-                                      "request_restart.service_active",
+                                      "request_restart",
 
                                       # Possibly undesirable... if a reload is
                                       # requested, and the service "can't" be
@@ -371,7 +371,7 @@ bundle agent standard_services(service,state)
     verbose_mode.fallback::
       "$(this.bundle): falling back to classic_services to $(state) $(service)";
 
-    systemd.service_notfound::
+    systemd.service_notfound.(inform_mode|verbose_mode)::
         "$(this.bundle): Could not find service: $(service)";
 }
 

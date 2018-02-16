@@ -47,3 +47,20 @@ Free Swap: {{{vars.mon.value_mem_freeswap}}} MB
 [{{method}}] {{name}}: version {{version}}, arch {{arch}}
 {{/vars.host_info_report_software.packages}}
 {{/classes.show_software}}
+
+## Policy
+
+Information about the policy set on this host.
+
+### Inventory
+
+#### Variables tagged for inventory
+
+{{%vars.host_info_report_inventory.inventory_vars}}
+
+{{#classes.enterprise_edition}}
+### Enterprise maintanance bundles available
+{{#vars.cfe_internal_enterprise_maintenance.enterprise_maintenance_bundles}}
+    {{{.}}}
+{{/vars.cfe_internal_enterprise_maintenance.enterprise_maintenance_bundles}}
+{{/classes.enterprise_edition}}

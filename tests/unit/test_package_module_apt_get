@@ -87,12 +87,16 @@ def check(operation, input, no_lines, expected_output, mock_lines, mock_output):
 
     return True
 
-apt_get_options = "-o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --force-yes"
+apt_get_options = "-o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --allow-downgrades --allow-remove-essential --allow-change-held-packages"
 
-assert check("supports-api-version", [], 1, ["1"], 0, [])
+assert check("supports-api-version", [], 1, ["1"], 1, ["apt-get -v"])
 
-assert check("file-install", ["File=/path/to/pkg"], 0, [], 1, ["dpkg -i /path/to/pkg"])
-assert check("file-install", ["File=/path/to/pkg","File=/path/to/pkg2"], 0, [], 1, ["dpkg -i /path/to/pkg /path/to/pkg2"])
+assert check("file-install", ["File=/path/to/pkg"], 0, [], 3, ["""apt-get -v
+apt-get -v
+dpkg --force-confold --force-confdef -i /path/to/pkg"""])
+assert check("file-install", ["File=/path/to/pkg","File=/path/to/pkg2"], 0, [], 3, ["""apt-get -v
+apt-get -v
+dpkg --force-confold --force-confdef -i /path/to/pkg /path/to/pkg2"""])
 
 assert check("repo-install", ["Name=a\nVersion=1\nArchitecture=x",
                               "Name=b\nArchitecture=y",
@@ -100,7 +104,9 @@ assert check("repo-install", ["Name=a\nVersion=1\nArchitecture=x",
                               "Name=netcat",
                               "Name=netcat\nVersion=3",
                               "Name=d"],
-             0, [], 15, ["""dpkg --print-architecture
+             0, [], 17, ["""apt-get -v
+apt-get -v
+dpkg --print-architecture
 dpkg --print-architecture
 dpkg --print-architecture
 dpkg-query --showformat ${Architecture}=${Status}
@@ -114,22 +120,26 @@ dpkg-query --showformat ${Architecture}=${Status}
 dpkg --print-architecture
 dpkg-query --showformat ${Architecture}=${Status}
  -W d:*
-apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --force-yes install a:x=1 b:y c=3 netcat:amd64 netcat:i386 netcat:amd64=3 netcat:i386=3 d
+apt-get """ + apt_get_options + """ install a:x=1 b:y c=3 netcat:amd64 netcat:i386 netcat:amd64=3 netcat:i386=3 d
 """])
 
 assert check("repo-install", [ "Name=netcat",
                               "options=-qq"],
-             0, [], 4, ["""dpkg --print-architecture
+             0, [], 6, ["""apt-get -v
+apt-get -v
+dpkg --print-architecture
 dpkg-query --showformat ${Architecture}=${Status}
  -W netcat:*
-apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --force-yes -qq install netcat:amd64 netcat:i386
+apt-get """ + apt_get_options + """ -qq install netcat:amd64 netcat:i386
 """])
 
 assert check("remove", ["Name=a\nVersion=1\nArchitecture=x",
                         "Name=b\nArchitecture=y",
                         "Name=c\nVersion=3",
                         "Name=d"],
-             0, [], 9, ["""dpkg --print-architecture
+             0, [], 11, ["""apt-get -v
+apt-get -v
+dpkg --print-architecture
 dpkg --print-architecture
 dpkg --print-architecture
 dpkg-query --showformat ${Architecture}=${Status}
@@ -139,7 +149,7 @@ dpkg-query --showformat ${Architecture}=${Status}
  -W d:*
 apt-get """ + apt_get_options + " remove a:x=1 b:y c=3 d"])
 
-assert check("list-updates", [], 75,
+assert check("list-updates", [], 78,
              ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
               "Name=tzdata-java\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
               "Name=tzdata\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
@@ -164,10 +174,14 @@ assert check("list-updates", [], 75,
               "Name=libx11-data\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=all",
               "Name=libx11-dev\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
               "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
-              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386"],
-             2, ["apt-get " + apt_get_options + " update\napt-get " + apt_get_options + " -s upgrade"])
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386",
+              "Name=rudder-agent\nVersion=4.1.0-jessie0\nArchitecture=amd64"],
+             4, ["""apt-get -v
+apt-get -v
+apt-get """ + apt_get_options + """ update
+apt-get """ + apt_get_options + """ -s upgrade"""])
 
-assert check("list-updates-local", [], 75,
+assert check("list-updates-local", [], 78,
              ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
               "Name=tzdata-java\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
               "Name=tzdata\nVersion=2015d-0ubuntu0.12.04\nArchitecture=all",
@@ -192,20 +206,36 @@ assert check("list-updates-local", [], 75,
               "Name=libx11-data\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=all",
               "Name=libx11-dev\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
               "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=amd64",
-              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386"],
-             1, ["apt-get " + apt_get_options + " -s upgrade"])
+              "Name=libx11-6\nVersion=2:1.4.99.1-0ubuntu2.3\nArchitecture=i386",
+              "Name=rudder-agent\nVersion=4.1.0-jessie0\nArchitecture=amd64"],
+             3, ["""apt-get -v
+apt-get -v
+apt-get """ + apt_get_options + """ -s upgrade"""])
 
 assert check("list-installed", [], 6,
              ["Name=netcat\nVersion=1.2.3.5\nArchitecture=amd64",
               "Name=yum\nVersion=3.2.29-43.el6_5\nArchitecture=all"],
-             5, ["dpkg-query --showformat Status=${Status}\nName=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n -W"])
+             7, ["""apt-get -v
+apt-get -v
+dpkg-query --showformat Status=${Status}
+Name=${Package}
+Version=${Version}
+Architecture=${Architecture}
+ -W"""])
 
 assert check("get-package-data", ["File=/path/to/pkg"], 4,
              ["PackageType=file\nName=file_pkg\nVersion=10.0\nArchitecture=x86_64"],
-             4, ["dpkg-deb --showformat Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n -W /path/to/pkg"])
+             6, ["""apt-get -v
+apt-get -v
+dpkg-deb --showformat Name=${Package}
+Version=${Version}
+Architecture=${Architecture}
+ -W /path/to/pkg"""])
 assert check("get-package-data", ["File=repo_pkg"], 2,
-             ["PackageType=repo\nName=repo_pkg"],
-             0, [])
+             ["""PackageType=repo
+Name=repo_pkg"""],
+             1, ["apt-get -v"])
 assert check("get-package-data", ["File=repo/pkg"], 2,
-             ["PackageType=repo\nName=repo/pkg"],
-             0, [])
+             ["""PackageType=repo
+Name=repo/pkg"""],
+             1, ["apt-get -v"])

@@ -126,11 +126,87 @@ bundle common def
                           not(isvariable("trustkeysfrom"))),
         meta => { "defvar" };
 
+      ## List of the hosts not using the latest protocol that we'll accept connections from
+      ## (absence of this option or empty list means allow none)
+      "control_server_allowlegacyconnects"
+        slist => {},
+        ifvarclass => not( isvariable( "control_server_allowlegacyconnects" ) );
+
+
+      # Executor Controls
+
+      ## Default splaytime to 4 unless it's already defined (via augments)
+      "control_executor_splaytime"
+        string => "4",
+        if => not( isvariable( "control_executor_splaytime" ) ),
+        comment => "Splaytime controls the number of minutes hosts execution
+                    should be splayed over. This value should be less than the
+                    number of minutes between scheduled executions";
+
+      ## Default schedule unless it's already defined (via augments)
+      "control_executor_schedule_value"
+        slist => {
+                   "Min00", "Min05", "Min10", "Min15",
+                   "Min20", "Min25", "Min30", "Min35",
+                   "Min40", "Min45", "Min50", "Min55",
+                 },
+        if => not( isvariable( control_executor_schedule) ),
+        comment => "This variable defines the list of classes that should
+                    trigger exec_command if any of them are defined.";
+
+      # schedule cant use a data structure directly, so we must use an
+      # intermediary variable to convert it to list
+      "control_executor_schedule_value"
+        slist => getvalues(control_executor_schedule),
+        if =>  not( isvariable( control_executor_schedule_value) ),
+        comment => "This variable defines the list of classes that should
+                    trigger exec_command if any of them are defined.";
+
+
       # Agent Controls
+
+      "control_agent_default_repository"
+        string => ifelse( isvariable( "control_agent_default_repository"),
+                          $(control_agent_default_repository),
+                          "$(sys.workdir)/backups"),
+        if => "mpf_control_agent_default_repository";
 
       "control_agent_maxconnections"
         int => "30",
         ifvarclass => not( isvariable( "control_agent_maxconnections" ) );
+
+      # Because in some versions of cfengine bundlesequence in body common
+      # control does not support does not support iteration over data containers
+      # we must first pick out the bundles into a shallow container that we can
+      # then get a regular list from using getvalues().
+
+      "tbse" data => mergedata( "def.control_common_bundlesequence_end" );
+
+      # Since we have @(def.bundlesequence_end) in body common control
+      # bundlesequence we must have a list variable defined. It can be empty, but it
+      # must be defined. If it is not defined the agent will error complaining
+      # that '@(def.bundlesequence_end) is not a defined bundle.
+
+      # As noted in CFE-2460 getvalues behaviour varies between versions. 3.7.x
+      # getvalues will return an empty list when run on a non existant data
+      # container.  On 3.9.1 it does not return an empty list.
+      # So we initialize it as an empty list first to be safe.
+
+      "bundlesequence_end" slist => {};
+      "bundlesequence_end" slist => getvalues( tbse );
+      # Agent controls
+
+      "control_agent_files_single_copy"
+        slist => { },
+        ifvarclass => not( some( ".*", "control_agent_files_single_copy") ),
+        comment => "Default files_single_copy to an empty list if it is not
+                    defined. It is expected that users can override the default
+                    by setting this value from the augments file (def.json).";
+
+      "control_server_maxconnections"
+        int => "200",
+        ifvarclass => not( isvariable( "control_server_maxconnections" ) );
+
 
     debian::
       "environment_vars"
@@ -170,6 +246,14 @@ bundle common def
       comment => "Define plugins path",
       handle => "common_def_vars_dir_plugins";
 
+      "dir_templates"
+        string => ifelse( isvariable( "def.dir_templates"),
+                          $(def.dir_templates),
+                          "$(sys.workdir)/templates"),
+      comment => "Define templates path",
+      handle => "common_def_vars_dir_templates";
+
+
       "cf_apache_user" string => "cfapache",
       comment => "User that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_user";
@@ -205,6 +289,7 @@ bundle common def
         "$(sys.workdir)/outputs/dc-scripts.log",
         "$(sys.workdir)/state/promise_log.jsonl",
         "$(sys.workdir)/state/classes.jsonl",
+        "/var/log/postgresql.log",
       };
 
       "hub_log_files" slist =>
@@ -215,6 +300,7 @@ bundle common def
 
       "max_client_history_size" -> { "cf-hub", "CFEngine Enterprise" }
         int => "50M",
+        unless => isvariable(max_client_history_size),
         comment => "The threshold of report diffs which will trigger purging of
                     diff files.";
 
@@ -242,6 +328,26 @@ bundle common def
     any::
       "cfe_log_dirs" slist => getvalues( log_dir );
 
+  # MPF controls
+
+      "mpf_log_dir_retention"
+        string => "30",
+        if => not( isvariable ( mpf_log_dir_retention ) ),
+        comment => "The default log file retention in cfe_log_dirs is 30 days
+                    unless it's already been defined (augments).";
+
+      "mpf_log_file_retention"
+        string => "10",
+        if => not( isvariable( mpf_log_file_retention) ),
+        comment => "This is the number of rotated versions of mpf log files to
+                    save";
+
+      "mpf_log_file_max_size"
+        string => "1M",
+        if => not( isvariable( mpf_log_file_max_size) ),
+        comment => "When individual mpf log files reach this size they should be
+                    rotated so that we don't fill up the disk";
+
   # Enterprise HA Related configuration
   # enable_cfengine_enterprise_hub_ha is defined below
   # Disabled by default
@@ -252,6 +358,31 @@ bundle common def
 
     !enable_cfengine_enterprise_hub_ha::
       "policy_servers" slist => {"$(sys.policy_hub)"};
+
+    enterprise_edition.policy_server::
+      "control_hub_exclude_hosts"
+        slist => { "" },
+        unless => isvariable(control_hub_exclude_hosts);
+
+      "mpf_access_rules_collect_calls_admit_ips"
+        slist => { @(def.acl) },
+        unless => isvariable(mpf_access_rules_collect_calls_admit_ips);
+
+    enterprise_edition.client_initiated_reporting_enabled::
+      "control_server_call_collect_interval"
+        string => "5",
+        unless => isvariable(control_server_call_collect_interval);
+
+    enterprise_edition.policy_server::
+      "default_data_select_host_monitoring_include"
+        comment => "Most people have monitoring systems, so instead of collecting data people won't use we save the work unless its requested.",
+        slist => { },
+        unless => isvariable( default_data_select_host_monitoring_include );
+
+      "default_data_select_policy_hub_monitoring_include"
+        comment => "Collect all the monitoring data from the hub itself. It can be useful in diagnostics.",
+        slist => { ".*" },
+        unless => isvariable( default_data_select_policy_hub_monitoring_include );
 
   classes:
 
@@ -343,6 +474,9 @@ bundle common def
         comment => "If reports are not collected for an extended period of time
                     the disk may fill up or cause additional collection
                     issues.";
+
+      # Enable paths to POSIX tools instead of native tools when possible.
+      "mpf_stdlib_use_posix_utils" expression => "any";
 
   reports:
     DEBUG|DEBUG_def::
@@ -464,4 +598,8 @@ bundle common inventory_control
       "$(this.bundle): package_refresh module enabled";
     verbose_mode.!disable_inventory_cmdb::
       "$(this.bundle): CMDB module enabled";
+
+    DEBUG|DEBUG_def::
+
+      "Executor Schedule: $(def.control_executor_schedule_value)";
 }

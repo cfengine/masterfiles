@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-#  Copyright (C) CFEngine AS
+#  Copyright 2017 Northern.tech AS
 #
-#  This file is part of CFEngine 3 - written and maintained by CFEngine AS.
+#  This file is part of CFEngine 3 - written and maintained by Northern.tech AS.
 #
 #  This program is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU General Public License as published by the
@@ -69,13 +69,28 @@ fi
 
 . "$TEST_DIR/testall.env"
 
-"$CORE/tests/acceptance/testall" \
-    --agent="$CORE/cf-agent/cf-agent" \
-    --cfpromises="$CORE/cf-promises/cf-promises" \
-    --cfserverd="$CORE/cf-serverd/cf-serverd" \
-    --cfrunagent="$CORE/cf-runagent/cf-runagent" \
-    --cfkey="$CORE/cf-key/cf-key" \
-    --rpmvercmp="$CORE/ext/rpmvercmp" \
-    --include="$TEST_DIR/../../modules" \
-    --baseclasses="AUTO,testing_masterfiles_policy_framework" \
-    "$@"
+
+# We have to execute Core's testall, but also give instructions
+# where the binaries are.
+
+# Common flags
+FLAGS="--include=$TEST_DIR/../../modules --baseclasses=AUTO,DEBUG,EXTRA,testing_masterfiles_policy_framework"
+
+
+# Was --bindir in the arguments?
+if echo -- "$@" | grep '[-][-]bindir' >/dev/null
+then
+    # Arguments are where --bindir points to
+    "$CORE/tests/acceptance/testall" $FLAGS "$@"
+else
+    # Arguments are where Core's checkout is
+    "$CORE/tests/acceptance/testall" \
+        --agent="$CORE/cf-agent/cf-agent" \
+        --cfpromises="$CORE/cf-promises/cf-promises" \
+        --cfserverd="$CORE/cf-serverd/cf-serverd" \
+        --cfrunagent="$CORE/cf-runagent/cf-runagent" \
+        --cfkey="$CORE/cf-key/cf-key" \
+        --cfnet="$CORE/cf-net/cf-net" \
+        --rpmvercmp="$CORE/ext/rpmvercmp" \
+        $FLAGS "$@"
+fi

@@ -11,10 +11,10 @@ body common control
                           "u_cfengine_enterprise",
                           @(u_cfengine_enterprise.def),
                           "cfe_internal_dc_workflow",
-                          "cfe_internal_bins",
                           "cfe_internal_update_policy",
-                          "cfe_internal_update_bins",
+                          "cfengine_internal_standalone_self_upgrade",
                           "cfe_internal_update_processes",
+                          @(update_def.bundlesequence_end), # Define control_common_update_bundlesequnce_end via augments
       };
 
       version => "update.cf $(update_def.current_version)";
@@ -23,12 +23,12 @@ body common control
                   "cfe_internal/update/lib.cf",
                   "cfe_internal/update/systemd_units.cf",
                   @(cfengine_update_controls.update_def_inputs),
-                  "cfe_internal/update/update_bins.cf",
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
                   "cfe_internal/update/cfe_internal_local_git_remote.cf",
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
-                  "cfe_internal/update/update_processes.cf"
+                  "cfe_internal/update/update_processes.cf",
+                  @(update_def.augments_inputs)
       };
 }
 
@@ -36,16 +36,6 @@ body common control
 bundle common cfengine_update_controls
 {
   vars:
-    # 3.6 uses the split controls
-    cfengine_3_6::
-      "update_def_inputs"
-        slist => {
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def.cf",
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/update_def_inputs.cf",
-                 };
-
-    # 3.7+ uses the re-unified controls
-    !cfengine_3_6::
        "update_def_inputs"
         slist => {
                    "controls/update_def.cf",
@@ -55,6 +45,50 @@ bundle common cfengine_update_controls
   reports:
     DEBUG|DEBUG_cfengine_update_controls::
       "DEBUG $(this.bundle): update def inputs='$(update_def_inputs)'";
+}
+
+bundle agent cfengine_internal_standalone_self_upgrade
+# @brief Manage the version of CFEngine that is currently installed. This policy
+# executes a stand alone policy as a sub agent. If systemd is found we assume
+# that it is necessary to escape the current unit via systemd-run.
+{
+  vars:
+
+      "exec_prefix"
+        string => ifelse( isexecutable("/bin/systemd-run"), "/bin/systemd-run --unit=cfengine-upgrade --scope ", # trailing space in commands important
+                          isexecutable( "/usr/bin/systemd-run" ), "/usr/bin/systemd-run --unit=cfengine-upgrade --scope ",
+                          "");
+
+      "desired_pkg_data_path" -> { "ENT-3592" }
+        string => "$(sys.statedir)/MPF/desired-cfengine-package-version.json";
+
+      "desired_pkg_data" -> { "ENT-3592" }
+        data => readjson( $(desired_pkg_data_path) ),
+        if => fileexists( $(desired_pkg_data_path) );
+
+  classes:
+      # If we are running the version desired by the self upgrade policy
+      "at_desired_version" -> { "ENT-3592" }
+        expression => strcmp( "$(desired_pkg_data[version])", "$(sys.cf_version)"  );
+
+      # If we are running the version explicitly defined by the user
+      "at_desired_version" -> { "ENT-3592" }
+        expression => strcmp( "$(def.cfengine_software_pkg_version)", "$(sys.cf_version)" );
+
+  commands:
+
+    trigger_upgrade.!at_desired_version::
+
+      "$(exec_prefix)$(sys.cf_agent)"
+      handle => "standalone_self_upgrade",
+      args => "--inform --timestamp --file $(this.promise_dirname)/standalone_self_upgrade.cf --define trigger_upgrade,update_cf_initiated";
+
+  reports:
+
+    inform_mode|verbose_mode|DEBUG|DEBUG_cfengine_internal_standalone_self_upgrade::
+      "Skipped self upgrade because we are running the desired version $(sys.cf_version)" -> { "ENT-3592" }
+        if => "at_desired_version";
+
 }
 
 body agent control

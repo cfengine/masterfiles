@@ -25,5 +25,153 @@ bundle agent cfe_internal_core_main
       "Enable Core Watchdog"
         usebundle => cfe_internal_core_watchdog("enabled");
 
+    mpf_augments_control_enabled::
+      "mpf_augments_control"
+        usebundle => mpf_augments_control;
 
+}
+
+bundle agent mpf_augments_control
+# @brief Restart cfenigne components when one of the control variables has changed.
+#
+# While the agent itsef will reload its config upon notice of policy change
+# this bundle specifically handles changes to variables used in the MPF which may
+# come from external data sources which are unknown to the components themselves.
+{
+
+@if minimum_version(3.10)
+
+      # This policy leverages variablesmatching_as_data() (available since
+      # 3.10.0) and the -top- mustache extension (available since 3.9.0).
+
+  vars:
+
+      # Variables and their data which might necessitate a component restart
+      "server_controls"   data => variablesmatching_as_data("default:def.control_server_.*");
+      "executor_controls" data => variablesmatching_as_data("default:def.control_executor_.*");
+      "monitor_controls"  data => variablesmatching_as_data("default:def.control_monitor_.*");
+      "hub_controls"      data => variablesmatching_as_data("default:def.control_hub_.*");
+      "runagent_controls" data => variablesmatching_as_data("default:def.control_runagent_.*");
+
+      "common_controls"   data => variablesmatching_as_data("default:def.control_common_.*");
+      "agent_controls"    data => variablesmatching_as_data("default:def.control_agent_.*");
+
+      # Serialized data for tracking state
+      "server_controls_state"   string => string_mustache("{{$-top-}}", server_controls);
+      "executor_controls_state" string => string_mustache("{{$-top-}}", executor_controls);
+      "monitor_controls_state"  string => string_mustache("{{$-top-}}", monitor_controls);
+      "hub_controls_state"      string => string_mustache("{{$-top-}}", hub_controls);
+      "runagent_controls_state" string => string_mustache("{{$-top-}}", runagent_controls);
+
+      "common_controls_state"   string => string_mustache("{{$-top-}}", common_controls);
+      "agent_controls_state"    string => string_mustache("{{$-top-}}", agent_controls);
+
+  files:
+
+      "/var/cfengine/state/mpf_hub_controls"
+        create => "true",
+        edit_line => insert_lines( $(hub_controls_state) ),
+        edit_defaults => empty,
+        classes => results("bundle", "hub_controls" );
+
+      "/var/cfengine/state/mpf_server_controls"
+        create => "true",
+        edit_line => insert_lines( $(server_controls_state) ),
+        edit_defaults => empty,
+        classes => results("bundle", "server_controls" );
+
+      "/var/cfengine/state/mpf_monitor_controls"
+        create => "true",
+        edit_line => insert_lines( $(monitor_controls_state) ),
+        edit_defaults => empty,
+        classes => results("bundle", "monitor_controls" );
+
+      "/var/cfengine/state/mpf_executor_controls"
+        create => "true",
+        edit_line => insert_lines( $(executor_controls_state) ),
+        edit_defaults => empty,
+        classes => results("bundle", "executor_controls" );
+
+      "/var/cfengine/state/mpf_runagent_controls"
+        create => "true",
+        edit_line => insert_lines( $(runagent_controls_state) ),
+        edit_defaults => empty,
+        classes => results("bundle", "runagent_controls" );
+
+      # Note a change in common controls is not expected to trigger any
+      # component restart, its simply tracked for completeness.
+
+      "/var/cfengine/state/mpf_common_controls"
+        create => "true",
+        edit_line => insert_lines( $(common_controls_state) ),
+        edit_defaults => empty,
+        classes => results("bundle", "common_controls" );
+
+    # No need to restart cf-agent it as its not long running. We simply track the details for completeness.
+
+      "/var/cfengine/state/mpf_agent_controls"
+        create => "true",
+        edit_line => insert_lines( $(agent_controls_state) ),
+        edit_defaults => empty,
+        classes => results("bundle", "agent_controls" );
+
+  services:
+
+    systemd::
+
+      "cf-serverd"
+        service_policy => "restart",
+        if => "(server_controls_repaired|runagent_controls_repaired)";
+
+      "cf-monitord"
+        service_policy => "restart",
+        if => "monitor_controls_repaired";
+
+      # Well, this is dangerous we might kill our own agent
+      # "cf-execd"
+      #   service_policy => "restart",
+      #   if => "(execd_controls_repaired|runagent_controls_repaired)";
+
+  processes:
+
+       !systemd::
+
+         "cf-serverd"
+           signals => { "term" },
+           if => "(server_controls_repaired|runagent_controls_repaired)";
+
+         "cf-monitord"
+           signals => { "term" },
+           if => "monitor_controls_repaired";
+
+       # Well, this is dangerous we might kill our own agent
+       #  "cf-execd"
+       #    signals => { "term" },
+       #    if => "(execd_controls_repaired|runagent_controls_repaired)";
+
+@endif
+
+  reports:
+
+    cfengine_3_7|cfengine_3_8|cfengine_3_9::
+      "WARNING: $(this.bundle) is only compatible with cfengine 3.10.0 and greater.";
+      "WARNING: $(this.bundle) Please consider undefining mpf_augments_control_enabled.";
+
+    server_controls_repaired|runagent_controls_repaired::
+      "Should restart cf-serverd because something in its data changed.";
+
+    executor_controls_repaired|runagent_controls_repaired::
+      "Should restart cf-execd because something in its data changed.";
+
+    monitor_controls_repaired::
+      "Should restart cf-monitord because something in its data changed.";
+
+    hub_controls_repaired::
+      "Should restart cf-hub because something in its data changed.";
+
+    DEBUG|DEBUG_mpf_augments_control::
+      "DEBUG $(this.bundle): Common control $(common_controls_state)";
+      "DEBUG $(this.bundle): Agent control $(agent_controls_state)";
+      "DEBUG $(this.bundle): Executor control $(executor_controls_state)";
+      "DEBUG $(this.bundle): Server control $(server_controls_state)";
 }

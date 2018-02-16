@@ -8,6 +8,7 @@ echo
 ########## Trailing Whitespace Check ##########
 
 git ls-files  \
+    |  grep -v 'set_config_values.cf.finish\|set_line_based_config_values.cf.finish'  \
     |  xargs grep --binary-files=without-match -n ' $'
 
 if [ $? = 0 ]

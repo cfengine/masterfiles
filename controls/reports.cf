@@ -1,5 +1,5 @@
 ############################################################################
-#  Copyright (C) CFEngine AS
+#  Copyright 2017 Northern.tech AS
 #
 #  This program is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License LGPL as published by the
@@ -39,7 +39,6 @@
 # the online docs
 #
 
-# For CFEngine Core: 3.6.0 to 3.6.x
 # Reporting bodies
 
 ###################################################
@@ -68,7 +67,7 @@ bundle server report_access_rules
       comment => "Grant $(query_types) reporting query for the hub on the policy server",
       resource_type => "query",
       report_data_select => default_data_select_policy_hub,
-      admit => { @(def.policy_servers) };
+      admit => { "127.0.0.1", @(def.policy_servers) };
 }
 
 body report_data_select default_data_select_host
@@ -80,7 +79,8 @@ body report_data_select default_data_select_host
 {
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
-      monitoring_include => { "" };
+      promise_handle_exclude => { "noreport_.*" };
+      monitoring_include => { @(def.default_data_select_host_monitoring_include) };
 }
 
 body report_data_select default_data_select_policy_hub
@@ -92,5 +92,6 @@ body report_data_select default_data_select_policy_hub
 {
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
-      monitoring_include => { "" };
+      promise_handle_exclude => { "noreport_.*" };
+      monitoring_include => { @(def.default_data_select_policy_hub_monitoring_include) };
 }

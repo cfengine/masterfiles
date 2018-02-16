@@ -15,6 +15,7 @@
 ##################################################################
 
 bundle agent cfe_internal_setup_knowledge
+# @brief Policy related to enterprise hubs
 {
 
   classes:
@@ -23,13 +24,24 @@ bundle agent cfe_internal_setup_knowledge
       # check when updates arrive, new compared to the database
       #
 
+      "ENT_3572" -> { "ENT-3572" }
+        comment => "Hosts with this class need to be sure that the ssl directory
+                    is readable and executable by other users",
+        or => {
+                "enterprise_3_7_3", "enterprise_3_7_4", "enterprise_3_7_5",
+                "enterprise_3_10_0"
+              };
+
   files:
 
+    !mpf_disable_mission_portal_docroot_sync_from_share_gui::
       "$(cfe_internal_hub_vars.docroot)"
       comment => "Copy the basic knowledge base configuration from the installation to doc root",
       handle => "cfe_internal_setup_knowledge_files_doc_root_1",
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI"),
       depth_search => recurse("inf");
+
+    any::
 
       "$(cfe_internal_hub_vars.docroot)"
       comment => "All files in there should be at least 0644",
@@ -108,11 +120,34 @@ bundle agent cfe_internal_setup_knowledge
       create => "true",
       perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group));
 
-      "$(cfe_internal_hub_vars.docroot)/ssl/."
-        depth_search => recurse_basedir("inf"),
+      "$(cfe_internal_hub_vars.docroot)/../ssl/."
         perms => mog("0440", "root", "root" ),
-        comment => "The ssl certificates only need to be readable by root since
-                    the webserver reads them before dropping privileges.";
+        if => not( "ENT_3572" );
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/." -> { "ENT-3572" }
+        perms => mog("0444", "root", "root" ),
+        if => "ENT_3572",
+        comment => "Exported be 0 bytes in some versions if the ssl directory is
+                    not accessible to all users.";
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/private/."
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0440", "root", "root"),
+        comment => "Private keys are secrets and should not be accessible by
+                    anyone other than root.";
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/csr/."
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0440", "root", "root"),
+        comment => "Certificate signing requests, while not secrets do not need to
+                    be readable by others.";
+
+      "$(cfe_internal_hub_vars.docroot)/../ssl/certs/." -> { "ENT-3050", "Mission Portal" }
+        depth_search => recurse_with_base("inf"),
+        perms => mog("0444", "root", "root"),
+        comment => "Certificates need to be read by any user wishing to validate
+                    a request. For example Mission Portals api.";
+
 
       "$(cfe_internal_hub_vars.docroot)/"
         depth_search => recurse_basedir("inf"),
@@ -121,34 +156,36 @@ bundle agent cfe_internal_setup_knowledge
         perms => mog("0440", "root", $(def.cf_apache_group) ),
         comment => ".htaccess files should only be readable by webserver.";
 
+      "$(cfe_internal_hub_vars.docroot)/ldap/config/settings.ldap.php" -> { "ENT-3400" }
+        handle => "cfe_internal_setup_knowledge_files_ldap_config_settings_perms",
+        perms => mog("0600", $(def.cf_apache_user), $(def.cf_apache_group) ),
+        if => fileexists( "$(cfe_internal_hub_vars.docroot)/ldap/config/settings.ldap.php" ),
+        comment => "If the ldap settings are not writeable by
+                    $(def.cf_apache_user) then users will not be able to change
+                    ldap settings.";
+
+
       "$(sys.workdir)/share/GUI/."
         perms => mog("0400", "root", "root" ),
         depth_search => recurse_basedir("inf"),
         comment => "No Mission Portal code in share needs to be accessed by
                     anyone";
 
-}
+      "$(sys.workdir)/." -> { "ENT-3299" }
+        perms => mog("755", "root", "root"),
+        comment => "Ensure that others (like cfpostgres and cfapache) are able
+                    to enter and read from cfengines workdir";
 
-#############################################################################
-
-body action aggregator
-{
-      ifelapsed => "120";
-      expireafter => "240";
-      background => "true";
-}
-
-############################################################################
-
-body file_select folder(regex)
-{
-      leaf_name  => { ".*$(regex)$"};
-      file_result => "leaf_name";
+      "$(sys.workdir)/modules/."
+        perms => mog("755", "root", "root"),
+        comment => "The agent will complain if any other users (group or other)
+                    have write access to the modules directory.";
 }
 
 ############################################################################
 
 body depth_search recurse_basedir(d)
+# @brief Search `d` levels deep including the base dir
 {
       depth => "$(d)";
       include_basedir => "true";
@@ -157,6 +194,7 @@ body depth_search recurse_basedir(d)
 ###########################################################################
 
 body depth_search recurse_basedir_exclude(d)
+# @brief Search `d` levels deep including the base dir but exclude some specific dirs
 {
       depth => "$(d)";
       include_basedir => "true";
@@ -166,13 +204,17 @@ body depth_search recurse_basedir_exclude(d)
 ############################################################################
 
 body file_select cfe_internal_docroot_perms
+# @brief Select files not named `.htacces` or `settings.ldap.php`
 {
-  leaf_name => { "\.htaccess" };
+  leaf_name => { "\.htaccess", "settings.ldap.php" };
+      # htaccess are going the way of the dodo bird
+      # settings.ldap.php permissions are handled explicitly in it's own bundle
   file_result => "!leaf_name";
 }
 
 ############################################################################
 body depth_search recurse_exclude(d)
+# @brief Search to a depth of `d` excluding known directories
 {
       depth => "$(d)";
       exclude_dirs => { "hub" , "graphs", "scripts", "tmp", "logs", "api", "rest", "application", "dc-scripts" };
@@ -180,16 +222,8 @@ body depth_search recurse_exclude(d)
 
 ############################################################################
 
-body process_count check_process(in,out)
-{
-      match_range => "1,1";
-      in_range_define => { "$(in)" };
-      out_of_range_define => { "$(out)" };
-}
-
-############################################################################
-
 body file_select cfe_internal_exclude_sh_pl_scripts
+# @brief select plain files not ending in `.sh` and `.pl`
 {
   leaf_name => { ".*\.sh",".*\.pl"};
   file_types => { "plain" };
@@ -199,6 +233,7 @@ body file_select cfe_internal_exclude_sh_pl_scripts
 ############################################################################
 
 body file_select cfe_internal_sh_pl_scripts
+# @brief select plain files ending in `.sh` and `.pl`
 {
   leaf_name => { ".*\.sh",".*\.pl" };
   file_types => { "plain" };
@@ -208,6 +243,7 @@ body file_select cfe_internal_sh_pl_scripts
 ############################################################################
 
 body file_select cfe_internal_htaccess
+# @brief select files named `.htaccess`
 {
   leaf_name => { "\.htaccess" };
   file_result => "leaf_name";

@@ -1,0 +1,65 @@
+#######################################################
+#
+# Test manage_variable_values_ini
+#
+#######################################################
+
+body common control
+{
+      inputs => { '../../default.cf.sub' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+#######################################################
+
+bundle agent init
+{
+  files:
+      # The tested file "actual" is copied from our seeded starting position.
+      "$(G.testfile).actual"
+      copy_from => local_cp("$(this.promise_filename).start");
+
+     # Next we place the file which we will compare the final result with.
+     "$(G.testfile).expected"
+      copy_from => local_cp("$(this.promise_filename).finish");
+
+}
+
+#######################################################
+
+bundle agent test
+{
+  meta:
+      "test_skip_unsupported" string => "cfengine_3_7";
+
+  vars:
+      "config[metachar_section$][keyone]" string => "1";
+      "config[metachar_section$][keytwo]" string => "valuetwo";
+
+  files:
+      "$(G.testfile).actual"
+      edit_line => manage_variable_values_ini( "test.config", "metachar_section$" );
+
+}
+
+#######################################################
+
+bundle agent check
+{
+
+  methods:
+
+      "check"
+      usebundle => dcs_if_diff( "$(G.testfile).actual", "$(G.testfile).expected",
+                                "pass", "_fail");
+      # Fail the test if any of the files fail.
+
+      "fail"
+        usebundle => dcs_fail( $(this.promise_filename) ),
+        ifvarclass => "$(files)_fail";
+
+    pass::
+      "pass"
+        usebundle => dcs_pass( $(this.promise_filename) );
+
+}

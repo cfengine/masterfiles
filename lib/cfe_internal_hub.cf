@@ -1,5 +1,5 @@
 ############################################################################
-#  Copyright (C) CFEngine AS
+#  Copyright 2017 Northern.tech AS
 #
 #  This program is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License LGPL as published by the
@@ -181,7 +181,6 @@ bundle agent cfe_internal_database_cleanup_reports (settings)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      contain => silent,
       handle => "cf_database_maintain_report_$(settings[$(index)][report])";
 }
 
@@ -196,7 +195,6 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
-      contain => silent,
       handle => "cf_database_maintain_consumer_status";
 }
 
@@ -210,7 +208,6 @@ bundle agent cfe_internal_database_cleanup_diagnostics (settings)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      contain => silent,
       handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
 }
 
@@ -227,11 +224,9 @@ bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
-      contain => silent,
       handle => "cf_database_maintain_promise_log_repaired";
 
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_notkept)\""
-      contain => silent,
       handle => "cf_database_maintain_promise_log_notkept";
 }
 
@@ -248,7 +243,6 @@ bundle agent cfe_internal_database_partitioning()
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
-      contain => silent,
       handle => "cf_database_create_partition_promise_log_$(promise_outcome)";
 }
 

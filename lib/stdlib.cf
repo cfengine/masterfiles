@@ -1,5 +1,5 @@
 ############################################################################
-#  Copyright (C) CFEngine AS
+#  Copyright 2017 Northern.tech AS
 #
 #  This program is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License LGPL as published by the
@@ -48,7 +48,7 @@
 ###################################################
 
 bundle common stdlib_common
-# @ignore
+# @brief Select which parts of the stdlib should be added to inputs
 {
   vars:
 
@@ -83,7 +83,7 @@ bundle common stdlib_common
 }
 
 body file control
-# @ignore
+# @brief Include the standard library files selected to inputs
 {
       inputs => { @(stdlib_common.inputs) };
 }

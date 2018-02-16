@@ -11,15 +11,24 @@
         "my_debian_role": [ "debian.*" ],
         "services_autorun": [ "any" ],
         "cfengine_internal_disable_agent_email": [ "enterprise_edition" ],
-        "cfe_internal_core_watchdog_enabled": [ "any" ]
+        "cfe_internal_core_watchdog_enabled": [ "any" ],
+        "mpf_control_agent_default_repository": [ "any" ]
     },
 
     "inputs": [ "$(sys.libdir)/bundles.cf" ],
     "vars": {
+
+        "control_agent_default_repository": "/var/cfengine/edit_backups",
         "acl": [ ".*$(def.domain)", "$(sys.policy_hub)/16" ],
         "control_agent_maxconnections": 100,
+        "control_common_bundlesequence_end": [ "my_bundle", "my_other_bundle" ],
+        "control_agent_files_single_copy": [ "/etc/.*", "/tmp/special_file" ],
         "input_name_patterns": [ ".*\\.cf",".*\\.dat",".*\\.txt", ".*\\.conf", ".*\\.mustache",
                                  ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
-                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ]
+                                 "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ],
+
+        "dir_templates": "/var/cfengine/templates_tests"
+        }
+
     }
 }

@@ -11,17 +11,6 @@ bundle agent change_management
 {
   vars:
 
-      # windows::
-
-      #  "watch_files" slist =>  {
-      #                          "$(sys.windir)\important.txt",
-      #                          "$(sys.windir)\important2.txt"
-      #                          };
-
-      #  "watch_dirs" slist =>   {
-      #                          "$(sys.workdir)\watch"
-      #                          };
-
     linux::
 
       "watch_files_report_diffs"
@@ -40,10 +29,6 @@ bundle agent change_management
                     reported back to mission portal, only that the file did
                     change.";
 
-      #  "watch_dirs" slist =>   {
-      #                          "/usr",
-      #                          };
-
   files:
 
     linux::
@@ -51,20 +36,16 @@ bundle agent change_management
       "$(watch_files_report_diffs)" -> { "InfoSec" }
         changes => diff,
         handle => "change_management_files_watch_files_report_diffs",
+        ifvarclass => fileexists( $(watch_files_report_diffs) ),
         comment => "Unplanned changes of these files may indicate a security
                     breach.";
 
       "$(watch_files_report_change)" -> { "InfoSec" }
         changes => detect_content_using("sha256"),
+        ifvarclass => fileexists( $(watch_files_report_change) ),
         comment => "Unplanned changes of these files may indicate a security
                     breach. (Diffs are not reported in case those with access
                     to this report should not have access to shadow entries.)";
-
-      #   "$(watch_dirs)"  -> "goal_infosec"
-      #      comment      => "Change detection on important directories",
-      #      pathtype     => "literal",
-      #      changes      => detect_all_change,
-      #      depth_search => recurse("inf");
 
       #######################################################################
       # Redundant cross monitoring for strong `tripwire' ...............

@@ -155,10 +155,11 @@ LogLevel warn
   SSLSessionTickets Off
 
   # OCSP stapling is an extension that aims to improve SSL negotiation
-  # performance while mainting visitor privacy.
+  # performance while mainting visitor privacy. Disabled because of
+  # issues with self signed certs.
 
-  SSLUseStapling on
-  SSLStaplingCache "shmcb:logs/stabling-cache(150000)"
+  SSLUseStapling off
+  # SSLStaplingCache "shmcb:logs/stabling-cache(150000)"
 
   # TLS Compression should be disabled to avoid CRIME
   # https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-4929
@@ -222,9 +223,9 @@ LogLevel warn
 </IfModule>
 
 
-LoadModule php5_module       modules/libphp5.so
-AddHandler php5-script       .php
-AddType    application/x-httpd-php-source php5
+LoadModule php{{{vars.cfe_internal_hub_vars.php_version}}}_module       modules/libphp{{{vars.cfe_internal_hub_vars.php_version}}}.so
+AddHandler php{{{vars.cfe_internal_hub_vars.php_version}}}-script       .php
+AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_version}}}
 
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}">
@@ -272,6 +273,17 @@ AddType    application/x-httpd-php-source php5
     AddType text/csv .csv
     AddType application/pdf .pdf
     AddType application/json .json
+  </IfModule>
+</Directory>
+
+<Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/ldap">
+
+    AllowOverride None
+
+  <IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
   </IfModule>
 </Directory>
 

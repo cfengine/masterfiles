@@ -1,6 +1,15 @@
 bundle agent ha_update
 {
  methods:
+
+  enable_cfengine_enterprise_hub_ha::
+
+      "Hubs have am_policy_hub marker"
+        usebundle => ha_hubs_have_am_policy_hub_marker,
+        comment => "All hubs should have the am_policy_hub marker. This bundle
+                    ensures that standby hubs get this marker even though they are not
+                    bootstrapped to themselves";
+
   enable_cfengine_enterprise_hub_ha.am_policy_hub::
       "share_keys" usebundle => ha_share_hub_keys;
       "sync_hub_data" usebundle => ha_hub_sync;
@@ -13,6 +22,25 @@ bundle agent ha_update
 
   enable_cfengine_enterprise_hub_ha.ha_replication_only_node::
       "syncronize_master_hub_dat" usebundle => sync_master_hub_dat;
+}
+
+bundle agent ha_hubs_have_am_policy_hub_marker
+# @brief Ensure that all ha hub members have the am_policy_hub state marker
+{
+  classes:
+      # We know we need the am_policy_hub marker if any of our ips are found in the ha definition
+      "ha_hub_member" expression => iprange( $(ha_def.ips) );
+
+  files:
+
+    ha_hub_member::
+
+      "$(sys.statedir)/am_policy_hub" -> { "ENT-3328" }
+        create => "true",
+        comment => "This file is automatically created when bootstrapping to
+                    self, but in a clustered environment standby hubs bootstrap to the
+                    primary and this marker will not be automatically created.";
+
 }
 
 bundle agent ha_agent_sync
@@ -67,8 +95,27 @@ bundle agent ha_hub_sync
 }
 
 bundle agent manage_hub_synced_data
+# @brief Manage trust of clients bootstrapped other hubs in cluster
+#
+# Ensures keys collected from other hubs are present in ppkeys so that the
+# agents bootstrapped to other hubs are trusted.
 {
  files:
+
+   # Ensure that localhost.pub and localhost.priv are not in the directory of
+   # keys collected from standby hubs
+
+   "$(ha_def.ppkeys_staging)/localhost.*" -> { "ENT-3303" }
+      delete => tidy,
+      handle => "manage_hub_synced_data_ppkeys_staging_localhost_absent",
+      comment => "We don't want localhost related key files from a standby
+                  server to end up over-writing the active hubs key. That will
+                  cause an identity crisis and trust issues.";
+
+   # Ensure that keys collected from standby hubs are present in this hubs
+   # ppkeys directory so that agents bootstrapped to standby hubs will be
+   # trusted.
+
    "$(sys.workdir)/ppkeys"
       copy_from => ha_update_no_backup_cp("$(ha_def.ppkeys_staging)"),
       file_select => ha_update_plain,
@@ -89,7 +136,6 @@ bundle agent sync_master_hub_dat
       handle => "ha_cfengine_hub_update_master_ip";
 
 }
-
 
 body file_select hub_all_keys
 {

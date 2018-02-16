@@ -26,14 +26,17 @@ body server control
 
       ## List of the hosts not using the latest protocol that we'll accept connections from
       ## (absence of this option or empty list means allow none)
-      # allowlegacyconnects   => { };
+      allowlegacyconnects   => { @(def.control_server_allowlegacyconnects) };
 
       # Maximum number of concurrent connections.
       # Suggested value >= total number of hosts
-      maxconnections        => "200";
+      maxconnections        => "$(def.control_server_maxconnections)";
 
       # Allow connections from nodes which are out-of-sync
       denybadclocks         => "false";
+
+    enterprise_edition.client_initiated_reporting_enabled::
+      call_collect_interval => "$(def.control_server_call_collect_interval)";
 
     !policy_server::
       allowusers            => { "root" };
@@ -48,6 +51,10 @@ body server control
       cfruncommand => "$(def.cf_runagent_shell) -c \'
                            $(sys.cf_agent) -I -D cfruncommand -f $(sys.update_policy_path)  ;
                            $(sys.cf_agent) -I -D cfruncommand";
+
+      # Bind to all interfaces including ipv6
+      # Adding this on windows will force ipv6 only
+      bindtointerface => "::";
 
 }
 
@@ -86,6 +93,17 @@ bundle server access_rules()
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
       admit => { @(def.acl) };
+
+      "$(def.dir_templates)"
+      handle => "server_access_grant_access_templates",
+      shortcut => "templates",
+      comment => "Grant access to templates directory",
+      admit => { @(def.acl) };
+
+      enterprise_edition.policy_server::
+        "collect_calls"
+          resource_type => "query",
+          admit_ips => { @(def.mpf_access_rules_collect_calls_admit_ips) };
 
     !windows::
       "$(def.cf_runagent_shell)"

@@ -32,6 +32,17 @@ body agent control
       # Maximum number of outgoing connections to a remote cf-serverd.
       maxconnections => "$(def.control_agent_maxconnections)";
 
+    mpf_control_agent_default_repository::
+
+      # Location to backup files before they are edited by cfengine
+
+      default_repository => "$(def.control_agent_default_repository)";
+
+      # File patterns which allow a file to be copied over only a single time
+      # per agent run.
+
+      files_single_copy => { @(def.control_agent_files_single_copy) };
+
       # Environment variables based on Distro
 
     debian::

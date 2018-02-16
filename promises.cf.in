@@ -26,6 +26,7 @@ body common control
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
                           main,
                           @(cfengine_enterprise_hub_ha.management_bundles),
+                          @(def.bundlesequence_end),
 
       };
 
@@ -61,12 +62,17 @@ body common control
       # modules in which you MUST provide package modules used to generate
       # software inventory reports. You can also provide global default package module
       # instead of specifying it in all package promises.
-      debian|redhat::
+    debian.!disable_inventory_package_refresh::
           package_inventory => { $(package_module_knowledge.platform_default) };
+
+      # We only define pacakge_invetory on redhat like systems that have a
+      # python version that works with the package module.
+    (redhat|centos|suse).cfe_yum_package_module_supported.!disable_inventory_package_refresh::
+        package_inventory => { $(package_module_knowledge.platform_default) };
+
+    (debian|redhat|suse)::
           package_module => $(package_module_knowledge.platform_default);
 
-      #   goal_categories => { "goals", "targets", "milestones" };
-      #   goal_patterns   => { "goal_.*", "target.*","milestone.*" };
 }
 
 bundle common inventory
@@ -106,6 +112,9 @@ bundle common inventory
     linux.!specific_linux_os::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/os.cf"};
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_os" };
+    aix::
+      "inputs" slist => { "inventory/any.cf", "inventory/generic.cf", "inventory/aix.cf", "inventory/os.cf" };
+      "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_generic", "inventory_aix", "inventory_os" };
     other_unix_os::
       "inputs" slist => { "inventory/any.cf", "inventory/generic.cf", "inventory/os.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_generic", "inventory_os" };
@@ -207,48 +216,7 @@ bundle common cfengine_controls
 # @brief Include various agent control policies
 {
   vars:
-    # 3.7+ uses the re-unified controls
-    cfengine_3_6::
-      "def_inputs"
-        slist => {
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def.cf",
-                   "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/def_inputs.cf",
-                 },
-        comment => "We strictly order the def inputs because they should be parsed first";
 
-      "input[cf_agent]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_agent.cf",
-        comment => "Agent control options";
-
-      "input[cf_execd]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_execd.cf",
-        comment => "Executor (scheduler) control options";
-
-      "input[cf_monitord]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_monitord.cf",
-        comment => "Monitor/Measurement control options";
-
-      "input[cf_serverd]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_serverd.cf",
-        comment => "Server control options";
-
-      "input[cf_runagent]"
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_runagent.cf",
-        comment => "Runagent (remote activation request) control options";
-
-    enterprise_edition.cfengine_3_6::
-
-      "input[cf_hub]" -> { "CFEngine Enterprise" }
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/cf_hub.cf",
-        comment => "Hub (agent report collection) control options";
-
-      "input[reports]" -> { "CFEngine Enterprise" }
-        string => "controls/$(sys.cf_version_major).$(sys.cf_version_minor)/reports.cf",
-        comment => "Report collection options";
-
-
-    # 3.7+ uses the re-unified controls
-    !cfengine_3_6::
       "def_inputs"
         slist => {
                    "controls/def.cf",
@@ -277,7 +245,7 @@ bundle common cfengine_controls
         string => "controls/cf_runagent.cf",
         comment => "Runagent (remote activation request) control options";
 
-    enterprise_edition.!cfengine_3_6::
+    enterprise_edition::
 
       "input[cf_hub]" -> { "CFEngine Enterprise" }
         string => "controls/cf_hub.cf",
@@ -286,7 +254,6 @@ bundle common cfengine_controls
       "input[reports]" -> { "CFEngine Enterprise" }
         string => "controls/reports.cf",
         comment => "Report collection options";
-
 
     any::
 
@@ -303,9 +270,8 @@ bundle common services_autorun
 {
   vars:
     !cfengine_3_7.services_autorun::
-      # Both 3.6 and 3.8+ can use local_libdir
-      # 3.6 will use the split library in the version specific path
-      # 3.8+ will use the common lib as it supports the @if macro
+      # 3.8+ can use local_libdir and will use the common lib as it supports the
+      # @if macro
       "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles

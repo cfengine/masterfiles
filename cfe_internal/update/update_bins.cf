@@ -14,61 +14,7 @@
 #
 ################################################################################
 
-bundle agent cfe_internal_bins
-# @brief Ensure various component binaries and libraries have proper
-# permissions and make sure that symlinks exist in common $PATH for
-# usability.
-{
-  vars:
-    any::
-      "component[cf-agent]"    string => "cf-agent";
-      "component[cf-runagent]" string => "cf-runagent";
-      "component[cf-key]"      string => "cf-key";
-      "component[cf-monitord]" string => "cf-monitord";
-      "component[cf-promises]" string => "cf-promises";
-      "component[cf-serverd]"  string => "cf-serverd";
-
-    enterprise_edition.policy_server::
-      "component[cf-hub]"       string => "cf-hub";
-      "component[cf-consumer]"  string => "cf-consumer";
-
-    any::
-      "agents" slist => getvalues(component);
-
-  files:
-    # TODO: Add support for windows
-    !windows::
-
-      "$(sys.bindir)"
-      comment => "Make sure cfengine binaries have right file permissions",
-      handle => "cfe_internal_bins_files_sys_workdir_bin",
-      perms => u_m("755"),
-      depth_search => u_recurse_basedir("inf"),
-      ifvarclass => and(strcmp($(sys.workdir), "/var/cfengine")),
-      action => u_immediate;
-
-      # Not to be confused with $(sys.libdir) which is for the stdlib
-      "$(sys.workdir)/lib"
-      comment => "Make sure cfengine libraries have right file permissions",
-      handle => "cfe_internal_bins_files_sys_workdir_lib",
-      perms => u_shared_lib_perms,
-      depth_search => u_recurse_basedir("inf"),
-      action => u_immediate;
-
-      "/usr/local/sbin/$(agents)"
-      comment => "Create symlinks of CFE binaries in /usr/local/sbin",
-      handle => canonify("cfe_internal_bins_files_sbin_$(agents)"),
-      move_obstructions => "true",
-      link_from => u_ln_s("$(sys.workdir)/bin/$(agents)");
-
-      "/usr/local/sbin/$(agents).cfsaved"
-      comment => "Remove all .cfsaved file extension",
-      handle => canonify("cfe_internal_bins_files_remove_$(agent)_cfsaved"),
-      delete => u_tidy;
-}
-
 bundle agent cfe_internal_update_bins
-
 {
 
   vars:
@@ -320,26 +266,6 @@ bundle agent cfe_internal_update_bins
       action => u_immediate,
       classes => u_if_repaired("bin_newpkg");
 
-    !am_policy_hub.enterprise.trigger_upgrade.(cfengine_3_6_0|cfengine_3_6_1)::
-      "$(sys.bindir)/cf-upgrade"
-      handle => "cfe_internal_update_bins_files_cf_upgrade_i386_linux",
-      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.i386/cf-upgrade", @(update_def.policy_servers), "$(sys.policy_hub_port)"),
-      perms => u_m("0755"),
-      ifvarclass => "linux.i686",
-      comment => "The cf-upgrade binary that shipped with 3.6.0 and 3.6.1 was
-                  broken, we need to download a working copy so that upgrades
-                  will work on i386 linux";
-
-      "$(sys.workdir)/bin/cf-upgrade"
-      comment => "Copy cf-upgrade binary from policy hub for x86_64 linux",
-      handle => "cfe_internal_update_bins_files_cf_upgrade_x86_64_linux",
-      copy_from => u_rcp("$(master_software_location)/cf-upgrade/linux.x86_64/cf-upgrade", @(update_def.policy_servers), "$(sys.policy_hub_port)"),
-      perms => u_m("0755"),
-      ifvarclass => "linux.x86_64",
-      comment => "The cf-upgrade binary that shipped with 3.6.0 and 3.6.1 was
-                  broken, we need to download a working copy so that upgrades
-                  will work on x86_64 linux";
-
     bin_update_success.enterprise.trigger_upgrade::
 
       "$(local_update_log_dir)/upgraded_binary_from_$(sys.nova_version)"
@@ -406,7 +332,7 @@ bundle edit_line u_backup_script
       "#!/bin/sh
 
 if [ $(const.dollar)1 = \"BACKUP\" ]; then
- tar cfz $(const.dollar)2 $(sys.workdir) > /dev/null
+ tar cfzS $(const.dollar)2 $(sys.workdir) > /dev/null
 fi
 if [ $(const.dollar)1 = \"RESTORE\" ]; then
  tar xfz $(const.dollar)2
@@ -512,6 +438,9 @@ body package_method u_generic(repo)
       package_installed_regex    => ".*"; # all reported are installed
 
       package_file_repositories  => { "$(repo)" };
+      package_version_equal_command => "/usr/bin/dpkg --compare-versions '$(v1)' eq '$(v2)'";
+      package_version_less_command => "/usr/bin/dpkg --compare-versions '$(v1)' lt '$(v2)'";
+
 
     debian.x86_64::
       package_name_convention    => "$(name)_$(version)_amd64.deb";
@@ -548,6 +477,10 @@ body package_method u_generic(repo)
       package_delete_command     => "/bin/rpm -e --nodeps";
       package_verify_command     => "/bin/rpm -V";
       package_noverify_regex     => ".*[^\s].*";
+
+      package_version_less_command => "$(sys.bindir)/rpmvercmp '$(v1)' lt '$(v2)'";
+      package_version_equal_command => "$(sys.bindir)/rpmvercmp '$(v1)' eq '$(v2)'";
+
     (redhat|SuSE|suse)::
       package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 

@@ -1,0 +1,60 @@
+# Tests that the bundles specified in vars control_common_bundlesequence_end
+# are automatically run.
+
+body common control
+{
+      inputs => { "../../default.cf.sub" };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent test
+{
+  vars:
+      # This is bad, see below.
+      "files_to_copy" slist => {
+          "cfe_internal",
+          "controls",
+          "inventory",
+          "lib",
+          "promises.cf",
+          "services",
+          "sketches",
+      };
+
+  files:
+      "$(sys.inputdir)/."
+        create => "true";
+      # Ideally this should be a complete subdir copy, but masterfiles files are
+      # currently mixed with other files, including this directory that we're
+      # in, so we would get an infinitely deep copy in that case.
+      "$(sys.inputdir)/$(files_to_copy)"
+        copy_from => dcs_sync("$(this.promise_dirname)/../../../../$(files_to_copy)"),
+        perms => m(600),
+        depth_search => recurse("inf");
+
+  methods:
+      "" usebundle => file_make("$(sys.inputdir)/secondary.cf", '
+bundle agent x
+{
+  reports:
+    "reporting actuation of bundle x";
+}
+');
+
+      "" usebundle => file_copy("$(this.promise_filename).json", "$(sys.inputdir)/def.json");
+}
+
+#######################################################
+
+bundle agent check
+{
+  vars:
+    #"command" string => "$(sys.cf_agent) -Kf $(sys.inputdir)/promises.cf|$(G.grep) 'R:'";
+    "command" string => "$(sys.cf_agent) -Kf $(sys.inputdir)/promises.cf";
+
+  methods:
+      "" usebundle => dcs_passif_output(".*R: reporting actuation of bundle x.*", "", $(command), $(this.promise_filename));
+}

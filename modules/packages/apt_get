@@ -1,31 +1,20 @@
 #!/bin/sh
-set -e
-PYTHON_BINS="/usr/bin/python /usr/bin/python3"
-PYTHON_BIN=
-
-for python_bin in $PYTHON_BINS;
-do
-	if [ -x $python_bin ];
-	then
-		PYTHON_BIN="$python_bin"
-		break
-	fi
-done
-
-if [ -z $PYTHON_BIN ];
-then
-	"Unable to find python binary"
-	exit 1
-fi
-
-
-$PYTHON_BIN << EOF
+''':'
+# First try to run this script with python3, else run with python
+command -v python3 >/dev/null 2>/dev/null  \
+    && exec python3 "$0" "$@" \
+    || exec python  "$0" "$@"
+'''
 
 import sys
 import os
 import subprocess
 import re
+from distutils.version import LooseVersion
 
+PY3 = sys.version_info > (3,)
+
+dpkg_options = ["--force-confold", "--force-confdef"]
 
 dpkg_cmd = os.environ.get('CFENGINE_TEST_DPKG_CMD', "/usr/bin/dpkg")
 dpkg_deb_cmd = os.environ.get('CFENGINE_TEST_DPKG_DEB_CMD', "/usr/bin/dpkg-deb")
@@ -34,11 +23,26 @@ dpkg_query_cmd = os.environ.get('CFENGINE_TEST_DPKG_QUERY_CMD', "/usr/bin/dpkg-q
 dpkg_output_format = "Name=${Package}\nVersion=${Version}\nArchitecture=${Architecture}\n"
 dpkg_status_format = "Status=${Status}\n" + dpkg_output_format
 
+apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
+
+# Some options only work with specific versions of apt, so we must know the
+# current version in order to do the right thing.
+apt_version = subprocess.Popen([ apt_get_cmd , '-v'],
+    stdout=subprocess.PIPE, universal_newlines=True).communicate()[0]
+apt_version = apt_version.splitlines()[0].split(' ')[1]
+
 apt_get_options = ["-o", "Dpkg::Options::=--force-confold",
                    "-o", "Dpkg::Options::=--force-confdef",
-                   "-y",
-                   "--force-yes"]
-apt_get_cmd = os.environ.get('CFENGINE_TEST_APT_GET_CMD', "/usr/bin/apt-get")
+                   "-y"]
+
+if LooseVersion(apt_version) < LooseVersion("1.1"):
+    apt_get_options.append("--force-yes")
+
+else:
+    # The --force-yes option was deprecated in apt-get 1.1
+    apt_get_options.extend( [ "--allow-downgrades",
+                              "--allow-remove-essential",
+                              "--allow-change-held-packages"])
 
 os.environ['DEBIAN_FRONTEND'] = "noninteractive"
 os.environ['LC_ALL'] = "C"
@@ -139,6 +143,8 @@ def list_installed():
     process = subprocess_Popen([dpkg_query_cmd, "--showformat", dpkg_status_format, "-W"], stdout=subprocess.PIPE)
     installed_package = False
     for line in process.stdout:
+        if PY3:
+            line = line.decode("utf-8")
         line = line.rstrip("\n")
         # The space before "installed" is important, because it can be "not-installed".
         if line.startswith("Status=") and line.split("=", 1)[1].find(" installed") >= 0:
@@ -162,6 +168,8 @@ def list_updates(online):
 
     process = subprocess_Popen([apt_get_cmd] + apt_get_options + ["-s", "upgrade"], stdout=subprocess.PIPE)
     for line in process.stdout:
+        if PY3:
+            line = line.decode("utf-8")
         # Example of lines that we try to match:
         #        (name)  (old version (ignored))  (new version)     (repository(ies) (ignored))  (arch)
         #           |              |                    |                        |                 |
@@ -174,15 +182,18 @@ def list_updates(online):
         # Note multiple repositories in this one:
         #   Inst linux-libc-dev [2.6.32-48squeeze4] (2.6.32-48squeeze6 Debian:6.0.10/oldstable, Debian-Security:6.0/oldoldstable [amd64])
         #
+        # Another example (note the addition of jessie:jessie without a comma):
+        #   Inst rudder-agent [4.1.0~rc1-jessie0] (4.1.0-jessie0 release/4.1.0-2 jessie:jessie [amd64])
+        #
         #                               name                   old version       new version
         #                                 |                         |                 |
         #                         /-------+-------\              /--+--\       /------+-------\
         match = re.match("^Inst\s+(?P<name>[^\s:]+)(?::\S+)?\s+\[[^]\s]+\]\s+\((?P<version>\S+)" +
 
-        #                         repository(ies)                arch (might be optional)
-        #                               |                          |
-        #                    /----------+----------\     /---------+---------\
-                         "\s+[^,\s]+(?:,\s+[^,\s]+)*(\s+\[(?P<arch>[^]\s]+)\])?\).*", line)
+        #                repository(ies)      arch (might be optional)
+        #                       |               |
+        #                    /--+-\   /---------+---------\
+                         "(?:\s+\S+)*?(\s+\[(?P<arch>[^]\s]+)\])?\).*", line)
 
         if match is not None:
             sys.stdout.write("Name=" + match.group("name") + "\n")
@@ -199,6 +210,8 @@ def list_updates(online):
 def get_platform_arch():
     process = subprocess_Popen([dpkg_cmd, "--print-architecture"], stdout=subprocess.PIPE)
     for line in process.stdout:
+        if PY3:
+            line = line.decode("utf-8")
         return line.rstrip()
     return None
 
@@ -217,6 +230,8 @@ def one_package_argument(name, arch, version, is_apt_install):
                                     "-W", name + ":*"],
                                    stdout=subprocess.PIPE, stderr=NULLFILE)
         for line in process.stdout:
+            if PY3:
+              line = line.decode("utf-8")
             # The space before "installed" is important, because it can be "not-installed".
             if "=" in line:
                 arch, stat = line.split("=", 1)
@@ -274,7 +289,9 @@ def package_arguments_builder(is_apt_install):
 
         elif line.startswith("options="):
             global apt_get_options
-            apt_get_options.append(line.split("=", 1)[1].rstrip())
+            option =  line.split("=", 1)[1].rstrip()
+            if option:
+              apt_get_options.append(option)
 
     if name:
         args.extend(one_package_argument(name, arch, version, is_apt_install))
@@ -327,7 +344,7 @@ def remove():
     return ret
 
 def file_install():
-    cmd_line = [dpkg_cmd, "-i"]
+    cmd_line = [dpkg_cmd] + dpkg_options + ["-i"]
 
     found = False
     for line in sys.stdin:
@@ -384,5 +401,3 @@ def main():
         return 2
 
 sys.exit(main())
-
-EOF
