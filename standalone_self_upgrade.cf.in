@@ -72,7 +72,7 @@ bundle common package_module_knowledge
     debian|ubuntu::
       "platform_default" string => "apt_get";
 
-    redhat|centos::
+    redhat|centos|amazon_linux::
       "platform_default" string => "yum";
 }
 bundle common u_common_knowledge
