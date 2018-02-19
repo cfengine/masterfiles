@@ -194,6 +194,17 @@ bundle common def
 
       "bundlesequence_end" slist => {};
       "bundlesequence_end" slist => getvalues( tbse );
+
+      "control_common_ignore_missing_bundles" -> { "CFE-2773" }
+        string => ifelse( strcmp( $(control_common_ignore_missing_bundles), "true" ),
+                          "true",
+                          "false");
+
+      "control_common_ignore_missing_inputs" -> { "CFE-2773" }
+        string => ifelse( strcmp( $(control_common_ignore_missing_inputs), "true" ),
+                          "true",
+                          "false");
+
       # Agent controls
 
       "control_agent_files_single_copy"

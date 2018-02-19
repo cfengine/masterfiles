@@ -129,6 +129,46 @@ Override this bundle by setting `def.mpf_update_policy_bundle` via augments:
 
 - Introduced in 3.12.0
 
+#### ignore_missing_bundles
+
+This option allows you to ignore errors when a bundle specified in body common control bundlesequence is not found.
+
+This example illustrates enabling the option via augments.
+
+```
+{
+  "vars": {
+    "control_common_ignore_missing_bundles": "true"
+  }
+}
+```
+
+**NOTE:** The same augments key is used for both `update.cf` and `promsies.cf` entries.
+
+**History:**
+
+- Introduced in 3.12.0
+
+#### ignore_missing_inputs
+
+This option allows you to ignore errors when a file specified in body common control inputs is not found.
+
+This example illustrates enabling the option via augments.
+
+```
+{
+  "vars": {
+    "control_common_ignore_missing_inputs": "true"
+  }
+}
+```
+
+**NOTE:** The same augments key is used for both `update.cf` and `promsies.cf` entries.
+
+**History:**
+
+- Introduced in 3.12.0
+
 ### Verify update transfers
 
 Enable additional verrification after file transfers during policy update by
@@ -336,6 +376,46 @@ The SMTP server that `cf-execd` should use to send emails.
 
 This is a list of of network ranges that the hub should allow download of policy
 files from.
+
+#### ignore_missing_bundles
+
+This option allows you to ignore errors when a bundle specified in body common control bundlesequence is not found.
+
+This example illustrates enabling the option via augments.
+
+```
+{
+  "vars": {
+    "control_common_ignore_missing_bundles": "true"
+  }
+}
+```
+
+**NOTE:** The same augments key is used for both `update.cf` and `promises.cf` entries.
+
+**History:**
+
+- Introduced in 3.12.0
+
+#### ignore_missing_inputs
+
+This option allows you to ignore errors when a file specified in body common control inputs is not found.
+
+This example illustrates enabling the option via augments.
+
+```
+{
+  "vars": {
+    "control_common_ignore_missing_inputs": "true"
+  }
+}
+```
+
+**NOTE:** The same augments key is used for both `update.cf` and `promises.cf` entries.
+
+**History:**
+
+- Introduced in 3.12.0
 
 #### trustkeysfrom
 

@@ -30,6 +30,11 @@ body common control
                   "cfe_internal/update/update_processes.cf",
                   @(update_def.augments_inputs)
       };
+
+    any::
+        ignore_missing_bundles => "$(update_def.control_common_ignore_missing_bundles)";
+        ignore_missing_inputs => "$(update_def.control_common_ignore_missing_inputs)";
+
 }
 
 #############################################################################
