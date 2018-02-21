@@ -106,7 +106,7 @@ bundle agent manage_hub_synced_data
    # keys collected from standby hubs
 
    "$(ha_def.ppkeys_staging)/localhost.*" -> { "ENT-3303" }
-      delete => tidy,
+      delete => ha_tidy,
       handle => "manage_hub_synced_data_ppkeys_staging_localhost_absent",
       comment => "We don't want localhost related key files from a standby
                   server to end up over-writing the active hubs key. That will
@@ -192,4 +192,11 @@ body copy_from ha_update_no_backup_cp(from)
 {
       source      => "$(from)";
       copy_backup => "false";
+}
+
+body delete ha_tidy
+# @brief Copy of body delete tidy from the standard library
+{
+        dirlinks => "delete";
+        rmdirs   => "true";
 }
