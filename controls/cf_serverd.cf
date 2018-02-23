@@ -42,8 +42,8 @@ body server control
       allowusers            => { "root" };
 
     windows::
-      cfruncommand => "$(sys.cf_agent) -I -D cfruncommand -f \"$(sys.update_policy_path)\"  &
-                       $(sys.cf_agent) -I -D cfruncommand";
+      cfruncommand => "$(sys.cf_agent) -I -D cf_runagent_initiated -f \"$(sys.update_policy_path)\"  &
+                       $(sys.cf_agent) -I -D cf_runagent_initiated";
 
     !windows.!cfengine_3_7::
 
@@ -52,8 +52,8 @@ body server control
       # 3.10.x does not automatically append -I -Dcfruncommand
 
         cfruncommand => "$(def.cf_runagent_shell) -c \'
-                           $(sys.cf_agent) -I -D cfruncommand -f $(sys.update_policy_path)  ;
-                           $(sys.cf_agent) -I -D cfruncommand";
+                           $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
+                           $(sys.cf_agent) -I -D cf_runagent_initiated";
 
     !windows.cfengine_3_7::
 
@@ -61,12 +61,14 @@ body server control
       # policy execution, so we must provide a trailing quote for cfruncommand.
 
       # 3.7.x Automatically appends -I -Dcfruncommand to the cfruncommand. This
-      # results in a benign error about not being allowed to specify inputs for
-      # remote execution.
+      # results in an error about not being allowed to specify inputs for remote
+      # execution from the update policy. In order to preserve the ability for
+      # policy to know its execution provenance we define a different class
+      # `cf_runagent_initiated` that does not elicit the error.
 
         cfruncommand => "$(def.cf_runagent_shell) -c \'
-                           $(sys.cf_agent) -I -D cfruncommand -f $(sys.update_policy_path)  ;
-                           $(sys.cf_agent) -I -D cfruncommand\'";
+                           $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
+                           $(sys.cf_agent) -I -D cf_runagent_initiated\'";
 
 }
 
