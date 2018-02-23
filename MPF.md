@@ -32,6 +32,11 @@ request to expose the tunable into the ```def``` bundle.
 **Note:** `controls/def.cf` contains the defaults and settings for `promises.cf`
 and `controls/update_def.cf` contains the defaults and settings for `update.cf`.
 
+Since 3.7.8, 3.10.4, and 3.12.0 The class `cf_runagent_initated` is defined by
+default in the MPF for agent executions initiated by `cf-runagent` through
+`cf-serverd`. Previously the class `cfruncommand` was defined. See `body server
+control cfruncommand` in `controls/cf_serverd.cf`.
+
 ## Update Policy (update.cf)
 
 Synchronizing clients with the policy server happens here, in
