@@ -60,7 +60,7 @@ bundle common package_module_knowledge
     freebsd::
       "platform_default" string => "pkg";
 
-    redhat::
+    redhat|amazon_linux::
       "platform_default" string => "yum";
 
     suse::
