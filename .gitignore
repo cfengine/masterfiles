@@ -31,3 +31,6 @@ CFVERSION
 
 # vim
 .*.sw[po]
+
+# Atom-IDE
+.ropeproject
