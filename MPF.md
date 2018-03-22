@@ -76,6 +76,29 @@ As is typical for CFEngine, the policy and the configuration are mixed. In
 to `controls/update_def.cf` as you read this. We are skipping the nonessential
 ones.
 
+### Configure upstream masterfiles location for policy update
+
+Want to get your policy from a place other than `/var/cfengine/masterfiles` on
+`sys.policy_hub`?
+
+With an augments like this:
+
+```
+{
+  "vars": {
+            "house": "Gryffindor",
+            "mpf_update_policy_master_location": "/srv/cfengine/$(sys.flavor)/$(def.house)"
+          }
+}
+```
+
+A CentOS 7 host would copy policy from `/srv/cfengine/centos_6/Gryffindor` to
+`$(sys.inputdir)` (commonly `/var/cfengine/inputs**).
+
+**History:**
+
+- Introduced in 3.12.0.
+
 ### Append to inputs used by update policy
 
 You can append to the inputs used by the update policy via augments by defining
