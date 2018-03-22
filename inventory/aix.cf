@@ -76,4 +76,3 @@ bundle agent inventory_aix_oslevel
      "Highest Service Pack: $(oslevel_s)";
      "Highest Technology Level: $(oslevel_r)";
 }
-
