@@ -28,7 +28,5 @@
                                  "cf_promises_release_id", ".*\\.json", ".*\\.yaml", ".*\\.js" ],
 
         "dir_templates": "/var/cfengine/templates_tests"
-        }
-
     }
 }
