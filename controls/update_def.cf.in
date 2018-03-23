@@ -128,6 +128,12 @@ bundle common update_def
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_group";
 
+      "mpf_update_policy_master_location" -> { "ENT-3692" }
+        comment => "Directory where clients should get policy from.",
+        string => ifelse( isvariable( $(def.mpf_update_policy_master_location) ),
+                                      $(def.mpf_update_policy_master_location),
+                          "masterfiles");
+
     # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 

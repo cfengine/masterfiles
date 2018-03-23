@@ -90,12 +90,12 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
 
+      "master_location" -> { "ENT-3692" }
+        string => "$(update_def.master_location)",
+        comment => "The path to request updates from the policy server.",
+        handle => "cfe_internal_update_policy_vars_master_location";
 
     windows::
-
-      "master_location"    string => "/var/cfengine/masterfiles",  # NB! NOT $(sys.workdir) on Windows !
-      comment => "The master CFEngine policy directory on the policy host",
-      handle => "cfe_internal_update_policy_vars_master_location_windows";
 
       "modules_dir"        string => "/var/cfengine/modules",      # NB! NOT $(sys.workdir) on Windows !
       comment => "Directory containing CFEngine modules",
@@ -106,9 +106,6 @@ bundle agent cfe_internal_update_policy_cpv
       handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
 
     !windows::
-      "master_location"    string => "$(sys.masterdir)",
-      comment => "The master CFEngine policy directory on the policy host",
-      handle => "cfe_internal_update_policy_vars_master_location";
 
       "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
       comment => "Directory containing CFEngine modules",
