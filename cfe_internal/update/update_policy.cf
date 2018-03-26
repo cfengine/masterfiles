@@ -91,7 +91,7 @@ bundle agent cfe_internal_update_policy_cpv
       handle => "cfe_internal_update_policy_vars_inputs_dir";
 
       "master_location" -> { "ENT-3692" }
-        string => "$(update_def.master_location)",
+        string => "$(update_def.mpf_update_policy_master_location)",
         comment => "The path to request updates from the policy server.",
         handle => "cfe_internal_update_policy_vars_master_location";
 

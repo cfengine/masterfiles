@@ -128,11 +128,24 @@ bundle common update_def
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_group";
 
+
+      # Hubs get the explicit path because they perform local copies (especially
+      # during bootstrap) when cf-serverd may not be available. Else we use the
+      # "masterfiles" shortcut.
+
+      "mpf_update_policy_master_location" -> { "ENT-3692" }
+        string => ifelse( "am_policy_hub", "/var/cfengine/masterfiles",
+                          "masterfiles");
+
+      # Here we allow the masterfiles location to be overridden via augments. If
+      # augments overides the value, use that. Note: Since hubs do not perform
+      # copies to themselves over cf-serverd, this should be a fully qualified
+      # path or special considerations must be made for hub bootstrapping.
+
       "mpf_update_policy_master_location" -> { "ENT-3692" }
         comment => "Directory where clients should get policy from.",
-        string => ifelse( isvariable( $(def.mpf_update_policy_master_location) ),
-                                      $(def.mpf_update_policy_master_location),
-                          "masterfiles");
+        string => "$(def.mpf_update_policy_master_location)",
+        if => isvariable( $(def.mpf_update_policy_master_location) );
 
     # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
