@@ -184,6 +184,26 @@ bundle common paths
       "path[journalctl]"        string => "/usr/bin/journalctl";
       "path[netctl]"            string => "/usr/bin/netctl";
 
+    coreos::
+
+      "path[awk]"      string => "/usr/bin/awk";
+      "path[cat]"      string => "/usr/bin/cat";
+      "path[cksum]"    string => "/usr/bin/cksum";
+      "path[curl]"     string => "/usr/bin/curl";
+      "path[cut]"      string => "/usr/bin/cut";
+      "path[diff]"     string => "/usr/bin/diff";
+      "path[dig]"      string => "/usr/bin/dig";
+      "path[echo]"     string => "/usr/bin/echo";
+      "path[ip]"       string => "/usr/bin/ip";
+      "path[lsof]"     string => "/usr/bin/lsof";
+      "path[netstat]"  string => "/usr/bin/netstat";
+      "path[ping]"     string => "/usr/bin/ping";
+      "path[printf]"   string => "/usr/bin/printf";
+      "path[sed]"      string => "/usr/bin/sed";
+      "path[sort]"     string => "/usr/bin/sort";
+      "path[test]"     string => "/usr/bin/test";
+      "path[wget]"     string => "/usr/bin/wget";
+
     freebsd|netbsd|openbsd::
 
       "path[awk]"      string => "/usr/bin/awk";
