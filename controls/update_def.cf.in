@@ -216,6 +216,11 @@ bundle common update_def
       # Enable failover to node which is outside cluster
       #"failover_to_replication_node_enabled" expression => "enterprise_edition";
 
+    any::
+      # TODO Remove from MPF after 3.12 EOL
+      "cfconsumer_in_enterprise"  -> { "ENT-2797" }
+        or => { "cfengine_3_7", "cfengine_3_8", "cfengine_3_9", "cfengine_3_10", "cfengine_3_11" };
+
   reports:
     DEBUG|DEBUG_update_def::
       "DEBUG: $(this.bundle)";
