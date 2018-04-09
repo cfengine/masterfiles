@@ -526,6 +526,27 @@ bundle agent cfe_internal_refresh_inventory_view
 
 }
 
+bundle agent cfe_internal_refresh_hosts_view
+# @brief Refresh hosts materialized view every 5 minutes
+{
+  meta:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "tags" slist => { "enterprise_maintenance" };
+
+  commands:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3482" }
+        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks materialized_hosts_view_refresh",
+        comment => "This refreshes the hosts view. If the hosts view is not refreshed then it will contain stale data.",
+        handle  => "mpf_fresh_hosts_view",
+        if => isgreaterthan(countlinesmatching(".*materialized_hosts_view_refresh.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
+
+}
+
 bundle agent cfe_internal_refresh_events_table
 # @brief Refresh materialized view every 5 minutes
 {
