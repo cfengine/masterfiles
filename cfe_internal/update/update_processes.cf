@@ -80,8 +80,16 @@ bundle agent cfe_internal_update_processes
       "agent[cf_postgres]" string => "cf-postgres";
       "agent[cf_runalerts]" string => "cf-runalerts";
       "agent[cf_apache]"   string => "cf-apache";
-      "agent[cf_redis_server]" string => "cf-redis-server";
-      "agent[cf_consumer]" string => "cf-consumer";
+
+    cfredis_in_enterprise::
+      # TODO Remove from MPF after 3.12 EOL
+      "agent[cf_redis_server]" -> { "ENT-2797" }
+        string => "cf-redis-server";
+
+    cfconsumer_in_enterprise::
+      # TODO Remove from MPF after 3.12 EOL
+      "agent[cf_consumer]" -> { "ENT-2797" }
+        string => "cf-consumer";
 
     any::
       # We get a consolidated list of all agents for the executing host.
@@ -226,14 +234,15 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
       ifvarclass => "nova|enterprise";
 
-   am_policy_hub::
-      "$(cfe_internal_process_knowledge.bindir)/redis-server"
+   am_policy_hub.cfredis_in_enterprise::
+      "$(cfe_internal_process_knowledge.bindir)/redis-server" -> { "ENT-2797" }
       restart_class => "start_redis_server",
       comment => "Monitor redis-server process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_redis",
       ifvarclass => "nova|enterprise";
 
-      "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
+    am_policy_hub.cfconsumer_in_enterprise::
+      "$(cfe_internal_process_knowledge.bindir)/cf-consumer" -> { "ENT-2797" }
       restart_class => "start_cf_consumer",
       comment => "Monitor cf-consumer process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_consumer",
@@ -272,9 +281,10 @@ bundle agent maintain_cfe_hub_process
 
   commands:
 
-    !windows.am_policy_hub.start_redis_server::
+    !windows.am_policy_hub.start_redis_server.cfredis_in_enterprise::
+      # TODO Remove from MPF after 3.12 EOL
 
-     "$(cfe_internal_process_knowledge.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)"
+     "$(cfe_internal_process_knowledge.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)" -> { "ENT-2797" }
       contain => u_in_dir("/"),
       comment => "Start redis process",
       classes => u_kept_successful_command,
@@ -287,8 +297,10 @@ bundle agent maintain_cfe_hub_process
       classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
 
-    !windows.am_policy_hub.start_cf_consumer::
-     "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
+    !windows.am_policy_hub.start_cf_consumer.cfconsumer_in_enterprise::
+      # TODO Remove from MPF after 3.12 EOL
+
+      "$(cfe_internal_process_knowledge.bindir)/cf-consumer"
       comment => "Start cf-consumer process",
       classes => u_kept_successful_command,
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf-consumer";
