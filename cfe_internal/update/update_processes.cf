@@ -279,7 +279,7 @@ bundle agent maintain_cfe_hub_process
 
     !windows.am_policy_hub.start_redis_server::
 
-     "$(cfe_internal_process_knowledge.bindir)/redis-server $(cfe_internal_update_policy.redis_conf_file)"
+     "$(cfe_internal_process_knowledge.bindir)/redis-server $(cfe_internal_update_policy_cpv.redis_conf_file)"
       contain => u_in_dir("/"),
       comment => "Start redis process",
       classes => u_kept_successful_command,
