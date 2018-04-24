@@ -133,8 +133,9 @@ bundle agent cfe_autorun_inventory_memory
       meta => { "report" };
 
     enterprise.aix::
-      "total" string => execresult("/usr/bin/lparstat -i | grep 'Online Memory' | awk '{ print $4 }'", "useshell"),
-      meta => { "inventory", "attribute_name=Memory size (MB)" };
+      "total" -> { "CFE-2797", "CFE-2803" }
+        string => execresult("/usr/bin/lparstat -i | awk '/Online Memory/ { print $4 }'", "useshell"),
+        meta => { "inventory", "attribute_name=Memory size (MB)" };
 
 }
 
