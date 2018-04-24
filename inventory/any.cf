@@ -136,15 +136,22 @@ bundle agent cfe_autorun_inventory_memory
 # @brief Inventory the memory (Enterprise only)
 {
   vars:
-    enterprise::
+    enterprise.!aix::
       # due to a Windows issue this is set to 0 there for now
       "total" string => ifelse("windows", "0",
                                $(mon.value_mem_total)),
       meta => { "inventory", "attribute_name=Memory size (MB)" };
 
+    enterprise::
       "free" string => ifelse("windows", "0",
                               $(mon.value_mem_free)),
       meta => { "report" };
+
+    enterprise.aix::
+      "total" -> { "CFE-2797" }
+        string => execresult("/usr/bin/lparstat -i | awk '/Online Memory/ { print $4 }'", "useshell"),
+        meta => { "inventory", "attribute_name=Memory size (MB)" };
+
 }
 
 bundle agent cfe_autorun_inventory_loadaverage
