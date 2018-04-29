@@ -1,6 +1,14 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.4:
+	- Avoid executing self upgrade policy unnecessarily (ENT-3592)
+	- Change class identifying runagent initiated executions from cfruncommand to cf_runagent_initated
+	- Fix cf-runagent during 3.7.x -> 3.10.x migration
+	  (CFE-2776, CFE-2781, CFE-2782)
+	- Improve MPF agent self upgrade docs (ENT-3592)
+	- Localize delete tidy in ha update policy (ENT-3659)
+
 3.10.3:
 	- Add oracle linux support to standalone self upgrade
 	- Fix systemctl path detection
