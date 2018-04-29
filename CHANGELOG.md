@@ -1,6 +1,12 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+## 3.7.8
+ - Fix inventory for total memory on AIX (CFE-2797)
+ - Localize delete tidy in ha update policy (ENT-3659)
+ - Support enablerepo and disablerepo options in yum package_module
+   (CFE-2806)
+
 ## 3.7.7
  - Allow multiple sections in insert_ini_section (CFE-2721)
  - make apt_get package module work with repositories containing spaces in the label
