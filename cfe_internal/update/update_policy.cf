@@ -133,9 +133,14 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "File where Postgres database files will be logging -",
       handle => "cfe_internal_update_policy_postgresdb_log_file";
 
-      "redis_conf_file"  string => translatepath("$(sys.workdir)/config/redis.conf"),
-      comment => "Path to Redis configuration file",
-      handle => "cfe_internal_update_policy_redis_conf_file";
+    cfredis_in_enterprise::
+
+      # TODO Remove from MPF after 3.12 EOL
+
+      "redis_conf_file" -> { "ENT-2797" }
+        string => translatepath("$(sys.workdir)/config/redis.conf"),
+        comment => "Path to Redis configuration file",
+        handle => "cfe_internal_update_policy_redis_conf_file";
 
   classes:
 

@@ -490,6 +490,8 @@ bundle common def
       "mpf_stdlib_use_posix_utils" expression => "any";
 
       # TODO Remove from MPF after 3.12 EOL
+      "cfredis_in_enterprise" -> { "ENT-2797" }
+        or => { "cfengine_3_7", "cfengine_3_8", "cfengine_3_9", "cfengine_3_10", "cfengine_3_11" };
       "cfconsumer_in_enterprise"  -> { "ENT-2797" }
         or => { "cfengine_3_7", "cfengine_3_8", "cfengine_3_9", "cfengine_3_10", "cfengine_3_11" };
 
