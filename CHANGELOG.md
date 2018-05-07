@@ -1,6 +1,130 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.0b1:
+	- Avoid executing self upgrade policy unnecessarily (ENT-3592)
+	- Add amazon_linux class to yum package module
+	- Introduce ability to set policy update bundle via augments (CFE-2687)
+	- Localize delete tidy in ha update policy (ENT-3659)
+	- Improve context notifying user of missing policy update bundle
+	  (ENT-3624)
+	- Configure ignore_missing_inputs and ignore_missing_bundles via augments
+	  (CFE-2773)
+	- Change class identifying runagent initiated executions from cfruncommand to cf_runagent_initated
+	- Support enablerepo and disablerepo options in yum package_module
+	  (CFE-2806)
+	- Fix cf-runagent during 3.7.x -> 3.10.x migration
+	  (CFE-2776, CFE-2781, CFE-2782)
+	- Makes it possible to tune policy master_location via augments in update policy
+	  (ENT-3692)
+	- Fix inventory for total memory on AIX (CFE-2797)
+	- Do not manage redis since it's no longer used (ENT-2797)
+	- Server control maxconnections can be configured via augments
+	  (CFE-2660)
+	- Allow configuration of allowlegacyconnects from augments (ENT-3375)
+	- Fix ability for zypper package_module to downgrade packages
+	- Splaytime in body executor control can now be configured via augments
+	  (CFE-2699)
+	- Add maintenance policy to refresh events table on enterprise hubs
+	  (ENT-3537)
+	- Add apache config for new LDAP API (ENT-3265)
+	- update.cf bundlesequence can be configured via augments (CFE-2521)
+	- Update policy inputs can be extended via augments (CFE-2702)
+	- Add oracle linux support to standalone self upgrade
+	- Add bundle to track component variables to restart when necessary
+	  (CFE-2326)
+	- Retention of files found in log directories can now be configured via augments
+	  (CFE-2539)
+	- Allow multiple sections in insert_ini_section (CFE-2721)
+	- Add lines_present edit_lines bundle
+	- Schedule in body executor control can now be configured via augments
+	  (CFE-2508)
+	- Include scheduled report assets in self maintenance (ENT-3558)
+	- Remove unused body action aggregator and body file_select folder
+	- Remove unused body process_count check_process
+	- Prevent yum from locking in package_methods when possible
+	  (CFE-2759)
+	- Render variables tagged for inventory from agent host_info_report
+	  (CFE-2750)
+	- Make apt_get package module work with repositories containing spaces in the label
+	  (ENT-3438)
+	- Allow hubs to collect from themselves over loopback (ENT-3329)
+	- Log file max size and rotation limits can now be configured via augments
+	  (CFE-2538)
+	- Change: Do not silence Enterprise hub maintenance
+	- Ensure HA standby hubs have am_policy_hub state marker (ENT-3328)
+	- Add support for 32bit rpms in standalone self upgrade (ENT-3377)
+	- Add enterprise maintenance bundles to host info report (ENT-3537)
+	- Removed unnecessary promises for OOTB package inventory
+	- Add external watchdog support for stuck cf-execd (ENT-3251)
+	- Be less noisy when a promised service is not found (CFE-2690)
+	- Ignore empty options in apt_get module (CFE-2685)
+	- Add postgres.log to enterprise log file rotation (ENT-3191)
+	- Removed unnecessary support for including 3.6 controls
+	- Fix systemctl path detection
+	- Policy Release Id is now inventoried by default (CFE-2097)
+	- Fix to frequent logging of enterprise license utilization (ENT-3390)
+	- Maintain access to exported CSV reports in older versions (ENT-3572)
+	- cf-execd service override template now only kills cf-execd on stop
+	  (ENT-3395)
+	- Fix self upgrade for hosts older than 3.7.4 (ENT-3368)
+	- Avoid self upgrade from triggering during bootstrap (ENT-3394)
+	- Add json templates for rendering serial and multiline data (CFE-2713)
+	- Removed unused libraries and controls
+	- Fixed an error in the file_make_mustache_*, incorrect variable name used
+	  (CFE-2714)
+
+3.11.0:
+	- Rename enable_client_initiated_reporting to client_initiated_reporting_enabled
+	- Directories for ubuntu 16 and centos 7 should exist in master_software_updates
+	  (ENT-3136)
+	- Fix: Automatic client upgrades for deb hosts
+	- Add AIX OOTB oslevel inventory (ENT-3117)
+	- Disable package inventory via modules on redhat like systems with unsupported python versions
+	  (CFE-2602)
+	- Make stock policy update more resiliant (CFE-2587)
+	- Configure networks allowed to initiate report collection (client initiated reporting) via augments (#910)
+	  (CFE-2624)
+	- apt_get package module: Fix bug which prevented updates
+	  from being picked up if there was more than one source listed in the
+	  'apt upgrade' output, without a comma in between (CFE-2605)
+	- Enable specification of monitoring_include via augments (CFE-2505)
+	- Configure call_collect_interval from augments (enable_client_initiated_reporting) (#905)
+	  (CFE-2623)
+	- Add templates shortcut (CFE-2582)
+	- Behaviour change: when used with CFEngine 3.10.0 or greater,
+	  bundles set_config_values() and set_line_based() are appending a
+	  trailing space when inserting a configuration option with empty value
+	  (CFE-2466)
+	- Add default report collection exclusion based on promise handle
+	  (ENT-3061)
+	- Fix ability to select INI region with metachars (CFE-2519)
+	- Change: Verify transfered files during policy update
+	- Change select_region INI_section to match end of section or end of file
+	  (CFE-2519)
+	- Add class to enable post transfer verrification during policy updates
+	- Add: prunetree bundle to stdlib
+	  The prunetree bundle allws you to delete files and directories up to a
+	  sepcified depth older than a specified number of days
+	- Do not symlink agents to /usr/local/bin on coreos (ENT-3047)
+	- Add: Ability to set default_repository via augments
+	- Enable settig def.max_client_history_size via augments (CFE-2560)
+	- Change self upgrade now uses standalone policy (ENT-3155)
+	- Fix apt_get package module incorrectly using interactive mode
+	- Add ability to append to bundlesequnece with def.json (CFE-2460)
+	- Enable paths to POSIX tools by default instead of native tools
+	- Remove bundle agent cfe_internal_bins (CFE-2636)
+	- Include previous_state and untracked reports when client clear a buildup of unreported data
+	  (ENT-3161)
+	- Fix command to restart apache on config change (ENT-3134)
+	- cf-serverd listens on ipv4 and ipv6 by default (CFE-528)
+	- FixesMake apt_get module compatible with Ubuntu 16.04 (CFE-2445)
+	- Fix rare bug that would sometimes prevent redis-server from launching
+	- Add oslevel to well known paths (ENT-3121)
+	- Add policy to track CFEngine Enterprise license utilization
+	  (ENT-3186)
+	- Ensure MP SSL Cert is readable (ENT-3050)
+
 3.10.0:
 	- Add: Classes body tailored for use with diff
 	- Change: Session Cookies use HTTPOnly and secure attribtues (ENT-2781)
