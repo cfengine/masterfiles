@@ -63,8 +63,8 @@ bundle common paths
 # {
 # commands:
 #   _stdlib_path_exists_sed::
-#      “$(path[sed])”
-#        args => “-i 's/^M//' $(filename)”
+#      "$(path[sed])"
+#        args => "-i 's/^M//' $(filename)"
 # }
 # ```
 {
