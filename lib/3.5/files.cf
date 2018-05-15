@@ -296,7 +296,7 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
 # Based on set_variable_values_ini
 # Added delete lines section to empty out undefined variable values for INI section
 
-# CAUTION : for it to work nicely, you should use CFEngine with the commit n°3229
+# CAUTION : for it to work nicely, you should use CFEngine with the commit n#3229
 # otherwise you may risk a segfault
 
 #
@@ -371,7 +371,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 # Based on set_variable_values from cfengine_stdlib.cf, modified to
 # use section to define were to write, and to handle commented-out lines.
 
-# CAUTION : for it to work nicely, you should use CFEngine with the commit n°3229
+# CAUTION : for it to work nicely, you should use CFEngine with the commit n#3229
 # otherwise you may risk a segfault
 
 #
