@@ -547,6 +547,27 @@ bundle agent cfe_internal_refresh_hosts_view
 
 }
 
+bundle agent cfe_internal_clear_last_seen_hosts_logs
+# @brief Clear last seen hosts log every 5 minutes
+{
+  meta:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "tags" slist => { "enterprise_maintenance" };
+
+  commands:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3550" }
+        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks clearLastSeenHostsLogs",
+        comment => "This clears the __lastseenhostslogs table. If the __lastseenhostslogs table is not cleared then it will contain unnecessary data.",
+        handle  => "mpf_clear_lastseenhostslogs",
+        if => isgreaterthan(countlinesmatching(".*clearLastSeenHostsLogs.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
+
+}
+
 bundle agent cfe_internal_refresh_events_table
 # @brief Refresh materialized view every 5 minutes
 {
