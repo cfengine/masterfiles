@@ -16,9 +16,9 @@ body hub control
       exclude_hosts => { @(def.control_hub_exclude_hosts) };
       # exclude_hosts => { "192.168.12.21", "10.10", "10.12.*" };
 
-      # cf-hub collects up reports from registered hosts every 5 minutes.
+      # cf-hub initiates a pull collection round if one of the listed classes is defined.
+      hub_schedule => { @(def.control_hub_hub_schedule) };
 
-      # hub_schedule => { "Min00", "Min30", "(Evening|Night).Min45_50" };
       # port => "5308";
 
       # Hub will discard accumulated reports on the clients
