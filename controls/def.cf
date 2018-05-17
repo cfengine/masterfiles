@@ -375,6 +375,13 @@ bundle common def
         slist => { "" },
         unless => isvariable(control_hub_exclude_hosts);
 
+      "control_hub_hub_schedule"
+        comment => "By default Enterprise hubs initiate pull collection once every 5 minutes.",
+        slist  => { "Min00", "Min05", "Min10", "Min15", "Min20",
+                    "Min25", "Min30", "Min35", "Min40", "Min45",
+                    "Min50", "Min55" },
+        unless => isvariable(control_hub_hub_schedule);
+
       "mpf_access_rules_collect_calls_admit_ips"
         slist => { @(def.acl) },
         unless => isvariable(mpf_access_rules_collect_calls_admit_ips);
