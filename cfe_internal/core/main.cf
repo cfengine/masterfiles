@@ -127,6 +127,13 @@ bundle agent mpf_augments_control
         service_policy => "restart",
         if => "monitor_controls_repaired";
 
+    systemd.enterprise_edition.(am_policy_hub|policy_server)::
+
+      "cf-hub"
+        service_policy => "restart",
+        if => "hub_controls_repaired";
+
+
       # Well, this is dangerous we might kill our own agent
       # "cf-execd"
       #   service_policy => "restart",
@@ -143,6 +150,13 @@ bundle agent mpf_augments_control
          "cf-monitord"
            signals => { "term" },
            if => "monitor_controls_repaired";
+
+    systemd.enterprise_edition.(am_policy_hub|policy_server)::
+
+      "cf-hub"
+        signals => { "term" },
+        if => "hub_controls_repaired";
+
 
        # Well, this is dangerous we might kill our own agent
        #  "cf-execd"
