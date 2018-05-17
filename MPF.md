@@ -637,6 +637,23 @@ The default 50M threshold can be configured using an [augments file][Augments], 
 }
 ```
 
+### Enterprise hub pull collection schedule
+
+By default Enterprise hubs initiate pull collection once every 5 minutes. This can be overridden in the MPF by defining `def.control_hub_hub_schedule` as a list of classes that should trigger collection when defined.
+
+Here we set the schedule to initiate pull collection once every 30 minutes via augments.
+```
+{
+  "vars": {
+    "control_hub_hub_schedule": { "Min00", "Min30" }
+  }
+}
+```
+
+**History:**
+
+- MPF override introduced in 3.12.0
+
 ### Exclude hosts from hub initiated report collection
 
 You may want to exclude some hosts like community agents, hosts behind NAT, and
