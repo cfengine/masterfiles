@@ -68,31 +68,31 @@ bundle agent mpf_augments_control
 
   files:
 
-      "/var/cfengine/state/mpf_hub_controls"
+      "$(sys.workdir)$(const.dirsep)state$(const.dirsep)mpf_hub_controls"
         create => "true",
         edit_line => insert_lines( $(hub_controls_state) ),
         edit_defaults => empty,
         classes => results("bundle", "hub_controls" );
 
-      "/var/cfengine/state/mpf_server_controls"
+      "$(sys.workdir)$(const.dirsep)state$(const.dirsep)mpf_server_controls"
         create => "true",
         edit_line => insert_lines( $(server_controls_state) ),
         edit_defaults => empty,
         classes => results("bundle", "server_controls" );
 
-      "/var/cfengine/state/mpf_monitor_controls"
+      "$(sys.workdir)$(const.dirsep)state$(const.dirsep)mpf_monitor_controls"
         create => "true",
         edit_line => insert_lines( $(monitor_controls_state) ),
         edit_defaults => empty,
         classes => results("bundle", "monitor_controls" );
 
-      "/var/cfengine/state/mpf_executor_controls"
+      "$(sys.workdir)$(const.dirsep)state$(const.dirsep)mpf_executor_controls"
         create => "true",
         edit_line => insert_lines( $(executor_controls_state) ),
         edit_defaults => empty,
         classes => results("bundle", "executor_controls" );
 
-      "/var/cfengine/state/mpf_runagent_controls"
+      "$(sys.workdir)$(const.dirsep)state$(const.dirsep)mpf_runagent_controls"
         create => "true",
         edit_line => insert_lines( $(runagent_controls_state) ),
         edit_defaults => empty,
@@ -101,7 +101,7 @@ bundle agent mpf_augments_control
       # Note a change in common controls is not expected to trigger any
       # component restart, its simply tracked for completeness.
 
-      "/var/cfengine/state/mpf_common_controls"
+      "$(sys.workdir)$(const.dirsep)state$(const.dirsep)mpf_common_controls"
         create => "true",
         edit_line => insert_lines( $(common_controls_state) ),
         edit_defaults => empty,
@@ -109,7 +109,7 @@ bundle agent mpf_augments_control
 
     # No need to restart cf-agent it as its not long running. We simply track the details for completeness.
 
-      "/var/cfengine/state/mpf_agent_controls"
+      "$(sys.workdir)$(const.dirsep)state$(const.dirsep)mpf_agent_controls"
         create => "true",
         edit_line => insert_lines( $(agent_controls_state) ),
         edit_defaults => empty,
