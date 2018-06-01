@@ -1,7 +1,7 @@
 # Changelog
 Notable changes to the framework should be documented here
 
-3.12.0b1:
+3.12.0:
 	- Avoid executing self upgrade policy unnecessarily (ENT-3592)
 	- Add amazon_linux class to yum package module
 	- Introduce ability to set policy update bundle via augments (CFE-2687)
@@ -73,6 +73,11 @@ Notable changes to the framework should be documented here
 	- Removed unused libraries and controls
 	- Fixed an error in the file_make_mustache_*, incorrect variable name used
 	  (CFE-2714)
+	- Fix augments control state paths to work on windows (ENT-3839)
+	- Remove templates for deprecated components (ENT-3781)
+	- Replace unicode smartquotes with apostrophe (ENT-3823)
+	- Configure Enterprise hub pull collection schedule via augments
+	  (ENT-3834)
 
 3.11.0:
 	- Rename enable_client_initiated_reporting to client_initiated_reporting_enabled
