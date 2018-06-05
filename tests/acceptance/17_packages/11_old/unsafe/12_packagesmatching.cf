@@ -81,7 +81,19 @@ bundle agent check
     enterprise::
       "ok" and => { "function_ok", "file1_ok", "file2_ok", "file1_size_ok", "file2_size_ok" };
 
+  vars:
+    "file1_content" string => readfile("$(sys.workdir)/state/software_packages.csv");
+    "file2_content" string => readfile("$(sys.workdir)/state/software_patches_avail.csv");
+    "file1_stat" string => filestat("$(sys.workdir)/state/software_packages.csv", "size");
+    "file2_stat" string => filestat("$(sys.workdir)/state/software_patches_avail.csv", "size");
+
   reports:
+    any::
+      "software_packages.csv: |$(file1_content)|";
+      "stat: |$(file1_stat)|";
+    enterprise::
+      "software_patches_avail.csv: |$(file2_content)|";
+      "stat: |$(file2_stat)|";
     DEBUG::
       "packagesmatching: $(test.all_packages[0])";
     DEBUG.!function_ok::
