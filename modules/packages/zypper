@@ -29,6 +29,7 @@ import sys
 import os
 import subprocess
 import re
+from distutils.version import StrictVersion
 
 
 rpm_cmd = os.environ.get('CFENGINE_TEST_RPM_CMD', "/bin/rpm")
@@ -40,18 +41,21 @@ zypper_options = ["--quiet", "-n"]
 
 NULLFILE = open(os.devnull, 'w')
 
-
-# Suse zypper "--oldpackage" option is only supported greater that 1.6.169
-import rpm
-from distutils.version import StrictVersion
-
-ZYPPER_SUPPORTS_OLDPACKAGE=False
-package_zypper = rpm.TransactionSet().dbMatch('name', "zypper").next()
-if StrictVersion(package_zypper['version']) >= StrictVersion("1.6.169"):
-    ZYPPER_SUPPORTS_OLDPACKAGE=True
-
-
 redirection_is_broken_cached = -1
+zypper_supports_oldpackage_cached = -1
+
+def zypper_supports_oldpackage():
+    # Suse zypper "--oldpackage" option is only supported greater that 1.6.169
+    global zypper_supports_oldpackage_cached
+    if zypper_supports_oldpackage_cached == -1:
+        process = subprocess_Popen([zypper_cmd, "-n", "--version"], stdout=subprocess.PIPE)
+        process.wait()
+        package_zypper_version = process.stdout.readline().split(" ", 1)[1].rstrip()
+        if StrictVersion(package_zypper_version) >= StrictVersion("1.6.169"):
+            zypper_supports_oldpackage_cached = 1
+        else:
+            zypper_supports_oldpackage_cached = 0
+    return zypper_supports_oldpackage_cached
 
 def redirection_is_broken():
     # Older versions of Python have a bug where it is impossible to redirect
@@ -326,7 +330,7 @@ def repo_install():
 
         cmd_line = [zypper_cmd] + zypper_options + ["install"]
 
-        if ZYPPER_SUPPORTS_OLDPACKAGE:
+        if zypper_supports_oldpackage():
             cmd_line += ["--oldpackage"]
 
         cmd_line.extend(single_cmd_args)
@@ -354,7 +358,7 @@ def repo_install():
 
             cmd_line = [zypper_cmd] + zypper_options + ["install"]
 
-            if ZYPPER_SUPPORTS_OLDPACKAGE:
+            if zypper_supports_oldpackage():
                 cmd_line += ["--oldpackage"]
 
             cmd_line += block
