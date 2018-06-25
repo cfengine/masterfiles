@@ -200,7 +200,7 @@ bundle agent maintain_cfe_hub_process
 
     am_policy_hub::
 
-      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
+      "file_check"  string => translatepath("$(cfe_internal_update_policy_cpv.inputs_dir)/promises.cf"),
       comment => "Path to a policy file",
       handle => "cfe_internal_maintain_cfe_hub_process_vars_file_check";
 
@@ -293,7 +293,7 @@ bundle agent maintain_cfe_hub_process
       handle => "cfe_internal_maintain_cfe_hub_process_commands_start_redis";
 
     !windows.am_policy_hub.!enable_cfengine_enterprise_hub_ha.start_postgres_server::
-     "$(cfe_internal_process_knowledge.bindir)/pg_ctl -D $(cfe_internal_update_policy.postgresdb_dir) -l $(cfe_internal_update_policy.postgresdb_log) start"
+     "$(cfe_internal_process_knowledge.bindir)/pg_ctl -D $(cfe_internal_update_policy_cpv.postgresdb_dir) -l $(cfe_internal_update_policy_cpv.postgresdb_log) start"
       contain => u_postgres,
       comment => "Start postgres process",
       classes => u_kept_successful_command,
@@ -424,7 +424,7 @@ bundle agent maintain_cfe_windows
 
     windows::
 
-      "file_check"  string => translatepath("$(cfe_internal_update_policy.inputs_dir)/promises.cf"),
+      "file_check"  string => translatepath("$(cfe_internal_update_policy_cpv.inputs_dir)/promises.cf"),
       comment => "Path to a policy file",
       handle => "cfe_internal_maintain_cfe_windows_vars_file_check";
 
