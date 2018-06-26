@@ -494,8 +494,11 @@ bundle agent cfe_internal_enterprise_maintenance
 
     enterprise_edition::
 
+      "enterprise_maintenance_bundles_unsorted"
+        slist => bundlesmatching(".*", "enterprise_maintenance");
+
       "enterprise_maintenance_bundles"
-        slist => sort( bundlesmatching(".*", "enterprise_maintenance"),
+        slist => sort( @(enterprise_maintenance_bundles_unsorted),
                        lex);
 
   methods:
