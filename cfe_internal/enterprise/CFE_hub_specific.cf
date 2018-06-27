@@ -498,13 +498,27 @@ bundle agent cfe_internal_enterprise_maintenance
         slist => bundlesmatching(".*", "enterprise_maintenance");
 
       "enterprise_maintenance_bundles"
-        slist => sort( @(enterprise_maintenance_bundles_unsorted),
+        slist => sort( enterprise_maintenance_bundles_unsorted,
                        lex);
+
+      "enterprise_maintenance_bundle_count"
+        int => length( enterprise_maintenance_bundles );
 
   methods:
 
-    "Enterprise Maintenance"
-      usebundle => $(enterprise_maintenance_bundles);
+      "Enterprise Maintenance"
+        usebundle => $(enterprise_maintenance_bundles),
+        ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+
+  reports:
+
+    "DEBUG|DEBUG_$(this.bundle)"::
+
+      "DEBUG $(this.bundle): $(enterprise_maintenance_bundle_count) CFEngine Enterprise Maintenance Bundles"
+        ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+
+      "DEBUG $(this.bundle): $(enterprise_maintenance_bundles) CFEngine Enterprise Maintenance Bundles"
+        ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
 }
 
 bundle agent cfe_internal_refresh_inventory_view
