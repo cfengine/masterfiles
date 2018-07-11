@@ -353,6 +353,7 @@ body classes state_repaired(x)
 {
       promise_repaired => { "$(x)" };
       persist_time => "10";
+      scope => "namespace";
 }
 
 ##
@@ -366,6 +367,7 @@ body classes enumerate(x)
       promise_repaired => { "mXC_$(x)" };
       promise_kept => { "mXC_$(x)" };
       persist_time => "15";
+      scope => "namespace";
 }
 
 ##
