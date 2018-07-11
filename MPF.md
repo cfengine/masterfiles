@@ -402,8 +402,19 @@ The SMTP server that `cf-execd` should use to send emails.
 
 #### acl
 
-This is a list of of network ranges that the hub should allow download of policy
-files from.
+`def.acl` is a list of of network ranges that should be allowed to connect to cf-serverd. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed. 
+
+Here is an example setting the acl from augments:
+
+```
+{
+  "vars": {
+    "acl": [ "24.124.0.0/16", "192.168.33.0/24" ]
+  }
+}
+```
+
+**See Also:** [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
 
 #### ignore_missing_bundles
 
@@ -752,6 +763,8 @@ For example to allow client initiated reporting for hosts coming from
   }
 }
 ```
+
+**See Also:** [Generic acl](#acl)
 
 ### Configure Enterprise Measurement/Monitoring Collection
 
