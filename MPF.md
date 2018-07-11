@@ -405,6 +405,18 @@ The SMTP server that `cf-execd` should use to send emails.
 This is a list of of network ranges that the hub should allow download of policy
 files from.
 
+Here is an example for configuring via augments.
+```
+{
+  "vars": {
+    "acl": [ "24.124.0.0/16" ]
+  }
+}
+```
+
+This would likely be useful along with allowing collect calls from a network. See [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
+
+
 #### ignore_missing_bundles
 
 This option allows you to ignore errors when a bundle specified in body common control bundlesequence is not found.
@@ -752,6 +764,8 @@ For example to allow client initiated reporting for hosts coming from
   }
 }
 ```
+
+Note: you likely would also need to add this network to the list of networks that the hub allows to download policy from. See [acl](#acl)
 
 ### Configure Enterprise Measurement/Monitoring Collection
 
