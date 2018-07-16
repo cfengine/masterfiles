@@ -764,6 +764,8 @@ For example to allow client initiated reporting for hosts coming from
 }
 ```
 
+**See Also:** [Generic acl](#acl)
+
 ### Configure Enterprise Measurement/Monitoring Collection
 
 Metrics recorded by measurement promises in `cf-monitord` are only collected by
