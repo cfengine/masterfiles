@@ -402,7 +402,7 @@ The SMTP server that `cf-execd` should use to send emails.
 
 #### acl
 
-`def.acl` is a list of of network ranges that should be allowed to connect to cf-serverd. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed. 
+`def.acl` is a list of of network ranges that should be allowed to connect to cf-serverd. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed.
 
 Here is an example setting the acl from augments:
 

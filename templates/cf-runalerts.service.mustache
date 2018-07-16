@@ -1,7 +1,7 @@
 [Unit]
 Description=CFEngine Enterprise SQL Alerts
 After=syslog.target
-ConditionFileIsExecutable={{{vars.sys.bindir}}}/runalerts.php
+ConditionPathExists={{{vars.sys.bindir}}}/runalerts.php
 ConditionFileIsExecutable={{{vars.sys.workdir}}}/httpd/php/bin/php
 
 PartOf=cfengine3.service
@@ -13,7 +13,7 @@ Requires=cf-postgres.service
 Type=simple
 # The cfapache user doesn't have the rights to write to {{{vars.sys.workdir}}}/httpd/php/runalerts_*
 User={{{vars.def.cf_apache_user}}}
-ExecStart={{{vars.sys.bindir}}}/runalerts.php
+ExecStart={{{vars.sys.workdir}}}/httpd/php/bin/php {{{vars.sys.bindir}}}/runalerts.php
 Restart=always
 RestartSec=10
 
