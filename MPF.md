@@ -944,3 +944,27 @@ control lists as necessary. `cf-serverd` will only automatically reload its
 config when it notices a change in *policy*.
 
 **History**: Added in 3.11.
+
+## Recommendations
+
+The MPF includes policy that inspects the system and makes recommendations about
+the configuration of the system. When `cfengine_recommendations_enabled` is
+defined bundles tagged `cfengine_recommendation` are executed in lexical order.
+`cfengine_recommendations_enabled` is defined by default when
+`cfengine_recommendations_disabled` is **not** defined.
+
+To disable cfengine recommendations define `cfengine_recommendations_disabled`.
+
+This snippet disables recommendations via augments.
+
+```
+{
+    "classes": [
+        "cfengine_recommendations_disabled"
+    ]
+}
+```
+
+**History:**
+
+* Recommendations added in 3.12.1

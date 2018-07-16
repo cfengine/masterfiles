@@ -15,6 +15,12 @@
 #
 ##################################################################
 
+body file control
+{
+    cfengine_recommendations_enabled::
+      inputs => { "recommendations.cf" };
+}
+
 bundle agent cfe_internal_management
 {
   vars:
@@ -36,6 +42,9 @@ bundle agent cfe_internal_management
     any::
       "bundles" slist => getindices(policy);
 
+      "recommendation_bundles"
+        slist => sort( bundlesmatching( "cfengine_recommendations" ), lex);
+
   methods:
 
       #
@@ -44,6 +53,9 @@ bundle agent cfe_internal_management
 
       "CFEngine_Internals"
         usebundle => "$(bundles)";
+
+      "CFEngine Recommendations"
+        usebundle => $(recommendation_bundles);
 
   reports:
     DEBUG|DEBUG_cfe_internal_management::
