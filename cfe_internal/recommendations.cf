@@ -1,0 +1,66 @@
+bundle agent postgresql_conf_reccomendations
+# @brief Recommendations about the configuration of postgresql.conf for CFEngine Enterprise Hubs
+{
+  meta:
+
+   (policy_server|am_policy_hub).enterprise_edition::
+
+    "tags" slist => { "cfengine_recommends" };
+
+  vars:
+    "pgsql_conf" string => "/var/cfengine/state/pg/data/postgresql.conf";
+    "pgsql_conf" string => "/tmp/postgresql.conf";
+    "mem_info_source" string => "/proc/meminfo";
+    "mem_info_data" data => data_readstringarray( $(mem_info_source), "", "(:|\s+)", inf, inf);
+
+    "upper" string => "67108864"; # 64 * 1024 * 1024 in KB
+    "lower" string => "3145728"; # 3 * 1024 * 1024 in KB
+
+      "conf[maintenance_work_mem]"
+        string => "2GB",
+        if => isgreaterthan( "$(mem_info_data[MemTotal][1])", $(lower) ),
+        comment => "If we have more than 2GB of memory available then we set the
+        maintenance_work_memory to 2G to improve index creation, and
+        vacuuming. Else we leave the default value.";
+
+      "conf[shared_buffers]"
+        string => "16GB",
+        if => isgreaterthan( "$(mem_info_data[MemTotal][1])", $(upper) );
+
+      "conf[effective_cache_size]"
+        string => "11GB", # 70% of 16GB
+        if => isgreaterthan( "$(mem_info_data[MemTotal][1])", $(upper) );
+
+      "calculated_shared_buffers_MB"
+        string => format( "%d0",
+                          eval( "$(mem_info_data[MemTotal][1]) * 25 / 100 / 1024"));
+
+      "conf[shared_buffers]"
+        string => concat( $(calculated_shared_buffers_MB), "MB"),
+        if => and(
+                   not( isvariable( "conf[maintenance_work_mem]" ) ),
+                   not( isvariable( "conf[shared_buffers]" )));
+
+      "calculated_effective_cache_size_MB"
+        string => format( "%d0",
+                          eval( "$(mem_info_data[MemTotal][1]) * 70 / 100 / 1024"));
+
+      "conf[effective_cache_size]"
+        string => concat( $(calculated_effective_cache_size_MB), "MB"),
+        if => and(
+                   not( isvariable( "conf[maintenance_work_mem]" ) ),
+                   not( isvariable( "conf[effective_cache_size]" )));
+
+  files:
+      "$(pgsql_conf)"
+        edit_line => set_line_based("$(this.bundle).conf", "=", "\s*=\s*", ".*", "\s*#\s*"),
+        action => warn_only;
+
+  reports:
+      "CFEngine Recommended Settings:";
+      "shared_buffers = $(conf[shared_buffers])";
+      "effective_cache_size = $(conf[effective_cache_size])";
+      "maintenance_work_mem = $(conf[maintenance_work_mem])";
+      "$(pgsql_conf) contains:"
+        printfile => cat( $(pgsql_conf) );
+}
