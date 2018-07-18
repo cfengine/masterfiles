@@ -404,6 +404,9 @@ bundle common def
 
   classes:
 
+      "cfengine_recommendations_enabled"
+        expression => "!cfengine_recommendations_disabled";
+
       ### Enable special features policies. Set to "any" to enable.
 
       # Auto-load files in "services/autorun" and run bundles tagged "autorun".
