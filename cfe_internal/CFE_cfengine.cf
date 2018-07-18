@@ -55,7 +55,8 @@ bundle agent cfe_internal_management
         usebundle => "$(bundles)";
 
       "CFEngine Recommendations"
-        usebundle => $(recommendation_bundles);
+        usebundle => $(recommendation_bundles),
+        if => isvariable( recommendation_bunldes );
 
   reports:
     DEBUG|DEBUG_cfe_internal_management::
