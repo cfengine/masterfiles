@@ -109,6 +109,7 @@ bundle agent cfengine_software
 
     aix::
       "pkg_name" string => "cfengine.cfengine-nova";
+      "pkg_arch" string => "default";
 
       # TODO ENT-3187
     solaris|solarisx86::
