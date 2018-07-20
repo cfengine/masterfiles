@@ -155,8 +155,10 @@ bundle agent cfengine_software
       "$(sys.statedir)/MPF/."
         create => "true";
 
+      "$(sys.statedir)/MPF/desired-cfengine-package-version.json"
+        create => "true";
+
       "$(sys.statedir)/MPF/desired-cfengine-package-version.json" -> { "ENT-3592", "ENT-3937" }
-        create => "true",
         edit_line => cfengine_software_version_data;
 }
 
