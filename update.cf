@@ -68,7 +68,7 @@ bundle agent cfengine_internal_standalone_self_upgrade
         string => "$(sys.statedir)/MPF/desired-cfengine-package-version.json";
 
       "desired_pkg_data" -> { "ENT-3592" }
-        data => readjson( $(desired_pkg_data_path) ),
+        data => readjson( $(desired_pkg_data_path), inf ),
         if => fileexists( $(desired_pkg_data_path) );
 
   classes:
