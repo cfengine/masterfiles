@@ -307,7 +307,7 @@ bundle agent cfengine_software_version_packages1
 
       "local_software_dir" string => "$(cfengine_software.local_software_dir)";
 
-      "version"
+      "desired_version"
         string => ifelse("linux", "$(cfengine_software.pkg_version)-$(cfengine_software.pkg_release)",
                          "aix", "$(cfengine_software.pkg_version).0",
                          $(cfengine_software.pkg_version) ),
@@ -396,7 +396,7 @@ bundle agent cfengine_software_version_packages1
         package_policy => "update",
         package_select => "==",
         package_architectures => { "$(cfengine_software.pkg_arch)" },
-        package_version => "$(version)",
+        package_version => "$(desired_version)",
         package_method => u_generic( $(cfengine_software.local_software_dir) ),
         classes => u_if_else("bin_update_success", "bin_update_fail");
 
