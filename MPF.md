@@ -886,16 +886,15 @@ Example enabling the class from an [augments file][Augments]:
 
 **Note**: This feature is not enabled by default.
 
-If the class `cfe_internal_core_watchdog_enabled` is defined the mustache template `templates/cfengine_watchdog.mustache` is rendered to `/etc/cron.d/cfengine_watchdog`.
+If the class `cfe_internal_core_watchdog_enabled` is defined, the feature is
+enabled and the watchdog will be active. If the class
+`cfe_internal_core_watchdog_disabled` is defined, the feature is disabled and
+the watchdog will not be active.
 
 By default if enabled the watchdog tries to remediate the following conditions:
 
 - If `cf-execd` is executable and there is no `cf-execd` process running, then
   `cf-execd` will be launched.
-
-- If there are more than 0 `cf-execd` processes running, but the
-  `promise_summary.log` has not been updated in the last 30 minutes all
-  `cf-execd** processes are killed, and the service is re-started.
 
 **History:**
 
