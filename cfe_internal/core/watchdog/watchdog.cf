@@ -17,9 +17,18 @@ bundle agent cfe_internal_core_watchdog(state)
       "use_cfe_internal_core_watchdog_cron_d"
         expression => "have_cron_d._stdlib_has_path_pgrep";
 
+      # We use the aix specific watchdog implementation when it's aix and we are
+      # not using the cron.d implementation.
+
+      "use_cfe_internal_core_watchdog_aix"
+        expression => "!use_cfe_internal_core_watchdog_cron_d.aix";
+
   methods:
     use_cfe_internal_core_watchdog_cron_d::
       "any" usebundle => cfe_internal_core_watchdog_cron_d( $(state) );
+
+    use_cfe_internal_core_watchdog_aix::
+      "any" usebundle => cfe_internal_core_watchdog_aix( $(state) );
 
   reports:
     DEBUG|DEBUG_cfe_internal_core_watchdog::
@@ -27,8 +36,80 @@ bundle agent cfe_internal_core_watchdog(state)
       "DEBUG $(this.bundle): Invalid state '$(state)' only enabled|disabled allowed"
         ifvarclass => "invalid_state";
 
-    !use_cfe_internal_core_watchdog_cron_d::
-      "WARNING $(this.bundle): Currently only supports /etc/cron.d on systems that have pgrep in the the stdlib paths bundle.";
+    !(use_cfe_internal_core_watchdog_cron_d|aix)::
+      "WARNING $(this.bundle): Currently only supports /etc/cron.d on systems that have pgrep in the the stdlib paths bundle and AIX hosts.";
+}
+
+bundle agent cfe_internal_core_watchdog_aix(state)
+# @brief Manage watchdog state on aix
+# @param state enabled|disabled
+# - When enabled a cron job will be present to start cf-execd if it's not running.
+# - When disabled cron jobs including the the text CFEngine watchdog will not be present.
+{
+  classes:
+    any::
+
+      # Define a class for whatever the desired state is
+
+      "$(state)"
+        expression => "any";
+
+  vars:
+      "my_statedir" string => "$(sys.statedir)/MPF/$(this.bundle)";
+
+  commands:
+
+      # We need to know about the current crontab before making any changes
+
+      "/usr/bin/crontab -l > $(my_statedir)/root-crontab"
+        handle => "aix_crontab_get_state",
+        if => isdir( "$(my_statedir)" ),
+        contain => in_shell_and_silent;
+
+  files:
+
+    enabled::
+
+      # We need a place to track state for processing changes to cron entries
+      # with proper signaling.
+
+      "$(my_statedir)/."
+        create => "true";
+
+      # The watchdog script takes care of detecting conditions and launching
+      # necessary components.
+
+      "$(sys.bindir)/watchdog"
+        create => "true",
+        template_method => "mustache",
+        perms => mog( "700", "root", "system" ),
+        edit_template => "$(this.promise_dirname)/templates/watchdog.mustache";
+
+      # When enabled we make sure there is a cron entry to execute the watchdog
+      # script.
+
+      "$(my_statedir)/root-crontab"
+        create => "true",
+        edit_line => lines_present( "* * * * * $(sys.bindir)/watchdog # CFEngine watchdog"),
+        classes => results( "bundle", "root_crontab" ),
+        depends_on => { "aix_crontab_get_state" };
+
+    disabled::
+
+      "$(my_statedir)/root-crontab"
+        edit_line => delete_lines_matching(".*CFEngine watchdog"),
+        classes => results( "bundle", "root_crontab" ),
+        depends_on => { "aix_crontab_get_state" };
+
+  commands:
+
+    root_crontab_repaired::
+
+      # We use crontab to load the desired entries so that crond will be
+      # signaled and the changes will be respected.
+
+      "/usr/bin/crontab $(my_statedir)/root-crontab";
+
 }
 
 bundle agent cfe_internal_core_watchdog_cron_d(state)
