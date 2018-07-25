@@ -44,7 +44,7 @@ bundle agent cfe_internal_core_watchdog_aix(state)
 # @brief Manage watchdog state on aix
 # @param state enabled|disabled
 # - When enabled a cron job will be present to start cf-execd if it's not running.
-# - When disabled cron jobs including the the text CFEngine watchdog will not be present.
+# - When disabled cron jobs ending with `# CFEngine watchdog` will not be present.
 {
   classes:
     any::
@@ -88,6 +88,7 @@ bundle agent cfe_internal_core_watchdog_aix(state)
       # When enabled we make sure there is a cron entry to execute the watchdog
       # script.
 
+      # NOTE The text `# CFEngine watchdog` is used to locate the specific entry in cron when disabling
       "$(my_statedir)/root-crontab"
         create => "true",
         edit_line => lines_present( "* * * * * $(sys.bindir)/watchdog # CFEngine watchdog"),
@@ -97,7 +98,7 @@ bundle agent cfe_internal_core_watchdog_aix(state)
     disabled::
 
       "$(my_statedir)/root-crontab"
-        edit_line => delete_lines_matching(".*CFEngine watchdog"),
+        edit_line => delete_lines_matching(".*# CFEngine watchdog"),
         classes => results( "bundle", "root_crontab" ),
         depends_on => { "aix_crontab_get_state" };
 
