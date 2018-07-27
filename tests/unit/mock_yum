@@ -34,3 +34,4 @@ firefox.i386                        24.5.0-1.el5.centos                updates
 firefox.x86_64                      24.5.0-1.el5.centos                updates
     firefox.x86_64                  17.0.6-1.el5.centos                installed
 ''')
+    sys.exit(100)
