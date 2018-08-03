@@ -197,13 +197,13 @@ bundle common def
         "$(sys.workdir)/cf_repair.log",
         "$(sys.workdir)/state/cf_value.log",
         "$(sys.workdir)/outputs/dc-scripts.log",
-        "/var/log/postgresql.log",
       };
 
       "hub_log_files" slist =>
       {
         "$(sys.workdir)/httpd/logs/access_log", # Mission Portal
         "$(sys.workdir)/httpd/logs/error_log", # Mission Portal
+        "/var/log/postgresql.log",
       };
 
       "max_client_history_size" -> { "cf-hub", "CFEngine Enterprise" }
