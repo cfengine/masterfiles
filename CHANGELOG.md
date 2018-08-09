@@ -1,6 +1,11 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.7.9:
+	- Remove more smartquotes (ENT-3823)
+	- Replace unicode smartquotes with apostrophe (ENT-3823)
+	- Specify scope => "namespace" when using persistent classes (CFE-2860)
+
 ## 3.7.8
  - Fix inventory for total memory on AIX (CFE-2797)
  - Localize delete tidy in ha update policy (ENT-3659)
