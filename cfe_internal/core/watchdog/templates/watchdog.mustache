@@ -1,0 +1,8 @@
+#!/usr/bin/sh
+
+# If cf-execd is present and executable, and there is no cf-execd process running, then launch it.
+
+[ -x {{{vars.sys.cf_execd}}} ] && if ! ( ps -ef | grep -q {{{vars.sys.bindir}}}/[c]f-execd ); then
+  {{{vars.sys.cf_execd}}}
+fi
+
