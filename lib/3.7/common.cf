@@ -241,7 +241,7 @@ body classes if_ok(x)
 ##
 
 body classes if_ok_cancel(x)
-# @brief Cancel the class `x` if the promise ks kept or repaired
+# @brief Cancel the class `x` if the promise is kept or repaired
 # @param x The name of the class that should be cancelled
 {
       cancel_repaired => { "$(x)" };
