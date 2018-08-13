@@ -179,7 +179,7 @@ assert check("list-updates", [], 78,
              4, ["""apt-get -v
 apt-get -v
 apt-get """ + apt_get_options + """ update
-apt-get """ + apt_get_options + """ -s upgrade"""])
+apt-get """ + apt_get_options + """ --simulate --ignore-hold upgrade"""])
 
 assert check("list-updates-local", [], 78,
              ["Name=dpkg\nVersion=1.16.1.2ubuntu7.6\nArchitecture=amd64",
@@ -210,7 +210,7 @@ assert check("list-updates-local", [], 78,
               "Name=rudder-agent\nVersion=4.1.0-jessie0\nArchitecture=amd64"],
              3, ["""apt-get -v
 apt-get -v
-apt-get """ + apt_get_options + """ -s upgrade"""])
+apt-get """ + apt_get_options + """ --simulate --ignore-hold upgrade"""])
 
 assert check("list-installed", [], 6,
              ["Name=netcat\nVersion=1.2.3.5\nArchitecture=amd64",
