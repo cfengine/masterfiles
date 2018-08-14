@@ -941,10 +941,6 @@ body package_method u_generic(repo)
 
       package_add_command        => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine.cfengine-nova > /dev/null$";
       package_update_command     => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine.cfengine-nova > /dev/null$";
-
-      # package_add_command        => "/bin/sh -c /usr/sbin/inutoc $(repo) && /usr/sbin/installp -qacgXNYd $(repo) cfengine.cfengine-nova$";
-      # package_update_command     => "/bin/sh -c /usr/sbin/inutoc $(repo) && /usr/sbin/installp -qacgXNYd $(repo) cfengine.cfengine-nova$";
-
       package_delete_command     => "/usr/sbin/installp -ug cfengine.cfengine-nova$";
 
 }
