@@ -939,13 +939,12 @@ body package_method u_generic(repo)
       package_name_convention    => "$(name)-$(version).bff";
       package_delete_convention  => "$(name)";
 
-      package_add_command        => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IqacgXNY -d $(repo) cfengine.cfengine-nova$";
-      package_update_command     => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IqacgXNY -d $(repo) cfengine.cfengine-nova$";
-
-      # package_add_command        => "/bin/sh -c /usr/sbin/inutoc $(repo) && /usr/sbin/installp -qacgXNYd $(repo) cfengine.cfengine-nova$";
-      # package_update_command     => "/bin/sh -c /usr/sbin/inutoc $(repo) && /usr/sbin/installp -qacgXNYd $(repo) cfengine.cfengine-nova$";
-
-      package_delete_command     => "/usr/sbin/installp -ug cfengine.cfengine-nova$";
+      # Redirecting the output to '/dev/null' below makes sure 'geninstall' has
+      # its stdout open even if the 'cf-agent' process that started it
+      # terminates (e.g. gets killed).
+        package_add_command        => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine.cfengine-nova > /dev/null$";
+        package_update_command     => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine.cfengine-nova > /dev/null$";
+        package_delete_command     => "/usr/sbin/installp -ug cfengine.cfengine-nova$";
 
 }
 
