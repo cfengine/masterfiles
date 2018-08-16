@@ -1,6 +1,13 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.5:
+	- Replace unicode smartquotes with apostrophe (ENT-3823)
+	- Fix unattended self upgrade on AIX (ENT-3972)
+	- Also list  packages updates for hold packages: (CFE-2855)
+	- apt_get package module includes held packages when listing updates
+	  (CFE-2855)
+
 3.10.4:
 	- Avoid executing self upgrade policy unnecessarily (ENT-3592)
 	- Change class identifying runagent initiated executions from cfruncommand to cf_runagent_initated
