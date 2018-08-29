@@ -93,7 +93,7 @@ With an augments like this:
 ```
 
 A CentOS 7 host would copy policy from `/srv/cfengine/centos_6/Gryffindor` to
-`$(sys.inputdir)` (commonly `/var/cfengine/inputs**).
+`$(sys.inputdir)` (commonly `/var/cfengine/inputs`).
 
 **History:**
 
