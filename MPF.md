@@ -592,6 +592,27 @@ Example definition in augments file:
 }
 ```
 
+### Configure users allowed to initate execution via cf-runagent
+
+cf-serverd only allows specified users to request unscheduled execution remotely via cf-runagent.
+
+By default the MPF allows `root` to request unscheduled execution of non policy servers and does not allow any users to request unscheduled execution from policy servers.
+
+To configure the list of users allowed to request unscheduled execution from non policy servers define `vars.control_server_allowusers_non_policy_server`. This example allows the users `hubmanager` and  `cfoperator` to request unscheduled execution from policy servers and no users are allowed to request unscheduled runs from non policy servers.
+
+```
+{
+  "vars": {
+    "control_server_allowusers_non_policy_server": [ ],
+    "control_server_allowusers_policy_server": [ "hubmanager", "cfoperator" ]
+  }
+}
+```
+
+**History:**
+
+- Added in 3.13.0, 3.12.1
+
 ### Configure retention for files in log directories
 
 By default the MPF rotates managed log files when they reach 1M in size. To configure this limit via augments define `vars.mpf_log_file_max_size`.
