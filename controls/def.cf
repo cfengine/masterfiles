@@ -133,6 +133,15 @@ bundle common def
         ifvarclass => not( isvariable( "control_server_allowlegacyconnects" ) );
 
 
+      # Users authorized to request executions via cf-runagent
+      "control_server_allowusers_non_policy_server"
+        slist => { "root" },
+        ifvarclass => not( isvariable( "control_server_allowusers_non_policy_server" ) );
+
+      "control_server_allowusers_policy_server"
+        slist => {},
+        ifvarclass => not( isvariable( "control_server_allowusers_non_policy_server" ) );
+
       # Executor Controls
 
       ## Default splaytime to 4 unless it's already defined (via augments)

@@ -38,8 +38,13 @@ body server control
     enterprise_edition.client_initiated_reporting_enabled::
       call_collect_interval => "$(def.control_server_call_collect_interval)";
 
+    # The MPF provides different variables for configuring which users are
+    # allowed to initiate execution via cf-runagent.
     !policy_server::
-      allowusers            => { "root" };
+      allowusers => { @(def.control_server_allowusers_non_policy_server) };
+
+    policy_server::
+        allowusers => { @(def.control_server_allowusers_policy_server) };
 
     windows::
       cfruncommand => "$(sys.cf_agent) -I -D cf_runagent_initiated -f \"$(sys.update_policy_path)\"  &
