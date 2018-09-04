@@ -195,7 +195,7 @@ do
     MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $j | sed -e 's/\.in$//'`"
 done
 
-for i in cfe_internal controls inventory lib services sketches/meta
+for i in cfe_internal controls inventory lib services
 do
     for j in `find "$srcdir/$i" -name '*.cf'`
     do

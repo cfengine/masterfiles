@@ -147,57 +147,6 @@ bundle agent cfe_internal_update_folders
 
 }
 
-##################################################################
-#
-# cfe_internal_apache_sudoer
-#  - permit apache user to run passwordless sudo to cf-runagent
-#
-##################################################################
-
-bundle agent cfe_internal_apache_sudoer
-# @brief Ensure that cfapache user can run cf-runagent with elevated privledges
-{
-  classes:
-
-    !windows::
-
-      "sudoers_exists" expression => fileexists("/etc/sudoers"),
-      comment => "Check if there is /etc/sudoers",
-      handle => "cfe_internal_apache_sudoer_vars_linux_sudoers_exists";
-
-      #
-
-  files:
-
-    sudoers_exists.cfengine_internal_sudoers_editing_enable::
-
-      "/etc/sudoers"
-      comment => "Permit Apache user to run passwordless sudo cf-runagent",
-      handle => "cfe_internal_apache_sudoer_files_etc_sudoer",
-      edit_line => apache_sudoer;
-
-  reports:
-    (DEBUG|DEBUG_cfengine_internal_apache_sudoer).!cfengine_internal_sudoers_editing_enable::
-      "DEBUG $(this.bundle): Editing of the sudoers file is disabled. The Apache user
-       may not be able to run passwordless sudo cf-runagent";
-}
-
-#
-
-bundle edit_line apache_sudoer
-# @brief Ensure that the cfapache user can run cf-runagent as root without a password
-{
-  insert_lines:
-
-    linux::
-
-      "$(def.cf_apache_user) ALL=(ALL) NOPASSWD:$(sys.bindir)/cf-runagent *"
-      comment => "Add Apache user to run passwordless sudo cf-runagent",
-      handle => "apache_sudoer_insert_lines";
-}
-
-
-
 bundle agent cfe_internal_php_runalerts
 # @brief Manage the runalerts service.
 #

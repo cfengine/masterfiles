@@ -469,12 +469,6 @@ bundle common def
 
       "cfengine_internal_preserve_permissions" expression => "!any";
 
-      # Allow the hub to edit sudoers in order for the Apache user to
-      # run passwordless sudo cf-runagent. Enable this if you want the
-      # Mission Portal to be able to troubleshoot failed Design Center
-      # sketch activations on a host.
-      "cfengine_internal_sudoers_editing_enable" expression => "!any";
-
       # Class defining which versions of cfengine are (not) supported
       # by this policy version.
       # Also note that this policy will only be run on enterprise policy_server

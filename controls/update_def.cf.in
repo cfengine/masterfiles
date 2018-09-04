@@ -105,14 +105,10 @@ bundle common update_def
       meta => { "defvar" };
 
       "dc_scripts" string => "$(sys.workdir)/httpd/htdocs/api/dc-scripts",
-      comment => "Directory where design center scripts are located on Enterprise Hub";
+      comment => "Directory where VCS scripts are located on Enterprise Hub";
 
       "DCWORKFLOW" string => "/opt/cfengine",
-      comment => "Directory where DC Workflow related things are stored";
-
-      "masterfiles_staging" string => "$(DCWORKFLOW)/masterfiles_staging",
-      comment => "Directory where Mission Portal Design Center
-                  activations are staged for commit to upstream repository";
+      comment => "Directory where VCS related data things is stored";
 
       "local_masterfiles_git" string => "$(DCWORKFLOW)/masterfiles.git",
       comment => "Local bare git repository, serves as OOTB upstream repo";

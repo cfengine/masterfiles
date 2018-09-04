@@ -27,10 +27,6 @@ bundle agent cfe_internal_enterprise_main
       handle => "cfe_internal_management_setup_knowledge",
       comment => "Manage CFE Knowledge Map";
 
-      "hub" usebundle => cfe_internal_apache_sudoer,
-      handle => "cfe_internal_management_apache_sudoer",
-      comment => "Permit Apache user to run passwordless sudo cf-runagent";
-
       "hub" usebundle => cfe_internal_php_runalerts,
       handle => "cfe_internal_management_php_runalerts",
       comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
