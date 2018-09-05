@@ -84,13 +84,13 @@ bundle agent cronjob(commands,user,hours,mins)
 # ```
 {
   vars:
-    suse::
+    suse|sles::
       "crontab" string => "/var/spool/cron/tabs";
     redhat|fedora::
       "crontab" string => "/var/spool/cron";
     freebsd::
       "crontab" string => "/var/cron/tabs";
-    !(suse|redhat|fedora|freebsd)::
+    !(suse|sles|redhat|fedora|freebsd)::
       "crontab" string => "/var/spool/cron/crontabs";
 
     any::

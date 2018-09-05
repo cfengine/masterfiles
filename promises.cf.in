@@ -67,10 +67,10 @@ body common control
 
       # We only define pacakge_invetory on redhat like systems that have a
       # python version that works with the package module.
-    (redhat|centos|suse|amazon_linux).cfe_yum_package_module_supported.!disable_inventory_package_refresh::
+    (redhat|centos|suse|sles|amazon_linux).cfe_yum_package_module_supported.!disable_inventory_package_refresh::
         package_inventory => { $(package_module_knowledge.platform_default) };
 
-    (debian|redhat|suse|amazon_linux)::
+    (debian|redhat|suse|sles|amazon_linux)::
           package_module => $(package_module_knowledge.platform_default);
 
     any::
@@ -92,7 +92,7 @@ bundle common inventory
 {
   classes:
       "other_unix_os" expression => "!windows.!macos.!linux.!freebsd";
-      "specific_linux_os" expression => "redhat|debian|suse";
+      "specific_linux_os" expression => "redhat|debian|suse|sles";
 
   vars:
       # This list is intended to grow as needed
@@ -102,7 +102,7 @@ bundle common inventory
     redhat::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/redhat.cf", "inventory/os.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_redhat", "inventory_os" };
-    suse::
+    suse|sles::
       "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/suse.cf", "inventory/os.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_suse", "inventory_os" };
     windows::

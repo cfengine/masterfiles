@@ -589,7 +589,7 @@ bundle agent cfe_autorun_inventory_packages
     # exists. As package modules become available the package_methods should be
     # removed.
 
-    suse::
+    suse|sles::
       "cfe_internal_non_existing_package"
       package_policy => "add",
       package_method => inventory_zypper($(refresh)),
@@ -607,7 +607,7 @@ bundle agent cfe_autorun_inventory_packages
       package_method => emerge,
       action => if_elapsed_day;
 
-    !redhat.!debian.!gentoo.!suse.!aix::
+    !redhat.!debian.!gentoo.!(suse|sles).!aix::
       "cfe_internal_non_existing_package"
       package_policy => "add",
       package_method => generic,
