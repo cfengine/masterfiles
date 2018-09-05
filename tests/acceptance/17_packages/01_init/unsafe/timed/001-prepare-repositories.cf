@@ -45,7 +45,7 @@ body contain useshell
 bundle agent repositories
 {
   vars:
-    suse::
+    suse|sles::
       "repo_file" string => "/etc/zypp/repos.d/test-repository.repo";
       "repos" slist => { "rpm_repo" };
     redhat::
@@ -81,7 +81,7 @@ bundle agent repositories
         depth_search => recurse("inf"),
         file_select => not_test_source;
 
-    suse::
+    suse|sles::
       "/etc/zypp/repos.d"
         delete => tidy,
         depth_search => recurse("inf"),
@@ -97,7 +97,7 @@ body file_select not_test_source
 bundle edit_line repository
 {
   insert_lines:
-    redhat|suse::
+    redhat|suse|sles::
       "[test-repository]";
       "name=Test repository";
       "baseurl=file:///test-repos/rpm_repo";
@@ -178,7 +178,7 @@ bundle agent dpkg_multiarch
 bundle agent update
 {
   commands:
-    suse::
+    suse|sles::
       "zypper ref"
         contain => useshell,
         classes => if_successful("update_ok");

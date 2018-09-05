@@ -16,14 +16,14 @@ bundle common p
     "name[2]" string => "test-package-$(distinct_name[2])";
     "name[3]" string => "test-package-$(distinct_name[3])";
 
-    redhat|suse::
+    redhat|suse|sles::
       "ext" string => "rpm";
       "delim" string => "-";
     debian::
       "ext" string => "deb";
       "delim" string => "_";
 
-    redhat|suse::
+    redhat|suse|sles::
       "64_bit" string => "x86_64";
     debian::
       "64_bit" string => "amd64";
@@ -39,7 +39,7 @@ bundle common p
       "version[1]" string => "1.0-1";
       "version[2]" string => "1.0-2";
 
-    redhat|suse::
+    redhat|suse|sles::
       "package[$(packages)][$(versions)][$(archs)]"
         string => "$(p.resources)/rpm_repo/$(name[$(packages)])-$(version[$(versions)]).$($(archs)).rpm";
     debian::
@@ -77,11 +77,11 @@ bundle agent clear_packages(key)
       "output_sink" string => "> $(G.dev_null) 2>&1";
 
   commands:
-    redhat|suse::
+    redhat|suse|sles::
       "$(paths.path[rpm]) -e --allmatches $(p.name[$(p.packages)]) $(output_sink)"
         contain => in_shell,
         comment => $(key);
-    debian::
+    debian|sles::
       "$(paths.path[dpkg]) --purge $(p.name[$(p.packages)]):$(p.$(p.archs)) $(output_sink)"
         contain => in_shell,
         comment => $(key);
@@ -100,7 +100,7 @@ bundle agent install_package(package_name, package_version, package_arch, key)
       "output_sink" string => "> $(G.dev_null) 2>&1";
 
   commands:
-    redhat|suse::
+    redhat|suse|sles::
       "$(paths.path[rpm]) -U --force $(p.resources)/rpm_repo/$(package_name)-$(package_version).$(package_arch).rpm $(output_sink)"
         contain => in_shell,
         comment => $(key);
