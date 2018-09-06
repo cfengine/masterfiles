@@ -14,11 +14,24 @@
 #  - some agent bundles are in CFE_hub_specific.cf
 #
 ##################################################################
+bundle agent cfe_internal_management_file_control
+{
+  vars:
+
+      "inputs" slist => { };
+
+    cfengine_recommendations_enabled::
+      "input[cfengine_recommendations]"
+        string => "$(this.promise_dirname)/recommendations.cf";
+
+    any::
+      "inputs" slist => getvalues( input );
+}
 
 body file control
 {
     cfengine_recommendations_enabled::
-      inputs => { "recommendations.cf" };
+      inputs => { @(cfe_internal_management_file_control.inputs) };
 }
 
 bundle agent cfe_internal_management
