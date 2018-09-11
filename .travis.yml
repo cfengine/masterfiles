@@ -13,7 +13,7 @@ matrix:
         apt:
           sources:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
-            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+              key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
             - cfengine-community
 
@@ -23,7 +23,7 @@ matrix:
         apt:
           sources:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
-            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+              key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
             - cfengine-community=3.10.2-1
 
@@ -33,7 +33,7 @@ matrix:
         apt:
           sources:
             - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
-            - key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+              key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
           packages:
             - cfengine-community=3.7.6-1
 
