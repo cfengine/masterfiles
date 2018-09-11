@@ -25,7 +25,6 @@ bundle agent test
           "lib",
           "promises.cf",
           "services",
-          "sketches",
       };
 
   files:

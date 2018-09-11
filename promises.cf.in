@@ -15,9 +15,6 @@ body common control
                           def,
                           @(cfengine_enterprise_hub_ha.classification_bundles),
 
-                          # Design Center
-                          cfsketch_run,
-
                           # autorun system
                           services_autorun,
                           @(services_autorun.bundles),
@@ -36,10 +33,6 @@ body common control
 
                 # Inventory policy
                   @(inventory.inputs),
-
-                 # Design Center
-                  "sketches/meta/api-runfile.cf",
-                  @(cfsketch_g.inputs),
 
                  # CFEngine internal policy for the management of CFEngine itself
                   @(cfe_internal_inputs.inputs),
