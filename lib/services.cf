@@ -582,7 +582,7 @@ bundle agent classic_services(service,state)
       "pattern[varnish]"          string => ".*varnish.*";
       "pattern[wpa_supplicant]"   string => ".*wpa_supplicant.*";
 
-    suse::
+    suse|sles::
 
       "baseinit[mysql]"           string => "mysqld";
       "pattern[mysql]"            string => ".*mysqld.*";

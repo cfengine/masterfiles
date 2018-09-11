@@ -61,7 +61,7 @@ bundle agent test
             package_method => yum_rpm,
             classes => test_set_class("pass","fail");
 
-        suse::
+        suse|sles::
 
             "$(package_name)"
             package_policy => "addupdate",
@@ -87,7 +87,7 @@ bundle agent check
 
     classes:
 
-        redhat|suse::
+        redhat|suse|sles::
             "has_pkg" expression => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
 
         debian::

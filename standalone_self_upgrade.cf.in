@@ -122,7 +122,7 @@ bundle agent cfengine_software
         comment => "On debian hosts it's the standard to use 'amd64' instead of
                    'x86_64' in package architectures.";
 
-    (redhat|centos|suse).32_bit::
+    (redhat|centos|suse|sles).32_bit::
       "pkg_arch"
         string => "i386",
         comment => "i686 is the detected architecture, but the package is
@@ -295,7 +295,7 @@ bundle agent cfengine_software_version_packages1
 {
   classes:
 
-      "cf_upgrade" expression => "(redhat|suse|debian|solaris|solarisx86).!(am_policy_hub|policy_server)";
+      "cf_upgrade" expression => "(redhat|suse|sles|debian|solaris|solarisx86).!(am_policy_hub|policy_server)";
 
   vars:
 
@@ -629,7 +629,7 @@ bundle edit_line u_install_script
 {
   insert_lines:
 
-    redhat|suse::
+    redhat|suse|sles::
 
       "#!/bin/sh
 
@@ -806,7 +806,7 @@ body package_method u_generic(repo)
     debian::
         package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
-    redhat|SuSE|suse::
+    redhat|SuSE|suse|sles::
 
         package_changes => "individual";
 
@@ -832,14 +832,14 @@ body package_method u_generic(repo)
         package_version_less_command => "$(sys.bindir)/rpmvercmp '$(v1)' lt '$(v2)'";
         package_version_equal_command => "$(sys.bindir)/rpmvercmp '$(v1)' eq '$(v2)'";
 
-    (redhat|SuSE|suse)::
+    (redhat|SuSE|suse|sles)::
         package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     redhat.!redhat_4::
         package_list_update_command => "/usr/bin/yum --quiet check-update";
     redhat_4::
         package_list_update_command => "/usr/bin/yum check-update";
-    SuSE|suse::
+    SuSE|suse|sles::
         package_list_update_command => "/usr/bin/zypper list-updates";
 
     windows::
