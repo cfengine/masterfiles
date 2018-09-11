@@ -33,7 +33,7 @@ bundle agent postgresql_conf_reccomendations
 
       "calculated_shared_buffers_MB"
         string => format( "%d0",
-                          eval( "$(mem_info_data[MemTotal][1]) * 25 / 100 / 1024"));
+                          eval( "$(mem_info_data[MemTotal][1]) * 25 / 100 / 1024"), "math", "infix");
 
       "conf[shared_buffers]"
         string => concat( $(calculated_shared_buffers_MB), "MB"),
@@ -43,7 +43,7 @@ bundle agent postgresql_conf_reccomendations
 
       "calculated_effective_cache_size_MB"
         string => format( "%d0",
-                          eval( "$(mem_info_data[MemTotal][1]) * 70 / 100 / 1024"));
+                          eval( "$(mem_info_data[MemTotal][1]) * 70 / 100 / 1024"), "math", "infix");
 
       "conf[effective_cache_size]"
         string => concat( $(calculated_effective_cache_size_MB), "MB"),

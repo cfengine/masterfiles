@@ -45,7 +45,7 @@ bundle agent init
             package_policy => "add",
             package_method => apt_get;
 
-        redhat|suse::
+        redhat|suse|sles::
 
             "$(package_name)"
             package_policy => "add",
@@ -66,7 +66,7 @@ bundle agent test
             package_policy => "delete",
             classes => test_set_class("pass","fail");
 
-    redhat|suse::
+    redhat|suse|sles::
         "$(package_name)"
         package_policy => "delete",
         classes => test_set_class("pass","fail");
@@ -89,7 +89,7 @@ bundle agent check
     classes:
         debian::
             "not_has_pkg" not => returnszero("dpkg -l | grep ' $(test.package_name) ' > /dev/null", "useshell");
-        redhat|suse::
+        redhat|suse|sles::
             "not_has_pkg" not => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
 
         any::
