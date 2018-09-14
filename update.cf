@@ -24,7 +24,6 @@ body common control
                   "cfe_internal/update/systemd_units.cf",
                   @(cfengine_update_controls.update_def_inputs),
                   "cfe_internal/update/cfe_internal_dc_workflow.cf",
-                  "cfe_internal/update/cfe_internal_local_git_remote.cf",
                   "cfe_internal/update/cfe_internal_update_from_repository.cf",
                   "cfe_internal/update/update_policy.cf",
                   "cfe_internal/update/update_processes.cf",
