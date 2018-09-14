@@ -159,7 +159,7 @@ bundle agent cfe_internal_php_runalerts
 
       "runalerts_types"
         comment => "Runalerts is run for different types of alerts",
-        slist => { "sketch", "sql" };
+        slist => { "sql" };
 
       "runalerts_script" string => "$(sys.bindir)/runalerts.php",
       comment => "location of php runalerts script",
@@ -190,18 +190,6 @@ bundle agent cfe_internal_php_runalerts
       "sql[running]"     string => "20",
       comment => "how many query at a time of sql",
       handle => "cfe_internal_php_runalerts_vars_sql_running";
-
-      "sketch[name]"     string => "sketch",
-      comment => "name of query type - sketch",
-      handle => "cfe_internal_php_runalerts_vars_sketch_name";
-
-      "sketch[limit]"    string => "300",
-      comment => "query limit of sketch",
-      handle => "cfe_internal_php_runalerts_vars_sketch_limit";
-
-      "sketch[running]"  string => "10",
-      comment => "how many query at a time of sketch",
-      handle => "cfe_internal_php_runalerts_vars_sketch_running";
 
   classes:
 

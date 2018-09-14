@@ -29,7 +29,7 @@ bundle agent cfe_internal_enterprise_main
 
       "hub" usebundle => cfe_internal_php_runalerts,
       handle => "cfe_internal_management_php_runalerts",
-      comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
+      comment => "Check status on SQL Alerts";
 
       "Enterprise Maintenance"
         usebundle => cfe_internal_enterprise_maintenance;
