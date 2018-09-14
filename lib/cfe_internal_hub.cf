@@ -73,65 +73,67 @@ bundle agent cfe_internal_hub_maintain
 # as maintenance process could take a considerable time
 {
   vars:
-      "report_settings" data => parsejson('[
-                                            {
-                                                "report": "contexts",
-                                                "table": "__ContextsLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "variables",
-                                                "table": "__VariablesLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "software",
-                                                "table": "__SoftwareLog",
-                                                "history_length_days": 28,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "software_updates",
-                                                "table": "__SoftwareUpdatesLog",
-                                                "history_length_days": 28,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "filechanges",
-                                                "table": "__FileChangesLog",
-                                                "history_length_days": 365,
-                                                "time_key": "ChangeTimeStamp"
-                                            },
-                                            {
-                                                "report": "benchmarks",
-                                                "table": "__BenchmarksLog",
-                                                "history_length_days": 1,
-                                                "time_key": "CheckTimeStamp"
-                                            },
-                                            {
-                                                "report": "promise_executions",
-                                                "table": "__PromiseExecutionsLog",
-                                                "history_length_days": 7,
-                                                "time_key": "ChangeTimeStamp"
-                                            }
-                                           ]');
+      "report_settings"
+        data => parsejson('[
+  {
+    "report": "contexts",
+    "table": "__ContextsLog",
+    "history_length_days": 7,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "variables",
+    "table": "__VariablesLog",
+    "history_length_days": 7,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "software",
+    "table": "__SoftwareLog",
+    "history_length_days": 28,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "software_updates",
+    "table": "__SoftwareUpdatesLog",
+    "history_length_days": 28,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "filechanges",
+    "table": "__FileChangesLog",
+    "history_length_days": 365,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "benchmarks",
+    "table": "__BenchmarksLog",
+    "history_length_days": 1,
+    "time_key": "CheckTimeStamp"
+  },
+  {
+    "report": "promise_executions",
+    "table": "__PromiseExecutionsLog",
+    "history_length_days": 7,
+    "time_key": "ChangeTimeStamp"
+  }
+]');
 
-      "diagnostics_settings" data => parsejson('[
-                                                     {
-                                                         "report": "hub_connection_errors",
-                                                         "table": "__HubConnectionErrors",
-                                                         "history_length_days": 1,
-                                                         "time_key": "CheckTimeStamp"
-                                                     },
-                                                     {
-                                                         "report": "diagnostics",
-                                                         "table": "Diagnostics",
-                                                         "history_length_days": 1,
-                                                         "time_key": "TimeStamp"
-                                                     }
-                                                    ]');
+      "diagnostics_settings"
+        data => parsejson('[
+  {
+    "report": "hub_connection_errors",
+    "table": "__HubConnectionErrors",
+    "history_length_days": 1,
+    "time_key": "CheckTimeStamp"
+  },
+  {
+    "report": "diagnostics",
+    "table": "Diagnostics",
+    "history_length_days": 1,
+    "time_key": "TimeStamp"
+  }
+]');
 
   classes:
       "enable_cfe_internal_reporting_database_purge_old_history" -> { "postgres", "CFEngine Enterprise" }
