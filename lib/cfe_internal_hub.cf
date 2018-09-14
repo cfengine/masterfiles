@@ -172,16 +172,24 @@ bundle agent cfe_internal_database_cleanup_reports (settings)
       "index" slist => getindices(settings);
 
       "remove_query_$(settings[$(index)][report])"
-      string =>   "DELETE FROM $(settings[$(index)][table]) AS T
-                            USING (SELECT HostKey,
-                                          (LastAgentLocalExecutionTimestamp - INTERVAL '$(settings[$(index)][history_length_days]) day') AS purge_time
-                                   FROM __agentstatus) AS A
-                            WHERE T.HostKey = A.HostKey AND T.$(settings[$(index)][time_key]) <= A.purge_time;";
-
+        comment => "This query will delete rows that have a changetimestamp
+                    $(settings[$(index)][history_length_days]) older than the
+                    hosts most recent changetimestamp in the table.",
+        string => "WITH z AS
+(
+         SELECT   hostkey,
+                  Max($(settings[$(index)][time_key])) AS latest
+         FROM     $(settings[$(index)][table])
+         GROUP BY hostkey)
+DELETE
+FROM   $(settings[$(index)][table]) t
+using  z
+WHERE  z.hostkey = t.hostkey
+AND    t.$(settings[$(index)][time_key]) <= (z.latest - '$(settings[$(index)][history_length_days]) day'::interval);";
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-      handle => "cf_database_maintain_report_$(settings[$(index)][report])";
+        handle => "cf_database_maintain_report_$(settings[$(index)][report])";
 }
 
 bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
