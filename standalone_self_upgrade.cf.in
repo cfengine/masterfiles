@@ -173,7 +173,7 @@ bundle edit_line cfengine_software_version_data
 "name": "$(cfengine_software.pkg_name)",
 "version": "$(cfengine_software.pkg_version)",
 "release": "$(cfengine_software.pkg_release)",
-"arch" "$(cfengine_software.pkg_arch)"
+"arch": "$(cfengine_software.pkg_arch)"
 }';
 }
 
