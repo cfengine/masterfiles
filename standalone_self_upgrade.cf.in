@@ -167,10 +167,10 @@ bundle edit_line cfengine_software_version_data
 {
       delete_lines: ".*";
       insert_lines: '{
-"name": "$(cfengine_version.pkg_name)",
-"version": "$(cfengine_version.pkg_version)",
-"release": "$(cfengine_version.pkg_release)",
-"arch" "$(cfengine_version.pkg_arch)"
+"name": "$(cfengine_software.pkg_name)",
+"version": "$(cfengine_software.pkg_version)",
+"release": "$(cfengine_software.pkg_release)",
+"arch": "$(cfengine_software.pkg_arch)"
 }';
 }
 
