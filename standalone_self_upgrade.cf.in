@@ -437,6 +437,7 @@ bundle common cfengine_package_names
       "pkg[debian_8_x86_64]" string => "$(pkg[debian_7_x86_64])";
       "pkg[ubuntu_14_x86_64]" string => "$(pkg[debian_7_x86_64])";
       "pkg[ubuntu_16_x86_64]" string => "$(pkg[debian_7_x86_64])";
+      "pkg[ubuntu_18_x86_64]" string => "$(pkg[debian_7_x86_64])";
 
       # 32bit DEBs
       "pkg[debian_4_i386]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_i386-debian4.deb";
@@ -466,6 +467,10 @@ bundle common cfengine_package_names
       "pkg[ubuntu_16_i386]" string => "$(pkg[debian_4_i386])";
       "pkg[ubuntu_16_i586]" string => "$(pkg[debian_4_i386])";
       "pkg[ubuntu_16_i686]" string => "$(pkg[debian_4_i386])";
+      "pkg[ubuntu_18_i386]" string => "$(pkg[debian_4_i386])";
+      "pkg[ubuntu_18_i586]" string => "$(pkg[debian_4_i386])";
+      "pkg[ubuntu_18_i686]" string => "$(pkg[debian_4_i386])";
+
 
       "my_pkg"
         string => "$(pkg[$(sys.flavor)_$(sys.arch)])",
