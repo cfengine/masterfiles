@@ -85,7 +85,7 @@ bundle agent cfengine_internal_standalone_self_upgrade
 
       "$(exec_prefix)$(sys.cf_agent)"
       handle => "standalone_self_upgrade",
-      args => "--inform --timestamp --file $(this.promise_dirname)/standalone_self_upgrade.cf --define trigger_upgrade,update_cf_initiated";
+      args => '--inform --timestamp --file "$(this.promise_dirname)$(const.dirsep)standalone_self_upgrade.cf" --define trigger_upgrade,update_cf_initiated';
 
   reports:
 
