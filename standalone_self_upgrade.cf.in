@@ -40,26 +40,6 @@ bundle agent main
       "CFEngine Version"
         usebundle => cfengine_software_version;
 
-      "Follow up Run"
-        usebundle => agent_run,
-        comment => "We execute the agent after managing the software version so
-                    that the next collection will see the currently running version, instead
-                    of the version that was running at the beginning of the agent
-                    execution.";
-}
-
-bundle agent agent_run
-# @ignore
-{
-
-  commands:
-
-      "$(sys.cf_agent)"
-        args => "--inform --timestamp --define standalone_self_upgrade_initiated",
-        comment => "Primarily we want to be sure that all the CFEngine version
-                    information is up to date after upgrading a package. This
-                    improves the time for Mission Portal to report on the data
-                    by one cycle.";
 }
 
 bundle common package_module_knowledge
