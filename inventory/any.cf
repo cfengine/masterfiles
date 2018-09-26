@@ -451,9 +451,22 @@ bundle agent cfe_autorun_inventory_fstab
 }
 
 bundle agent cfe_autorun_inventory_dmidecode
-# @brief Do dmidecode-based inventory
+# @brief Do hardware related inventory
 #
-# This common bundle runs dmidecode
+# This agent bundle runs dmidecode when present to inventory:
+# - BIOS vendor
+# - BIOS version
+# - System serial number
+# - System manufacturer
+# - System version
+# - System product name
+# - Physical memory (MB)
+#
+# On windows where powershell is available this bundle runs gwmi to inventory:
+# - BIOS vendor
+# - BIOS version
+# - System serial number
+# - System manufacturer
 {
   vars:
       "dmidefs" data => parsejson('
@@ -542,9 +555,35 @@ bundle agent cfe_autorun_inventory_dmidecode
                                               execresult("gwmi -query 'SELECT Manufacturer FROM WIN32_COMPUTERSYSTEM'", "powershell"),
                                               "system_array");
 
+  # BEGIN Inventory Total Physical Memory MB
+  vars:
+
+      "total_physical_memory_MB" -> { "CFE-2896" }
+        string => readfile( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt", 100),
+        meta => { "inventory", "attribute_name=Physical memory (MB)" },
+        if => fileexists( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt" );
+
+  commands:
+
+    have_dmidecode::
+
+      "$(decoder) -t 17 | $(paths.awk) '/Size.*MB/ {s+=$2} END {print s}' > '$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt'" -> { "CFE-2896" }
+        contain => in_shell,
+        if => not( fileexists( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt") );
+
+  files:
+
+      "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt" -> { "CFE-2896" }
+        delete => tidy,
+        file_select => older_than(0, 0, 1, 0, 0, 0),
+        comment => "Clear the cached value for total physical memory MB once a day.";
+
+  # END Inventory Total Physical Memory MB
+
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_dmidecode::
       "DEBUG $(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
+      "DEBUG $(this.bundle): Obtained Physical memory (MB) = '$(total_physical_memory_MB)'";
 }
 
 bundle agent cfe_autorun_inventory_LLDP
