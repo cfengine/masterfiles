@@ -451,9 +451,22 @@ bundle agent cfe_autorun_inventory_fstab
 }
 
 bundle agent cfe_autorun_inventory_dmidecode
-# @brief Do dmidecode-based inventory
+# @brief Do hardware related inventory
 #
-# This common bundle runs dmidecode
+#@ This agent bundle runs dmidecode when present to inventory:
+#@ - BIOS vendor
+#@ - BIOS version
+#@ - System serial number
+#@ - System manufacturer
+#@ - System version
+#@ - System product name
+#@ - Physical memory (MB)
+#@
+#@ On windows where powershell is available this bundle runs gwmi to inventory:
+#@ - BIOS vendor
+#@ - BIOS version
+#@ - System serial number
+#@ - System manufacturer
 {
   vars:
       "dmidefs" data => parsejson('
@@ -547,7 +560,7 @@ bundle agent cfe_autorun_inventory_dmidecode
 
       "total_physical_memory_MB" -> { "CFE-2896" }
         string => readfile( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt", 100),
-        meta => { "inventory", "attribute_name=Physical Memory MB" },
+        meta => { "inventory", "attribute_name=Physical memory (MB)" },
         if => fileexists( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt" );
 
   commands:
@@ -570,7 +583,7 @@ bundle agent cfe_autorun_inventory_dmidecode
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_dmidecode::
       "DEBUG $(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
-      "DEBUG $(this.bundle): Obtained Physical Memory MB = '$(total_physical_memory_MB)'";
+      "DEBUG $(this.bundle): Obtained Physical memory (MB) = '$(total_physical_memory_MB)'";
 }
 
 bundle agent cfe_autorun_inventory_LLDP
