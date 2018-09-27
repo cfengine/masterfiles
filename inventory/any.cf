@@ -451,9 +451,22 @@ bundle agent cfe_autorun_inventory_fstab
 }
 
 bundle agent cfe_autorun_inventory_dmidecode
-# @brief Do dmidecode-based inventory
+# @brief Do hardware related inventory
 #
-# This common bundle runs dmidecode
+#@ This agent bundle runs dmidecode when present to inventory:
+#@ - BIOS vendor
+#@ - BIOS version
+#@ - System serial number
+#@ - System manufacturer
+#@ - System version
+#@ - System product name
+#@ - Physical memory (MB)
+#@
+#@ On windows where powershell is available this bundle runs gwmi to inventory:
+#@ - BIOS vendor
+#@ - BIOS version
+#@ - System serial number
+#@ - System manufacturer
 {
   vars:
       "dmidefs" data => parsejson('
