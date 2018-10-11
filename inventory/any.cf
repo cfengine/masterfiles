@@ -167,6 +167,70 @@ bundle agent cfe_autorun_inventory_memory
 
 }
 
+bundle agent cfe_autorun_inventory_setuid
+# @brief Inventory setuid files and prune invalid entries from the setuid log
+{
+  vars:
+    !disable_inventory_setuid::
+      "candidates" slist => lsdir( "$(sys.workdir)", "cfagent\..*\.log", true );
+
+      "setuid_log_path"
+        comment => "We select the file that matches the downcased version of the
+                    hostname since sys.fqhost always returns lower case",
+        string => "$(candidates)",
+        if => strcmp( "$(sys.workdir)/cfagent.$(sys.fqhost).log",
+                      string_downcase($(candidates)));
+
+      "files" slist => readstringlist( $(setuid_log_path), "", "$(const.n)", inf, inf);
+
+      "setuid[$(files)]"
+        string => "$(files)",
+        meta => { "inventory", "attribute_name=Setuid files" },
+        if => regcmp( "104\d+", filestat( $(files), modeoct ) );
+
+      "rootsetuid[$(files)]"
+        string => "$(files)",
+        meta => { "inventory", "attribute_name=Root owned setuid files" },
+        if => and( regcmp( "104\d+", filestat( $(files), modeoct ) ),
+                   regcmp( "0", filestat( $(files), uid ) ));
+
+    files:
+    !disable_inventory_setuid::
+      "$(setuid_log_path)"
+        comment => "If the logged file is not currently setuid then we can
+                    safely purge it from the list to avoid unnecessary work.",
+        edit_line => delete_lines_matching( escape( $(files) ) ),
+        if => not( regcmp( "104\d+", filestat( $(files), modeoct ) ) );
+
+  reports:
+    !disable_inventory_setuid.(DEBUG|DEBUG_cfe_autorun_inventory_setuid)::
+      "$(setuid_log_path) present"
+        if =>  fileexists( $(setuid_log_path) );
+
+@if minimum_version(3.11)
+
+      "Candidate: setuid Files: $(files) modeoct=$(with)"
+        with => filestat( $(files), modeoct );
+
+      "Remove $(files) from log by matching $(with)"
+        comment => "If the logged file is not currently setuid then we can
+                    safely purge it from the list to avoid unnecessary work.",
+        with =>  escape( $(files) ),
+        if => not( regcmp( "104\d+", filestat( $(files), modeoct ) ) );
+
+      # The `with` attribute was introduced in 3.11
+      "Inventory: setuid Files: $(files) modeoct=$(with)"
+        with => filestat( $(files), modeoct ),
+        if => regcmp( "104\d+", filestat( $(files), modeoct ) );
+
+      "Inventory: root owned setuid Files: $(files) modeoct=$(with)"
+        with => filestat( $(files), modeoct ),
+        if => and( regcmp( "104\d+", filestat( $(files), modeoct ) ),
+                   regcmp( "0", filestat( $(files), uid ) ));
+@endif
+
+}
+
 bundle agent cfe_autorun_inventory_loadaverage
 # @brief Inventory the loadaverage (Enterprise only)
 {
