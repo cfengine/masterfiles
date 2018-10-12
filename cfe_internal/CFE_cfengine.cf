@@ -14,7 +14,7 @@
 #  - some agent bundles are in CFE_hub_specific.cf
 #
 ##################################################################
-bundle agent cfe_internal_management_file_control
+bundle common cfe_internal_management_file_control
 {
   vars:
 
