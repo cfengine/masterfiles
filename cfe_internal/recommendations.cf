@@ -11,7 +11,9 @@ bundle agent postgresql_conf_reccomendations
     "pgsql_conf" string => "/var/cfengine/state/pg/data/postgresql.conf";
     "pgsql_conf" string => "/tmp/postgresql.conf";
     "mem_info_source" string => "/proc/meminfo";
-    "mem_info_data" data => data_readstringarray( $(mem_info_source), "", "(:|\s+)", inf, inf);
+      "mem_info_data"
+        data => data_readstringarray( $(mem_info_source), "", "(:|\s+)", inf, inf),
+        if => fileexists( $(mem_info_source) );
 
     "upper" string => "67108864"; # 64 * 1024 * 1024 in KB
     "lower" string => "3145728"; # 3 * 1024 * 1024 in KB
