@@ -197,6 +197,8 @@ bundle agent standard_services(service,state)
 #
     systemd::
       "service_enabled" expression => reglist(@(systemd_service_info), "UnitFileState=enabled");
+      "service_enabled" -> { "CFE-2923" }
+        expression => returnszero( "$(call_systemctl) is-enabled $(service) > /dev/null 2>&1", useshell);
       "service_active"  expression => reglist(@(systemd_service_info), "ActiveState=active");
       "service_loaded"  expression => reglist(@(systemd_service_info), "LoadState=loaded");
       "service_notfound" expression => reglist(@(systemd_service_info), "LoadState=not-found");
