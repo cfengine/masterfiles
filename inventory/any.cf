@@ -477,6 +477,7 @@ bundle agent cfe_autorun_inventory_dmidecode
   "system-manufacturer": "System manufacturer",
   "system-version": "System version",
   "system-product-name": "System product name",
+  "system-uuid": "System UUID",
 }');
 
       # other dmidecode variables you may want:
