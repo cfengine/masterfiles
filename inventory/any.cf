@@ -480,6 +480,12 @@ bundle agent cfe_autorun_inventory_dmidecode
   "system-uuid": "System UUID",
 }');
 
+      # We override dmidefs from augments when we can.
+
+      "dmidefs" -> { "CFE-2927" }
+        data => mergedata( "def.cfe_autorun_inventory_dmidecode[dmidefs]" ),
+        if => isvariable( "def.cfe_autorun_inventory_dmidecode[dmidefs]");
+
       # other dmidecode variables you may want:
       # baseboard-asset-tag
       # baseboard-manufacturer

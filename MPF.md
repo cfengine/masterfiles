@@ -267,6 +267,41 @@ hosts.
 The following settings are defined in `controls/def.cf` can be set from an
 [augments file][Augments].
 
+### dmidecode inventory
+
+When dmidecode is present, some key system attributes are inventoried. The
+inventoried attributes can be overridden by defining
+`def.cfe_autorun_inventory_demidecode[dmidefs]` via augments. dmidecode queries
+each key in dmidefs and tags the result with the value prefixed with
+`attribute_name=` Note, as the dmidefs are overridden, you must supply all
+desired inventory attributes.
+
+For example:
+
+```json
+{
+  "vars": {
+    "cfe_autorun_inventory_dmidecode": {
+      "dmidefs": {
+        "bios-vendor": "BIOS vendor",
+        "bios-version": "BIOS version",
+        "system-serial-number": "System serial number",
+        "system-manufacturer": "System manufacturer",
+        "system-version": "System version",
+        "system-product-name": "System product name",
+        "bios-release-date": "BIOS release date",
+        "chassis-serial-number": "Chassis serial number",
+        "chassis-asset-tag": "Chassis asset tag",
+        "baseboard-asset-tag": "Baseboard asset tag"
+      }
+    }
+  }
+}
+```
+
+**History:**
+- Introduced 3.13.0, 3.12.1, 3.10.5
+
 ### mailto
 
 The address that `cf-execd` should email agent output to.
