@@ -542,7 +542,7 @@ This class can be defined by an [augments file][Augments]. For example:
 ### enable\_cfe\_internal\_cleanup\_agent\_reports
 
 This class enables policy that cleans up report diffs when they exceed
-`def.maxclient_history_size`. By default is is **off** unless a CFEngine
+`def.max_client_history_size`. By default is is **off** unless a CFEngine
 Enterprise agent is detected.
 
 
