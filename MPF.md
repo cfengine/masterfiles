@@ -388,19 +388,20 @@ hosts.
 The following settings are defined in `controls/def.cf` can be set from an
 [augments file][Augments].
 
-#### mailto
+
+### mailto
 
 The address that `cf-execd` should email agent output to.
 
-#### mailfrom
+### mailfrom
 
 The address that output mailed from `cf-execd` should come from.
 
-#### smtpserver
+### smtpserver
 
 The SMTP server that `cf-execd` should use to send emails.
 
-#### acl
+### acl
 
 `def.acl` is a list of of network ranges that should be allowed to connect to cf-serverd. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed.
 
@@ -416,7 +417,7 @@ Here is an example setting the acl from augments:
 
 **See Also:** [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
 
-#### ignore_missing_bundles
+### ignore_missing_bundles
 
 This option allows you to ignore errors when a bundle specified in body common control bundlesequence is not found.
 
@@ -436,7 +437,7 @@ This example illustrates enabling the option via augments.
 
 - Introduced in 3.12.0
 
-#### ignore_missing_inputs
+### ignore_missing_inputs
 
 This option allows you to ignore errors when a file specified in body common control inputs is not found.
 
@@ -456,7 +457,7 @@ This example illustrates enabling the option via augments.
 
 - Introduced in 3.12.0
 
-#### trustkeysfrom
+### trustkeysfrom
 
 The list of network ranges that `cf-serverd` should trust keys from. This is
 should only be open on policy servers while new hosts are expected to be
