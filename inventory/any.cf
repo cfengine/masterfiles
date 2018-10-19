@@ -64,6 +64,14 @@ bundle agent inventory_autorun
       "dmidecode" usebundle => cfe_autorun_inventory_dmidecode(),
       handle => "cfe_internal_autorun_inventory_dmidecode";
 
+    !disable_inventory_aws::
+      "aws" usebundle => cfe_autorun_inventory_aws(),
+        handle => "cfe_internal_autorun_inventory_aws";
+
+    !disable_inventory_aws|disable_inventory_aws_ec2_metadata::
+      "aws" usebundle => cfe_autorun_inventory_aws_ec2_metadata(),
+        handle => "cfe_internal_autorun_inventory_ec2_metadata";
+
     any::
       "listening ports" usebundle => cfe_autorun_inventory_listening_ports(),
       handle => "cfe_internal_autorun_listening_ports";
@@ -364,6 +372,118 @@ bundle agent cfe_autorun_inventory_cpuinfo
       "DEBUG $(this.bundle)";
       "$(const.t) CPU model: $(cpu_model)";
       "$(const.t) CPU physical cores: $(cpuinfo_physical_cores)";
+}
+
+bundle common cfe_autorun_inventory_aws
+# @brief inventory AWS EC2 instances
+#
+# Provides:
+#  ec2_instance class based on Amazon markers in dmidecode's system-uuid, bios-version or bios-vendor
+{
+  classes:
+    !disable_inventory_aws::
+      "ec2_instance" -> { "CFE-2924" }
+        comment => "See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html",
+        scope => "namespace",
+        expression => regcmp("^[eE][cC]2.*", "$(cfe_autorun_inventory_dmidecode.dmi[system-uuid])"),
+        if => isvariable("cfe_autorun_inventory_dmidecode.dmi[system-uuid]");
+
+      "ec2_instance" -> { "CFE-2924" }
+        expression => regcmp(".*[aA]mazon.*", "$(cfe_autorun_inventory_dmidecode.dmi[bios-version])"),
+        scope => "namespace",
+        if => isvariable("cfe_autorun_inventory_dmidecode.dmi[bios-version]");
+
+      "ec2_instance" -> { "CFE-2924" }
+        expression => regcmp(".*[aA]mazon.*", "$(cfe_autorun_inventory_dmidecode.dmi[bios-vendor])"),
+        scope => "namespace",
+        if => isvariable("cfe_autorun_inventory_dmidecode.dmi[bios-vendor]");
+
+      "ec2_instance" -> { "CFE-2924" }
+        expression => regline( "^ec2.*", "/sys/hypervisor/uuid" ),
+        scope => "namespace",
+        if => fileexists("/sys/hypervisor/uuid");
+
+  reports:
+    (DEBUG|DEBUG_inventory_aws)::
+      "DEBUG $(this.bundle)";
+
+      "$(const.t)+ec2_instance"
+        if => "ec2_instance";
+}
+
+bundle agent cfe_autorun_inventory_aws_ec2_metadata
+# @brief Inventory ec2 metadata
+# Provides:
+{
+  methods:
+    !(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+      "cfe_autorun_inventory_aws_ec2_metadata_cache";
+      "cfe_autorun_inventory_aws_ec2_metadata_from_cache";
+}
+bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
+# @brief Cache ec2 metadata from http request for one day
+#
+# Provides cache of ec2 instance metadata for inventory
+{
+
+  vars:
+
+    ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+
+      "curl"      string => "$(paths.curl)";
+      "curl_opts" string => "--max-time 1 --connect-timeout 1 --silent";
+      "URL"       string => "http://169.254.169.254/latest/dynamic/instance-identity/document";
+      "cache"     string => "$(sys.statedir)/aws_ec2_metadata";
+
+  commands:
+
+    ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+
+      "$(curl)"
+        args => "$(curl_opts) $(URL) -o $(cache)",
+        if => not( fileexists( $(cache) ));
+
+  files:
+    ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+      "$(cache)"
+        delete => tidy,
+        file_select => days_old(1);
+}
+
+bundle agent cfe_autorun_inventory_aws_ec2_metadata_from_cache
+# @brief Inventory ec2 metadata from cache
+#
+# Provides inventory for EC2 Region, EC2 Instance ID, EC2 Instance Type, EC2
+# Image ID, and EC2 Availability Zone
+{
+  classes:
+
+    ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+
+      "have_cached_instance_identity"
+        expression => fileexists( $(cfe_autorun_inventory_aws_ec2_metadata_cache.cache) );
+
+  vars:
+
+    have_cached_instance_identity.ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+
+      "data" data => readjson( $(cfe_autorun_inventory_aws_ec2_metadata_cache.cache), 100K);
+
+      "region" string => "$(data[region])", meta => { "inventory", "attribute_name=EC2 Region" };
+      "instanceId" string => "$(data[instanceId])", meta => { "inventory", "attribute_name=EC2 Instance ID" };
+      "instanceType" string => "$(data[instanceType])", meta => { "inventory", "attribute_name=EC2 Instance Type" };
+      "imageId" string => "$(data[imageId])", meta => { "inventory", "attribute_name=EC2 Image ID" };
+      "availabilityZone" string => "$(data[availabilityZone])", meta => { "inventory", "attribute_name=EC2 Availability Zone" };
+
+  reports:
+
+    DEBUG|DEBUG_inventory_ec2_metadata|DEBUG_inventory_ec2_metadata_from_cache::
+      "DEBUG $(this.bundle):";
+      "$(const.t)Inventory 'EC2 Region' = '$(region)'";
+      "$(const.t)Inventory 'EC2 Instance ID' = '$(instanceId)'";
+      "$(const.t)Inventory 'EC2 Instance Type' = '$(instanceType)'";
+      "$(const.t)Inventory 'EC2 Image ID' = '$(imageId)'";
+      "$(const.t)Inventory 'EC2 Availability Zone' = '$(availabilityZone)'";
 }
 
 bundle agent cfe_autorun_inventory_mtab
