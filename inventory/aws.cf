@@ -1,0 +1,21 @@
+bundle common inventory_aws
+# @brief inventory AWS EC2 instances
+#
+# Provides:
+#  ec2_instance class based on Amazon markers in dmidecode's system-uuid, bios-version or bios-vendor
+{
+  classes:
+    any::
+      "ec2_instance"
+        comment => "See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html",
+        or => {
+          regcmp("^[eE][cC]2.*", "$(cfe_autorun_inventory_dmidecode.dmi[system-uuid])"),
+          regcmp(".*[aA]mazon.*", "$(cfe_autorun_inventory_dmidecode.dmi[bios-version])"),
+          regcmp(".*[aA]mazon.*", "$(cfe_autorun_inventory_dmidecode.dmi[bios-vendor])")
+        };
+
+  reports:
+    (DEBUG|DEBUG_inventory_aws).ec2_instance
+      "DEBUG $(this.bundle)";
+      "$(const.t)+ec2_instance";
+}
