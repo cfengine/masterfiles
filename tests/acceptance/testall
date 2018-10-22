@@ -91,6 +91,7 @@ else
         --cfrunagent="$CORE/cf-runagent/cf-runagent" \
         --cfkey="$CORE/cf-key/cf-key" \
         --cfnet="$CORE/cf-net/cf-net" \
+        --cfcheck="$CORE/cf-check/cf-check" \
         --rpmvercmp="$CORE/ext/rpmvercmp" \
         $FLAGS "$@"
 fi
