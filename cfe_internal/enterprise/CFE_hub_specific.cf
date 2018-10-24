@@ -419,7 +419,7 @@ bundle agent log_cfengine_enterprise_license_utilization
 # @brief Log the number of hosts seen within the last 24 hours and the number of
 # hosts reported to have the "cfengine" class. Note any hosts that has been
 # successfully collected from is expected to have the "cfengine" class. This
-# policy will not do anything unless the class
+# bundle will not be called unless the class
 # `enable_log_cfengine_enterprise_license_utilization` is defined.
 {
   reports:
@@ -432,7 +432,7 @@ bundle agent log_cfengine_enterprise_license_utilization
 
       "log_frequency" int => "720";
 
-    policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+    policy_server.enterprise_edition::
 
       "log_dir" string => "$(sys.workdir)/log";
 
@@ -450,23 +450,20 @@ bundle agent log_cfengine_enterprise_license_utilization
 
   files:
 
-    policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+    policy_server.enterprise_edition::
       "$(log_dir)/."
         create => "true",
         comment => "The log dir must exist in order to write to a file.";
 
   reports:
 
-    policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+    policy_server.enterprise_edition::
 
       "$(sys.date), hosts_reporting=$(count_reporting), hosts_seen=$(count_seen)"
         report_to_file => "$(sys.workdir)/log/license_utilization.log",
         if => not("cfe_internal_logged_utilization"),
         classes => cfe_internal_log_utilization($(log_frequency));
 
-    policy_server.enterprise_edition.!enable_log_cfengine_enterprise_license_utilization::
-
-      "WARNING $(this.bundle) is actuated but not enabled. enable_$(this.bundle) is not defined.";
 }
 
 body classes cfe_internal_log_utilization(time)
