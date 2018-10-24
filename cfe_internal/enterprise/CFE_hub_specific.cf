@@ -424,7 +424,7 @@ bundle agent log_cfengine_enterprise_license_utilization
 {
   reports:
 
-    policy_server.enterprise_edition.(DEBUG|DEBUG_log_cfengine_enterprise_license_utilization|inform_mode)::
+    policy_server.enterprise_edition.DEBUG_log_cfengine_enterprise_license_utilization::
 
       "Hosts reported: $(count_reporting)";
 
@@ -434,7 +434,7 @@ bundle agent log_cfengine_enterprise_license_utilization
 
       "log_dir" string => "$(sys.workdir)/log";
 
-    policy_server.enterprise_edition.(DEBUG|DEBUG_log_cfengine_enterprise_license_utilization|inform_mode|!cfe_internal_logged_utilization)::
+    policy_server.enterprise_edition.(DEBUG_log_cfengine_enterprise_license_utilization|!cfe_internal_logged_utilization)::
 
       "log_frequency" int => "720";
 
