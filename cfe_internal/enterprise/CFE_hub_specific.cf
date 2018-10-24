@@ -448,11 +448,13 @@ bundle agent log_cfengine_enterprise_license_utilization
 
   vars:
 
-      "log_frequency" int => "720";
-
     policy_server.enterprise_edition::
 
       "log_dir" string => "$(sys.workdir)/log";
+
+    policy_server.enterprise_edition.(DEBUG|DEBUG_log_cfengine_enterprise_license_utilization|inform_mode|!cfe_internal_logged_utilization)::
+
+      "log_frequency" int => "720";
 
       # Using address for reporting hosts because hostseen() will incur
       # undesirable reverse dns lookups if name is used
@@ -475,11 +477,10 @@ bundle agent log_cfengine_enterprise_license_utilization
 
   reports:
 
-    policy_server.enterprise_edition::
+    policy_server.enterprise_edition.!cfe_internal_logged_utilization::
 
       "$(sys.date), hosts_reporting=$(count_reporting), hosts_seen=$(count_seen)"
         report_to_file => "$(sys.workdir)/log/license_utilization.log",
-        if => not("cfe_internal_logged_utilization"),
         classes => cfe_internal_log_utilization($(log_frequency));
 
 }
