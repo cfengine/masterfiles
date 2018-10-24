@@ -38,6 +38,7 @@ bundle agent cfe_internal_enterprise_main
 
       "hub" -> { "ENT-3186" }
         usebundle => log_cfengine_enterprise_license_utilization,
+        unless => "cfe_internal_logged_utilization",
         handle => "log_cfengine_enterprise_license_utilization",
         comment => "Log license utilization information";
 
