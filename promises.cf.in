@@ -115,7 +115,7 @@ bundle common inventory
       "inputs" slist => { "inventory/any.cf", "inventory/freebsd.cf", "inventory/os.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_freebsd", "inventory_os" };
     linux.!specific_linux_os::
-      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/os.cf"};
+      "inputs" slist => { "inventory/any.cf", "inventory/linux.cf", "inventory/lsb.cf", "inventory/os.cf" };
       "bundles" slist => { "inventory_control", "inventory_any", "inventory_autorun", "inventory_linux", "inventory_lsb", "inventory_os" };
     aix::
       "inputs" slist => { "inventory/any.cf", "inventory/generic.cf", "inventory/aix.cf", "inventory/os.cf" };
