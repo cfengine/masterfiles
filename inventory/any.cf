@@ -72,11 +72,6 @@ bundle agent inventory_autorun
       "aws" usebundle => cfe_autorun_inventory_aws_ec2_metadata(),
         handle => "cfe_internal_autorun_inventory_ec2_metadata";
 
-    !disable_inventory_setuid::
-      "Inventory SetUID Files" -> { "ENT-4158" }
-        usebundle => cfe_autorun_inventory_setuid(),
-        handle => "cfe_internal_autorun_inventory_setuid";
-
     any::
       "listening ports" usebundle => cfe_autorun_inventory_listening_ports(),
       handle => "cfe_internal_autorun_listening_ports";
