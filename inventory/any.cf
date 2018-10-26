@@ -149,21 +149,53 @@ bundle agent cfe_autorun_inventory_memory
 # @brief Inventory the memory (Enterprise only)
 {
   vars:
-    enterprise.!aix::
-      # due to a Windows issue this is set to 0 there for now
-      "total" string => ifelse("windows", "0",
-                               $(mon.value_mem_total)),
-      meta => { "inventory", "attribute_name=Memory size (MB)" };
+@if minimum_version(3.11)
+      # The `with` attribute is necessary for this to work in a single promise.
 
-    enterprise::
-      "free" string => ifelse("windows", "0",
-                              $(mon.value_mem_free)),
-      meta => { "report" };
+    enterprise_edition.windows::
 
-    enterprise.aix::
+      # wmic returns "TotalVisibleMemorySize=10760224" so split on = and take
+      # the second item (0-based with nth())
+
+      "total" -> { "ENT-4188" }
+        meta => { "inventory", "attribute_name=Memory size (MB)" },
+        string => format( "%d", eval("$(with)/1024", "math", "infix" )),
+        if => not( isvariable( "total" ) ),
+        with => nth( string_split( execresult("wmic OS get TotalVisibleMemorySize /format:list", useshell ),
+                                   "=", 2), 1);
+
+      "totalPhysical" -> { "CFE-2896" }
+        meta => { "inventory", "attribute_name=Physical memory (MB)" },
+        string => format( "%d", eval("$(with)/1024", "math", "infix" )),
+        if => not( isvariable( "total" ) ),
+        with => nth( string_split( execresult("wmic ComputerSystem get TotalPhysicalMemory /format:list", useshell ),
+                                   "=", 2), 1);
+
+      # This is a volatile metric, perhaps  not well suited for inventory
+      "free"
+        meta => { "report" },
+        string => format( "%d", eval("$(with)/1024", "math", "infix" )),
+        if => not( isvariable( "free" ) ),
+        with => nth( string_split( execresult("wmic OS get FreePhysicalMemory /format:list", useshell ),
+                                   "=", 2), 1);
+@endif
+    enterprise_edition.aix::
       "total" -> { "CFE-2797", "CFE-2803" }
         string => execresult("/usr/bin/lparstat -i | awk '/Online Memory/ { print $4 }'", "useshell"),
         meta => { "inventory", "attribute_name=Memory size (MB)" };
+
+    enterprise_edition.hpux::
+       "total" -> { "ENT-4188" }
+         string => execresult( "machinfo | awk '/^Memory =/ {print $3}'", useshell ),
+         meta => { "inventory", "attribute_name=Memory size (MB)" };
+
+    enterprise_edition.!(aix|windows|hpux)::
+      "total" string => "$(mon.value_mem_total)",
+        meta => { "inventory", "attribute_name=Memory size (MB)" };
+
+      "free" string => "$(mon.value_mem_free)",
+        if => not( isvariable( "free" ) ),
+        meta => { "report" };
 
 }
 
