@@ -552,3 +552,58 @@ body classes cfe_internal_log_utilization(time)
         scope => "namespace";
         persist_time => "$(time)";
 }
+
+bundle agent cfe_internal_enterprise_policy_analyzer
+# @brief Ensure published policy is available for use with policy analyzer
+# @description This bundle runs as part of the enterprise_maintenance bundles. When `analyzer_flagfile` exists, this bundle ensures policy from `analyzer_source` is kept in sync with `analyzer_dir`.
+{
+    meta:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "tags" -> { "ENT-4192" }
+        slist => { "enterprise_maintenance" };
+
+  vars:
+
+    enterprise_edition.policy_server::
+
+      "analyzer_flagfile" string => "$(cfe_internal_hub_vars.docroot)/analyzer/pa.enabled";
+      "analyzer_dir" string => "/opt/cfengine/analyzer/policy/masterfiles";
+      "analyzer_source" string => "/var/cfengine/masterfiles";
+
+  classes:
+
+    enterprise_edition.policy_server::
+
+      "policy_analyzer_enabled" expression => fileexists( $(analyzer_flagfile) );
+
+    files:
+
+    policy_analyzer_enabled::
+
+      "$(analyzer_dir)/."
+        create => "true",
+        perms => mog( "700", $(def.cf_apache_user), $(def.cf_apache_user) );
+
+       "$(analyzer_dir)/."
+         copy_from => analyzer_sync( $(analyzer_source) ),
+         file_select => all,
+         depth_search => recurse_with_base( inf ),
+         perms => og( $(def.cf_apache_user), $(def.cf_apache_group) );
+
+  reports:
+      DEBUG|DEBUG_cfe_internal_enterprise_policy_analyzer::
+        "DEBUG Mission Portal Policy Analyzer enabled. Keeping '$(analyzer_dir)' in sync with '$(analyzer_source)'"
+          if => "policy_analyzer_enabled";
+
+}
+
+body copy_from analyzer_sync(path)
+# @brief Keep promised files in sync with local `path`
+{
+        source   => "$(path)";
+        purge    => "true";
+        preserve => "false";
+        compare  => "digest";
+}
