@@ -597,6 +597,20 @@ Configure it via augments by defining ```control_executor_splaytime```:
 }
 ```
 
+### Configure agent expiration
+
+cf-agents spawned by cf-execd are killed after this number of minutes of not returning data.
+
+Example configuration via augments:
+
+```
+{
+  "vars": {
+    "control_executor_agent_expireafter": "15"
+  }
+}
+```
+
 ### Configure agent execution schedule
 
 The execution scheduled is expressesd as a list of classes. If any of the classes are defined when cf-execd wakes up then exec_command is triggered. By default this is set to a list of time based classes for every 5th minute. This results in a 5 minute execution schedule.
