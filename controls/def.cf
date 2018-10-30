@@ -152,6 +152,14 @@ bundle common def
                     should be splayed over. This value should be less than the
                     number of minutes between scheduled executions";
 
+      ## Default agent_expireafter to 120 unless it's already defined (via augments)
+      "control_executor_agent_expireafter" -> { "ENT-4208" }
+        string => "120",
+        if => not( isvariable( "control_executor_agent_expireafter" ) ),
+        comment => "This controls the number of minutes after no data has been
+                    recieved by cf-execd from a cf-agent process before that
+                    cf-agent process is killed.";
+
       ## Default schedule unless it's already defined (via augments)
       "control_executor_schedule_value"
         slist => {
