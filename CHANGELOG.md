@@ -1,6 +1,38 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.5:
+	- Add 'system-uuid' to default dmidecode inventory (CFE-2925)
+	- Add inventory of AWS EC2 linux instances (CFE-2924)
+	- Add ubuntu 18 to package map for self upgrade (ENT-4118)
+	- Allow dmidefs inventory to be overridden via augments (CFE-2927)
+	- apt_get module now includes held packages when listing updates (CFE-2855)
+	- Analyze yum return code before parsing its output (CFE-2868)
+	- Cleanup old report data relative to the most recent changetimestamp
+	  (ENT-4807)
+	- Create desired version tracking data when necessary (ENT-3937)
+	- Detect systemd service enablement for non-native services (CFE-2932)
+	- Fix name of tunable to control max client-side report history
+	  (CFE-2926)
+	- Fix package_latest detecting larger version in some cases (CFE-1743)
+	- Fix standalone self-upgrade when path contains spaces (ENT-4117)
+	- Fix unattended self-upgrade on AIX (ENT-3972)
+	- Inventory Physical Memory MB when dmidecode is found (CFE-2896)
+	- Only consider files that exist for rotation (ENT-3946)
+	- Prevent noise when a service that should be disabled is missing.
+	  (CFE-2690)
+	- Prevent standalone self-upgrade from triggering un-necessarily
+	  (ENT-4092)
+	- Remove more smartquotes (ENT-3823)
+	- Remove un-necessary agent run during self upgrade (ENT-4116)
+	- Replace unicode smartquotes with apostrophe (ENT-3823)
+	- Specify scope => "namespace" when using persistent classes (CFE-2860)
+	- Store epoch for packages managed by zypper module (CFE-2875)
+	- Store the epoch of packages in cache db with zypper
+	- Updated yum package module to take arbitrary options (ENT-4177)
+	- apt_get package module includes held packages when listing updates
+	  (CFE-2855)
+
 3.10.4:
 	- Avoid executing self upgrade policy unnecessarily (ENT-3592)
 	- Change class identifying runagent initiated executions from cfruncommand to cf_runagent_initated
