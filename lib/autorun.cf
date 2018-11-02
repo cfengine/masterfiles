@@ -20,13 +20,13 @@ bundle agent autorun
 
       # Both yaml and json formatted control files are supported.
 
-      "data_$(bundles)"
-        data => readyaml( "$(sys.workdir)/inputs/services/$(bundles)/control.yaml"),
-        if => fileexists( "$(sys.workdir)/inputs/services/$(bundles)/control.yaml" );
+      "data_$(services_prefixed_classes)"
+        data => readyaml( "$(sys.workdir)/inputs/services/$(services_prefixed_classes)/control.yaml"),
+        if => fileexists( "$(sys.workdir)/inputs/services/$(services_prefixed_classes)/control.yaml" );
 
-      "data_$(bundles)"
-        data => readjson( "$(sys.workdir)/inputs/services/$(bundles)/control.json"),
-        if => fileexists( "$(sys.workdir)/inputs/services/$(bundles)/control.json");
+      "data_$(services_prefixed_classes)"
+        data => readjson( "$(sys.workdir)/inputs/services/$(services_prefixed_classes)/control.json"),
+        if => fileexists( "$(sys.workdir)/inputs/services/$(services_prefixed_classes)/control.json");
 
       # This is each directory inside services that has a matching policy entry
       # e.g. services/example/promises.cf then the list would have an element
@@ -49,13 +49,13 @@ bundle agent autorun
 
   methods:
     services_autorun::
-      "autorun" usebundle => $(sorted_bundles);
+      "autorun" usebundle => $(sorted_autorun_bundles);
 
 @if minimum_version(3.11)
       # This is guarded because the variables it depends on are also guarded above
-    "services_$(sorted_bundles)"::
-      "Run $(sorted_bundles)" -> { "CFE-2905" }
-        usebundle => "$(_services_loader.data_$(sorted_bundles)[$(sys.policy_entry_basename)][namespace]):$(_services_loader.data_$(sorted_bundles)[$(sys.policy_entry_basename)][bundle])";
+    "services_$(sorted_services_autorun_policies)"::
+      "Run $(sorted_services_autorun_policies)" -> { "CFE-2905" }
+        usebundle => "$(_services_loader.data_$(sorted_services_autorun_policies)[$(sys.policy_entry_basename)][namespace]):$(_services_loader.data_$(sorted_services_autorun_policies)[$(sys.policy_entry_basename)][bundle])";
 @endif
 
   reports:
