@@ -7,15 +7,56 @@ bundle agent autorun
 {
   vars:
     services_autorun::
-      "bundles" slist => bundlesmatching(".*", "autorun");
+@if minimum_version(3.11)
+      "services_prefixed_classes"
+        slist => classesmatching( "services_.*" );
+      # For backwards compatibility during upgrades, this must be guarded
+      # because the with attribute is used.
 
-      "sorted_bundles"
-        slist => sort("bundles", "lex"),
+      "services_autorun_input[$(with)]" -> { "CFE-2905" }
+        string => "$(sys.workdir)/inputs/services/$(with)/$(sys.policy_entry_basename)",
+        with => nth(string_split( "$(services_prefixed_classes)", "_", 2), 1),
+        if => fileexists( "$(sys.workdir)/inputs/services/$(with)/$(sys.policy_entry_basename)" );
+
+      # Both yaml and json formatted control files are supported.
+
+      "data_$(bundles)"
+        data => readyaml( "$(sys.workdir)/inputs/services/$(bundles)/control.yaml"),
+        if => fileexists( "$(sys.workdir)/inputs/services/$(bundles)/control.yaml" );
+
+      "data_$(bundles)"
+        data => readjson( "$(sys.workdir)/inputs/services/$(bundles)/control.json"),
+        if => fileexists( "$(sys.workdir)/inputs/services/$(bundles)/control.json");
+
+      # This is each directory inside services that has a matching policy entry
+      # e.g. services/example/promises.cf then the list would have an element
+      # matching example.
+      "services_autorun_policies"
+        slist => getindices( services_autorun_input );
+@endif
+
+      "bundles_tagged_autorun"
+        slist => bundlesmatching(".*", "autorun");
+
+      "sorted_autorun_bundles"
+        slist => sort("bundles_tagged_autorun", "lex"),
         comment => "Lexicographically sorted bundles for predictable order";
+
+      "sorted_services_autorun_policies"
+        slist => sort("services_autorun_bundles", "lex"),
+        comment => "Lexicographically sorted bundles for predictable order";
+
 
   methods:
     services_autorun::
       "autorun" usebundle => $(sorted_bundles);
+
+@if minimum_version(3.11)
+      # This is guarded because the variables it depends on are also guarded above
+    "services_$(sorted_bundles)"::
+      "Run $(sorted_bundles)" -> { "CFE-2905" }
+        usebundle => "$(_services_loader.data_$(sorted_bundles)[$(sys.policy_entry_basename)][namespace]):$(_services_loader.data_$(sorted_bundles)[$(sys.policy_entry_basename)][bundle])";
+@endif
 
   reports:
     DEBUG|DEBUG_autorun|DEBUG_services_autorun::
