@@ -450,7 +450,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata
   methods:
     !(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
       "cfe_autorun_inventory_aws_ec2_metadata_cache";
-      "cfe_autorun_inventory_aws_ec2_metadata_from_cache";
+      "cfe_aws_ec2_metadata_from_cache";
 }
 bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
 # @brief Cache ec2 metadata from http request for one day
@@ -482,7 +482,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
         file_select => days_old(1);
 }
 
-bundle agent cfe_autorun_inventory_aws_ec2_metadata_from_cache
+bundle agent cfe_aws_ec2_metadata_from_cache
 # @brief Inventory ec2 metadata from cache
 #
 # Provides inventory for EC2 Region, EC2 Instance ID, EC2 Instance Type, EC2
