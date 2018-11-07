@@ -588,7 +588,7 @@ bundle agent cfe_internal_enterprise_policy_analyzer
          copy_from => analyzer_sync( $(analyzer_source) ),
          file_select => all,
          depth_search => recurse_with_base( inf ),
-         perms => og( $(def.cf_apache_user), $(def.cf_apache_group) );
+         perms => mog( "400", $(def.cf_apache_user), $(def.cf_apache_group) );
 
   reports:
       DEBUG|DEBUG_cfe_internal_enterprise_policy_analyzer::
