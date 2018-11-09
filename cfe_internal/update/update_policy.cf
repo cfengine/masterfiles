@@ -233,7 +233,9 @@ bundle agent cfe_internal_update_policy
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 
-      "/usr/local/sbin/$(agents)"
+    !(solaris|windows|coreos)::
+
+      "/usr/local/sbin/$(agents)" -> { "ENT-4232", "ENT-3082", "ENT-3046" }
       comment => "Create symlinks of CFE binaries in /usr/local/sbin",
       handle => canonify("cfe_internal_update_policy_files_sbin_$(agents)"),
       move_obstructions => "true",
