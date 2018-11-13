@@ -36,7 +36,15 @@ body server control
       denybadclocks         => "false";
 
     enterprise_edition.client_initiated_reporting_enabled::
+
+      # How often cf-serverd should try to establish a reverse tunnel for report
+      # collection
+
       call_collect_interval => "$(def.control_server_call_collect_interval)";
+
+      # The time in seconds that a collect-call tunnel will remain open for hub
+      # to complete report transfer.
+        collect_window => "$(def.control_server_collect_window)";
 
     # The MPF provides different variables for configuring which users are
     # allowed to initiate execution via cf-runagent.
