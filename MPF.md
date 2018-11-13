@@ -777,6 +777,33 @@ For example:
 }
 ```
 
+### Configure client initiated reporting timeout
+
+By default cf-serverd holds an open connection for client initiated for 30
+seconds. In some environments this value may need to be increased in order for
+report collection to finish. Once the connection has been open for longer than
+the specified seconds it is closed.
+
+The window of time can be controled by setting `def.control_server_collect_window`.
+
+For example, enable client initated reporting for all hosts with a 10 minute interval and hold the connection open for 90 seconds.
+
+```
+{
+  "classes" {
+    "client_initiated_reporting_enabled": [ "any" ]
+  },
+  "vars": {
+    "control_server_collect_window": "90",
+    "control_server_call_collect_interval": "10"
+  }
+}
+```
+
+**History:**
+
+- Added in 3.10.6, 3.12.2, 3.13.1
+
 ### Configure MPF to automatically restart components on relevant data change
 
 While the agent itsef will reload its config upon notice of policy change this
