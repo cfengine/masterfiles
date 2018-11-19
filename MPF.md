@@ -726,7 +726,7 @@ Here we set the schedule to initiate pull collection once every 30 minutes via a
 ```
 {
   "vars": {
-    "control_hub_hub_schedule": { "Min00", "Min30" }
+    "control_hub_hub_schedule": [ "Min00", "Min30" ]
   }
 }
 ```
