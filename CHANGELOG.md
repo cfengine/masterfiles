@@ -1,6 +1,54 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.1:
+	- Add 'system-uuid' to default dmidecode inventory (CFE-2925)
+	- Add inventory of AWS EC2 linux instances (CFE-2924)
+	- Add ubuntu 18 to package map for self upgrade (ENT-4118)
+	- Allow dmidefs inventory to be overridden via augments (CFE-2927)
+	- Also list  packages updates for hold packages: (CFE-2855)
+	- Analyze yum return code before parsing its output (CFE-2868)
+	- Fixed an issue when Promise to edit file that does not exist caused
+	  "promise not kept" condition (ENT-3965)
+	- Avoid trying to read /proc/meminfo when it doesn't exist (CFE-2922)
+	- Avoid use of $(version) for package_version in legacy implementation
+	  (ENT-3963)
+	- Cleanup old report data relative to the most recent changetimestamp
+	  (ENT-4807)
+	- Configure agent_expireafter from augments (ENT-4308)
+	- Consider sles when considering suse (CFE-2897)
+	- Fixed an issue when standalone self upgrade policy did not create
+	  desired-cfengine-package-version.json file (ENT-3937)
+	- Cron based watchdog for cf-execd on AIX (ENT-3963)
+	- Detect systemd service enablement for non native services (CFE-2932)
+	- Document how def.acl is used and how to configure it (CFE-2861)
+	- Fix name of tunable to control max client side report history
+	  (CFE-2926)
+	- Fix package_latest detecting larger version in some cases (CFE-1743)
+	- Fix standalone self upgrade when path contains spaces (ENT-4117)
+	- Fix unattended self upgrade on AIX (ENT-3972)
+	- Inventory Memory on HPUX (ENT-4188)
+	- Inventory Physical Memory MB when dmidecode is found (CFE-2896)
+	- Inventory memory on Windows (ENT-4187)
+	- Make recommendations about postgresql.conf (ENT-3958)
+	- Only consider files that exist for rotation (ENT-3946)
+	- Prevent noise when a service that should be disabled is missing.
+	  (CFE-2690)
+	- Prevent standalone self upgrade from triggering un-necessarily
+	  (ENT-4092)
+	- Remove un-necessary agent run during self upgrade (ENT-4116)
+	- Specify scope => "namespace" when using persistent classes (CFE-2860)
+	- Store timestamp for packages managed by zypper module (CFE-2875)
+	- Store timestamp of packages in cache db with zypper
+	- Sync cf-runalerts override unit template with package (ENT-3923)
+	- Updated yum package module to take arbitrary options (ENT-4177)
+	- Use default for package arch on aix (ENT-3963)
+	- Use rpmvercmp for version comparison on AIX (ENT-3963)
+	- Users allowed to request execution via cf-runagent can be configured
+          via augments (ENT-4054)
+	- apt_get package module includes held packages when listing updates
+	  (CFE-2855)
+
 3.12.0:
 	- Avoid executing self upgrade policy unnecessarily (ENT-3592)
 	- Add amazon_linux class to yum package module
