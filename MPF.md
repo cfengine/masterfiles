@@ -723,7 +723,8 @@ The default 50M threshold can be configured using an [augments file][Augments], 
 By default Enterprise hubs initiate pull collection once every 5 minutes. This can be overridden in the MPF by defining `def.control_hub_hub_schedule` as a list of classes that should trigger collection when defined.
 
 Here we set the schedule to initiate pull collection once every 30 minutes via augments.
-```
+
+```json
 {
   "vars": {
     "control_hub_hub_schedule": [ "Min00", "Min30" ]
@@ -733,7 +734,28 @@ Here we set the schedule to initiate pull collection once every 30 minutes via a
 
 **History:**
 
-- MPF override introduced in 3.12.0
+- MPF override introduced in 3.13.0, 3.12.2
+
+### Configure maximum age in hours of old reports for cf-hub to collect
+
+By default cf-hub instructs clients to expire reports older than 6 hours in order to prevent a build up of reports that could cause a condition where the client is never able to send all reports within the collection window.
+
+You can adjust this time by setting `vars.control_hub_client_history_timeout`
+
+For example:
+
+
+```json
+{
+  "vars": {
+    "control_hub_client_history_timeout": "72"
+  }
+}
+```
+
+**History:**
+
+- MPF override introduced in 3.13.0, 3.12.2
 
 ### Exclude hosts from hub initiated report collection
 
@@ -744,13 +766,35 @@ exclude hosts from hub initiated report collection define
 
 For example to completely disable hub initiated report collection:
 
-```
+```json
 {
   "vars": {
     "control_hub_exclude_hosts": [ "0.0.0.0/0" ]
   }
 }
 ```
+
+**History:**
+
+- MPF override introduced in 3.13.0, 3.12.2
+
+### Change port used for enterprise report collection
+
+By default cf-hub collects reports by connecting to port 5308. You can change this default by setting `vars.control_hub_port` in augments.
+
+For example:
+
+```json
+{
+  "vars": {
+    "control_hub_port": "8035"
+  }
+}
+```
+
+**History:**
+
+- Added in 3.13.0, 3.12.2
 
 ### Enable client initiated reporting
 
