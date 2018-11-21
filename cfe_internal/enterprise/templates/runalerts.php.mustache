@@ -10,11 +10,11 @@ if(PHP_SAPI != 'cli')
 while(1 == 1)
 {
   $status=0;
-  touch ('{{{vars.cfe_internal_php_runalerts.runalerts_stampfiles_dir}}}/runalerts_sql');
-  passthru('{{{vars.sys.workdir}}}/httpd/php/bin/php {{{vars.sys.workdir}}}/httpd/htdocs/index.php cli_tasks runalerts {{{vars.cfe_internal_php_runalerts.sql[limit]}}} {{{vars.cfe_internal_php_runalerts.sql[running]}}} sql', $status);
+  touch ('{{{vars.cfe_internal_php_runalerts.runalerts_stampfiles_dir}}}/runalerts_all');
+  passthru('{{{vars.sys.workdir}}}/httpd/php/bin/php {{{vars.sys.workdir}}}/httpd/htdocs/index.php cli_tasks runalerts {{{vars.cfe_internal_php_runalerts.sql[limit]}}} {{{vars.cfe_internal_php_runalerts.sql[running]}}} all', $status);
 
   if ($status != 0){
-    print("Error executing cli_task runalerts sql");
+    print("Error executing cli_task runalerts all");
     print("Sleeping for {{{vars.cfe_internal_php_runalerts.sleep_time}}} seconds");
   }
 
