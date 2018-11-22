@@ -2,9 +2,9 @@
 #!/bin/bash
 
 while true; do
-  touch {{{vars.sys.workdir}}}/httpd/php/runalerts_sql
- if [ -f {{{vars.sys.workdir}}}/httpd/php/runalerts_sql ]; then
-     {{{vars.sys.workdir}}}/httpd/php/bin/php {{{vars.sys.workdir}}}/httpd/htdocs/index.php cli_tasks runalerts {{{vars.cfe_internal_php_runalerts.sql[limit]}}} {{{vars.cfe_internal_php_runalerts.sql[running]}}} sql >/dev/null 2>&1
+  touch {{{vars.sys.workdir}}}/httpd/php/runalerts_all
+ if [ -f {{{vars.sys.workdir}}}/httpd/php/runalerts_all ]; then
+     {{{vars.sys.workdir}}}/httpd/php/bin/php {{{vars.sys.workdir}}}/httpd/htdocs/index.php cli_tasks runalerts {{{vars.cfe_internal_php_runalerts.sql[limit]}}} {{{vars.cfe_internal_php_runalerts.sql[running]}}} all >/dev/null 2>&1
  fi
  sleep {{{vars.cfe_internal_php_runalerts.sleep_time}}}
 done
