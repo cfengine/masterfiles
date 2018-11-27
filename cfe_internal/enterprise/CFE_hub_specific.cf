@@ -226,6 +226,7 @@ bundle agent cfe_internal_php_runalerts
       create => "true",
       perms => mog("0755","root","root"),
       edit_template => "$(this.promise_dirname)/templates/runalerts.php.mustache",
+      classes => results( "bundle", "runalerts_script" ),
       template_method => "mustache";
 
 
@@ -273,16 +274,18 @@ bundle agent cfe_internal_php_runalerts
                     and replaced with the php version of the loop.",
         signals => { "kill" };
 
-    # Make sure to kill script on non active hub(s).
-    stale_runalerts_timestamp_repaired|passive_ha_hub::
+    # Make sure to kill script on non active hub(s), when the tracking timestamp
+    # is stale, or when the script has been repaired.
+
+    stale_runalerts_timestamp_repaired|passive_ha_hub|runalerts_script_repaired::
 
       "$(runalerts_script)"
-      comment => "The runalerts process should be killed if it has failed to
-                  update the timestamp files in $(stale_time) minutes or if it
-                  is running on an standby HA hub.",
-      handle => "cfe_internal_php_runalerts_process_kill_php_runalerts_script",
-      signals => { "term" },
-      classes => if_repaired("run_script");
+        comment => "The runalerts process should be killed if it has failed to
+                    update the timestamp files in $(stale_time) minutes or if it
+                    is running on an standby HA hub.",
+        handle => "cfe_internal_php_runalerts_process_kill_php_runalerts_script",
+        signals => { "term" },
+        classes => if_repaired("run_script");
 
 
     # We don't try to supervise the runalerts process on systemd hosts because
