@@ -408,6 +408,10 @@ bundle common def
         string => "5",
         unless => isvariable(control_server_call_collect_interval);
 
+      "control_server_collect_window" -> { "ENT-4102" }
+        string => "30",
+        unless => isvariable(control_server_collect_window);
+
     enterprise_edition.policy_server::
       "default_data_select_host_monitoring_include"
         comment => "Most people have monitoring systems, so instead of collecting data people won't use we save the work unless its requested.",
