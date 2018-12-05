@@ -399,6 +399,20 @@ bundle common def
                     "Min50", "Min55" },
         unless => isvariable(control_hub_hub_schedule);
 
+      "control_hub_port"
+        comment => "cf-hub performs pull collection on port 5308, unless
+                    overridden by augments",
+        string => "5308",
+        unless => isvariable(control_hub_port);
+
+      "control_hub_client_history_timeout"
+        comment => "cf-hub instructs clients to discard reports older than this
+                    many hours to avoid a condition where a build up of reports
+                    causes a client to never be fully collected from",
+        string => "6",
+        unless => isvariable(control_hub_port);
+
+
       "mpf_access_rules_collect_calls_admit_ips"
         slist => { @(def.acl) },
         unless => isvariable(mpf_access_rules_collect_calls_admit_ips);
