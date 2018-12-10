@@ -141,7 +141,7 @@ bundle common update_def
       "mpf_update_policy_master_location" -> { "ENT-3692" }
         comment => "Directory where clients should get policy from.",
         string => "$(def.mpf_update_policy_master_location)",
-        if => isvariable( $(def.mpf_update_policy_master_location) );
+        if => isvariable( "def.mpf_update_policy_master_location" );
 
     # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
