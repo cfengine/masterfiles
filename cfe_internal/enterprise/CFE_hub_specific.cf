@@ -159,7 +159,7 @@ bundle agent cfe_internal_php_runalerts
 
       "runalerts_types"
         comment => "Runalerts is run for different types of alerts",
-        slist => { "sql" };
+        slist => { "all" };
 
       "runalerts_script" string => "$(sys.bindir)/runalerts.php",
       comment => "location of php runalerts script",
@@ -179,17 +179,17 @@ bundle agent cfe_internal_php_runalerts
       comment => "if script does not function in minutes, restart the script",
       handle => "cfe_internal_php_runalerts_vars_stale_time";
 
-      "sql[name]"        string => "sql",
-      comment => "name of query type - sql",
+      "all[name]"        string => "all",
+      comment => "name of query type - all",
 
-      handle => "cfe_internal_php_runalerts_vars_sql_name";
-      "sql[limit]"       string => "300",
+      handle => "cfe_internal_php_runalerts_vars_all_name";
+      "all[limit]"       string => "300",
       comment => "query limit of sql",
-      handle => "cfe_internal_php_runalerts_vars_sql_limit";
+      handle => "cfe_internal_php_runalerts_vars_all_limit";
 
-      "sql[running]"     string => "20",
+      "all[running]"     string => "20",
       comment => "how many query at a time of sql",
-      handle => "cfe_internal_php_runalerts_vars_sql_running";
+      handle => "cfe_internal_php_runalerts_vars_all_running";
 
   classes:
 
