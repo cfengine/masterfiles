@@ -392,7 +392,7 @@ bundle agent log_cfengine_enterprise_license_utilization
 
       "log_dir" string => "$(sys.workdir)/log";
 
-    policy_server.enterprise_edition.(DEBUG_log_cfengine_enterprise_license_utilization|!cfe_internal_logged_utilization)::
+    policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization.(DEBUG_log_cfengine_enterprise_license_utilization|!cfe_internal_logged_utilization)::
 
       "log_frequency" int => "720";
 
