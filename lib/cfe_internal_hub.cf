@@ -203,10 +203,17 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
 
   vars:
 
+    any::
+
       "status_table_name" -> { "ENT-4331" }
-        string => ifelse( eval( "$(sys.cf_version) < 3.12.1", class, infix ), "__status",
-                          "status"),
-        comment => "This is important for handling the current name of the status table for proper cleanup.";
+        string => "__status";
+
+    cfengine_3_7|cfengine_3_10|cfengine_3_12_1::
+
+      "status_table_name"
+        string => "status";
+
+    any::
 
       "remove_query"
         string => "DELETE FROM $(status_table_name) WHERE ts IN (SELECT ts FROM $(status_table_name) ORDER BY ts DESC OFFSET $(row_count));";
