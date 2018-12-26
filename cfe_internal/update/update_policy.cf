@@ -30,7 +30,12 @@ bundle agent cfe_internal_update_policy
       # (otherwise we may get an error about undefined bundle)
 
       "have_found_user_specified_update_bundle"
-        expression  => isgreaterthan( 0, length( "found_matching_user_specified_bundle" ) );
+        expression  => some(".*", "found_matching_user_specified_bundle");
+
+      "missing_user_specified_update_bundle"
+       not  => some(".*", "found_matching_user_specified_bundle");
+
+
 
   vars:
       "default_policy_update_bundle" string => "cfe_internal_update_policy_cpv";
@@ -69,7 +74,9 @@ bundle agent cfe_internal_update_policy
 
       "User specified update bundle MISSING! Falling back to $(default_policy_update_bundle)."
         if => and( "have_user_specified_update_bundle",
-                   not( "have_found_user_specified_update_bundle" ));
+                   "missing_user_specified_update_bundle"
+                  );
+
 
 }
 
