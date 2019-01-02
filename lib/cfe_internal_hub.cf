@@ -149,7 +149,7 @@ bundle agent cfe_internal_hub_maintain
       action => if_elapsed_day;
 
       "Remove cf-consumer history"
-      usebundle => cfe_internal_database_cleanup_consumer_status("50000"),
+      usebundle => cfe_internal_database_cleanup_consumer_status("3"),
       action => if_elapsed_day;
 
       "Remove diagnostics history"
@@ -216,7 +216,7 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
     any::
 
       "remove_query"
-        string => "DELETE FROM $(status_table_name) WHERE ts IN (SELECT ts FROM $(status_table_name) ORDER BY ts DESC OFFSET $(row_count));";
+        string => "SELECT * FROM cleanup_historical_data('$(status_table_name)', 'ts', $(row_count), 'host');";
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
