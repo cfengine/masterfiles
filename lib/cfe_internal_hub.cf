@@ -206,7 +206,7 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
       # We probe the database to see if the function is defined
 
       "has_sql_function_cleanup_historical_data"
-        expression => returnszero( "$(sys.bindir)/psql cfdb -c \"SELECT 'cleanup_historical_data'::regproc;", noshell ),
+        expression => returnszero( "$(sys.bindir)/psql cfdb -c \"SELECT 'cleanup_historical_data'::regproc;\" > /dev/null 2>&1", useshell ),
         if => isexecutable( "$(sys.bindir)/psql" );
 
   vars:
