@@ -408,6 +408,7 @@ bundle agent cfe_internal_truncate_events
   commands:
     Hr05.Min00_05::
       "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks truncate_events"
+      contain => silent,
       comment => "Turncate all the pending notifications if there is any",
       classes => kept_successful_command,
       handle  => "cfe_internal_truncate_event_mp";
@@ -537,6 +538,7 @@ bundle agent cfe_internal_refresh_inventory_view
 
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh",
+        contain => silent,
         comment => "This refreshes the inventory view. If the inventory view is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_inventory_view",
         classes => kept_successful_command,
@@ -559,6 +561,7 @@ bundle agent cfe_internal_refresh_hosts_view
 
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3482" }
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks materialized_hosts_view_refresh",
+        contain => silent,
         comment => "This refreshes the hosts view. If the hosts view is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_hosts_view",
         if => isgreaterthan(countlinesmatching(".*materialized_hosts_view_refresh.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
@@ -580,6 +583,7 @@ bundle agent cfe_internal_clear_last_seen_hosts_logs
 
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3550" }
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks clearLastSeenHostsLogs",
+        contain => silent,
         comment => "This clears the __lastseenhostslogs table. If the __lastseenhostslogs table is not cleared then it will contain unnecessary data.",
         handle  => "mpf_clear_lastseenhostslogs",
         if => isgreaterthan(countlinesmatching(".*clearLastSeenHostsLogs.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
@@ -601,6 +605,7 @@ bundle agent cfe_internal_refresh_events_table
 
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks process_api_events",
+        contain => silent,
         comment => "This refreshes the events table. If the events table is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_events_table",
         classes => kept_successful_command,
