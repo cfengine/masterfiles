@@ -28,7 +28,7 @@ bundle agent cfe_internal_limit_robot_agents
       # [agent_expireafter][cf-execd#agent_expireafter] as defined in body executor control
       #
 
-    something_wrong_execd::
+    more_cf_execd_processes_than_expected::
 
       "bin/cf-execd"
         signals => { "term", "kill" },
@@ -41,7 +41,7 @@ bundle agent cfe_internal_limit_robot_agents
         handle => "cfe_internal_limit_robot_agents_processes_cf_execd_not_running";
 
 
-    something_wrong_monitord::
+    more_cf_monitord_processes_than_expected::
 
       "bin/cf-monitord"
         signals => { "term", "kill" },
@@ -75,11 +75,11 @@ bundle agent cfe_internal_limit_robot_agents
 body process_count check_execd(n)
 {
       match_range => "0,$(n)";
-      out_of_range_define => {"something_wrong_execd"};
+      out_of_range_define => {"more_cf_execd_processes_than_expected"};
 }
 
 body process_count check_monitord(n)
 {
       match_range => "0,$(n)";
-      out_of_range_define => {"something_wrong_monitord"};
+      out_of_range_define => {"more_cf_monitord_processes_than_expected"};
 }
