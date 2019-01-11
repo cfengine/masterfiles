@@ -31,10 +31,15 @@ bundle agent cfe_internal_limit_robot_agents
     something_wrong_execd::
 
       "bin/cf-execd"
-      signals => { "term", "kill" },
-      restart_class => "restart_execd",
-      comment => "When cf-execd comes undone then kill all and restart the process",
-      handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
+        signals => { "term", "kill" },
+        comment => "When cf-execd comes undone then kill all and restart the process",
+        handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
+
+      "bin/cf-execd" -> { "CFE-2974" }
+        restart_class => "restart_execd",
+        comment => "If cf-execd isn't running, define a class so that it will be started",
+        handle => "cfe_internal_limit_robot_agents_processes_cf_execd_not_running";
+
 
     something_wrong_monitord::
 
