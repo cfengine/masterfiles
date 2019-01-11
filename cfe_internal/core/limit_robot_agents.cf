@@ -36,7 +36,7 @@ bundle agent cfe_internal_limit_robot_agents
         handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
 
       "bin/cf-execd" -> { "CFE-2974" }
-        restart_class => "restart_execd",
+        restart_class => "cf_execd_not_running",
         comment => "If cf-execd isn't running, define a class so that it will be started",
         handle => "cfe_internal_limit_robot_agents_processes_cf_execd_not_running";
 
@@ -58,7 +58,7 @@ bundle agent cfe_internal_limit_robot_agents
 
   commands:
 
-    restart_execd::
+    cf_execd_not_running::
 
       "$(sys.cf_execd)"
       comment => "Restart cf-execd process",
