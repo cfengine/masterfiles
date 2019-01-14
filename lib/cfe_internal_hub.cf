@@ -149,7 +149,7 @@ bundle agent cfe_internal_hub_maintain
       action => if_elapsed_day;
 
       "Remove cf-consumer history"
-      usebundle => cfe_internal_database_cleanup_consumer_status("50000"),
+      usebundle => cfe_internal_database_cleanup_consumer_status("3"),
       action => if_elapsed_day;
 
       "Remove diagnostics history"
@@ -197,11 +197,42 @@ AND    t.$(settings[$(index)][time_key]) <= (z.latest - '$(settings[$(index)][hi
 bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
 # @ignore
 # @brief keep up to row_count entries in the database
+# @note ENT-2797 After cf-consumer removal, this will still be necessary, functionality
+# of cf-consumer to be replaced with cf-hub-worker per Ole.
 {
 
+  classes:
+
+      # We probe the database to see if the function is defined
+
+      "has_sql_function_cleanup_historical_data"
+        expression => returnszero( "$(sys.bindir)/psql cfdb -c \"SELECT 'cleanup_historical_data'::regproc;\" > /dev/null 2>&1", useshell ),
+        if => isexecutable( "$(sys.bindir)/psql" );
+
+      "has_sql_table___status" -> { "ENT-4331" }
+        expression => returnszero( "$(sys.bindir)/psql cfdb -c \"SELECT 'public.__status'::regclass;\" > /dev/null 2>&1", useshell ),
+        if => isexecutable( "$(sys.bindir)/psql" );
+
   vars:
+
+    any::
+
+      # The status table changed it's name for 3.12.2 and 3.10.6, this handles
+      # using the proper table name in the cleanup query
+
+      "status_table_name" -> { "ENT-4331" }
+        string => ifelse( "has_sql_table___status", "__status", "status");
+
+    any::
+      # This is the fallback query to use in case the cleanup_historical_data
+      # function is not present.
+      "remove_query" -> { "ENT-4365" }
+        string => "DELETE FROM $(status_table_name) WHERE ts IN (SELECT ts FROM $(status_table_name) ORDER BY ts DESC OFFSET 50000);";
+
+    has_sql_function_cleanup_historical_data::
+
       "remove_query"
-      string => "DELETE FROM status WHERE ts IN (SELECT ts FROM status ORDER BY ts DESC OFFSET $(row_count));";
+        string => "SELECT * FROM cleanup_historical_data('$(status_table_name)', 'ts', $(row_count), 'host');";
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
