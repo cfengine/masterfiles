@@ -28,15 +28,20 @@ bundle agent cfe_internal_limit_robot_agents
       # [agent_expireafter][cf-execd#agent_expireafter] as defined in body executor control
       #
 
-    something_wrong_execd::
+    more_cf_execd_processes_than_expected::
 
       "bin/cf-execd"
-      signals => { "term", "kill" },
-      restart_class => "restart_execd",
-      comment => "When cf-execd comes undone then kill all and restart the process",
-      handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
+        signals => { "term", "kill" },
+        comment => "When cf-execd comes undone then kill all and restart the process",
+        handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
 
-    something_wrong_monitord::
+      "bin/cf-execd" -> { "CFE-2974" }
+        restart_class => "cf_execd_not_running",
+        comment => "If cf-execd isn't running, define a class so that it will be started",
+        handle => "cfe_internal_limit_robot_agents_processes_cf_execd_not_running";
+
+
+    more_cf_monitord_processes_than_expected::
 
       "bin/cf-monitord"
         signals => { "term", "kill" },
@@ -53,7 +58,7 @@ bundle agent cfe_internal_limit_robot_agents
 
   commands:
 
-    restart_execd::
+    cf_execd_not_running::
 
       "$(sys.cf_execd)"
       comment => "Restart cf-execd process",
@@ -70,11 +75,11 @@ bundle agent cfe_internal_limit_robot_agents
 body process_count check_execd(n)
 {
       match_range => "0,$(n)";
-      out_of_range_define => {"something_wrong_execd"};
+      out_of_range_define => {"more_cf_execd_processes_than_expected"};
 }
 
 body process_count check_monitord(n)
 {
       match_range => "0,$(n)";
-      out_of_range_define => {"something_wrong_monitord"};
+      out_of_range_define => {"more_cf_monitord_processes_than_expected"};
 }
