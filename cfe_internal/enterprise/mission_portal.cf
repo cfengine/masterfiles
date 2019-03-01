@@ -39,6 +39,7 @@ bundle agent cfe_internal_enterprise_mission_portal_apache
 {
   vars:
 
+    policy_server.enterprise_edition::
     "template"
       string => "$(this.promise_dirname)/templates/httpd.conf.mustache",
       comment => "The template used to render the apache config file.";
