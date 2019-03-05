@@ -170,12 +170,14 @@ bundle agent standard_services(service,state)
       "call_systemctl" string => "$(paths.systemctl) --no-ask-password --global --system";
       "systemd_properties" string => "-pLoadState,CanStop,UnitFileState,ActiveState,LoadState,CanStart,CanReload";
       "c_service" string => canonify("$(service)");
+
     freebsd::
       "init" string => ifelse(fileexists("/usr/local/etc/rc.d/$(service)"),
-			      "/usr/local/etc/rc.d/$(service)",
-			      "/etc/rc.d/$(service)");
+                              "/usr/local/etc/rc.d/$(service)",
+                              "/etc/rc.d/$(service)");
+
     !freebsd::
-      "init" string => "/etc/init.d/$(service)";      
+      "init" string => "/etc/init.d/$(service)";
 
     start|restart|reload::
       "chkconfig_mode" string => "on";
