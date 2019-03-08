@@ -409,7 +409,7 @@ bundle agent cfe_internal_truncate_events
     Hr05.Min00_05::
       "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks truncate_events"
       contain => silent,
-      comment => "Turncate all the pending notifications if there is any",
+      comment => "Truncate all the pending notifications if there is any",
       classes => kept_successful_command,
       handle  => "cfe_internal_truncate_event_mp";
 }
