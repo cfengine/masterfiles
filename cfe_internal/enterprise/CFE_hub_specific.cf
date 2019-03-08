@@ -347,7 +347,6 @@ bundle agent cfe_internal_truncate_events
       "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks truncate_events"
       contain => silent,
       comment => "Truncate all the pending notifications if there is any",
-      classes => kept_successful_command,
       handle  => "cfe_internal_truncate_event_mp";
 }
 
@@ -478,7 +477,6 @@ bundle agent cfe_internal_refresh_inventory_view
         contain => silent,
         comment => "This refreshes the inventory view. If the inventory view is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_inventory_view",
-        classes => kept_successful_command,
         if => isdir( "$(cfe_internal_hub_vars.docroot)/api/modules/inventory" );
 
 }
@@ -545,7 +543,6 @@ bundle agent cfe_internal_refresh_events_table
         contain => silent,
         comment => "This refreshes the events table. If the events table is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_events_table",
-        classes => kept_successful_command,
         if => fileexists( "$(cfe_internal_hub_vars.docroot)/api/resource-v1/Event.php" );
 }
 
