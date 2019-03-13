@@ -159,12 +159,19 @@ bundle common cfe_internal_inputs
         comment => "This policy configures external watchdogs to ensure that
                     cf-execd is always running.";
 
-    enterprise_edition::
+    enterprise_edition.(policy_server|am_policy_hub)::
 
       "input[enterprise_hub_specific]"
         string => "cfe_internal/enterprise/CFE_hub_specific.cf",
         comment => "Policy relating to CFEngine Enterprise Hub, for example
                     software updates, webserver configuration, and alerts";
+
+      "input[enterprise_hub_federation]"
+        string => "cfe_internal/enterprise/federation/federation.cf",
+        comment => "Policy relating to CFEngine Federated Reporting";
+
+
+    enterprise_edition::
 
       "input[enterprise_knowledge]"
         string => "cfe_internal/enterprise/CFE_knowledge.cf",
