@@ -11,12 +11,12 @@ bundle agent federation_config
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
       "cfengine_internal_federation_enabled"
-        expression => fileexists("$(path)"),
+        expression => fileexists( $(path) ),
         scope => "namespace";
   vars:
     cfengine_internal_federation_enabled::
-      "data" data => readjson("$(path)");
-      "remotes" slist => getindices(@(data[remote_hubs]));
+      "data" data => readjson( $(path) );
+      "remotes" slist => getindices( @(data[remote_hubs]) );
 
   classes:
     cfengine_internal_federation_enabled::
@@ -83,7 +83,7 @@ bundle agent federation_manage_cfdrop
     "$(home)/."
       depth_search => recurse_with_base("inf"),
       file_select => all,
-      perms => mo("600", "$(user)");
+      perms => mo("600", $(user));
   commands:
     selinux_enabled.missing_ssh_context::
       "restorecon -F $(home)/.ssh/authorized_keys"
