@@ -83,7 +83,7 @@ bundle agent federation_manage_cfdrop
     "$(home)/."
       depth_search => recurse_with_base("inf"),
       file_select => all,
-      perms => mo("600", $(user));
+      perms => mog( "600", $(user), "root" );
   commands:
     selinux_enabled.missing_ssh_context::
       "restorecon -F $(home)/.ssh/authorized_keys"
@@ -98,52 +98,49 @@ bundle agent federation_manage_files
     enterprise_edition.(policy_server|am_policy_hub)::
       "$(federation_config.federation_dir)/."
         create => "true",
-        perms => mo("601", "root");
+        perms => mog( "701", "root", "root" );
       "$(federation_config.federation_dir)/cfapache/."
         create => "true",
-        perms => mo("600", "cfapache");
+        perms => mog( "600", "cfapache", "root" );
       "$(federation_config.federation_dir)/cfapache/."
-        depth_search => recurse("inf"),
+        depth_search => recurse_with_base("inf"),
         file_select => all,
-        perms => mo("600", "cfapache");
+        perms => mog( "600", "cfapache", "root" );
     cfengine_internal_federation_enabled::
       "$(federation_config.bin_dir)/."
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
     cfengine_internal_federation_am_superhub::
       "$(federation_config.federation_dir)/superhub/."
         create => "true",
-        perms => mo("600", "root");
-      "$(federation_config.federation_dir)/superhub/drop/."
-        create => "true",
-        perms => mo("600", "root");
+        perms => mog( "701", "root", "root" );
       "$(federation_config.federation_dir)/superhub/import/."
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
     cfengine_internal_federation_am_feeder::
       "$(federation_config.federation_dir)/fedhub/."
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
       "$(federation_config.federation_dir)/fedhub/dump/."
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
       "$(federation_config.federation_dir)/fedhub/transport/."
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
 
     # TODO: Render these from templates:
     cfengine_internal_federation_am_feeder::
       "$(federation_config.bin_dir)/dump.sh"
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
     cfengine_internal_federation_am_transporter::
       "$(federation_config.bin_dir)/transport.sh"
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
     cfengine_internal_federation_am_superhub::
       "$(federation_config.bin_dir)/import.sh"
         create => "true",
-        perms => mo("600", "root");
+        perms => mog( "600", "root", "root" );
 }
 
 bundle agent federation_manage_database
