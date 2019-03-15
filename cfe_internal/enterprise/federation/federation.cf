@@ -58,7 +58,7 @@ bundle agent federation_manage_cfdrop
       "user"
         string => "cfdrop";
       "home"
-        string => "/home/$(user)";
+        string => "$(federation_config.federation_dir)/superhub/drop";
       "create_files"
         slist => {
           "$(home)/.",
