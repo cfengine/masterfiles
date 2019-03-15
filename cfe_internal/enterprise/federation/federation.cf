@@ -92,17 +92,17 @@ bundle agent federation_manage_cfdrop
 
 
 bundle agent federation_manage_files
-# @brief Manage files, directories and permissions in /opt/cfengine/federation
+# @brief Manage files, directories and permissions in $(federation_config.federation_dir)
 {
   files:
     enterprise_edition.(policy_server|am_policy_hub)::
-      "/opt/cfengine/federation/."
+      "$(federation_config.federation_dir)/."
         create => "true",
         perms => mo("601", "root");
-      "/opt/cfengine/federation/cfapache/."
+      "$(federation_config.federation_dir)/cfapache/."
         create => "true",
         perms => mo("600", "cfapache");
-      "/opt/cfengine/federation/cfapache/."
+      "$(federation_config.federation_dir)/cfapache/."
         depth_search => recurse("inf"),
         file_select => all,
         perms => mo("600", "cfapache");
@@ -203,7 +203,7 @@ bundle agent federation_entry_bundle
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
       "federation_config_exists"
-        expression => fileexists("/opt/cfengine/federation/cfapache/federation-config.json");
+        expression => fileexists("$(federation_config.federation_dir)/cfapache/federation-config.json");
   methods:
     federation_config_exists::
       "federation_config"
