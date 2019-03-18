@@ -46,8 +46,8 @@ rem Choose one of two following functions to call based on whether file exists o
   rem This function called with an argument in quotes, so:
   rem use %1 when you need value in quotes,
   rem use %~1 when you need without
-  if not exist "%1" call :get_package_data_repo "%1"
-  if     exist "%1" call :get_package_data_file "%1"
+  if not exist %1 call :get_package_data_repo %1
+  if     exist %1 call :get_package_data_file %1
 goto :EOF
 
 
@@ -56,10 +56,10 @@ rem Print package information for an existing file
   echo PackageType=file
   rem %~dp0 expands to drive and path of current script
   rem TODO: if name is multi-line, print "Name=" only once
-  for /f "usebackq delims=" %%b in (`%CSCRIPT% /nologo "%~dp0\WiRunSQL.vbs" "%1"
+  for /f "usebackq delims=" %%b in (`%CSCRIPT% /nologo "%~dp0\WiRunSQL.vbs" %1
     "select Value from Property where Property = 'ProductName'"`
   ) do echo Name=%%b
-  for /f "usebackq delims=" %%b in (`%CSCRIPT% /nologo "%~dp0\WiRunSQL.vbs" "%1"
+  for /f "usebackq delims=" %%b in (`%CSCRIPT% /nologo "%~dp0\WiRunSQL.vbs" %1
     "select Value from Property where Property = 'ProductVersion'"`
   ) do echo Version=%%b
 goto :EOF
@@ -106,7 +106,7 @@ rem Install this file if it exists
     goto :EOF
   )
 
-  %MSIEXEC% /quiet /passive /qn /norestart /i "%1"
+  %MSIEXEC% /quiet /passive /qn /norestart /i %1
   rem TODO options, error checking
 goto :EOF
 
@@ -165,6 +165,6 @@ goto :EOF
 
 rem Remove software from MSI package which name is passed as argument
 :remove_file
-  %MSIEXEC% /quiet /passive /qn /norestart /x "%1"
+  %MSIEXEC% /quiet /passive /qn /norestart /x %1
   rem TODO options, error checking
 goto :EOF
