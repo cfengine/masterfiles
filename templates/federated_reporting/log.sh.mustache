@@ -1,0 +1,18 @@
+# -*- mode: shell-script -*-
+# A bash "library" providing logging functionality
+
+CFE_LOGGER="{{logger}}"
+CFE_LOGGER="${CFE_LOGGER:-echo}"
+CFE_LOGGER_ARGS="{{logger_args}}" # no extra args by default
+CFE_TIMESTAMP_CMD="{{timestamp_cmd}}" # use 'true' to disable explicit timestamps
+CFE_TIMESTAMP_CMD="${CFE_TIMESTAMP_CMD:-date}"
+
+function log() {
+  # $1 -- message to log
+  ts="$($CFE_TIMESTAMP_CMD)"
+  if [ -n "$ts" ]; then
+    "${CFE_LOGGER}" "[$ts] $1"
+  else
+    "${CFE_LOGGER}" "$1"
+  fi
+}

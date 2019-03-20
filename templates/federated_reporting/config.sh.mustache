@@ -1,0 +1,62 @@
+# -*- mode: shell-script -*-
+# Configuration file that is supposed to be sourced into bash scripts.
+
+DEFAULT_PREFIX="/opt/cfengine/federation/"
+
+# generic configuration
+CFE_BIN_DIR="{{bindir}}"
+CFE_BIN_DIR="${CFE_BIN_DIR:-/var/cfengine/bin}"
+
+# specific feeder name
+CFE_FR_FEEDER="{{feeder}}"
+CFE_FR_FEEDER="${CFE_FR_FEEDER:-$(hostname)}"
+
+# tables to dump and import
+DEFAULT_TABLES="__agentstatus
+__contexts
+__hosts
+__filechangeslog
+__lastseenhosts
+__software
+__softwareupdates
+__variables
+__benchmarkslog
+__contextslog
+__promiseexecutions
+__promiselog
+contextcache"
+CFE_FR_TABLES="{{tables}}"
+CFE_FR_TABLES="${CFE_FR_TABLES:-$DEFAULT_TABLES}"
+
+# dump phase
+CFE_FR_COMPRESSOR="{{compressor}}"
+CFE_FR_COMPRESSOR="${CFE_FR_COMPRESSOR:-gzip}"
+CFE_FR_COMPRESSOR_ARGS="{{compressor_args}}" # no extra args by default
+CFE_FR_COMPRESSOR_EXT="{{compressor_ext}}"
+CFE_FR_COMPRESSOR_EXT="${CFE_FR_COMPRESSOR_EXT:-gz}"
+CFE_FR_DUMP_DIR="{{dump_dir}}"
+CFE_FR_DUMP_DIR="${CFE_FR_DUMP_DIR:-$DEFAULT_PREFIX/fedhub/dump}"
+
+# transport phase
+CFE_FR_SUPERHUB_DROP_DIR="{{drop_dir}}"
+CFE_FR_SUPERHUB_DROP_DIR="${CFE_FR_SUPERHUB_DROP_DIR:-$DEFAULT_PREFIX/superhub/drop}"
+CFE_FR_SUPERHUB_IMPORT_DIR="{{import_dir}}"
+CFE_FR_SUPERHUB_IMPORT_DIR="${CFE_FR_SUPERHUB_IMPORT_DIR:-$DEFAULT_PREFIX/superhub/import}"
+CFE_FR_SUPERHUB_LOGIN="{{login}}"
+CFE_FR_SUPERHUB_LOGIN="${CFE_FR_SUPERHUB_LOGIN:-cfdrop@superhub}"
+CFE_FR_TRANSPORT_DIR="{{transport_dir}}"
+CFE_FR_TRANSPORT_DIR="${CFE_FR_TRANSPORT_DIR:-$DEFAULT_PREFIX/fedhub/transport}"
+CFE_FR_TRANSPORTER="{{transporter}}"
+CFE_FR_TRANSPORTER="${CFE_FR_TRANSPORTER:-rsync}"
+CFE_FR_TRANSPORTER_ARGS="{{transporter_args}}"
+CFE_FR_TRANSPORTER_ARGS="${CFE_FR_TRANSPORTER_ARGS:--av}"
+
+# import phase
+CFE_FR_EXTRACTOR="{{extractor}}"
+CFE_FR_EXTRACTOR="${CFE_FR_EXTRACTOR:-zcat}"
+CFE_FR_EXTRACTOR_ARGS="{{extractor_args}}" # no extra args by default
+CFE_FR_IMPORT_NJOBS="{{n_jobs}}"           # no explicit limit of jobs by default
+                                           # (will use all the CPUs available)
+CFE_FR_SED_ARGS="{{sed_args}}" # no extra args by default
+CFE_FR_SED_FILTERS_DIR="{{sed_filters_dir}}"
+CFE_FR_SED_FILTERS_DIR="${CFE_FR_SED_FILTERS_DIR:-$DEFAULT_PREFIX/superhub/import/filters}"
