@@ -1,6 +1,10 @@
-body file control { inputs => { "$(sys.libdir)/stdlib.cf" }; }
+body file control
+{
+        inputs => { "$(sys.libdir)/stdlib.cf" };
+        namespace => "cfengine_enterprise_federation";
+}
 
-bundle agent federation_config
+bundle agent config
 # @brief Read/parse config JSON, define variables and classes for use later
 {
   vars:
@@ -10,30 +14,30 @@ bundle agent federation_config
       "path" string => "$(federation_dir)/cfapache/federation-config.json";
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
-      "cfengine_internal_federation_enabled"
-        expression => fileexists("$(path)"),
+      "enabled"
+        expression => fileexists( $(path) ),
         scope => "namespace";
   vars:
-    cfengine_internal_federation_enabled::
-      "data" data => readjson("$(path)");
-      "remotes" slist => getindices(@(data[remote_hubs]));
+    enabled::
+      "data" data => readjson( $(path) );
+      "remotes" slist => getindices( @(data[remote_hubs]) );
 
   classes:
-    cfengine_internal_federation_enabled::
+    enabled::
 
-      "cfengine_internal_federation_am_feeder"
+      "am_feeder"
         and => {strcmp("superhub", "$(data[remote_hubs][$(remotes)][role])"),
                 strcmp("true", "$(data[remote_hubs][$(remotes)][enabled])")},
         comment => "Has a remote hub with superhub role, should act as feeder",
         scope => "namespace";
 
-      "cfengine_internal_federation_am_superhub"
+      "am_superhub"
         and => {strcmp("feeder", "$(data[remote_hubs][$(remotes)][role])"),
                 strcmp("true", "$(data[remote_hubs][$(remotes)][enabled])")},
         comment => "Has a remote hub with feeder role, should act as superhub",
         scope => "namespace";
 
-      "cfengine_internal_federation_am_transporter"
+      "am_transporter"
         and => {strcmp("superhub", "$(data[remote_hubs][$(remotes)][role])"),
                 strcmp("true", "$(data[remote_hubs][$(remotes)][enabled])"),
                 strcmp("push_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])")},
@@ -41,24 +45,24 @@ bundle agent federation_config
         scope => "namespace";
 
   reports:
-    cfengine_internal_federation_enabled.(DEBUG|DEBUG_federation_config)::
+    enabled.(DEBUG|DEBUG_config)::
       "Federation enabled!";
-    cfengine_internal_federation_am_superhub.(DEBUG|DEBUG_federation_config)::
+    am_superhub.(DEBUG|DEBUG_config)::
       "I'm a superhub!";
-    cfengine_internal_federation_am_feeder.(DEBUG|DEBUG_federation_config)::
+    am_feeder.(DEBUG|DEBUG_config)::
       "I'm a feeder!";
-    cfengine_internal_federation_am_transporter.(DEBUG|DEBUG_federation_config)::
+    am_transporter.(DEBUG|DEBUG_config)::
       "I'm a transporter!";
 }
 
-bundle agent federation_manage_cfdrop
+bundle agent transport_user
 # @brief Manage cfdrop user and permissions for remote SSH access
 {
   vars:
       "user"
         string => "cfdrop";
       "home"
-        string => "/home/$(user)";
+        string => "$(cfengine_enterprise_federation:config.federation_dir)/superhub/drop";
       "create_files"
         slist => {
           "$(home)/.",
@@ -66,7 +70,7 @@ bundle agent federation_manage_cfdrop
           "$(home)/.ssh/authorized_keys"
         };
   classes:
-    cfengine_internal_federation_enabled::
+    enabled::
       "selinux_enabled"
         expression => strcmp("Enforcing", execresult("getenforce", useshell));
       "missing_ssh_context"
@@ -81,119 +85,116 @@ bundle agent federation_manage_cfdrop
     "$(create_files)"
       create => "true";
     "$(home)/."
-      depth_search => recurse_with_base("inf"),
-      file_select => all,
-      perms => mo("600", "$(user)");
+      depth_search => default:recurse_with_base("inf"),
+      file_select => default:all,
+      perms => default:mog( "600", $(user), "root" );
   commands:
     selinux_enabled.missing_ssh_context::
       "restorecon -F $(home)/.ssh/authorized_keys"
-        contain => in_shell;
+        contain => default:in_shell;
 }
 
 
 bundle agent federation_manage_files
-# @brief Manage files, directories and permissions in /opt/cfengine/federation
+# @brief Manage files, directories and permissions in $(cfengine_enterprise_federation:config.federation_dir)
 {
   files:
     enterprise_edition.(policy_server|am_policy_hub)::
-      "/opt/cfengine/federation/."
+      "$(cfengine_enterprise_federation:config.federation_dir)/."
         create => "true",
-        perms => mo("601", "root");
-      "/opt/cfengine/federation/cfapache/."
+        perms => default:mog( "701", "root", "root" );
+      "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/."
         create => "true",
-        perms => mo("600", "cfapache");
-      "/opt/cfengine/federation/cfapache/."
-        depth_search => recurse("inf"),
-        file_select => all,
-        perms => mo("600", "cfapache");
-    cfengine_internal_federation_enabled::
-      "$(federation_config.bin_dir)/."
+        perms => default:mog( "600", "cfapache", "root" );
+      "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/."
+        depth_search => default:recurse_with_base("inf"),
+        file_select => default:all,
+        perms => default:mog( "600", "cfapache", "root" );
+    enabled::
+      "$(cfengine_enterprise_federation:config.bin_dir)/."
         create => "true",
-        perms => mo("600", "root");
-    cfengine_internal_federation_am_superhub::
-      "$(federation_config.federation_dir)/superhub/."
+        perms => default:mog( "600", "root", "root" );
+    am_superhub::
+      "$(cfengine_enterprise_federation:config.federation_dir)/superhub/."
         create => "true",
-        perms => mo("600", "root");
-      "$(federation_config.federation_dir)/superhub/drop/."
+        perms => default:mog( "701", "root", "root" );
+      "$(cfengine_enterprise_federation:config.federation_dir)/superhub/import/."
         create => "true",
-        perms => mo("600", "root");
-      "$(federation_config.federation_dir)/superhub/import/."
+        perms => default:mog( "600", "root", "root" );
+    am_feeder::
+      "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/."
         create => "true",
-        perms => mo("600", "root");
-    cfengine_internal_federation_am_feeder::
-      "$(federation_config.federation_dir)/fedhub/."
+        perms => default:mog( "600", "root", "root" );
+      "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/dump/."
         create => "true",
-        perms => mo("600", "root");
-      "$(federation_config.federation_dir)/fedhub/dump/."
+        perms => default:mog( "600", "root", "root" );
+      "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/transport/."
         create => "true",
-        perms => mo("600", "root");
-      "$(federation_config.federation_dir)/fedhub/transport/."
-        create => "true",
-        perms => mo("600", "root");
+        perms => default:mog( "600", "root", "root" );
 
     # TODO: Render these from templates:
-    cfengine_internal_federation_am_feeder::
-      "$(federation_config.bin_dir)/dump.sh"
+    am_feeder::
+      "$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"
         create => "true",
-        perms => mo("600", "root");
-    cfengine_internal_federation_am_transporter::
-      "$(federation_config.bin_dir)/transport.sh"
+        perms => default:mog( "600", "root", "root" );
+    am_transporter::
+      "$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"
         create => "true",
-        perms => mo("600", "root");
-    cfengine_internal_federation_am_superhub::
-      "$(federation_config.bin_dir)/import.sh"
+        perms => default:mog( "600", "root", "root" );
+    am_superhub::
+      "$(cfengine_enterprise_federation:config.bin_dir)/import.sh"
         create => "true",
-        perms => mo("600", "root");
+        perms => default:mog( "600", "root", "root" );
 }
 
-bundle agent federation_manage_database
+bundle agent postgres_config
 # @brief Customize postgres config for superhub
 {
   files:
-    cfengine_internal_federation_am_superhub::
+    am_superhub::
       "/var/cfengine/state/pg/data/postgresql.conf"
-        edit_line => insert_lines("shared_buffers=1GB");
+        edit_line => default:insert_lines("shared_buffers=1GB");
       "/var/cfengine/state/pg/data/postgresql.conf"
-        edit_line => insert_lines("max_locks_per_transaction=4000");
+        edit_line => default:insert_lines("max_locks_per_transaction=4000");
 }
 
-bundle agent federation_manage_dump
+bundle agent exported_data
 # @brief Run script to dump pg data on feeder hub
 {
   commands:
-    cfengine_internal_federation_am_feeder::
+    am_feeder::
       # TODO: pass correct arguments once script is done
       "bash"
-        arglist => {"$(federation_config.bin_dir)/dump.sh",
-                    "$(federation_config.federation_dir)/config.sh"},
-        contain => in_shell;
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/dump.sh",
+                    "$(cfengine_enterprise_federation:config.federation_dir)/config.sh"},
+        contain => default:in_shell;
 }
 
-bundle agent federation_manage_transport
+bundle agent data_transport
 # @brief Run script to transport data from feeder to superhub
 {
   commands:
-    cfengine_internal_federation_am_transporter::
+    am_transporter::
       # TODO: pass correct arguments once script is done
       "bash"
-        arglist => {"$(federation_config.bin_dir)/transport.sh",
-                    "$(federation_config.federation_dir)/config.sh"},
-        contain => in_shell;
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh",
+                    "$(cfengine_enterprise_federation:config.federation_dir)/config.sh"},
+        contain => default:in_shell;
 }
 
-bundle agent federation_manage_import
+bundle agent imported_data
 # @brief Run script to import dumps on superhub
 {
   commands:
-    cfengine_internal_federation_am_superhub::
+    am_superhub::
       # TODO: pass correct arguments once script is done
       "bash"
-        arglist => {"$(federation_config.bin_dir)/import.sh",
-                    "$(federation_config.federation_dir)/config.sh"},
-        contain => in_shell;
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/import.sh",
+                    "$(cfengine_enterprise_federation:config.federation_dir)/config.sh"},
+        contain => default:in_shell;
 }
 
-bundle agent federation_entry_bundle
+bundle agent entry
 # @brief Conditionally runs all federated reporting bundles
 {
   meta:
@@ -202,27 +203,27 @@ bundle agent federation_entry_bundle
         slist => { "enterprise_maintenance" };
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
-      "federation_config_exists"
-        expression => fileexists("/opt/cfengine/federation/cfapache/federation-config.json");
+      "config_exists"
+        expression => fileexists("$(cfengine_enterprise_federation:config.federation_dir)/cfapache/federation-config.json");
   methods:
-    federation_config_exists::
-      "federation_config"
-        usebundle => federation_config;
+    config_exists::
+      "CFEngine Enterprise Federation Configuration"
+        usebundle => config;
     enterprise_edition.(policy_server|am_policy_hub)::
       "federation_manage_files"
         usebundle => federation_manage_files;
-    cfengine_internal_federation_am_superhub::
-      "federation_manage_cfdrop"
-        usebundle => federation_manage_cfdrop;
-    cfengine_internal_federation_enabled::
-      "federation_manage_database"
-        usebundle => federation_manage_database;
-      "federation_manage_dump"
-        usebundle => federation_manage_dump;
-      "federation_manage_transport"
-        usebundle => federation_manage_transport;
-      "federation_manage_import"
-        usebundle => federation_manage_import;
+    am_superhub::
+      "CFEngine Enterprise Federation Transport User"
+        usebundle => transport_user;
+    enabled::
+      "CFEngine Enterprise Federation Postgres Configuration"
+        usebundle => postgres_config;
+      "CFEngine Enterprise Federation Feeder Data Export"
+        usebundle => exported_data;
+      "CFEngine Enterprise Federation Feeder Data Transport"
+        usebundle => data_transport;
+      "CFEngine Enterprise Federation Feeder Data Import"
+        usebundle => imported_data;
   reports:
     !enterprise_edition::
       "Federated reporting is only available in CFEngine Enterprise.";
@@ -230,9 +231,14 @@ bundle agent federation_entry_bundle
       "Federated reporting is only available on the policy server / hub.";
 }
 
+body file control
+{
+        namespace => "default";
+}
+
 bundle agent __main__
 # @brief You can run this policy file from shell without specifying bundle
 {
   methods:
-    "federation_entry_bundle" usebundle => federation_entry_bundle;
+    "entry" usebundle => cfengine_enterprise_federation:entry;
 }
