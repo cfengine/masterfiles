@@ -37,6 +37,24 @@ bundle common inventory_linux
         comment => "Name of the interface where default gateway is routed",
         ifvarclass => strcmp("$(proc_routes[$(routeidx)][1])", "00000000");
 
+    linux::
+      "nfs_servers"
+        comment => "NFS servers (to list hosts impacted by NFS outages)",
+        slist => maplist( regex_replace( $(this) , ":.*", "", "g"),
+                          # NFS server is before the colon (:), that's all we want
+                          # e.g., nfs.example.com:/vol/homedir/user1 /home/user1 ...
+                          #       ^^^^^^^^^^^^^^^
+                          grep( ".* nfs .*",
+                                readstringlist("/proc/mounts", "", "\n", inf, inf)
+                              )
+                        );
+
+
+        "nfs_server[$(nfs_servers)]"
+          string => "$(nfs_servers)",
+          meta => { "inventory", "attribute_name=NFS Server" };
+
+
   classes:
 
     any::
