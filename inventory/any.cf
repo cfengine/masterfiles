@@ -190,7 +190,8 @@ bundle agent cfe_autorun_inventory_memory
         if => isvariable( $(mon.value_mem_total) );
 
       "free" string => "$(mon.value_mem_free)",
-        if => not( isvariable( "free" ) ),
+        if => and( not( isvariable( "free" ) ),
+                   isvariable( $(mon.value_mem_free) )),
         meta => { "report" };
 
 }
