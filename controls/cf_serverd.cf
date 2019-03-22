@@ -81,34 +81,34 @@ bundle server access_rules()
 
     any::
 
-      "$(def.dir_masterfiles)"
+      "$(def.dir_masterfiles)/"
       handle => "server_access_grant_access_policy",
       shortcut => "masterfiles",
       comment => "Grant access to the policy updates",
       admit => { @(def.acl) };
 
-      "$(def.dir_software)"
+      "$(def.dir_software)/"
       handle => "server_access_grant_access_datafiles",
       comment => "Grant access to software updates",
       admit => { @(def.acl) };
 
-      "$(def.dir_bin)"
+      "$(def.dir_bin)/"
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
       admit => { @(def.acl) };
 
-      "$(def.dir_modules)"
+      "$(def.dir_modules)/"
       handle => "server_access_grant_access_modules",
       shortcut => "modules",
       comment => "Grant access to modules directory",
       admit => { @(def.acl) };
 
-      "$(def.dir_plugins)"
+      "$(def.dir_plugins)/"
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
       admit => { @(def.acl) };
 
-      "$(def.dir_templates)"
+      "$(def.dir_templates)/"
       handle => "server_access_grant_access_templates",
       shortcut => "templates",
       comment => "Grant access to templates directory",
@@ -126,7 +126,7 @@ bundle server access_rules()
       admit => { @(def.policy_servers) };
 
     policy_server.enable_cfengine_enterprise_hub_ha::
-      "$(sys.workdir)/ppkeys"
+      "$(sys.workdir)/ppkeys/"
       handle => "server_access_grant_access_ppkeys_hubs",
       comment => "Grant access to ppkeys for HA hubs",
       admit => { @(def.policy_servers) };
@@ -147,7 +147,7 @@ bundle server access_rules()
       # will be able to synchronize its content. Once passive hub will
       # be promoted to act as a master all the custom scripts will be
       # accessible.
-      "/opt/cfengine/notification_scripts"
+      "/opt/cfengine/notification_scripts/"
       handle => "server_access_grant_access_notification scripts",
       comment => "Grant access tonotification scripts",
       admit => { @(def.policy_servers) };
@@ -163,7 +163,7 @@ bundle server access_rules()
       # In order to perform failover while active hub is down clients needs to
       # have all hubs keys. This gives ability to connect to slave hub promoted to active role
       # once active is down.
-      "$(ha_def.hubs_keys_location)"
+      "$(ha_def.hubs_keys_location)/"
       handle => "server_access_grant_access_to_clients",
       comment => "Grant access to hubs' keys to clients",
       admit => { @(def.acl) };
