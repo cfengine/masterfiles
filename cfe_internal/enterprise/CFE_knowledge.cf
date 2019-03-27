@@ -131,6 +131,13 @@ bundle agent cfe_internal_setup_knowledge
       file_select => cfe_internal_docroot_api_static_perms,
       perms => mog("0440", "root", $(def.cf_apache_group) );
 
+      "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "ENT-4551" }
+        comment => ".status, .pid, and potentially .abort files need to be writeable so that the async query API will function properly",
+        handle => "cfe_internal_setup_knowledge_files_doc_root_api_static_async_query_status",
+        depth_search => recurse("inf"),
+        file_select => cfe_internal_docroot_api_static_async_query_status_status_perms,
+        perms => mog("0660", "root", $(def.cf_apache_group) );
+
       "$(sys.workdir)/httpd/logs/."
       comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
       handle => "cfe_internal_setup_knowledge_files_httpd_logs",
@@ -278,8 +285,23 @@ body file_select cfe_internal_exclude_index_html
 
 body file_select cfe_internal_docroot_api_static_perms
 {
-  leaf_name => { "\.htaccess" };
+      # ENT-4551 - .status, .pid, and potentially .abort files used by async
+      # query mechanism need to be writeable by the webserver, we exclude those
+      # files here to avoid continual promise repair.
+
+  leaf_name => { "\.htaccess", "\.status", "\.pid", "\.abort" };
   file_result => "!leaf_name";
+}
+############################################################################
+
+body file_select cfe_internal_docroot_api_static_async_query_status_status_perms
+# @brief .status, .pid and .abort files are used by the asynchronous query API and need to be writeable
+{
+      # ENT-4551 - .status, .pid, and potentially .abort files used by async
+      # query mechanism need to be writeable by the webserver
+
+        leaf_name => { "\.status", "\.pid", "\.abort" };
+        file_result => "leaf_name";
 }
 
 ############################################################################
