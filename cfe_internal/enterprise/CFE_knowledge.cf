@@ -43,6 +43,9 @@ bundle agent cfe_internal_setup_knowledge
 
     any::
 
+      "/var/log/CFEngineHub-Install.log" -> { "ENT-4506" }
+        perms => mog("0600", "root", "root" );
+
       "$(cfe_internal_hub_vars.docroot)"
       comment => "All files in there should be at least 0644",
       handle => "cfe_internal_setup_knowledge_files_doc_root_2",
