@@ -151,7 +151,7 @@ bundle agent federation_manage_files
         perms => default:mog( "600", "root", "root" );
 
       "$(cfengine_enterprise_federation:config.bin_dir)/parallel.sh"
-        copy_from => local_dcp( "$(this.promise_dirname)/../../../templates/parallel.sh" ),
+        copy_from => local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/parallel.sh" ),
         perms => default:mog( "600", "root", "root" );
 
     am_feeder::
