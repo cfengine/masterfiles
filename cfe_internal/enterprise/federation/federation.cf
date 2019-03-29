@@ -139,14 +139,14 @@ bundle agent federation_manage_files
       "$(cfengine_enterprise_federation:config.bin_dir)/config.sh"
         create => "true",
         template_method => "mustache",
-        edit_template => "$(this.promise_dirname)/../../../templates/config.sh.mustache",
+        edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
         perms => default:mog( "600", "root", "root" );
 
       # TODO: Instrument augments
       "$(cfengine_enterprise_federation:config.bin_dir)/log.sh"
         create => "true",
         template_method => "mustache",
-        edit_template => "$(this.promise_dirname)/../../../templates/log.sh.mustache",
+        edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/log.sh.mustache",
         template_data => '{ "logger": "log", "logger_args": "", "timestamp_cmd": "date --iso-8601=seconds"}',
         perms => default:mog( "600", "root", "root" );
 
