@@ -1031,7 +1031,7 @@ body copy_from inventory_cmdb_copy_from
 bundle server hub_mdr_access_rules
 {
   vars:
-      "MDR_PATH" string => "/opt/cfengine/MDR";
+      "MDR_PATH" string => "/opt/cfengine/cmdb";
 
   access:
       # Allow each host access to download their host specific data
