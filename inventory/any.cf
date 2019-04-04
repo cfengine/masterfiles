@@ -1000,7 +1000,7 @@ bundle agent inventory_cmdb_load(file)
         ifvarclass => fileexists( $(file) );
 
       "cmdb_string"
-      string => format("%S", cmdb),
+        string => format("%S", cmdb),
         ifvarclass => isvariable( cmdb );
 
       "bkeys" slist => getindices("cmdb[vars]");
