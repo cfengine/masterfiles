@@ -984,7 +984,12 @@ bundle agent inventory_cmdb_load(file)
   classes:
       "have_cmdb_data" expression => isvariable("cmdb");
 
-      "$(ckeys)" expression => "any", scope => "namespace";
+      # Like augments, if any of the regular expressions for the class match,
+      # define the class.
+
+      "$(ckeys)"
+        expression => classmatch( "$($(ckeys)_matches)" ),
+        scope => "namespace";
 
   vars:
       "cmdb"
@@ -1000,6 +1005,7 @@ bundle agent inventory_cmdb_load(file)
       "$(vkeys_$(bkeys))" string => nth("cmdb[vars][$(bkeys)]", $(vkeys));
 
       "ckeys" slist => getindices("cmdb[classes]");
+      "$(ckeys)_matches" slist => getindices("cmdb[classes][$(ckeys)]");
 
   reports:
     DEBUG|DEBUG_inventory_cmdb_load::
