@@ -958,7 +958,7 @@ bundle agent cfe_autorun_inventory_cmdb
 # classes.
 {
   vars:
-      "cmdb_dir" string => "$(sys.workdir)/cmdb",
+      "cmdb_dir" string => "$(sys.statedir)/cmdb",
         comment => "CMDB directory location",
         meta => { "cmdb" };
 
@@ -967,6 +967,9 @@ bundle agent cfe_autorun_inventory_cmdb
         meta => { "cmdb" };
 
   files:
+      "$(cmdb_dir)/."
+        create => "true";
+
       "$(cmdb_file)"
         copy_from => inventory_cmdb_copy_from,
         classes => inventory_scoped_classes_generic("bundle", "cmdb_file");
