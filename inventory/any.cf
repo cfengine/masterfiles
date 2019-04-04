@@ -1027,7 +1027,8 @@ body copy_from inventory_cmdb_copy_from
 {
         source      => "my.json";
         servers     => { "$(sys.policy_hub)" };
-        compare     => "digest"; # Poor interop with mixed Enterprise and Community agents
+        compare     => "digest"; # Poor interoperability with mixed Enterprise and Community agents
+        missing_ok  => "true"; # Not all hosts will necessarily have host specific data.
         encrypt     => "true"; # NOOP with protocol 2 which is required
         verify      => "true";
 }
