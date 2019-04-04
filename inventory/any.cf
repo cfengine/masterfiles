@@ -954,22 +954,22 @@ bundle agent cfe_autorun_inventory_cmdb
 # @brief Copy and load the CMDB inventory
 #
 # This bundle is for refreshing the CMDB inventory.  It copies the
-# file me.json from the server, then loads it to create variables and
+# file my.json from the server, then loads it to create variables and
 # classes.
 {
   vars:
       "cmdb_dir" string => "$(sys.workdir)/cmdb",
-      comment => "CMDB directory location",
-      meta => { "cmdb" };
+        comment => "CMDB directory location",
+        meta => { "cmdb" };
 
-      "cmdb_file" string => "$(cmdb_dir)/me.json",
-      comment => "CMDB file location",
-      meta => { "cmdb" };
+      "cmdb_file" string => "$(cmdb_dir)/my.json",
+        comment => "CMDB file location",
+        meta => { "cmdb" };
 
   files:
       "$(cmdb_file)"
-      copy_from => inventory_cmdb_copy_from,
-      classes => inventory_scoped_classes_generic("bundle", "cmdb_file");
+        copy_from => inventory_cmdb_copy_from,
+        classes => inventory_scoped_classes_generic("bundle", "cmdb_file");
 
   methods:
     cmdb_file_ok::
@@ -1016,15 +1016,22 @@ bundle agent inventory_cmdb_load(file)
 body copy_from inventory_cmdb_copy_from
 # @brief Copy from the CMDB source
 {
-    !cfe_inventory_cmdb_override_file::
-      source      => "me.json";
-      servers     => { "$(sys.policy_hub)" };
-    cfe_inventory_cmdb_override_file::
-      source      => "$(sys.inputdir)/me.json";
-    any::
-      compare     => "digest";
-      encrypt     => "true";
-      verify      => "true";
+        source      => "my.json";
+        servers     => { "$(sys.policy_hub)" };
+        compare     => "digest"; # Poor interop with mixed Enterprise and Community agents
+        encrypt     => "true"; # NOOP with protocol 2 which is required
+        verify      => "true";
+}
+bundle server hub_mdr_access_rules
+{
+  vars:
+      "MDR_PATH" string => "/opt/cfengine/MDR";
+
+  access:
+      # Allow each host access to download their host specific data
+      "$(MDR_PATH)/$(connnection.key).json"
+        shortcut => "my.json",
+        admit_keys => { $(connection.key) };
 }
 
 body classes inventory_scoped_classes_generic(scope, x)
