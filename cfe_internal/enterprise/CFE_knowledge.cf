@@ -30,7 +30,11 @@ bundle agent cfe_internal_setup_knowledge
         or => {
                 "enterprise_3_7_3", "enterprise_3_7_4", "enterprise_3_7_5",
                 "enterprise_3_10_0"
-              };
+        };
+
+  vars:
+      "install_logs" -> {"ENT-4564"}
+        slist => findfiles("/var/log/CFEngine*Install.log");
 
   files:
 
@@ -43,7 +47,7 @@ bundle agent cfe_internal_setup_knowledge
 
     any::
 
-      "/var/log/CFEngineHub-Install.log" -> { "ENT-4506" }
+      "$(install_logs)" -> { "ENT-4506" }
         perms => mog("0600", "root", "root" );
 
       "$(cfe_internal_hub_vars.docroot)"
