@@ -1039,7 +1039,7 @@ bundle server hub_mdr_access_rules
 
   access:
       # Allow each host access to download their host specific data
-      "$(MDR_PATH)/$(connnection.key).json"
+      "$(MDR_PATH)/$(connection.key).json"
         shortcut => "my.json",
         admit_keys => { $(connection.key) };
 }
