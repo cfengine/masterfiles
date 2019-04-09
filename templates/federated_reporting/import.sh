@@ -24,7 +24,17 @@ fi
 
 # TODO: we should do some validation of the files here
 mkdir -p "$CFE_FR_SUPERHUB_IMPORT_DIR"
-mv "$CFE_FR_SUPERHUB_DROP_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT" "$CFE_FR_SUPERHUB_IMPORT_DIR" || true
+no_drop_files=0
+ls -l "$CFE_FR_SUPERHUB_DROP_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT" >/dev/null 2>/dev/null ||
+  no_drop_files=1
+
+if [ "$no_drop_files" != "0" ]; then
+  log "No files in drop dir."
+else
+  log "Moving files from drop dir to import dir."
+  mv "$CFE_FR_SUPERHUB_DROP_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT" "$CFE_FR_SUPERHUB_IMPORT_DIR" ||
+    log "Failed to move files from drop dir to import dir."
+fi
 
 dump_files="$(ls -1 "$CFE_FR_SUPERHUB_IMPORT_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT" 2>/dev/null)" ||
   {
