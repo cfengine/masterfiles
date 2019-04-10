@@ -47,8 +47,9 @@ function push() {
   for dump_file in $dump_files; do
     failed=0
     mv "$dump_file" "$dump_file.transporting"
-    "$CFE_FR_TRANSPORTER" "$CFE_FR_TRANSPORTER_ARGS" "$dump_file.transporting" "$CFE_FR_SUPERHUB_LOGIN:$CFE_FR_SUPERHUB_DROP_DIR/$(basename "$dump_file")" &&
-      rm -f "$dump_file.transporting" || failed=1
+    "$CFE_FR_TRANSPORTER" "$CFE_FR_TRANSPORTER_ARGS" "$dump_file.transporting" "$CFE_FR_SUPERHUB_LOGIN:$CFE_FR_SUPERHUB_DROP_DIR/$(basename "$dump_file")" ||
+      failed=1
+    rm -f "$dump_file.transporting"
     if [ "$failed" != 0 ]; then
       log "Transporting file $dump_file failed!"
       some_failed=1
