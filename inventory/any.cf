@@ -971,12 +971,12 @@ bundle agent cfe_autorun_inventory_cmdb
         create => "true";
 
       "$(cmdb_file)"
-        copy_from => inventory_cmdb_copy_from,
-        classes => inventory_scoped_classes_generic("bundle", "cmdb_file");
+        copy_from => inventory_cmdb_copy_from;
 
   methods:
-    cmdb_file_ok::
-      "load CMDB file" usebundle => inventory_cmdb_load($(cmdb_file));
+      "load CMDB file"
+        usebundle => inventory_cmdb_load( $(cmdb_file) ),
+        if => fileexists( $(cmdb_file) );
 }
 
 bundle agent inventory_cmdb_load(file)
