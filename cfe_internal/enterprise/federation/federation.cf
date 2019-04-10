@@ -121,6 +121,9 @@ bundle agent federation_manage_files
       "$(cfengine_enterprise_federation:config.federation_dir)/superhub/import/."
         create => "true",
         perms => default:mog( "600", "root", "root" );
+      "$(cfengine_enterprise_federation:config.federation_dir)/superhub/import/filters/."
+        create => "true",
+        perms => default:mog( "600", "root", "root" );
     am_feeder::
       "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/."
         create => "true",
@@ -133,18 +136,52 @@ bundle agent federation_manage_files
         perms => default:mog( "600", "root", "root" );
 
     # TODO: Render these from templates:
+
+    am_feeder|am_transporter|am_superhub::
+      # TODO: Instrument augments
+      "$(cfengine_enterprise_federation:config.bin_dir)/config.sh"
+        create => "true",
+        template_method => "mustache",
+        edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
+        perms => default:mog( "600", "root", "root" );
+
+      # TODO: Instrument augments
+      "$(cfengine_enterprise_federation:config.bin_dir)/log.sh"
+        create => "true",
+        template_method => "mustache",
+        edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/log.sh.mustache",
+        perms => default:mog( "600", "root", "root" );
+
+      "$(cfengine_enterprise_federation:config.bin_dir)/parallel.sh"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/parallel.sh" ),
+        perms => default:mog( "600", "root", "root" );
+
     am_feeder::
       "$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"
-        create => "true",
-        perms => default:mog( "600", "root", "root" );
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/dump.sh" ),
+        perms => default:mog( "700", "root", "root" );
+
     am_transporter::
       "$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"
-        create => "true",
-        perms => default:mog( "600", "root", "root" );
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/transport.sh" ),
+        perms => default:mog( "700", "root", "root" );
+
     am_superhub::
       "$(cfengine_enterprise_federation:config.bin_dir)/import.sh"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/import.sh" ),
+        perms => default:mog( "700", "root", "root" );
+
+      "$(cfengine_enterprise_federation:config.bin_dir)/import_file.sh"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/import_file.sh" ),
+        perms => default:mog( "700", "root", "root" );
+
+      "$(cfengine_enterprise_federation:config.federation_dir)/superhub/import/filters/filter.sed"
         create => "true",
+        template_method => "mustache",
+        edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/filter.sed.mustache",
         perms => default:mog( "600", "root", "root" );
+
+
 }
 
 bundle agent postgres_config
