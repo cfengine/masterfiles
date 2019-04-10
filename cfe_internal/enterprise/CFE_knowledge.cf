@@ -34,7 +34,8 @@ bundle agent cfe_internal_setup_knowledge
 
   vars:
       "install_logs" -> {"ENT-4564"}
-        slist => findfiles("/var/log/CFEngine*Install.log");
+        slist => findfiles("/var/log/CFEngine*Install.log"),
+        unless => "windows";
 
   files:
 
