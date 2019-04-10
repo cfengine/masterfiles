@@ -50,6 +50,12 @@ CFE_FR_TRANSPORTER="{{transporter}}"
 CFE_FR_TRANSPORTER="${CFE_FR_TRANSPORTER:-rsync}"
 CFE_FR_TRANSPORTER_ARGS="{{transporter_args}}"
 CFE_FR_TRANSPORTER_ARGS="${CFE_FR_TRANSPORTER_ARGS:--av}"
+CFE_FR_SSH="{{ssh}}"
+CFE_FR_SSH="${CFE_FR_SSH:-ssh}"
+CFE_FR_SSH_ARGS="{{ssh_args}}"
+CFE_FR_SSH_ARGS="${CFE_FR_SSH_ARGS:--o StrictHostKeyChecking=no}"
+CFE_FR_FEEDER_USERNAME="{{feeder_username}}"
+CFE_FR_FEEDER_USERNAME="${CFE_FR_FEEDER_USERNAME:-superhub}"
 
 # import phase
 CFE_FR_EXTRACTOR="{{extractor}}"
