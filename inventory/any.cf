@@ -1003,16 +1003,17 @@ bundle agent inventory_cmdb_load(file)
         string => format("%S", cmdb),
         ifvarclass => isvariable( cmdb );
 
-      "bkeys" slist => getindices("cmdb[vars]");
-      "vkeys_$(bkeys)"
-        slist => getindices("cmdb[vars][$(bkeys)]"),
+      # Inventory data received from MDR
+      "bkeys"
+        slist => getindices("cmdb[vars]"),
         meta => { "inventory", "Vars from Hub MDR" };
-
+      "vkeys_$(bkeys)" slist => getindices("cmdb[vars][$(bkeys)]");
       "$(vkeys_$(bkeys))" string => nth("cmdb[vars][$(bkeys)]", $(vkeys));
 
-      "ckeys" slist => getindices("cmdb[classes]");
-      "$(ckeys)_matches" slist => getindices("cmdb[classes][$(ckeys)]"),
+      "ckeys"
+        slist => getindices("cmdb[classes]"),
         meta => { "inventory", "Classes considered from Hub MDR" };
+      "$(ckeys)_matches" slist => getindices("cmdb[classes][$(ckeys)]");
 
   reports:
     DEBUG|DEBUG_inventory_cmdb_load::
