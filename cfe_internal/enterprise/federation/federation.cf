@@ -21,7 +21,22 @@ bundle agent config
     enabled::
       "data" data => readjson( $(path) );
       "remotes" slist => getindices( @(data[remote_hubs]) );
-
+      "login" string => ""; # default
+      "login"
+        string => "$(data[remote_hubs][$(remotes)][transport][ssh_user])@$(data[remote_hubs][$(remotes)][transport][ssh_host])",
+            if => and(
+                       # To ensure we are using a remote hub that's actually enabled
+                       strcmp( "true", "$(data[remote_hubs][$(remotes)][enabled])" ),
+                       # To ensure the remote we are pushing to actually needs the data (is a superhub)
+                       strcmp( "superhub", "$(data[remote_hubs][$(remotes)][role])" ));
+      "pubkey[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_pubkey])",
+            if => and(
+                       # To ensure we are using a remote hub that's actually enabled
+                       strcmp( "true", "$(data[remote_hubs][$(remotes)][enabled])" ),
+                       # To ensure the remote is a feeder that we need to add to superhub's authorized_keys
+                       strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" ));
+      "pubkeys" slist => getvalues( pubkey );
+      
   classes:
     enabled::
 
@@ -63,20 +78,33 @@ bundle agent transport_user
         string => "cfdrop";
       "home"
         string => "$(cfengine_enterprise_federation:config.federation_dir)/superhub/drop";
+
+      "ssh_key_type" string => "ed25519";
+      "ssh_priv_key" string => "$(home)/.ssh/id_$(ssh_key_type)";
+      "ssh_pub_key" string => "$(home)/.ssh/id_$(ssh_key_type).pub";
+      "ssh_auth_keys" string => "$(home)/.ssh/authorized_keys";
+      
       "create_files"
         slist => {
           "$(home)/.",
           "$(home)/.ssh/.",
-          "$(home)/.ssh/authorized_keys"
+          "$(ssh_auth_keys)"
         };
   classes:
     enabled::
       "selinux_enabled"
         expression => strcmp("Enforcing", execresult("getenforce", useshell));
       "missing_ssh_context"
-        expression => not(regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                 execresult("ls -Z $(home)/.ssh/authorized_keys",
-                                            useshell)));
+        expression => not( or(
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(ssh_auth_keys)",
+                                                 useshell)),
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(ssh_priv_key)",
+                                                 useshell)),
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(ssh_pub_key)",
+                                                 useshell))));
   users:
     "$(user)"
       policy => "present",
@@ -88,9 +116,22 @@ bundle agent transport_user
       depth_search => default:recurse_with_base("inf"),
       file_select => default:all,
       perms => default:mog( "600", $(user), "root" );
+    "$(ssh_auth_keys)"
+      create => "true",
+      edit_template_string => "{{#-top-}}{{{.}}}$(const.n){{/-top-}}",
+      template_data => @(cfengine_enterprise_federation:config.pubkeys),
+      template_method => "inline_mustache";
+
   commands:
+    # Generate a modern ssh keypair (2019-04)
+    "/usr/bin/ssh-keygen"
+      handle => "ssh_keys_configured",
+      args => "-N '' -a 150 -t $(ssh_key_type) -f $(ssh_priv_key)",
+      if => and( isdir( "$(home)/.ssh" ),
+                 not( fileexists( "$(ssh_priv_key)" )));
+
     selinux_enabled.missing_ssh_context::
-      "restorecon -F $(home)/.ssh/authorized_keys"
+      "restorecon -R -F  $(home)/.ssh/"
         contain => default:in_shell;
 }
 
@@ -143,6 +184,7 @@ bundle agent federation_manage_files
         create => "true",
         template_method => "mustache",
         edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
+        template_data => parsejson('{"login":"$(cfengine_enterprise_federation:config.login)"}'),
         perms => default:mog( "600", "root", "root" );
 
       # TODO: Instrument augments
@@ -187,12 +229,19 @@ bundle agent federation_manage_files
 bundle agent postgres_config
 # @brief Customize postgres config for superhub
 {
+  vars:
+    am_superhub::
+      "c[shared_buffers]" string => "1GB";
+      "c[max_locks_per_transaction]" string => "4000";
+      
   files:
     am_superhub::
       "/var/cfengine/state/pg/data/postgresql.conf"
-        edit_line => default:insert_lines("shared_buffers=1GB");
-      "/var/cfengine/state/pg/data/postgresql.conf"
-        edit_line => default:insert_lines("max_locks_per_transaction=4000");
+        edit_line => default:set_line_based( "$(this.bundle).c",
+                                     "=",
+                                     "\s*=\s*",
+                                     ".*",
+                                     "");
 }
 
 bundle agent exported_data
@@ -202,8 +251,7 @@ bundle agent exported_data
     am_feeder::
       # TODO: pass correct arguments once script is done
       "bash"
-        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/dump.sh",
-                    "$(cfengine_enterprise_federation:config.federation_dir)/config.sh"},
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"},
         contain => default:in_shell;
 }
 
@@ -214,8 +262,7 @@ bundle agent data_transport
     am_transporter::
       # TODO: pass correct arguments once script is done
       "bash"
-        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh",
-                    "$(cfengine_enterprise_federation:config.federation_dir)/config.sh"},
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"},
         contain => default:in_shell;
 }
 
@@ -226,8 +273,7 @@ bundle agent imported_data
     am_superhub::
       # TODO: pass correct arguments once script is done
       "bash"
-        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/import.sh",
-                    "$(cfengine_enterprise_federation:config.federation_dir)/config.sh"},
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/import.sh"},
         contain => default:in_shell;
 }
 
@@ -249,7 +295,7 @@ bundle agent entry
     enterprise_edition.(policy_server|am_policy_hub)::
       "federation_manage_files"
         usebundle => federation_manage_files;
-    am_superhub::
+    am_superhub|am_feeder::
       "CFEngine Enterprise Federation Transport User"
         usebundle => transport_user;
     enabled::
