@@ -129,12 +129,12 @@ bundle agent signing_keys
   commands:
     debian::
       # re-sign repo
-      "mkdir -m 700 .gnupg-temp; \
-       $(gpg) --import $(p.resources)/gpg/secring.gpg; \
-       rm /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo2/dists/package2/Release.gpg; \
-       $(gpg) --detach-sign --armor --output /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo1/dists/package1/Release; \
-       $(gpg) --detach-sign --armor --output /test-repos/deb_repo2/dists/package2/Release.gpg /test-repos/deb_repo2/dists/package2/Release; \
-       rm -rf .gnupg-temp; \
+      "mkdir -m 700 .gnupg-temp && \
+       $(gpg) --import $(p.resources)/gpg/secring.gpg && \
+       rm /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo2/dists/package2/Release.gpg && \
+       $(gpg) --detach-sign --armor --output /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo1/dists/package1/Release && \
+       $(gpg) --detach-sign --armor --output /test-repos/deb_repo2/dists/package2/Release.gpg /test-repos/deb_repo2/dists/package2/Release && \
+       rm -rf .gnupg-temp && \
        apt-key add $(p.resources)/gpg/pubring.gpg"
         contain => useshell,
         classes => if_successful("signing_keys_ok");
