@@ -191,6 +191,10 @@ bundle agent cfe_internal_setup_knowledge
         perms => mog("755", "root", "root"),
         comment => "The agent will complain if any other users (group or other)
                     have write access to the modules directory.";
+
+      "$(sys.statedir)/."
+        perms => mog("600", "root", "root");
+
 }
 
 #############################################################################
