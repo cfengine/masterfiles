@@ -31,10 +31,10 @@ bundle agent config
         comment => "Has a remote hub with superhub role, should act as feeder",
         scope => "namespace";
 
+      # Knowing if your a superhub is based on explicit setting of role in path
+      # (federation-config.json)
       "am_superhub"
-        and => {strcmp("feeder", "$(data[remote_hubs][$(remotes)][role])"),
-                strcmp("true", "$(data[remote_hubs][$(remotes)][enabled])")},
-        comment => "Has a remote hub with feeder role, should act as superhub",
+        expression => strcmp("superhub", "$(data[role])"),
         scope => "namespace";
 
       "am_transporter"
