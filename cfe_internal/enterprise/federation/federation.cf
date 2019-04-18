@@ -245,15 +245,19 @@ bundle agent entry
   methods:
     config_exists::
       "CFEngine Enterprise Federation Configuration"
+        handle => "config",
         usebundle => config;
     enterprise_edition.(policy_server|am_policy_hub)::
       "federation_manage_files"
+        handle => "federation_manage_files",
         usebundle => federation_manage_files;
     am_superhub::
       "CFEngine Enterprise Federation Transport User"
+        handle => "transport_user",
         usebundle => transport_user;
     enabled::
       "CFEngine Enterprise Federation Postgres Configuration"
+        handle => "postgres_config",
         usebundle => postgres_config;
       "CFEngine Enterprise Federation Feeder Data Export"
         usebundle => exported_data;
@@ -261,6 +265,10 @@ bundle agent entry
         usebundle => data_transport;
       "CFEngine Enterprise Federation Feeder Data Import"
         usebundle => imported_data;
+
+      "Update Status"
+        usebundle => setup_status;
+
   reports:
     !enterprise_edition::
       "Federated reporting is only available in CFEngine Enterprise.";
@@ -268,6 +276,30 @@ bundle agent entry
       "Federated reporting is only available on the policy server / hub.";
 }
 
+bundle agent setup_status
+{
+  classes:
+      "superhub_setup_status_complete"
+        expression => "any",
+        depends_on => {
+                        "config",
+                        "transport_user",
+                        "postgres_config", # We are depending on a deep guard within this bundle
+                        "federation_manage_files",
+        };
+
+  files:
+
+    setup_status_complete::
+
+      "$(config.federation_dir)/cfapache/setup-status.json"
+        create => "true",
+        template_method => "inline_mustache",
+        edit_template_string => "{{%-top-}}",
+        template_data => '{ "configured": true }';
+
+
+}
 body file control
 {
         namespace => "default";
