@@ -107,7 +107,6 @@ bundle agent transport_user
       # Generate a modern ssh keypair (2019-04)
       "/usr/bin/ssh-keygen"
         args => "-N '' -o -a 150 -t $(ssh_key_type) -f $(ssh_priv_key)",
-        contain => default:setuid( $(user) ),
         if => and( isdir( "$(home)/.ssh" ),
                    not( fileexists( "$(ssh_priv_key)" )));
 
