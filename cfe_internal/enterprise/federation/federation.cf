@@ -211,8 +211,14 @@ bundle agent postgres_config
 {
   vars:
     am_superhub::
-      "c[shared_buffers]"            string => "1GB";
-      "c[max_locks_per_transaction]" string => "4000";
+
+      "c[shared_buffers]"
+        string => "1GB",
+        comment => "Changing this setting requires restarting the database.";
+
+      "c[max_locks_per_transaction]"
+        string => "4000",
+        comment => "Changing this setting requires restarting the database.";
 
   files:
     am_superhub::
@@ -221,7 +227,25 @@ bundle agent postgres_config
                                      "=",
                                      "\s*=\s*",
                                      ".*",
-                                     "");
+                                     ""),
+        classes => results( "bundle", "postgresql_conf" );
+
+  commands:
+
+    am_superhub.postgresql_conf_repaired::
+
+      "$(sys.bindir)/pg_ctl"
+        arglist => {
+                     "restart",
+                     "-w", # Wait for starup or shutdown to complete, -W (do not wait) is the default for start and restart modes
+                     "-D",
+                     "$(sys.statedir)/pg/data",
+                     "-l",
+                     "/var/log/postgresql.log",
+                     "-m",
+                     "fast" # All active transactions rolled back and clients forcibly disconnected
+        };
+
 }
 
 bundle agent exported_data
