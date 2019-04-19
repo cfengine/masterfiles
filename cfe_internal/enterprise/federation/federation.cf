@@ -69,6 +69,7 @@ bundle agent transport_user
           "$(home)/.ssh/.",
           "$(home)/.ssh/authorized_keys"
         };
+
   classes:
     enabled::
       "selinux_enabled"
@@ -318,8 +319,9 @@ bundle agent setup_status
         create => "true",
         template_method => "inline_mustache",
         edit_template_string => "{{%-top-}}",
-        template_data => '{ "configured": true }';
-
+        template_data => '{ "configured": true, "transport_ssh_public_key": "$(with)" }',
+        with => readfile( "$(transport_user.home)/.ssh/id_ed25519.pub" ),
+        if => fileexists( "$(transport_user.home)/.ssh/id_ed25519.pub" );
 
 }
 body file control
