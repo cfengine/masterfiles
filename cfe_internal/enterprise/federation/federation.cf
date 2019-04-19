@@ -74,9 +74,16 @@ bundle agent transport_user
       "selinux_enabled"
         expression => strcmp("Enforcing", execresult("getenforce", useshell));
       "missing_ssh_context"
-        expression => not(regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                 execresult("ls -Z $(home)/.ssh/authorized_keys",
-                                            useshell)));
+        expression => not( or(
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(home)/.ssh/authorized_keys",
+                                                 useshell)),
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(home)/.ssh/id_ed25519",
+                                                 useshell)),
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(home)/.ssh/id_ed25519.pub",
+                                                 useshell))));
   users:
     "$(user)"
       policy => "present",
@@ -89,8 +96,16 @@ bundle agent transport_user
       file_select => default:all,
       perms => default:mog( "600", $(user), "root" );
   commands:
+
+      # Generate a modern ssh keypair (2019-04)
+      "/usr/bin/ssh-keygen"
+        args => "-N '' -o -a 150 -t ed25519 -f $(home)/.ssh/id_ed25519",
+        contain => setuid( $(user) ),
+        if => and( isdir( "$(home)/.ssh" ),
+                   not( fileexists( "/home/$(desired_support_accounts)/.ssh/id_ed25519" )));
+
     selinux_enabled.missing_ssh_context::
-      "restorecon -F $(home)/.ssh/authorized_keys"
+      "restorecon -R -F $(home)/.ssh/"
         contain => default:in_shell;
 }
 
