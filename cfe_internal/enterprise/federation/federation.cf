@@ -202,12 +202,19 @@ bundle agent federation_manage_files
 bundle agent postgres_config
 # @brief Customize postgres config for superhub
 {
+  vars:
+    am_superhub::
+      "c[shared_buffers]"            string => "1GB";
+      "c[max_locks_per_transaction]" string => "4000";
+
   files:
     am_superhub::
       "/var/cfengine/state/pg/data/postgresql.conf"
-        edit_line => default:insert_lines("shared_buffers=1GB");
-      "/var/cfengine/state/pg/data/postgresql.conf"
-        edit_line => default:insert_lines("max_locks_per_transaction=4000");
+        edit_line => set_line_based( "$(this.bundle).c",
+                                     "=",
+                                     "\s*=\s*",
+                                     ".*",
+                                     "");
 }
 
 bundle agent exported_data
