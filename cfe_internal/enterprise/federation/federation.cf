@@ -63,11 +63,17 @@ bundle agent transport_user
         string => "cfdrop";
       "home"
         string => "$(cfengine_enterprise_federation:config.federation_dir)/superhub/drop";
+
+      "ssh_key_type"  string => "ed25519";
+      "ssh_priv_key"  string => "$(home)/.ssh/id_$(ssh_key_type)";
+      "ssh_pub_key"   string => "$(home)/.ssh/id_$(ssh_key_type).pub";
+      "ssh_auth_keys" string => "$(home)/.ssh/authorized_keys";
+
       "create_files"
         slist => {
           "$(home)/.",
           "$(home)/.ssh/.",
-          "$(home)/.ssh/authorized_keys"
+          "$(ssh_auth_keys)"
         };
 
   classes:
@@ -77,13 +83,13 @@ bundle agent transport_user
       "missing_ssh_context"
         expression => not( or(
                                regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(home)/.ssh/authorized_keys",
+                                      execresult("ls -Z $(ssh_auth_keys)",
                                                  useshell)),
                                regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(home)/.ssh/id_ed25519",
+                                      execresult("ls -Z $(ssh_priv_key)",
                                                  useshell)),
                                regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(home)/.ssh/id_ed25519.pub",
+                                      execresult("ls -Z $(ssh_pub_key)",
                                                  useshell))));
   users:
     "$(user)"
@@ -100,10 +106,10 @@ bundle agent transport_user
 
       # Generate a modern ssh keypair (2019-04)
       "/usr/bin/ssh-keygen"
-        args => "-N '' -o -a 150 -t ed25519 -f $(home)/.ssh/id_ed25519",
+        args => "-N '' -o -a 150 -t $(ssh_key_type) -f $(ssh_priv_key)",
         contain => setuid( $(user) ),
         if => and( isdir( "$(home)/.ssh" ),
-                   not( fileexists( "/home/$(desired_support_accounts)/.ssh/id_ed25519" )));
+                   not( fileexists( "$(ssh_priv_key)" )));
 
     selinux_enabled.missing_ssh_context::
       "restorecon -R -F $(home)/.ssh/"
@@ -320,8 +326,8 @@ bundle agent setup_status
         template_method => "inline_mustache",
         edit_template_string => "{{%-top-}}",
         template_data => '{ "configured": true, "transport_ssh_public_key": "$(with)" }',
-        with => readfile( "$(transport_user.home)/.ssh/id_ed25519.pub" ),
-        if => fileexists( "$(transport_user.home)/.ssh/id_ed25519.pub" );
+        with => readfile( "$(transport_user.ssh_pub_key)" ),
+        if => fileexists( "$(transport_user.ssh_pub_key)" );
 
 }
 body file control
