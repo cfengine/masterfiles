@@ -21,7 +21,7 @@ true "${CFE_FR_FEEDER_USERNAME?undefined}"
 
 mkdir -p "$CFE_FR_DUMP_DIR"
 mkdir -p "$CFE_FR_TRANSPORT_DIR"
-chown "$CFE_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR"
+chown "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR"
 
 if ! type "$CFE_FR_COMPRESSOR" >/dev/null; then
   log "Compressor $CFE_FR_COMPRESSOR not available!"
@@ -44,5 +44,5 @@ if [ "$failed" != "0" ]; then
 else
   log "Dumping tables: DONE"
   mv "$in_progress_file" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
-  chown "$CFE_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
+  chown "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
 fi
