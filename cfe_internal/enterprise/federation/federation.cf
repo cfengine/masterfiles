@@ -36,7 +36,7 @@ bundle agent config
                        # To ensure the remote is a feeder that we need to add to superhub's authorized_keys
                        strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" ));
       "pubkeys" slist => getvalues( pubkey );
-      
+
   classes:
     enabled::
 
@@ -83,7 +83,7 @@ bundle agent transport_user
       "ssh_priv_key" string => "$(home)/.ssh/id_$(ssh_key_type)";
       "ssh_pub_key" string => "$(home)/.ssh/id_$(ssh_key_type).pub";
       "ssh_auth_keys" string => "$(home)/.ssh/authorized_keys";
-      
+
       "create_files"
         slist => {
           "$(home)/.",
@@ -233,7 +233,7 @@ bundle agent postgres_config
     am_superhub::
       "c[shared_buffers]" string => "1GB";
       "c[max_locks_per_transaction]" string => "4000";
-      
+
   files:
     am_superhub::
       "/var/cfengine/state/pg/data/postgresql.conf"
