@@ -118,3 +118,10 @@ Take a look at the resulting file, it has lots of useful information about the s
 Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 The CFEngine masterfiles are under the MIT license, see [LICENSE](LICENSE)
+
+# Authors
+
+CFEngine was originally created by Mark Burgess with many contributions from
+around the world. Thanks [everyone](https://github.com/cfengine/core/blob/master/AUTHORS)!
+
+[CFEngine](https://cfengine.com) is sponsored by [Northern.tech AS](https://northern.tech)
