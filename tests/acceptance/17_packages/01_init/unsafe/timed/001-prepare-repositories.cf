@@ -122,15 +122,20 @@ bundle agent signing_keys
         expression => "any",
         scope => "namespace";
 
-  files:
+  vars:
     debian::
-      "$(G.testdir)/."
-        create => "true";
+      "gpg" string => "gpg --homedir .gnupg-temp --batch --no-tty";
 
   commands:
     debian::
-      "gpg --homedir $(G.testdir) --no-default-keyring --keyring $(p.resources)/gpg/pubring.gpg --export \
-       | gpg --homedir $(G.testdir) --no-default-keyring --primary-keyring /etc/apt/trusted.gpg --import"
+      # re-sign repo
+      "mkdir -m 700 .gnupg-temp && \
+       $(gpg) --import $(p.resources)/gpg/secring.gpg && \
+       rm /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo2/dists/package2/Release.gpg && \
+       $(gpg) --detach-sign --armor --output /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo1/dists/package1/Release && \
+       $(gpg) --detach-sign --armor --output /test-repos/deb_repo2/dists/package2/Release.gpg /test-repos/deb_repo2/dists/package2/Release && \
+       rm -rf .gnupg-temp && \
+       apt-key add $(p.resources)/gpg/pubring.gpg"
         contain => useshell,
         classes => if_successful("signing_keys_ok");
 }
