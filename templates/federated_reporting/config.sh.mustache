@@ -66,3 +66,5 @@ CFE_FR_IMPORT_NJOBS="{{n_jobs}}"           # no explicit limit of jobs by defaul
 CFE_FR_SED_ARGS="{{sed_args}}" # no extra args by default
 CFE_FR_SED_FILTERS_DIR="{{sed_filters_dir}}"
 CFE_FR_SED_FILTERS_DIR="${CFE_FR_SED_FILTERS_DIR:-$DEFAULT_PREFIX/superhub/import/filters}"
+# no inventory refresh command by default (=> no inventory refresh after import)
+CFE_FR_INVENTORY_REFRESH_CMD="{{inventory_refresh_cmd}}"
