@@ -762,9 +762,12 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
 # Adds a new line if none exists or if more than one commented-out
 # possible matches exist.
 #
+#
+# **Note:** If the data structure being used for the first parameter is in the current bundle, you can use `$(this.bundle).variable`.
+#
 # Originally `set_config_values` by Ed King.
 #
-# @param v The fully-qualified name of an associative array containing `v[LHS]="rhs"`
+# @param v The fully-qualified name (`bundlename.variable`) of an associative array containing `v[LHS]="rhs"`
 # @param sep The separator to insert, e.g. ` ` for space-separated
 # @param bp The key-value separation regex, e.g. `\s+` for space-separated
 # @param kp The keys to select from v, use `.*` for all
