@@ -16,6 +16,7 @@ true "${CFE_FR_SUPERHUB_IMPORT_DIR?undefined}"
 true "${CFE_FR_COMPRESSOR_EXT?undefined}"
 true "${CFE_FR_EXTRACTOR?undefined}"
 true "${CFE_FR_TABLES?undefined}"
+true "${CFE_FR_INVENTORY_REFRESH_CMD?undefined}"
 
 if ! type "$CFE_FR_EXTRACTOR" >/dev/null; then
   log "Extractor $CFE_FR_EXTRACTOR not available!"
@@ -72,4 +73,15 @@ if [ "$failed" != "0" ]; then
   exit 1
 else
   log "Importing files: DONE"
+  if [ -n "$CFE_FR_INVENTORY_REFRESH_CMD" ]; then
+    log "Refreshing inventory"
+    inv_refresh_failed=0
+    $CFE_FR_INVENTORY_REFRESH_CMD || inv_refresh_failed=1
+    if [ "$inv_refresh_failed" != "0" ]; then
+      log "Refreshing inventory: FAILED"
+      exit 1
+    else
+      log "Refreshing inventory: DONE"
+    fi
+  fi
 fi
