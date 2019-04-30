@@ -1,6 +1,35 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.6:
+	- Add path support for setfacl
+	- Add path support for timedatectl and journalctl (CFE-3013)
+	- Add trailing slash to access promises expecting directories
+	  (CFE-3024)
+	- Do not suppress repair outcome for starting cf-monitord or cf-execd
+	  (CFE-2964)
+	- Enforce restrictive permissions on hub install log (ENT-4506)
+	- Ensure that asynchronous query API semaphores are writable (ENT-4551)
+	- Fix standalone_self_upgrade not triggering because of stale data
+	  (ENT-4317)
+	- Improve performance of enterprise license utilization logging
+	- Log version of Enterprise agent outside of state (ENT-4352)
+	- Prevent performance overhead on hubs that don't enable license utilization logging
+	  (ENT-4333)
+	- Purge collection status records from the future (ENT-4362)
+	- Reduce cost of knowing when setopt is available in yum (CFE-2993)
+	- Separate termination and observation promises for cf-monitord
+	  (CFE-2963)
+	- Set default value for purge_scheduled_reports_older_than_days
+	  (ENT-4404)
+	- guard vars promises in cfe_internal_enterprise_mission_portal_apache
+	  Constrain vars promises in cfe_internal_enterprise_mission_portal_apache
+	  to policy_server.enterprise_edition::, otherwise "cf-promises --show-vars"
+	  includes a dump of the entire datastate from the "data" variable in
+	  cfe_internal_enterprise_mission_portal_apache (line over 100K long).
+	  (CFE-3011)
+	- redhat_pure is no longer defined on Fedora hosts (CFE-3022)
+
 3.10.5:
 	- Add 'system-uuid' to default dmidecode inventory (CFE-2925)
 	- Add inventory of AWS EC2 linux instances (CFE-2924)
