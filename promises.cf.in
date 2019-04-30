@@ -62,7 +62,7 @@ body common control
       # modules in which you MUST provide package modules used to generate
       # software inventory reports. You can also provide global default package module
       # instead of specifying it in all package promises.
-    debian.!disable_inventory_package_refresh::
+    (debian).!disable_inventory_package_refresh::
           package_inventory => { $(package_module_knowledge.platform_default) };
 
       # We only define pacakge_invetory on redhat like systems that have a
@@ -72,6 +72,16 @@ body common control
 
     (debian|redhat|suse|sles|amazon_linux)::
           package_module => $(package_module_knowledge.platform_default);
+
+      # CFEngine 3.12.2+ and 3.14+ have new package module on Windows
+    windows.cfengine_3_12.!(cfengine_3_12_0|cfengine_3_12_1)::
+          package_inventory => { $(package_module_knowledge.platform_default) };
+          package_module => $(package_module_knowledge.platform_default);
+@if minimum_version(3.14)
+    windows::
+          package_inventory => { $(package_module_knowledge.platform_default) };
+          package_module => $(package_module_knowledge.platform_default);
+@endif
 
     any::
         ignore_missing_bundles => "$(def.control_common_ignore_missing_bundles)";
@@ -197,6 +207,7 @@ bundle common cfengine_stdlib
 # @brief Include the standard library
 {
   vars:
+
     !cfengine_3_7::
       # CFEngine 3.6 can include through a secondary file
       # CFEngine version 3.6 and prior use the split library to avoid syntax
@@ -204,6 +215,24 @@ bundle common cfengine_stdlib
       # This also works for 3.8 because local_libdir should be set to lib
       # instead of lib/3.8
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
+
+
+      # As part of ENT-2719 3.12.2 introduced package_method attributes for
+      # specifying the interpreter and specifying the module path. These
+      # attributes are not known in previous versions and must not be seen by
+      # the parser or they will be seen as syntax errors. A cleaner way to do
+      # this using the minimum_version macro is possible, but that would break
+      # masterfiles compatibility in 3.12 with 3.7 binaries since 3.7 binaries
+      # do not support major.minor.patch with minimum_version, only major.minor.
+
+    windows.cfengine_3_12.!(cfengine_3_12_0|cfengine_3_12_1)::
+      "inputs" slist => { "$(sys.local_libdir)/stdlib.cf",
+                          "$(sys.local_libdir)/packages-ENT-3719.cf" };
+@if minimum_version(3.14)
+    windows::
+      "inputs" slist => { "$(sys.local_libdir)/stdlib.cf",
+                          "$(sys.local_libdir)/packages-ENT-3719.cf" };
+@endif
 
     cfengine_3_7::
       # CFEngine 3.7 has local_libdir set to $(sys.inputdir)/lib/3.7, but with
