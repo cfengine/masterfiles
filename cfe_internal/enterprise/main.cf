@@ -75,4 +75,10 @@ bundle agent cfe_internal_enterprise_main
       "any" usebundle => cfe_internal_cleanup_agent_reports,
       handle => "cfe_internal_management_cleanup_agent_reports",
       comment => "Remove accumulated reports if they grow too large in size";
+
+    any::
+      "Permissions and Ownership"
+        usebundle => cfe_internal_permissions,
+        comment => "Specific expectations for permissions and ownership for cfengine itself";
+
 }
