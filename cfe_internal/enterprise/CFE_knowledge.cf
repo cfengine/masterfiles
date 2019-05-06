@@ -209,7 +209,7 @@ bundle agent cfe_internal_setup_knowledge
       "$(sys.statedir)/."
         perms => mog("0600", "root", "root");
 
-    any::
+    !(policy_server|am_policy_hub)::
 
       "$(sys.statedir)/."
         perms => mog("0600", "root", "root"),
