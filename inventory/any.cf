@@ -441,7 +441,8 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
 
       "$(curl)"
         args => "$(curl_opts) $(URL) -o $(cache)",
-        if => not( fileexists( $(cache) ));
+        if => and( not( fileexists( $(cache) )),
+                   isexecutable( $(curl) ));
 
   files:
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
