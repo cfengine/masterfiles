@@ -269,7 +269,7 @@ bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
     string => "SELECT promise_log_partition_cleanup('REPAIRED', '$(history_length_days) day');";
 
     "cleanup_query_notkept"
-    string => "SELECT promise_log_partition_cleanup('NOTKEPT', '1 day');";
+    string => "SELECT promise_log_partition_cleanup('NOTKEPT', '$(history_length_days) day');";
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
