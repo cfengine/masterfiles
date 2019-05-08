@@ -210,9 +210,45 @@ bundle agent cfe_internal_setup_knowledge
         comment => "The agent will complain if any other users (group or other)
                     have write access to the modules directory.";
 
-      "$(sys.statedir)/."
-        perms => mog("600", "root", "root");
+}
 
+bundle agent cfe_internal_permissions
+# @brief Specific expectations for permissions and ownership of CFEngine with respect to the Enterprise Edition
+{
+
+  files:
+
+    !(policy_server|am_policy_hub)::
+      "$(sys.statedir)/."
+        perms => mog("0600", "root", "root"),
+        # Important to recurse across file system boundaries, as databases and or state are commonly on different filesystems
+        depth_search => recurse_with_base( inf ),
+        file_select => all;
+
+    enterprise_edition.(policy_server|am_policy_hub)::
+
+     "$(sys.statedir)/."
+        perms => mog("0640", "root", "cfpostgres"),
+        comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
+
+     "$(sys.statedir)/."
+        perms => mog("0600", "root", "root" ),
+        depth_search => recurse_except( inf, "pg" ),
+        file_select => all,
+        comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
+
+      "$(sys.statedir)/pg/."
+        perms => mog("0600", "cfpostgres", "cfpostgres"),
+        depth_search => recurse_with_base( inf ),
+        comment => "No one except for the database user needs to access where the db is installed.";
+}
+
+#############################################################################
+body depth_search recurse_except( d, exception)
+{
+        depth => "$(d)";
+        include_basedir => "false";
+        exclude_dirs => { $(exception) };
 }
 
 ############################################################################
