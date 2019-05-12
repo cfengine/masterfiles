@@ -1,6 +1,41 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.2:
+	- Fixed isvariable() syntax error in update_def.cf (CFE-2953)
+	- Added setfacl to paths
+	- Added path support for timedatectl and journalctl (CFE-3013)
+	- Added trailing slash to access promises expecting directories (CFE-3024)
+	- Conditioned use of curl for ec2 metadata cache on curl binary being executable (CFE-3049)
+	- Instrumented cf-hub pull schedule for augments (ENT-4269)
+	- Stopped suppressing repair outcome for starting cf-monitord or cf-execd (CFE-2964)
+	- Enforced restrictive permissions on hub install log (ENT-4506)
+	- Ensured that asynchronous query API semaphores are writable (ENT-4551)
+	- Fixed standalone_self_upgrade not triggering because of stale data (ENT-4317)
+	- Improved efficiency and error handling of user specified policy update bundle
+	- Improved performance of enterprise license utilization logging
+	- Added version logging for Enterprise agent outside of state (ENT-4352)
+	- Added package_module for managing windows packages using msiexec (ENT-3719)
+	- Prevented inventorying un-expanded free memory from cf-monitord
+	- Prevented mon.value_mem_total from being inventoried if not defined (ENT-4522)
+	- Prevented performance overhead on hubs that don't enable license utilization logging (ENT-4333)
+	- Added purging of future status records (ENT-4362)
+	- Reduced cost of knowing when setopt is available in yum (CFE-2993)
+	- Added restart of runalerts if modified (ENT-4273)
+	- Separated kill signals from restart class to avoid warning (CFE-2974)
+	- Separated termination and observation promises for cf-monitord (CFE-2963)
+	- Set default value for purge_scheduled_reports_older_than_days (ENT-4404)
+	- Changed internal class name to describes daemon state instead of desired action
+	- Changed internal class names to be more descriptive when identifying concurrent daemons
+	- Implemented augments support for collect_window in body server control (ENT-4283)
+	- Added guard for vars promises in cfe_internal_enterprise_mission_portal_apache
+	  Constrain vars promises in cfe_internal_enterprise_mission_portal_apache
+	  to policy_server.enterprise_edition::, otherwise "cf-promises --show-vars"
+	  includes a dump of the entire datastate from the "data" variable in
+	  cfe_internal_enterprise_mission_portal_apache (line over 100K long).
+	  (CFE-3011)
+    - Stopped defining redhat_pure on Fedora hosts (CFE-3022)
+
 3.12.1:
 	- Add 'system-uuid' to default dmidecode inventory (CFE-2925)
 	- Add inventory of AWS EC2 linux instances (CFE-2924)
