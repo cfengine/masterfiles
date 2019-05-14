@@ -3,6 +3,7 @@ Notable changes to the framework should be documented here
 
 3.12.2:
 	- Fixed isvariable() syntax error in update_def.cf (CFE-2953)
+	- Fixed maintenance policy for promise log cleanup to respect history_length_days (ENT-4588)
 	- Added setfacl to paths
 	- Added path support for timedatectl and journalctl (CFE-3013)
 	- Added trailing slash to access promises expecting directories (CFE-3024)
