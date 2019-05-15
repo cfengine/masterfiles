@@ -187,11 +187,11 @@ bundle agent cfe_autorun_inventory_memory
     enterprise_edition.!(aix|windows|hpux)::
       "total" string => "$(mon.value_mem_total)",
         meta => { "inventory", "attribute_name=Memory size (MB)" },
-        if => isvariable( $(mon.value_mem_total) );
+        if => isvariable( "mon.value_mem_total" );
 
       "free" string => "$(mon.value_mem_free)",
         if => and( not( isvariable( "free" ) ),
-                   isvariable( $(mon.value_mem_free) )),
+                   isvariable( "mon.value_mem_free" )),
         meta => { "report" };
 
 }
