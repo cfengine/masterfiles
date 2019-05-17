@@ -48,10 +48,9 @@ def zypper_supports_oldpackage():
     # Suse zypper "--oldpackage" option is only supported greater that 1.6.169
     global zypper_supports_oldpackage_cached
     if zypper_supports_oldpackage_cached == -1:
-        process = subprocess_Popen([zypper_cmd, "-n", "--version"], stdout=subprocess.PIPE)
-        process.wait()
-        package_zypper_version = process.stdout.readline().split(" ", 1)[1].rstrip()
-        if StrictVersion(package_zypper_version) >= StrictVersion("1.6.169"):
+        zypper_version = subprocess.Popen([zypper_cmd, "-n", "--version"], stdout=subprocess.PIPE).communicate()[0]
+        zypper_version = zypper_version.split(" ", 1)[1].rstrip()
+        if StrictVersion(zypper_version) >= StrictVersion("1.6.169"):
             zypper_supports_oldpackage_cached = 1
         else:
             zypper_supports_oldpackage_cached = 0
