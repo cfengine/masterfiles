@@ -49,7 +49,7 @@ def zypper_supports_oldpackage():
     global zypper_supports_oldpackage_cached
     if zypper_supports_oldpackage_cached == -1:
         zypper_version = subprocess.Popen([zypper_cmd, "-n", "--version"], stdout=subprocess.PIPE).communicate()[0]
-        zypper_version = zypper_version.split(" ", 1)[1].rstrip()
+        zypper_version = zypper_version.decode().split(" ", 1)[1].rstrip()
         if StrictVersion(zypper_version) >= StrictVersion("1.6.169"):
             zypper_supports_oldpackage_cached = 1
         else:
