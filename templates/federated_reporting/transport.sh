@@ -51,7 +51,7 @@ function push() {
       failed=1
     rm -f "$dump_file.transporting"
     if [ "$failed" != 0 ]; then
-      log "Transporting file $dump_file failed!"
+      log "Transporting file $dump_file to $CFE_FR_SUPERHUB_LOGIN:$CFE_FR_SUPERHUB_DROP_DIR failed!"
       some_failed=1
     fi
   done
