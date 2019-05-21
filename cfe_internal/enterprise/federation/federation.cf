@@ -56,6 +56,8 @@ bundle agent config
         # To ensure we are using a remote hub that's enabled
         if => strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" );
       "fingerprints" slist => getvalues( fingerprint );
+      "feeder[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][hostkey])",
+        if => strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" );
 
   classes:
     enabled::
@@ -401,10 +403,31 @@ bundle agent superhub_schema
                      "cfdb",
                      "'select superhub_schema();'",
                    },
-        classes => superhub_schema_exit_codes;
+        classes => psql_wrapper_exit_codes;
 }
 
-body classes superhub_schema_exit_codes
+bundle agent ensure_feeders
+# @brief Run SQL function to ensure that all configured feeder hubs are in __hubs table
+{
+  vars:
+    am_superhub::
+      "feeders_arg" string => concat( "ARRAY['",
+                                      join( "', '",
+                                            getvalues( "cfengine_enterprise_federation:config.feeder" )
+                                      ),
+                                      "']");
+
+  commands:
+    am_superhub::
+      "$(cfengine_enterprise_federation:config.bin_dir)/psql_wrapper.sh"
+        arglist => {
+                     "cfdb",
+                     `"select ensure_feeders($(feeders_arg));"`
+                   },
+        classes => psql_wrapper_exit_codes;
+}
+
+body classes psql_wrapper_exit_codes
 {
   kept_returncodes => { "0" };
   repaired_returncodes => { "1" };
@@ -447,6 +470,8 @@ bundle agent entry
         usebundle => imported_data;
       "CFEngine Enterprise Federation Schema Migration"
         usebundle => superhub_schema;
+      "CFEngine Enterprise Federation Ensure Feeder Hubs in Database"
+        usebundle => ensure_feeders;
       "Configuration Status"
         usebundle => setup_status;
   reports:
@@ -487,6 +512,7 @@ bundle agent setup_status
         template_data => '{
           "configured": true,
           "role": "$(role)",
+          "hostkey": "$(sys.key_digest)",
           "transport_ssh_public_key": "$(ssh_pub_key)",
           "transport_ssh_server_fingerprint": "$(ssh_server_fingerprint)",
         }',
