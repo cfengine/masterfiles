@@ -1,5 +1,13 @@
-s/SELECT pg_catalog.set_config('search_path', '', false);/SET search_path = public, pg_catalog;/;
+# remove the search_path settings because we want to stay in the newly created feeder schema
+/SELECT pg_catalog.set_config('search_path', '', false);/d;
 
 # Prevent setval() entries from being replayed on the superhub
 # e.g., SELECT pg_catalog.setval('__promiselog_id_seq', 44075, true);
-/^SELECT pg_catalog.setval/d;
+#/^SELECT pg_catalog.setval/d;
+# NOTE: don't need this anymore since we will be calling setval on the local schema copy of things
+
+# Remove public. schema prefix so that import can go into the current schema (feeder schema)
+s/public\.//g;
+
+# Remove CREATE TYPE blocks
+/CREATE TYPE.*/,/^);$/d

@@ -401,7 +401,7 @@ bundle agent superhub_schema
       "$(cfengine_enterprise_federation:config.bin_dir)/psql_wrapper.sh"
         arglist => {
                      "cfdb",
-                     "'select superhub_schema();'",
+                     `"select superhub_schema('$(sys.key_digest)');"`,
                    },
         classes => psql_wrapper_exit_codes;
 }
@@ -411,11 +411,8 @@ bundle agent ensure_feeders
 {
   vars:
     am_superhub::
-      "feeders_arg" string => concat( "ARRAY['",
-                                      join( "', '",
-                                            getvalues( "cfengine_enterprise_federation:config.feeder" )
-                                      ),
-                                      "']");
+      "feeders" slist => getvalues( "cfengine_enterprise_federation:config.feeder");
+      "feeders_arg" string => concat( "ARRAY['", join( "', '", feeders ), "']");
 
   commands:
     am_superhub::
@@ -424,7 +421,8 @@ bundle agent ensure_feeders
                      "cfdb",
                      `"select ensure_feeders($(feeders_arg));"`
                    },
-        classes => psql_wrapper_exit_codes;
+        classes => psql_wrapper_exit_codes,
+        if => isgreaterthan(length(feeders), 0);
 }
 
 body classes psql_wrapper_exit_codes
