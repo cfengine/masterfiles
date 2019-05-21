@@ -43,30 +43,21 @@ dump_files="$(ls -1 "$CFE_FR_SUPERHUB_IMPORT_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT"
     exit 0
   }
 
-log "Database cleanup"
-{
-  cat<<EOF
-\set QUIET on
-\set ON_ERROR_STOP 1
-SET session_replication_role = replica;
-EOF
-  # XXX: this needs to be moved into the importing transaction once partitioning
-  #      is done
-  printf 'TRUNCATE %s;\n' $CFE_FR_TABLES
-} | "$CFE_BIN_DIR"/psql -U cfpostgres -d cfdb
-log "Database cleanup: DONE"
-
 # make sure the script we are about to run is executable
 chmod u+x "$(dirname "$0")/import_file.sh"
 
 log "Importing files: $dump_files"
 failed=0
-echo "$dump_files" | run_in_parallel "$(dirname "$0")/import_file.sh" - $CFE_FR_IMPORT_NJOBS ||
-  failed=1
+# for now, import in serial to avoid deadlocks (ENT-4742)
+for file in $dump_files; do
+  "$(dirname "$0")/import_file.sh" $file || failed=1
+done
 
 if [ "$failed" != "0" ]; then
   log "Importing files: FAILED"
-  for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
+  find "$CFE_FR_SUPERHUB_IMPORT_DIR"
+  for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
+    echo "file=$file"
     log "Failed to import file '${file%%.failed}'"
     rm -f "$file"
   done

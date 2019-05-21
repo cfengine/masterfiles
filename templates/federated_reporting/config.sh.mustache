@@ -1,7 +1,8 @@
 # -*- mode: shell-script -*-
 # Configuration file that is supposed to be sourced into bash scripts.
 
-DEFAULT_PREFIX="/opt/cfengine/federation/"
+DEFAULT_PREFIX="{{prefix}}"
+DEFAULT_PREFIX="${DEFAULT_PREFIX:-/opt/cfengine/federation/}"
 
 # generic configuration
 CFE_BIN_DIR="{{bindir}}"
@@ -68,3 +69,5 @@ CFE_FR_SED_FILTERS_DIR="{{sed_filters_dir}}"
 CFE_FR_SED_FILTERS_DIR="${CFE_FR_SED_FILTERS_DIR:-$DEFAULT_PREFIX/superhub/import/filters}"
 # no inventory refresh command by default (=> no inventory refresh after import)
 CFE_FR_INVENTORY_REFRESH_CMD="{{inventory_refresh_cmd}}"
+CFE_FR_DB_USER="{{db_user}}"
+CFE_FR_DB_USER="${CFE_FR_DB_USER:-cfpostgres}"
