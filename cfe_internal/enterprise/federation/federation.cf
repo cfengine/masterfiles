@@ -156,11 +156,10 @@ bundle agent federation_manage_files
 
   files:
     enterprise_edition.(policy_server|am_policy_hub)::
-      # $(transport_user) needs permissions from / up to it's homedir
-      # cfapache needs to get into this dir, so o+x is specified here
+      # Both cfpache and $(transport_user) need permission so adding o+x here
       "$(cfengine_enterprise_federation:config.federation_dir)/."
         create => "true",
-        perms => default:mog( "661", "root", "$(transport_user)" );
+        perms => default:mog( "661", "root", "root" );
       "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/."
         create => "true",
         perms => default:mog( "600", "cfapache", "root" );
