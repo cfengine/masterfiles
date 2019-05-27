@@ -22,6 +22,8 @@ bundle agent config
       "data" data => readjson( $(path) );
       "remotes" slist => getindices( @(data[remote_hubs]) );
       "transport_user" -> { "ENT-4610" } string => "cfdrop";   # TODO: don't hard-code cfdrop user
+      "transport_home"
+        string => "$(cfengine_enterprise_federation:config.federation_dir)/cfdrop";
       "login" string => ""; # default
       "login"
         string => "$(data[remote_hubs][$(remotes)][transport][ssh_user])@$(data[remote_hubs][$(remotes)][transport][ssh_host])",
@@ -79,7 +81,7 @@ bundle agent transport_user
       "user"
         string => "$(cfengine_enterprise_federation:config.transport_user)";
       "home"
-        string => "$(cfengine_enterprise_federation:config.federation_dir)/superhub/drop";
+        string => "$(cfengine_enterprise_federation:config.transport_home)";
       "ssh_key_type" string => "ed25519";
       "ssh_priv_key" string => "$(home)/.ssh/id_$(ssh_key_type)";
       "ssh_pub_key" string => "$(home)/.ssh/id_$(ssh_key_type).pub";
@@ -89,6 +91,8 @@ bundle agent transport_user
         slist => {
           "$(home)/.",
           "$(home)/.ssh/.",
+          "$(home)/source/.",      # Dumps from feeders are taken from here
+          "$(home)/destination/.", # And dropped here on superhub
           "$(ssh_auth_keys)",
           "$(ssh_known_hosts)"
         };
@@ -300,7 +304,7 @@ body contain contain_transport_user
 {
     exec_owner => "$(cfengine_enterprise_federation:config.transport_user)";
     exec_group => "$(cfengine_enterprise_federation:config.transport_user)";
-    chdir => "$(cfengine_enterprise_federation:config.federation_dir)/superhub/drop";
+    chdir => "$(cfengine_enterprise_federation:config.transport_home)";
     useshell => "true";
 }
 
