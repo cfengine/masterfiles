@@ -22,9 +22,9 @@ bundle agent config
       "data" data => readjson( $(path) );
       "role" string => "$(data[role])";
       "remotes" slist => getindices( @(data[remote_hubs]) );
-      "transport_user" -> { "ENT-4610" } string => "cfdrop";   # TODO: don't hard-code cfdrop user
+      "transport_user" -> { "ENT-4610" } string => "cftransport";   # TODO: don't hard-code cftransport user
       "transport_home"
-        string => "$(cfengine_enterprise_federation:config.federation_dir)/cfdrop";
+        string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport";
       "login" string => ""; # default
       "login"
         string => "$(data[remote_hubs][$(remotes)][transport][ssh_user])@$(data[remote_hubs][$(remotes)][transport][ssh_host])",
