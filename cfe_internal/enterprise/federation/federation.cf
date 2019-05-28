@@ -383,7 +383,7 @@ bundle agent setup_status
       "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/setup-status.json"
         create => "true",
         template_method => "inline_mustache",
-        edit_template_string => "{{%-top-}}",
+        edit_template_string => "{{%-top-}}$(const.n)",
         template_data => '{ "configured": true, "role": "$(role)", "transport_ssh_public_key": "$(with)" }',
         with => readfile( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" ),
         if => fileexists( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" );
