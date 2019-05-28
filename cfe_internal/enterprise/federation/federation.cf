@@ -20,6 +20,7 @@ bundle agent config
   vars:
     enabled::
       "data" data => readjson( $(path) );
+      "role" string => "$(data[role])";
       "remotes" slist => getindices( @(data[remote_hubs]) );
       "transport_user" -> { "ENT-4610" } string => "cfdrop";   # TODO: don't hard-code cfdrop user
       "transport_home"
@@ -365,6 +366,8 @@ bundle agent entry
 bundle agent setup_status
 {
 @if minimum_version(3.11)
+  vars:
+    "role" string => "$(cfengine_enterprise_federation:config.role)";
   classes:
     "superhub_setup_status_complete"
       expression => "any",
@@ -381,7 +384,7 @@ bundle agent setup_status
         create => "true",
         template_method => "inline_mustache",
         edit_template_string => "{{%-top-}}",
-        template_data => '{ "configured": true, "transport_ssh_public_key": "$(with)" }',
+        template_data => '{ "configured": true, "role": "$(role)", "transport_ssh_public_key": "$(with)" }',
         with => readfile( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" ),
         if => fileexists( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" );
 @endif
