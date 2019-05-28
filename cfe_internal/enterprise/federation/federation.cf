@@ -335,7 +335,7 @@ bundle agent entry
       "CFEngine Enterprise Federation Configuration"
         handle => "config",
         usebundle => config;
-    am_superhub|am_feeder::
+    enabled::
       "CFEngine Enterprise Federation Transport User"
         handle => "transport_user",
         usebundle => transport_user;
