@@ -20,8 +20,11 @@ bundle agent config
   vars:
     enabled::
       "data" data => readjson( $(path) );
+      "role" string => "$(data[role])";
       "remotes" slist => getindices( @(data[remote_hubs]) );
-      "transport_user" -> { "ENT-4610" } string => "cfdrop";   # TODO: don't hard-code cfdrop user
+      "transport_user" -> { "ENT-4610" } string => "cftransport";   # TODO: don't hard-code cftransport user
+      "transport_home"
+        string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport";
       "login" string => ""; # default
       "login"
         string => "$(data[remote_hubs][$(remotes)][transport][ssh_user])@$(data[remote_hubs][$(remotes)][transport][ssh_host])",
@@ -79,7 +82,7 @@ bundle agent transport_user
       "user"
         string => "$(cfengine_enterprise_federation:config.transport_user)";
       "home"
-        string => "$(cfengine_enterprise_federation:config.federation_dir)/superhub/drop";
+        string => "$(cfengine_enterprise_federation:config.transport_home)";
       "ssh_key_type" string => "ed25519";
       "ssh_priv_key" string => "$(home)/.ssh/id_$(ssh_key_type)";
       "ssh_pub_key" string => "$(home)/.ssh/id_$(ssh_key_type).pub";
@@ -89,6 +92,8 @@ bundle agent transport_user
         slist => {
           "$(home)/.",
           "$(home)/.ssh/.",
+          "$(home)/source/.",      # Dumps from feeders are taken from here
+          "$(home)/destination/.", # And dropped here on superhub
           "$(ssh_auth_keys)",
           "$(ssh_known_hosts)"
         };
@@ -300,7 +305,7 @@ body contain contain_transport_user
 {
     exec_owner => "$(cfengine_enterprise_federation:config.transport_user)";
     exec_group => "$(cfengine_enterprise_federation:config.transport_user)";
-    chdir => "$(cfengine_enterprise_federation:config.federation_dir)/superhub/drop";
+    chdir => "$(cfengine_enterprise_federation:config.transport_home)";
     useshell => "true";
 }
 
@@ -331,7 +336,7 @@ bundle agent entry
       "CFEngine Enterprise Federation Configuration"
         handle => "config",
         usebundle => config;
-    am_superhub|am_feeder::
+    enabled::
       "CFEngine Enterprise Federation Transport User"
         handle => "transport_user",
         usebundle => transport_user;
@@ -360,7 +365,12 @@ bundle agent entry
 
 bundle agent setup_status
 {
-@if minimum_version(3.11)
+  vars:
+    "role" string => "$(cfengine_enterprise_federation:config.role)";
+    "ssh_pub_key"
+      string => readfile( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" ),
+      if => fileexists( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" );
+
   classes:
     "superhub_setup_status_complete"
       expression => "any",
@@ -376,11 +386,9 @@ bundle agent setup_status
       "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/setup-status.json"
         create => "true",
         template_method => "inline_mustache",
-        edit_template_string => "{{%-top-}}",
-        template_data => '{ "configured": true, "transport_ssh_public_key": "$(with)" }',
-        with => readfile( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" ),
-        if => fileexists( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" );
-@endif
+        edit_template_string => "{{%-top-}}$(const.n)",
+        template_data => '{ "configured": true, "role": "$(role)", "transport_ssh_public_key": "$(ssh_pub_key)" }',
+        if => isvariable( ssh_pub_key );
 }
 
 body file control
