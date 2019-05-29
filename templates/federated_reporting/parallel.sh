@@ -4,19 +4,19 @@
 # For best results, make sure 'parallel' is installed.
 #
 
-if type parallel >/dev/null; then
+if type parallel >/dev/null 2>&1; then
   HAVE_PARALLEL=1
 else
   HAVE_PARALLEL=0
 fi
 
-if type xargs >/dev/null; then
+if type xargs >/dev/null 2>&1; then
   HAVE_XARGS=1
 else
   HAVE_XARGS=0
 fi
 
-if type getconf >/dev/null; then
+if type getconf >/dev/null 2>&1; then
   NCPUs="$(getconf _NPROCESSORS_ONLN)"
 else
   NCPUs="$(grep processor /proc/cpuinfo | wc -l)"
