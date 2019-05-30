@@ -33,17 +33,29 @@ bundle agent config
                        strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" ),
                        # To ensure the remote we are pushing to actually needs the data (is a superhub)
                        strcmp( "superhub", "$(data[remote_hubs][$(remotes)][role])" ));
+
+    am_superhub::
+      # Public keys of enabled pushing feeders need to be trusted (on a superhub)
       "pubkey[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_pubkey])",
-            if => and(
-                       # To ensure we are using a remote hub that's actually enabled
-                       strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" ),
-                       # To ensure the remote is a feeder that we need to add to superhub's authorized_keys
-                       strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" ));
+            if => and( strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" ),
+                       strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" ),
+                       strcmp( "push_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
+
+    am_feeder::
+      # Public key(s) of enabled pulling superhub(s) need(s) to be trusted (on a feeder)
+      "pubkey[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_pubkey])",
+            if => and( strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" ),
+                       strcmp( "superhub", "$(data[remote_hubs][$(remotes)][role])" ),
+                       strcmp( "pull_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
+
+    am_superhub|am_feeder::
       "pubkeys" slist => getvalues( pubkey );
+
       "fingerprint[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_fingerprint])",
         # To ensure we are using a remote hub that's enabled
         if => strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" );
       "fingerprints" slist => getvalues( fingerprint );
+
   classes:
     enabled::
 
@@ -57,11 +69,22 @@ bundle agent config
         expression => strcmp("superhub", "$(data[role])"),
         scope => "namespace";
 
-      "am_transporter"
+      "am_pusher"
         and => {strcmp("superhub", "$(data[remote_hubs][$(remotes)][role])"),
                 strcmp("enabled", "$(data[remote_hubs][$(remotes)][target_state])"),
                 strcmp("push_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])")},
-        comment => "Has an enabled remote superhub with push as transport method, should run transport ",
+        comment => "Has an enabled remote superhub with push as transport method, should run push transport",
+        scope => "namespace";
+
+      "am_puller"
+        and => {"am_superhub",
+                strcmp("enabled", "$(data[remote_hubs][$(remotes)][target_state])"),
+                strcmp("pull_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])")},
+        comment => "Superhub with some enabled remote hub with pull as transport method, should run pull transport",
+        scope => "namespace";
+
+      "am_transporter"
+        or => {"am_pusher", "am_puller"},
         scope => "namespace";
 
   reports:
@@ -71,6 +94,10 @@ bundle agent config
       "I'm a superhub!";
     am_feeder.(DEBUG|DEBUG_config)::
       "I'm a feeder!";
+    am_pusher.(DEBUG|DEBUG_config)::
+      "I'm pushing dumps!";
+    am_puller.(DEBUG|DEBUG_config)::
+      "I'm pulling dumps!";
     am_transporter.(DEBUG|DEBUG_config)::
       "I'm a transporter!";
 }
@@ -227,6 +254,11 @@ bundle agent federation_manage_files
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/transport.sh" ),
         perms => default:mog( "500", "$(transport_user)", "root" );
 
+    am_puller::
+      "$(cfengine_enterprise_federation:config.bin_dir)/pull_dumps_from.sh"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/pull_dumps_from.sh" ),
+        perms => default:mog( "500", "$(transport_user)", "root" );
+
     am_superhub::
       "$(cfengine_enterprise_federation:config.bin_dir)/import.sh"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/import.sh" ),
@@ -294,10 +326,29 @@ bundle agent exported_data
 bundle agent data_transport
 # @brief Run script to transport data from feeder to superhub
 {
+  vars:
+    am_puller::
+      # local copies of the variables to make using them below sane
+      "remotes" slist => {@(cfengine_enterprise_federation:config.remotes)};
+      "data"    data  => @(cfengine_enterprise_federation:config.data);
+
+      "enabled_pull_hosts[$(remotes)]"
+        string => "$(data[remote_hubs][$(remotes)][transport][ssh_host])",
+        if => and(strcmp("enabled", "$(data[remote_hubs][$(remotes)][target_state])"),
+                  strcmp("pull_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
+
+      "pull_args" -> {"ENT-4499"}
+        string => join(" ", getvalues(@(enabled_pull_hosts)));
+
   commands:
-    am_transporter::
+    am_pusher::
       "/bin/bash"
-        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"},
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh push"},
+        contain => contain_transport_user;
+
+    am_puller::
+      "/bin/bash"
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh pull $(pull_args)"},
         contain => contain_transport_user;
 }
 
