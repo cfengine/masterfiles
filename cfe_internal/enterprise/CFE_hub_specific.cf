@@ -14,6 +14,11 @@
 #
 ##################################################################
 
+body file control
+{
+        inputs => { "$(sys.inputdir)/cfe_internal/enterprise/federation/federation.cf" };
+}
+
 bundle common cfe_internal_hub_vars
 # @brief Set hub specific variables
 {
@@ -459,6 +464,18 @@ bundle agent cfe_internal_enterprise_maintenance
         ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
 }
 
+bundle agent cfe_internal_refresh_inventory_args
+{
+  vars:
+    cfengine_enterprise_federation:am_superhub::
+      "args" -> {"ENT-4527"}
+        string => "inventory_refresh_by_hostkey $(sys.key_digest)",
+        comment => "Only refresh inventory for the superhub, other hosts get refreshed on data import";
+
+    !cfengine_enterprise_federation:am_superhub::
+      "args" string => "inventory_refresh";
+}
+
 bundle agent cfe_internal_refresh_inventory_view
 # @brief Refresh materialized view every 5 minutes
 {
@@ -468,17 +485,21 @@ bundle agent cfe_internal_refresh_inventory_view
 
       "tags" slist => { "enterprise_maintenance" };
 
+  methods:
+      # we need to know if we are running on a superhub
+      "superhub_config" usebundle => "cfengine_enterprise_federation:config";
+      "inventory_refresh_args" usebundle => "cfe_internal_refresh_inventory_args";
+
   commands:
 
     (policy_server|am_policy_hub).enterprise_edition::
 
       "$(sys.workdir)/httpd/php/bin/php"
-        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh",
+        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks $(cfe_internal_refresh_inventory_args.args)",
         contain => silent,
         comment => "This refreshes the inventory view. If the inventory view is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_inventory_view",
         if => isdir( "$(cfe_internal_hub_vars.docroot)/api/modules/inventory" );
-
 }
 
 bundle agent cfe_internal_refresh_hosts_view

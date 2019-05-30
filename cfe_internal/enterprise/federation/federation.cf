@@ -1,6 +1,6 @@
 body file control
 {
-        inputs => { "$(sys.libdir)/stdlib.cf" };
+        inputs => { "$(sys.libdir)/stdlib.cf", "$(sys.inputdir)/cfe_internal/enterprise/CFE_hub_specific.cf" };
         namespace => "cfengine_enterprise_federation";
 }
 
@@ -176,15 +176,28 @@ bundle agent transport_user
         contain => default:in_shell;
 }
 
+bundle agent inventory_refresh_cmd
+{
+  vars:
+    "cmd" data => parsejson('{"inventory_refresh_cmd":
+                                "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh"}');
+}
 
 bundle agent federation_manage_files
 # @brief Manage files, directories and permissions in $(cfengine_enterprise_federation:config.federation_dir)
 {
+
   vars:
     "transport_user"
       string => "$(cfengine_enterprise_federation:config.transport_user)";
     "login" data => parsejson('{"login":"$(cfengine_enterprise_federation:config.login)"}');
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
+
+  methods:
+      "internal_vars" usebundle => "default:cfe_internal_hub_vars",
+        comment => "We need the path to the inventory refresh PHP script before we use it.";
+      "inventory_refresh_cmd" usebundle => "cfengine_enterprise_federation:inventory_refresh_cmd",
+        comment => "Needs to be in a separate bundle so that it gets evaluated *after* cfe_internal_hub_vars.";
 
   files:
     enterprise_edition.(policy_server|am_policy_hub)::
@@ -230,7 +243,7 @@ bundle agent federation_manage_files
         create => "true",
         template_method => "mustache",
         edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
-        template_data => mergedata(login, feeder_username),
+        template_data => mergedata(@(login), @(feeder_username), @(cfengine_enterprise_federation:inventory_refresh_cmd.cmd)),
         perms => default:mog( "640", "root", "$(transport_user)" );
 
       # TODO: Instrument augments
