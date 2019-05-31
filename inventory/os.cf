@@ -17,4 +17,9 @@ bundle common inventory_os
         string => "$(sys.flavor) (LSB missing)",
         meta => { "inventory", "attribute_name=OS" };
 
+    !_inventory_lsb_found.oracle_enterprise_linux::
+      "description" -> { "CFE-3070" }
+        string => "Oracle Enterprise Linux $(inventory_oracle_enhanced_linux.release[version])",
+        meta => { "inventory", "attribute_name=OS" };
+
 }

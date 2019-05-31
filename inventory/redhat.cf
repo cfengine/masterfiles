@@ -20,3 +20,49 @@ bundle common inventory_redhat
                                   useshell);
 
 }
+
+bundle common inventory_oracle_enterprise_linux
+# @brief Extract release details for Oracle Enterprise Linux
+# @var release[version] the version Oracle Enterprise Linux installed
+# @var release[codename] the codename of the Oracle Enterprise Linux release installed
+# @var release[0] the full content of the RELEASE_FILE
+# @class oracle_enterprise_linux namespace scoped class identifying oracle enterprise linux
+# @class oracle_enterprise_linux_\d namespace scoped class identifying the major version of oracle enterprise linux
+# @class oracle_enterprise_linux_\d_\d+ namespace scoped class identifying the full version of oracle enterprise linux
+{
+  vars:
+
+    linux::
+
+      "RELEASE_FILE" string => "/etc/enterprise-release";
+
+      "release" -> { "CFE-3070" }
+        data => data_regextract(
+                                 ".*release\s+(?<version>\d[\d\.]+)\s+\((?<codename>\w+)\)",
+                                 readfile( $(RELEASE_FILE) )
+        ),
+        if => and( not( isvariable( $(this.promiser) )), # Avoid un-necessary re-definition
+                   fileexists( $(RELEASE_FILE) ));
+
+      "release_version_major"
+        string => nth(
+                       string_split( '$(release[version])', '\.', 2 ), 0);
+
+  classes:
+
+    linux::
+
+      "oracle_enterprise_linux"
+        expression => isvariable( release ),
+        scope => "namespace",
+        meta => { "derived-from=$(RELEASE_FILE)" };
+
+      "oracle_enterprise_linux_$(release_version_major)"
+        scope => "namespace",
+        meta => { "derived-from=$(this.namespace):$(this.bundle).release_version_major" };
+
+      "oracle_enterprise_linux_$(release[version])"
+        scope => "namespace",
+        meta => { "derived-from=$(this.namespace):$(this.bundle).release[version]" };
+
+}
