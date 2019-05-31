@@ -1,17 +1,20 @@
 bundle common inventory_os
 {
-vars:
+  vars:
 
-_inventory_lsb_found::
-  "description" string => "$(inventory_lsb.os) $(inventory_lsb.release)",
-                  meta => { "inventory", "attribute_name=OS" };
+    _inventory_lsb_found::
+      "description"
+        string => "$(inventory_lsb.os) $(inventory_lsb.release)",
+        meta => { "inventory", "attribute_name=OS" };
 
-!_inventory_lsb_found.windows::
-  "description" string => "$(sys.release)",
-                  meta => { "inventory", "attribute_name=OS" };
+    !_inventory_lsb_found.windows::
+      "description"
+        string => "$(sys.release)",
+        meta => { "inventory", "attribute_name=OS" };
 
-!_inventory_lsb_found.!windows::
-  "description" string => "$(sys.flavor) (LSB missing)",
-                  meta => { "inventory", "attribute_name=OS" };
+    !_inventory_lsb_found.!windows::
+      "description"
+        string => "$(sys.flavor) (LSB missing)",
+        meta => { "inventory", "attribute_name=OS" };
 
 }
