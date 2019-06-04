@@ -205,21 +205,6 @@ bundle agent cfe_internal_php_runalerts
                     when available. Prior to 3.10 the service is supervised
                     directly by CFEngine policy.";
 
-      # NOTE The `hub_active` class is a hard class defined by the ha_plugin in
-      # the enterprise agent.
-      "active_hub"
-      comment => "The runalerts service should only run on policy servers that
-                  are active.",
-      scope => "bundle",
-      expression => "policy_server.(!enable_cfengine_enterprise_hub_ha|(enable_cfengine_enterprise_hub_ha.hub_active))";
-
-      # TODO Consider using `hub_passive` instead of `!hub_active`
-      "passive_ha_hub"
-      comment => "To avoid duplicate alerts the runalerts service should not run
-                  on standby hubs.",
-      scope => "bundle",
-      expression => "policy_server.(enable_cfengine_enterprise_hub_ha.!hub_active)";
-
   files:
 
     any::
@@ -430,6 +415,23 @@ bundle agent log_cfengine_enterprise_license_utilization
 
 }
 
+bundle agent cfe_internal_enterprise_HA_classes
+{
+  classes:
+      # NOTE The `hub_active` class is a hard class defined by the ha_plugin in
+      # the enterprise agent.
+      "active_hub"
+        expression => "policy_server.(!enable_cfengine_enterprise_hub_ha|(enable_cfengine_enterprise_hub_ha.hub_active))",
+        scope => "namespace",
+        comment => "This means this is a hub that is not in an HA setup or the active one in a HA setup";
+
+      # TODO Consider using `hub_passive` instead of `!hub_active`
+      "passive_ha_hub"
+        expression => "policy_server.(enable_cfengine_enterprise_hub_ha.!hub_active)",
+        scope => "namespace",
+        comment => "This means this is a passive hub in an HA setup";
+}
+
 bundle agent cfe_internal_enterprise_maintenance
 # @brief Actuate bundles tagged with `enterprise_maintenance` in lexically sorted order
 {
@@ -448,6 +450,11 @@ bundle agent cfe_internal_enterprise_maintenance
         int => length( enterprise_maintenance_bundles );
 
   methods:
+
+    enterprise_edition::
+      "HA classes"
+        usebundle => "cfe_internal_enterprise_HA_classes",
+        comment => "Set the HA-related classes for the maintenance bundles";
 
       "Enterprise Maintenance"
         usebundle => $(enterprise_maintenance_bundles),
@@ -492,7 +499,7 @@ bundle agent cfe_internal_refresh_inventory_view
 
   commands:
 
-    (policy_server|am_policy_hub).enterprise_edition::
+    (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks $(cfe_internal_refresh_inventory_args.args)",
@@ -513,7 +520,7 @@ bundle agent cfe_internal_refresh_hosts_view
 
   commands:
 
-    (policy_server|am_policy_hub).enterprise_edition::
+    (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3482" }
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks materialized_hosts_view_refresh",
@@ -535,7 +542,7 @@ bundle agent cfe_internal_clear_last_seen_hosts_logs
 
   commands:
 
-    (policy_server|am_policy_hub).enterprise_edition::
+    (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3550" }
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks clearLastSeenHostsLogs",
@@ -557,7 +564,7 @@ bundle agent cfe_internal_refresh_events_table
 
   commands:
 
-    (policy_server|am_policy_hub).enterprise_edition::
+    (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks process_api_events",
