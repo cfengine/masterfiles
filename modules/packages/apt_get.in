@@ -1,10 +1,4 @@
-#!/bin/sh
-''':'
-# First try to run this script with python3, else run with python
-command -v python3 >/dev/null 2>/dev/null  \
-    && exec python3 "$0" "$@" \
-    || exec python  "$0" "$@"
-'''
+#!@bindir@/python
 
 import sys
 import os
