@@ -435,6 +435,8 @@ bundle agent setup_status
       string => readfile( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" ),
       if => fileexists( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" );
     "ssh_server_fingerprint"
+      # ssh-keyscan is used because it's more reliable/easy than trying to
+      # parse sshd config to find the file and then readfile():
       string => execresult("ssh-keyscan -t ecdsa -H localhost 2>/dev/null", useshell);
   classes:
     "superhub_setup_status_complete"
