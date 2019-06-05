@@ -80,6 +80,57 @@ bundle agent cfe_internal_update_policy
 
 }
 
+bundle agent cfe_internal_remove_broken_symlink(symlink_path)
+# @brief Checks if the symlink_path symlink points to an existing target
+# @warning Only works for symlinks using absolute paths!
+{
+  vars:
+      "link_target" string => filestat("$(symlink_path)", "linktarget");
+
+  files:
+      "$(symlink_path)"
+        delete => u_tidy,
+        if => not(fileexists("$(link_target)"));
+}
+
+bundle agent cfe_internal_setup_python_symlink(symlink_path)
+# @brief Create the /var/cfengine/bin/python symlink pointing to some installed python (if any)
+{
+  vars:
+      "path" string => getenv("PATH", 1024);
+      "path_folders" slist => splitstring("$(path)", ":", 128);
+
+      "exact_version_globs" slist => maplist("$(this)/python[23]", @(path_folders)),
+        comment => "Looking for Python 2 and/or Python 3 in the $PATH folders";
+
+      "generic_python_globs" slist => maplist("$(this)/python", @(path_folders)),
+        comment => "Looking for the 'python' symlink/executable which can be any
+                    version of Python (usually Python 2 for backwards compatibility)";
+
+      "python_exact[$(exact_version_globs)]" slist => findfiles("$(exact_version_globs)");
+      "python_generic[$(generic_python_globs)]" slist => findfiles("$(generic_python_globs)");
+
+      "python_exact_sorted" slist => reverse(sort(getvalues(@(python_exact)), "lex")),
+        comment => "Prefer higher major versions of Python";
+
+      "pythons" slist => getvalues(mergedata(@(python_exact_sorted), getvalues(@(python_generic)))),
+        comment => "Prefer exact versions over unknown";
+
+      "python" string => nth(@(pythons), 0),
+        if => isgreaterthan(length(@(pythons)), 0),
+        comment => "Taking the first item from the list (sorted by preference)";
+
+  files:
+      "$(symlink_path)"
+        delete => u_tidy,
+        if => not(isvariable("python"));
+
+      "$(symlink_path)"
+        link_from => u_ln_s("$(python)"),
+        move_obstructions => "true",
+        if => isvariable("python");
+}
+
 bundle agent cfe_internal_update_policy_cpv
 # @brief Update inputs from masterfiles when cf_promises_validated changes
 #
@@ -138,7 +189,11 @@ bundle agent cfe_internal_update_policy_cpv
 
       "postgresdb_log"        string => "/var/log/postgresql.log",
       comment => "File where Postgres database files will be logging -",
-      handle => "cfe_internal_update_policy_postgresdb_log_file";
+        handle => "cfe_internal_update_policy_postgresdb_log_file";
+
+      "python_symlink"        string => "$(sys.bindir)/python",
+        comment => "Symlink to Python we found (if any)",
+        handle => "cfe_internal_update_policy_python_symlink";
 
     cfredis_in_enterprise::
 
@@ -231,6 +286,11 @@ bundle agent cfe_internal_update_policy_cpv
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 
+  methods:
+    debian|redhat|amazon_linux|suse|sles::
+      # Only needed on distros with Python-based package modules
+      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_symlink)"),
+        if => not(fileexists("$(python_symlink)"));
 }
 
 #########################################################
