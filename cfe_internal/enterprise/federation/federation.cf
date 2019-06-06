@@ -30,30 +30,31 @@ bundle agent config
         string => "$(data[remote_hubs][$(remotes)][transport][ssh_user])@$(data[remote_hubs][$(remotes)][transport][ssh_host])",
             if => and(
                        # To ensure we are using a remote hub that's actually enabled
-                       strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" ),
+                       strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" ),
                        # To ensure the remote we are pushing to actually needs the data (is a superhub)
                        strcmp( "superhub", "$(data[remote_hubs][$(remotes)][role])" ));
 
     am_superhub::
       # Public keys of enabled pushing feeders need to be trusted (on a superhub)
       "pubkey[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_pubkey])",
-            if => and( strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" ),
+            if => and( strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" ),
                        strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" ),
                        strcmp( "push_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
 
     am_feeder::
       # Public key(s) of enabled pulling superhub(s) need(s) to be trusted (on a feeder)
       "pubkey[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_pubkey])",
-            if => and( strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" ),
+            if => and( strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" ),
                        strcmp( "superhub", "$(data[remote_hubs][$(remotes)][role])" ),
                        strcmp( "pull_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
 
     am_superhub|am_feeder::
       "pubkeys" slist => getvalues( pubkey );
 
-      "fingerprint[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_fingerprint])",
+      "fingerprint[$(remotes)]"
+        string => "$(data[remote_hubs][$(remotes)][transport][ssh_host]) $(data[remote_hubs][$(remotes)][transport][ssh_fingerprint])",
         # To ensure we are using a remote hub that's enabled
-        if => strcmp( "enabled", "$(data[remote_hubs][$(remotes)][target_state])" );
+        if => strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" );
       "fingerprints" slist => getvalues( fingerprint );
 
   classes:
@@ -71,14 +72,14 @@ bundle agent config
 
       "am_pusher"
         and => {strcmp("superhub", "$(data[remote_hubs][$(remotes)][role])"),
-                strcmp("enabled", "$(data[remote_hubs][$(remotes)][target_state])"),
+                strcmp("on", "$(data[remote_hubs][$(remotes)][target_state])"),
                 strcmp("push_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])")},
         comment => "Has an enabled remote superhub with push as transport method, should run push transport",
         scope => "namespace";
 
       "am_puller"
         and => {"am_superhub",
-                strcmp("enabled", "$(data[remote_hubs][$(remotes)][target_state])"),
+                strcmp("on", "$(data[remote_hubs][$(remotes)][target_state])"),
                 strcmp("pull_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])")},
         comment => "Superhub with some enabled remote hub with pull as transport method, should run pull transport",
         scope => "namespace";
@@ -351,7 +352,7 @@ bundle agent data_transport
 
       "enabled_pull_hosts[$(remotes)]"
         string => "$(data[remote_hubs][$(remotes)][transport][ssh_host])",
-        if => and(strcmp("enabled", "$(data[remote_hubs][$(remotes)][target_state])"),
+        if => and(strcmp("on", "$(data[remote_hubs][$(remotes)][target_state])"),
                   strcmp("pull_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
 
       "pull_args" -> {"ENT-4499"}
@@ -463,7 +464,7 @@ bundle agent setup_status
     "ssh_server_fingerprint"
       # ssh-keyscan is used because it's more reliable/easy than trying to
       # parse sshd config to find the file and then readfile():
-      string => execresult("ssh-keyscan -t ecdsa -H localhost 2>/dev/null", useshell);
+      string => execresult("ssh-keyscan -t ecdsa localhost 2>/dev/null | sed s/localhost//g", useshell);
   classes:
     "superhub_setup_status_complete"
       expression => "any",
