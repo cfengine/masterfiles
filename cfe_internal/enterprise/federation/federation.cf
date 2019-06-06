@@ -51,7 +51,8 @@ bundle agent config
     am_superhub|am_feeder::
       "pubkeys" slist => getvalues( pubkey );
 
-      "fingerprint[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_fingerprint])",
+      "fingerprint[$(remotes)]"
+        string => "$(data[remote_hubs][$(remotes)][transport][ssh_host]) $(data[remote_hubs][$(remotes)][transport][ssh_fingerprint])",
         # To ensure we are using a remote hub that's enabled
         if => strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" );
       "fingerprints" slist => getvalues( fingerprint );
@@ -463,7 +464,7 @@ bundle agent setup_status
     "ssh_server_fingerprint"
       # ssh-keyscan is used because it's more reliable/easy than trying to
       # parse sshd config to find the file and then readfile():
-      string => execresult("ssh-keyscan -t ecdsa localhost 2>/dev/null", useshell);
+      string => execresult("ssh-keyscan -t ecdsa localhost 2>/dev/null | sed s/localhost//g", useshell);
   classes:
     "superhub_setup_status_complete"
       expression => "any",
