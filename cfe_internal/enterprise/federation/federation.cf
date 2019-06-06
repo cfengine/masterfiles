@@ -257,6 +257,10 @@ bundle agent federation_manage_files
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/parallel.sh" ),
         perms => default:mog( "640", "root", "$(transport_user)" );
 
+      "$(cfengine_enterprise_federation:config.bin_dir)/psql_wrapper.sh"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/psql_wrapper.sh" ),
+        perms => default:mog( "700", "root", "root" );
+
     am_feeder::
       "$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/dump.sh" ),
@@ -384,6 +388,26 @@ bundle agent imported_data
         contain => default:in_shell;
 }
 
+bundle agent superhub_schema
+# @brief Run SQL script to ensure schema is migrated to superhub partitioned tables architecture
+{
+  commands:
+    am_superhub::
+      "$(cfengine_enterprise_federation:config.bin_dir)/psql_wrapper.sh"
+        arglist => {
+                     "cfdb",
+                     "'select superhub_schema();'",
+                   },
+        classes => superhub_schema_exit_codes;
+}
+
+body classes superhub_schema_exit_codes
+{
+  kept_returncodes => { "0" };
+  repaired_returncodes => { "1" };
+  failed_returncodes => { "2" };
+}
+
 bundle agent entry
 # @brief Conditionally runs all federated reporting bundles
 {
@@ -418,6 +442,8 @@ bundle agent entry
         usebundle => data_transport;
       "CFEngine Enterprise Federation Feeder Data Import"
         usebundle => imported_data;
+      "CFEngine Enterprise Federation Schema Migration"
+        usebundle => superhub_schema;
       "Configuration Status"
         usebundle => setup_status;
   reports:
