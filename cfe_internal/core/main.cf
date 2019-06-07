@@ -1,6 +1,13 @@
 bundle agent cfe_internal_core_main
 {
   methods:
+
+    !mpf_auto_am_policy_hub_state_disabled::
+
+      "Verify policy hub state" -> { "CFE-3073" }
+        usebundle => mpf_auto_am_policy_hub_state,
+        if => not( fileexists( "$(sys.statedir)/am_policy_hub" ));
+
     any::
 
 #   NB! On a container host this may kill CFEngine processes inside containers.
@@ -31,6 +38,20 @@ bundle agent cfe_internal_core_main
 
 }
 
+bundle agent mpf_auto_am_policy_hub_state
+# @brief Ensure that `$(sys.statedir)/am_policy_hub` file is present when expected
+{
+  files:
+
+      # We think we are a policy hub if the policy server (the host you
+      # bootstrapped to) resolves to an IP found on the host. This is intended
+      # to prevent accidental removal of the am_policy_hub state file.
+
+      "$(sys.statedir)/am_policy_hub"
+        create => "true",
+        if => some( escape( $(sys.policy_server) ), @(sys.ipaddresses) );
+
+}
 bundle agent mpf_augments_control
 # @brief Restart cfenigne components when one of the control variables has changed.
 #
