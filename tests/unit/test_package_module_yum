@@ -31,7 +31,7 @@ except OSError:
 #                   The mock log is the command line(s) that the mock command
 #                   was called with.
 def check(operation, input, no_lines, expected_output, mock_lines, mock_output):
-    process = subprocess.Popen([yum_module, operation],
+    process = subprocess.Popen(["/usr/bin/python", yum_module, operation],
                                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in input:
         process.stdin.write(line + "\n")
