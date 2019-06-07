@@ -98,6 +98,8 @@ body common control
                 "../../../../../controls/def.cf",
                 "../../../../../$(sys.local_libdir)/packages.cf",
                 "../../../../../$(sys.local_libdir)/commands.cf",
+                "../../../../../cfe_internal/update/lib.cf",
+                "../../../../../cfe_internal/update/update_policy.cf",
                 "../../packages-info.cf.sub",
               };
     bundlesequence => { default($(this.promise_filename)) };
@@ -114,6 +116,10 @@ bundle agent init
       "test_skip_needs_work" string => "!debian.!redhat";
       # The package module does not support RedHat 4 or Debian 4 (Etch).
       "test_skip_unsupported" string => "centos_4|redhat_4|debian_4|debian_etch";
+
+  methods:
+    debian|redhat::
+      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("/var/cfengine/bin/python");
 }
 
 bundle agent log_test_case(msg)

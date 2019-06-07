@@ -80,19 +80,6 @@ bundle agent cfe_internal_update_policy
 
 }
 
-bundle agent cfe_internal_remove_broken_symlink(symlink_path)
-# @brief Checks if the symlink_path symlink points to an existing target
-# @warning Only works for symlinks using absolute paths!
-{
-  vars:
-      "link_target" string => filestat("$(symlink_path)", "linktarget");
-
-  files:
-      "$(symlink_path)"
-        delete => u_tidy,
-        if => not(fileexists("$(link_target)"));
-}
-
 bundle agent cfe_internal_setup_python_symlink(symlink_path)
 # @brief Create the /var/cfengine/bin/python symlink pointing to some installed python (if any)
 {
