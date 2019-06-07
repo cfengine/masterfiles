@@ -590,6 +590,31 @@ For example, to only allow any file to be copied a single time:
 
 **History**: Added in 3.11.0, 3.10.2
 
+### Disable automatic policy hub detection
+
+During bootstrap, if the executing host finds the IP address of the target on
+itself it automatically classifies the host as a policy server by ensuring the
+`$(sys.statedir)/am_policy_hub` file exists. When this file exists, the
+`am_policy_hub` and `policy_server` classes are defined. To help avoid
+accidental declassification, the MPF contains policy to regularly check if the
+host is bootstrapped to an IP found on itself, and if so, to ensure the proper
+state file exists.
+
+To disable this check, define `mpf_auto_am_policy_hub_state_disabled`.
+
+For example, to define this class via augments, place the following in your def.json.
+
+```
+{
+  "classes":{
+    "mpf_auto_am_policy_hub_state_disabled": [ "any" ]
+  }
+
+}
+```
+
+**History**: Added in 3.15.0, 3.12.3, 3.10.7
+
 ### Configure default repository for file backups
 
 By default the agent creates a backup of a file before it is edited in the same
