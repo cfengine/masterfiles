@@ -479,6 +479,7 @@ bundle agent setup_status
     superhub_setup_status_complete::
       "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/setup-status.json"
         create => "true",
+        perms => default:mog( "600", "cfapache", "root" ),
         template_method => "inline_mustache",
         edit_template_string => "{{%-top-}}$(const.n)",
         template_data => '{
