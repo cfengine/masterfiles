@@ -1,6 +1,59 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.14.0:
+	- - fix isvariable syntax error in update_def.cf (CFE-2953)
+	- - fixup FR push_over_rsync for FR i2 (ENT-4587)
+	- Add path support for setfacl
+	- Add path support for timedatectl and journalctl (CFE-3013)
+	- Add trailing slash to access promises expecting directories
+	  (CFE-3024)
+	- Added scripts and templates for Federated Reporting (ENT-4473)
+	- Avoid requiring rpm python module to check zypper version
+	- Change cleanup consumer status SQL query (ENT-4365)
+	- Conditioned use of curl for ec2 metadata cache on curl binary being executable
+	  (CFE-3049)
+	- Control cf-hub without modifying vendored policy (ENT-4269)
+	- Do not run DB maintenance tasks on a passive HA hub (ENT-4706)
+	- Do not suppress repair outcome for starting cf-monitord or cf-execd
+	  (CFE-2964)
+	- Enforce restrictive permissions on hub install log (ENT-4506)
+	- Ensure that asynchronous query API semaphores are writable (ENT-4551)
+	- Fix standalone_self_upgrade not triggering because of stale data
+	  (ENT-4317)
+	- Fixed maintenance policy for promise log cleanup to respect history_length_days
+	  (ENT-4588)
+	- Improve efficiency and error handling of user specified policy update bundle
+	- Log version of Enterprise agent outside of state (ENT-4352)
+	- Package module for managing windows packages using msiexec (ENT-3719)
+	- Prevent inventorying un-expanded free memory from cf-monitord
+	- Prevent mon.value_mem_total from being inventoried if not defined
+	  (ENT-4522)
+	- Prevent performance overhead on hubs that don't enable license utilization logging
+	  (ENT-4333)
+	- Purge collection status records from the future (ENT-4362)
+	- Reduce cost of knowing when setopt is available in yum (CFE-2993)
+	- Restart runalerts if modified (ENT-4273)
+	- Separate kill signals from restart class to avoid warning (CFE-2974)
+	- Separate termination and observation promises for cf-monitord
+	  (CFE-2963)
+	- Set default access promises for directories to only share if directory exists
+	  (CFE-3060)
+	- Set default value for purge_scheduled_reports_older_than_days
+	  (ENT-4404)
+	- Use class name that describes daemon state, not desired action
+	- Use more descriptive class names to identify concurrent daemons
+	- collect_window in body server control can now be set from augments
+	  (ENT-4283)
+	- guard vars promises in cfe_internal_enterprise_mission_portal_apache
+	  Constrain vars promises in cfe_internal_enterprise_mission_portal_apache
+	  to policy_server.enterprise_edition::, otherwise "cf-promises --show-vars"
+	  includes a dump of the entire datastate from the "data" variable in
+	  cfe_internal_enterprise_mission_portal_apache (line over 100K long).
+	  (CFE-3011)
+	- make various fixes for Federated Reporting i2 (ENT-4566)
+	- redhat_pure is no longer defined on Fedora hosts (CFE-3022)
+
 3.13.0:
 	- Add debian 9 to the self upgrade package map (ENT-4255)
 	- Add 'system-uuid' to default dmidecode inventory (CFE-2925)
