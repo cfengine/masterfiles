@@ -193,6 +193,7 @@ bundle agent federation_manage_files
       string => "$(cfengine_enterprise_federation:config.transport_user)";
     "login" data => parsejson('{"login":"$(cfengine_enterprise_federation:config.login)"}');
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
+    "feeder" data => parsejson('{"feeder": "$(sys.key_digest)"}');
 
   methods:
       "internal_vars" usebundle => "default:cfe_internal_hub_vars",
@@ -244,7 +245,8 @@ bundle agent federation_manage_files
         create => "true",
         template_method => "mustache",
         edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
-        template_data => mergedata(@(login), @(feeder_username), @(cfengine_enterprise_federation:inventory_refresh_cmd.cmd)),
+        template_data => mergedata(@(login), @(feeder_username), @(feeder),
+                                   @(cfengine_enterprise_federation:inventory_refresh_cmd.cmd)),
         perms => default:mog( "640", "root", "$(transport_user)" );
 
       # TODO: Instrument augments
