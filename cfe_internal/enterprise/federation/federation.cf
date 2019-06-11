@@ -309,7 +309,7 @@ bundle agent postgres_config
   files:
     am_superhub::
       "/var/cfengine/state/pg/data/postgresql.conf"
-        edit_line => default:set_line_based( "$(this.bundle).c",
+        edit_line => default:set_line_based( "$(this.namespace):$(this.bundle).c",
                                      "=",
                                      "\s*=\s*",
                                      ".*",
