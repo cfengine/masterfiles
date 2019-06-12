@@ -332,7 +332,17 @@ bundle agent postgres_config
                      "/var/log/postgresql.log",
                      "-m",
                      "smart" # wait for online backup mode to finish and all clients to disconnect
-        };
+        },
+        contain => cfpostgres_user;
+}
+
+body contain cfpostgres_user
+{
+  useshell   => "useshell";
+  exec_owner => "cfpostgres";
+  exec_group => "cfpostgres";
+  chdir      => "/tmp";
+  no_output  => "true";
 }
 
 bundle agent exported_data
