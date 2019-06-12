@@ -1,6 +1,53 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.14.0:
+	- Fixed isvariable syntax error in update_def.cf (CFE-2953)
+	- Added path support for setfacl, timedatectl and journalctl (CFE-3013)
+	- Added trailing slash to access promises expecting directories
+	  (CFE-3024)
+	- Added scripts and templates for Federated Reporting (ENT-4473)
+	- rpm python module is no longer required to check zypper version
+	- Changed cleanup consumer status SQL query (ENT-4365)
+	- Conditioned use of curl for ec2 metadata cache on curl binary being executable
+	  (CFE-3049)
+	- Added augments variables to control cf-hub (ENT-4269)
+	- Prevented DB maintenance tasks on a passive High Availability hub (ENT-4706)
+	- Repair outcome for starting cf-monitord or cf-execd is no longer suppressed
+	  (CFE-2964)
+	- Restrictive permissions on hub install log are now enforced (ENT-4506)
+	- Ensured that asynchronous query API semaphores are writable (ENT-4551)
+	- Fixed standalone_self_upgrade not triggering because of stale data
+	  (ENT-4317)
+	- Fixed maintenance policy for promise log cleanup to respect history_length_days
+	  (ENT-4588)
+	- Improved efficiency and error handling of user specified policy update bundle
+	- Log version of Enterprise agent outside of state (ENT-4352)
+	- Added package module for managing windows packages using msiexec (ENT-3719)
+	- Prevented inventorying un-expanded memory values from cf-monitord (ENT-4522)
+	- Prevented performance overhead on hubs that don't enable license utilization logging
+	  (ENT-4333)
+	- Collection status records in the future are now purged (ENT-4362)
+	- Reduced cost of knowing when setopt is available in yum (CFE-2993)
+	- runalerts is now restarted if modified (ENT-4273)
+	- Separated kill signals from restart class to avoid warning (CFE-2974)
+	- Separated termination and observation promises for cf-monitord
+	  (CFE-2963)
+	- Set default access promises for directories to only share if directory exists
+	  (CFE-3060)
+	- Set default value for purge_scheduled_reports_older_than_days
+	  (ENT-4404)
+	- Added more accurate and descriptive daemon classes
+	- collect_window in body server control can now be set from augments
+	  (ENT-4283)
+	- Guarded vars promises in cfe_internal_enterprise_mission_portal_apache
+	  Constrain vars promises in cfe_internal_enterprise_mission_portal_apache
+	  to policy_server.enterprise_edition::, otherwise "cf-promises --show-vars"
+	  includes a dump of the entire datastate from the "data" variable in
+	  cfe_internal_enterprise_mission_portal_apache (line over 100K long).
+	  (CFE-3011)
+	- redhat_pure is no longer defined on Fedora hosts (CFE-3022)
+
 3.13.0:
 	- Add debian 9 to the self upgrade package map (ENT-4255)
 	- Add 'system-uuid' to default dmidecode inventory (CFE-2925)
