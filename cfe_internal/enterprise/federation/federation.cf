@@ -489,7 +489,7 @@ bundle agent setup_status
     "ssh_server_fingerprint"
       # ssh-keyscan is used because it's more reliable/easy than trying to
       # parse sshd config to find the file and then readfile():
-      string => execresult("ssh-keyscan -t ecdsa localhost 2>/dev/null | sed s/localhost//g", useshell);
+      string => execresult("ssh-keyscan -t ecdsa localhost 2>/dev/null | sed 's/localhost //g'", useshell);
   classes:
     "superhub_setup_status_complete"
       expression => "any",
