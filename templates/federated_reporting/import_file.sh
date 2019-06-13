@@ -44,6 +44,9 @@ EOF
   exit 0
 } || {
   mv "$file.importing" "$file.failed"
+  echo "--------------------------------------"
+  echo "Last 10 lines of log for failed import"
+  echo "--------------------------------------"
+  tail -n 10 $file.log
   exit 1
 }
-
