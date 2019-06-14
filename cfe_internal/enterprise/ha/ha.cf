@@ -24,14 +24,16 @@ bundle agent ha_manage_mp_status_file
   policy_server.!enable_cfengine_enterprise_hub_ha::
     "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal" }
       delete => tidy,
+      handle => "cfengine_enterprise_ha_enabled_semaphore_absent",
       comment => "If this file is present when HA is not enabled
                   Mission Portal will incorrectly report HA status.";
 
   policy_server.enable_cfengine_enterprise_hub_ha::
-    "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal" }
+    "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal", "ENT-4751" }
      create => "true",
-     perms => mog("0644",$(def.cf_apache_user),$(def.cf_apache_group)),
-     comment => "This file is used by mission portal to know that HA
+     handle => "cfengine_enterprise_ha_enabled_semaphore_present",
+     perms => mog("0440",$(def.cf_apache_user),$(def.cf_apache_group)),
+     comment => "This file is read by mission portal to know that HA
                  is enabled. Without it the UI will not report the
                  correct HA status.";
 }
