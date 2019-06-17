@@ -58,7 +58,7 @@ body server control
       cfruncommand => "$(sys.cf_agent) -I -D cf_runagent_initiated -f \"$(sys.update_policy_path)\"  &
                        $(sys.cf_agent) -I -D cf_runagent_initiated";
 
-    !windows.!cfengine_3_7::
+    !windows::
 
       # In 3.10 the quotation is properly closed when EOF is reached. It is left
       # open so that arguments (like -K and --remote-bundles) can be appended.
@@ -67,25 +67,6 @@ body server control
         cfruncommand => "$(def.cf_runagent_shell) -c \'
                            $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
                            $(sys.cf_agent) -I -D cf_runagent_initiated";
-
-    !windows.cfengine_3_7::
-
-      # 3.7.x does not properly close open quotes when EOF is reached preventing
-      # policy execution, so we must provide a trailing quote for cfruncommand.
-
-      # 3.7.x Automatically appends -I -Dcfruncommand to the cfruncommand. This
-      # results in an error about not being allowed to specify inputs for remote
-      # execution from the update policy. In order to preserve the ability for
-      # policy to know its execution provenance we define a different class
-      # `cf_runagent_initiated` that does not elicit the error.
-
-        cfruncommand => "$(def.cf_runagent_shell) -c \'
-                           $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
-                           $(sys.cf_agent) -I -D cf_runagent_initiated\'";
-
-      # Bind to all interfaces including ipv6
-      # Adding this on windows will force ipv6 only
-      bindtointerface => "::";
 
 }
 
