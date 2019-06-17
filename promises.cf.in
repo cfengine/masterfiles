@@ -291,18 +291,8 @@ bundle common services_autorun
 # @brief Include autorun policy and discover autorun bundles if enabled
 {
   vars:
-    !cfengine_3_7.services_autorun::
-      # 3.8+ can use local_libdir and will use the common lib as it supports the
-      # @if macro
+    services_autorun::
       "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
-      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
-      "bundles" slist => { "autorun" }; # run loaded bundles
-
-    cfengine_3_7.services_autorun::
-      # We have to point 3.7 at the unified library because sys.local_libdir in
-      # 3.7 binaries it is set to a version specific path. However since 3.7
-      # knows about the @if macro it is safe to share the same policy as 3.8+
-      "inputs" slist => { "$(sys.local_libdir)/../autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
 
