@@ -70,17 +70,6 @@ bundle agent cfengine_software
   vars:
 
       # Default desired CFEngine software
-
-      "pkg_name" string => "cfengine-nova";
-      "pkg_version" string => "@VERSION@";
-      "pkg_release" string => "1";
-      "pkg_arch" string => "x86_64";
-      "package_dir" string => "$(sys.flavour)_$(sys.arch)";
-
-!(cfengine_3_7_1|cfengine_3.7.2|cfengine_3.7.3)::
-# After 3.7.4 a fix to ifelse and isvarible allows for actuating the function
-# even thought the promise references an unresolved variable.
-
       "pkg_name" string => ifelse( isvariable( "def.cfengine_software_pkg_name" ), $(def.cfengine_software_pkg_name), "cfengine-nova");
       "pkg_version" string => ifelse( isvariable( "def.cfengine_software_pkg_version" ), $(def.cfengine_software_pkg_version), "@VERSION@");
       "pkg_release" string => ifelse( isvariable( "def.cfengine_software_pkg_release" ), $(def.cfengine_software_pkg_release), "1");
