@@ -12,12 +12,16 @@ s/public\.//g;
 # Remove CREATE TYPE blocks
 /CREATE TYPE.*/,/^);$/d
 
-# remove __promiselog related items so that __promiselog_* child tables inherit from
-# public.__promiselog and are so included in that way.
-/CREATE TABLE __promiselog.*/,/^);$/d
-/CREATE SEQUENCE __promiselog_id_seq.*/,/^$/d
-/ALTER SEQUENCE __promiselog_id_seq.*$/d
-/ALTER TABLE ONLY __promiselog .*$/d
-/ALTER TABLE ONLY __promiselog.*/,/__promiselog_pkey.*$/d
+# don't reset the promiselog sequence value
 /SELECT pg_catalog.setval('__promiselog_id_seq.*$/d
-/CREATE TRIGGER promise_log_partition_trigger.*$/d
+
+# enable more debug messages
+s/client_min_messages = warning/client_min_messages = notice/
+
+# Munge rows from __promiselog child tables (like __promiselog_KEPT_2017-01-01)
+# to write them to parent table on import (and the database will take care
+# of placing them in the appropriate child table)
+/^INSERT INTO "__promiselog_/ {
+    s/^INSERT INTO "__promiselog_.[^"]*"/INSERT INTO __promiselog/;
+    s/VALUES [^,]*,/VALUES \(DEFAULT,/;
+};
