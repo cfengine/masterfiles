@@ -219,8 +219,8 @@ bundle agent cfe_internal_permissions
   files:
 
     !(policy_server|am_policy_hub)::
-      "$(sys.statedir)/."
-        perms => mog("0600", "root", "root"),
+      "$(sys.statedir)/." -> { "ENT-4773" }
+        perms => system_owned( "0600" ),
         # Important to recurse across file system boundaries, as databases and or state are commonly on different filesystems
         depth_search => recurse_with_base( inf ),
         file_select => all;
