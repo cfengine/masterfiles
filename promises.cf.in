@@ -208,12 +208,7 @@ bundle common cfengine_stdlib
 {
   vars:
 
-    !cfengine_3_7::
-      # CFEngine 3.6 can include through a secondary file
-      # CFEngine version 3.6 and prior use the split library to avoid syntax
-      # errors introduced by new functionality. For example new functions.
-      # This also works for 3.8 because local_libdir should be set to lib
-      # instead of lib/3.8
+    any::
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
 
 
@@ -233,13 +228,6 @@ bundle common cfengine_stdlib
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf",
                           "$(sys.local_libdir)/packages-ENT-3719.cf" };
 @endif
-
-    cfengine_3_7::
-      # CFEngine 3.7 has local_libdir set to $(sys.inputdir)/lib/3.7, but with
-      # the @if macro support we can re-unify the split library for 3.7+ so we
-      # specify the unified lib relative to local_libdir.
-      "inputs" slist => { "$(sys.local_libdir)/../stdlib.cf" };
-
 
   reports:
     verbose_mode::
