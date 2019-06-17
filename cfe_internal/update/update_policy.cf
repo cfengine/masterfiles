@@ -80,6 +80,44 @@ bundle agent cfe_internal_update_policy
 
 }
 
+bundle agent cfe_internal_setup_python_symlink(symlink_path)
+# @brief Create the /var/cfengine/bin/python symlink pointing to some installed python (if any)
+{
+  vars:
+      "path" string => getenv("PATH", 1024);
+      "path_folders" slist => splitstring("$(path)", ":", 128);
+
+      "exact_version_globs" slist => maplist("$(this)/python[23]", @(path_folders)),
+        comment => "Looking for Python 2 and/or Python 3 in the $PATH folders";
+
+      "generic_python_globs" slist => maplist("$(this)/python", @(path_folders)),
+        comment => "Looking for the 'python' symlink/executable which can be any
+                    version of Python (usually Python 2 for backwards compatibility)";
+
+      "python_exact[$(exact_version_globs)]" slist => findfiles("$(exact_version_globs)");
+      "python_generic[$(generic_python_globs)]" slist => findfiles("$(generic_python_globs)");
+
+      "python_exact_sorted" slist => reverse(sort(getvalues(@(python_exact)), "lex")),
+        comment => "Prefer higher major versions of Python";
+
+      "pythons" slist => getvalues(mergedata(@(python_exact_sorted), getvalues(@(python_generic)))),
+        comment => "Prefer exact versions over unknown";
+
+      "python" string => nth(@(pythons), 0),
+        if => isgreaterthan(length(@(pythons)), 0),
+        comment => "Taking the first item from the list (sorted by preference)";
+
+  files:
+      "$(symlink_path)"
+        delete => u_tidy,
+        if => not(isvariable("python"));
+
+      "$(symlink_path)"
+        link_from => u_ln_s("$(python)"),
+        move_obstructions => "true",
+        if => isvariable("python");
+}
+
 bundle agent cfe_internal_update_policy_cpv
 # @brief Update inputs from masterfiles when cf_promises_validated changes
 #
@@ -104,21 +142,21 @@ bundle agent cfe_internal_update_policy_cpv
 
     windows::
 
-      "modules_dir"        string => "/var/cfengine/modules",      # NB! NOT $(sys.workdir) on Windows !
+      "modules_dir_source"        string => "/var/cfengine/modules",
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
-      "plugins_dir"        string => "/var/cfengine/plugins",      # NB! NOT $(sys.workdir) on Windows !
+      "plugins_dir_source"        string => "/var/cfengine/plugins",
       comment => "Directory containing CFEngine plugins",
       handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
 
     !windows::
 
-      "modules_dir"        string => translatepath("$(sys.workdir)/modules"),
+      "modules_dir_source"        string => translatepath("$(sys.workdir)/modules"),
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir";
 
-      "plugins_dir"        string => translatepath("$(sys.workdir)/plugins"),
+      "plugins_dir_source"        string => translatepath("$(sys.workdir)/plugins"),
       comment => "Directory containing CFEngine plugins",
       handle => "cfe_internal_update_policy_vars_plugins_dir";
 
@@ -138,7 +176,11 @@ bundle agent cfe_internal_update_policy_cpv
 
       "postgresdb_log"        string => "/var/log/postgresql.log",
       comment => "File where Postgres database files will be logging -",
-      handle => "cfe_internal_update_policy_postgresdb_log_file";
+        handle => "cfe_internal_update_policy_postgresdb_log_file";
+
+      "python_symlink"        string => "$(sys.bindir)/python",
+        comment => "Symlink to Python we found (if any)",
+        handle => "cfe_internal_update_policy_python_symlink";
 
     cfredis_in_enterprise::
 
@@ -177,38 +219,20 @@ bundle agent cfe_internal_update_policy_cpv
       action => u_immediate,
       classes => u_if_repaired("validated_updates_ready");
 
-    !am_policy_hub.!windows::
+    !am_policy_hub::
 
-      "$(modules_dir)"
+      "$(sys.workdir)$(const.dirsep)modules"
       comment => "Always update modules files on client side",
       handle => "cfe_internal_update_policy_files_update_modules",
-      copy_from => u_rcp("$(modules_dir)", @(update_def.policy_servers)),
+      copy_from => u_rcp("$(modules_dir_source)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
 
-      "$(plugins_dir)"
+      "$(sys.workdir)$(const.dirsep)plugins"
       comment => "Always update plugins files on client side",
       handle => "cfe_internal_update_policy_files_update_plugins",
-      copy_from => u_rcp("$(plugins_dir)", @(update_def.policy_servers)),
-      depth_search => u_recurse("inf"),
-      perms => u_m("755"),
-      action => u_immediate;
-
-    !am_policy_hub.windows::
-
-      "$(sys.workdir)\modules"
-      comment => "Always update modules files on client side (Windows)",
-      handle => "cfe_internal_update_policy_files_update_modules_windows",
-      copy_from => u_rcp("$(modules_dir)", @(update_def.policy_servers)),
-      depth_search => u_recurse("inf"),
-      perms => u_m("755"),
-      action => u_immediate;
-
-      "$(sys.workdir)\plugins"
-      comment => "Always update plugins files on client side (Windows)",
-      handle => "cfe_internal_update_policy_files_update_plugins_windows",
-      copy_from => u_rcp("$(plugins_dir)", @(update_def.policy_servers)),
+      copy_from => u_rcp("$(plugins_dir_source)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
@@ -249,6 +273,11 @@ bundle agent cfe_internal_update_policy_cpv
       depth_search => u_recurse_basedir("inf"),
       action => u_immediate;
 
+  methods:
+    debian|redhat|amazon_linux|suse|sles::
+      # Only needed on distros with Python-based package modules
+      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_symlink)"),
+        if => not(fileexists("$(python_symlink)"));
 }
 
 #########################################################

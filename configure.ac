@@ -133,6 +133,11 @@ AS_IF([test x"$prefix" = xNONE],
     prefix=/var/cfengine
 )
 
+bindir="${bindir:-${exec_prefix}/bin}"
+dnl Expand ${prefix} and whatnot in bindir
+adl_RECURSIVE_EVAL("${bindir}", bindir)
+AC_SUBST(bindir, "${bindir}")
+
 dnl ######################################################################
 dnl OS specific stuff
 dnl ######################################################################
@@ -161,6 +166,7 @@ AM_COND_IF(HAVE_ENTERPRISE,
     AC_MSG_RESULT(Enterprise directory -> not set - some tests are disabled)
 )
 AC_MSG_RESULT(Install prefix       -> $prefix)
+AC_MSG_RESULT(bindir               -> $bindir)
 AC_MSG_RESULT()
 
 
@@ -227,7 +233,6 @@ do
 done
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
 
-
 dnl ######################################################################
 dnl Now make the Makefiles
 dnl ######################################################################
@@ -235,6 +240,9 @@ dnl ######################################################################
 AC_CONFIG_FILES([Makefile
                 controls/update_def.cf
                 modules/packages/Makefile
+                modules/packages/apt_get
+                modules/packages/yum
+                modules/packages/zypper
                 promises.cf
                 standalone_self_upgrade.cf
                 tests/acceptance/Makefile
@@ -242,6 +250,12 @@ AC_CONFIG_FILES([Makefile
 ])
 
 AC_OUTPUT
+
+dnl The package modules generated from the .in files are not executable and we need
+dnl the to be for tests.
+for pkg_module in modules/packages/apt_get modules/packages/yum modules/packages/zypper; do
+    chmod a+x $pkg_module
+done
 
 AC_MSG_RESULT()
 AC_MSG_RESULT(DONE: Configuration done. Run "make install" to install CFEngine Masterfiles.)
