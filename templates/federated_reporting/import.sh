@@ -53,11 +53,11 @@ for file in $dump_files; do
   "$(dirname "$0")/import_file.sh" $file || failed=1
 done
 
+
 if [ "$failed" != "0" ]; then
   log "Importing files: FAILED"
-  find "$CFE_FR_SUPERHUB_IMPORT_DIR"
+  #find "$CFE_FR_SUPERHUB_IMPORT_DIR"
   for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
-    echo "file=$file"
     log "Failed to import file '${file%%.failed}'"
     rm -f "$file"
   done
