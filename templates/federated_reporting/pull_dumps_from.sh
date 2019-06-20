@@ -11,6 +11,7 @@ set -e
 set -o pipefail
 
 source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/log.sh"
 
 # check that we have all the variables we need
 true "${CFE_FR_TRANSPORT_DIR?undefined}"
@@ -30,6 +31,12 @@ fi
 feeder="$1"
 
 mkdir -p "$feeder"
+
+"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@$feeder" "test -e $CFE_FR_TRANSPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT" ||
+  {
+    log "No files to transport."
+    exit 0
+  }
 
 # move the files so that they don't get overwritten/deleted during the transport
 "$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@$feeder" "mkdir $CFE_FR_TRANSPORT_DIR/$$.transporting"
