@@ -25,6 +25,9 @@ stamp-h1
 /ylwrap
 /test-driver
 CFVERSION
+modules/packages/apt_get
+modules/packages/yum
+modules/packages/zypper
 
 # Misc.
 /cf_promises_*
