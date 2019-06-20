@@ -113,11 +113,12 @@ bundle agent transport_user
         string => "$(cfengine_enterprise_federation:config.transport_user)";
       "home"
         string => "$(cfengine_enterprise_federation:config.transport_home)";
-      "ssh_key_type" string => "ed25519";
-      "ssh_priv_key" string => "$(home)/.ssh/id_$(ssh_key_type)";
-      "ssh_pub_key" string => "$(home)/.ssh/id_$(ssh_key_type).pub";
+      "ssh_key_name" string => "id_FR";
+      "ssh_priv_key" string => "$(home)/.ssh/$(ssh_key_name)";
+      "ssh_pub_key" string => "$(ssh_priv_key).pub";
       "ssh_auth_keys" string => "$(home)/.ssh/authorized_keys";
       "ssh_known_hosts" string => "$(home)/.ssh/known_hosts";
+      "ssh_config" string => "$(home)/.ssh/config";
       "create_files"
         slist => {
           "$(home)/.",
@@ -125,7 +126,8 @@ bundle agent transport_user
           "$(home)/source/.",      # Dumps from feeders are taken from here
           "$(home)/destination/.", # And dropped here on superhub
           "$(ssh_auth_keys)",
-          "$(ssh_known_hosts)"
+          "$(ssh_known_hosts)",
+          "$(ssh_config)"
         };
   classes:
     enabled::
@@ -141,6 +143,9 @@ bundle agent transport_user
                                                  useshell)),
                                regcmp(".*[\s:]ssh_home_t[\s:].*",
                                       execresult("ls -Z $(ssh_pub_key)",
+                                                 useshell)),
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(ssh_config)",
                                                  useshell))));
   users:
     "$(user)"
@@ -165,12 +170,16 @@ bundle agent transport_user
       edit_template_string => "{{#-top-}}{{{.}}}$(const.n){{/-top-}}",
       template_data => @(cfengine_enterprise_federation:config.fingerprints),
       template_method => "inline_mustache";
+    "$(ssh_config)"
+      create => "true",
+      handle => "ssh_config_configured",
+      edit_line => default:insert_lines("IdentityFile $(ssh_priv_key)");
 
   commands:
     # Generate a modern ssh keypair (2019-04)
     "/usr/bin/ssh-keygen"
       handle => "ssh_keys_configured",
-      args => "-N '' -a 150 -t $(ssh_key_type) -f $(ssh_priv_key)",
+      args => "-N '' -f $(ssh_priv_key)",
       if => and( isdir( "$(home)/.ssh" ),
                  not( fileexists( "$(ssh_priv_key)" )));
 
@@ -502,7 +511,7 @@ bundle agent setup_status
     "ssh_server_fingerprint"
       # ssh-keyscan is used because it's more reliable/easy than trying to
       # parse sshd config to find the file and then readfile():
-      string => execresult("ssh-keyscan -t ecdsa localhost 2>/dev/null | sed 's/localhost //g'", useshell);
+      string => execresult("ssh-keyscan localhost 2>/dev/null | sed 's/localhost //g'", useshell);
   classes:
     "superhub_setup_status_complete"
       expression => "any",
