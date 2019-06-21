@@ -28,7 +28,7 @@ mv "$file" "$file.importing"
   cat<<EOF
 \set ON_ERROR_STOP 1
 BEGIN;
-SELECT switch_to_feeder_schema('$hostkey'); -- so that the import below imports into it
+SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]); -- so that the import below imports into it
 EOF
 
   "$CFE_FR_EXTRACTOR" $CFE_FR_EXTRACTOR_ARGS "$file.importing" | sed $CFE_FR_SED_ARGS $(printf ' -f %s' $sed_scripts)
@@ -45,5 +45,11 @@ EOF
   echo "Last 10 lines of log for failed import"
   echo "--------------------------------------"
   tail -n 10 $file.log
+  echo "--------------------------------------"
+  echo "Reverting import"
+  echo "--------------------------------------"
+  "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                -c "SELECT rollback_import_schema('$hostkey');" \
+                >> $file.log 2>&1 || echo "Problem rolling back feeder schema for hostkey=$hostkey";
   exit 1
 }

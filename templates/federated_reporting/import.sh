@@ -32,7 +32,7 @@ ls -l "$CFE_FR_SUPERHUB_DROP_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT" >/dev/null 2>/d
 if [ "$no_drop_files" != "0" ]; then
   log "No files in drop dir."
 else
-  log "Moving files from drop dir to import dir."
+    log "Moving files from drop dir to import dir."
   mv "$CFE_FR_SUPERHUB_DROP_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT" "$CFE_FR_SUPERHUB_IMPORT_DIR" ||
     log "Failed to move files from drop dir to import dir."
 fi
@@ -46,23 +46,18 @@ dump_files="$(ls -1 "$CFE_FR_SUPERHUB_IMPORT_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT"
 table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
 
 failed=0
-log "Setting up schemas for import"
-for file in $dump_files; do
-  hostkey=$(basename "$file" | cut -d. -f1)
-  "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
-                      -c "SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-    > schema_setup.log 2>&1 || failed=1
-done
-if [ "$failed" = "0" ]; then
-  log "Setting up schemas for import: DONE"
-else
-  log "Setting up schemas for import: FAILED"
-  # XXX: this needs to revert
-  exit 1
-fi
-
 # make sure the script we are about to run is executable
 chmod u+x "$(dirname "$0")/import_file.sh"
+
+# build an array of dump files so we can delete any that fail in import step
+# and try to process others that do not.
+declare -A dump_files_array
+for dump_file in $dump_files; do
+  hostkey=$(basename "$file" | cut -d. -f1)
+  dump_files_array[$hostkey]=$dump_file  
+done
+
+echo "dump_files_array=${dump_files_array[@]}"
 
 log "Importing files: $dump_files"
 echo "$dump_files" | run_in_parallel "$(dirname "$0")/import_file.sh" - $CFE_FR_IMPORT_NJOBS ||
@@ -71,8 +66,12 @@ if [ "$failed" = "0" ]; then
   log "Importing files: DONE"
 else
   log "Importing files: FAILED"
-  # XXX: this needs to revert (ideally just for the specific failed hosts/dumps)
   for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
+    # TODO, does this * and %% business actually work?
+    # in my testing "" there make it fail
+    hostkey="${file%%.sql.$CFE_FR_COMPRESSOR_EXT.failed}"
+    # remove this host from future operations
+    unset dump_files_array[$hostkey]  
     log "Failed to import file '${file%%.failed}'"
     rm -f "$file"
   done
@@ -80,28 +79,34 @@ else
 fi
 
 log "Attaching schemas"
-for file in $dump_files; do
+for file in ${dump_files_array[@]}; do
   hostkey=$(basename "$file" | cut -d. -f1)
   "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
                       -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-    > schema_attach.log 2>&1 || failed=1
+                      > schema_attach.log 2>&1 || \
+      {
+          unset dump_files_array[$hostkey]
+          failed=1
+      }
 done
 if [ "$failed" = "0" ]; then
-  log "Attaching schemas: DONE"
+  log "Attaching schemas: All DONE"
 else
-  log "Attaching schemas: FAILED"
-  # XXX: anything we can do here to make things ready for the next round of import?
-  exit 1
+  log "Attaching schemas: 1 or more FAILED"
 fi
 
-if [ -n "$CFE_FR_INVENTORY_REFRESH_CMD" ]; then
-  log "Refreshing inventory"
-  inv_refresh_failed=0
-  $CFE_FR_INVENTORY_REFRESH_CMD || inv_refresh_failed=1
-  if [ "$inv_refresh_failed" != "0" ]; then
-    log "Refreshing inventory: FAILED"
-    exit 1
-  else
-    log "Refreshing inventory: DONE"
+if [ "${#dump_files_array[@]}" != "0" ]; then
+  if [ -n "$CFE_FR_INVENTORY_REFRESH_CMD" ]; then
+    log "Refreshing inventory"
+    inv_refresh_failed=0
+    $CFE_FR_INVENTORY_REFRESH_CMD || inv_refresh_failed=1
+    if [ "$inv_refresh_failed" != "0" ]; then
+      log "Refreshing inventory: FAILED"
+      exit 1
+    else
+      log "Refreshing inventory: DONE"
+    fi
   fi
+else
+  log "All files failed to import."
 fi
