@@ -208,12 +208,7 @@ bundle common cfengine_stdlib
 {
   vars:
 
-    !cfengine_3_7::
-      # CFEngine 3.6 can include through a secondary file
-      # CFEngine version 3.6 and prior use the split library to avoid syntax
-      # errors introduced by new functionality. For example new functions.
-      # This also works for 3.8 because local_libdir should be set to lib
-      # instead of lib/3.8
+    any::
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
 
 
@@ -233,13 +228,6 @@ bundle common cfengine_stdlib
       "inputs" slist => { "$(sys.local_libdir)/stdlib.cf",
                           "$(sys.local_libdir)/packages-ENT-3719.cf" };
 @endif
-
-    cfengine_3_7::
-      # CFEngine 3.7 has local_libdir set to $(sys.inputdir)/lib/3.7, but with
-      # the @if macro support we can re-unify the split library for 3.7+ so we
-      # specify the unified lib relative to local_libdir.
-      "inputs" slist => { "$(sys.local_libdir)/../stdlib.cf" };
-
 
   reports:
     verbose_mode::
@@ -303,18 +291,8 @@ bundle common services_autorun
 # @brief Include autorun policy and discover autorun bundles if enabled
 {
   vars:
-    !cfengine_3_7.services_autorun::
-      # 3.8+ can use local_libdir and will use the common lib as it supports the
-      # @if macro
+    services_autorun::
       "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
-      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
-      "bundles" slist => { "autorun" }; # run loaded bundles
-
-    cfengine_3_7.services_autorun::
-      # We have to point 3.7 at the unified library because sys.local_libdir in
-      # 3.7 binaries it is set to a version specific path. However since 3.7
-      # knows about the @if macro it is safe to share the same policy as 3.8+
-      "inputs" slist => { "$(sys.local_libdir)/../autorun.cf" };
       "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
       "bundles" slist => { "autorun" }; # run loaded bundles
 
