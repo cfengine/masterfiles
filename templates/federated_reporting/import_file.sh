@@ -28,15 +28,12 @@ mv "$file" "$file.importing"
   cat<<EOF
 \set ON_ERROR_STOP 1
 BEGIN;
-SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);
+SELECT switch_to_feeder_schema('$hostkey'); -- so that the import below imports into it
 EOF
 
   "$CFE_FR_EXTRACTOR" $CFE_FR_EXTRACTOR_ARGS "$file.importing" | sed $CFE_FR_SED_ARGS $(printf ' -f %s' $sed_scripts)
 
-cat<<EOF
-
-SET SCHEMA 'public';
-SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);
+  cat<<EOF
 COMMIT;
 EOF
 } | "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb >$file.log 2>&1 && {

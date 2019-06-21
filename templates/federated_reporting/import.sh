@@ -43,36 +43,65 @@ dump_files="$(ls -1 "$CFE_FR_SUPERHUB_IMPORT_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT"
     exit 0
   }
 
+table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
+
+failed=0
+log "Setting up schemas for import"
+for file in $dump_files; do
+  hostkey=$(basename "$file" | cut -d. -f1)
+  "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                      -c "SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+    > schema_setup.log 2>&1 || failed=1
+done
+if [ "$failed" = "0" ]; then
+  log "Setting up schemas for import: DONE"
+else
+  log "Setting up schemas for import: FAILED"
+  # XXX: this needs to revert
+  exit 1
+fi
+
 # make sure the script we are about to run is executable
 chmod u+x "$(dirname "$0")/import_file.sh"
 
 log "Importing files: $dump_files"
-failed=0
-# for now, import in serial to avoid deadlocks (ENT-4742)
-for file in $dump_files; do
-  "$(dirname "$0")/import_file.sh" $file || failed=1
-done
-
-
-if [ "$failed" != "0" ]; then
+echo "$dump_files" | run_in_parallel "$(dirname "$0")/import_file.sh" - $CFE_FR_IMPORT_NJOBS ||
+  failed=1
+if [ "$failed" = "0" ]; then
+  log "Importing files: DONE"
+else
   log "Importing files: FAILED"
-  #find "$CFE_FR_SUPERHUB_IMPORT_DIR"
+  # XXX: this needs to revert (ideally just for the specific failed hosts/dumps)
   for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
     log "Failed to import file '${file%%.failed}'"
     rm -f "$file"
   done
   exit 1
+fi
+
+log "Attaching schemas"
+for file in $dump_files; do
+  hostkey=$(basename "$file" | cut -d. -f1)
+  "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                      -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+    > schema_attach.log 2>&1 || failed=1
+done
+if [ "$failed" = "0" ]; then
+  log "Attaching schemas: DONE"
 else
-  log "Importing files: DONE"
-  if [ -n "$CFE_FR_INVENTORY_REFRESH_CMD" ]; then
-    log "Refreshing inventory"
-    inv_refresh_failed=0
-    $CFE_FR_INVENTORY_REFRESH_CMD || inv_refresh_failed=1
-    if [ "$inv_refresh_failed" != "0" ]; then
-      log "Refreshing inventory: FAILED"
-      exit 1
-    else
-      log "Refreshing inventory: DONE"
-    fi
+  log "Attaching schemas: FAILED"
+  # XXX: anything we can do here to make things ready for the next round of import?
+  exit 1
+fi
+
+if [ -n "$CFE_FR_INVENTORY_REFRESH_CMD" ]; then
+  log "Refreshing inventory"
+  inv_refresh_failed=0
+  $CFE_FR_INVENTORY_REFRESH_CMD || inv_refresh_failed=1
+  if [ "$inv_refresh_failed" != "0" ]; then
+    log "Refreshing inventory: FAILED"
+    exit 1
+  else
+    log "Refreshing inventory: DONE"
   fi
 fi
