@@ -15,8 +15,8 @@ s/public\.//g;
 # don't reset the promiselog sequence value
 /SELECT pg_catalog.setval('__promiselog_id_seq.*$/d
 
-# enable more debug messages
-s/client_min_messages = warning/client_min_messages = notice/
+# remove setting of client_min_messages so that import_file.sh and --define DEBUG can control
+/client_min_messages.*$/d
 
 # Munge rows from __promiselog child tables (like __promiselog_KEPT_2017-01-01)
 # to write them to parent table on import (and the database will take care

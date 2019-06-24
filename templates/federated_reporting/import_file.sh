@@ -13,6 +13,10 @@ true "${CFE_FR_EXTRACTOR?undefined}"
 true "${CFE_FR_EXTRACTOR_ARGS?undefined}"
 true "${CFE_FR_DB_USER?undefined}"
 true "${CFE_FR_TABLES?undefined}"
+true "${CFE_FR_DEBUG?undefined}"
+true "${CFE_FR_COMPRESSOR?undefined}"
+true "${CFE_FR_COMPRESSOR_ARGS?undefined}"
+true "${CFE_FR_COMPRESSOR_EXT?undefined}"
 
 file="$1"
 
@@ -22,9 +26,21 @@ hostkey=$(basename "$file" | cut -d. -f1)
 
 table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
 
+psql_debug_option="--quiet"
+
+if $CFE_FR_DEBUG; then
+    psql_debug_option="--echo-all"
+fi
+
 mv "$file" "$file.importing"
 
 {
+  if $CFE_FR_DEBUG; then
+      echo "\set client_min_messages = notice"
+  else
+      echo "\set client_min_messages = warning"
+  fi
+
   cat<<EOF
 \set ON_ERROR_STOP 1
 BEGIN;
@@ -36,14 +52,10 @@ EOF
   cat<<EOF
 COMMIT;
 EOF
-} | "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb >$file.log 2>&1 && {
+} | "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER $psql_debug_option -d cfdb 2>&1 | "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS > "$file.log.$CFE_FR_COMPRESSOR_EXT" && {
   rm -f "$file.importing"
   exit 0
 } || {
   mv "$file.importing" "$file.failed"
-  echo "--------------------------------------"
-  echo "Last 10 lines of log for failed import"
-  echo "--------------------------------------"
-  tail -n 10 $file.log
   exit 1
 }

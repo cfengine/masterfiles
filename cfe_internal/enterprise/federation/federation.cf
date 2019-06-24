@@ -212,6 +212,11 @@ bundle agent federation_manage_files
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
     "feeder" data => parsejson('{"feeder": "$(sys.key_digest)"}');
 
+    "DEBUG|DEBUG_$(this.namespace)_$(this.bundle)"::
+      "debug" data => parsejson('{ "classes": { "DEBUG":true}}');
+    "!(DEBUG|DEBUG_$(this.namespace)_$(this.bundle))"::
+      "debug" data => parsejson('{ "classes": { "DEBUG":false}}');
+
   methods:
       "internal_vars" usebundle => "default:cfe_internal_hub_vars",
         comment => "We need the path to the inventory refresh PHP script before we use it.";
@@ -262,7 +267,7 @@ bundle agent federation_manage_files
         create => "true",
         template_method => "mustache",
         edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
-        template_data => mergedata(@(login), @(feeder_username), @(feeder),
+        template_data => mergedata(@(login), @(feeder_username), @(feeder), @(debug),
                                    @(cfengine_enterprise_federation:inventory_refresh_cmd.cmd)),
         perms => default:mog( "640", "root", "$(transport_user)" );
 

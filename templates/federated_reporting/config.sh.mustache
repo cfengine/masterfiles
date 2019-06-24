@@ -7,6 +7,8 @@ DEFAULT_PREFIX="${DEFAULT_PREFIX:-/opt/cfengine/federation/}"
 # generic configuration
 CFE_BIN_DIR="{{bindir}}"
 CFE_BIN_DIR="${CFE_BIN_DIR:-/var/cfengine/bin}"
+CFE_FR_DEBUG="{{classes.DEBUG}}"
+CFE_FR_DEBUG="${CFE_FR_DEBUG:-false}"
 
 # specific feeder name
 CFE_FR_FEEDER="{{feeder}}"
