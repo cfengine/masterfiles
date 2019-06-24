@@ -482,16 +482,24 @@ bundle agent entry
       "CFEngine Enterprise Federation Postgres Configuration"
         handle => "postgres_config",
         usebundle => postgres_config;
-      "CFEngine Enterprise Federation Feeder Data Export"
-        usebundle => exported_data;
-      "CFEngine Enterprise Federation Feeder Data Transport"
-        usebundle => data_transport;
-      "CFEngine Enterprise Federation Feeder Data Import"
-        usebundle => imported_data;
       "CFEngine Enterprise Federation Schema Migration"
+        handle => "superhub_schema",
+        depends_on => { "postgres_config" },
         usebundle => superhub_schema;
       "CFEngine Enterprise Federation Ensure Feeder Hubs in Database"
+        handle => "ensure_feeders",
+        depends_on => { "superhub_schema" },
         usebundle => ensure_feeders;
+      "CFEngine Enterprise Federation Feeder Data Transport"
+        handle => "data_transport",
+        depends_on => { "transport_user" },
+        usebundle => data_transport;
+      "CFEngine Enterprise Federation Feeder Data Import"
+        handle => "imported_data",
+        depends_on => { "transport_user", "ensure_feeders" },
+        usebundle => imported_data;
+      "CFEngine Enterprise Federation Feeder Data Export"
+        usebundle => exported_data;
       "Configuration Status"
         usebundle => setup_status;
   reports:
