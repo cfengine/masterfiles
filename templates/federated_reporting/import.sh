@@ -57,7 +57,11 @@ if [ "$failed" = "0" ]; then
   log "Setting up schemas for import: DONE"
 else
   log "Setting up schemas for import: FAILED"
-  # XXX: this needs to revert
+  # remove any newly created schemas (revert the changes)
+  for file in $dump_files; do
+    hostkey=$(basename "$file" | cut -d. -f1)
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
+  done
   exit 1
 fi
 
@@ -71,26 +75,34 @@ if [ "$failed" = "0" ]; then
   log "Importing files: DONE"
 else
   log "Importing files: FAILED"
-  # XXX: this needs to revert (ideally just for the specific failed hosts/dumps)
   for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
     log "Failed to import file '${file%%.failed}'"
-    rm -f "$file"
+
+    # revert any changes by dropping the particular feeder's import schema (the
+    # original/in-use/previous schema is left intact)
+    hostkey=$(basename "$file" | cut -d. -f1)
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
   done
-  exit 1
 fi
 
+failed=0
 log "Attaching schemas"
 for file in $dump_files; do
-  hostkey=$(basename "$file" | cut -d. -f1)
-  "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
-                      -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-    > schema_attach.log 2>&1 || failed=1
+  if [ ! -f "${file}.failed" ]; then
+    hostkey=$(basename "$file" | cut -d. -f1)
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                        -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+      > schema_attach.log 2>&1 || failed=1
+  else
+    rm -f "${file}.failed"
+  fi
 done
 if [ "$failed" = "0" ]; then
   log "Attaching schemas: DONE"
 else
+  # attach_feeder_schema() makes sure the feeder's import schema is removed in
+  # case of failure
   log "Attaching schemas: FAILED"
-  # XXX: anything we can do here to make things ready for the next round of import?
   exit 1
 fi
 
