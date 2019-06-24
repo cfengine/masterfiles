@@ -43,36 +43,77 @@ dump_files="$(ls -1 "$CFE_FR_SUPERHUB_IMPORT_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT"
     exit 0
   }
 
+table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
+
+failed=0
+log "Setting up schemas for import"
+for file in $dump_files; do
+  hostkey=$(basename "$file" | cut -d. -f1)
+  "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                      -c "SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+    > schema_setup.log 2>&1 || failed=1
+done
+if [ "$failed" = "0" ]; then
+  log "Setting up schemas for import: DONE"
+else
+  log "Setting up schemas for import: FAILED"
+  # remove any newly created schemas (revert the changes)
+  for file in $dump_files; do
+    hostkey=$(basename "$file" | cut -d. -f1)
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
+  done
+  exit 1
+fi
+
 # make sure the script we are about to run is executable
 chmod u+x "$(dirname "$0")/import_file.sh"
 
 log "Importing files: $dump_files"
-failed=0
-# for now, import in serial to avoid deadlocks (ENT-4742)
-for file in $dump_files; do
-  "$(dirname "$0")/import_file.sh" $file || failed=1
-done
-
-
-if [ "$failed" != "0" ]; then
+echo "$dump_files" | run_in_parallel "$(dirname "$0")/import_file.sh" - $CFE_FR_IMPORT_NJOBS ||
+  failed=1
+if [ "$failed" = "0" ]; then
+  log "Importing files: DONE"
+else
   log "Importing files: FAILED"
-  #find "$CFE_FR_SUPERHUB_IMPORT_DIR"
   for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
     log "Failed to import file '${file%%.failed}'"
-    rm -f "$file"
+
+    # revert any changes by dropping the particular feeder's import schema (the
+    # original/in-use/previous schema is left intact)
+    hostkey=$(basename "$file" | cut -d. -f1)
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
   done
-  exit 1
+fi
+
+failed=0
+log "Attaching schemas"
+for file in $dump_files; do
+  if [ ! -f "${file}.failed" ]; then
+    hostkey=$(basename "$file" | cut -d. -f1)
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                        -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+      > schema_attach.log 2>&1 || failed=1
+  else
+    rm -f "${file}.failed"
+  fi
+done
+if [ "$failed" = "0" ]; then
+  log "Attaching schemas: DONE"
 else
-  log "Importing files: DONE"
-  if [ -n "$CFE_FR_INVENTORY_REFRESH_CMD" ]; then
-    log "Refreshing inventory"
-    inv_refresh_failed=0
-    $CFE_FR_INVENTORY_REFRESH_CMD || inv_refresh_failed=1
-    if [ "$inv_refresh_failed" != "0" ]; then
-      log "Refreshing inventory: FAILED"
-      exit 1
-    else
-      log "Refreshing inventory: DONE"
-    fi
+  # attach_feeder_schema() makes sure the feeder's import schema is removed in
+  # case of failure
+  log "Attaching schemas: FAILED"
+  exit 1
+fi
+
+if [ -n "$CFE_FR_INVENTORY_REFRESH_CMD" ]; then
+  log "Refreshing inventory"
+  inv_refresh_failed=0
+  $CFE_FR_INVENTORY_REFRESH_CMD || inv_refresh_failed=1
+  if [ "$inv_refresh_failed" != "0" ]; then
+    log "Refreshing inventory: FAILED"
+    exit 1
+  else
+    log "Refreshing inventory: DONE"
   fi
 fi
