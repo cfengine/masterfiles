@@ -484,14 +484,14 @@ bundle agent entry
         usebundle => postgres_config;
       "CFEngine Enterprise Federation Feeder Data Export"
         usebundle => exported_data;
-      "CFEngine Enterprise Federation Feeder Data Transport"
-        usebundle => data_transport;
-      "CFEngine Enterprise Federation Feeder Data Import"
-        usebundle => imported_data;
       "CFEngine Enterprise Federation Schema Migration"
         usebundle => superhub_schema;
       "CFEngine Enterprise Federation Ensure Feeder Hubs in Database"
         usebundle => ensure_feeders;
+      "CFEngine Enterprise Federation Feeder Data Transport"
+        usebundle => data_transport;
+      "CFEngine Enterprise Federation Feeder Data Import"
+        usebundle => imported_data;
       "Configuration Status"
         usebundle => setup_status;
   reports:
