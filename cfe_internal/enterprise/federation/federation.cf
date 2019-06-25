@@ -12,6 +12,12 @@ bundle agent config
       "federation_dir" string => "/opt/cfengine/federation";
       "bin_dir" string => "$(federation_dir)/bin";
       "path" string => "$(federation_dir)/cfapache/federation-config.json";
+
+      # TODO: Instrument augments
+      "dump_interval" -> {"ENT-4806"}
+        int => "20",
+        comment => "Dump data on the feeders every 20 minutes";
+
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
       "enabled"
@@ -278,7 +284,8 @@ bundle agent federation_manage_files
     am_feeder::
       "$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/dump.sh" ),
-        perms => default:mog( "700", "root", "root" );
+        perms => default:mog( "700", "root", "root" ),
+        action => if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
 
     am_transporter::
       "$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"
