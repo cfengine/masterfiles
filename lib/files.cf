@@ -1674,6 +1674,9 @@ body perms system_owned(mode)
 
     solaris::
       groups => { "sys" };
+
+    aix::
+      groups => { "system" };
 }
 
 ##-------------------------------------------------------
