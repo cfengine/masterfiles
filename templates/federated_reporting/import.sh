@@ -75,7 +75,7 @@ if [ "$failed" = "0" ]; then
   log "Importing files: DONE"
 else
   log "Importing files: FAILED"
-  for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
+  for file in "$CFE_FR_SUPERHUB_IMPORT_DIR/"*".sql.$CFE_FR_COMPRESSOR_EXT.failed"; do
     log "Failed to import file '${file%%.failed}'"
 
     # revert any changes by dropping the particular feeder's import schema (the
