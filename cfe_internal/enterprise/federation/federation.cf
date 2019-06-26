@@ -285,7 +285,7 @@ bundle agent federation_manage_files
       "$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/dump.sh" ),
         perms => default:mog( "700", "root", "root" ),
-        action => if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
+        action => default:if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
 
     am_transporter::
       "$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"
@@ -311,7 +311,6 @@ bundle agent federation_manage_files
         template_method => "mustache",
         edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/filter.sed.mustache",
         perms => default:mog( "600", "root", "root" );
-
 
 }
 
