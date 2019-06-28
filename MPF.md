@@ -974,6 +974,40 @@ For example:
 
 **History**: Added in 3.10.0
 
+### Configure `abortclasses` via augments
+
+Configure a list of regular expressions that result in cf-agent terminating
+itself upon definition of a matching class.
+
+For example, abort execution if any class starting with ```error_``` or ```abort_``` is defined:
+
+```
+{
+  "vars":{
+    "control_agent_abortclasses": [ "error.*", "abort.**" ]
+  }
+}
+```
+
+**History**: Added in 3.15.0, 3.12.3
+
+### Configure `abortbundleclasses` via augments
+
+Configure a list of regular expressions that match classes which if defined lead
+to termination of current bundle.
+
+For example, abort execution if any class starting with ```bundle_error_``` or ```bundle_abort_``` is defined:
+
+```
+{
+  "vars":{
+    "control_agent_abortbundleclasses": [ "bundle_error.*", "bundle_abort.**" ]
+  }
+}
+```
+
+**History**: Added in 3.15.0, 3.12.3
+
 ### Configure `files_single_copy` via augments
 
 Specify a list of regular expressions that when matched will prevent the agent
