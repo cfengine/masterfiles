@@ -76,7 +76,18 @@ _run_using_for() {
     "$1" "$item" &
     job_slots="$(expr $job_slots - 1)"
   done < $input_arg
-  wait
+
+  # wait for the jobs one by one and check the exit statuses (127 means there
+  # are no more jobs to wait for)
+  wait -n
+  exit_status=$?
+  while [ $exit_status != 127 ]; do
+    wait -n
+    exit_status=$?
+    if [ $exit_status != 0 ] && [ $exit_status != 127 ] && [ $failure = 0 ]; then
+      failure=1
+    fi
+  done
   return $failure
 }
 
