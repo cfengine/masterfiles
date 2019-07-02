@@ -182,6 +182,16 @@ bundle common def
 
       # Agent Controls
 
+      "control_agent_abortclasses" -> { "ENT-4823" }
+        slist => { },
+        comment => "The control body has a variable, so a valid list must be defined or the agent will error",
+        if => not( isvariable( $(this.promiser) ));
+
+      "control_agent_abortbundleclasses" -> { "ENT-4823" }
+        slist => { },
+        comment => "The control body has a variable, so a valid list must be defined or the agent will error",
+        if => not( isvariable( $(this.promiser) ));
+
       "control_agent_default_repository"
         string => ifelse( isvariable( "control_agent_default_repository"),
                           $(control_agent_default_repository),
