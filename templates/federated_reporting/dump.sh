@@ -11,6 +11,8 @@ source "$(dirname "$0")/log.sh"
 # check that we have all the variables we need
 true "${CFE_BIN_DIR?undefined}"
 true "${CFE_FR_DUMP_DIR?undefined}"
+true "${CFE_FR_DUMP_FILTERS_DIR?undefined}"
+true "${CFE_FR_SED_ARGS?undefined}"
 true "${CFE_FR_TRANSPORT_DIR?undefined}"
 true "${CFE_FR_COMPRESSOR?undefined}"
 true "${CFE_FR_COMPRESSOR_ARGS?undefined}"
@@ -28,12 +30,21 @@ if ! type "$CFE_FR_COMPRESSOR" >/dev/null; then
   exit 1
 fi
 
+function sed_filters() {
+  sed_scripts="$(ls -1 "$CFE_FR_DUMP_FILTERS_DIR/"*".sed" 2>/dev/null)"
+  if [ -n "$sed_scripts" ]; then
+    sed $CFE_FR_SED_ARGS $(printf ' -f %s' $sed_scripts)
+  else
+    cat
+  fi
+}
+
 failed=0
 ts="$(date -Iseconds)"  # ISO 8601 format that doesn't have spaces in it
 in_progress_file="$CFE_FR_DUMP_DIR/$CFE_FR_FEEDER_$ts.sql.$CFE_FR_COMPRESSOR_EXT.dumping"
 
 log "Dumping tables: $CFE_FR_TABLES"
-"$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb |
+"$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb | sed_filters |
   "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS > "$in_progress_file" || failed=1
 
 if [ "$failed" != "0" ]; then
