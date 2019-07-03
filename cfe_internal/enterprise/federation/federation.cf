@@ -255,6 +255,9 @@ bundle agent federation_manage_files
       "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/transport/."
         create => "true",
         perms => default:mog( "660", "root", "$(transport_user)" );
+      "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/dump/filters/."
+        create => "true",
+        perms => default:mog( "600", "root", "root" );
 
     am_feeder|am_transporter|am_superhub::
       # TODO: Instrument augments
