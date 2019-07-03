@@ -28,6 +28,15 @@ function sed_filters() {
   fi
 }
 
+function awk_filters() {
+  awk_scripts="$(ls -1 "$CFE_FR_IMPORT_FILTERS_DIR/"*".awk" 2>/dev/null)"
+  if [ -n "$awk_scripts" ]; then
+    awk $CFE_FR_AWK_ARGS $(printf ' -f %s' $awk_scripts)
+  else
+    cat
+  fi
+}
+
 hostkey=$(basename "$file" | cut -d. -f1)
 
 table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
@@ -41,7 +50,7 @@ BEGIN;
 SELECT switch_to_feeder_schema('$hostkey'); -- so that the import below imports into it
 EOF
 
-  "$CFE_FR_EXTRACTOR" $CFE_FR_EXTRACTOR_ARGS "$file.importing" | sed_filters
+  "$CFE_FR_EXTRACTOR" $CFE_FR_EXTRACTOR_ARGS "$file.importing" | sed_filters | awk_filters
 
   cat<<EOF
 COMMIT;

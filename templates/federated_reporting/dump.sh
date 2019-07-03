@@ -39,12 +39,21 @@ function sed_filters() {
   fi
 }
 
+function awk_filters() {
+  awk_scripts="$(ls -1 "$CFE_FR_DUMP_FILTERS_DIR/"*".awk" 2>/dev/null)"
+  if [ -n "$awk_scripts" ]; then
+    awk $CFE_FR_AWK_ARGS $(printf ' -f %s' $awk_scripts)
+  else
+    cat
+  fi
+}
+
 failed=0
 ts="$(date -Iseconds)"  # ISO 8601 format that doesn't have spaces in it
 in_progress_file="$CFE_FR_DUMP_DIR/$CFE_FR_FEEDER_$ts.sql.$CFE_FR_COMPRESSOR_EXT.dumping"
 
 log "Dumping tables: $CFE_FR_TABLES"
-"$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb | sed_filters |
+"$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb | sed_filters | awk_filters |
   "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS > "$in_progress_file" || failed=1
 
 if [ "$failed" != "0" ]; then
