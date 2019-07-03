@@ -290,6 +290,10 @@ bundle agent federation_manage_files
         perms => default:mog( "700", "root", "root" ),
         action => default:if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
 
+      "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/dump/filters/merge_inserts.awk"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/merge_inserts.awk" ),
+        perms => default:mog( "600", "root", "root" );
+
     am_transporter::
       "$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/transport.sh" ),
