@@ -62,6 +62,8 @@ else
     hostkey=$(basename "$file" | cut -d. -f1)
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
   done
+  echo "last 10 lines of schema_setup.log"
+  tail -n 10 schema_setup.log
   exit 1
 fi
 
@@ -103,6 +105,8 @@ else
   # attach_feeder_schema() makes sure the feeder's import schema is removed in
   # case of failure
   log "Attaching schemas: FAILED"
+  log "last 10 lines of schema_attach.log"
+  tail -n 10 schema_attach.log
   exit 1
 fi
 
