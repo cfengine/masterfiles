@@ -26,8 +26,11 @@ body agent control
       skipidentify => "true";
 
       # explicitly not supported (but they should break long before)
-      abortclasses => { "cfengine_3_3", "cfengine_3_4" };
+      abortclasses => { "cfengine_3_3", "cfengine_3_4", @(def.control_agent_abortclasses) };
 
+      # The abortbundleclasses slist contains regular expressions that match
+      # classes which if defined lead to termination of current bundle.
+      abortbundleclasses => { @(def.control_agent_abortbundleclasses) };
 
       # Maximum number of outgoing connections to a remote cf-serverd.
       maxconnections => "$(def.control_agent_maxconnections)";
