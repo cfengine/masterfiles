@@ -123,6 +123,11 @@ def list_updates(online):
     # 0 means no updates
     # 1 means there was an error
     # 100 means that there are available updates
+    if process.returncode == 1 and not online:
+        # If we get an error when listing local updates, try again using the
+        # online method, so that the cache is generated
+        process = subprocess_Popen([yum_cmd] + yum_options + ["check-update"], stdout=subprocess.PIPE)
+        (stdoutdata, _) = process.communicate()
     if process.returncode != 100:
         # either there were no updates or error happened
         # Nothing to do for us here anyway
