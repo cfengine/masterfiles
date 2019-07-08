@@ -370,11 +370,20 @@ body contain cfpostgres_user
 bundle agent exported_data
 # @brief Run script to dump pg data on feeder hub
 {
+  methods:
+    am_feeder::
+      "Refresh Inventory"
+        usebundle => "default:cfe_internal_refresh_inventory_view",
+        handle => "fr_inventory_refresh",
+        comment => "Use standard inventory refresh so that we don't run it twice";
+
   commands:
     am_feeder::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"},
-        contain => default:in_shell;
+        contain => default:in_shell,
+        depends_on => { "fr_inventory_refresh" },
+        comment => "Refresh Inventory must be completed before dumping data";
 }
 
 bundle agent data_transport
