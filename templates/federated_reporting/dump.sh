@@ -31,7 +31,7 @@ if ! type "$CFE_FR_COMPRESSOR" >/dev/null; then
 fi
 
 function sed_filters() {
-  sed_scripts="$(ls -1 "$CFE_FR_DUMP_FILTERS_DIR/"*".sed" 2>/dev/null)"
+  sed_scripts="$(ls -1 "$CFE_FR_DUMP_FILTERS_DIR/"*".sed" 2>/dev/null | sort)"
   if [ -n "$sed_scripts" ]; then
     sed $CFE_FR_SED_ARGS $(printf ' -f %s' $sed_scripts)
   else
@@ -40,7 +40,7 @@ function sed_filters() {
 }
 
 function awk_filters() {
-  awk_scripts="$(ls -1 "$CFE_FR_DUMP_FILTERS_DIR/"*".awk" 2>/dev/null)"
+  awk_scripts="$(ls -1 "$CFE_FR_DUMP_FILTERS_DIR/"*".awk" 2>/dev/null | sort)"
   if [ -n "$awk_scripts" ]; then
     awk $CFE_FR_AWK_ARGS $(printf ' -f %s' $awk_scripts)
   else

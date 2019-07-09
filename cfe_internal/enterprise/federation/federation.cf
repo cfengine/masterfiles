@@ -290,8 +290,8 @@ bundle agent federation_manage_files
         perms => default:mog( "700", "root", "root" ),
         action => default:if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
 
-      "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/dump/filters/merge_inserts.awk"
-        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/merge_inserts.awk" ),
+      "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/dump/filters/50-merge_inserts.awk"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/50-merge_inserts.awk" ),
         perms => default:mog( "600", "root", "root" );
 
     am_transporter::
@@ -313,12 +313,9 @@ bundle agent federation_manage_files
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/import_file.sh" ),
         perms => default:mog( "700", "root", "root" );
 
-      "$(cfengine_enterprise_federation:config.federation_dir)/superhub/import/filters/filter.sed"
-        create => "true",
-        template_method => "mustache",
-        edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/filter.sed.mustache",
+      "$(cfengine_enterprise_federation:config.federation_dir)/superhub/import/filters/10-base_filter.sed"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/10-base_filter.sed" ),
         perms => default:mog( "600", "root", "root" );
-
 }
 
 bundle agent postgres_config
