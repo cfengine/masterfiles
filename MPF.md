@@ -865,15 +865,38 @@ While the agent itsef will reload its config upon notice of policy change this
 bundle specifically handles changes to variables used in the MPF which may come
 from external data sources which are unknown to the components themselves.
 
-Note currently only `cf-serverd` and `cf-monitord` are handled. `cf-execd` is
+Currently only `cf-serverd` and `cf-monitord` are handled. `cf-execd` is
 **NOT** automatically restarted.
 
 To enable this functionality define the class **`mpf_augments_control_enabled`**
 
-```
+```json
 {
   "classes":{
       "mpf_augments_control_enabled": [ "any" ]
+  }
+}
+```
+
+**Notes:** In order for custom ACLs to leverage augments and support data based
+restart you should use variables prefixed with ```control_server_```.
+
+For example changes to ```vars.control_server_my_access_rules``` when
+```mpf_augments_control_enabled``` is defined will result in `cf-serverd`
+restarting.
+
+
+```json
+{
+  "classes": {
+      "mpf_augments_control_enabled": [ "any" ]
+  },
+  "vars": {
+    "control_server_my_access_rules" : {
+      "/var/repo/": {
+        "admit": "def.acl"
+      }
+    }
   }
 }
 ```
