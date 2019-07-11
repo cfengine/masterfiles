@@ -881,9 +881,9 @@ To enable this functionality define the class **`mpf_augments_control_enabled`**
 **Notes:** In order for custom ACLs to leverage augments and support data based
 restart you should use variables prefixed with ```control_server_```.
 
-For example changes to ```vars.control_server_my_access_rules``` when
-```mpf_augments_control_enabled``` is defined will result in `cf-serverd`
-restarting.
+For example changes to ```vars.control_server_my_access_rules```
+when ```mpf_augments_control_enabled``` is defined will result
+in `cf-serverd` restarting.
 
 
 ```json
