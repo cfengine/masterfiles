@@ -361,3 +361,25 @@ bundle agent cfe_internal_postgresql_vacuum
       comment => "Run vacuum db command (database: cfdb)",
       handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb";
 }
+
+bundle monitor measure_psql
+{
+  measurements:
+    policy_server|am_policy_hub::
+      "/var/log/postgresql.log"
+        if => fileexists( "/var/log/postgresql.log"),
+        handle => "psql_lock_wait_before_acquisition",
+        stream_type => "file",
+        data_type => "real",
+        history_type => "weekly",
+        units => "ms",
+        match_value => acquired_lock;
+}
+
+body match_value acquired_lock
+{
+  select_line_matching => ".*acquired.*Lock.*";
+  extraction_regex => ".*after (\d+)";
+  track_growing_file => "true";
+  select_multiline_policy => "average"; # average, sum, first, last
+}
