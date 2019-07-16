@@ -1100,6 +1100,28 @@ For example:
 
 **History**: Added in 3.10.1
 
+### Configure periodic package inventory refresh interval
+
+CFEngine refreshes software inventory when it makes changes via packages
+promises. Additionally, by default, CFEngine periodically refreshes it's
+internal cache of packages installed (every 60 minutes) and package updates that
+are available (once a day) according to the default package manager in order to
+pick up changes made outside packages promises.
+
+```json
+{
+  "vars": {
+    "package_module_query_installed_ifelapsed": "5",
+    "package_module_query_updates_ifelapsed": "60"
+  }
+}
+```
+
+WARNING: Be ware of setting `package_module_query_update_ifelapsed` too low,
+especially with public repositories or you may be banned for abuse.
+
+**History**: Added in 3.15.0, 3.12.3
+
 ### Enable logging of Enterprise License utilization
 
 If the class `enable_log_cfengine_enterprise_license_utilization` is defined on
