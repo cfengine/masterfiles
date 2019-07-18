@@ -15,7 +15,7 @@ matrix:
         - DATE="${DATE#*>}"
         - DIR_URL="https://builds.cfengine.com/pub/nightly/master/$DATE/output/PACKAGES_x86_64_linux_debian_7"
         - FILE=`wget --no-check-certificate -qO- "$DIR_URL" | grep -o '[^>]*\.deb<'`
-        - FILE="${FILE%<}"
+        - FILE="${FILE%%<*}"
         - wget --no-check-certificate $DIR_URL/$FILE
         - sudo dpkg -i $FILE
 
