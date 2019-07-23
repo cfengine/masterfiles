@@ -1,0 +1,84 @@
+#!/bin/bash
+
+echo "1..4"
+
+function assert() {
+    grep $1 $2 || {
+        echo "error: did not find '$1' in file: $2"
+        exit 1
+    }
+}
+
+set -e
+
+# test FR config and it's outputs of classes
+# assumes cf-agent is enterprise copy and installed and in PATH
+
+FR_DIR=/opt/cfengine/federation
+CFAPACHE_DIR="$FR_DIR/cfapache"
+CONFIG_JSON="$CFAPACHE_DIR/federation-config.json"
+
+sudo mkdir -p "$CFAPACHE_DIR"
+sudo chown -R "$USER" "$FR_DIR"
+
+# fake out being a policy_server|am_policy_hub?
+touch ~/.cfagent/state/am_policy_hub
+echo "localhost" > ~/.cfagent/policy_server.dat
+
+echo "test superhub config, target_state on"
+cat > "$CONFIG_JSON" <<EOF
+{
+  "hostname": "localhost",
+  "role": "superhub",
+  "target_state": "on",
+  "remote_hubs": []
+}
+EOF
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes | grep cfengine_enterprise_federation > output
+assert am_superhub output
+assert enabled output
+echo "ok 1"
+
+echo "test feeder config, target_state on"
+cat > "$CONFIG_JSON" <<EOF
+{
+  "hostname": "localhost",
+  "role": "feeder",
+  "target_state": "on",
+  "remote_hubs": []
+}
+EOF
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes --show-evaluated-vars | grep cfengine_enterprise_federation > output
+assert am_feeder output
+assert enabled output
+echo "ok 2"
+
+echo "test superhub config, target_state paused"
+cat > "$CONFIG_JSON" <<EOF
+{
+  "hostname": "localhost",
+  "role": "superhub",
+  "target_state": "paused",
+  "remote_hubs": []
+}
+EOF
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes | grep cfengine_enterprise_federation > output
+assert am_superhub output
+assert enabled output
+assert am_paused output
+echo "ok 3"
+
+echo "test feeder config, target_state paused"
+cat > "$CONFIG_JSON" <<EOF
+{
+  "hostname": "localhost",
+  "role": "feeder",
+  "target_state": "paused",
+  "remote_hubs": []
+}
+EOF
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes --show-evaluated-vars | grep cfengine_enterprise_federation > output
+assert am_feeder output
+assert enabled output
+assert am_paused output
+echo "ok 4"

@@ -96,19 +96,31 @@ bundle agent config
         or => {"am_pusher", "am_puller"},
         scope => "namespace";
 
+      "am_paused"
+        expression => strcmp("paused", "$(data[target_state])"),
+        scope => "namespace";
+
+  # Note: in order to see these debugs you must either define the default DEBUG class
+  # or the namespace prefixed class like:
+  # cf-agent -KI -DDEBUG
+  # or
+  # cf-agent -KI -Dcfengine_enterprise_federation:DEBUG_config
+
   reports:
-    enabled.(DEBUG|DEBUG_config)::
+    enabled.(default:DEBUG|DEBUG_config)::
       "Federation enabled!";
-    am_superhub.(DEBUG|DEBUG_config)::
+    am_superhub.(default:DEBUG|DEBUG_config)::
       "I'm a superhub!";
-    am_feeder.(DEBUG|DEBUG_config)::
+    am_feeder.(default:DEBUG|DEBUG_config)::
       "I'm a feeder!";
-    am_pusher.(DEBUG|DEBUG_config)::
+    am_pusher.(default:DEBUG|DEBUG_config)::
       "I'm pushing dumps!";
-    am_puller.(DEBUG|DEBUG_config)::
+    am_puller.(default:DEBUG|DEBUG_config)::
       "I'm pulling dumps!";
-    am_transporter.(DEBUG|DEBUG_config)::
+    am_transporter.(default:DEBUG|DEBUG_config)::
       "I'm a transporter!";
+    am_paused.(default:DEBUG|DEBUG_config)::
+      "I'm paused so won't do any import/dump";
 }
 
 bundle agent transport_user
@@ -371,14 +383,14 @@ bundle agent exported_data
 # @brief Run script to dump pg data on feeder hub
 {
   methods:
-    am_feeder::
+    am_feeder.!am_paused::
       "Refresh Inventory"
         usebundle => "default:cfe_internal_refresh_inventory_view",
         handle => "fr_inventory_refresh",
         comment => "Use standard inventory refresh so that we don't run it twice";
 
   commands:
-    am_feeder::
+    am_feeder.!am_paused::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"},
         contain => default:in_shell,
@@ -390,7 +402,7 @@ bundle agent data_transport
 # @brief Run script to transport data from feeder to superhub
 {
   vars:
-    am_puller::
+    am_puller.!am_paused::
       # local copies of the variables to make using them below sane
       "remotes" slist => {@(cfengine_enterprise_federation:config.remotes)};
       "data"    data  => @(cfengine_enterprise_federation:config.data);
@@ -404,12 +416,12 @@ bundle agent data_transport
         string => join(" ", getvalues(@(enabled_pull_hosts)));
 
   commands:
-    am_pusher::
+    am_pusher.!am_paused::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh push"},
         contain => contain_transport_user;
 
-    am_puller::
+    am_puller.!am_paused::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh pull $(pull_args)"},
         contain => contain_transport_user;
@@ -427,7 +439,7 @@ bundle agent imported_data
 # @brief Run script to import dumps on superhub
 {
   commands:
-    am_superhub::
+    am_superhub.!am_paused::
       # TODO: pass correct arguments once script is done
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/import.sh"},
