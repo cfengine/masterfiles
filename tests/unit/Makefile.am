@@ -4,8 +4,7 @@ check_SCRIPTS =
 if LINUX
 check_SCRIPTS += \
 	test_package_module_apt_get \
-	test_package_module_yum \
-	test_federation_policy
+	test_package_module_yum
 endif
 
 if HAVE_SHUNIT2
