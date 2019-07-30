@@ -1,15 +1,95 @@
 #!/bin/bash
 
+# Requirements:
+# - cf-agent installed
+
 echo "1..4"
 
 function assert() {
-    grep $1 $2 || {
+    grep "$1" "$2" || {
         echo "error: did not find '$1' in file: $2"
         exit 1
     }
 }
 
 set -e
+
+# borrow PATH setup from nova/tests/reporting/common.sh
+[ -z "$CFE_ROOT" ] && CFE_ROOT=$(cd ../../../ && pwd)
+PATH="$CFE_ROOT/core/cf-agent/:$PATH"
+
+# === SETUP FAKE ENVIRONMENT in /tmp for CFE_WORKDIR and built binaries/masterfiles ===
+# TODO: reuse much of this
+CFE_WORKDIR=$(mktemp -d)
+TMPLOG=$(mktemp)
+
+# for debugging
+#set +e
+#find /opt/cfengine > opt-cfengine-before.log
+#find "$CFE_ROOT" > cfe-root-before.log
+#set -e
+
+function tear_down() {
+    # for debugging
+    #set +e
+    #find /opt/cfengine > opt-cfengine-after.log
+    #find "$CFE_ROOT" > cfe-root-after.log
+    #diff opt-cfengine-before.log opt-cfengine-after.log
+    #diff cfe-root-before.log cfe-root-after.log
+    rm -rf "$CFE_WORKDIR"
+    rm "$TMPLOG"
+    sudo rm -rf /opt/cfengine
+
+    # re-make masterfiles so that the shebang in modules/packages/apt_get
+    # is reverted to /var/cfengine/bin/python from our tmp dir
+    pushd ../../
+    ./configure
+    make
+    popd
+
+    set -e
+}
+
+trap tear_down SIGTERM
+trap tear_down EXIT
+trap tear_down SIGINT
+
+mkdir -p "$CFE_WORKDIR/bin"
+mkdir -p "$CFE_WORKDIR/lib"
+mkdir -p "$CFE_WORKDIR/state"
+
+# NOTE: environment in jenkins/travis guarantees these are already built
+pushd "$CFE_ROOT/core"
+if [ ! -f configure ]; then
+  ./autogen.sh
+  make -j4
+fi
+popd
+
+pushd "$CFE_ROOT/enterprise"
+if [ ! -f configure ]; then
+  ./autogen.sh
+  make -j4
+fi
+popd
+
+cp "$CFE_ROOT/enterprise/enterprise-plugin/.libs/cfengine-enterprise.so" "$CFE_WORKDIR/lib/"
+cp "$CFE_ROOT/core/cf-promises/cf-promises" "$CFE_WORKDIR/bin"
+cp -R "$CFE_ROOT/core/cf-promises/.libs" "$CFE_WORKDIR/bin"
+
+pushd ../../
+./configure --prefix "$CFE_WORKDIR"
+make install
+popd
+
+cp -R "$CFE_WORKDIR/masterfiles" "$CFE_WORKDIR/inputs"
+
+export CFENGINE_TEST_OVERRIDE_WORKDIR="$CFE_WORKDIR"
+
+# === DONE WITH GENERIC FAKE SETUP ===
+
+command -v cf-agent
+cf-agent --version
 
 # test FR config and it's outputs of classes
 # assumes cf-agent is enterprise copy and installed and in PATH
@@ -22,8 +102,8 @@ sudo mkdir -p "$CFAPACHE_DIR"
 sudo chown -R "$USER" "$FR_DIR"
 
 # fake out being a policy_server|am_policy_hub?
-touch ~/.cfagent/state/am_policy_hub
-echo "localhost" > ~/.cfagent/policy_server.dat
+touch "$CFE_WORKDIR/state/am_policy_hub"
+echo "localhost" > "$CFE_WORKDIR/policy_server.dat"
 
 echo "test superhub config, target_state on"
 cat > "$CONFIG_JSON" <<EOF
@@ -34,7 +114,8 @@ cat > "$CONFIG_JSON" <<EOF
   "remote_hubs": []
 }
 EOF
-cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes | grep cfengine_enterprise_federation > output
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes 2>&1 | tee "$TMPLOG"
+grep cfengine_enterprise_federation "$TMPLOG" > output
 assert am_superhub output
 assert enabled output
 echo "ok 1"
@@ -48,7 +129,8 @@ cat > "$CONFIG_JSON" <<EOF
   "remote_hubs": []
 }
 EOF
-cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes --show-evaluated-vars | grep cfengine_enterprise_federation > output
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes 2>&1 | tee "$TMPLOG"
+grep cfengine_enterprise_federation "$TMPLOG" > output
 assert am_feeder output
 assert enabled output
 echo "ok 2"
@@ -62,7 +144,8 @@ cat > "$CONFIG_JSON" <<EOF
   "remote_hubs": []
 }
 EOF
-cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes | grep cfengine_enterprise_federation > output
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes 2>&1 | tee "$TMPLOG"
+grep cfengine_enterprise_federation "$TMPLOG" > output
 assert am_superhub output
 assert enabled output
 assert am_paused output
@@ -77,7 +160,8 @@ cat > "$CONFIG_JSON" <<EOF
   "remote_hubs": []
 }
 EOF
-cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes --show-evaluated-vars | grep cfengine_enterprise_federation > output
+cf-agent --bundlesequence cfengine_enterprise_federation:config --no-lock --file ../../cfe_internal/enterprise/federation/federation.cf  --show-evaluated-classes 2>&1 | tee "$TMPLOG"
+grep cfengine_enterprise_federation "$TMPLOG" > output
 assert am_feeder output
 assert enabled output
 assert am_paused output
