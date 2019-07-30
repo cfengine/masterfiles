@@ -83,15 +83,15 @@ bundle common package_module_knowledge
 
 body package_module apt_get
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
     #default_options =>  {};
 }
 
 body package_module zypper
 {
-      query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-      query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+      query_installed_ifelapsed => "60";
+      query_updates_ifelapsed => "1440";
       #default_options =>  {};
 }
 
@@ -112,8 +112,9 @@ body package_module nimclient
 # }
 # ```
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "14400";
+
     # This would likey be customized based on your infrastructure specifics
     # you may for example want to default the lpp_source based on something
     # like `oslevel -s` output.
@@ -134,28 +135,28 @@ body package_module pkgsrc
 # }
 # ```
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "14400";
 }
 
 body package_module yum
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
     #default_options => {};
 }
 
 body package_module slackpkg
 {
-      query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-      query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+      query_installed_ifelapsed => "60";
+      query_updates_ifelapsed => "1440";
       #default_options =>  {};
 }
 
 body package_module pkg
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
     #default_options => {};
 }
 
@@ -180,8 +181,8 @@ body package_module freebsd_ports
 # }
 # ```
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "60";
+    query_updates_ifelapsed => "1440";
 }
 
 bundle common packages_common
