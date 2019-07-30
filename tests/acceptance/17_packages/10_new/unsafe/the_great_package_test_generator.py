@@ -95,6 +95,7 @@ def header(test_count):
 body common control
 {
     inputs => { "../../../dcs.cf.sub",
+                "../../../../../controls/def.cf",
                 "../../../../../$(sys.local_libdir)/packages.cf",
                 "../../../../../$(sys.local_libdir)/commands.cf",
                 "../../packages-info.cf.sub",
