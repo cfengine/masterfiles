@@ -53,6 +53,8 @@ EOF
   "$CFE_FR_EXTRACTOR" $CFE_FR_EXTRACTOR_ARGS "$file.importing" | sed_filters | awk_filters
 
   cat<<EOF
+
+UPDATE public.__hubs SET last_import_ts = now() WHERE hostkey = '$hostkey';
 COMMIT;
 EOF
 } | "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb 2>&1 | "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS >"$file.log.$CFE_FR_COMPRESSOR_EXT" && {
