@@ -13,7 +13,7 @@ if [ $# -ne 2 ]; then
 fi
 
 TMP=$(mktemp)
-OUT=$(su - cfpostgres --command "psql --quiet --tuples-only --no-align --no-psqlrc \"$1\" --command=\"$2\"" 2> $TMP)
+OUT=$(su - cfpostgres --command "/var/cfengine/bin/psql --quiet --tuples-only --no-align --no-psqlrc \"$1\" --command=\"$2\"" 2> $TMP)
 RETURN_CODE=$?
 ERR=$(<$TMP)
 
