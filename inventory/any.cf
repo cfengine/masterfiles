@@ -726,7 +726,7 @@ bundle agent cfe_autorun_inventory_LLDP
 
   vars:
     !disable_inventory_LLDP.lldpctl_exec_exists::
-      "info" data => parsejson(execresult($(inventory_control.lldpctl_json), "noshell"));
+      "info" data => parsejson(execresult("$(inventory_control.lldpctl_json) 2>/dev/null", "useshell"));
 }
 
 bundle agent cfe_autorun_inventory_packages
