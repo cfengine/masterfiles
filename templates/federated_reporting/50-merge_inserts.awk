@@ -51,8 +51,9 @@ BEGIN {
     # split the "table_name (col1, col2)" field on spaces
     split($2, fields, " ")
 
-    # trim ";" from the "VALUES (val1, val2);" part
-    values = substr($3, 0, (length($3) - 1));
+    # trim ";" and any trailing whitespace from the "VALUES (val1, val2);" part
+    values = $3;
+    gsub(";\\s*$", "", values);
 
     if (table_name == "") {
         # starting with a new table, store its name and write out the beginning
