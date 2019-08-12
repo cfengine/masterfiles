@@ -292,8 +292,10 @@ bundle agent federation_manage_files
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/parallel.sh" ),
         perms => default:mog( "640", "root", "$(transport_user)" );
 
-      "$(cfengine_enterprise_federation:config.bin_dir)/psql_wrapper.sh"
-        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/psql_wrapper.sh" ),
+      "$(cfengine_enterprise_federation:config.bin_dir)/psql_wrapper.sh" -> { "ENT-4792"}
+        create => "true",
+        edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/psql_wrapper.sh.mustache",
+        template_method => "mustache",
         perms => default:mog( "700", "root", "root" );
 
     am_feeder::
