@@ -1,3 +1,10 @@
+#
+# An AWK script to merge consecutive INSERT INTO SQL statements that insert data
+# into the same table into fewer statements each inserting multiple VALUES
+# tuples (rows). This can significantly speed up processing/execution of the SQL
+# statements (if the DB supports multiple VALUES per one INSERT INTO).
+#
+
 BEGIN {
     # split lines on SQL keywords
     # lines are like "INSERT INTO table_name (col1, col2) VALUES (val1, val2);"
@@ -18,8 +25,28 @@ BEGIN {
 /^INSERT INTO/ {
     # "INSERT INTO table_name (col1, col2) VALUES (val1, val2);"
     # $1 == ""
-    # $2 == "table_name (col1, col2)"
-    # $3 == "(val1, val2);"
+    # $2 == " table_name (col1, col2) "
+    # $3 == " (val1, val2);"
+
+    if (NF != 3) {
+        # Less or more than 3 fields which this means that 'INSERT INTO' or
+        # 'VALUES' didn't appear in the row or appeared in some unexpected
+        # places. Just preserve such line.
+
+        if (table_name != "") {
+            # the previous line(s) was (were) INSERT INTO statements into some
+            # table, let's terminate the statement, remember we are not in the
+            # process of adding rows to any INSERT INTO statement and reset the
+            # counter
+            print ";\n"
+            table_name = ""
+            counter = 0
+        }
+
+        # in any case just print/preserve the line
+        print $0"\n"
+        next
+    }
 
     # split the "table_name (col1, col2)" field on spaces
     split($2, fields, " ")
@@ -68,9 +95,10 @@ BEGIN {
     # all the other lines (empty, different SQL statements, comments,...)
 
     if (table_name != "") {
-        # the previous line(s) where INSERT INTO statements into some table,
-        # let's terminate the statement, remember we are not in the process
-        # of adding rows to any INSERT INTO statement and reset the counter
+        # the previous line(s) was (were) INSERT INTO statements into some
+        # table, let's terminate the statement, remember we are not in the
+        # process of adding rows to any INSERT INTO statement and reset the
+        # counter
         print ";\n"
         table_name = ""
         counter = 0
@@ -78,4 +106,12 @@ BEGIN {
 
     # in any case just print/preserve the line
     print $0"\n"
+}
+
+END {
+    if (table_name != "") {
+        # the previous line(s) was (were) INSERT INTO statements into some
+        # table, let's terminate the statement, we are at the end
+        print ";\n"
+    }
 }
