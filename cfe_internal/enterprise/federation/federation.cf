@@ -57,11 +57,11 @@ bundle agent config
     am_superhub|am_feeder::
       "pubkeys" slist => getvalues( pubkey );
 
-      "fingerprint[$(remotes)]"
-        string => "$(data[remote_hubs][$(remotes)][transport][ssh_host]) $(data[remote_hubs][$(remotes)][transport][ssh_fingerprint])",
+      "fingerprint[$(data[remote_hubs][$(remotes)][transport][ssh_host])]"
+        slist => string_split("$(data[remote_hubs][$(remotes)][transport][ssh_fingerprint])", "$(const.n)", "inf"),
         # To ensure we are using a remote hub that's enabled
         if => strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" );
-      "fingerprints" slist => getvalues( fingerprint );
+      "fingerprints" slist => maparray("$(this.k) $(this.v)", fingerprint);
       "feeder[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][hostkey])",
         if => strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" );
 
@@ -187,7 +187,8 @@ bundle agent transport_user
       handle => "ssh_known_hosts_configured",
       edit_template_string => "{{#-top-}}{{{.}}}$(const.n){{/-top-}}",
       template_data => @(cfengine_enterprise_federation:config.fingerprints),
-      template_method => "inline_mustache";
+      template_method => "inline_mustache",
+      if => isvariable("cfengine_enterprise_federation:config.fingerprints");
     "$(ssh_config)"
       create => "true",
       handle => "ssh_config_configured",
