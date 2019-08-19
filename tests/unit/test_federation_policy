@@ -13,6 +13,7 @@ function assert() {
 }
 
 set -e
+set -o pipefail
 
 # borrow PATH setup from nova/tests/reporting/common.sh
 [ -z "$CFE_ROOT" ] && CFE_ROOT=$(cd ../../../ && pwd)
@@ -47,6 +48,8 @@ function tear_down() {
     make
     popd
 
+    # TODO maybe re-autogen/make in core and enterprise as well to "clean up"?
+
     set -e
 }
 
@@ -61,14 +64,14 @@ mkdir -p "$CFE_WORKDIR/state"
 # NOTE: environment in jenkins/travis guarantees these are already built
 pushd "$CFE_ROOT/core"
 if [ ! -f configure ]; then
-  ./autogen.sh
+  ./autogen.sh --prefix "$CFE_WORKDIR"
   make -j4
 fi
 popd
 
 pushd "$CFE_ROOT/enterprise"
 if [ ! -f configure ]; then
-  ./autogen.sh
+  ./autogen.sh --prefix "$CFE_WORKDIR"
   make -j4
 fi
 popd
@@ -84,7 +87,8 @@ popd
 
 cp -R "$CFE_WORKDIR/masterfiles" "$CFE_WORKDIR/inputs"
 
-export CFENGINE_TEST_OVERRIDE_WORKDIR="$CFE_WORKDIR"
+# check that the following NOT being used still works
+#export CFENGINE_TEST_OVERRIDE_WORKDIR="$CFE_WORKDIR"
 
 # === DONE WITH GENERIC FAKE SETUP ===
 
