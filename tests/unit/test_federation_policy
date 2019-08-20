@@ -62,14 +62,14 @@ mkdir -p "$CFE_WORKDIR/state"
 # NOTE: environment in jenkins/travis guarantees these are already built
 pushd "$CFE_ROOT/core"
 if [ ! -f configure ]; then
-  ./autogen.sh
+  ./autogen.sh --with-workdir "$CFE_WORKDIR"
   make -j4
 fi
 popd
 
 pushd "$CFE_ROOT/enterprise"
 if [ ! -f configure ]; then
-  ./autogen.sh
+  ./autogen.sh --with-workdir "$CFE_WORKDIR"
   make -j4
 fi
 popd
@@ -85,7 +85,7 @@ popd
 
 cp -R "$CFE_WORKDIR/masterfiles" "$CFE_WORKDIR/inputs"
 
-export CFENGINE_TEST_OVERRIDE_WORKDIR="$CFE_WORKDIR"
+#export CFENGINE_TEST_OVERRIDE_WORKDIR="$CFE_WORKDIR"
 
 # === DONE WITH GENERIC FAKE SETUP ===
 
