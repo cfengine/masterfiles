@@ -59,19 +59,15 @@ mkdir -p "$CFE_WORKDIR/state"
 
 # NOTE: environment in jenkins/travis guarantees these are already built
 pushd "$CFE_ROOT/core"
-if [ ! -f configure ]; then
-  ./autogen.sh --with-workdir "$CFE_WORKDIR"
-  # diagnostic for WORKDIR, BINDIR etc
-  cat libutils/config.h | grep \/var\/cfengine
-  make -j4
-fi
+./autogen.sh --with-workdir "$CFE_WORKDIR"
+# diagnostic for WORKDIR, BINDIR etc
+cat libutils/config.h | grep \/var\/cfengine
+make -j4
 popd
 
 pushd "$CFE_ROOT/enterprise"
-if [ ! -f configure ]; then
-  ./autogen.sh --with-workdir "$CFE_WORKDIR"
-  make -j4
-fi
+./autogen.sh --with-workdir "$CFE_WORKDIR"
+make -j4
 popd
 
 cp "$CFE_ROOT/enterprise/enterprise-plugin/.libs/cfengine-enterprise.so" "$CFE_WORKDIR/lib/"
