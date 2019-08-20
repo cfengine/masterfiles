@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Requirements:
-# - cf-agent installed
-
 echo "1..4"
 
 function assert() {
@@ -12,6 +9,7 @@ function assert() {
     }
 }
 
+set -x
 set -e
 set -o pipefail
 
@@ -63,6 +61,8 @@ mkdir -p "$CFE_WORKDIR/state"
 pushd "$CFE_ROOT/core"
 if [ ! -f configure ]; then
   ./autogen.sh --with-workdir "$CFE_WORKDIR"
+  # diagnostic for WORKDIR, BINDIR etc
+  cat libutils/config.h | grep \/var\/cfengine
   make -j4
 fi
 popd
@@ -91,6 +91,8 @@ cp -R "$CFE_WORKDIR/masterfiles" "$CFE_WORKDIR/inputs"
 
 command -v cf-agent
 cf-agent --version
+cf-agent --self-diagnostics
+"$CFE_ROOT/core/cf-agent/cf-agent --self-diagnostics"
 
 # test FR config and it's outputs of classes
 # assumes cf-agent is enterprise copy and installed and in PATH
