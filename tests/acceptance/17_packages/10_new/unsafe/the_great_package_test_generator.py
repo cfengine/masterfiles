@@ -123,9 +123,13 @@ bundle agent init
       "test_soft_fail" string => "rhel_8",
         meta  => {"CFE-rhbz"};
 
+  vars:
+      "python_path" string => execresult("/bin/sed '1s/#!//;q' $(sys.workdir)/modules/packages/yum", "noshell");
+
   methods:
     debian|redhat::
-      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("/var/cfengine/bin/python");
+      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_path)");
+
 }
 
 bundle agent log_test_case(msg)
