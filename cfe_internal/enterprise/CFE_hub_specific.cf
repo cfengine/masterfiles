@@ -14,9 +14,15 @@
 #
 ##################################################################
 
+bundle common cfe_hub_specific_file_control
+{
+  vars:
+    "inputs" slist => { "$(this.promise_dirname)/federation/federation.cf" };
+}
+
 body file control
 {
-        inputs => { "$(sys.inputdir)/cfe_internal/enterprise/federation/federation.cf" };
+        inputs => { @(cfe_hub_specific_file_control.inputs) };
 }
 
 bundle common cfe_internal_hub_vars

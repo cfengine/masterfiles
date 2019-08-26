@@ -1,6 +1,12 @@
+bundle common federation_file_control
+{
+  vars:
+    "inputs" slist => { "$(sys.local_libdir)/stdlib.cf", "$(this.promise_dirname)/../CFE_hub_specific.cf" };
+}
+
 body file control
 {
-        inputs => { "$(sys.libdir)/stdlib.cf", "$(sys.inputdir)/cfe_internal/enterprise/CFE_hub_specific.cf" };
+        inputs => { @(federation_file_control.inputs) };
         namespace => "cfengine_enterprise_federation";
 }
 
