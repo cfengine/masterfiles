@@ -133,7 +133,7 @@ def list_updates(online):
         # Nothing to do for us here anyway
         return process.returncode
     lastline = ""
-    for line in stdoutdata.splitlines():
+    for line in stdoutdata.decode("utf-8").splitlines():
         # Combine multiline entries into one line. A line without at least three
         # space separated fields gets combined with the next line, if that line
         # starts with a space.
