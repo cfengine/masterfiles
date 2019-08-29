@@ -245,6 +245,7 @@ AC_CONFIG_FILES([Makefile
                 modules/packages/zypper
                 promises.cf
                 standalone_self_upgrade.cf
+                tests/Makefile
                 tests/acceptance/Makefile
                 tests/unit/Makefile
 ])
