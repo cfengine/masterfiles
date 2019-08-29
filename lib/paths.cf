@@ -345,7 +345,6 @@ bundle common paths
       "path[ethtool]"       string => "/usr/sbin/ethtool";
       "path[find]"          string => "/usr/bin/find";
       "path[free]"          string => "/usr/bin/free";
-      "path[getenforce]"    string => "/usr/sbin/getenforce";
       "path[grep]"          string => "/bin/grep";
       "path[hostname]"      string => "/bin/hostname";
       "path[init]"          string => "/sbin/init";
@@ -358,9 +357,7 @@ bundle common paths
       "path[ping]"          string => "/usr/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
       "path[printf]"        string => "/usr/bin/printf";
-      "path[restorecon]"    string => "/usr/sbin/restorecon";
       "path[sed]"           string => "/bin/sed";
-      "path[semodule]"      string => "/usr/sbin/semodule";
       "path[sort]"          string => "/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
@@ -439,7 +436,6 @@ bundle common paths
       "path[ethtool]"       string => "/sbin/ethtool";
       "path[find]"          string => "/usr/bin/find";
       "path[free]"          string => "/usr/bin/free";
-      "path[getenforce]"    string => "/usr/sbin/getenforce";
       "path[grep]"          string => "/bin/grep";
       "path[hostname]"      string => "/bin/hostname";
       "path[init]"          string => "/sbin/init";
@@ -452,9 +448,7 @@ bundle common paths
       "path[ping]"          string => "/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
       "path[printf]"        string => "/usr/bin/printf";
-      "path[restorecon]"    string => "/sbin/restorecon";
       "path[sed]"           string => "/bin/sed";
-      "path[semodule]"      string => "/usr/sbin/semodule";
       "path[sort]"          string => "/usr/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
