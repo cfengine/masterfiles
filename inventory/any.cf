@@ -760,7 +760,19 @@ bundle agent cfe_autorun_inventory_LLDP
 
   vars:
     !disable_inventory_LLDP.lldpctl_exec_exists::
-      "info" data => parsejson(execresult("$(inventory_control.lldpctl_json) 2>/dev/null", "useshell"));
+      # TODO When CFE-3108 is DONE, migrate to capturing only stdout
+      "info" -> { "CFE-3109", "CFE-3108" }
+        data => parsejson(execresult("$(inventory_control.lldpctl_json) 2>/dev/null", "useshell")),
+        if => not(isvariable("def.lldpctl_json")),
+        comment => "Not all versions of lldpctl support json, and because an
+        absent lldpd will result in an error on stderr resulting noisy logs and
+        failure to parse the json we redirect to dev null";
+
+      "info" -> { "CFE-3109" }
+        data => parsejson(execresult($(inventory_control.lldpctl_json), "noshell")),
+        if => isvariable("def.lldpctl_json"),
+        comment => "For safety, we do not run lldpctl in a shell if the path to
+        lldpctl is customized via augments";
 }
 
 bundle agent cfe_autorun_inventory_packages
