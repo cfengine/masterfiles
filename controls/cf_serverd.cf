@@ -88,12 +88,6 @@ bundle server access_rules()
       if => isdir( "$(def.dir_masterfiles)/" ),
       admit => { @(def.acl) };
 
-      "$(def.dir_software)/"
-      handle => "server_access_grant_access_datafiles",
-      comment => "Grant access to software updates",
-      if => isdir( "$(def.dir_software)/" ),
-      admit => { @(def.acl) };
-
       "$(def.dir_bin)/"
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
@@ -119,6 +113,15 @@ bundle server access_rules()
       comment => "Grant access to templates directory",
       if => isdir( "$(def.dir_templates)/" ),
       admit => { @(def.acl) };
+
+    policy_server|am_policy_hub::
+
+      "$(def.dir_master_software_updates)/" -> { "ENT-4953" }
+        handle => "server_access_grant_access_master_software_updates",
+        shortcut => "master_software_updates",
+        comment => "Grant access for hosts to download cfengine packages for self upgrade",
+        if => isdir( "$(sys.workdir)/master_software_updates" ),
+        admit => { @(def.acl) };
 
       enterprise_edition.policy_server::
         "collect_calls"

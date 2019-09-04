@@ -168,8 +168,8 @@ bundle agent cfengine_software_cached_locally
       "package_dir"
         string => "$(cfengine_software.package_dir)";
 
-      # TODO Add shortcut for this path
-      "master_software_location"  string => "/var/cfengine/master_software_updates",
+      "master_software_location" -> { "ENT-4953" }
+        string => "master_software_updates",
         comment => "The Cfengine binary updates directory on the policy server",
         handle => "cfe_internal_update_bins_vars_master_software_location";
 
@@ -562,9 +562,10 @@ bundle agent cfengine_master_software_content
       "dir[ubuntu_16_i686]" string => "$(dir[debian_4_i386])";
 
       "platform_dir" slist => getindices( dir );
+      "download_dir" string => "$(sys.workdir)/master_software_updates";
 
   files:
-      "/var/cfengine/master_software_updates/$(platform_dir)/."
+      "$(download_dir)/$(platform_dir)/."
        create => "true",
        comment => "We need a place to download each packge we build";
 
@@ -572,11 +573,11 @@ bundle agent cfengine_master_software_content
       # Fetch each package that we don't already have
        "/usr/bin/curl"
         args => "-s $(base_url)/$(dir[$(platform_dir)])/$(cfengine_package_names.pkg[$(platform_dir)]) --output /var/cfengine/master_software_updates/$(platform_dir)/$(cfengine_package_names.pkg[$(platform_dir)])",
-        if => not( fileexists( "/var/cfengine/master_software_updates/$(platform_dir)/$(cfengine_package_names.pkg[$(platform_dir)])" ) );
+        if => not( fileexists( "$(download_dir)/$(platform_dir)/$(cfengine_package_names.pkg[$(platform_dir)])" ) );
 
   reports:
     DEBUG|DEBUG_cfengine_master_software_content::
-      "curl -s $(base_url)/$(dir[$(i)])/$(cfengine_package_names.pkg[$(i)]) --output /var/cfengine/master_software_updates/$(i)/$(cfengine_pacakge_names.pkg[$(i)])";
+      "curl -s $(base_url)/$(dir[$(i)])/$(cfengine_package_names.pkg[$(i)]) --output $(download_dir)/$(i)/$(cfengine_pacakge_names.pkg[$(i)])";
 }
 
 bundle edit_line u_backup_script
