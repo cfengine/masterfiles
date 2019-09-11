@@ -153,12 +153,21 @@ bundle agent transport_user
           "$(ssh_known_hosts)",
           "$(ssh_config)"
         };
+      "ssh_home_cil_file" string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport_ssh_home_t.cil";
+
   classes:
     enabled::
-      "selinux_enabled"
-        expression => strcmp("Enforcing", execresult("getenforce", useshell));
-      "missing_ssh_context"
-        expression => not( or(
+      # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
+      _stdlib_path_exists_getenforce::
+        "selinux_enabled"
+          expression => strcmp("Enforcing", execresult("$(paths.getenforce)", useshell));
+
+      selinux_enabled::
+        "incorrect_ssh_context"
+          expression => not( or(
+                               regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                      execresult("ls -Z $(home) | grep .ssh",
+                                                 useshell)),
                                regcmp(".*[\s:]ssh_home_t[\s:].*",
                                       execresult("ls -Z $(ssh_auth_keys)",
                                                  useshell)),
@@ -200,17 +209,27 @@ bundle agent transport_user
       handle => "ssh_config_configured",
       edit_line => default:insert_lines("IdentityFile $(ssh_priv_key)");
 
-  commands:
-    # Generate a modern ssh keypair (2019-04)
-    "/usr/bin/ssh-keygen"
-      handle => "ssh_keys_configured",
-      args => "-N '' -f $(ssh_priv_key)",
-      if => and( isdir( "$(home)/.ssh" ),
-                 not( fileexists( "$(ssh_priv_key)" )));
+    selinux_enabled.incorrect_ssh_context::
+      "$(ssh_home_cil_file)"
+        create => "true",
+        edit_defaults => default:empty,
+        edit_line => default:insert_lines('(filecon "$(home)/.ssh" any (system_u object_r ssh_home_t ((s0)(s0))))');
 
-    selinux_enabled.missing_ssh_context::
-      "restorecon -R -F  $(home)/.ssh/"
-        contain => default:in_shell;
+  commands:
+    # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
+    selinux_enabled.incorrect_ssh_context._stdlib_path_exists_semodule._stdlib_path_exists_restorecon::
+      # the filename becomes the name for the selinux policy (as listed by semodule -l)
+      "$(paths.semodule) -i $(ssh_home_cil_file)";
+      "$(paths.restorecon) -R -F  $(home)/.ssh/";
+
+    any::
+      # Generate ssh keypair
+      "/usr/bin/ssh-keygen"
+        handle => "ssh_keys_configured",
+        args => "-N '' -f $(ssh_priv_key)",
+        if => and( isdir( "$(home)/.ssh" ),
+                   not( fileexists( "$(ssh_priv_key)" )));
+
 }
 
 bundle agent inventory_refresh_cmd
