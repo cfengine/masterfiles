@@ -156,13 +156,12 @@ bundle agent transport_user
       "ssh_home_cil_file" string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport_ssh_home_t.cil";
 
   classes:
-    enabled::
-      # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
-      _stdlib_path_exists_getenforce::
+    # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
+    enabled.default:_stdlib_path_exists_getenforce::
         "selinux_enabled"
           expression => strcmp("Enforcing", execresult("$(paths.getenforce)", useshell));
 
-      selinux_enabled::
+    enabled.selinux_enabled::
         "incorrect_ssh_context"
           expression => not( or(
                                regcmp(".*[\s:]ssh_home_t[\s:].*",
@@ -217,7 +216,7 @@ bundle agent transport_user
 
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
-    selinux_enabled.incorrect_ssh_context._stdlib_path_exists_semodule._stdlib_path_exists_restorecon::
+    selinux_enabled.incorrect_ssh_context.default:_stdlib_path_exists_semodule.default:_stdlib_path_exists_restorecon::
       # the filename becomes the name for the selinux policy (as listed by semodule -l)
       "$(paths.semodule) -i $(ssh_home_cil_file)";
       "$(paths.restorecon) -R -F  $(home)/.ssh/";
@@ -230,6 +229,11 @@ bundle agent transport_user
         if => and( isdir( "$(home)/.ssh" ),
                    not( fileexists( "$(ssh_priv_key)" )));
 
+  reports:
+    selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_semodule::
+      "need to fix incorrect ssh context for transport user but semodule path in $(sys.libdir)/paths.cf ($paths.semodule) does not resolve";
+    selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
+      "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf ($paths.restorecon) does not resolve";
 }
 
 bundle agent inventory_refresh_cmd
