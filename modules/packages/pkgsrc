@@ -140,7 +140,7 @@ parse_pkg_data () {
 }
 
 # Cfengine passes data on STDIN. Absorb that and convert to shell variables.
-while IFS= read -r -u 0 line; do
+while IFS= read -r line; do
   eval "$line"
   # options can be passed multiple times so we need to avoid clobbering
   # previous instances. Plus, what we really want to eval is the value of
