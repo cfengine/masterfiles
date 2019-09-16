@@ -1,6 +1,35 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.0b1:
+	- Added continual checking for policy_server state (CFE-3073)
+	- Added monitoring for postgresql lock acquisition times (ENT-4753)
+	- Added support for 'awk' filters in the FR dump-import process (ENT-4839)
+	- Added support for configuring abortclasses and abortbundleclasses via
+	  augments (ENT-4823)
+	- Added support for filtering in both dump and import phases of the FR
+	  ETL process (ENT-4839)
+	- Added support for ordering FR awk and sed scripts (ENT-4839)
+	- Added support for setting periodic package inventory refresh interval
+	  via augments (CFE-2771)
+	- Changed FR policy to honor target_state properly (ENT-4874)
+	- Copy .awk and .sed files from masterfiles to inputs (ENT-4839)
+	- Fixed Python 3 incompatibility in yum package module
+	- Fixed synchronization of important configuration files from active to
+	  passive hub (ENT-4944)
+	- Made keys of all types from feeder hubs trusted on a superhub (ENT-4917)
+	- Speeded-up FR import process by merging INSERT INTO statements (ENT-4839)
+	- Suppressed stderr output from lldpctl when using path defined by
+	  def.lldpctl_json (CFE-3109)
+	- Added SQL to update feeder update timestamp during import (ENT-4776)
+	- Added ssh_home_t type to cftransport .ssh dir (ENT-4906)
+	- fix use of _stdlib_path_exists_<command> in FR transport_user policy
+	  bundle (ENT-4906)
+	- partitioned __inventory table for federated reporting (ENT-4842)
+	- psql_wrapper needed full path to psql binary (ENT-4912)
+	- yum package_module gets updates available from online repos if local
+	  cache fails (CFE-3094)
+
 3.14.0:
 	- Fixed isvariable syntax error in update_def.cf (CFE-2953)
 	- Added path support for setfacl, timedatectl and journalctl (CFE-3013)
