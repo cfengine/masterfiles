@@ -106,7 +106,7 @@ bundle agent cfe_internal_update_processes
       # class OR if the agent is found in a list of agents to be specifically
       # disabled.
 
-      "disable[$(all_agents)]"
+      "disabled[$(all_agents)]"
         string => "$(all_agents)",
         ifvarclass => or( canonify( "persistent_disable_$(all_agents)" ),
                           some( "$(all_agents)", agents_to_be_disabled ));
