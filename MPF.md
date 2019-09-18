@@ -365,8 +365,6 @@ This [augments file][Augments] will ensure that `cf-monitord` is disabled on hos
 }
 ```
 
-**Note:** By default MPF does not manage systemd units. This must be enabled by uncommenting policy in [cfe_internal_update_processes](https://github.com/cfengine/masterfiles/blob/master/cfe_internal/update/update_processes.cf#L149)
-
 #### clear_persistent\_disable\_*DAEMON*
 
 **Description:** Re-enable a previously disabled CFEngine Enterprise daemon
