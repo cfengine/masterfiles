@@ -472,7 +472,6 @@ bundle agent imported_data
 {
   commands:
     am_superhub.!am_paused::
-      # TODO: pass correct arguments once script is done
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/import.sh"},
         contain => default:in_shell;
