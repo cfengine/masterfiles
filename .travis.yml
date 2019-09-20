@@ -10,6 +10,14 @@ matrix:
     - env: STYLE_CHECK_JOB=1
 
     # JOB 1
+    - env: JOB_TYPE=valgrind_health_check
+      before_install:
+        - chmod ug+x ./travis-scripts/*
+        - ./travis-scripts/before_install.sh
+      script:
+        - sudo ./travis-scripts/valgrind.sh
+
+    # JOB 2
     - env: CF_VERSION=master
       install:
         - BRANCH=$CF_VERSION
@@ -21,7 +29,7 @@ matrix:
         - wget --no-check-certificate $DIR_URL/$FILE
         - sudo dpkg -i $FILE
 
-    # JOB 2
+    # JOB 3
     - env: CF_VERSION=3.12.x
       addons:
         apt:
@@ -31,7 +39,7 @@ matrix:
           packages:
             - cfengine-community=3.12.*
 
-    # JOB 3
+    # JOB 4
     - env: CF_VERSION=3.10.x
       addons:
         apt:
