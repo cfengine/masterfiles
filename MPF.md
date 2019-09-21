@@ -302,6 +302,20 @@ hosts.
 }
 ```
 
+#### agents_to_be_disabled
+
+**Description:** list of agents to disable.
+
+This [augments file][Augments] is a way to specify that `cf-monitord` should be disabled on all hosts.
+
+```
+{
+  "vars": {
+    "agents_to_be_disabled": [ "cf-monitord" ]
+  }
+}
+```
+
 ## Main Policy (promises.cf)
 
 The following settings are defined in `controls/def.cf` can be set from an
