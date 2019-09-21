@@ -167,6 +167,7 @@ valgrind $VG_OPTS /var/cfengine/bin/cf-agent -K -f update.cf -D mpf_skip_local_c
 check_output update2.txt
 check_masterfiles_and_inputs
 echo "Running promises.cf:"
+# The mpf limits concurrency of daemons (namely cf-execd and cf-monitord) using a loose process check
 valgrind $VG_OPTS /var/cfengine/bin/cf-agent -K -f promises.cf 2>&1 | tee promises.txt
 check_output promises.txt
 echo "Running cf-check:"
