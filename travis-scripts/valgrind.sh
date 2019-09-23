@@ -178,7 +178,8 @@ check_output update2.txt
 check_masterfiles_and_inputs
 
 echo "Running promises.cf:"
-valgrind $VG_OPTS /var/cfengine/bin/cf-agent -K -f promises.cf 2>&1 | tee promises.txt
+# The mpf limits concurrency of daemons (namely cf-execd and cf-monitord) using a loose process check
+valgrind $VG_OPTS /var/cfengine/bin/cf-agent -K --define mpf_disable_cfe_internal_limit_robot_agents -f promises.cf 2>&1 | tee promises.txt
 check_output promises.txt
 
 echo "Running cf-check:"
@@ -186,8 +187,8 @@ valgrind $VG_OPTS /var/cfengine/bin/cf-check diagnose /var/cfengine/state/*.lmdb
 check_output check.txt
 
 echo "Checking that bootstrap ID doesn't change"
-/var/cfengine/bin/cf-agent --show-evaluated-vars | grep bootstrap_id > id_a
-/var/cfengine/bin/cf-agent -K --show-evaluated-vars | grep bootstrap_id > id_b
+/var/cfengine/bin/cf-agent --define mpf_disable_cfe_internal_limit_robot_agents --show-evaluated-vars | grep bootstrap_id > id_a
+/var/cfengine/bin/cf-agent --define mpf_disable_cfe_internal_limit_robot_agents -K --show-evaluated-vars | grep bootstrap_id > id_b
 cat id_a
 diff id_a id_b
 
