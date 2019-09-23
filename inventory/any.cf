@@ -90,9 +90,9 @@ bundle agent inventory_autorun
       "loadaverage" usebundle => cfe_autorun_inventory_loadaverage(),
       handle => "cfe_internal_autorun_loadaverage";
 
-      "ipv4 addresses"
-        usebundle => cfe_autorun_inventory_ipv4_addresses,
-        handle => "cfe_internal_autorun_ipv4_addresses";
+      "IP addresses" -> { "ENT-2552", "ENT-4987" }
+        usebundle => cfe_autorun_inventory_ip_addresses,
+        handle => "cfe_internal_autorun_ip_addresses";
 }
 
 bundle agent cfe_autorun_inventory_listening_ports
@@ -110,30 +110,60 @@ bundle agent cfe_autorun_inventory_listening_ports
                     values that make sense.";
 }
 
-bundle agent cfe_autorun_inventory_ipv4_addresses
+bundle agent cfe_autorun_inventory_ip_addresses
 # @brief Inventory ipv4 addresses
-# This will filter the loopback address (127.0.0.1, as it is likely not very interesting)
+# This will filter the ipv4 and ipv4 loopback address (127.0.0.1, ::as it is likely not very interesting)
 {
   vars:
-    "filter_reg"
-      string => "127\.0\.0\.1",
-      comment => "Addresses that match this regular expression will be filtered
-                  from the inventory for ipv4 addresses";
+      "ipv4_regex" -> { "ENT-4987" }
+        string => "\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b";
+
+      "ipv4_loopback_regex" -> { "ENT-2552" }
+        string => "127\.0\.0\.1",
+        comment => "Addresses that match this regular expression will be filtered
+                    from the inventory for ipv4 addresses";
+
+      "ipv6_loopback_regex" -> { "ENT-4987" }
+        string => "::1",
+        comment => "Addresses that match this regular expression will be filtered
+                    from the inventory for ipv4 addresses";
 
     # Strings are displayed more beautifully in Mission Portal than lists, so
     # we first generate the list of addresses to be inventoried and then do
     # inventory using an array.
-    "ipv4_addresses"
-      slist => filter( $(filter_reg), "sys.ip_addresses", "true", "true", 999999999);
+      "ipv4_addresses"
+        slist => sort( filter( $(ipv4_regex), "sys.ip_addresses", "true", "false", inf), lex ),
+        if => not( isvariable( $(this.promiser) ));
 
-    "ipv4[$(ipv4_addresses)]"
-      string => "$(ipv4_addresses)",
-      meta => { "inventory", "attribute_name=IPv4 addresses" };
+      "ipv4_addresses_non_loopback" -> { "ENT-2552" }
+        slist => sort( filter( $(ipv4_loopback_regex), "$(this.bundle).ipv4_addresses", "true", "true", inf)),
+        if => not( isvariable( $(this.promiser) ));
+
+      "ipv4[$(ipv4_addresses_non_loopback)]" -> { "ENT-2552" }
+        string => "$(ipv4_addresses_non_loopback)",
+        meta => { "inventory", "attribute_name=IPv4 addresses" };
+
+      # sys.ip_addresses contains ipv4 and (as of 3.15.0) ipv6 addresses. We get
+      # the ipv6 addresses indirectly, based on excluding the ipv4 addresses
+      # (which we identify using a regular expression)
+
+      "ipv6_addresses" -> { "ENT-4987" }
+        slist => sort( difference( "sys.ip_addresses", "$(this.bundle).ipv4_addresses" ), lex),
+        if => not( isvariable( $(this.promiser) ));
+
+      "ipv4_addresses_non_loopback" -> { "ENT-4987" }
+        slist => sort( filter( $(ipv6_loopback_regex), "$(this.bundle).ipv4_addresses", "true", "true", inf)),
+        if => not( isvariable( $(this.promiser) ));
+
+      "ipv6[$(ipv6_addresses_non_loopback)]" -> { "ENT-4987" }
+        string => "$(ipv6_addresses_non_loopback)",
+        meta => { "inventory", "attribute_name=IPv6 addresses" };
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_ipv4_addresses::
       "DEBUG $(this.bundle)";
       "$(const.t)Inventorying: '$(ipv4_addresses)'";
+      "$(const.t)Inventorying: '$(ipv6_addresses)'";
 }
 
 bundle agent cfe_autorun_inventory_disk
