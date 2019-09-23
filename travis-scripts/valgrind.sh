@@ -135,7 +135,8 @@ check_masterfiles_and_inputs
 print_ps
 
 echo "Stopping service to relaunch under valgrind"
-systemctl stop cfengine3
+systemctl stop cfengine3 cf-execd cf-serverd
+systemctl disable cf-execd cf-serverd
 sleep 10
 print_ps
 
@@ -162,13 +163,16 @@ echo "Running update.cf:"
 valgrind $VG_OPTS /var/cfengine/bin/cf-agent -K -f update.cf 2>&1 | tee update.txt
 check_output update.txt
 check_masterfiles_and_inputs
+
 echo "Running update.cf without local copy:"
 valgrind $VG_OPTS /var/cfengine/bin/cf-agent -K -f update.cf -D mpf_skip_local_copy_optimization 2>&1 | tee update2.txt
 check_output update2.txt
 check_masterfiles_and_inputs
+
 echo "Running promises.cf:"
 valgrind $VG_OPTS /var/cfengine/bin/cf-agent -K -f promises.cf 2>&1 | tee promises.txt
 check_output promises.txt
+
 echo "Running cf-check:"
 valgrind $VG_OPTS /var/cfengine/bin/cf-check diagnose /var/cfengine/state/*.lmdb 2>&1 | tee check.txt
 check_output check.txt
@@ -205,6 +209,7 @@ check_serverd_valgrind_output serverd.txt
 check_daemon_output serverd_output.txt
 
 echo "Stopping cfengine3 service"
+systemctl enable cf-execd cf-serverd
 systemctl stop cfengine3
 
 echo "Done killing"
