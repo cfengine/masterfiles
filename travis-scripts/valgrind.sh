@@ -118,6 +118,11 @@ function check_masterfiles_and_inputs {
     diff /var/cfengine/inputs/promises.cf /var/cfengine/masterfiles/promises.cf
 }
 
+function print_cfengine_units {
+    echo "CFEngine Systemd Unit                      State"
+    systemctl list-unit-files | grep --color=never -P "cfengine|cf-"
+}
+
 /var/cfengine/bin/cf-agent --version
 
 VG_OPTS="--leak-check=full --track-origins=yes --error-exitcode=1"
@@ -133,12 +138,15 @@ echo "127.0.0.1" > /var/cfengine/policy_server.dat
 check_masterfiles_and_inputs
 
 print_ps
+print_cfengine_units
 
 echo "Stopping service to relaunch under valgrind"
 systemctl stop cfengine3 cf-execd cf-serverd
 systemctl disable cf-execd cf-serverd
 sleep 10
 print_ps
+
+print_cfengine_units
 
 echo "Starting cf-serverd with valgrind in background:"
 valgrind $VG_OPTS --log-file=serverd.txt /var/cfengine/bin/cf-serverd --no-fork 2>&1 > serverd_output.txt &
