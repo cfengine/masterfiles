@@ -54,23 +54,50 @@ bundle agent ha_manage_notification_scripts_dir
 }
 
 bundle agent ha_hub_sync_config_data
+# @brief Keep passive hub configuration in sync with active hub
 {
- files:
-  "$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php"
-     copy_from => ha_no_backup_scp("$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php", $(sys.hub_active_ip)),
-     comment => "Synchronize cf_robot configuration",
-     handle => "ha_sync_robot_config";
+  vars:
 
-  "$(sys.workdir)/share/GUI/application/config/appsettings.php"
-     copy_from => ha_no_backup_scp("$(sys.workdir)/share/GUI/application/config/appsettings.php", $(sys.hub_active_ip)),
-     comment => "Synchronize appsetings configuration",
-     handle => "ha_sync_appsettings_config";
+      "htdocs" string => "$(sys.workdir)/httpd/htdocs/";
+      "application_config_path" string => "$(htdocs)/application/config/";
+      "application_config_files"
+        comment => "These files are from application/config and if not in sync
+        will cause various authentication errors",
+        slist => {
+                   "cf_robot.php",
+                   "appsettings.php",
+                   "config.php", # ENT-4944
+        };
 
-  "/opt/cfengine/notification_scripts"
-      copy_from => ha_no_backup_scp("/opt/cfengine/notification_scripts", $(sys.hub_active_ip)),
-      comment => "Copy MP notification scripts",
-      handle => "ha_copy_notification_scripts",
-      depth_search => recurse("1");
+  files:
+      "$(application_config_path)/$(application_config_files)"
+        copy_from => ha_no_backup_scp("$(application_config_path)/$(application_config_files)",
+                                      $(sys.hub_active_ip)),
+        comment => "Ensure application configuration files are in sync to avoid authentication issues",
+        handle => "ha_sync_application_config";
+
+      "/opt/cfengine/notification_scripts"
+        copy_from => ha_no_backup_scp("/opt/cfengine/notification_scripts",
+                                      $(sys.hub_active_ip)),
+        comment => "Copy MP notification scripts",
+        handle => "ha_copy_notification_scripts",
+        depth_search => recurse("1");
+
+@if minimum_version(3.11)
+      # These configuration settings were introduced in CFEngine non-LTS 3.11
+      # Used macro as there is no class based way to do version X and greater
+      "$(htdocs)/ldap/config/settings.php" -> { "ENT-4944" }
+        copy_from => ha_no_backup_scp("$(htdocs)/ldap/config/settings.php",
+                                      $(sys.hub_active_ip)),
+        comment => "Ensure LDAP configuration files are in sync to avoid authentication issues",
+        handle => "ha_sync_ldap_config";
+
+      "$(htdocs)/api/config/config.php" -> { "ENT-4944" }
+        copy_from => ha_no_backup_scp("$(htdocs)/api/config/config.php",
+                                      $(sys.hub_active_ip)),
+        comment => "Ensure LDAP configuration files are in sync to avoid authentication issues",
+        handle => "ha_sync_api_config";
+@endif
 }
 
 body copy_from ha_no_backup_scp(from,server)
