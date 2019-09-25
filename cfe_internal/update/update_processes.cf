@@ -114,7 +114,7 @@ bundle agent cfe_internal_update_processes
       # class OR if the agent is found in a list of agents to be specifically
       # disabled.
 
-      "disable[$(all_agents)]"
+      "disabled[$(all_agents)]"
         string => "$(all_agents)",
         ifvarclass => or( canonify( "persistent_disable_$(all_agents)" ),
                           some( "$(all_agents)", agents_to_be_disabled ));
@@ -146,15 +146,11 @@ bundle agent cfe_internal_update_processes
 
     systemd_supervised::
 
-      # By default when running under systemd supervision, cfengine will not
-      # continue to make sure that the units are enabled or running. To enable
-      # this internal management please uncomment the following.
+      "CFEngine systemd Unit Definitions"
+        usebundle => cfe_internal_systemd_unit_files;
 
-    #  "CFEngine systemd Unit Definitions"
-    #    usebundle => cfe_internal_systemd_unit_files;
-
-    #  "CFEngine systemd Unit States"
-    #    usebundle => cfe_internal_systemd_service_unit_state;
+      "CFEngine systemd Unit States"
+        usebundle => cfe_internal_systemd_service_unit_state;
 
     am_policy_hub.enterprise.!systemd_supervised::
 
