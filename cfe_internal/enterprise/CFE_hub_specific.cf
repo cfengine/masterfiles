@@ -607,7 +607,7 @@ bundle agent cfe_internal_enterprise_policy_analyzer
 
       "analyzer_flagfile" string => "$(cfe_internal_hub_vars.docroot)/analyzer/pa.enabled";
       "analyzer_dir" string => "/opt/cfengine/analyzer/policy/masterfiles";
-      "analyzer_source" string => "/var/cfengine/masterfiles";
+      "analyzer_source" string => "$(sys.masterdir)";
 
   classes:
 
