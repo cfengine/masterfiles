@@ -379,6 +379,7 @@ bundle common paths
       "path[svc]"       string => "/sbin/service";
       "path[useradd]"   string => "/usr/sbin/useradd";
       "path[userdel]"   string => "/usr/sbin/userdel";
+      "path[usermod]"   string => "/usr/sbin/usermod";
       "path[yum]"       string => "/usr/bin/yum";
 
     darwin::
