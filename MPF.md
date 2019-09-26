@@ -269,24 +269,6 @@ This [augments file][Augments] will enable this behavior for all clients.
 }
 ```
 
-### Disable limiting robot agents
-
-By default the MPF (Masterfiles Policy Framework) contains active policy that is intended to remediate a pathological condition where multiple agent component daemons (like cf-execd) are running concurrently.
-
-Define the class ```mpf_disable_cfe_internal_limit_robot_agents``` to disable this automatic remediation.
-
-```json
-{
-  "classes": {
-    "mpf_disable_cfe_internal_limit_robot_agents": [ "any" ]
-  }
-}
-```
-
-**History:**
-
-- Introduced in 3.15.0
-
 ### Automatically deploy masterfiles from Version Control
 
 On a CFEngine Enterprise Hub during the update policy if the class
@@ -397,20 +379,6 @@ hosts.
 {
   "classes": {
     "clear_persistent_disable_cf_monitord": [ "redhat" ]
-  }
-}
-```
-
-#### agents_to_be_disabled
-
-**Description:** list of agents to disable.
-
-This [augments file][Augments] is a way to specify that `cf-monitord` should be disabled on all hosts.
-
-```
-{
-  "vars": {
-    "agents_to_be_disabled": [ "cf-monitord" ]
   }
 }
 ```
