@@ -164,7 +164,7 @@ Define the class ```mpf_disable_cfe_internal_limit_robot_agents``` to disable th
 
 **History:**
 
-- Introduced in 3.15.0, 3.12.3
+- Introduced in 3.15.0, 3.12.3, 3.10.7
 
 ### Automatically deploy masterfiles from Version Control
 
