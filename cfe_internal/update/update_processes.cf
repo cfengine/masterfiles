@@ -138,6 +138,12 @@ bundle agent cfe_internal_update_processes
   methods:
 
     systemd.!systemd_supervised::
+      # TODO Remove from policy.
+      # This makes sure the cfengine3 (umbrella) unit is active. It does not
+      # make any assertions about individual components. Furthermore, since
+      # commit 6a7fe6b3fa466e55b29eca75cd53ff8b2883ff0e (introduced in 3.14)
+      # this policy won't be run because systemd_supervised is defined any time
+      # systemd is defined.
 
       "CFENGINE systemd service"
       usebundle => maintain_cfe_systemd,
