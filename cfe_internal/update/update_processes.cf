@@ -35,6 +35,9 @@ bundle agent cfe_internal_update_processes
 #   persistent_disable_cf_monitord) is defined the service will be disabled.
 #
 # * If the component is found in def.agents_to_be_disabled it will be disabled.
+#
+# * To enable component management on hosts with systemd define the class
+#    `mpf_enable_cfengine_systemd_component_management`.
 {
   classes:
       "systemd_supervised"
@@ -150,7 +153,7 @@ bundle agent cfe_internal_update_processes
       comment => "Call a bundle to maintain CFEngine with systemd",
       handle => "cfe_internal_update_processes_methods_maintain_systemd";
 
-    systemd_supervised::
+    systemd_supervised.mpf_enable_cfengine_systemd_component_management::
 
       "CFEngine systemd Unit Definitions"
         usebundle => cfe_internal_systemd_unit_files;
