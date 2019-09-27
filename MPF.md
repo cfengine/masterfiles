@@ -384,9 +384,36 @@ embedded
 [failsafe policy](https://github.com/cfengine/core/blob/master/libpromises/failsafe.cf) is
 used and it decides which files should be copied.
 
-### Enable or disable CFEngine components
+### Configuring component management
 
-#### persistent\_disable\_*DAEMON*
+The Masterfiles Policy Framework ships with policy to manage the components of CFEngine.
+
+By default, for hosts without systemd, this policy defaults to ensuring that components are running.
+
+On systemd hosts, the policy to manage component units is disabled by default.
+
+#### Enable management of components on systemd hosts
+
+To allow the Masterfiles Policy Framework to actively manage cfengine systemd units and state define the `mpf_enable_cfengine_systemd_component_management`.
+
+This example illustrates enabling management of components on systemd hosts having a class matching `redhat_8` via augments.
+
+```json
+{
+  "classes:" {
+    "mpf_enable_cfengine_systemd_component_management": [ "redhat_8" ]
+  }
+}
+```
+
+When enabled, the policy will render systemd unit files in `/etc/systemd/system` for managed services. Mustache templates for service units are in the *templates* directory in the root of the Masterfiles Policy Framework.
+
+When enabled, the policy will make sure that all units are enabled, unless they have been disabled by a persistent class or are explicitly listed as an agent to be disabled.
+
+#### Enable or disable CFEngine components
+
+##### Using persistent classes
+###### persistent\_disable\_*DAEMON*
 
 **Description:** Disable a CFEngine Enterprise daemon component persistently.
 
@@ -405,7 +432,7 @@ This [augments file][Augments] will ensure that `cf-monitord` is disabled on hos
 }
 ```
 
-#### clear_persistent\_disable\_*DAEMON*
+###### clear_persistent\_disable\_*DAEMON*
 
 **Description:** Re-enable a previously disabled CFEngine Enterprise daemon
 component.
@@ -423,7 +450,8 @@ hosts.
 }
 ```
 
-#### agents_to_be_disabled
+##### Using augments
+##### agents_to_be_disabled
 
 **Description:** list of agents to disable.
 
