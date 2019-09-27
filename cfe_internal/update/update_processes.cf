@@ -47,6 +47,20 @@ bundle agent cfe_internal_update_processes
                     when available. Prior to 3.10 the service is supervised
                     directly by CFEngine policy.";
 
+  reports:
+      inform.systemd_supervised.!mpf_enable_cfengine_systemd_component_management::
+      "NOTE: You have defined a class to persistently disable a cfengine
+             component on a systemd managed host, but you have not defined
+             mpf_enable_cfengine_systemd_component_management in order to enable
+             management"
+        if => classmatch( "persistent_disable_cf_.*" );
+
+      "NOTE: You have explicitly listed components that should be disabled in def.agents_to_be_disabled.
+             This host is managed by systemd and requires the class
+             mpf_enable_cfengine_systemd_component_management in order to enable
+             active management"
+        if => some( ".*", @(def.agents_to_be_disabled) );
+
   vars:
 
     any::
