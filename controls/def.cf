@@ -276,10 +276,6 @@ bundle common def
       comment => "Define reports path",
       handle => "common_def_vars_dir_reports";
 
-      "dir_software"    string => translatepath("$(sys.workdir)/master_software_updates"),
-      comment => "Define software path",
-      handle => "common_def_vars_dir_software";
-
       "dir_bin"         string => translatepath("$(sys.bindir)"),
       comment => "Define binary path",
       handle => "common_def_vars_dir_bin";
@@ -307,6 +303,19 @@ bundle common def
       "cf_apache_group" string => "cfapache",
       comment => "Group that CFEngine Enterprise webserver runs as",
       handle => "common_def_vars_cf_cfapache_group";
+
+    policy_server|am_policy_hub::
+
+      # Only hubs serve software updates
+
+      "dir_master_software_updates" -> { "ENT-4953" }
+        string => "$(sys.workdir)/master_software_updates",
+        handle => "common_def_vars_dir_serve_master_software_updates",
+        comment => "Path where software updates are served from the policy hub.
+        This variable is overridable via augments as
+        vars.dir_master_software_updates. All remote agents request this path
+        via the master_software_updates shortcut.",
+        if => not( isvariable( "def.dir_master_software_updates" ));
 
     solaris::
       "cf_runagent_shell"
