@@ -318,7 +318,7 @@ This [augments file][Augments] will defines `trigger_upgrade` on hosts with IPv4
 - The negative look ahead regular expression is useful because it automatically
   turns off on hosts after they reach the target version.
 
-#### Configure path that software is served for autonomous agent upgrades
+#### Configure path that software is served from for autonomous agent upgrades
 
 {% comment %}ENT-4953{% endcomment %}
 `def.master_software_updates` defines the path that cfengine policy servers
