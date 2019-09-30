@@ -336,6 +336,28 @@ This [augments file][Augments] will defines `trigger_upgrade` on hosts with IPv4
 - The negative look ahead regular expression is useful because it automatically
   turns off on hosts after they reach the target version.
 
+#### Configure path that software is served from for autonomous agent upgrades
+
+{% comment %}ENT-4953{% endcomment %}
+`def.master_software_updates` defines the path that cfengine policy servers
+share software updates from. Remote agents access this path via the
+`master_software_updates` *shortcut*. By default this path is
+`$(sys.workdir)/master_software_updates`. This path can be overridden via
+`vars.dir_master_software_updates` in augments.
+
+For example:
+
+```json
+{
+   "vars": {
+     "dir_master_software_updates": "/srv/cfengine-software-updates/"
+   }
+}
+```
+
+**History:**
+- Introduced 3.15.0, 3.12.3, 3.10.8
+
 ### Files considered for copy during policy updates
 
 The default update policy only copies files that match regular expressions
