@@ -103,14 +103,14 @@ def subprocess_Popen(cmd, stdout=None, stderr=None):
 # If subprocess.PIPE is passed as stderr, it will re-write it in an ErrorMessage
 def subprocess_call(cmd, stdout=None, stderr=None):
     process = subprocess_Popen(cmd, stdout, stderr)
-    return_code = process.wait()
+    outs, errs = process.communicate()
     if stderr == subprocess.PIPE:
-        lines = [line for line in process.stderr]
+        lines = [line for line in errs.split('\n')]
         if len(lines):
             printed_error = "ErrorMessage=" + " ".join(lines)
             sys.stdout.write(printed_error)
             sys.stdout.flush()
-    return return_code
+    return process.returncode
 
 
 
