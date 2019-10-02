@@ -105,7 +105,7 @@ def subprocess_call(cmd, stdout=None, stderr=None):
     process = subprocess_Popen(cmd, stdout, stderr)
     outs, errs = process.communicate()
     if stderr == subprocess.PIPE:
-        lines = [line for line in errs.split('\n')]
+        lines = [line for line in errs.decode("utf-8").splitlines()]
         if len(lines):
             printed_error = "ErrorMessage=" + " ".join(lines)
             sys.stdout.write(printed_error)
