@@ -103,9 +103,18 @@ def subprocess_Popen(cmd, stdout=None, stderr=None):
     return result
 
 
+# If subprocess.PIPE is passed as stderr, it will re-write it in an ErrorMessage
 def subprocess_call(cmd, stdout=None, stderr=None):
     process = subprocess_Popen(cmd, stdout, stderr)
-    return process.wait()
+    outs, errs = process.communicate()
+    if stderr == subprocess.PIPE:
+        lines = [line for line in errs.decode("utf-8").splitlines()]
+        if len(lines):
+            printed_error = "ErrorMessage=" + " ".join(lines)
+            sys.stdout.write(printed_error)
+            sys.stdout.flush()
+    return process.returncode
+
 
 
 def get_package_data():
@@ -122,7 +131,8 @@ def get_package_data():
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
-        return subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string])
+        subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string], stderr=subprocess.PIPE)
+        return 0
     elif re.search("[:,]", pkg_string):
         # Contains an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -137,8 +147,8 @@ def list_installed():
     # Ignore everything.
     sys.stdin.readlines()
 
-    return subprocess_call([rpm_cmd, "-qa", "--qf", rpm_output_format])
-
+    subprocess_call([rpm_cmd, "-qa", "--qf", rpm_output_format])
+    return 0
 
 def list_updates(online):
     # Ignore everything.
@@ -322,7 +332,6 @@ def repo_install():
     # since it's unlikely that people will do a whole lot of downgrades
     # simultaneously.
 
-    ret = 0
     single_cmd_args, multi_cmd_args = package_arguments_builder(True)
 
     if single_cmd_args:
@@ -334,19 +343,19 @@ def repo_install():
 
         cmd_line.extend(single_cmd_args)
 
-        ret = subprocess_call(cmd_line, stdout=NULLFILE)
+        subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
 
     if multi_cmd_args:
         for block in multi_cmd_args:
             # Try to upgrade.
             cmd_line = [zypper_cmd] + zypper_options + ["update"] + block
-            subprocess_call(cmd_line, stdout=NULLFILE)
+            subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
 
             # See if it succeeded.
             success = True
             for item in block:
                 cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-                if subprocess_call(cmd_line, stdout=NULLFILE) != 0:
+                if subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE) != 0:
                     success = False
                     break
 
@@ -362,14 +371,14 @@ def repo_install():
 
             cmd_line += block
 
-            subprocess_call(cmd_line, stdout=NULLFILE)
+            subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
 
             # No final check. CFEngine will figure out that it's missing
             # if it failed.
 
-    # ret == 0 doesn't mean we succeeded with everything, but it's expensive to
+    # return 0 doesn't mean we succeeded with everything, but it's expensive to
     # check, so let CFEngine do that.
-    return ret
+    return 0
 
 
 def remove():
@@ -381,7 +390,7 @@ def remove():
     args = package_arguments_builder(False)[0]
 
     if args:
-        return subprocess_call(cmd_line + args, stdout=NULLFILE)
+        return subprocess_call(cmd_line + args, stdout=NULLFILE, stderr=subprocess.PIPE)
     return 0
 
 
@@ -396,7 +405,8 @@ def file_install():
     if not found:
         return 0
 
-    return subprocess_call(cmd_line, stdout=NULLFILE)
+    subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
+    return 0
 
 
 def main():
