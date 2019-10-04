@@ -580,7 +580,7 @@ bundle agent cfengine_master_software_content
 
   reports:
     DEBUG|DEBUG_cfengine_master_software_content::
-      "curl -s $(base_url)/$(dir[$(i)])/$(cfengine_package_names.pkg[$(i)]) --output $(download_dir)/$(i)/$(cfengine_pacakge_names.pkg[$(i)])";
+      "curl -s $(base_url)/$(dir[$(i)])/$(cfengine_package_names.pkg[$(i)]) --output $(download_dir)/$(i)/$(cfengine_package_names.pkg[$(i)])";
 }
 
 bundle edit_line u_backup_script
