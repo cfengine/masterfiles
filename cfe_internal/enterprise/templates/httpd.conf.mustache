@@ -4,7 +4,7 @@
 ServerSignature Off
 ServerTokens ProductOnly
 ServerName {{{vars.sys.fqhost}}}
-ServerRoot "/var/cfengine/httpd"
+ServerRoot "{{{vars.sys.workdir}}}/httpd"
 Listen 80
 
 # Modules
@@ -150,7 +150,7 @@ LogLevel warn
   AddType application/x-pkcs7-crl    .crl
 
   SSLPassPhraseDialog  builtin
-  SSLSessionCache        "shmcb:/var/cfengine/httpd/logs/ssl_scache(512000)"
+  SSLSessionCache        "shmcb:{{{vars.sys.workdir}}}/httpd/logs/ssl_scache(512000)"
   SSLSessionCacheTimeout  300
   SSLSessionTickets Off
 
@@ -207,7 +207,7 @@ LogLevel warn
         SSLOptions +StdEnvVars
     </FilesMatch>
 
-    <Directory "/var/cfengine/httpd/cgi-bin">
+    <Directory "{{{vars.sys.workdir}}}/httpd/cgi-bin">
         SSLOptions +StdEnvVars
         AllowOverride None
     </Directory>

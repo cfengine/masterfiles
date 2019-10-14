@@ -8,7 +8,7 @@ bundle agent postgresql_conf_reccomendations
     "tags" slist => { "cfengine_recommends" };
 
   vars:
-    "pgsql_conf" string => "/var/cfengine/state/pg/data/postgresql.conf";
+    "pgsql_conf" string => "$(sys.statedir)/pg/data/postgresql.conf";
     "pgsql_conf" string => "/tmp/postgresql.conf";
     "mem_info_source" string => "/proc/meminfo";
       "mem_info_data"
