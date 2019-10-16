@@ -77,7 +77,7 @@ bundle agent cfengine_software
       "pkg_arch" string => "x86_64";
       "package_dir" string => "$(sys.flavour)_$(sys.arch)";
 
-!(cfengine_3_7_1|cfengine_3.7.2|cfengine_3.7.3)::
+!(cfengine_3_7_1|cfengine_3_7_2|cfengine_3_7_3)::
 # After 3.7.4 a fix to ifelse and isvarible allows for actuating the function
 # even thought the promise references an unresolved variable.
 
