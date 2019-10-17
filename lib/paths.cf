@@ -120,6 +120,8 @@ bundle common paths
     linux::
       "path[lsattr]"        string => "/usr/bin/lsattr";
       "path[tar]"           string => "/bin/tar";
+      "path[true]"          string => "/bin/true";
+      "path[false]"         string => "/bin/false";
       "path[pgrep]"         string => "/usr/bin/pgrep";
       "path[getent]"        string => "/usr/bin/getent";
       "path[mailx]"         string => "/usr/bin/mailx";
