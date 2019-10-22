@@ -135,7 +135,7 @@ bundle agent cfengine_internal_standalone_self_upgrade_execution
 
   reports:
 
-    inform_mode|verbose_mode|DEBUG|DEBUG_cfengine_internal_standalone_self_upgrade::
+    trigger_upgrade.(inform_mode|verbose_mode|DEBUG|DEBUG_cfengine_internal_standalone_self_upgrade)::
       "Skipped self upgrade because we are running the desired version $(sys.cf_version)" -> { "ENT-3592" }
         if => "at_desired_version";
 
