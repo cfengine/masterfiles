@@ -26,7 +26,7 @@ bundle agent init
         "package_name" string => "$(p.name[3])";
 
     debian::
-        "package_arch" string => "amd64";
+        "package_arch" string => "$(debian_knowledge.default_arch)";
         "package_version" string => "$(p.version[1])";
     redhat::
         "package_arch" string => "x86_64";
