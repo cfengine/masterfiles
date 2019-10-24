@@ -204,7 +204,7 @@ bundle agent cfengine_software_version
 {
   classes:
       "__supported_platform"
-        or => { "redhat.!redhat_4", "centos.!centos_4", "debian", "ubuntu", "hpux", "aix" };
+        or => { "redhat.!redhat_4", "centos.!centos_4", "debian", "ubuntu", "hpux", "aix", "SUSE_11" };
 
       "__new_implementation"
         or => { "redhat", "centos", "ubuntu", "debian" };
@@ -820,7 +820,7 @@ body package_method u_generic(repo)
         package_version_equal_command => "$(sys.bindir)/rpmvercmp '$(v1)' eq '$(v2)'";
 
     (redhat|SuSE|suse|sles)::
-        package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
+        package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfengine_software_version_packages1.backup_script) -s $(cfengine_software_version_packages1.backup_file) -i $(cfengine_software_version_packages1.install_script)";
 
     redhat.!redhat_4::
         package_list_update_command => "/usr/bin/yum --quiet check-update";
