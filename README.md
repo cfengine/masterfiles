@@ -6,10 +6,7 @@
 |   3.7.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.7.x)](https://travis-ci.org/cfengine/core)  | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=3.7.x)](https://travis-ci.org/cfengine/masterfiles)    |
 
 Looking for help?
-
-[![IRC channel](https://kiwiirc.com/buttons/irc.cfengine.com/cfengine.png)](https://kiwiirc.com/client/irc.cfengine.com/#cfengine)
-
-[![Developer IRC channel](https://kiwiirc.com/buttons/irc.freenode.net/cfengine-dev.png)](https://kiwiirc.com/client/irc.cfengine.com/#cfengine-dev)
+[![Gitter chat](https://badges.gitter.im/cfengine/core.png)](https://gitter.im/cfengine/core) | [![IRC channel](https://kiwiirc.com/buttons/irc.cfengine.com/cfengine.png)](https://kiwiirc.com/client/irc.cfengine.com/#cfengine)
 
 # CFEngine 3 masterfiles
 
