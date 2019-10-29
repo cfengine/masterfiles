@@ -47,9 +47,9 @@ systemctl --version
 cd core/
 echo "Building CFEngine core"
 set +e
-git fetch --unshallow 2>&1 >> /dev/null
+git fetch --unshallow > /dev/null 2>&1
 git remote add upstream https://github.com/cfengine/core.git  \
-    && git fetch upstream 'refs/tags/*:refs/tags/*' 2>&1 >> /dev/null
+    && git fetch upstream 'refs/tags/*:refs/tags/*' > /dev/null 2>&1
 set -e
 
 ./autogen.sh --enable-debug --with-systemd-service
@@ -163,12 +163,12 @@ sleep 10
 print_ps
 
 echo "Starting cf-serverd with valgrind in background:"
-valgrind $VG_OPTS --log-file=serverd.txt /var/cfengine/bin/cf-serverd --no-fork 2>&1 > serverd_output.txt &
+valgrind $VG_OPTS --log-file=serverd.txt /var/cfengine/bin/cf-serverd --no-fork > serverd_output.txt 2>&1 &
 server_pid="$!"
 sleep 20
 
 echo "Starting cf-execd with valgrind in background:"
-valgrind $VG_OPTS --log-file=execd.txt /var/cfengine/bin/cf-execd --no-fork 2>&1 > execd_output.txt &
+valgrind $VG_OPTS --log-file=execd.txt /var/cfengine/bin/cf-execd --no-fork > execd_output.txt 2>&1 &
 exec_pid="$!"
 sleep 10
 
