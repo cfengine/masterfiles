@@ -1,6 +1,29 @@
 #!/usr/bin/env bash
 set -e
 
+wait_for_pid () {
+    # $1 -- pid to wait for
+    # $2 -- timeout in seconds
+    echo ""
+    echo "Checking if $1 is still alive:"
+    ps -p $1 || return 0
+    echo ""
+    echo -n "Waiting for $1 to terminate"
+
+    i=$2
+    while [ $i -gt 0 ] && ps -p $1 2>&1 > /dev/null ; do
+      echo -n "."
+      sleep 1s
+      i=$(($i - 1))
+    done
+    echo ""
+    if [ "$i" == 0 ] ; then
+        echo "Waited for $2 seconds - timeout"
+        return 1
+    fi
+    return 0
+}
+
 if [ -d /var/cfengine ]; then
     rm -rf /var/cfengine
 fi
@@ -193,7 +216,9 @@ echo "Killing valgrind cf-execd"
 kill $exec_pid
 echo "Killing valgrind cf-serverd"
 kill $server_pid
-sleep 40
+
+wait_for_pid $exec_pid 60
+wait_for_pid $server_pid 60
 
 echo "Output from cf-execd in valgrind:"
 cat execd.txt
