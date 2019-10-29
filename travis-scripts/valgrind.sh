@@ -6,15 +6,15 @@ wait_for_pid () {
     # $2 -- timeout in seconds
     echo ""
     echo "Checking if $1 is still alive:"
-    ps -p $1 || return 0
+    ps -p "$1" || return 0
     echo ""
     echo -n "Waiting for $1 to terminate"
 
     i=$2
-    while [ $i -gt 0 ] && ps -p $1 2>&1 > /dev/null ; do
-      echo -n "."
-      sleep 1s
-      i=$(($i - 1))
+    while [ "$i" -gt 0 ] && ps -p "$1" > /dev/null 2>&1; do
+        echo -n "."
+        sleep 1s
+        i=$(($i - 1))
     done
     echo ""
     if [ "$i" == 0 ] ; then
