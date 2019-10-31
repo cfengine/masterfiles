@@ -24,6 +24,11 @@ bundle agent config
         int => "20",
         comment => "Dump data on the feeders every 20 minutes";
 
+      # TODO: don't hard-code cftransport user
+      "transport_user" -> { "ENT-4610" } string => "cftransport";
+      "transport_home"
+        string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport";
+
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
       "enabled"
@@ -34,9 +39,6 @@ bundle agent config
       "data" data => readjson( $(path) );
       "role" string => "$(data[role])";
       "remotes" slist => getindices( @(data[remote_hubs]) );
-      "transport_user" -> { "ENT-4610" } string => "cftransport";   # TODO: don't hard-code cftransport user
-      "transport_home"
-        string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport";
       "login" string => ""; # default
       "login"
         string => "$(data[remote_hubs][$(remotes)][transport][ssh_user])@$(data[remote_hubs][$(remotes)][transport][ssh_host])",
@@ -106,6 +108,13 @@ bundle agent config
         expression => strcmp("paused", "$(data[target_state])"),
         scope => "namespace";
 
+      "am_off"
+        expression => strcmp("off", "$(data[target_state])"),
+        scope => "namespace";
+
+    !enabled::
+      "am_off" expression => "any";
+
   # Note: in order to see these debugs you must either define the default DEBUG class
   # or the namespace prefixed class like:
   # cf-agent -KI -DDEBUG
@@ -127,6 +136,8 @@ bundle agent config
       "I'm a transporter!";
     am_paused.(default:DEBUG|DEBUG_config)::
       "I'm paused so won't do any import/dump";
+    am_off.(default:DEBUG|DEBUG_config)::
+      "I'm off so will cleanup";
 }
 
 bundle agent transport_user
@@ -153,7 +164,8 @@ bundle agent transport_user
           "$(ssh_known_hosts)",
           "$(ssh_config)"
         };
-      "ssh_home_cil_file" string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport_ssh_home_t.cil";
+      "ssh_home_cil_name" string => "cftransport_ssh_home_t";
+      "ssh_home_cil_file" string => "$(cfengine_enterprise_federation:config.federation_dir)/$(ssh_home_cil_name).cil";
 
   classes:
     # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
@@ -234,6 +246,35 @@ bundle agent transport_user
       "need to fix incorrect ssh context for transport user but semodule path in $(sys.libdir)/paths.cf ($paths.semodule) does not resolve";
     selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
       "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf ($paths.restorecon) does not resolve";
+}
+
+bundle agent clean_when_off
+# @brief cleanup changes made for federated reporting on a feeder
+# NOTE: a superhub turned off by removing federation-config.json or setting
+# target_state=off will not revert schema changes.
+# federation_manage_files will always run regardless of off or not
+# so as to be prepared for enablement via Mission Portal UI
+{
+  vars:
+    "user" string => "$(cfengine_enterprise_federation:transport_user.user)";
+    "home" string => "$(cfengine_enterprise_federation:transport_user.home)"; 
+
+  users:
+    am_off::
+      "$(user)"  
+        policy => "absent";
+
+  files::
+    am_off::
+      "$(home)"
+      delete => tidy;
+
+  commands:
+    # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
+    selinux_enabled.am_off.default:_stdlib_path_exists_semodule.default:_stdlib_path_exists_restorecon::
+      # the filename becomes the name for the selinux policy (as listed by semodule -l)
+      "$(paths.semodule) -r $(cfengine_enterprise_federation:transport_user.ssh_home_cil_name)";
+
 }
 
 bundle agent inventory_refresh_cmd
@@ -527,12 +568,16 @@ bundle agent entry
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
       "config_exists"
-        expression => fileexists("$(cfengine_enterprise_federation:config.federation_dir)/cfapache/federation-config.json");
+        expression => fileexists("$(cfengine_enterprise_federation:config.federation_dir)/cfapache/federatin-config.json");
   methods:
     config_exists::
       "CFEngine Enterprise Federation Configuration"
         handle => "config",
         usebundle => config;
+    am_off::
+      "CFEngine Enterprise Federation Transport Off"
+        handle => "clean_when_off",
+        usebundle => clean_when_off;
     enabled::
       "CFEngine Enterprise Federation Transport User"
         handle => "transport_user",
