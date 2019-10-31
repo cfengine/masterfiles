@@ -1,6 +1,33 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.10.7:
+	- Added ability to avoid limiting robot agents (CFE-3161)
+	- Added and transitioned to using master_software_updates shortcut
+	  (ENT-4953)
+	- Added continual checking for policy_server state (CFE-3073)
+	- Added documentation how to enable systemd unit management and disable agents on all hosts
+	  (CFE-3416)
+	- Added package_module for snap (CFE-2811)
+	- Always set files_single_copy from augments if available (CFE-3064)
+	- Enabled systemd unit management by default (CFE-2429)
+	- Fixed agent disabling on systemd systems (CFE-2429)
+	- Fixed agent disabling on systemd systems (CFE-3416)
+	- Fixed cleanup of future timestamps from status table
+	  (ENT-4331, ENT-4992)
+	- Fixed maintenance policy for promise log cleanup to respect history_length_days
+	  (ENT-4588)
+	- Fixed pkgsrc in case where multiple Prefix paths are returned for pkg_install
+	  (CFE-3152)
+	- Fixed pkgsrc module on Solaris/NetBSD (CFE-3151)
+	- Set default access promises for directories to only share if directory exists
+	  (CFE-3060)
+	- Suppressed stderr output from lldpctl when using path defined by def.lldpctl_json
+	  (CFE-3109)
+	- lib/paths.cf: Add usermod path for redhat systems
+	- yum package_module gets updates available from online repos if local cache fails
+	  (CFE-3094)
+
 3.10.6:
 	- Add path support for setfacl
 	- Add path support for timedatectl and journalctl (CFE-3013)
