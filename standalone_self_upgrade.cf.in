@@ -204,7 +204,7 @@ bundle agent cfengine_software_version
 {
   classes:
       "__supported_platform"
-        or => { "redhat.!redhat_4", "centos.!centos_4", "debian", "ubuntu", "hpux", "aix" };
+        or => { "redhat.!redhat_4", "centos.!centos_4", "debian", "ubuntu", "hpux", "aix", "SUSE_11" };
 
       "__new_implementation"
         or => { "redhat", "centos", "ubuntu", "debian" };
@@ -633,8 +633,8 @@ bundle edit_line u_install_script
       "#!/bin/sh
 
 pkgname=`pkginfo -d $(const.dollar)1 | awk '{print $(const.dollar)2}'`
-/usr/sbin/pkgrm -n -a $(cfe_internal_update_bins.admin_file) $pkgname
-/usr/sbin/pkgadd -n -a $(cfe_internal_update_bins.admin_file) -d $(const.dollar)1 all
+/usr/sbin/pkgrm -n -a $(cfengine_software_version_packages1.admin_file) $pkgname
+/usr/sbin/pkgadd -n -a $(cfengine_software_version_packages1.admin_file) -d $(const.dollar)1 all
 $(sys.workdir)/bin/cf-execd || true
 exit 0";
 
@@ -790,9 +790,6 @@ body package_method u_generic(repo)
         package_add_command        => "/usr/bin/dpkg --force-confdef --force-confnew --install";
         package_delete_command     => "/usr/bin/dpkg --purge";
 
-    debian::
-        package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
-
     redhat|SuSE|suse|sles::
 
         package_changes => "individual";
@@ -819,8 +816,8 @@ body package_method u_generic(repo)
         package_version_less_command => "$(sys.bindir)/rpmvercmp '$(v1)' lt '$(v2)'";
         package_version_equal_command => "$(sys.bindir)/rpmvercmp '$(v1)' eq '$(v2)'";
 
-    (redhat|SuSE|suse|sles)::
-        package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
+    (redhat|SuSE|suse|sles|debian|solarisx86|solaris)::
+        package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfengine_software_version_packages1.backup_script) -s $(cfengine_software_version_packages1.backup_file) -i $(cfengine_software_version_packages1.install_script)";
 
     redhat.!redhat_4::
         package_list_update_command => "/usr/bin/yum --quiet check-update";
@@ -908,8 +905,6 @@ body package_method u_generic(repo)
       # Cfengine appends path to package and package name below, respectively
         package_add_command        => "/bin/sh $(repo)/add_scr $(repo)/admin_file";
         package_delete_command     => "/usr/sbin/pkgrm -n -a $(repo)/admin_file";
-    (solarisx86|solaris)::
-        package_update_command     => "$(sys.workdir)/bin/cf-upgrade -b $(cfe_internal_update_bins.backup_script) -s $(cfe_internal_update_bins.backup_file) -i $(cfe_internal_update_bins.install_script)";
 
     aix::
 
