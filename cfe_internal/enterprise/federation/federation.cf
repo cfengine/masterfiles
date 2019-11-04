@@ -74,6 +74,9 @@ bundle agent config
         if => strcmp( "feeder", "$(data[remote_hubs][$(remotes)][role])" );
 
   classes:
+    "am_off" expression => or("!enabled", strcmp("off", "$(data[target_state])"))
+      scope => "namespace";
+
     enabled::
 
       # Knowing if feeder or superhub is based on explicit setting of role in
@@ -107,13 +110,6 @@ bundle agent config
       "am_paused"
         expression => strcmp("paused", "$(data[target_state])"),
         scope => "namespace";
-
-      "am_off"
-        expression => strcmp("off", "$(data[target_state])"),
-        scope => "namespace";
-
-    !enabled::
-      "am_off" expression => "any";
 
   # Note: in order to see these debugs you must either define the default DEBUG class
   # or the namespace prefixed class like:
@@ -265,13 +261,12 @@ bundle agent clean_when_off
         policy => "absent";
 
   files::
-    am_off::
-      "$(home)"
+    "$(home)"
       delete => tidy;
 
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
-    selinux_enabled.am_off.default:_stdlib_path_exists_semodule.default:_stdlib_path_exists_restorecon::
+    selinux_enabled.default:_stdlib_path_exists_semodule.default:_stdlib_path_exists_restorecon::
       # the filename becomes the name for the selinux policy (as listed by semodule -l)
       "$(paths.semodule) -r $(cfengine_enterprise_federation:transport_user.ssh_home_cil_name)";
 
@@ -568,7 +563,7 @@ bundle agent entry
   classes:
     enterprise_edition.(policy_server|am_policy_hub)::
       "config_exists"
-        expression => fileexists("$(cfengine_enterprise_federation:config.federation_dir)/cfapache/federatin-config.json");
+        expression => fileexists("$(cfengine_enterprise_federation:config.federation_dir)/cfapache/federation-config.json");
   methods:
     config_exists::
       "CFEngine Enterprise Federation Configuration"
