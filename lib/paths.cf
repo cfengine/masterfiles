@@ -358,7 +358,7 @@ bundle common paths
       "path[ping]"          string => "/usr/bin/ping";
       "path[perl]"          string => "/usr/bin/perl";
       "path[printf]"        string => "/usr/bin/printf";
-      "path[restorecon]"    string => "/usr/sbin/restorecon";
+      "path[restorecon]"    string => "/sbin/restorecon";
       "path[sed]"           string => "/bin/sed";
       "path[semodule]"      string => "/usr/sbin/semodule";
       "path[sort]"          string => "/bin/sort";
