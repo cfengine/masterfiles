@@ -13,6 +13,10 @@ body server control
       # for "openssl ciphers". Default is "AES256-GCM-SHA384:AES256-SHA"
       #allowciphers          => "AES256-GCM-SHA384:AES256-SHA";
 
+      # Minimum required version of TLS. Set to "1.0" if you need clients
+      # running CFEngine in a version lower than 3.7.0 to connect.
+      #allowtlsversion => "1.1";
+
       # List of hosts that may connect (change the ACL in def.cf)
       allowconnects         => { "127.0.0.1" , "::1", @(def.acl) };
 
