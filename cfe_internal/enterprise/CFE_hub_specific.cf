@@ -548,7 +548,7 @@ bundle agent cfe_internal_clear_last_seen_hosts_logs
 
   commands:
 
-    (policy_server|am_policy_hub).enterprise_edition.active_hub::
+    (policy_server|am_policy_hub).enterprise_edition.active_hub.(cfengine_3_12|cfengine_3_13|cfengine_3_14)::
 
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3550" }
         args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks clearLastSeenHostsLogs",
