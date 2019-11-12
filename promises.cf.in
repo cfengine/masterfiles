@@ -183,10 +183,11 @@ bundle common cfe_internal_inputs
         comment => "Policy relating to CFEngine Enterprise Hub, for example
                     software updates, webserver configuration, and alerts";
 
+@if minimum_version(3.12.0)
       "input[enterprise_hub_federation]"
         string => "cfe_internal/enterprise/federation/federation.cf",
         comment => "Policy relating to CFEngine Federated Reporting";
-
+@endif
 
     enterprise_edition::
 
