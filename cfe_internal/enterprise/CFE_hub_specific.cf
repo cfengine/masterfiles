@@ -14,6 +14,7 @@
 #
 ##################################################################
 
+@if minimum_version(3.12.0)
 bundle common cfe_hub_specific_file_control
 {
   vars:
@@ -24,6 +25,7 @@ body file control
 {
         inputs => { @(cfe_hub_specific_file_control.inputs) };
 }
+@endif
 
 bundle common cfe_internal_hub_vars
 # @brief Set hub specific variables
@@ -499,8 +501,11 @@ bundle agent cfe_internal_refresh_inventory_view
       "tags" slist => { "enterprise_maintenance" };
 
   methods:
+@if minimum_version(3.12.0)
       # we need to know if we are running on a superhub
       "superhub_config" usebundle => "cfengine_enterprise_federation:config";
+@endif
+
       "inventory_refresh_args" usebundle => "cfe_internal_refresh_inventory_args";
 
   commands:
