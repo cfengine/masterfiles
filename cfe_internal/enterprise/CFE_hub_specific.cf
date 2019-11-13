@@ -14,7 +14,7 @@
 #
 ##################################################################
 
-@if minimum_version(3.12.0)
+@if minimum_version(3.12)
 bundle common cfe_hub_specific_file_control
 {
   vars:
@@ -564,7 +564,7 @@ bundle agent cfe_internal_refresh_inventory_view
       "tags" slist => { "enterprise_maintenance" };
 
   methods:
-@if minimum_version(3.12.0)
+@if minimum_version(3.12)
       # we need to know if we are running on a superhub
       "superhub_config" usebundle => "cfengine_enterprise_federation:config";
 @endif
