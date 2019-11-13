@@ -205,6 +205,13 @@ bundle agent cfe_internal_setup_knowledge
         comment => "The agent will complain if any other users (group or other)
                     have write access to the modules directory.";
 
+      "/opt/cfengine/notification_scripts/." -> { "ENT-5070" }
+        create => "true",
+        perms => mog("770", "root", $(def.cf_apache_group) ),
+        comment => "If this directory is not present and writable by the
+                    web-server, then Mission Portal users will be unable to
+                    upload custom action scripts.";
+
 }
 
 bundle agent cfe_internal_permissions
