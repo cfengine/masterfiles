@@ -53,7 +53,16 @@ ts="$(date -Iseconds)"  # ISO 8601 format that doesn't have spaces in it
 in_progress_file="$CFE_FR_DUMP_DIR/$CFE_FR_FEEDER_$ts.sql.$CFE_FR_COMPRESSOR_EXT.dumping"
 
 log "Dumping tables: $CFE_FR_TABLES"
-"$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb | sed_filters | awk_filters |
+{
+  "$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb
+
+  # in case of 3.12 must copy m_inventory as if it was __inventory
+  if [[ "$CFE_VERSION" =~ "3.12." ]]; then
+    "$CFE_BIN_DIR"/psql cfdb -c "COPY (SELECT * FROM m_inventory) TO STDOUT CSV QUOTE '''' FORCE QUOTE *" |
+      sed -e 's.^.INSERT INTO __inventory (hostkey, values) VALUES (.' \
+          -e 's.$.);.'
+  fi
+} | sed_filters | awk_filters |
   "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS > "$in_progress_file" || failed=1
 
 if [ "$failed" != "0" ]; then
