@@ -1,6 +1,61 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.3:
+	- Added AIX support to body perms system_owned (ENT-4773)
+	- Added ability to avoid limiting robot agents (CFE-3161)
+	- Added and transitioned to using master_software_updates shortcut
+	  (ENT-4953)
+	- Added continual checking for policy_server state (CFE-3073)
+	- Added documentation how to enable systemd unit management and disable
+	  agents on all hosts (CFE-3416)
+	- Added package_module for snap (CFE-2811)
+	- Added scripts and templates for Federated Reporting (ENT-4473)
+	- Added support for 'awk' filters in the FR dump-import process (ENT-4839)
+	- Added support for configuring abortclasses and abortbundleclasses via
+	  augments (ENT-4823)
+	- Added support for filtering in both dump and import phases of the FR
+	  ETL process (ENT-4839)
+	- Added support for ordering FR awk and sed scripts (ENT-4839)
+	- Added support for setting periodic package inventory refresh interval
+	  via augments (CFE-2771)
+	- Always set files_single_copy from augments if available (CFE-3064)
+	- Changed FR policy to honor target_state properly (ENT-4874)
+	- Copy .awk and .sed files from masterfiles to inputs (ENT-4839)
+	- Do not run DB maintenance tasks on a passive HA hub (ENT-4706)
+	- Fixed agent disabling on systemd systems (CFE-2429, CFE-3416)
+	- Fixed cleanup of future timestamps from status table (ENT-4331,
+	  ENT-4992)
+	- Fixed pkgsrc in case where multiple Prefix paths are returned for
+	  pkg_install (CFE-3153)
+	- Fixed pkgsrc module on Solaris/NetBSD (CFE-3151)
+	- Fixed re-spawning of cf-execd or cf-monitord after remediating
+	  duplicate concurrent processes (CFE-3150)
+	- Fixed state ownership on aix (ENT-4773)
+	- Fixed synchronization of important configuration files from active to
+	  passive hub (ENT-4944)
+	- Fixed the CFEngine 3.7.x class guard in standalone_self_upgrade.cf
+	  (CFE-3182)
+	- Made keys of all types from feeder hubs trusted on a superhub
+	  (ENT-4917)
+	- Set default access promises for directories to only share if directory
+	  exists (CFE-3060)
+	- Speeded-up FR import process by merging INSERT INTO statements
+	  (ENT-4839)
+	- Suppressed stderr output from lldpctl when using path defined by
+	  def.lldpctl_json (CFE-3109)
+	- added SQL to update feeder update timestamp during import (ENT-4776)
+	- added ssh_home_t type to cftransport .ssh dir (ENT-4906)
+	- fix use of _stdlib_path_exists_<command> in FR transport_user policy
+	  bundle (ENT-4906)
+	- lib/paths.cf: Add usermod path for redhat systems
+	- modules/packages/zypper.in: Moved zypper package module errors to the
+	  cf-agent output (CFE-3154)
+	- partitioned __inventory table for federated reporting (ENT-4842)
+	- psql_wrapper needed full path to psql binary (ENT-4912)
+	- yum package_module gets updates available from online repos if local
+	  cache fails (CFE-3094)
+
 3.12.2:
 	- Fixed isvariable() syntax error in update_def.cf (CFE-2953)
 	- Fixed maintenance policy for promise log cleanup to respect history_length_days (ENT-4588)
