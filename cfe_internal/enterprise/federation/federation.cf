@@ -253,6 +253,7 @@ bundle agent federation_manage_files
     "login" data => parsejson('{"login":"$(cfengine_enterprise_federation:config.login)"}');
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
     "feeder" data => parsejson('{"feeder": "$(sys.key_digest)"}');
+    "cf_version" data => parsejson('{"cf_version":"$(sys.cf_version)"}');
 
   methods:
       "internal_vars" usebundle => "default:cfe_internal_hub_vars",
@@ -307,7 +308,7 @@ bundle agent federation_manage_files
         create => "true",
         template_method => "mustache",
         edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
-        template_data => mergedata(@(login), @(feeder_username), @(feeder),
+        template_data => mergedata(@(login), @(feeder_username), @(feeder), @(cf_version),
                                    @(cfengine_enterprise_federation:inventory_refresh_cmd.cmd)),
         perms => default:mog( "640", "root", "$(transport_user)" );
 
