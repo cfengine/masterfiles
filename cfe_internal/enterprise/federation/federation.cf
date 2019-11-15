@@ -129,6 +129,44 @@ bundle agent config
       "I'm paused so won't do any import/dump";
 }
 
+bundle agent semanage_installed
+# @brief Install semanage utility if selinux enabled and
+# cfengine_mp_fr_dependencies_auto_install class is defined
+# if not defined then only warn
+{
+  vars:
+    "semanage_action"
+      string => ifelse( "default:_stdlib_path_exists_semanage", "fix", "default:cfengine_mp_fr_dependencies_auto_install", "fix", "warn" ),
+      comment => "We only want to use semanage if it's available, or if we have
+                  indicated it's ok to install it automatically. This variable
+                  is subsequently used by a commands and packages promises to
+                  warn or fix based.";
+    debian_6|debian_7|debian_8|ubuntu_12|ubuntu_14|ubuntu_16|rhel_5::
+      "semanage_package" string => "policycoreutils";
+    debian_9|debian_10|ubuntu_18|redhat_8|centos_8::
+      "semanage_package" string => "policycoreutils-python-utils";
+    redhat_6|centos_6|redhat_7|centos_7::
+      "semanage_package" string => "policycoreutils-python";
+
+  packages:
+    debian|ubuntu::
+      "$(semanage_package)"
+        policy => "present",
+        package_module => default:apt_get,
+        action => default:policy ( $(semanage_action) );
+    redhat::
+      "$(semanage_package)"
+        policy => "present",
+        package_module => default:yum,
+        action => default:policy ( $(semanage_action) );
+
+  reports:
+    default:DEBUG|DEBUG_semanage_installed::
+      "paths.semanage = $(paths.semanage)";
+    !default:_stdlib_path_exists_semanage.!default:cfengine_mp_fr_dependencies_auto_install::
+      "semanage command is not available at $(paths.semanage). Will only install needed package if cfengine_mp_fr_dependencies_auto_install class is defined in augments(def.json) or with --define cf-agent option.";
+}
+
 bundle agent transport_user
 # @brief Manage transport user and permissions for remote SSH access
 {
@@ -153,7 +191,6 @@ bundle agent transport_user
           "$(ssh_known_hosts)",
           "$(ssh_config)"
         };
-      "ssh_home_cil_file" string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport_ssh_home_t.cil";
 
   classes:
     # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
@@ -208,18 +245,14 @@ bundle agent transport_user
       handle => "ssh_config_configured",
       edit_line => default:insert_lines("IdentityFile $(ssh_priv_key)");
 
-    selinux_enabled.incorrect_ssh_context::
-      "$(ssh_home_cil_file)"
-        create => "true",
-        edit_defaults => default:empty,
-        edit_line => default:insert_lines('(filecon "$(home)/.ssh" any (system_u object_r ssh_home_t ((s0)(s0))))');
+  methods:
+    "semanage_installed" usebundle => semanage_installed;
 
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
-    selinux_enabled.incorrect_ssh_context.default:_stdlib_path_exists_semodule.default:_stdlib_path_exists_restorecon::
-      # the filename becomes the name for the selinux policy (as listed by semodule -l)
-      "$(paths.semodule) -i $(ssh_home_cil_file)";
-      "$(paths.restorecon) -R -F  $(home)/.ssh/";
+    selinux_enabled.incorrect_ssh_context.default:_stdlib_path_exists_semanage.default:_stdlib_path_exists_restorecon.selinux_makefile_present::
+      "$(paths.semanage) fcontext -a -t ssh_home_t '$(home)/.ssh(/.*)?'";
+      "$(paths.restorecon) -R -F $(home)/.ssh/";
 
     any::
       # Generate ssh keypair
@@ -230,8 +263,8 @@ bundle agent transport_user
                    not( fileexists( "$(ssh_priv_key)" )));
 
   reports:
-    selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_semodule::
-      "need to fix incorrect ssh context for transport user but semodule path in $(sys.libdir)/paths.cf ($paths.semodule) does not resolve";
+    selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_semanage::
+      "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf ($paths.semanage) does not resolve";
     selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
       "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf ($paths.restorecon) does not resolve";
 }
