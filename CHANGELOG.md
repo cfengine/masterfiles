@@ -2,6 +2,7 @@
 Notable changes to the framework should be documented here
 
 3.12.3:
+	- Extended watchdog for AIX (ENT-4995)
 	- Added AIX support to body perms system_owned (ENT-4773)
 	- Added ability to avoid limiting robot agents (CFE-3161)
 	- Added and transitioned to using master_software_updates shortcut
