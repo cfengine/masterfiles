@@ -1,8 +1,313 @@
 #!/usr/bin/sh
 
-# If cf-execd is present and executable, and there is no cf-execd process running, then launch it.
+# Watchdog events are logged here.
+PIDFILE="/var/cfengine/watchdog.pid"
+trap cleanup SIGHUP SIGINT SIGQUIT SIGABRT SIGTERM
+cleanup()
+{
+    # Don't leave behind junk if the script is killed
+    if [ -d "${COLLECTION_DIR}" ]; then
+        rm -rf "${COLLECTION_DIR}"
+    fi
+}
 
-[ -x {{{vars.sys.cf_execd}}} ] && if ! ( ps -ef | grep -q {{{vars.sys.bindir}}}/[c]f-execd ); then
-  {{{vars.sys.cf_execd}}}
+all_cfengine_daemons_running()
+{
+    /etc/rc.d/init.d/cfengine3 restart > ${COLLECTION_DIR}/etc_rc_d_init_d_cfengine3_restart.$(date +%s).log 2>&1
+
+    sleep 3
+
+    # Log if any expected daemon is not running
+    if [ $(ps -ef -o args | grep -c ^\/var\/cfengine\/bin\/[c]f-execd) -lt 1 ]; then
+        echo "- *cf-execd is not running after service restart*" >> ${COLLECTION_REPORT}
+        echo "$(date) cf-execd is not running after service restart" | tee -a ${LOGFILE}
+    fi
+    if [ $(ps -ef -o args | grep -c ^\/var\/cfengine\/bin\/[c]f-serverd) -lt 1 ]; then
+        echo "- *cf-serverd is not running after service restart*" >> ${COLLECTION_REPORT}
+        echo "$(date) cf-serverd is not running after service restart" | tee -a ${LOGFILE}
+    fi
+    if [ $(ps -ef -o args | grep -c ^\/var\/cfengine\/bin\/[c]f-monitord) -lt 1 ]; then
+        echo "- *cf-monitord is not running after service restart*" >> ${COLLECTION_REPORT}
+        echo "$(date) cf-monitord is not running after service restart" | tee -a ${LOGFILE}
+    fi
+
+    if [ $(ps -ef -o args | grep -c ^\/var\/cfengine\/bin\/[c]f-) -lt 1 ]; then
+        echo "- *No cf- processes running after service restart*" >> ${COLLECTION_REPORT}
+        echo "$(date) No cf- processes running after service restart" | tee -a ${LOGFILE}
+    fi
+
+    for each in execd serverd monitord; do
+        if [ $(ps -ef -o args | grep -c ^\/var\/cfengine\/bin\/[c]f-${each}) -lt 1 ]; then
+            /etc/rc.d/init.d/cfengine3 stop > ${COLLECTION_DIR}/etc_rc_d_init_d_cfengine3_stop.$(date +%s).log 2>&1
+            return 1
+        fi
+    done
+
+    return 0
+}
+
+LOGFILE="/var/cfengine/watchdog.log"
+echo "$(date) Initiating watchdog $$" >> ${LOGFILE}
+
+if [ -s $PIDFILE ]; then
+    ps -p $(cat $PIDFILE) > /dev/null 2>&1
+    _ret=$?
+    if [ "${_ret}" -eq 0 ] ; then
+        echo "$(date) Aborting execution of watchdog $$, existing watchdog process $(cat $PIDFILE) running" >> ${LOGFILE}
+        exit 1
+    else
+        # No current process matching pid in file
+        echo $$ > $PIDFILE
+    fi
+else
+    echo $$ > $PIDFILE
 fi
 
+
+
+TMPDIR="/tmp"
+mkdir -p $TMPDIR
+CFENGINE_WORKDIR="/var/cfengine"
+CFENGINE_WORKDIR_COLLECTION=""
+OUTPUTS_DIR="${CFENGINE_WORKDIR}/outputs"
+ARCHIVE_DIR="/var/cfengine/watchdog-archives"
+mkdir -p "${ARCHIVE_DIR}"
+PATHOLOGY_COUNT=0
+PATHOLOGY_THRESHOLD=0
+
+# Collection Dir
+# - We create a directory in order to collect artifacts about our observations
+# - If there are enough pathology indicators found to warrant a report, the
+#   directory will be packaged for sending
+# Portable mktemp: https://stackoverflow.com/questions/10224921/how-to-create-a-temporary-file-with-portable-shell-in-a-secure-way#comment86787877_10235393
+# Adjusted, known to work on aix 7.1.0.0
+if [ -r "/dev/urandom" ]; then
+    RNDM="/dev/urandom"
+else
+    RNDM="/dev/random"
+fi
+length=7; safetemp=$(od -An -N${length} -tx1 ${RNDM} | tr -d ' \t').cfengine-watchdog
+COLLECTION_DIR="${TMPDIR}/${safetemp}"
+mkdir -p "${COLLECTION_DIR}"
+COLLECTION_REPORT="${COLLECTION_DIR}/README.org"
+echo "#+Title: CFEngine Watchdog Engineering Summary [$(date '+%Y-%m-%d %a')]" >> ${COLLECTION_REPORT}
+echo "* Pathologies" >> ${COLLECTION_REPORT}
+
+ARCHIVE_DIR_FREEk=$(df -k ${ARCHIVE_DIR} | tail -n 1 | awk '{print $3}')
+if [ "${ARCHIVE_DIR_FREEk}" -lt 500000 ]; then
+    echo "$(date) ${ARCHIVE_DIR} has less than 500MB free space, initiating watchdog archive cleanup" | tee -a ${LOGFILE}
+    # Archive dir has less than 500MB, cleanup leaving oldest and newest archives
+    files=$(ls ${ARCHIVE_DIR})
+    count=$(echo $files | wc -w)
+    _counter=0
+    for i in $files; do
+        if [ "${_counter}" -eq 0 ]; then
+            echo "Not deleting $i it's the oldest and may contain valuable information about the first event"
+        elif [ "${_counter}" -eq "$(( $count - 1))" ]; then
+            echo "Not deleting $i it's the most recent"
+        else
+            echo "Delete $i"
+            rm "${ARCHIVE_DIR}/$i"
+        fi
+        _counter=$((1 + ${_counter}))
+    done
+    ARCHIVE_DIR_FREEk=$(df -k ${ARCHIVE_DIR} | tail -n 1 | awk '{print $3}')
+    if [ "${ARCHIVE_DIR_FREEk}" -lt 500000 ]; then
+        echo "$(date) ${ARCHIVE_DIR} still has less than 500MB free space after cleaning up archives." | tee -a ${LOGFILE}
+        echo "$(date) Aborting watchdog $$" | tee -a ${LOGFILE}
+        cleanup
+        exit 1
+    fi
+fi
+
+# We check free space in tmp second (in case tmp is on same filesystem as archives, and archives get cleaned up)
+TMPDIR_FREEk=$(df -k ${TMPDIR} | tail -n 1 | awk '{print $3}')
+if [ "${TMPDIR_FREEk}" -lt 500000 ]; then
+    echo "$(date) ${TMPDIR} has less than 500MB free space" | tee -a ${LOGFILE}
+    echo "$(date) Aborting watchdog $$" | tee -a ${LOGFILE}
+    cleanup
+    exit 1
+fi
+
+
+# Pathology #1: cf-execd is not running.
+# While not strictly a pathology, it is non-standard to run cf-agent without cf-execd.
+ps -ef -o args | grep ^\/var\/cfengine\/bin\/[c]f-execd > "${COLLECTION_DIR}/ps_grep_cf-execd.txt"
+_COUNT_CF_EXECD_PROCS="$(cat ${COLLECTION_DIR}/ps_grep_cf-execd.txt | wc -l)"
+if [ "${_COUNT_CF_EXECD_PROCS}" -lt "1" ]; then
+    echo "$(date) Found cf-execd not running" >> ${LOGFILE}
+    echo "- cf-execd not running" >> ${COLLECTION_REPORT}
+    PATHOLOGY_COUNT=$((${PATHOLOGY_COUNT}+1))
+fi
+
+# Pathology #1.5: More than one cf-execd is running.
+if [ "${_COUNT_CF_EXECD_PROCS}" -gt "1" ]; then
+    echo "$(date) Found ${_COUNT_CF_EXECD_PROCS} cf-execd processes running" >> ${LOGFILE}
+    echo "- Found ${_COUNT_CF_EXECD_PROCS} cf-execd running" >> ${COLLECTION_REPORT}
+    PATHOLOGY_COUNT=$((${PATHOLOGY_COUNT}+1))
+fi
+
+# Pathology #2: cf-agent execution times exceed body executor control agent_expireafter
+# cf-agent processes launched by cf-execd have not communicated back to cf-execd
+# within $(agent_expireafter). This may be OK, but may also indicate that
+# cf-agent is hung.
+# Outputs could be empty because:
+# - cf-execd hasn't executed cf-agent since purging outputs
+# - cf-agent is not producing output (the expected normal state)
+if [ "$(ls -A ${OUTPUTS_DIR})" ]; then
+    observation=$(find "${OUTPUTS_DIR}" ! -name previous | xargs grep "cf-execd: timeout waiting for output from agent")
+    if [ -n "$observation" ]; then
+        count=$(expr 0 + $(echo -n "${observation}" | wc -l))
+        echo "$(date) Found ${count} occurrences of cf-execd terminating unresponsive cf-agent" >> ${LOGFILE}
+        echo "- ${count} cf-agent terminations" >> ${COLLECTION_REPORT}
+        PATHOLOGY_COUNT=$((${PATHOLOGY_COUNT}+1))
+    fi
+fi
+
+# Pathology #3: cf-agent process(s) running longer than expected
+# While not strictly a pathology, this may indicate a hung agent
+# On AIX, etime (and etimes) is displayed in human readable form
+# e.g:
+#    USER      PID     ELAPSED COMMAND
+#    root 10551366  5-00:35:58 /var/cfengine/bin/cf-agent
+# We have to convert that into seconds so that we can determine if it's been
+# running longer than we expect, that's what the second awk command is for.
+observation=$(ps -e -o user,pid,etime,args | awk 'FNR == 1 {next} /\/var\/cfengine\/bin\/cf-agent/ {print $3}' | awk 'BEGIN { FS = ":" } \
+{
+  if (NF == 2) {
+    etimes = $1*60 + $2
+  } else if (NF == 3) {
+    split($1, a, "-");
+    if (a[2] != "" ) {
+      etimes = ((a[1]*24+a[2])*60 + $2) * 60 + $3;
+    } else {
+      etimes = ($1*60 + $2) * 60 + $3;
+    }
+  }
+ if (etimes > 300) {
+   print
+}
+}')
+if [ ${#observation} -gt 0 ]; then
+    count=$(expr 1 + $(echo -n "${observation}" | wc -l))
+    echo "$(date) Found ${count} cf-agent processes running longer than 300s" >> ${LOGFILE}
+    echo "- ${count} cf-agent processes running longer than 300s" >> ${COLLECTION_REPORT}
+    PATHOLOGY_COUNT=$((${PATHOLOGY_COUNT}+1))
+fi
+
+# Pathology #4: High number of concurrent cf-agent processes
+# While cf-agent is designed to be able to run concurrently, having many
+# concurrent cf-agent processes may indicate an an issue like an agent pile up
+observation=$(ps -e -o pid,etime,args | awk '/\/var\/cfengine\/bin\/cf-agent/ {print}')
+if [ ${#observation} -gt 0 ]; then
+    count=$(expr 1 + $(echo -n "${observation}" | wc -l))
+    if [ ${count} -gt 3 ]; then
+      echo "$(date) Found ${count} concurrently running agents" >> ${LOGFILE}
+      echo "- ${count} concurrently running cf-agent processes" >> ${COLLECTION_REPORT}
+      PATHOLOGY_COUNT=$((${PATHOLOGY_COUNT}+1))
+    fi
+fi
+
+# Pathology #5: cf-check has encountered a critical issue
+# This indicates that there are one or more integrity issues
+if [ -x /var/cfengine/bin/cf-check ]; then
+    observation=$(/var/cfengine/bin/cf-check diagnose /var/cfengine/state/*.lmdb)
+    if [ $? -ne 0 ]; then
+      echo "$(date) cf-check observed critical integrity issues" >> ${LOGFILE}
+      echo "- cf-check observed critical integrity issues" >> ${COLLECTION_REPORT}
+      echo "  #+begin_example\n${observation}\n#+end_example" >> ${COLLECTION_REPORT}
+    fi
+fi
+
+if [ "${PATHOLOGY_COUNT}" -gt "${PATHOLOGY_THRESHOLD}" ]; then
+
+    echo "$(date) Found ${PATHOLOGY_COUNT} symptoms, threshold (${PATHOLOGY_THRESHOLD}) breached." | tee -a ${LOGFILE}
+    echo "* Observations" >> ${COLLECTION_REPORT}
+
+    ps auxwww > "${COLLECTION_DIR}/ps_auxwww.txt"
+    echo "- [[./ps_auxwww.txt][~ps auxwww~]]" >> ${COLLECTION_REPORT}
+
+    ps -elf > "${COLLECTION_DIR}/ps_-elf.txt"
+    echo "- [[./ps_-elf.txt][~ps -elf~]]" >> ${COLLECTION_REPORT}
+
+    find "${CFENGINE_WORKDIR}" >> "${COLLECTION_DIR}/find__var_cfengine.txt"
+    echo "- [[./find__var_cfengine.txt][=/var/cfengine= file list]] - Before remediation" >> ${COLLECTION_REPORT}
+
+    tar -c -f "${COLLECTION_DIR}/sys.workdir-before-remediation.tar" -C "${CFENGINE_WORKDIR}" state outputs
+    echo "- [[./sys.workdir-before-remediation.tar][=sys.workdir-before-remediation.tar=]] - CFEngine WORKDIR artifacts before remediation" >> ${COLLECTION_REPORT}
+
+    ps -efl | grep cf- > "${COLLECTION_DIR}/cf-procs.txt"
+    echo "- [[./cf-procs.txt][~ps -efl | grep cf-~]]" >> ${COLLECTION_REPORT}
+
+    echo "$(date) Initiating apoptosis" | tee -a ${LOGFILE}
+    while IFS= read -r proc; do
+        _PID=$(echo $proc | awk '{print $4}')
+        _PROC=$(echo $proc | awk '{print $15}')
+        _PROCFILE=$(echo "$_PROC" | sed 's./._.g')
+        _COREFILE=$(printf "%s_%s.core" "$_PID" "$_PROCFILE")
+        _COREPATH=$(printf "%s/%s" "${COLLECTION_DIR}" "$_COREFILE")
+        _DBX_ERR_LOG=$(printf "%s/%s.dbx.err" "${COLLECTION_DIR}" "$_COREFILE")
+
+        gencore "$_PID" "$_COREPATH" > "${COLLECTION_DIR}/gencore-$_PID.output" 2>&1
+        echo "- [[./gencore-$_PID.output][output from gencore $_PID $_COREPATH]]" >> ${COLLECTION_REPORT}
+        echo "- [[./$_COREFILE][core from $_PID]]" >> ${COLLECTION_REPORT}
+
+        observation=$(echo "where" | dbx "$_PROC" "$_COREPATH" 2> "$_DBX_ERR_LOG")
+        echo "  - backtrace:" >> ${COLLECTION_REPORT}
+        echo "    #+begin_example\n${observation}\n#+end_example" >> ${COLLECTION_REPORT}
+        echo "  - dbx stderr: [[./$(basename $_DBX_ERR_LOG)][dbx $_PROC $_COREPATH]]" >> ${COLLECTION_REPORT}
+        kill -s SIGKILL "$_PID" > "${COLLECTION_DIR}/kill_$_PID.txt" 2>&1
+        echo "  - [[./kill_$_PID.txt][~kill -s SIGKILL $_PID~]]" >> ${COLLECTION_REPORT}
+
+    done < "${COLLECTION_DIR}/cf-procs.txt"
+
+    echo "- Purged outputs (don't want them to trigger pathology remediation more than once)" >> ${COLLECTION_REPORT}
+    for each in $(ls -A "${CFENGINE_WORKDIR}/outputs/"); do
+        rm "${CFENGINE_WORKDIR}/outputs/${each}"
+    done
+
+    # Switch to more intelligent cf-check repair in 3.12.3
+    echo "- Purged LMDBs" >> ${COLLECTION_REPORT}
+    for each in ${CFENGINE_WORKDIR}/state/*.lmdb*; do
+        rm "${each}"
+    done
+
+    tar -c -f "${COLLECTION_DIR}/sys.workdir-after-remediation.tar" -C "${CFENGINE_WORKDIR}" state outputs
+    echo "- [[./sys.workdir-after-remediation.tar][=sys.workdir-after-remediation.tar=]] - CFEngine WORKDIR artifacts after remediation" >> ${COLLECTION_REPORT}
+
+####+begin_critical
+    # We will re-try up to 10 times to get all the daemons running
+    echo "$(date) Initiating anastasis" | tee -a ${LOGFILE}
+    for try in 1 2 3 4 5 6 7 8 9 10; do
+        echo "- Anastasis [[./remediation-re-start-try-${try}.log][try ${try}]]" >> ${COLLECTION_REPORT}
+        if all_cfengine_daemons_running > "${COLLECTION_DIR}/remediation-re-start-try-${try}.log"; then break; fi
+        if [ "${try}" -ne 10 ]; then
+            echo "Attempt $((1 + ${try})) of 10 in 10 seconds ..." >> ${LOGFILE}
+            sleep 10
+        else
+            echo "$(date) Failed to bring all services online after 10 retries, giving up" | tee -a ${LOGFILE}
+            echo "- Failed to bring all services online after 10 retries, giving up" >> ${COLLECTION_REPORT}
+        fi
+    done
+####+end_critical
+
+
+    tar -c -f "${COLLECTION_DIR}/sys.workdir-after-restarting.tar" -C "${CFENGINE_WORKDIR}" state outputs
+    echo "- [[./sys.workdir-after-restarting.tar][=sys.workdir-after-restarting.tar=]] - CFEngine WORKDIR artifacts after restarting" >> ${COLLECTION_REPORT}
+
+    cp $0 ${COLLECTION_DIR}/watchdog
+    echo "- [[./watchdog][=watchdog=]] - The watchdog that generated this report" >> ${COLLECTION_REPORT}
+
+    # Package the artifacts together
+    tar -c -f "${COLLECTION_DIR}.tar" -C "${COLLECTION_DIR}" .
+    gzip "${COLLECTION_DIR}.tar"
+    mv "${COLLECTION_DIR}.tar.gz" "${ARCHIVE_DIR}/$(date +%Y-%m-%d_%s).tar.gz"
+    echo "$(date) Collected artifacts stored in ${ARCHIVE_DIR}/$(date +%Y-%m-%d_%s).tar.gz" | tee -a ${LOGFILE}
+elif [ "${PATHOLOGY_COUNT}" -gt 0 ]; then
+    echo "$(date) Found ${PATHOLOGY_COUNT} symptoms, threshold (${PATHOLOGY_THRESHOLD}) not breached." | tee -a ${LOGFILE}
+else
+    echo "$(date) Found ${PATHOLOGY_COUNT} symptoms, threshold (${PATHOLOGY_THRESHOLD}) not breached, no remediation or collection performed" >> ${LOGFILE}
+fi
+echo "$(date) DONE watchdog $$" >> ${LOGFILE}
+
+cleanup
