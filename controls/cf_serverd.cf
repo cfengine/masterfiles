@@ -158,16 +158,34 @@ bundle server access_rules()
       if => isdir( "$(sys.workdir)/ppkeys/" ),
       admit => { @(def.policy_servers) };
 
-      # Allow slave hub to synchronize cf_robot and appsettings content.
+      # Allow slave hub to synchronize cf_robot and appsettings, application
+      # config config, ldap config settings, and ldap api config settings.
       # Files are containing configuration that must be the same on all hubs.
       "$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php"
       handle => "server_access_grant_access_cf_robot",
       comment => "Grant access to cf_robot file for HA hubs",
       admit => { @(def.policy_servers) };
 
-      "$(sys.workdir)/share/GUI/application/config/appsettings.php"
+      "$(sys.workdir)/httpd/htdocs/application/config/appsettings.php"
       handle => "server_access_grant_access_appsettings",
       comment => "Grant access to appsettings for HA hubs",
+      admit => { @(def.policy_servers) };
+
+      "$(sys.workdir)/httpd/htdocs/application/config/config.php" -> { "ENT-4944" }
+      handle => "server_access_grant_access_application_config_config_php",
+      comment => "Grant access to application config for HA hubs",
+      admit => { @(def.policy_servers) };
+
+
+      "$(sys.workdir)/httpd/htdocs/ldap/config/settings.php" -> { "ENT-4944" }
+      handle => "server_access_grant_access_ldap_config_settings_php",
+      comment => "Grant access to ldap config settings for HA hubs",
+      admit => { @(def.policy_servers) };
+
+
+      "$(sys.workdir)/httpd/htdocs/api/config/config.php" -> { "ENT-4944" }
+      handle => "server_access_grant_access_api_config_settings_php",
+      comment => "Grant access to LDAP api config for HA hubs",
       admit => { @(def.policy_servers) };
 
       # Allow access to notification_scripts directory so passive hub
