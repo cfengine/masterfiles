@@ -362,7 +362,7 @@ bundle common paths
       "path[printf]"        string => "/usr/bin/printf";
       "path[restorecon]"    string => "/sbin/restorecon";
       "path[sed]"           string => "/bin/sed";
-      "path[semodule]"      string => "/usr/sbin/semodule";
+      "path[semanage]"      string => "/usr/sbin/semanage";
       "path[sort]"          string => "/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
@@ -457,7 +457,7 @@ bundle common paths
       "path[printf]"        string => "/usr/bin/printf";
       "path[restorecon]"    string => "/sbin/restorecon";
       "path[sed]"           string => "/bin/sed";
-      "path[semodule]"      string => "/usr/sbin/semodule";
+      "path[semanage]"      string => "/usr/sbin/semanage";
       "path[sort]"          string => "/usr/bin/sort";
       "path[test]"          string => "/usr/bin/test";
       "path[tr]"            string => "/usr/bin/tr";
