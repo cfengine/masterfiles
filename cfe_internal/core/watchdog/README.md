@@ -1,4 +1,4 @@
-The watchdog implements a process external to CFEngine which is responsible for identifying symptoms of pathology that result in CFEngine degrading into an inoperable non-recoverable state. 
+The watchdog implements a process external to CFEngine which is responsible for identifying symptoms of pathology that result in CFEngine degrading into an inoperable non-recoverable state.
 
 ## cron.d Watchdog
 
@@ -30,4 +30,3 @@ The following conditions are included in the watchdog checks:
 - `cf-check` does not observe any critical integrity issues in embedded databases
 
 If the pathology threshold (default 0) is breached the watchdog collects observations about the environment into an archive which is intended for submission to CFEngine Support. After the archive has been prepared the watchdog terminates all CFEngine processes, purges outputs (`$(sys.workdir)/outputs/*`), local databases (`$(sys.statedir)/*.lmdb*`), and then the watchdog will try to re-start the CFEngine processes. The agent will try up to 10 times, with a delay of 10 seconds between each attempt to ensure that `cf-execd`, `cf-serverd`, and `cf-monitord` are all running.
- 
