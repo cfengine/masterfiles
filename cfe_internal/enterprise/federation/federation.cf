@@ -24,19 +24,31 @@ bundle agent config
         int => "20",
         comment => "Dump data on the feeders every 20 minutes";
 
-  classes:
-    enterprise_edition.(policy_server|am_policy_hub)::
-      "enabled"
-        expression => fileexists( $(path) ),
-        scope => "namespace";
-  vars:
-    enabled::
-      "data" data => readjson( $(path) );
-      "role" string => "$(data[role])";
-      "remotes" slist => getindices( @(data[remote_hubs]) );
-      "transport_user" -> { "ENT-4610" } string => "cftransport";   # TODO: don't hard-code cftransport user
+      # TODO: don't hard-code cftransport user
+      "transport_user" -> { "ENT-4610" } string => "cftransport";
       "transport_home"
         string => "$(cfengine_enterprise_federation:config.federation_dir)/cftransport";
+
+    config_present::
+      "data" data => readjson( $(path) );
+
+  classes:
+    enterprise_edition.(policy_server|am_policy_hub)::
+      "config_present"
+        expression => fileexists( $(path) );
+    config_present::
+      "enabled" expression => or(strcmp("on", "$(data[target_state])"),
+                                 strcmp("paused", "$(data[target_state])")),
+        scope => "namespace";
+      "am_off" expression => strcmp("off", "$(data[target_state])"),
+        scope => "namespace";
+      "am_on" expression => strcmp("on", "$(data[target_state])"),
+        scope => "namespace";
+
+  vars:
+    enabled::
+      "role" string => "$(data[role])";
+      "remotes" slist => getindices( @(data[remote_hubs]) );
       "login" string => ""; # default
       "login"
         string => "$(data[remote_hubs][$(remotes)][transport][ssh_user])@$(data[remote_hubs][$(remotes)][transport][ssh_host])",
@@ -267,6 +279,31 @@ bundle agent transport_user
       "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf ($paths.semanage) does not resolve";
     selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
       "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf ($paths.restorecon) does not resolve";
+}
+
+bundle agent clean_when_off
+# @brief cleanup changes made for federated reporting on a feeder
+# NOTE: a superhub turned off by removing federation-config.json or setting
+# target_state=off will not revert schema changes.
+# federation_manage_files will always run regardless of off or not
+# so as to be prepared for enablement via Mission Portal UI
+{
+  vars:
+    "user" string => "$(cfengine_enterprise_federation:transport_user.user)";
+    "home" string => "$(cfengine_enterprise_federation:transport_user.home)";
+
+  users:
+    "$(user)"
+      policy => "absent";
+
+  methods:
+    "rm_rf_cftransport_home_dir" usebundle => default:rm_rf("$(home)");
+
+  commands:
+    # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
+    selinux_enabled.default:_stdlib_path_exists_semanage.default:_stdlib_path_exists_restorecon::
+      "$(paths.semanage) -d -t ssh_home_t '$(home)/.ssh(/.*)?'";
+
 }
 
 bundle agent inventory_refresh_cmd
@@ -561,12 +598,20 @@ bundle agent entry
     enterprise_edition.(policy_server|am_policy_hub)::
       "config_exists"
         expression => fileexists("$(cfengine_enterprise_federation:config.federation_dir)/cfapache/federation-config.json");
+    enterprise_edition.(policy_server|am_policy_hub)::
+      "config_not_exists"
+        expression => not(fileexists("$(cfengine_enterprise_federation:config.federation_dir)/cfapache/federation-config.json"));
+
   methods:
     config_exists::
       "CFEngine Enterprise Federation Configuration"
         handle => "config",
         usebundle => config;
-    enabled::
+    am_off|config_not_exists::
+      "CFEngine Enterprise Federation Transport Off"
+        handle => "clean_when_off",
+        usebundle => clean_when_off;
+    enabled.am_on::
       "CFEngine Enterprise Federation Transport User"
         handle => "transport_user",
         usebundle => transport_user;
@@ -574,7 +619,7 @@ bundle agent entry
       "federation_manage_files"
         handle => "federation_manage_files",
         usebundle => federation_manage_files;
-    enabled::
+    enabled.am_on::
       "CFEngine Enterprise Federation Postgres Configuration"
         handle => "postgres_config",
         usebundle => postgres_config;
