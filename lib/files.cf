@@ -421,7 +421,7 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
       # If the line is there, but commented out, first uncomment it
       "#+\s*$(index)\s*=.*"
       select_region => INI_section(escape("$(sectionName)")),
-      edit_field => col("=","1","$(index)","set"),
+      edit_field => col("\s*=\s*","1","$(index)","set"),
       ifvarclass => "edit_$(cindex[$(index)])";
 
       # match a line starting like the key something
@@ -478,7 +478,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
       # If the line is there, but commented out, first uncomment it
       "#+\s*$(index)\s*=.*"
       select_region => INI_section(escape("$(sectionName)")),
-      edit_field => col("=","1","$(index)","set"),
+      edit_field => col("\s*=\s*","1","$(index)","set"),
       ifvarclass => "edit_$(cindex[$(index)])";
 
       # match a line starting like the key something
