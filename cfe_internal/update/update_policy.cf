@@ -439,6 +439,7 @@ body contain u_postgres
 {
   useshell   => "useshell";
   exec_owner => "cfpostgres";
+  exec_group => "cfpostgres";
   chdir      => "/tmp";
   no_output  => "true";
 }
