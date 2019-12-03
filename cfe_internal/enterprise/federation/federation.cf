@@ -258,7 +258,8 @@ bundle agent transport_user
       edit_line => default:insert_lines("IdentityFile $(ssh_priv_key)");
 
   methods:
-    "semanage_installed" usebundle => semanage_installed;
+    selinux_enabled::
+      "semanage_installed" usebundle => semanage_installed;
 
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
