@@ -21,6 +21,8 @@ body hub control
 
       # port => "5308";
 
+      query_timeout => "$(def.control_hub_query_timeout)";
+
       # Hub will discard accumulated reports on the clients
       # and download only information about current state of the client
       # in case of not successfully downloading the reports for defined
