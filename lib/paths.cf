@@ -59,12 +59,17 @@ bundle common paths
 # **Example:**
 #
 # ```cf3
-# bundle agent repair_newlines(filename)
+# bundle agent no_carriage_returns(filename)
 # {
 # commands:
 #   _stdlib_path_exists_sed::
-#      "$(path[sed])"
-#        args => "-i 's/^M//' $(filename)"
+#      "$(paths.sed)" -> { "CFE-3216" }
+#        args => "-i 's/^M//' $(filename)",
+#        comment => "Preferred reference style";
+#
+#      "$(paths[sed])"
+#        args => "-i 's/^M//' $(filename)",
+#        comment => "Alternate array reference style";
 # }
 # ```
 {
