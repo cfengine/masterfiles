@@ -1,5 +1,13 @@
 [section]
 keyone=one
 keytwo=2
+[CFE-3221]
+variablename= desired value
+variablename2 = desired value2
+variablename3 =desired value3
+# variablename5=desired value5
+# variablename6= desired value6
+# variablename7 = desired value7
+# variablename8 = wrong value8
 [something]
 keyone=something1
