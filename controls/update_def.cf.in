@@ -1,4 +1,5 @@
 bundle common update_def
+# @brief Main default settings for update policy
 {
   classes:
     !feature_def_json_preparse::

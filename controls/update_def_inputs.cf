@@ -1,5 +1,5 @@
 bundle common u_cfengine_enterprise
-# @brief Inputs specific to CFEngine Enterpise
+# @brief Inputs specific to CFEngine Enterprise
 {
   vars:
     enable_cfengine_enterprise_hub_ha::
@@ -19,6 +19,7 @@ bundle common u_cfengine_enterprise
 }
 
 body file control
+# @brief Include policy specific to CFEngine Enterprise
 {
       inputs => { @(u_cfengine_enterprise.inputs) };
 }

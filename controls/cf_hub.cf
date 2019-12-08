@@ -8,7 +8,7 @@
 ###############################################################################
 
 body hub control
-
+# @brief Control attributes for `cf-hub`
 {
 
     enterprise_edition.policy_server::

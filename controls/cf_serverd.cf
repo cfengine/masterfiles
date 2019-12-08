@@ -7,7 +7,7 @@
 ###############################################################################
 
 body server control
-
+# @brief Control attributes for cf-serverd
 {
       # List of ciphers the server accepts. For Syntax help see man page
       # for "openssl ciphers". Default is "AES256-GCM-SHA384:AES256-SHA"
@@ -77,7 +77,7 @@ body server control
 ###############################################################################
 
 bundle server access_rules()
-
+# @brief Defines access to common resources
 {
   access:
 

@@ -1,15 +1,18 @@
 bundle common cfe_internal_update_from_repository_file_control
+# @brief Define inputs needed for updating *masterfiles*, the default policy distribution point with content from an upstream VCS
 {
   vars:
       "inputs" slist => { "$(this.promise_dirname)/lib.cf" };
 }
 
 body file control
+# @brief Include policy needed for updating *masterfiles*, the default policy distribution point with content from an upstream VCS
 {
       inputs => { @(cfe_internal_update_from_repository_file_control.inputs) };
 }
 
 bundle agent cfe_internal_update_from_repository
+# @brief Ensure *masterfiles*, the default policy is up to date
 {
   methods:
     am_policy_hub.cfengine_internal_masterfiles_update::
@@ -20,6 +23,7 @@ bundle agent cfe_internal_update_from_repository
 }
 
 bundle agent cfe_internal_masterfiles_stage
+# @brief Run masterfiles-stage.sh to update the default distribution of masterfiles
 {
 
   commands:

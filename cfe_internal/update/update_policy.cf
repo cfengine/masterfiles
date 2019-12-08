@@ -285,6 +285,8 @@ bundle agent cfe_internal_update_policy_cpv
 #########################################################
 
 body perms u_m(p)
+# @brief Ensure file mode is `p`
+# @param p Desired file mode
 {
       mode  => "$(p)";
 }
@@ -292,6 +294,9 @@ body perms u_m(p)
 #########################################################
 
 body perms u_mo(p,o)
+# @brief Ensure file mode is `p` and owner is `o`
+# @param p Desired file mode
+# @param p Desired file owner (username or uid)
 {
       mode   => "$(p)";
       owners => {"$(o)"};
@@ -300,6 +305,7 @@ body perms u_mo(p,o)
 #########################################################
 
 body perms u_shared_lib_perms
+# @brief Shared library permissions
 {
     !hpux::
       mode => "0644";
@@ -310,6 +316,7 @@ body perms u_shared_lib_perms
 #########################################################
 
 body file_select u_cf3_files
+# @brief Select files starting with `cf-` (cfengine binaries)
 {
       leaf_name => { "cf-.*" };
       file_result => "leaf_name";
@@ -318,6 +325,7 @@ body file_select u_cf3_files
 #########################################################
 
 body file_select u_input_files
+# @brief Select files by extension that we should include when updating inputs
 {
       leaf_name => { @(update_def.input_name_patterns) };
       file_result => "leaf_name";
@@ -326,6 +334,9 @@ body file_select u_input_files
 #########################################################
 
 body copy_from u_rcp(from,server)
+# @brief Ensure file is a copy of `from` on `server` using digest comparison
+# @param from The path to copy from
+# @param server The remote host to copy from
 {
       source      => "$(from)";
       compare     => "digest";
@@ -355,6 +366,7 @@ body copy_from u_rcp(from,server)
 #########################################################
 
 body copy_from u_cp(from)
+# @brief Ensure file is a copy from `from` on the local server based on digest comparison
 {
       source  => "$(from)";
       compare => "digest";
@@ -363,6 +375,7 @@ body copy_from u_cp(from)
 #########################################################
 
 body copy_from u_cp_nobck(from)
+# @brief copy from `from` locally with digest comparison and making no backups
 {
       source      => "$(from)";
       compare     => "digest";
@@ -372,6 +385,7 @@ body copy_from u_cp_nobck(from)
 #########################################################
 
 body action u_immediate
+# @brief Actuate the promise immediately, ignoring locks
 {
       ifelapsed => "0";
 }
@@ -379,6 +393,8 @@ body action u_immediate
 #########################################################
 
 body depth_search u_recurse(d)
+# @brief Search recursively for files up to `d` levels excluding common version control data
+# @param d Maximum depth to search recursively
 {
       depth => "$(d)";
       exclude_dirs => { "\.svn", "\.git", "git-core" };
@@ -387,6 +403,8 @@ body depth_search u_recurse(d)
 #########################################################
 
 body depth_search u_recurse_basedir(d)
+# @brief Search recursively for files up to `d` levels excluding common version control data and including the base directory
+# @param d Maximum depth to search recursively
 {
       include_basedir => "true";
       depth => "$(d)";
@@ -396,6 +414,8 @@ body depth_search u_recurse_basedir(d)
 #########################################################
 
 body classes u_if_repaired(x)
+# @brief Define `x` if the promise is repaired
+# @param x Class to define if promise repaired
 {
       promise_repaired => { "$(x)" };
 }
@@ -403,6 +423,8 @@ body classes u_if_repaired(x)
 #########################################################
 
 body classes u_if_repaired_then_cancel(y)
+# @brief Cancel class `x` if the promise is repaired
+# @param x Class to undefine if promise repaired
 {
       cancel_repaired => { "$(y)" };
 }
@@ -410,6 +432,9 @@ body classes u_if_repaired_then_cancel(y)
 #########################################################
 
 body classes u_if_else(yes,no)
+# @brief define `yes` if the promise is repaired, and `no` if the promise fails to repair (notkept)
+# @param yes Class to define if promise repaired
+# @param no Class to undefine if promise notkept
 {
 #      promise_kept     => { "$(yes)" };
       promise_repaired => { "$(yes)" };
@@ -421,6 +446,7 @@ body classes u_if_else(yes,no)
 #########################################################
 
 body contain u_in_shell
+# @brief Run command within shell environment
 {
       useshell => "true";
 }
@@ -428,6 +454,7 @@ body contain u_in_shell
 #########################################################
 
 body contain u_in_shell_and_silent
+# @brief Run command within shell environment suppressing output
 {
       useshell => "true";
       no_output => "true";
@@ -436,6 +463,7 @@ body contain u_in_shell_and_silent
 ########################################################""
 
 body contain u_postgres
+# @brief Run command within postgres users shell environment
 {
   useshell   => "useshell";
   exec_owner => "cfpostgres";
@@ -447,6 +475,7 @@ body contain u_postgres
 #########################################################
 
 body action u_ifwin_bg
+# @brief Run command in the background if windows is defined
 {
     windows::
       background => "true";
@@ -455,6 +484,7 @@ body action u_ifwin_bg
 #########################################################
 
 body service_method u_bootstart
+# @brief Attributes for u_bootstart service method
 {
       service_autostart_policy => "boot_time";
 }
@@ -462,6 +492,8 @@ body service_method u_bootstart
 #########################################################
 
 body contain u_in_dir(s)
+# @brief Run command from within `s`
+# @param s Path to change into before running command
 {
       chdir => "$(s)";
 }
@@ -469,6 +501,8 @@ body contain u_in_dir(s)
 #########################################################
 
 body contain u_silent_in_dir(s)
+# @brief Run command from within `s` and suppress output
+# @param s Path to change into before running command
 {
       chdir => "$(s)";
       no_output => "true";
@@ -477,6 +511,18 @@ body contain u_silent_in_dir(s)
 #########################################################
 
 body link_from u_ln_s(x)
+# @brief Symlink to `x`, even if it does not exist
+# @param x Path to symlink
+#@ **Example:**
+#@ ```cf3
+#@ bundle agent example u_ln_s {
+#@   files:
+#@     "$(symlink_path)"
+#@       link_from => u_ln_s("$(python)"),
+#@       move_obstructions => "true",
+#@       if => isvariable("python");
+#@ }
+#@ ```
 {
       link_type => "symlink";
       source => "$(x)";
@@ -486,6 +532,16 @@ body link_from u_ln_s(x)
 #########################################################
 
 body delete u_tidy
+# @brief Delete directories and symlinks
+#@ **Example:**
+#@ ```cf3
+#@ bundle agent example u_tidy {
+#@   files:
+#@     "$(symlink_path)"
+#@       delete => u_tidy,
+#@       if => not(isvariable("python"));
+#@ }
+#@ ```
 {
       dirlinks => "delete";
       rmdirs   => "true";

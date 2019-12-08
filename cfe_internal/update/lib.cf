@@ -99,6 +99,8 @@ body classes u_results(scope, class_prefix)
 }
 
 body depth_search u_cfe_internal_recurse(d)
+# @brief Search for files recursively to a depth of `d` across file system boundaries
+# @param d Number of levels deep to traverse
 {
       depth => "$(d)";
       xdev => "true";
@@ -143,6 +145,7 @@ body classes u_kept_successful_command_results(scope, class_prefix)
 }
 
 body service_method u_systemd_services
+# @brief Define service method for systemd
 {
       service_autostart_policy => "none";
       service_dependence_chain => "ignore";
@@ -152,6 +155,8 @@ body service_method u_systemd_services
 
 bundle agent u_systemd_services(service,state)
 # @brief Manage standard systemd services
+# @param service The name of the service
+# @param state The desired state the service should be in.
 {
   vars:
 

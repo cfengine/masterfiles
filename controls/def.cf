@@ -5,6 +5,7 @@
 #
 ###############################################################################
 bundle common def
+# @brief Common settings for the Masterfiles Policy Framework
 {
   classes:
     "_workaround_CFE_2333" -> { "https://tracker.mender.io/browse/CFE-2333" }

@@ -1,4 +1,5 @@
 bundle agent cfe_internal_dc_workflow
+# @brief Update default policy distribution point from upstream repository
 {
   methods:
     am_policy_hub.enterprise.cfengine_internal_masterfiles_update::
