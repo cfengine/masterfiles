@@ -14,6 +14,9 @@ body common control
 
 bundle agent init
 {
+  vars:
+      "expectations" string => ifelse( "cfengine_3_10", "3.10.x", "" );
+
   files:
       # The tested file "actual" is copied from our seeded starting position.
       "$(G.testfile).actual"
@@ -21,20 +24,37 @@ bundle agent init
 
      # Next we place the file which we will compare the final result with.
      "$(G.testfile).expected"
-      copy_from => local_cp("$(this.promise_filename).finish");
+     copy_from => local_cp("$(this.promise_filename).finish$(expectations)");
 }
 
 #######################################################
 
 bundle agent test
 {
+  meta:
+      "description" -> { "CFE-3221" }
+        string => "Test expected behavior of manage_variable_values_ini";
+
   vars:
       "config[section][keyone]" string => "1";
       "config[section][keytwo]" string => "valuetwo";
 
+      "config[CFE-3221][variablename]" string => "desired value";
+      "config[CFE-3221][variablename2]" string => "desired value2";
+      "config[CFE-3221][variablename3]" string => "desired value3";
+      "config[CFE-3221][variablename4]" string => "desired value4";
+      "config[CFE-3221][variablename5]" string => "desired value5";
+      "config[CFE-3221][variablename6]" string => "desired value6";
+      "config[CFE-3221][variablename7]" string => "desired value7";
+      "config[CFE-3221][variablename8]" string => "desired value8";
+
   files:
       "$(G.testfile).actual"
       edit_line => manage_variable_values_ini( "test.config", "section" );
+
+      "$(G.testfile).actual" -> { "CFE-3221" }
+        edit_line => manage_variable_values_ini( "test.config", "CFE-3221" );
+
 }
 
 #######################################################
