@@ -889,6 +889,29 @@ For example:
 
 - Added in 3.13.0, 3.12.2
 
+### Change hub to client connection timeout
+
+By default, cf-hub times out a connection after 30 seconds.
+This can be configured in augments.
+
+For example:
+
+```json
+{
+  "vars": {
+    "control_hub_query_timeout": "10"
+  }
+}
+```
+
+**Note:**
+
+- A value of `"0"` will cause the default to be used.
+
+**History:**
+
+- Added in 3.15.0
+
 ### Enable client initiated reporting
 
 In the default configuration for Enterprise report collection the hub

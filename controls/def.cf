@@ -432,6 +432,11 @@ bundle common def
                     "Min50", "Min55" },
         unless => isvariable(control_hub_hub_schedule);
 
+      "control_hub_query_timeout"
+        comment => "Configurable timeout for cf-hub outgoing connections",
+        string => "0", # 0 = default is set by cf-hub binary
+        unless => isvariable(control_hub_query_timeout);
+
       "control_hub_port"
         comment => "cf-hub performs pull collection on port 5308, unless
                     overridden by augments",
