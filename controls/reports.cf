@@ -47,6 +47,7 @@
 ###################################################
 
 bundle server report_access_rules
+# @brief Access rules for Enterprise report collection
 {
   vars:
     enterprise::

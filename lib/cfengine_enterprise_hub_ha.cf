@@ -45,7 +45,7 @@
 # CFEngine Enterprise Hub HA policy inclusion
 #################################################
 bundle common cfengine_enterprise_hub_ha
-# @brief Inputs specific to CFEngine Enterpise
+# @brief Inputs specific to CFEngine Enterprise High Availability
 {
   vars:
     enable_cfengine_enterprise_hub_ha::
@@ -77,6 +77,7 @@ bundle common cfengine_enterprise_hub_ha
 
 }
 body file control
+# @brief Include policy specific to CFEngine Enterprise High Availability
 {
   inputs => { @(cfengine_enterprise_hub_ha.inputs) };
 }

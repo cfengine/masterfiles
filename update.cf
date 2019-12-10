@@ -5,6 +5,7 @@
 ###############################################################################
 
 body common control
+# @brief Common control attributes for all components
 {
       bundlesequence => {
                           "update_def",
@@ -38,6 +39,7 @@ body common control
 
 #############################################################################
 bundle common cfengine_update_controls
+# @brief Resolve other controls necessary for update
 {
   vars:
        "update_def_inputs"
@@ -142,6 +144,7 @@ bundle agent cfengine_internal_standalone_self_upgrade_execution
 }
 
 body agent control
+# @brief Agent controls for update
 {
       ifelapsed => "1";
       skipidentify => "true";

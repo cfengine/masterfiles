@@ -139,6 +139,7 @@ body package_module pkgsrc
 }
 
 body package_module yum
+# @brief Define details used when interfacing with yum
 {
     query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
     query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
@@ -146,6 +147,7 @@ body package_module yum
 }
 
 body package_module slackpkg
+# @brief Define details used when interfacing with slackpkg
 {
       query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
       query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
@@ -153,6 +155,7 @@ body package_module slackpkg
 }
 
 body package_module pkg
+# @brief Define details used when interfacing with pkg
 {
     query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
     query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
@@ -160,6 +163,7 @@ body package_module pkg
 }
 
 body package_module snap
+# @brief Define details used when interfacing with snapcraft
 {
     query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
     query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
@@ -191,7 +195,7 @@ body package_module freebsd_ports
 }
 
 bundle common packages_common
-# @ignore
+# @brief Define inputs required for this policy file
 {
   vars:
       "inputs" slist => {
@@ -202,7 +206,7 @@ bundle common packages_common
 }
 
 body file control
-# @ignore
+# @brief include policy needed by this file
 {
       inputs => { @(packages_common.inputs) };
 }

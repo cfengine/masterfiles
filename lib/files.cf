@@ -95,7 +95,7 @@ bundle edit_line insert_file(templatefile)
 
 bundle edit_line lines_present(lines)
 # @brief Ensure `lines` are present in the file. Lines that do not exist are appended to the file
-# @param List or string that should be present in the file
+# @param lines List or string that should be present in the file
 #
 # **Example:**
 #
@@ -119,6 +119,7 @@ bundle edit_line lines_present(lines)
 
 bundle edit_line insert_lines(lines)
 # @brief Alias for `lines_present`
+# @param lines List or string that should be present in the file
 {
   insert_lines:
 
@@ -128,6 +129,7 @@ bundle edit_line insert_lines(lines)
 
 bundle edit_line append_if_no_line(lines)
 # @brief Alias for `lines_present`
+# @param lines List or string that should be present in the file
 {
   insert_lines:
 
@@ -137,6 +139,7 @@ bundle edit_line append_if_no_line(lines)
 
 bundle edit_line append_if_no_lines(lines)
 # @brief Alias for `lines_present`
+# @param lines List or string that should be present in the file
 {
   insert_lines:
 

@@ -401,6 +401,7 @@ bundle agent cfe_autorun_inventory_proc
 }
 
 bundle agent cfe_autorun_inventory_proc_cpuinfo
+# @brief Inventory cpu information from proc
 {
   classes:
     "_have_cpuinfo" expression => isvariable("default:cfe_autorun_inventory_proc.cpuinfo_idx");
@@ -473,6 +474,7 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
 }
 
 bundle agent cfe_autorun_inventory_cpuinfo
+# @brief Inventory cpu information
 {
   classes:
     "_have_proc_cpu_model_name" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_cpu_model_name");
@@ -1036,6 +1038,7 @@ bundle agent cfe_autorun_inventory_cmdb
 
 bundle agent inventory_cmdb_load(file)
 # @brief Load the CMDB inventory
+# @param file Load the CMDB inventory
 #
 # This bundle is for loading the CMDB inventory.
 {

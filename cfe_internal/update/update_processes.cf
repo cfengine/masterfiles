@@ -14,6 +14,8 @@
 ################################################################################
 
 bundle common cfe_internal_process_knowledge
+# @brief Variables related to CFEngine's own processes used in other bundles
+# TODO Redact use of this bundle. It's no longer useful now that bindir variable exists. Not clear why its unset on windows.
 {
   vars:
 
@@ -214,6 +216,7 @@ bundle agent cfe_internal_update_processes
 #
 
 bundle agent maintain_cfe_hub_process
+# @brief Ensure the proper processes are running on Enterprise hubs.
 {
   vars:
 
@@ -339,6 +342,8 @@ bundle agent maintain_cfe_hub_process
 #
 
 bundle agent disable_cfengine_agents(process)
+# @brief Ensure cfengine component is not running
+# @param process The name of the cfengine component binary to ensure not running. [cf-agent, cf-serverd, cf-monitord, cf-hub]
 {
   vars:
 
@@ -376,6 +381,8 @@ bundle agent disable_cfengine_agents(process)
 ###############################################################################
 #
 bundle agent enable_cfengine_agents(process)
+# @brief Ensure cfengine component is running
+# @param process The name of the cfengine component binary to ensure running. [cf-agent, cf-serverd, cf-monitord, cf-hub]
 {
   vars:
 
@@ -438,6 +445,7 @@ bundle agent enable_cfengine_agents(process)
 #
 
 bundle agent maintain_cfe_windows
+# @brief Ensure cfengine components are running
 {
   vars:
 
@@ -506,6 +514,7 @@ bundle agent maintain_cfe_windows
 }
 
 bundle agent maintain_cfe_systemd
+# @brief Ensure cfengine components are running
 {
   classes:
     systemd::
@@ -522,6 +531,7 @@ bundle agent maintain_cfe_systemd
 }
 
 body classes u_clear_always(theclass)
+# @brief Undefine, `theclass` for as a result of the promise actuation, no matter the outcome (kept, notkept, repaired)
 {
       cancel_kept => { $(theclass) };
       cancel_notkept => { $(theclass) };
@@ -529,6 +539,7 @@ body classes u_clear_always(theclass)
 }
 
 body classes u_always_forever(theclass)
+# @brief Define `theclass` for 999999999 minutes (1902 years) as a result of the promise actuation, no matter the outcome (kept, notkept, repaired)
 {
       promise_kept => { $(theclass) };
       promise_repaired => { $(theclass) };

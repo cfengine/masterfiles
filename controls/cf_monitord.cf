@@ -10,7 +10,7 @@
 ###############################################################################
 
 body monitor control
-
+# @brief Attributes controlling cf-monitord
 {
 
     any::
