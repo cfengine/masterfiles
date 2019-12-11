@@ -1,3 +1,7 @@
+body file control
+{
+        namespace => "cfengine_enterprise_federation";
+}
 bundle agent config
 # @brief Read/parse config JSON, define variables and classes for use later
 {
