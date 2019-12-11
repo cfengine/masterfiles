@@ -72,6 +72,11 @@ body server control
                            $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
                            $(sys.cf_agent) -I -D cf_runagent_initiated";
 
+    !windows::
+      # Bind to all interfaces including ipv6
+      # Adding this on windows will force ipv6 only, so limit to non-windows
+      bindtointerface => "::";
+
 }
 
 ###############################################################################
