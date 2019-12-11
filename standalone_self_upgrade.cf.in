@@ -192,8 +192,17 @@ bundle agent cfengine_software_version
 # upgrading.
 {
   classes:
-      "__supported_platform"
-        or => { "redhat.!redhat_4", "centos.!centos_4", "debian", "ubuntu", "hpux", "aix", "SUSE_11" };
+      "__supported_platform" -> { "ENT-5045", "ENT-5152" }
+        or => {
+                "redhat.!redhat_4",
+                "centos.!centos_4",
+                "debian",
+                "ubuntu",
+                "hpux",
+                "aix",
+                "SUSE_11",
+                "SUSE_12",
+        };
 
       "__new_implementation"
         or => { "redhat", "centos", "ubuntu", "debian" };
