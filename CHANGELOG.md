@@ -1,6 +1,45 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.0:
+	- Added package_module for snap (CFE-2811)
+	- Fixed pkgsrc in case where multiple Prefix paths are returned for pkg_install (CFE-3152)
+	- Fixed pkgsrc module on Solaris/NetBSD (CFE-3151)
+	- Moved zypper package module errors to the cf-agent output (CFE-3154)
+	- Added new class mpf_enable_cfengine_systemd_component_management to enable
+		component management on systemd hosts. When defined on systemd hosts policy
+		will render systemd unit files in /etc/systemd/system for managed services
+		and that all units are enabled unless explicitly disabled. When this class
+		is not defined on systemd hosts the policy will not actively mange cfengine
+		service units (no change from previous behavior) (CFE-2429)
+	- Fixed detection of service state on FreeBSD (CFE-3167)
+	- Added known paths for true and false on linux
+		(ENT-5060)
+	- Fixed path for restorecon on redhat systems to /sbin/restorecon
+	- Added usermod to known paths for redhat systems
+	- Added policy to manage federated reporting with CFEngine Enterprise
+	- Introduced augments variable `control_hub_query_timeout` to control cf-hub query timeout.
+		 (ENT-3153)
+	- Added OOTB inventory for IPv6 addresses (sans ::1 loopback)
+		(ENT-4987)
+	- Added and transitioned to using master_software_updates shortcut in self upgrade policy
+		(ENT-4953)
+	- Added brief descriptions to bodies and bundles in cfe_internal/CFE_cfengine.cf
+		(CFE-3220)
+	- Added support for SUSE 11, 12 in standalone self upgrade (ENT-5045, ENT-5152)
+	- Changed policy triggering cleanup of __lastseenhostlogs to target only
+		3.12.x, 3.13.x and 3.14.x. From 3.15.0 on the table is absent. (ENT-5052)
+	- Fixed agent disabling on systemd systems (CFE-2429, CFE-3416)
+	- Ensured directory for custom action scripts is present (ENT-5070)
+	- Excluded Enterprise federation policy parsing on incompatible versions
+		(CFE-3193)
+	- Extended watchdog for AIX (ENT-4995)
+	- Fixed cleanup of future timestamps from status table
+		(ENT-4331, ENT-4992)
+	- Fixed re-spawning of cf-execd or cf-monitord after remediating duplicate concurrent processes
+		(CFE-3150)
+	- Replaced /var/cfengine with proper $(sys.*) vars (ENT-4800)
+
 3.15.0b1:
 	- Added continual checking for policy_server state (CFE-3073)
 	- Added monitoring for postgresql lock acquisition times (ENT-4753)
