@@ -65,7 +65,7 @@ bundle common u_common_knowledge
       "list_update_ifelapsed_now" string => "10080";
 }
 bundle agent cfengine_software
-#@ brief Variables to control the specifics in desired package selection
+# @brief Variables to control the specifics in desired package selection
 {
   vars:
 
@@ -230,7 +230,7 @@ bundle agent cfengine_software_version
 }
 
 bundle agent cfengine_software_version_packages2
-#@ brief Ensure the correct version of software is installed using the new packages promise implementation
+# @brief Ensure the correct version of software is installed using the new packages promise implementation
 {
   vars:
       "pkg_name" string => "$(cfengine_software.pkg_name)";
@@ -261,7 +261,7 @@ bundle agent cfengine_software_version_packages2
 }
 
 bundle agent cfengine_software_version_packages1
-#@ brief Ensure the correct version of software is installed using the legacy self update mechanism
+# @brief Ensure the correct version of software is installed using the legacy self update mechanism
 #@ **Supported Platforms:**
 #@ - RedHat|Centos|Suse (rpm)
 #@ - Debian|Ubuntu (dpkg)
@@ -388,6 +388,7 @@ bundle agent cfengine_software_version_packages1
 }
 
 bundle common cfengine_package_names
+# @brief Maps platforms to the package naming convention used by the self upgrade policy
 {
   vars:
       "pkg_name" string => "$(cfengine_software.pkg_name)";
@@ -483,7 +484,7 @@ bundle common cfengine_package_names
 }
 
 bundle agent cfengine_master_software_content
-# When cfengine_master_software_content_state_present is defined the software
+# @brief When cfengine_master_software_content_state_present is defined the software
 # will try be be automatically downloaded.
 {
   vars:
@@ -680,11 +681,15 @@ basedir=default";
 }
 
 body action u_immediate
+# @brief Ignore promise locks, actuate the promise immediately
 {
       ifelapsed => "0";
 }
 
 body copy_from u_dsync(from,server)
+# @brief Synchronize promiser with `from` on `server` using digest comparison. If host is a policy hub, then it skips the remote copy, preferring the local file path. For this reason, this body is not compatible with shortcuts defined by cf-serverd.
+# @param from File path to copy from on remote server
+# @param server Remote server to copy file from if executing host is not a policy server
 {
       # NOTE policy servers cheat and copy directly from the local file system.
       # This works even if cf-serverd is down and it makes sense if your serving
@@ -705,10 +710,15 @@ body copy_from u_dsync(from,server)
 }
 
 body classes u_if_repaired(x)
+# @brief Define `x` if promise results in a repair
+# @param x Name of the class to be defined if promise results in repair
 {
       promise_repaired => { "$(x)" };
 }
 body classes u_if_else(yes,no)
+# @brief Define `yes` if promise results in a repair, `no` if promise is not kept (failed, denied, timeout)
+# @param yes class to define if promise results in repair
+# @param no class to define if promise is not kept (failed, denied, timeout)
 {
       #      promise_kept     => { "$(yes)" };
       promise_repaired => { "$(yes)" };
@@ -718,6 +728,7 @@ body classes u_if_else(yes,no)
 }
 
 body common control
+# @brief Common control for standalone self upgrade
 {
       version => "CFEngine Standalone Self Upgrade @VERSION@";
 
@@ -735,6 +746,8 @@ body common control
 }
 
 body depth_search u_recurse_basedir(d)
+# @brief Search recursively from (and including) the referenced directory directory to depth `d` excluding common version control paths
+# @param d maximum depth to descend
 {
       include_basedir => "true";
       depth => "$(d)";
@@ -757,6 +770,8 @@ body file_select plain
 }
 
 body package_method u_generic(repo)
+# @brief Generic package_method capable of managing packages on multiple platforms.
+# @param repo Local directory to look for packages in
 {
 
     debian::
@@ -935,18 +950,22 @@ body package_method u_generic(repo)
 }
 
 body package_module yum
+# @brief Yum package module default settings
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
 }
 
 body package_module apt_get
+# @brief apt_get package module default settings
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
 }
 
 body perms u_m(p)
+# @brief Ensure mode is `p`
+# @param p permissions
 {
       mode  => "$(p)";
 }
