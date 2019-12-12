@@ -1,15 +1,7 @@
-bundle common federation_file_control
-{
-  vars:
-    "inputs" slist => { "$(sys.local_libdir)/stdlib.cf", "$(this.promise_dirname)/../CFE_hub_specific.cf" };
-}
-
 body file control
 {
-        inputs => { @(federation_file_control.inputs) };
         namespace => "cfengine_enterprise_federation";
 }
-
 bundle agent config
 # @brief Read/parse config JSON, define variables and classes for use later
 {
