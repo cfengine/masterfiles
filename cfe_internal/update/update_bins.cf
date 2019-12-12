@@ -15,6 +15,10 @@
 ################################################################################
 
 bundle agent cfe_internal_update_bins
+# @brief Update cfengine binaries
+# TODO Redact this file, not in use. The policy here was migrated into
+# standalone self upgrade, nothing includes this policy nor references it's
+# bundles
 {
 
   vars:
@@ -283,6 +287,7 @@ bundle agent cfe_internal_update_bins
 ################################################################################
 
 bundle edit_line u_admin_file
+# @brief Admin file for automating solaris package installs
 {
   insert_lines:
 
@@ -324,6 +329,7 @@ basedir=default";
 ################################################################################
 
 bundle edit_line u_backup_script
+# brief Script to execute before package upgrade
 {
   insert_lines:
 
@@ -354,6 +360,7 @@ fi";
 ################################################################################
 
 bundle edit_line u_install_script
+# brief Script to upgrade package
 {
   insert_lines:
 
@@ -384,6 +391,7 @@ exit 0";
 ################################################################################
 
 body edit_defaults u_empty_no_backup
+# @brief Empty file before editing and create no backups
 {
   empty_file_before_editing => "true";
   edit_backup => "false";
@@ -392,6 +400,9 @@ body edit_defaults u_empty_no_backup
 ################################################################################
 
 body copy_from u_pcp(from,server)
+# @brief Copy from `from` on `server` using digest comparison
+# @param from Path on remote server to copy from
+# @param server Remote host to copy from
 {
       source      => "$(from)";
       compare     => "digest";
