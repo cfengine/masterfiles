@@ -87,7 +87,7 @@ bundle agent cfe_internal_update_policy_cpv
 #              cf_promises_validated file as a gating mechanism to prevent
 #              unnecessary burden on the server from remote agents checking to
 #              see if each individual file needs an update.
-# - The class `validated_updates_ready` is defined when `cf_promsies_validated` is repaired
+# - The class `validated_updates_ready` is defined when `cf_promises_validated` is repaired
 # - Executing `cf-agent -KIf update.cf --define validated_updates_ready` will
 #   cause the update policy to scan all files in masterfiles, modules, and
 #   plugins to be scanned for update.
