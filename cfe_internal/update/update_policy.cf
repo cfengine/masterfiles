@@ -84,6 +84,7 @@ bundle agent cfe_internal_setup_python_symlink(symlink_path)
 # @brief Create the /var/cfengine/bin/python symlink pointing to some installed python (if any)
 {
   vars:
+    debian|redhat::
       "path" string => getenv("PATH", 1024);
       "path_folders" slist => splitstring("$(path)", ":", 128);
 
@@ -108,6 +109,7 @@ bundle agent cfe_internal_setup_python_symlink(symlink_path)
         comment => "Taking the first item from the list (sorted by preference)";
 
   files:
+    debian|redhat::
       "$(symlink_path)"
         delete => u_tidy,
         if => not(isvariable("python"));
