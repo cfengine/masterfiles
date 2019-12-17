@@ -395,8 +395,7 @@ bundle agent federation_manage_files
     am_feeder::
       "$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/dump.sh" ),
-        perms => default:mog( "700", "root", "root" ),
-        action => default:if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
+        perms => default:mog( "700", "root", "root" );
 
       "$(cfengine_enterprise_federation:config.federation_dir)/fedhub/dump/filters/50-merge_inserts.awk"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/50-merge_inserts.awk" ),
@@ -633,7 +632,8 @@ bundle agent entry
         depends_on => { "transport_user", "ensure_feeders" },
         usebundle => imported_data;
       "CFEngine Enterprise Federation Feeder Data Export"
-        usebundle => exported_data;
+        usebundle => exported_data,
+        action => default:if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
       "Configuration Status"
         usebundle => setup_status;
   reports:
