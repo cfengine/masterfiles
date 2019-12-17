@@ -62,7 +62,5 @@ EOF
   exit 0
 } || {
   mv "$file.importing" "$file.failed"
-  echo "last 10 lines of log $file.log.$CFE_FR_COMPRESSOR_EXT"
-  "$CFE_FR_COMPRESSOR" "$file.log.$CFE_FR_COMPRESSOR_EXT" | tail -n 10
   exit 1
 }
