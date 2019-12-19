@@ -22,6 +22,16 @@ matrix:
         - sudo dpkg -i $FILE
 
     # JOB 2
+    - env: CF_VERSION=3.15.x
+      addons:
+        apt:
+          sources:
+            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+              key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+          packages:
+            - cfengine-community=3.15.*
+
+    # JOB 3
     - env: CF_VERSION=3.12.x
       addons:
         apt:
@@ -31,7 +41,7 @@ matrix:
           packages:
             - cfengine-community=3.12.*
 
-    # JOB 3
+    # JOB 4
     - env: CF_VERSION=3.10.x
       addons:
         apt:
@@ -41,7 +51,7 @@ matrix:
           packages:
             - cfengine-community=3.10.*
 
-    # JOB 4
+    # JOB 5
     - env: CF_VERSION=3.7.x
       addons:
         apt:
