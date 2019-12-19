@@ -519,8 +519,8 @@ bundle edit_line insert_ini_section(name, config)
 {
   vars:
       # TODO: refactor once 3.7.x is EOL
-      "indeces" slist => getindices($(config));
-      "k" slist => sort("indeces", lex);
+      "indices" slist => getindices($(config));
+      "k" slist => sort("indices", lex);
 
   insert_lines:
       "[$(name)]"
