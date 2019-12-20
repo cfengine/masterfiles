@@ -508,7 +508,7 @@ bundle edit_line insert_ini_section(name, config)
 # ```
 # # given an array "barray"
 # files:
-#     "myfile.ini" edit_line => insert_innit_section("foo", "barray");
+#     "myfile.ini" edit_line => insert_ini_section("foo", "barray");
 # ```
 #
 # Inserts a section in an INI file with the given configuration
@@ -519,8 +519,8 @@ bundle edit_line insert_ini_section(name, config)
 {
   vars:
       # TODO: refactor once 3.7.x is EOL
-      "indeces" slist => getindices($(config));
-      "k" slist => sort("indeces", lex);
+      "indices" slist => getindices($(config));
+      "k" slist => sort("indices", lex);
 
   insert_lines:
       "[$(name)]"
