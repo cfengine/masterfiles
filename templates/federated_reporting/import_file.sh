@@ -3,6 +3,7 @@
 #
 # $1 -- compressed SQL file to import
 set -e
+set -o pipefail
 
 source "$(dirname "$0")/config.sh"
 
