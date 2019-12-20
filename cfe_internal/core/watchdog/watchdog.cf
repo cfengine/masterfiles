@@ -15,7 +15,7 @@ bundle agent cfe_internal_core_watchdog(state)
         expression => isdir("/etc/cron.d");
 
       "use_cfe_internal_core_watchdog_cron_d"
-        expression => "have_cron_d._stdlib_has_path_pgrep";
+        expression => "have_cron_d._stdlib_path_exists_pgrep";
 
       # We use the aix specific watchdog implementation when it's aix and we are
       # not using the cron.d implementation.
