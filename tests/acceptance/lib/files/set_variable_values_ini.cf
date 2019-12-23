@@ -18,11 +18,11 @@ bundle agent init
   files:
 
       "$(G.testfile).actual"
-      copy_from => local_cp("$(this.promise_filename).start");
+        copy_from => local_cp("$(this.promise_filename).start");
 
 
       "$(G.testfile).expected"
-      copy_from => local_cp("$(this.promise_filename).finish");
+        copy_from => local_cp("$(this.promise_filename).finish");
 
 }
 
@@ -31,7 +31,7 @@ bundle agent init
 bundle agent test
 {
   meta:
-      "description" -> { "CFE-3221" }
+      "description" -> { "CFE-3221", "CFE-3244" }
         string => "Test expected behavior of set_variable_values_ini";
 
   vars:
@@ -47,13 +47,19 @@ bundle agent test
       "config[CFE-3221][variablename7]" string => "desired value7";
       "config[CFE-3221][variablename8]" string => "desired value8";
 
+      "config[CFE-3244][keyone]" string => "1";
+      "config[CFE-3244][keytwo]" string => "valuetwo";
+
   files:
 
       "$(G.testfile).actual"
-      edit_line => set_variable_values_ini("test.config", "section");
+        edit_line => set_variable_values_ini("test.config", "section");
 
       "$(G.testfile).actual" -> { "CFE-3221" }
         edit_line => set_variable_values_ini( "test.config", "CFE-3221" );
+
+      "$(G.testfile).actual" -> { "CFE-3244" }
+        edit_line => set_variable_values_ini( "test.config", "CFE-3244" );
 
 }
 
