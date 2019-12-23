@@ -10,5 +10,8 @@ variablename3=desired value3
 variablename8=desired value8
 variablename6=desired value6
 variablename7=desired value7
+[CFE-3244]
+keyone=1
+keytwo=valuetwo
 [section2]
 wat=WUT
