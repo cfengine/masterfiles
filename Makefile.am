@@ -1,10 +1,8 @@
+ACLOCAL_AMFLAGS = -I m4
+
 SUBDIRS = \
 	modules/packages \
-	tests/unit
-
-if HAVE_CORE
-    SUBDIRS += tests/acceptance
-endif
+	tests/
 
 # See configure.ac for MASTERFILES_INSTALL_TARGETS.
 nobase_dist_masterfiles_DATA = @MASTERFILES_INSTALL_TARGETS@
