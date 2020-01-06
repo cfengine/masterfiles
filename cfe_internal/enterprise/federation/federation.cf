@@ -37,6 +37,13 @@ bundle agent config
       "am_on" expression => strcmp("on", "$(data[target_state])"),
         scope => "namespace";
 
+      # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
+      default:_stdlib_path_exists_getenforce::
+        "selinux_enabled"
+          expression => strcmp("Enforcing", execresult("$(paths.getenforce)", useshell)),
+          scope => "namespace";
+
+
   vars:
     enabled::
       "role" string => "$(data[role])";
@@ -197,11 +204,6 @@ bundle agent transport_user
         };
 
   classes:
-    # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
-    enabled.default:_stdlib_path_exists_getenforce::
-        "selinux_enabled"
-          expression => strcmp("Enforcing", execresult("$(paths.getenforce)", useshell));
-
     enabled.selinux_enabled::
         "incorrect_ssh_context"
           expression => not( or(
@@ -294,8 +296,8 @@ bundle agent clean_when_off
 
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
-    selinux_enabled.default:_stdlib_path_exists_semanage.default:_stdlib_path_exists_restorecon::
-      "$(paths.semanage) -d -t ssh_home_t '$(home)/.ssh(/.*)?'";
+    selinux_enabled.default:_stdlib_path_exists_semanage::
+      "$(paths.semanage) fcontext -d '$(home)/.ssh(/.*)?'";
 
 }
 
