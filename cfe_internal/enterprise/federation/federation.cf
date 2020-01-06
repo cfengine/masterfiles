@@ -200,7 +200,8 @@ bundle agent transport_user
     # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
     enabled.default:_stdlib_path_exists_getenforce::
         "selinux_enabled"
-          expression => strcmp("Enforcing", execresult("$(paths.getenforce)", useshell));
+        expression => strcmp("Enforcing", execresult("$(paths.getenforce)", useshell)),
+        scope => "namespace";
 
     enabled.selinux_enabled::
         "incorrect_ssh_context"
