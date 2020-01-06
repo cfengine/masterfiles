@@ -724,7 +724,15 @@ bundle agent cfe_autorun_inventory_fstab
 bundle agent cfe_autorun_inventory_dmidecode
 # @brief Do hardware related inventory
 #
-# This agent bundle runs dmidecode when present to inventory:
+# This agent bundle reads dmi information from the sysfs and/or from dmidecode.
+# Sysfs is preferred for most variables, but if no sysfs (e.g. on RHEL 5),
+# or no sysfs equivalent to a dmidecode variable (e.g. system-version),
+# then dmidecode is run to collect the info.
+# For system-uuid, a parsed version of dmidecode is the preferred source.
+#
+# The variable names dmi[...] are all based on dmidecode string keywords.
+#
+# Information collected is:
 # - BIOS vendor
 # - BIOS version
 # - System serial number
@@ -739,7 +747,41 @@ bundle agent cfe_autorun_inventory_dmidecode
 # - System serial number
 # - System manufacturer
 {
+
   vars:
+    any::
+      "sysfs_name_for"
+        comment => "The names in /sys/devices/virtual/dmi/id/ don't match
+                    the strings to be passed to dmidecode, even though the
+                    values do.  We use the dmidecode string names for our
+                    variables since that was the original source (i.e. for
+                    backward compatibility with policies based on prior
+                    versions of this code).",
+        # system-version has no equivalent in sysfs that I can find.
+        # Items after the line break aren't currently collected, but mapping is provided
+        # in case someone adds them to a custom dmidefs (so that they could be gotten
+        # from sysfs in that case).
+        data => parsejson('
+          {
+            "bios-vendor": "bios_vendor",
+            "bios-version": "bios_version",
+            "system-serial-number": "product_serial",
+            "system-manufacturer": "sys_vendor",
+            "system-product-name": "product_name",
+            "system-uuid": "product_uuid",
+
+            "baseboard-manufacturer": "board_vendor",
+            "baseboard-product-name": "board_name",
+            "baseboard-serial-number": "board_serial",
+            "baseboard-version": "board_version",
+            "bios-release-date": "bios_date",
+            "chassis-manufacturer": "chassis_vendor",
+          }');
+
+  vars:
+    any::
+      # The dmidefs variable controls which values are collected
+      # (and what are their inventory tags)
       "dmidefs" data => parsejson('
 {
   "bios-vendor": "BIOS vendor",
@@ -772,7 +814,6 @@ bundle agent cfe_autorun_inventory_dmidecode
       # processor-family
       # processor-frequency
       # processor-manufacturer
-      # system-uuid
       #"processor-version": "CPU model" <- Collected by default, but not by iterating over the list
 
       "dmivars" slist => getindices(dmidefs);
@@ -780,12 +821,50 @@ bundle agent cfe_autorun_inventory_dmidecode
     have_dmidecode::
       "decoder" string => "$(inventory_control.dmidecoder)";
 
+    have_dmidecode._stdlib_path_exists_awk.!(redhat_4|redhat_3)::
+      # Awk script from https://kb.vmware.com/s/article/53609
+      # Edited only to add "-t1" (an improvement tested on RHEL 4/5/6/7 and FreeBSD)
+      # and to take out the "UUID: " prefix in the output.
+      # This works on a superset of systems where dmidecode -s system-uuid works,
+      # e.g. RHEL 5 with dmidecode-2.7-1.28.2.el5 where system-uuid is not one of the valid keywords;
+      # also, this returns the correct UUID on systems (such as VMWare VMs with hardware version 13)
+      # where dmidecode -s system-uuid shows the wrong UUID.  Some such VMWare VMs also show the
+      # wrong UUID in sysfs, which is why we prefer the "dmidecode | awk" version to sysfs for UUID.
+      # (We still need to check sysfs for UUID to handle hosts without dmidecode such as CoreOS.)
+      "dmi[system-uuid]"
+        string => execresult(
+          "$(decoder) -u -t1 |
+            $(paths.awk) '
+              BEGIN { in1 = 0; hd = 0}
+              /, DMI type / { in1 = 0 }
+              /Strings:/ { hd = 0 }
+              { if (hd == 2) { printf \"%s-%s\n\", $1 $2, $3 $4 $5 $6 $7 $8; hd = 0 } }
+              { if (hd == 1) { printf \"%s-%s-%s-\", $9 $10 $11 $12, $13 $14, $15 $16; hd = 2 } }
+              /, DMI type 1,/ { in1 = 1 }
+              /Header and Data:/ { if (in1 != 0) { hd = 1 } }
+            '",
+          "useshell" ),
+        if => isvariable("dmidefs[system-uuid]"), # Only run this if system-uuid is marked for collection in dmidefs
+        meta => { "inventory", "attribute_name=$(dmidefs[system-uuid])" };
+
+    !disable_inventory_dmidecode.!windows::
+    # The reason disable_inventory_dmidecode is referenced here but not in the other context lines
+    # is because those vars depend on have_dmidecode which won't be set during pre-eval (and won't
+    # be set at all if this bundle isn't called).  Without this guard here, we would attempt to
+    # read sysfs even if dmi inventory were turned off on the host via disable_inventory_dmidecode,
+    # which would be undesirable.
+      "dmi[$(dmivars)]"
+        unless => isvariable("dmi[$(dmivars)]"), # This is just for system-uuid really, which we get from the awk script above by preference.
+        if =>   fileexists("/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])"),
+        string => readfile("/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])", 0),
+        meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
 
     # Redhat 4 can support the -s option to dmidecode if
     # kernel-utils-2.4-15.el4 or greater is installed.
     have_dmidecode.!(redhat_4|redhat_3)::
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                              "useshell"),
+      unless => isvariable("dmi[$(dmivars)]"), # If already defined from sysfs, don't run dmidecode
       meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
 
       # We do not want to inventory the model name from here, as inventory for
