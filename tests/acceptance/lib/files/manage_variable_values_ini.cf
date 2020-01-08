@@ -47,6 +47,8 @@ bundle agent test
       "config[CFE-3221][variablename6]" string => "desired value6";
       "config[CFE-3221][variablename7]" string => "desired value7";
       "config[CFE-3221][variablename8]" string => "desired value8";
+      "config[section3][keyone]" string => "1";
+      "config[section3][keytwo]" string => "valuetwo";
 
   files:
       "$(G.testfile).actual"

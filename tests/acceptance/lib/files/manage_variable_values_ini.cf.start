@@ -9,5 +9,8 @@ variablename3 =desired value3
 # variablename6= desired value6
 # variablename7 = desired value7
 # variablename8 = wrong value8
+[section3]
+  keyone=valueone
+  keytwo=value2
 [section2]
 wat=WUT
