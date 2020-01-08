@@ -1,5 +1,14 @@
 [section]
 keyone=1
 keytwo=two
+[CFE-3221]
+variablename= desired value
+variablename2 = desired value2
+variablename3 =desired value3
+variablename5=desired value5
+variablename6= desired value6
+variablename7 = desired value7
+variablename8 = desired value8
+variablename4=desired value4
 [something]
 keyone=something1
