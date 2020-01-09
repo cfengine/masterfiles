@@ -57,6 +57,9 @@ bundle agent test
       "$(G.testfile).actual" -> { "CFE-3221" }
         edit_line => manage_variable_values_ini( "test.config", "CFE-3221" );
 
+      "$(G.testfile).actual" -> { "CFE-3221" }
+        edit_line => manage_variable_values_ini( "test.config", "section3" );
+
 }
 
 #######################################################

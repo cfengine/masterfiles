@@ -10,5 +10,8 @@ variablename7=desired value7
 variablename8=desired value8
 variablename2=desired value2
 variablename3=desired value3
+[section3]
+keytwo=valuetwo
+keyone=1
 [section2]
 wat=WUT
