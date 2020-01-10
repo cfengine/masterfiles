@@ -573,7 +573,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
 
   commands:
     _stdlib_path_exists_true::
-      "/bin/true"
+      "$(paths.true)"
         comment => "This promise is used for delaying execution of url_get, since locking does not work directly on vars type promises",
         classes => kept_successful_command,
         handle => "daily_dummy_job",
