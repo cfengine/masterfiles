@@ -626,7 +626,7 @@ bundle agent cfe_internal_enterprise_policy_analyzer
 
       "$(analyzer_dir)/."
         create => "true",
-        perms => mog( "700", $(def.cf_apache_user), $(def.cf_apache_user) );
+        perms => mog( "500", $(def.cf_apache_user), $(def.cf_apache_user) );
 
        "$(analyzer_dir)/."
          copy_from => analyzer_sync( $(analyzer_source) ),
