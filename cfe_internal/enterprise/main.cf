@@ -34,6 +34,11 @@ bundle agent cfe_internal_enterprise_main
       "Enterprise Maintenance"
         usebundle => cfe_internal_enterprise_maintenance;
 
+    am_policy_hub.enterprise_edition::
+
+      "Inventory Enterprise License Utilization" -> { "ENT-5089" }
+        usebundle => inventory_cfengine_enterprise_license_utilization;
+
     am_policy_hub.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
 
       "hub" -> { "ENT-3186" }
