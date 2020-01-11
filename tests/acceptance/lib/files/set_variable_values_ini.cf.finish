@@ -11,7 +11,7 @@ variablename7 = desired value7
 variablename8 = desired value8
 variablename4=desired value4
 [CFE-3244]
-keytwo=valuetwo
-keyone=1
+CFE-3244keytwo=valuetwo
+CFE-3244keyone=1
 [something]
 keyone=something1

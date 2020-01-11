@@ -485,7 +485,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
       ifvarclass => "edit_$(cindex[$(index)])";
 
       # match a line starting like the key something
-      "$(index)\s*=.*"
+      "\s+$(index)\s*=.*"
       edit_field => col("\s*=\s*","2","$($(tab)[$(sectionName)][$(index)])","set"),
       select_region => INI_section(escape("$(sectionName)")),
       classes => results("bundle", "set_variable_values_ini_not_$(cindex[$(index)])"),
