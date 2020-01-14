@@ -440,7 +440,7 @@ body classes ENT_5279
   # TODO: When ENT-5279 is resolved, adjust this guard so that 1 is only
   # considered kept on affected versions.
 
-  cfengine_3_15::
+  cfengine_3_15|cfengine_3_16::
     kept_returncodes => { "0", "1" };
 }
 
