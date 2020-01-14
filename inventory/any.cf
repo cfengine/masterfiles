@@ -565,19 +565,35 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
       "URL"       string => "http://169.254.169.254/latest/dynamic/instance-identity/document";
       "cache"     string => "$(sys.statedir)/aws_ec2_metadata";
+
+      "v" -> { "ENT-5233" }
+        string => ifelse( isgreaterthan( $(sys.cf_version_minor), 14), "suppress_inform_capable",
+                          "suppress_inform_incapable");
+
       "response" -> { "ENT-4900" }
         data => url_get($(URL), '{"url.max_content": 512000, "url.timeout": 1}'),
         # To prevent `url_get` from firing on every agent run, this variable
         # depends on a dummy command which does nothing but fires only once a day
-        depends_on => { "daily_dummy_job" };
+        depends_on => { "daily_dummy_job_$(v)" };
 
   commands:
     _stdlib_path_exists_true::
-      "/bin/true"
+
+      "$(paths.true)"
         comment => "This promise is used for delaying execution of url_get, since locking does not work directly on vars type promises",
         classes => kept_successful_command,
-        handle => "daily_dummy_job",
+        handle => "daily_dummy_job_suppress_inform_incapable",
+        action => if_elapsed_day,
+        if => strcmp( "daily_dummy_job_$(v)", "daily_dummy_job_suppress_inform_incapable" );
+
+@if minimum_version(3.15.0)
+      "$(paths.true)"
+        comment => "This promise is used for delaying execution of url_get, since locking does not work directly on vars type promises",
+        classes => kept_successful_command,
+        handle => "daily_dummy_job_suppress_inform_capable",
+        inform => "false",
         action => if_elapsed_day;
+@endif
 
   files:
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
