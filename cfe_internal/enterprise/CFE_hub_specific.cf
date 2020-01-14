@@ -370,6 +370,79 @@ bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
                     They need to be cleaned up as to not fill the disk.";
 
 }
+bundle agent inventory_cfengine_enterprise_license_utilization
+# @brief Inventory CFEngine Enterprise License Utilization
+{
+
+@if minimum_version(3.15.0)
+  classes:
+
+    enterprise_edition::
+    "have_cf_hub" expression => fileexists( $(cf_hub) );
+
+  vars:
+      "cf_hub" string => "/var/cfengine/bin/cf-hub";
+
+   have_cf_hub::
+      "cf_hub_show_license_output" string => '$(sys.statedir)/cf-hub-show-license.txt';
+
+      "parsed_license"
+        data => data_readstringarray( $(cf_hub_show_license_output),
+                                      "",
+                                      ":\s+",
+                                      10,
+                                      500),
+        if => fileexists( $(cf_hub_show_license_output) );
+
+      "license_file"
+        string => "$(parsed_license[License file])",
+        meta => { "inventory", "attribute_name=CFEngine Enterprise license file" };
+
+      "license_utilization"
+        string => "$(with)",
+        meta => { "inventory", "attribute_name=CFEngine Enterprise license utilization" },
+        with => nth( string_split( "$(parsed_license[Utilization])", "\W", inf ), 0),
+        if => isvariable( "parsed_license[Utilization]" );
+
+      "license_expiration"
+        string => "$(parsed_license[Expiration date])",
+        meta => { "inventory", "attribute_name=CFEngine Enterprise license expiration date" },
+        if => isvariable( "parsed_license[Expiration date]" );
+
+      "license_count"
+        string => "$(with)",
+        with => nth( string_split( "$(parsed_license[Utilization])", "\W", inf ), 1),
+        meta => { "inventory", "attribute_name=CFEngine Enterprise licenses allocated" },
+        if => isvariable( "parsed_license[Utilization]" );
+
+      "license_status"
+        string => "$(parsed_license[License status])",
+        meta => { "inventory", "attribute_name=CFEngine Enterprise licenses status" },
+        if => isvariable( "parsed_license[License status]" );
+
+  commands:
+
+   have_cf_hub::
+
+      "$(sys.cf_hub)"
+        arglist => {  "--show-license", ">",  $(cf_hub_show_license_output) },
+        contain => in_shell,
+        inform => "false",
+        classes => ENT_5279;
+
+@endif
+}
+
+body classes ENT_5279
+# @brief Work around ENT-5279, cf-hub --show-license returns 1 when no license is installed
+{
+
+  # TODO: When ENT-5279 is resolved, adjust this guard so that 1 is only
+  # considered kept on affected versions.
+
+  cfengine_3_15::
+    kept_returncodes => { "0", "1" };
+}
 
 bundle agent log_cfengine_enterprise_license_utilization
 # @brief Log the number of hosts seen within the last 24 hours and the number of
