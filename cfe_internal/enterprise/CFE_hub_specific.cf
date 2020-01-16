@@ -437,10 +437,10 @@ body classes ENT_5279
 # @brief Work around ENT-5279, cf-hub --show-license returns 1 when no license is installed
 {
 
-  # TODO: When ENT-5279 is resolved, adjust this guard so that 1 is only
+  # TODO: Redact when 3.15.x is no longer supported
   # considered kept on affected versions.
 
-  cfengine_3_15::
+  cfengine_3_15_0::
     kept_returncodes => { "0", "1" };
 }
 
