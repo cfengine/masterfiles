@@ -62,7 +62,7 @@ script:
       exit;
   fi
   # Fetch the tags from upstream, even if we are running on a foreign clone;
-  # Needed for determine-version.py to work
+  # Needed for determine-version.sh to work
 - git remote add upstream https://github.com/cfengine/masterfiles.git;
   git fetch upstream 'refs/tags/*:refs/tags/*';
 - ./autogen.sh --without-core --prefix=$INSTDIR
