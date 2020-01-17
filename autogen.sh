@@ -6,9 +6,9 @@ ORIGDIR=`pwd`
 srcdir=`dirname $0`
 [ -n "$srcdir" ] && cd $srcdir
 
-echo "$0: Running determine-version.py ..."
+echo "$0: Running determine-version.sh ..."
 rm -f CFVERSION
-3rdparty/core/determine-version.py > CFVERSION \
+misc/determine-version.sh .CFVERSION > CFVERSION \
     || echo "$0: Unable to auto-detect CFEngine version, continuing"
 
 echo "$0: Running autoreconf ..."
