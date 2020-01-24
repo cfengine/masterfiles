@@ -453,17 +453,10 @@ bundle agent postgres_config
 
   commands:
     am_superhub.postgresql_conf_repaired::
-      "$(sys.bindir)/pg_ctl"
-        arglist => {
-                     "restart",
-                     "-w", # Wait for startup or shutdown to complete, -W (do not wait) is the default for start and restart modes
-                     "-D",
-                     "$(sys.statedir)/pg/data",
-                     "-l",
-                     "/var/log/postgresql.log",
-                     "-m",
-                     "smart" # wait for online backup mode to finish and all clients to disconnect
-        },
+      # smart mode tries to wait for operations to finish and clients to
+      # disconnect, fast mode terminates open connections gracefully
+      "$(sys.bindir)/pg_ctl --pgdata $(sys.statedir)/pg/data --log /var/log/postgresql.log --wait --mode smart restart ||
+       $(sys.bindir)/pg_ctl --pgdata $(sys.statedir)/pg/data --log /var/log/postgresql.log --wait --mode fast  restart"
         contain => cfpostgres_user;
 }
 
