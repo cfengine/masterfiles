@@ -552,20 +552,8 @@ bundle agent cfe_internal_enterprise_maintenance
         ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
 }
 
-bundle agent cfe_internal_refresh_inventory_args
-{
-  vars:
-    cfengine_enterprise_federation:am_superhub::
-      "args" -> {"ENT-4527"}
-        string => "inventory_refresh_by_hostkey $(sys.key_digest)",
-        comment => "Only refresh inventory for the superhub, other hosts get refreshed on data import";
-
-    !cfengine_enterprise_federation:am_superhub::
-      "args" string => "inventory_refresh";
-}
-
 bundle agent cfe_internal_refresh_inventory_view
-# @brief Refresh materialized view every 5 minutes
+# @brief Refresh list of inventory variables every 5 minutes
 {
   meta:
 
@@ -573,22 +561,14 @@ bundle agent cfe_internal_refresh_inventory_view
 
       "tags" slist => { "enterprise_maintenance" };
 
-  methods:
-@if minimum_version(3.12.0)
-      # we need to know if we are running on a superhub
-      "superhub_config" usebundle => "cfengine_enterprise_federation:config";
-@endif
-
-      "inventory_refresh_args" usebundle => "cfe_internal_refresh_inventory_args";
-
   commands:
 
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php"
-        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks $(cfe_internal_refresh_inventory_args.args)",
+        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh",
         contain => silent,
-        comment => "This refreshes the inventory view. If the inventory view is not refreshed then it will contain stale data.",
+        comment => "This refreshes the variables shown in the Mission Portal Inventory.",
         handle  => "mpf_fresh_inventory_view",
         if => isdir( "$(cfe_internal_hub_vars.docroot)/api/modules/inventory" );
 }
