@@ -136,8 +136,10 @@ bundle agent cfe_autorun_inventory_disk
 {
   vars:
     enterprise::
-      "free" string => "$(mon.value_diskfree)",
-               meta => { "inventory", "attribute_name=Disk free (%)" };
+      "free" -> { "ENT-5190" }
+        string => "$(mon.value_diskfree)",
+        meta => { "inventory", "attribute_name=Disk free (%)" },
+        if => isvariable( "mon.value_diskfree" );
 }
 
 bundle agent cfe_autorun_inventory_memory
@@ -201,8 +203,10 @@ bundle agent cfe_autorun_inventory_loadaverage
 {
   vars:
     enterprise::
-      "value" string => "$(mon.value_loadavg)",
-      meta => { "report" };
+      "value" -> { "ENT-5190" }
+        string => "$(mon.value_loadavg)",
+        meta => { "report" },
+        if => isvariable( "mon.value_loadavg" );
 }
 
 bundle agent cfe_autorun_inventory_proc
