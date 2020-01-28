@@ -38,7 +38,7 @@ bundle common inventory_linux
         ifvarclass => strcmp("$(proc_routes[$(routeidx)][1])", "00000000");
 
     linux::
-      "nfs_servers"
+      "nfs_servers" -> { "CFE-3259" }
         comment => "NFS servers (to list hosts impacted by NFS outages)",
         slist => maplist( regex_replace( $(this) , ":.*", "", "g"),
                           # NFS server is before the colon (:), that's all we want
@@ -47,7 +47,8 @@ bundle common inventory_linux
                           grep( ".* nfs .*",
                                 readstringlist("/proc/mounts", "", "\n", inf, inf)
                               )
-                        );
+                        ),
+        if => fileexists( "/proc/mounts" );
 
 
         "nfs_server[$(nfs_servers)]"
