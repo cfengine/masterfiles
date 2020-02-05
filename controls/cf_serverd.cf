@@ -111,6 +111,13 @@ bundle server access_rules()
       if => isdir( "$(def.dir_bin)/" ),
       admit => { @(def.acl) };
 
+      "$(def.dir_data)/"
+      handle => "server_access_grant_access_data",
+      shortcut => "data",
+      comment => "Grant access to data directory",
+      if => isdir( "$(def.dir_data)/" ),
+      admit => { @(def.acl) };
+
       "$(def.dir_modules)/"
       handle => "server_access_grant_access_modules",
       shortcut => "modules",
