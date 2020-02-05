@@ -281,6 +281,13 @@ bundle common def
       comment => "Define binary path",
       handle => "common_def_vars_dir_bin";
 
+      "dir_data"
+        string => ifelse( isvariable( "def.dir_data"),
+                          $(def.dir_data),
+                          "$(sys.workdir)/data"),
+      comment => "Define data path",
+      handle => "common_def_vars_dir_data";
+
       "dir_modules"     string => translatepath("$(sys.workdir)/modules"),
       comment => "Define modules path",
       handle => "common_def_vars_dir_modules";
