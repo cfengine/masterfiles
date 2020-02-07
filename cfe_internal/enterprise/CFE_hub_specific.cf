@@ -398,6 +398,12 @@ bundle agent inventory_cfengine_enterprise_license_utilization
         string => "$(parsed_license[License file])",
         meta => { "inventory", "attribute_name=CFEngine Enterprise license file" };
 
+      "license_owner" -> { "ENT-5337" }
+        string => "$(with)",
+        meta => { "inventory", "attribute_name=CFEngine Enterprise license owner" },
+        with => nth( string_split( "$(parsed_license[Company name])", "\W", inf ), 0),
+        if => isvariable( "parsed_license[Company Name]" );
+
       "license_utilization"
         string => "$(with)",
         meta => { "inventory", "attribute_name=CFEngine Enterprise license utilization" },
@@ -417,7 +423,7 @@ bundle agent inventory_cfengine_enterprise_license_utilization
 
       "license_status"
         string => "$(parsed_license[License status])",
-        meta => { "inventory", "attribute_name=CFEngine Enterprise licenses status" },
+        meta => { "inventory", "attribute_name=CFEngine Enterprise license status" },
         if => isvariable( "parsed_license[License status]" );
 
   commands:
