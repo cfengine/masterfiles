@@ -87,10 +87,21 @@ bundle agent cfe_internal_setup_python_symlink(symlink_path)
       "path" string => getenv("PATH", 1024);
       "path_folders" slist => splitstring("$(path)", ":", 128);
 
-      "exact_version_globs" slist => maplist("$(this)/python[23]", @(path_folders)),
+    windows::
+      "abs_path_folders" -> {"CFE-2309"}
+        slist => filter("([A-Z]|//):.*", path_folders, "true", "false", 128),
+        comment => "findfiles() complains about relative directories";
+
+    !windows::
+      "abs_path_folders" -> {"CFE-2309"}
+        slist => filter("/.*", path_folders, "true", "false", 128),
+        comment => "findfiles() complains about relative directories";
+
+    any::
+      "exact_version_globs" slist => maplist("$(this)/python[23]", @(abs_path_folders)),
         comment => "Looking for Python 2 and/or Python 3 in the $PATH folders";
 
-      "generic_python_globs" slist => maplist("$(this)/python", @(path_folders)),
+      "generic_python_globs" slist => maplist("$(this)/python", @(abs_path_folders)),
         comment => "Looking for the 'python' symlink/executable which can be any
                     version of Python (usually Python 2 for backwards compatibility)";
 
