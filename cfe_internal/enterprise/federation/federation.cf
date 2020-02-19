@@ -525,14 +525,50 @@ body contain contain_transport_user
     useshell => "true";
 }
 
+bundle agent pre_import_state
+# @brief Get the superhub into a state ready for importing dumps from feeders
+{
+  meta:
+      "comment" string => "We need to stop cf-hub to prevent deadlocks on the PostgreSQL database";
+
+  services:
+    systemd::
+      "cf-hub" service_policy => "stop";
+
+  processes:
+    !systemd::
+      "cf-hub"
+        process_select => daemon_select,  # we want the main process (not its child processes)
+        signals => {"term"};
+}
+
+body process_select daemon_select
+# @brief Select a daemon process (with PPID equal to 1)
+{
+        ppid => irange(1, 1);
+        process_result => "ppid";
+}
+
 bundle agent imported_data
 # @brief Run script to import dumps on superhub
 {
   commands:
-    am_superhub.!am_paused::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/import.sh"},
         contain => default:in_shell;
+}
+
+bundle agent post_import_state
+# @brief Get the superhub into the standard state, after importing dumps from feeders
+# @see pre_import_state
+{
+  services:
+    systemd::
+      "cf-hub" service_policy => "start";
+
+  commands:
+    !systemd::
+      "/var/cfengine/bin/cf-hub";
 }
 
 bundle agent superhub_schema
@@ -622,15 +658,26 @@ bundle agent entry
         handle => "data_transport",
         depends_on => { "transport_user" },
         usebundle => data_transport;
-      "CFEngine Enterprise Federation Feeder Data Import"
-        handle => "imported_data",
-        depends_on => { "transport_user", "ensure_feeders" },
-        usebundle => imported_data;
       "CFEngine Enterprise Federation Feeder Data Export"
         usebundle => exported_data,
         action => default:if_elapsed($(cfengine_enterprise_federation:config.dump_interval));
       "Configuration Status"
         usebundle => setup_status;
+
+    enabled.am_on.am_superhub.!am_paused::
+      "CFEngine Enterprise Federation Feeder Data Import Preparations"
+        handle => "pre_import_state",
+        depends_on => { "transport_user", "ensure_feeders" },
+        usebundle => pre_import_state;
+      "CFEngine Enterprise Federation Feeder Data Import"
+        handle => "imported_data",
+        depends_on => { "pre_import_state" },
+        usebundle => imported_data;
+      "CFEngine Enterprise Federation Feeder Data Import Cleanups"
+        handle => "post_import_state",
+        depends_on => { "imported_data" },
+        usebundle => post_import_state;
+
   reports:
     !enterprise_edition::
       "Federated reporting is only available in CFEngine Enterprise.";
