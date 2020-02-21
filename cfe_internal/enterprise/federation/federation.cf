@@ -301,13 +301,6 @@ bundle agent clean_when_off
 
 }
 
-bundle agent inventory_refresh_cmd
-{
-  vars:
-    "cmd" data => parsejson('{"inventory_refresh_cmd":
-                                "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh"}');
-}
-
 bundle agent federation_manage_files
 # @brief Manage files, directories and permissions in $(cfengine_enterprise_federation:config.federation_dir)
 {
@@ -319,12 +312,6 @@ bundle agent federation_manage_files
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
     "feeder" data => parsejson('{"feeder": "$(sys.key_digest)"}');
     "cf_version" data => parsejson('{"cf_version":"$(sys.cf_version)"}');
-
-  methods:
-      "internal_vars" usebundle => "default:cfe_internal_hub_vars",
-        comment => "We need the path to the inventory refresh PHP script before we use it.";
-      "inventory_refresh_cmd" usebundle => "cfengine_enterprise_federation:inventory_refresh_cmd",
-        comment => "Needs to be in a separate bundle so that it gets evaluated *after* cfe_internal_hub_vars.";
 
   files:
     enterprise_edition.(policy_server|am_policy_hub)::
@@ -374,7 +361,7 @@ bundle agent federation_manage_files
         template_method => "mustache",
         edit_template => "$(this.promise_dirname)/../../../templates/federated_reporting/config.sh.mustache",
         template_data => mergedata(@(login), @(feeder_username), @(feeder), @(cf_version),
-                                   @(cfengine_enterprise_federation:inventory_refresh_cmd.cmd)),
+                                   parsejson('{"inventory_refresh_cmd": ""}')),
         perms => default:mog( "640", "root", "$(transport_user)" );
 
       # TODO: Instrument augments
