@@ -63,7 +63,7 @@ bundle common package_module_knowledge
     redhat|amazon_linux::
       "platform_default" string => "yum";
 
-    suse|sles::
+    suse|sles|opensuse::
       "platform_default" string => "zypper";
 
     aix::
