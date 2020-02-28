@@ -303,7 +303,7 @@ bundle agent cfe_internal_update_policy_cpv
       action => u_immediate;
 
   methods:
-    debian|redhat|amazon_linux|suse|sles::
+    debian|redhat|amazon_linux|suse|sles|opensuse::
       # Only needed on distros with Python-based package modules
       "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_symlink)"),
         if => not(fileexists("$(python_symlink)"));
