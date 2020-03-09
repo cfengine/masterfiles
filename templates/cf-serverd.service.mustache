@@ -3,11 +3,13 @@ Description=CFEngine Enterprise file server
 After=syslog.target
 After=network.target
 ConditionPathExists={{{vars.sys.bindir}}}/cf-serverd
+ConditionPathExists={{{vars.sys.workdir}}}/policy_server.dat
+ConditionPathExists={{{vars.sys.workdir}}}/inputs/promises.cf
 PartOf=cfengine3.service
 
 [Service]
 Type=simple
-ExecStart={{{vars.sys.bindir}}}/cf-serverd --no-fork --verbose
+ExecStart={{{vars.sys.bindir}}}/cf-serverd --no-fork
 Restart=always
 RestartSec=10
 
