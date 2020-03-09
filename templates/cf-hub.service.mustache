@@ -2,12 +2,16 @@
 Description=CFEngine Enterprise Hub Report Collector
 PartOf=cfengine3.service
 ConditionPathExists={{{vars.sys.bindir}}}/cf-hub
+ConditionPathExists={{{vars.sys.inputdir}}}/promises.cf
 After=syslog.target
 After=network.target
 
+Wants=cf-postgres.service
+After=cf-postgres.service
+
 [Service]
 Type=simple
-ExecStart={{{vars.sys.bindir}}}/cf-hub -F --verbose
+ExecStart={{{vars.sys.bindir}}}/cf-hub --no-fork
 Restart=always
 RestartSec=10
 
