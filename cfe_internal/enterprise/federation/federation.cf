@@ -520,7 +520,9 @@ bundle agent pre_import_state
 
   services:
     systemd::
-      "cf-hub" service_policy => "stop";
+      "cf-hub"
+        service_policy => "stop",
+        service_method => default:standard_services;
 
   processes:
     !systemd::
@@ -551,7 +553,9 @@ bundle agent post_import_state
 {
   services:
     systemd::
-      "cf-hub" service_policy => "start";
+      "cf-hub"
+        service_policy => "start",
+        service_method => default:standard_services;
 
   commands:
     !systemd::
