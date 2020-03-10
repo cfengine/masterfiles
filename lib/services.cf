@@ -120,7 +120,7 @@ body service_method standard_services
 #       service_method => standard_services;
 # ```
 {
-        service_bundle => standard_services( $(this.promiser), $(this.service_policy) );
+        service_bundle => default:standard_services( $(this.promiser), $(this.service_policy) );
 }
 
 ##
