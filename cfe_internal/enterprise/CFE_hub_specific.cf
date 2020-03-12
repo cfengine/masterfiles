@@ -38,6 +38,10 @@ bundle common cfe_internal_hub_vars
         comment => "Root directory of Enterprise Web interface",
         handle => "cfe_internal_hub_vars_docroot";
 
+      "public_docroot" string => ifelse( isdir("$(cfe_internal_hub_vars.docroot)/public"), "$(cfe_internal_hub_vars.docroot)/public",
+                                                $(cfe_internal_hub_vars.docroot)),
+        comment => "Public root directory of Enterprise Web interface";
+
       # TODO Consider tagging these files for file integrity monitoring.
 
       "SSLCertificateFile"
@@ -342,7 +346,7 @@ bundle agent cfe_internal_truncate_events
 {
   commands:
     Hr05.Min00_05::
-      "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.docroot)/index.php cli_tasks truncate_events"
+      "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks truncate_events"
       contain => silent,
       comment => "Truncate all the pending notifications if there is any",
       handle  => "cfe_internal_truncate_event_mp";
@@ -352,7 +356,7 @@ bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
 # @brief Clean up scheduled reports older than `days` days old
 {
   files:
-    "$(cfe_internal_hub_vars.docroot)/tmp/."
+    "$(cfe_internal_hub_vars.public_docroot)/tmp/."
       handle => "cfe_internal_purge_scheduled_reports_files_docroot_tmp",
       delete => tidy,
       depth_search => recurse("inf"),
@@ -572,7 +576,7 @@ bundle agent cfe_internal_refresh_inventory_view
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php"
-        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks inventory_refresh",
+        args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks inventory_refresh",
         contain => silent,
         comment => "This refreshes the variables shown in the Mission Portal Inventory.",
         handle  => "mpf_fresh_inventory_view",
@@ -593,7 +597,7 @@ bundle agent cfe_internal_refresh_hosts_view
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3482" }
-        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks materialized_hosts_view_refresh",
+        args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks materialized_hosts_view_refresh",
         contain => silent,
         comment => "This refreshes the hosts view. If the hosts view is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_hosts_view",
@@ -615,7 +619,7 @@ bundle agent cfe_internal_clear_last_seen_hosts_logs
     (policy_server|am_policy_hub).enterprise_edition.active_hub.(cfengine_3_12|cfengine_3_13|cfengine_3_14)::
 
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3550" }
-        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks clearLastSeenHostsLogs",
+        args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks clearLastSeenHostsLogs",
         contain => silent,
         comment => "This clears the __lastseenhostslogs table. If the __lastseenhostslogs table is not cleared then it will contain unnecessary data.",
         handle  => "mpf_clear_lastseenhostslogs",
@@ -637,7 +641,7 @@ bundle agent cfe_internal_refresh_events_table
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
 
       "$(sys.workdir)/httpd/php/bin/php"
-        args => "$(cfe_internal_hub_vars.docroot)/index.php cli_tasks process_api_events",
+        args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks process_api_events",
         contain => silent,
         comment => "This refreshes the events table. If the events table is not refreshed then it will contain stale data.",
         handle  => "mpf_fresh_events_table",

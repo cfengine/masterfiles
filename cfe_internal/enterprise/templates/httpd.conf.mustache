@@ -188,7 +188,10 @@ LogLevel warn
   SSLRandomSeed connect builtin
 
   <VirtualHost _default_:443>
-    DocumentRoot "{{{vars.cfe_internal_hub_vars.docroot}}}"
+    DocumentRoot "{{{vars.cfe_internal_hub_vars.public_docroot}}}"
+    Alias "/api" "{{{vars.cfe_internal_hub_vars.docroot}}}/api"
+    Alias "/api/static" "{{{vars.cfe_internal_hub_vars.docroot}}}/api/static"
+    Alias "/ldap" "{{{vars.cfe_internal_hub_vars.docroot}}}/ldap"
     ServerName {{{vars.sys.fqhost}}}:443
     # ServerAdmin root@localhost
     ErrorLog "{{{vars.cfe_internal_hub_vars.error_log}}}"
@@ -230,7 +233,7 @@ AddHandler php{{{vars.cfe_internal_hub_vars.php_version}}}-script       .php
 AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_version}}}
 
 
-<Directory "{{{vars.cfe_internal_hub_vars.docroot}}}">
+<Directory "{{{vars.cfe_internal_hub_vars.public_docroot}}}">
 
     Options -Indexes +FollowSymLinks +MultiViews
     Order deny,allow
@@ -256,6 +259,7 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api">
 
+    Order deny,allow
     AllowOverride None
 
   <IfModule mod_rewrite.c>
@@ -268,6 +272,7 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api/static">
 
+    Order deny,allow
     AllowOverride None
 
   # What do we use mod_mime for?
@@ -280,6 +285,7 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/ldap">
 
+    Order deny,allow
     AllowOverride None
 
   <IfModule mod_rewrite.c>
