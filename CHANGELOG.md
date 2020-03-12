@@ -1,6 +1,30 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.1:
+	- /var/cfengine/bin/python symlink creation on SLES was fixed
+	- Added 'data' shortcut to cf-serverd, defaults to sys.workdir/data
+	- Added inventory for CFEngine Enterprise License information
+	  (ENT-5089, ENT-5279)
+	- Added inventory of NFS servers in use (from /proc/mounts, on linux)
+	  (CFE-3259)
+	- Added inventory of license owner on enterprise hubs (ENT-5337)
+	- Added paths support for opensuse (CFE-3283)
+	- Added zypper as default package manager for opensuse (CFE-3284)
+	- Corrected application/logs path to outside of docroot (ENT-5255)
+	- Fixed dmi inventory to prefer sysfs to dmidecode for most variables for improved performance and to handle e.g. CoreOS hosts that don't have dmidecode.
+	  (CFE-3249)
+	- Fixed permission flip flop when policy analyzer is enabled (ENT-5235)
+	- Fixed system UUID inventory for certain VMWare VMs where dmidecode gives UUID bytes in wrong order.
+	  (CFE-3249)
+	- Improved resliliance of cron watchdog for linux (CFE-3258)
+	- Prevented inventory of unresolved variables for diskfree and loadavg
+	  (ENT-5190)
+	- Standard services now considers systemd services in ActiveState=activating active
+	  (CFE-3238)
+	- Suppress useless inform output from /bin/true in ec2 inventory
+	  (ENT-5233)
+
 3.15.0:
 	- Added package_module for snap (CFE-2811)
 	- Fixed pkgsrc in case where multiple Prefix paths are returned for pkg_install (CFE-3152)
