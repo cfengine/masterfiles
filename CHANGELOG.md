@@ -1,6 +1,25 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.4:
+	- Added 'data' shortcut to cf-serverd, defaults to sys.workdir/data
+	- Added inventory of NFS servers in use (from /proc/mounts, on linux)
+	  (CFE-3259)
+	- Added paths support for opensuse (CFE-3283)
+	- Added zypper as default package manager for opensuse (CFE-3284)
+	- Corrected application/logs path to outside of docroot (ENT-5255)
+	- Enabled SUSE 12 for self upgrade (ENT-5152)
+	- Fixed Python 3 incompatibility in yum package module
+	- Improved resliliance of cron watchdog for linux (CFE-3258)
+	- Modified federated reporting's import_file.sh to catch errors in psql run (ENT-5040)
+	- Move 'selinux_enabled' class to config bundle and namespace scope it
+	- Prevented inventory of unresolved variables for diskfree and loadavg
+	  (ENT-5190)
+	- Setup our own symlink for Python interpreter and use it
+	  (ENT-4668, ENT-4682)
+	- Standard services now considers systemd services in ActiveState=activating active
+	  (CFE-3238)
+
 3.12.3:
 	- Extended watchdog for AIX (ENT-4995)
 	- Added AIX support to body perms system_owned (ENT-4773)
