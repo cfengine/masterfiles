@@ -39,6 +39,7 @@ Notable changes to the framework should be documented here
 	- Fixed re-spawning of cf-execd or cf-monitord after remediating duplicate concurrent processes
 		(CFE-3150)
 	- Replaced /var/cfengine with proper $(sys.*) vars (ENT-4800)
+    - Fixed selection of standard_services when used from non-default namespace (ENT-5406)
 
 3.15.0b1:
 	- Added continual checking for policy_server state (CFE-3073)
