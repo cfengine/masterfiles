@@ -24,6 +24,8 @@ Notable changes to the framework should be documented here
 	  (CFE-3238)
 	- Suppress useless inform output from /bin/true in ec2 inventory
 	  (ENT-5233)
+	- Fixed selection of standard_services when used from non-default namespace (ENT-5406)
+
 
 3.15.0:
 	- Added package_module for snap (CFE-2811)
