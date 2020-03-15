@@ -19,6 +19,7 @@ Notable changes to the framework should be documented here
 	  (ENT-4668, ENT-4682)
 	- Standard services now considers systemd services in ActiveState=activating active
 	  (CFE-3238)
+	- Fixed selection of standard_services when used explicitly from non-default namespace (ENT-5406)
 
 3.12.3:
 	- Extended watchdog for AIX (ENT-4995)
