@@ -26,7 +26,6 @@ Notable changes to the framework should be documented here
 	  (ENT-5233)
 	- Fixed selection of standard_services when used from non-default namespace (ENT-5406)
 
-
 3.15.0:
 	- Added package_module for snap (CFE-2811)
 	- Fixed pkgsrc in case where multiple Prefix paths are returned for pkg_install (CFE-3152)
