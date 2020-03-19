@@ -452,12 +452,18 @@ bundle agent postgres_config
         classes => default:results( "bundle", "postgresql_conf" );
 
   commands:
-    am_superhub.postgresql_conf_repaired::
+    am_superhub.postgresql_conf_repaired.!systemd::
       # smart mode tries to wait for operations to finish and clients to
       # disconnect, fast mode terminates open connections gracefully
       "$(sys.bindir)/pg_ctl --pgdata $(sys.statedir)/pg/data --log /var/log/postgresql.log --wait --mode smart restart ||
        $(sys.bindir)/pg_ctl --pgdata $(sys.statedir)/pg/data --log /var/log/postgresql.log --wait --mode fast  restart"
         contain => cfpostgres_user;
+
+  services:
+    am_superhub.postgresql_conf_repaired.systemd::
+      "cf-postgres"
+        service_method => default:standard_services,
+        service_policy => "restart";
 }
 
 body contain cfpostgres_user
