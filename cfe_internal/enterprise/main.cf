@@ -31,12 +31,14 @@ bundle agent cfe_internal_enterprise_main
       handle => "cfe_internal_management_apache_sudoer",
       comment => "Permit Apache user to run passwordless sudo cf-runagent";
 
-      "hub" usebundle => cfe_internal_php_runalerts,
-      handle => "cfe_internal_management_php_runalerts",
-      comment => "To run PHP runalerts to check bundle status on SQL and Sketch";
-
       "Enterprise Maintenance"
         usebundle => cfe_internal_enterprise_maintenance;
+
+      "hub" usebundle => cfe_internal_php_runalerts,
+      handle => "cfe_internal_management_php_runalerts",
+      comment => "To run PHP runalerts to check bundle status on SQL and Sketch.
+                 ENT-5432: must run after cfe_internal_enterprise_maintenance bundle
+                 so that active_hub class is determined";
 
     am_policy_hub.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
 
