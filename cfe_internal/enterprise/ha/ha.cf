@@ -43,7 +43,7 @@ bundle agent ha_manage_notification_scripts_dir
  files:
     "/opt/cfengine/notification_scripts/." -> { "Mission Portal" }
      create => "true",
-     perms => mog("0755",$(def.cf_apache_user),$(def.cf_apache_group)),
+     perms => mog("770", "root", $(def.cf_apache_group)),
      comment => "This directory is used by Mission Portal to store custom
                  user-defined scripts. Having HA set up we need to synchronize
                  content of this directory between active and passive hubs.
