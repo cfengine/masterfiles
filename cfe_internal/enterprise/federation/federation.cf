@@ -271,9 +271,9 @@ bundle agent transport_user
 
   reports:
     selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_semanage::
-      "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf ($paths.semanage) does not resolve";
+      "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf $(paths.semanage) does not resolve";
     selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
-      "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf ($paths.restorecon) does not resolve";
+      "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf $(paths.restorecon) does not resolve";
 }
 
 bundle agent clean_when_off
