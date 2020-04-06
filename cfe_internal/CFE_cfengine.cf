@@ -72,7 +72,7 @@ bundle agent cfe_internal_management
 
       "CFEngine Recommendations"
         usebundle => $(recommendation_bundles),
-        if => isvariable( recommendation_bunldes );
+        if => isvariable( recommendation_bundles );
 
   reports:
     DEBUG|DEBUG_cfe_internal_management::
