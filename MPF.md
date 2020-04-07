@@ -369,12 +369,12 @@ This [augments file][Augments] ensures that only files ending in ```.cf```, ```.
 
 ```
 {
-  "vars:" {
-    "input_name_patterns": [ ".*\\.cf", ".*\\.dat",
-                             ".*\\.mustache",
-                             "cf_promises_release_id",
-                             ".*\\.json", ".*\\.yaml" ]
-  }
+    "vars": {
+        "input_name_patterns": [ ".*\\.cf", ".*\\.dat", ".*\\.txt", ".*\\.conf",
+            ".*\\.mustache", ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
+            ".*\\.sed", ".*\\.awk", "cf_promises_release_id", ".*\\.json",
+            ".*\\.yaml", ".*\\.csv" ]
+    }
 }
 ```
 
