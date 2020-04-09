@@ -280,9 +280,10 @@ body depth_search recurse_basedir_exclude(d)
 body file_select cfe_internal_docroot_perms
 # @brief Select files not named `.htacces` or `settings.ldap.php`
 {
-  leaf_name => { "\.htaccess", "settings.ldap.php" };
+  leaf_name => { "\.htaccess", "settings.ldap.php", "ha_enabled" };
       # htaccess are going the way of the dodo bird
       # settings.ldap.php permissions are handled explicitly in it's own bundle
+      # ha_enabled permissions is handled explicitly by cfengine_enterprise_ha_enabled_semaphore_present
   file_result => "!leaf_name";
 }
 
