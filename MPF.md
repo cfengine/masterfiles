@@ -1254,15 +1254,16 @@ enabled and the watchdog will be active. If the class
 `cfe_internal_core_watchdog_disabled` is defined, the feature is disabled and
 the watchdog will not be active.
 
-By default if enabled the watchdog tries to remediate the following conditions:
+```json
+{
+    "classes": {
+        "cfe_internal_core_watchdog_enabled": [ "aix::" ],
+        "cfe_internal_core_watchdog_disabled": [ "!cfe_internal_core_watchdog_enabled::" ]
+        }
+}
+```
 
-- If `cf-execd` is executable and there is no `cf-execd` process running, then
-  `cf-execd` will be launched.
-
-**History:**
-
-- start cf-execd if not running (3.8.0)
-- restart if processes not resulting in updated logs (3.12.0)
+**See Also:** [Watchdog documentation][cfe_internal/core/watchdog] 
 
 ### Modules
 
