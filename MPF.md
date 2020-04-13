@@ -1263,7 +1263,7 @@ the watchdog will not be active.
 }
 ```
 
-**See Also:** [Watchdog documentation][cfe_internal/core/watchdog] 
+**See Also:** [Watchdog documentation][cfe_internal/core/watchdog]
 
 ### Modules
 
