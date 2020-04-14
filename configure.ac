@@ -32,6 +32,7 @@ m4_undefine([cfversion])
 m4_undefine([cfversion_from_file])
 m4_undefine([cfversion_from_env])
 
+AS_IF([test -n "$RELEASE"], [AC_SUBST([RELEASE], ["$RELEASE"])], [AC_SUBST([RELEASE], [1])])
 
 AC_CANONICAL_TARGET
 
