@@ -63,7 +63,7 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI/Apache-htaccess");
 
-      "$(cfe_internal_hub_vars.docroot)/scripts/."
+      "$(cfe_internal_hub_vars.public_docroot)/scripts/."
       comment => "Ensure permissions for $(cfe_internal_hub_vars.public_docroot)/scripts",
       handle => "cfe_internal_setup_knowledge_files_doc_root_scripts",
       create => "true",
