@@ -241,7 +241,7 @@ bundle agent cfe_internal_update_policy_cpv
       "$(sys.workdir)$(const.dirsep)modules"
       comment => "Update modules from masterfiles",
       handle => "cfe_internal_update_policy_files_update_modules",
-      copy_from => u_cp("$(master_location)$(const.dirsep)modules"),
+      copy_from => u_cp("$(inputs_dir)$(const.dirsep)modules"),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
