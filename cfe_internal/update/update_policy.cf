@@ -236,17 +236,15 @@ bundle agent cfe_internal_update_policy_cpv
       action => u_immediate,
       classes => u_if_repaired("validated_updates_ready");
 
-    any::
+    !am_policy_hub::
 
       "$(sys.workdir)$(const.dirsep)modules"
-      comment => "Update modules from masterfiles",
+      comment => "Always update modules files on client side",
       handle => "cfe_internal_update_policy_files_update_modules",
-      copy_from => u_cp("$(master_location)$(const.dirsep)modules"),
+      copy_from => u_rcp("$(modules_dir_source)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
-
-    !am_policy_hub::
 
       "$(sys.workdir)$(const.dirsep)plugins"
       comment => "Always update plugins files on client side",
