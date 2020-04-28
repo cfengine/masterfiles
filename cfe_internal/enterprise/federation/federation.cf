@@ -302,9 +302,13 @@ bundle agent clean_when_off
   methods:
     "rm_rf_cftransport_home_dir" usebundle => default:rm_rf("$(home)");
 
+  classes:
+    selinux_enabled.default:_stdlib_path_exists_semanage::
+      "has_cftransport_fcontext" expression => returnszero("$(paths.semanage) fcontext -l | grep $(home)", "useshell");
+
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
-    selinux_enabled.default:_stdlib_path_exists_semanage::
+    selinux_enabled.default:_stdlib_path_exists_semanage.has_cftransport_fcontext::
       "$(paths.semanage) fcontext -d '$(home)/.ssh(/.*)?'";
 
 }
