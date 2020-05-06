@@ -14,7 +14,8 @@ bundle agent cfe_internal_core_main
 #       See https://dev.cfengine.com/issues/6906
 
     !mpf_disable_cfe_internal_limit_robot_agents::
-      "any" usebundle => cfe_internal_limit_robot_agents,
+      "Limit concurrent agents" -> { "CFE-1799" }
+        usebundle => cfe_internal_limit_robot_agents,
         handle => "cfe_internal_management_limit_cfe_agents",
         comment => "Manage CFE processes";
 
