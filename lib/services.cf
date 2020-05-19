@@ -251,8 +251,9 @@ bundle agent standard_services(service,state)
       "request_stop"    expression => strcmp("stop", "$(state)");
       "request_reload"  expression => strcmp("reload", "$(state)");
       "request_restart" expression => strcmp("restart", "$(state)");
+      "request_disable" expression => strcmp("disable", "$(state)");
 
-      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart)";
+      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart|request_disable)";
       "action_start"   expression => "request_start.!service_active.can_start_service";
       "action_stop"    expression => "request_stop.service_active.can_stop_service";
       "action_reload"  expression => "request_reload.service_active.can_reload_service";
@@ -269,7 +270,7 @@ bundle agent standard_services(service,state)
       "action_enable"  expression => "request_start.!service_enabled";
 
       # Respectively, stopping it implicitly disables it
-      "action_disable" expression => "request_stop.service_enabled";
+      "action_disable" expression => "(request_disable|request_stop).service_enabled";
 
   commands:
     systemd.service_loaded:: # note this class is defined in `inventory/linux.cf`
