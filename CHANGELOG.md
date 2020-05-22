@@ -1,6 +1,18 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.2:
+	- Admitted ::1 as a query source on Enterprise hubs (ENT-5531)
+	- Changed m_inventory dumping behavior to exclude when values are null
+	  (ENT-5562)
+	- Fixed typo preventing recommendation bundles from running (CFE-3305)
+	- HA setups no longer have flipping permissions on /opt/cfengine/notification_scripts
+	- Made python symlink fall back to platform-python (CFE-3291)
+	- Modified cftransport cleanup to avoid errors (ENT-5555)
+	- Release number was added to MPF tarballs (ENT-5429)
+	- Stopped continual repair of ha_enabled semaphore (ENT-4715)
+	- The zypper module is now fully compatible with Python 3 (CFE-3364)
+
 3.15.1:
 	- /var/cfengine/bin/python symlink creation on SLES was fixed
 	- Added 'data' shortcut to cf-serverd, defaults to sys.workdir/data
