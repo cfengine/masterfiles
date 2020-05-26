@@ -1,6 +1,17 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.5:
+	- Admitted ::1 as a query source on Enterprise hubs (ENT-5531)
+	- Changed m_inventory dumping behavior to exclude when values are null
+	  (ENT-5562)
+	- Fixed typo preventing recommendation bundles from running (CFE-3305)
+	- Made python symlink fall back to platform-python (CFE-3291)
+	- Modified cftransport cleanup to avoid errors (ENT-5555)
+	- Release number was added to MPF tarballs (ENT-5429)
+	- Stopped continual repair of ha_enabled semaphore (ENT-4715)
+	- The zypper module is now fully compatible with Python 3 (CFE-3364)
+
 3.12.4:
 	- Added 'data' shortcut to cf-serverd, defaults to sys.workdir/data
 	- Added inventory of NFS servers in use (from /proc/mounts, on linux)
