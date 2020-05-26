@@ -549,30 +549,14 @@ bundle agent cfengine_master_software_content
       "dir[ubuntu_18_x86_64]" string => "agent_ubuntu18_x86_64";
 
       # All 32bit debs use the same package
-      "dir[debian_4_i386]" string => "agent_deb_i386";
-      "dir[debian_4_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_4_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_5_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_5_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_5_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_6_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_6_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_6_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_7_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_7_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_7_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_8_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_8_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_8_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_9_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_9_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_9_i686]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_14_i386]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_14_i586]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_14_i686]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_16_i386]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_16_i586]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_16_i686]" string => "$(dir[debian_4_i386])";
+      "_deb_dists_i386" slist => { "debian_4", "debian_5", "debian_6",
+                                   "debian_7", "debian_8", "debian_9",
+                                   "debian_10", "ubuntu_14", "ubuntu_16",
+                                   "ubuntu_18" };
+
+      "_deb_arches_i386" slist => { "i386", "i586", "i686" };
+
+      "dir[$(_deb_dists_i386)_$(_deb_arches_i386)]" string => "agent_deb_i386";
 
       "platform_dir" slist => getindices( dir );
       "download_dir" string => "$(sys.workdir)/master_software_updates";
