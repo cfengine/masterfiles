@@ -506,21 +506,13 @@ bundle agent cfengine_master_software_content
       "dir[SuSE_10_x86_64]" string => "$(dir[redhat_5_x86_64])";
 
       # All 32bit rpms use the same package
-      "dir[redhat_5_i386]" string => "agent_rpm_i386";
-      "dir[centos_5_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_5_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_5_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_6_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_6_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_6_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[redhat_6_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[redhat_6_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[redhat_6_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_7_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_7_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_7_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[SuSE_11_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[SuSE_10_i386]" string => "$(dir[redhat_5_i386])";
+      "_rpm_dists_i386" slist => { "redhat_5", "redhat_6", "redhat_7",
+                                   "centos_5", "centos_6", "centos_7",
+                                   "SuSE_11", "SuSE_10" };
+
+      "_rpm_arches_i386" slist => { "i386", "i586", "i686" };
+
+      "dir[$(_rpm_dists_i386)_$(rpm_arches_i386)]" string => "agent_rpm_i386";
 
       # Redhat/Centos/Oracle 6 use the same package
       "dir[redhat_6_x86_64]" string => "agent_rhel6_x86_64";
