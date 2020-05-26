@@ -537,13 +537,16 @@ bundle agent cfengine_master_software_content
       "dir[centos_8_x86_64]" string => "$(dir[redhat_8_x86_64])";
       "dir[oracle_8_x86_64]" string => "$(dir[redhat_8_x86_64])";
 
+      # Debian
+      "dir[debian_7_x86_64]" string => "agent_deb_x86_64";
+      "dir[debian_8_x86_64]" string => "agent_debian8_x86_64";
+      "dir[debian_9_x86_64]" string => "agent_debian9_x86_64";
+      "dir[debian_10_x86_64]" string => "agent_debian10_x86_64";
 
-
-      # Debian 7, 8 and Ubuntu 14, 16 use the same package
-      "dir[debian_7_x86_64]" string => "agent_debian7_x86_64";
-      "dir[debian_8_x86_64]" string => "$(dir[debian_7_x86_64])";
-      "dir[ubuntu_14_x86_64]" string => "$(dir[debian_7_x86_64])";
-      "dir[ubuntu_16_x86_64]" string => "$(dir[debian_7_x86_64])";
+      # Ubuntu
+      "dir[ubuntu_14_x86_64]" string => "agent_ubuntu14_x86_64";
+      "dir[ubuntu_16_x86_64]" string => "agent_ubuntu16_x86_64";
+      "dir[ubuntu_18_x86_64]" string => "agent_ubuntu18_x86_64";
 
       # All 32bit debs use the same package
       "dir[debian_4_i386]" string => "agent_deb_i386";
