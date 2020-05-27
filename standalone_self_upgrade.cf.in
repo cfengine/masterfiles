@@ -405,21 +405,7 @@ bundle common cfengine_package_names
       "pkg[SuSE_10_x86_64]" string => "$(pkg[redhat_5_x86_64])";
 
       # 32bit RPMs
-      "pkg[redhat_5_i386]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el4.i386.rpm";
-      "pkg[redhat_5_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_5_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_5_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_5_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_5_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_6_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_6_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_6_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_6_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_7_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_7_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_7_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[SuSE_11_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[SuSE_10_i386]" string => "$(pkg[redhat_5_i386])";
+      "pkg[$(cfengine_master_software_content._rpm_dists_i386)_$(cfengine_master_software_content._rpm_arches_i386)]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el5.centos.i386.rpm";
 
       # Redhat/Centos 6, 7 use the same package
 
