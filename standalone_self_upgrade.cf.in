@@ -430,14 +430,17 @@ bundle common cfengine_package_names
       "pkg[centos_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
       "pkg[oracle_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
 
-      # Debian 7, 8, 9 and Ubuntu 14, 16, 18 use the same package
+      # 64bit Debian
 
-      "pkg[debian_7_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_amd64-debian7.deb";
-      "pkg[debian_8_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[debian_9_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[ubuntu_14_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[ubuntu_16_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[ubuntu_18_x86_64]" string => "$(pkg[debian_7_x86_64])";
+      "pkg[debian_7_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian7_amd64.deb";
+      "pkg[debian_8_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian8_amd64.deb";
+      "pkg[debian_9_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian9_amd64.deb";
+      "pkg[debian_10_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian10_amd64.deb";
+
+      # 64bit Ubuntu
+      "pkg[ubuntu_14_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_ubuntu14_amd64.deb";
+      "pkg[ubuntu_16_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_ubuntu16_amd64.deb";
+      "pkg[ubuntu_18_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_ubuntu18_amd64.deb";
 
       # 32bit DEBs
 
