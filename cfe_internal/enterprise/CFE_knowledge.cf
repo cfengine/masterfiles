@@ -220,7 +220,7 @@ bundle agent cfe_internal_permissions
 
     !(policy_server|am_policy_hub)::
       "$(sys.statedir)/." -> { "ENT-4773" }
-        perms => system_owned( "0600" ),
+        perms => state_dir_perms(),
         # Important to recurse across file system boundaries, as databases and or state are commonly on different filesystems
         depth_search => recurse_with_base( inf ),
         file_select => all;
@@ -356,4 +356,21 @@ body depth_search cfe_internal_docroot_application_perms
 {
       depth => "inf";
       exclude_dirs => { "logs" };
+}
+
+############################################################################
+
+body perms state_dir_perms
+{
+      mode   => "0600";
+      owners => { "root" };
+
+      freebsd|openbsd|netbsd|darwin::
+        groups => { "wheel" };
+
+      aix::
+        groups => { "system" };
+
+      !(freebsd|openbsd|netbsd|darwin|aix)::
+        groups => { "root" };
 }
