@@ -426,10 +426,10 @@ bundle common cfengine_package_names
 
       # 64bit Debian
 
-      "pkg[debian_7_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian7_amd64.deb";
-      "pkg[debian_8_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian8_amd64.deb";
-      "pkg[debian_9_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian9_amd64.deb";
-      "pkg[debian_10_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_debian10_amd64.deb";
+      "pkg[debian_7_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian7_amd64.deb";
+      "pkg[debian_8_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian8_amd64.deb";
+      "pkg[debian_9_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian9_amd64.deb";
+      "pkg[debian_10_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian10_amd64.deb";
 
       # 64bit Ubuntu
       "pkg[ubuntu_14_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu14_amd64.deb";
