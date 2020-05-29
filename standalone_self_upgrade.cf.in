@@ -406,81 +406,49 @@ bundle common cfengine_package_names
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
 
-      # Redhat/Centos 4, 5 use the same package
+      # Redhat/Centos/Oracle 5, SLES 11 use the same package
 
-      "pkg[redhat_5_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el4.x86_64.rpm";
+      "pkg[redhat_5_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el5.centos.x86_64.rpm";
       "pkg[centos_5_x86_64]" string => "$(pkg[redhat_5_x86_64])";
       "pkg[oracle_5_x86_64]" string => "$(pkg[redhat_5_x86_64])";
       "pkg[SuSE_11_x86_64]" string => "$(pkg[redhat_5_x86_64])";
-      "pkg[SuSE_10_x86_64]" string => "$(pkg[redhat_5_x86_64])";
 
       # 32bit RPMs
-      "pkg[redhat_5_i386]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el4.i386.rpm";
-      "pkg[redhat_5_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_5_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_5_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_5_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_5_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_6_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_6_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_6_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[redhat_6_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_7_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_7_i586]" string => "$(pkg[redhat_5_i386])";
-      "pkg[centos_7_i686]" string => "$(pkg[redhat_5_i386])";
-      "pkg[SuSE_11_i386]" string => "$(pkg[redhat_5_i386])";
-      "pkg[SuSE_10_i386]" string => "$(pkg[redhat_5_i386])";
+      "pkg[$(cfengine_master_software_content._rpm_dists)_$(cfengine_master_software_content._32bit_arches)]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el5.centos.i386.rpm";
 
-      # Redhat/Centos 6, 7 use the same package
+      # Redhat/Centos/Oracle 6, SLES 12-15 use the same package
 
       "pkg[redhat_6_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el6.x86_64.rpm";
       "pkg[centos_6_x86_64]" string => "$(pkg[redhat_6_x86_64])";
       "pkg[oracle_6_x86_64]" string => "$(pkg[redhat_6_x86_64])";
-      "pkg[redhat_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
-      "pkg[centos_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
-      "pkg[oracle_7_x86_64]" string => "$(pkg[redhat_6_x86_64])";
+      "pkg[SuSE_12_x86_64]" string => "$(pkg[redhat_6_x86_64])";
+      "pkg[SuSE_15_x86_64]" string => "$(pkg[redhat_6_x86_64])";
 
-      # Debian 7, 8, 9 and Ubuntu 14, 16, 18 use the same package
+      # Redhat/Centos/Oracle 7 use the same package
+      "pkg[redhat_7_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el7.x86_64.rpm";
+      "pkg[centos_7_x86_64]" string => "$(pkg[redhat_7_x86_64])";
+      "pkg[oracle_7_x86_64]" string => "$(pkg[redhat_7_x86_64])";
 
-      "pkg[debian_7_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_amd64-debian7.deb";
-      "pkg[debian_8_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[debian_9_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[ubuntu_14_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[ubuntu_16_x86_64]" string => "$(pkg[debian_7_x86_64])";
-      "pkg[ubuntu_18_x86_64]" string => "$(pkg[debian_7_x86_64])";
+      # Redhat/Centos/Oracle 8 use the same package
+      "pkg[redhat_8_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el8.x86_64.rpm";
+      "pkg[centos_8_x86_64]" string => "$(pkg[redhat_8_x86_64])";
+      "pkg[oracle_8_x86_64]" string => "$(pkg[redhat_8_x86_64])";
+
+      # 64bit Debian
+
+      "pkg[debian_7_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian7_amd64.deb";
+      "pkg[debian_8_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian8_amd64.deb";
+      "pkg[debian_9_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian9_amd64.deb";
+      "pkg[debian_10_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian10_amd64.deb";
+
+      # 64bit Ubuntu
+      "pkg[ubuntu_14_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu14_amd64.deb";
+      "pkg[ubuntu_16_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu16_amd64.deb";
+      "pkg[ubuntu_18_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu18_amd64.deb";
 
       # 32bit DEBs
-      "pkg[debian_4_i386]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release)_i386-debian4.deb";
-      "pkg[debian_4_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_4_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_5_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_5_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_5_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_6_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_6_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_6_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_7_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_7_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_7_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_8_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_8_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_8_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_9_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_9_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[debian_9_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_12_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_12_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_12_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_14_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_14_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_14_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_16_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_16_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_16_i686]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_18_i386]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_18_i586]" string => "$(pkg[debian_4_i386])";
-      "pkg[ubuntu_18_i686]" string => "$(pkg[debian_4_i386])";
 
+      "pkg[$(cfengine_master_software_content._deb_dists)_$(cfengine_master_software_content._32bit_arches)]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian7_i386.deb";
 
       "my_pkg"
         string => "$(pkg[$(sys.flavor)_$(sys.arch)])",
@@ -508,70 +476,54 @@ bundle agent cfengine_master_software_content
       # Map platform/directory identifier to upstream package URLs
       # Better to read in an external explicit data structure?
 
-      # Redhat/Centos 4, 5 and SuSE 10, 11 all use the same package
+      "_32bit_arches" slist => { "i386", "i586", "i686" };
+
+      # Redhat/Centos/Oracle 5 and SuSE 11 all use the same package
       "dir[redhat_5_x86_64]" string => "agent_rpm_x86_64";
       "dir[centos_5_x86_64]" string => "$(dir[redhat_5_x86_64])";
       "dir[oracle_5_x86_64]" string => "$(dir[redhat_5_x86_64])";
       "dir[SuSE_11_x86_64]" string => "$(dir[redhat_5_x86_64])";
-      "dir[SuSE_10_x86_64]" string => "$(dir[redhat_5_x86_64])";
 
       # All 32bit rpms use the same package
-      "dir[redhat_5_i386]" string => "agent_rpm_i386";
-      "dir[centos_5_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_5_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_5_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_6_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_6_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_6_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[redhat_6_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[redhat_6_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[redhat_6_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_7_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_7_i586]" string => "$(dir[redhat_5_i386])";
-      "dir[centos_7_i686]" string => "$(dir[redhat_5_i386])";
-      "dir[SuSE_11_i386]" string => "$(dir[redhat_5_i386])";
-      "dir[SuSE_10_i386]" string => "$(dir[redhat_5_i386])";
+      "_rpm_dists" slist => { "redhat_5", "redhat_6", "redhat_7",
+                              "centos_5", "centos_6", "centos_7",
+                              "SuSE_11", "SuSE_10" };
 
-      # Redhat/Centos 6, 7 use the same package
+      "dir[$(_rpm_dists)_$(_32bit_arches)]" string => "agent_rpm_i386";
 
+      # Redhat/Centos/Oracle 6 use the same package
       "dir[redhat_6_x86_64]" string => "agent_rhel6_x86_64";
       "dir[centos_6_x86_64]" string => "$(dir[redhat_6_x86_64])";
       "dir[oracle_6_x86_64]" string => "$(dir[redhat_6_x86_64])";
-      "dir[redhat_7_x86_64]" string => "$(dir[redhat_6_x86_64])";
-      "dir[centos_7_x86_64]" string => "$(dir[redhat_6_x86_64])";
-      "dir[oracle_7_x86_64]" string => "$(dir[redhat_6_x86_64])";
 
-      # Debian 7, 8 and Ubuntu 14, 16 use the same package
-      "dir[debian_7_x86_64]" string => "agent_debian7_x86_64";
-      "dir[debian_8_x86_64]" string => "$(dir[debian_7_x86_64])";
-      "dir[ubuntu_14_x86_64]" string => "$(dir[debian_7_x86_64])";
-      "dir[ubuntu_16_x86_64]" string => "$(dir[debian_7_x86_64])";
+      # Redhat/Centos/Oracle 7 use the same package
+      "dir[redhat_7_x86_64]" string => "agent_rhel7_x86_64";
+      "dir[centos_7_x86_64]" string => "$(dir[redhat_7_x86_64])";
+      "dir[oracle_7_x86_64]" string => "$(dir[redhat_7_x86_64])";
+
+      # Redhat/Centos/Oracle 8 use the same package
+      "dir[redhat_8_x86_64]" string => "agent_rhel8_x86_64";
+      "dir[centos_8_x86_64]" string => "$(dir[redhat_8_x86_64])";
+      "dir[oracle_8_x86_64]" string => "$(dir[redhat_8_x86_64])";
+
+      # Debian
+      "dir[debian_7_x86_64]" string => "agent_deb_x86_64";
+      "dir[debian_8_x86_64]" string => "agent_debian8_x86_64";
+      "dir[debian_9_x86_64]" string => "agent_debian9_x86_64";
+      "dir[debian_10_x86_64]" string => "agent_debian10_x86_64";
+
+      # Ubuntu
+      "dir[ubuntu_14_x86_64]" string => "agent_ubuntu14_x86_64";
+      "dir[ubuntu_16_x86_64]" string => "agent_ubuntu16_x86_64";
+      "dir[ubuntu_18_x86_64]" string => "agent_ubuntu18_x86_64";
 
       # All 32bit debs use the same package
-      "dir[debian_4_i386]" string => "agent_deb_i386";
-      "dir[debian_4_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_4_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_5_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_5_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_5_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_6_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_6_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_6_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_7_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_7_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_7_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_8_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_8_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_8_i686]" string => "$(dir[debian_4_i386])";
-      "dir[debian_9_i386]" string => "$(dir[debian_4_i386])";
-      "dir[debian_9_i586]" string => "$(dir[debian_4_i386])";
-      "dir[debian_9_i686]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_14_i386]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_14_i586]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_14_i686]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_16_i386]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_16_i586]" string => "$(dir[debian_4_i386])";
-      "dir[ubuntu_16_i686]" string => "$(dir[debian_4_i386])";
+      "_deb_dists" slist => { "debian_4", "debian_5", "debian_6",
+                              "debian_7", "debian_8", "debian_9",
+                              "debian_10", "ubuntu_14", "ubuntu_16",
+                              "ubuntu_18" };
+
+      "dir[$(_deb_dists)_$(_32bit_arches)]" string => "agent_deb_i386";
 
       "platform_dir" slist => getindices( dir );
       "download_dir" string => "$(sys.workdir)/master_software_updates";
@@ -589,7 +541,7 @@ bundle agent cfengine_master_software_content
 
   reports:
     DEBUG|DEBUG_cfengine_master_software_content::
-      "curl -s $(base_url)/$(dir[$(i)])/$(cfengine_package_names.pkg[$(i)]) --output $(download_dir)/$(i)/$(cfengine_package_names.pkg[$(i)])";
+      "curl -s $(base_url)/$(dir[$(platform_dir)])/$(cfengine_package_names.pkg[$(platform_dir)]) --output $(download_dir)/$(platform_dir)/$(cfengine_package_names.pkg[$(platform_dir)])";
 }
 
 bundle edit_line u_backup_script
