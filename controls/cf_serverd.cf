@@ -72,6 +72,12 @@ body server control
                            $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
                            $(sys.cf_agent) -I -D cf_runagent_initiated";
 
+    !windows.!(redhat_5|centos_5)::
+      # Bind to all interfaces including ipv6
+      # Adding this on windows will force ipv6 only, so limit to non-windows
+      # On RHEL/CentOS 5 binding to interface "::" fails.
+      bindtointerface => "::";
+
 }
 
 ###############################################################################
