@@ -6,6 +6,7 @@ stamp-h1
 /autom4te.cache
 /compile
 /config.guess
+/config.cache
 /config.log
 /config.status
 /config.sub
