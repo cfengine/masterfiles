@@ -89,7 +89,12 @@ script:
   fi;
   export IS_PRERELEASE
 - cd $TRAVIS_BUILD_DIR/..
-- git clone --depth=1 --branch $CF_VERSION https://github.com/cfengine/core
+- export RELEASE_TAG=$(/var/cfengine/bin/cf-agent --version | awk '{print $3}')
+- export BRANCH="$RELEASE_TAG"
+- if [ "$CF_VERSION" = "master" ]; then
+    export BRANCH="master";
+  fi
+- git clone --depth=1 --branch $BRANCH https://github.com/cfengine/core
 - chmod -R go-w .
 - cp core/tests/acceptance/*.cf.sub masterfiles/tests/acceptance/
 - umask 077
