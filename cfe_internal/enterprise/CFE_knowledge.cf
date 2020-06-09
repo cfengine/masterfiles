@@ -225,7 +225,7 @@ bundle agent cfe_internal_permissions
 
     !(policy_server|am_policy_hub)::
       "$(sys.statedir)/." -> { "ENT-4773" }
-        perms => system_owned( "0600" ),
+        perms => state_dir_system_owned(),
         # Important to recurse across file system boundaries, as databases and or state are commonly on different filesystems
         depth_search => recurse_with_base( inf ),
         file_select => all;
@@ -237,7 +237,7 @@ bundle agent cfe_internal_permissions
         comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
 
      "$(sys.statedir)/."
-        perms => mog("0600", "root", "root" ),
+        perms => state_dir_system_owned(),
         depth_search => recurse_except( inf, "pg" ),
         file_select => all,
         comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
@@ -361,4 +361,24 @@ body depth_search cfe_internal_docroot_application_perms
 {
       depth => "inf";
       exclude_dirs => { "logs" };
+}
+
+############################################################################
+
+body perms state_dir_system_owned
+{
+      mode   => "0600";
+      owners => { "root" };
+
+      freebsd|openbsd|netbsd|darwin::
+        groups => { "wheel" };
+
+      aix::
+        groups => { "system" };
+
+      hpux::
+        groups => { "sys" };
+
+      !(freebsd|openbsd|netbsd|darwin|aix|hpux)::
+        groups => { "root" };
 }
