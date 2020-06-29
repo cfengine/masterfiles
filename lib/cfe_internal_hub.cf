@@ -48,7 +48,7 @@
 ###################################################
 
 bundle common cfe_internal_hub_common
-# @ignore
+# @brief Enumerate policy files used by this policy file for inclusion to inputs
 {
   vars:
       "inputs" slist => { "$(this.promise_dirname)/common.cf",
@@ -56,13 +56,12 @@ bundle common cfe_internal_hub_common
 }
 
 body file control
-# @ignore
+# @brief Include policy files used by this policy file as part of inputs
 {
       inputs => { @(cfe_internal_hub_common.inputs) };
 }
 
 bundle agent cfe_internal_hub_maintain
-# @ignore
 # @brief Executes reporting database maintenance process
 # By default database clean up interval is 24 hours.
 # Length of log history in database is controlled
@@ -167,7 +166,6 @@ bundle agent cfe_internal_hub_maintain
 }
 
 bundle agent cfe_internal_database_cleanup_reports (settings)
-# @ignore
 # @brief clean up the reporting tables
 {
   vars:
@@ -195,7 +193,6 @@ AND    t.$(settings[$(index)][time_key]) <= (z.latest - '$(settings[$(index)][hi
 }
 
 bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
-# @ignore
 # @brief keep up to row_count entries in the database
 # @note ENT-2797 After cf-consumer removal, this will still be necessary, functionality
 # of cf-consumer to be replaced with cf-hub-worker per Ole.
@@ -261,8 +258,8 @@ bundle agent cfe_internal_database_cleanup_diagnostics (settings)
 }
 
 bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
-# @ignore
-# @brief clean up promise log
+# @brief clean up promise log files older than `history_length_days`
+# @param history_length_days Number of days after which promise logs should be deleted
 {
   vars:
     "cleanup_query_repaired"
@@ -280,7 +277,6 @@ bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
 }
 
 bundle agent cfe_internal_database_partitioning()
-# @ignore
 # @brief create any nesesary table partitions for database
 {
   vars:
@@ -296,7 +292,6 @@ bundle agent cfe_internal_database_partitioning()
 }
 
 bundle agent cfe_internal_postgresql_maintenance
-#@ignore
 #@brief Vacuum Full PostgreSQL for maintenance
 {
   vars:
@@ -348,7 +343,6 @@ bundle agent cfe_internal_postgresql_maintenance
 }
 
 bundle agent cfe_internal_postgresql_vacuum
-#@ignore
 #@brief Vacuum (with analyze) over cfdb database.
 {
   vars:
