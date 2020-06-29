@@ -47,14 +47,14 @@
 ###################################################
 
 bundle common files_common
-# @ignore
+# @brief Enumerate policy files used by this policy file for inclusion to inputs
 {
   vars:
       "inputs" slist => { "$(this.promise_dirname)/common.cf" };
 }
 
 body file control
-# @ignore
+# @brief Include policy files used by this policy file as part of inputs
 {
       inputs => { @(files_common.inputs) };
 }
@@ -873,7 +873,6 @@ bundle edit_line set_config_values_matching(v,pat)
 ##
 
 bundle edit_line maintain_key_values(v,sep)
-# @ignore
 # @brief Sets the RHS of configuration items with an giving separator
 #
 # Contributed by David Lee

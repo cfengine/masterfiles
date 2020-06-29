@@ -47,7 +47,7 @@
 ###################################################
 
 bundle common services_common
-# @ignore
+# @brief Enumerate policy files used by this policy file for inclusion to inputs
 {
   vars:
       "inputs" slist => { "$(this.promise_dirname)/common.cf",
@@ -55,7 +55,7 @@ bundle common services_common
 }
 
 body file control
-# @ignore
+# @brief Include policy files used by this policy file as part of inputs
 {
       inputs => { @(services_common.inputs) };
 }
