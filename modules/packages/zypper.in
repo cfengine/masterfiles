@@ -25,6 +25,7 @@
 # MIT Public License
 # Copyright 2017 Northern.tech AS
 
+import cfpackage
 import sys
 import os
 import subprocess
@@ -37,7 +38,7 @@ rpm_quiet_option = ["--quiet"]
 rpm_output_format = "Name=%{name}\nVersion=%|EPOCH?{%{epoch}:}:{}|%{version}-%{release}\nArchitecture=%{arch}\n"
 
 zypper_cmd = os.environ.get('CFENGINE_TEST_ZYPPER_CMD', "/usr/bin/zypper")
-zypper_options = ["--quiet", "-n"]
+default_options = ["--quiet", "-n"]
 
 NULLFILE = open(os.devnull, 'w')
 
@@ -158,7 +159,7 @@ def list_updates(online):
     if not online:
         online_flag = ["--no-refresh"]
 
-    process = subprocess_Popen([zypper_cmd] + zypper_options + online_flag + ["list-updates"], stdout=subprocess.PIPE)
+    process = subprocess_Popen([zypper_cmd] + default_options + online_flag + ["list-updates"], stdout=subprocess.PIPE)
 
     for line in (line.decode() for line in process.stdout):
 
@@ -239,51 +240,6 @@ def one_package_argument(name, arch, version, is_zypper_install):
 #             |             +---- package2:amd64    -+
 #             +- sublist ---+                        +--- And these together
 #                           +---- package2:i386     -+
-def package_arguments_builder(is_zypper_install):
-    name = ""
-    version = ""
-    arch = ""
-    single_cmd_args = []    # List of arguments
-    multi_cmd_args = []     # List of lists of arguments
-    old_name = ""
-    for line in sys.stdin:
-        if line.startswith("Name="):
-            if name:
-                # Each new "Name=" triggers a new entry.
-                single_list, multi_list = one_package_argument(name, arch, version, is_zypper_install)
-                single_cmd_args += single_list
-                if name == old_name:
-                    # Packages that differ only by architecture should be
-                    # processed together
-                    multi_cmd_args[-1] += multi_list
-                elif multi_list:
-                    # Otherwise we process them individually.
-                    multi_cmd_args += [multi_list]
-
-                version = ""
-                arch = ""
-
-            old_name = name
-            name = line.split("=", 1)[1].rstrip()
-
-        elif line.startswith("Version="):
-            version = line.split("=", 1)[1].rstrip()
-
-        elif line.startswith("Architecture="):
-            arch = line.split("=", 1)[1].rstrip()
-
-    if name:
-        single_list, multi_list = one_package_argument(name, arch, version, is_zypper_install)
-        single_cmd_args += single_list
-        if name == old_name:
-            # Packages that differ only by architecture should be
-            # processed together
-            multi_cmd_args[-1] += multi_list
-        elif multi_list:
-            # Otherwise we process them individually.
-            multi_cmd_args += [multi_list]
-
-    return single_cmd_args, multi_cmd_args
 
 
 def repo_install():
@@ -332,11 +288,11 @@ def repo_install():
     # since it's unlikely that people will do a whole lot of downgrades
     # simultaneously.
 
-    single_cmd_args, multi_cmd_args = package_arguments_builder(True)
+    single_cmd_args, multi_cmd_args, options = package_arguments_builder(True, one_package_argument)
 
     if single_cmd_args:
 
-        cmd_line = [zypper_cmd] + zypper_options + ["install"]
+        cmd_line = [zypper_cmd] + default_options + options + ["install"]
 
         if zypper_supports_oldpackage():
             cmd_line += ["--oldpackage"]
@@ -348,7 +304,7 @@ def repo_install():
     if multi_cmd_args:
         for block in multi_cmd_args:
             # Try to upgrade.
-            cmd_line = [zypper_cmd] + zypper_options + ["update"] + block
+            cmd_line = [zypper_cmd] + default_options + options + ["update"] + block
             subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
 
             # See if it succeeded.
@@ -364,7 +320,7 @@ def repo_install():
 
             # Try to plain install.
 
-            cmd_line = [zypper_cmd] + zypper_options + ["install"]
+            cmd_line = [zypper_cmd] + default_options + options + ["install"]
 
             if zypper_supports_oldpackage():
                 cmd_line += ["--oldpackage"]
@@ -382,12 +338,11 @@ def repo_install():
 
 
 def remove():
-    cmd_line = [zypper_cmd] + zypper_options + ["remove"]
-
     # package_arguments_builder will always return empty second element in case
     # of removals, so just drop it.         |
     #                                       V
-    args = package_arguments_builder(False)[0]
+    args, _multi_cmd_args, options = package_arguments_builder(False, one_package_argument)
+    cmd_line = [zypper_cmd] + default_options + options + ["remove"]
 
     if args:
         return subprocess_call(cmd_line + args, stdout=NULLFILE, stderr=subprocess.PIPE)

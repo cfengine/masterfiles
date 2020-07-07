@@ -1,5 +1,6 @@
 #!@bindir@/python
 
+import cfpackage
 import sys
 import os
 import subprocess
@@ -264,47 +265,15 @@ def one_package_argument(name, arch, version, is_apt_install):
     else:
         args.append((name + version_suffix, name + version_suffix))
 
-    return args
+# return args and empty to confirm with single_list, multi_list API in cfpackage.py
+    return args, []
 
-
-def package_arguments_builder(is_apt_install):
-    name = ""
-    version = ""
-    arch = ""
-    args = []
-    for line in sys.stdin:
-        if line.startswith("Name="):
-            if name:
-                # Each new "Name=" triggers a new entry.
-                args.extend(one_package_argument(name, arch, version, is_apt_install))
-
-                version = ""
-                arch = ""
-
-            name = line.split("=", 1)[1].rstrip()
-
-        elif line.startswith("Version="):
-            version = line.split("=", 1)[1].rstrip()
-
-        elif line.startswith("Architecture="):
-            arch = line.split("=", 1)[1].rstrip()
-
-        elif line.startswith("options="):
-            global apt_get_options
-            option =  line.split("=", 1)[1].rstrip()
-            if option:
-              apt_get_options.append(option)
-
-    if name:
-        args.extend(one_package_argument(name, arch, version, is_apt_install))
-
-    return args
 
 
 def repo_install():
-    args = package_arguments_builder(True)
+    args, _multi_cmd_args, options = cfpackage.package_arguments_builder(True, one_package_argument)
 
-    cmd_line = [apt_get_cmd] + apt_get_options + ["install"]
+    cmd_line = [apt_get_cmd] + options + ["install"]
 
     if (not args):
         return 0
@@ -320,9 +289,9 @@ def repo_install():
     return 0
 
 def remove():
-    args = package_arguments_builder(False)
+    args, _multi_cmd_args, options = cfpackage.package_arguments_builder(False, one_package_argument)
 
-    cmd_line = [apt_get_cmd] + apt_get_options + ["remove"]
+    cmd_line = [apt_get_cmd] + options + ["remove"]
 
     if (not args):
         return 0

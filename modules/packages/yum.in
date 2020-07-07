@@ -1,5 +1,6 @@
 #!@bindir@/python
 
+import cfpackage
 import sys
 import os
 import subprocess
@@ -211,58 +212,6 @@ def one_package_argument(name, arch, version, is_yum_install):
 #             |             +---- package2:amd64    -+
 #             +- sublist ---+                        +--- And these together
 #                           +---- package2:i386     -+
-def package_arguments_builder(is_yum_install):
-    name = ""
-    version = ""
-    arch = ""
-    single_cmd_args = []    # List of arguments
-    multi_cmd_args = []     # List of lists of arguments
-    old_name = ""
-    for line in sys.stdin:
-        line = line.strip()
-        if line.startswith("options="):
-            option = line[len("options="):]
-            if option.startswith("-"):
-                yum_options.append(option)
-            elif option.startswith("enablerepo=") or option.startswith("disablerepo="):
-                yum_options.append("--" + option)
-        if line.startswith("Name="):
-            if name:
-                # Each new "Name=" triggers a new entry.
-                single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
-                single_cmd_args += single_list
-                if name == old_name:
-                    # Packages that differ only by architecture should be
-                    # processed together
-                    multi_cmd_args[-1] += multi_list
-                elif multi_list:
-                    # Otherwise we process them individually.
-                    multi_cmd_args += [multi_list]
-
-                version = ""
-                arch = ""
-
-            old_name = name
-            name = line.split("=", 1)[1].rstrip()
-
-        elif line.startswith("Version="):
-            version = line.split("=", 1)[1].rstrip()
-
-        elif line.startswith("Architecture="):
-            arch = line.split("=", 1)[1].rstrip()
-
-    if name:
-        single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
-        single_cmd_args += single_list
-        if name == old_name:
-            # Packages that differ only by architecture should be
-            # processed together
-            multi_cmd_args[-1] += multi_list
-        elif multi_list:
-            # Otherwise we process them individually.
-            multi_cmd_args += [multi_list]
-
-    return single_cmd_args, multi_cmd_args
 
 
 def repo_install():
@@ -312,10 +261,10 @@ def repo_install():
     # simultaneously.
 
     ret = 0
-    single_cmd_args, multi_cmd_args = package_arguments_builder(True)
+    single_cmd_args, multi_cmd_args, options = cfpackace.package_arguments_builder(True)
 
     if single_cmd_args:
-        cmd_line = [yum_cmd] + yum_options + ["install"]
+        cmd_line = [yum_cmd] + options + ["install"]
         cmd_line.extend(single_cmd_args)
 
         ret = subprocess_call(cmd_line, stdout=NULLFILE)
@@ -323,7 +272,7 @@ def repo_install():
     if multi_cmd_args:
         for block in multi_cmd_args:
             # Try to upgrade.
-            cmd_line = [yum_cmd] + yum_options + ["upgrade"] + block
+            cmd_line = [yum_cmd] + options + ["upgrade"] + block
             subprocess_call(cmd_line, stdout=NULLFILE)
 
             # See if it succeeded.
@@ -338,7 +287,7 @@ def repo_install():
                 continue
 
             # Try to downgrade.
-            cmd_line = [yum_cmd] + yum_options + ["downgrade"] + block
+            cmd_line = [yum_cmd] + options + ["downgrade"] + block
             subprocess_call(cmd_line, stdout=NULLFILE)
 
             # See if it succeeded.
@@ -353,7 +302,7 @@ def repo_install():
                 continue
 
             # Try to plain install.
-            cmd_line = [yum_cmd] + yum_options + ["install"] + block
+            cmd_line = [yum_cmd] + options + ["install"] + block
             subprocess_call(cmd_line, stdout=NULLFILE)
 
             # No final check. CFEngine will figure out that it's missing
@@ -365,12 +314,12 @@ def repo_install():
 
 
 def remove():
-    cmd_line = [yum_cmd] + yum_options + ["remove"]
 
     # package_arguments_builder will always return empty second element in case
     # of removals, so just drop it.         |
     #                                       V
-    args = package_arguments_builder(False)[0]
+    args, _multi_cmd_args, options = cfpackage.package_arguments_builder(False)
+    cmd_line = [yum_cmd] + options + ["remove"]
 
     if args:
         return subprocess_call(cmd_line + args, stdout=NULLFILE)
