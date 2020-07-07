@@ -261,7 +261,7 @@ def repo_install():
     # simultaneously.
 
     ret = 0
-    single_cmd_args, multi_cmd_args, options = cfpackace.package_arguments_builder(True)
+    single_cmd_args, multi_cmd_args, options = cfpackage.package_arguments_builder(True)
 
     if single_cmd_args:
         cmd_line = [yum_cmd] + options + ["install"]
