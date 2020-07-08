@@ -129,7 +129,7 @@ bundle agent standard_services(service,state)
 # @brief Standard services bundle, used by CFEngine by default
 # @author CFEngine AS
 # @param service Name of service to control
-# @param state The desired state for that service: "start", "restart", "reload", "stop", or "disable"
+# @param state The desired state for that service: "start", "restart", "reload", "stop", or "disable". "enable", "enabled", and "disabled" are also able to be used when systemd is detected.
 #
 # This bundle is used by CFEngine if you don't specify a services
 # handler explicitly, and will work with systemd or chkconfig or other
@@ -247,13 +247,16 @@ bundle agent standard_services(service,state)
       "can_start_service"  expression => reglist(@(systemd_service_info), "CanStart=yes");
       "can_reload_service" expression => reglist(@(systemd_service_info), "CanReload=yes");
 
-      "request_start"   expression => strcmp("start", "$(state)");
-      "request_stop"    expression => strcmp("stop", "$(state)");
-      "request_reload"  expression => strcmp("reload", "$(state)");
-      "request_restart" expression => strcmp("restart", "$(state)");
-      "request_disable" expression => strcmp("disable", "$(state)");
+      "request_start"    expression => strcmp("start", "$(state)");
+      "request_stop"     expression => strcmp("stop", "$(state)");
+      "request_reload"   expression => strcmp("reload", "$(state)");
+      "request_restart"  expression => strcmp("restart", "$(state)");
+      "request_disable"  expression => strcmp("disable", "$(state)");
+      "request_disabled" expression => strcmp("disabled", "$(state)");
+      "request_enable"   expression => strcmp("enable", "$(state)");
+      "request_enabled"  expression => strcmp("enabled", "$(state)");
 
-      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart|request_disable)";
+      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart|request_disable|request_disabled|request_enable|request_enabled)";
       "action_start"   expression => "request_start.!service_active.can_start_service";
       "action_stop"    expression => "request_stop.service_active.can_stop_service";
       "action_reload"  expression => "request_reload.service_active.can_reload_service";
@@ -267,10 +270,10 @@ bundle agent standard_services(service,state)
                                      };
 
       # Starting a service implicitly enables it
-      "action_enable"  expression => "request_start.!service_enabled";
+      "action_enable"  expression => "(request_start|request_enable|request_enabled).!service_enabled";
 
       # Respectively, stopping it implicitly disables it
-      "action_disable" expression => "(request_disable|request_stop).service_enabled";
+      "action_disable" expression => "(request_disable|request_disabled|request_stop).service_enabled";
 
   commands:
     systemd.service_loaded:: # note this class is defined in `inventory/linux.cf`
