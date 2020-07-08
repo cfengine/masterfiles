@@ -261,7 +261,7 @@ def repo_install():
     # simultaneously.
 
     ret = 0
-    single_cmd_args, multi_cmd_args, options = cfpackage.package_arguments_builder(True)
+    single_cmd_args, multi_cmd_args, options = cfpackage.package_arguments_builder(True, one_package_argument)
 
     if single_cmd_args:
         cmd_line = [yum_cmd] + options + ["install"]
@@ -318,7 +318,7 @@ def remove():
     # package_arguments_builder will always return empty second element in case
     # of removals, so just drop it.         |
     #                                       V
-    args, _multi_cmd_args, options = cfpackage.package_arguments_builder(False)
+    args, _multi_cmd_args, options = cfpackage.package_arguments_builder(False, one_package_argument)
     cmd_line = [yum_cmd] + options + ["remove"]
 
     if args:
