@@ -82,7 +82,7 @@ bundle agent standard_services(service,state)
 # @brief Standard services bundle, used by CFEngine by default
 # @author CFEngine AS
 # @param service Name of service to control
-# @param state The desired state for that service: "start", "restart", "reload", "stop", or "disable". "enable", "enabled", and "disabled" are also able to be used when systemd is detected.
+# @param state The desired state for that service: "start", "restart", "reload", "stop", or "disable". "enable", "enabled", and "disabled" are also able to be used when systemd is detected. "active" and "inactive" states are supported for systemd managed hosts and can be used for controlling the services currently running state, but make no promises about the service state on boot.
 #
 # This bundle is used by CFEngine if you don't specify a services
 # handler explicitly, and will work with systemd or chkconfig or other
@@ -208,10 +208,12 @@ bundle agent standard_services(service,state)
       "request_disabled" expression => strcmp("disabled", "$(state)");
       "request_enable"   expression => strcmp("enable", "$(state)");
       "request_enabled"  expression => strcmp("enabled", "$(state)");
+      "request_active"   expression => strcmp("active", "$(state)");
+      "request_inactive" expression => strcmp("inactive", "$(state)");
 
-      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart|request_disable|request_disabled|request_enable|request_enabled)";
-      "action_start"   expression => "request_start.!service_active.can_start_service";
-      "action_stop"    expression => "request_stop.service_active.can_stop_service";
+      "action_custom"  expression => "!(request_start|request_stop|request_reload|request_restart|request_disable|request_disabled|request_enable|request_enabled|request_active|request_inactive)";
+      "action_start"   expression => "(request_start|request_active).!service_active.can_start_service";
+      "action_stop"    expression => "(request_stop|request_inactive).service_active.can_stop_service";
       "action_reload"  expression => "request_reload.service_active.can_reload_service";
       "action_restart"         or => {
                                       "request_restart",
