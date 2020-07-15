@@ -131,6 +131,14 @@ bundle agent standard_services(service,state)
 # methods:
 #     "" usebundle => standard_services("sshd", "start"); # direct
 # ```
+#
+# Alternatively, since services promises are an abstraction around bundles, the service state can be promised via a methods type promise.
+#
+# ```cf3
+#
+# methods:
+#     "SSHD should be running" usebundle => standard_services("sshd", "start");
+# ```
 {
   vars:
       "c_service" string => canonify("$(service)");
@@ -279,12 +287,19 @@ bundle agent systemd_services(service,state)
 # @brief Manage systemd service state
 # @author Bryan Burke
 # @param service specific service to control
-# @param state The desired state for that service: "active", "inactive", "restart", "reload", "enabled" and "disabled" are specifically understood states. Any other custom state will be passed through to systemctl.
+# @param state The desired state for that service: "active", "inactive", "restart", "reload", "enabled", "disabled", "start", and "stop" are specifically understood states. Any other custom state will be passed through to systemctl.
+#
 # **State descriptions:**
 #
 # * active - Service should be running, no promise about state on boot made.
 # * inactive - Service should not be running, no promise about state on boot made.
 # * restart - Service should be restarted, no promise about state on boot made.
+# * reload - Service should be reloaded, no promise about state on boot made.
+# * enabled - Service should be enabled, no promise about state on boot made.
+# * disabled - Service should be reloaded, no promise about state on boot made.
+# * start - Service should be running, service should be started on boot (active + enabled).
+# * stop - Service should not be running, service should not be started on boot (inactive + disabled).
+#
 # **Example:**
 #
 # ```cf3
@@ -297,6 +312,14 @@ bundle agent systemd_services(service,state)
 #     "sshd"
 #       service_policy => "running",
 #       service_policy => "systemd_services";
+# ```
+#
+# Alternatively, since services promises are an abstraction around bundles, the service state can be promised via a methods type promise.
+#
+# ```cf3
+#
+# methods:
+#     "SSHD should be running" usebundle => systemd_services("sshd", "enabled");
 # ```
 {
   vars:
