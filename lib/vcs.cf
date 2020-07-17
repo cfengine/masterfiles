@@ -156,7 +156,7 @@ bundle agent git_clean(repo_path)
 }
 
 bundle agent git_stash(repo_path, stash_name)
-# @brief Stash any changes (including untracked files) in repo_path
+# @brief Stash any changes (including untracked files if git is capable) in repo_path
 # @param repo_path Path to the clone
 # @param stash_name Stash name
 #
@@ -169,14 +169,31 @@ bundle agent git_stash(repo_path, stash_name)
 #      comment => "Stash any changes, including untracked files";
 # ```
 {
+  classes:
+    _stdlib_path_exists_git::
+      "_git_stash_supports_including_untracked_files" -> { "CFE-3383" }
+        expression => regcmp( ".*--include-untracked.*",
+                              execresult( "$(paths.git) stash --help", noshell ) );
+
+  vars:
+      "_stash_options"
+        string => concat( "save ",
+                          "--quiet ",
+                          ifelse( "_git_stash_supports_including_untracked_files",
+                                  "--include-untracked", ""),
+                          "$(stash_name)");
+
   methods:
-      "" usebundle => git($(repo_path), "stash", 'save --quiet --include-untracked "$(stash_name)"'),
+      "" usebundle => git($(repo_path), "stash", $(_stash_options)),
       comment => "So that we don't lose any trail of what happened and so that
                     we don't accidentally delete something important we stash any
                     changes.
   Note:
                       1. This promise will fail if user.email is not set
                       2. We are respecting ignored files.";
+
+    !_stdlib_path_exists_git::
+      "Warning: bundle '$(this.bundle)' actuated, but git not found";
 }
 
 bundle agent git_stash_and_clean(repo_path)
