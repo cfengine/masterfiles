@@ -225,7 +225,9 @@ To enable encryption during policy updates define the class
 
 ### Preserve permissions
 
-By default the MPF enforces restrictive permissions for inputs. If the class
+By default the MPF does not *enforce* permissions of *inputs*. When
+*masterfiles* are copied to *inputs*, new files are created with default
+restrictive permissions. If the class
 ```cfengine_internal_preserve_permissions``` is defined the permissions of the
 policy server's masterfiles will be preserved when they are copied.
 
