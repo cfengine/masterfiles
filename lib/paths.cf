@@ -1,8 +1,8 @@
 # Paths bundle (used by other bodies)
 
 bundle common paths
-# @brief Defines an array `path` with common paths to standard binaries,
-# and classes for defined and existing paths.
+# @brief Defines an array `path` with common paths to standard binaries and
+# directories as well as classes for defined and existing paths.
 #
 # If the current platform knows that binary XYZ should be present,
 # `_stdlib_has_path_XYZ` is defined. Furthermore, if XYZ is actually present
@@ -25,6 +25,22 @@ bundle common paths
 #        comment => "Alternate array reference style";
 # }
 # ```
+#
+# Additionally several path entries are present to aid in policy sharing between
+# unix systems and Android Termux environments.
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent track_sshd_config
+# {
+#   files:
+#     "$(paths.etc_path)/sshd/sshd_config"
+#       changes => detect_all_change;
+# }
+# ```
+#
+# In case of termux, `paths.etc_path` will be `/data/data/com.termux/files/usr/etc`.
 {
   vars:
 
@@ -569,6 +585,32 @@ bundle common paths
     aix::
 
       "path[shadow]"       string => "/etc/security/passwd";
+
+    termux::
+      "path[tar]"           string => "/usr/bin/tar";
+      "path[true]"          string => "/usr/bin/true";
+      "path[false]"         string => "/usr/bin/false";
+      "path[cat]"           string => "/usr/bin/cat";
+      "path[sysctl]"        string => "/usr/bin/sysctl";
+      "path[env]"           string => "/usr/bin/env";
+
+      # now, mangle the values by prepending the TERMUX_PREFIX
+      "files_path" string => "/data/data/com.termux/files";
+      "etc_path" string => "$(files_path)/usr/etc";
+      "tmp_path" string => "$(files_path)/usr/tmp";
+      "bin_path" string => "$(files_path)/usr/bin";
+      "var_path" string => "$(files_path)/usr/var";
+      "tmp_paths" slist => getindices("path");
+      "tmp_path[$(tmp_paths)]" string => "$(files_path)$(path[$(tmp_paths)])";
+      "path[$(tmp_paths)]" string => "$(tmp_path[$(tmp_paths)])";
+
+    !(termux|windows)::
+      # reasonable defaults for unix systems to allow for writing
+      # more portable paths between termux and other systems
+      "etc_path" string => "/etc";
+      "tmp_path" string => "/tmp";
+      "bin_path" string => "/bin";
+      "var_path" string => "/var";
 
     any::
 
