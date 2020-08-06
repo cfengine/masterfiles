@@ -37,6 +37,9 @@ bundle common def
         string => "localhost",
         ifvarclass => not(isvariable("smtpserver"));
 
+      # system owned group for use by lib/files.cf system_owned body
+      "system_owned_group" string => "$(sys.user_data[gid])";
+
       # List here the IP masks that we grant access to on the server
 
       "acl"

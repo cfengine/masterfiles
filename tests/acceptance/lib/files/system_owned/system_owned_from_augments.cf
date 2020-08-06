@@ -1,0 +1,48 @@
+# Tests that system_owned body takes value from augements when present
+
+body common control
+{
+      inputs => { "../../../default.cf.sub" };
+      bundlesequence => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent init
+{
+  vars:
+    windows::
+      "tmp" string => "C:\temp";
+    !windows::
+      "tmp" string => "/tmp"; # /var/tmp?
+}
+
+bundle agent test
+{
+  meta:
+    "description" -> { "ENT-6122" }
+    string => "Allow system_owned_group from augments to override default of $(sys.user_data[gid])";
+
+  files:
+    "$(init.tmp)/testfile"
+      create => "true",
+      perms => system_owned("0644");
+}
+
+#######################################################
+
+bundle agent check
+{
+  files:
+    "$(init.tmp)/testfile"
+      perms => test_perms,
+      classes => results("namespace", "test_perms");
+  methods:
+    "" usebundle => dcs_passif("test_perms_kept", $(this.promise_filename));
+}
+
+body perms test_perms
+{
+  groups => { "10" }; # hard coded in def.json alongside this test
+}
