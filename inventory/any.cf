@@ -628,7 +628,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
         create => "true",
         edit_line => lines_present( "$(response[content])" ),
         edit_defaults => empty,
-        if => isvariable( response );
+        if => regcmp( ".*", "$(response[content][version])" );
 
 @if minimum_version(3.11)
       # template_method inline_mustache introduced in 3.11
@@ -638,7 +638,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
         edit_template_string => "{{{content}}}",
         template_data => @(response),
         create =>   "true",
-        if => isvariable( response );
+        if => regcmp( ".*", "$(response[content][version])" );
 @endif
 }
 
