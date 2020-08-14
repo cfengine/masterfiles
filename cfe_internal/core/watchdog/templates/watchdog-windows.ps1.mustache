@@ -1,0 +1,22 @@
+$LOGFILE="{{{logfile}}}"
+
+$long_running_cf_agent_threshold_min = 5
+$long_running_cf_agent_count = @(Get-Process cf-agent -erroraction "silentlycontinue" | Where { $_.StartTime -lt (Get-Date).AddMinutes(-$long_running_cf_agent_threshold_min) }).count
+$long_running_cf_agent_count_threshold = 1
+
+If ($long_running_cf_agent_count -ge $long_running_cf_agent_count_threshold) {
+    $DATESTAMP=Get-Date -Format "yyyy-MM-dd HH:mm"
+
+    Write-Output "${DATESTAMP}: Count of long running cf-agent ($long_running_cf_agent_count) has met the threshold ($long_running_cf_agent_count_threshold) of long running agents, remediation triggered." | Tee-Object -FilePath "$LOGFILE" -Append
+    Write-Output "${DATESTAMP}: Before remediation" | Tee-Object -FilePath "$LOGFILE" -Append
+    Get-Process cf-agent -erroraction "silentlycontinue" | ft -erroraction "silentlycontinue" Name,CommandLine,StartTime,@{label="Elapsed Minutes";expression={[System.Math]::Round(((Get-Date)-$_.StartTime).totalminutes)}} | Tee-Object -FilePath "$LOGFILE" -Append
+
+    Get-Process cf-agent -erroraction "silentlycontinue" | Where { $_.StartTime -lt (Get-Date).AddMinutes(-$long_running_cf_agent_threshold_min) } | Stop-Process -Force
+    # Give the system a bit of time to kill all the processes
+    sleep 1
+
+    $DATESTAMP=Get-Date -Format "yyyy-MM-dd HH:mm"
+    $running_cf_agent_count = @(Get-Process cf-agent -erroraction "silentlycontinue").count
+    Write-Output "${DATESTAMP}: Observed $running_cf_agent_count cf-agent processes after remediation" | Tee-Object -FilePath "$LOGFILE" -Append
+    Get-Process cf-agent -erroraction "silentlycontinue" | ft -erroraction "silentlycontinue" Name,CommandLine,StartTime,@{label="Elapsed Minutes";expression={[System.Math]::Round(((Get-Date)-$_.StartTime).totalminutes)}} | Tee-Object -FilePath "$LOGFILE" -Append
+}
