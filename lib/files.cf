@@ -292,6 +292,41 @@ bundle edit_line replace_line_end(start,end)
       edit_field => line("(^|\s)$(start)\s*", "2", "$(end)","set");
 }
 
+bundle edit_line replace_uncommented_substrings( _comment, _find, _replace )
+# @brief Replace all occurrences of `_find` with `_replace` on lines that do not follow a `_comment`
+# @param _comment Sequence of characters, each indicating the start of a comment.
+# @param _find String matching substring to replace
+# @param _replace String to substitute `_find` with
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent example_replace_uncommented_substrings
+# {
+#   files:
+#     "/tmp/file.txt"
+#       edit_line => replace_uncommented_substrings( "#", "ME", "YOU");
+# }
+# ```
+#
+# **Notes:**
+#
+# * Only single character comments are supported as `_comment` is used in the PCRE character group (`[^...]`).
+# * `-` in `_comment` is interpreted as a range unless it's used as the first or last character. For example, setting `_comment` to `0-9` means any digit starts a comment.
+#
+# **History:**
+#
+# * Introduced 3.17.0
+{
+  vars:
+      "_reg_match_uncommented_lines_containing_find"
+        string => "^([^$(_comment)]*)\Q$(_find)\E(.*$)";
+
+  replace_patterns:
+    "$(_reg_match_uncommented_lines_containing_find)"
+      replace_with => text_between_match1_and_match2( $(_replace) );
+}
+
 ##
 
 bundle edit_line append_to_line_end(start,end)
@@ -1192,6 +1227,14 @@ body edit_field line(split,col,newval,method)
 }
 
 ##
+
+body replace_with text_between_match1_and_match2( _text )
+# @brief Replace matched line with substituted string
+# @param _text String to substitute between first and second match
+{
+        replace_value => "$(match.1)$(_text)$(match.2)";
+        occurrences => "all";
+}
 
 body replace_with value(x)
 # @brief Replace matching lines
