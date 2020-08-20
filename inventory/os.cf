@@ -21,6 +21,11 @@ _inventory_lsb_found::
 
 # Hard coded values for exceptions / platforms without os-release:
 
+(redhat_5|redhat_6).redhat_pure::
+  "description" string => regex_replace("$(inventory_lsb.description)", " release ", "", "g"),
+                    if => isvariable("inventory_lsb.description"),
+                  meta => { "inventory", "attribute_name=OS", "derived-from=inventory_lsb.description" };
+
 centos_5::
   "description" string => "CentOS Linux 5", # Matches format of os-release on 7+
                   meta => { "inventory", "attribute_name=OS", "derived-from=centos_5" };
