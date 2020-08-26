@@ -185,7 +185,7 @@ bundle common def
 
       # Package inventory refresh
       "package_module_query_installed_ifelapsed" -> { "CFE-2771" }
-        string => "60", # 1 hour
+        string => "0", # Always refresh local package inventory
         if => not( isvariable( $(this.promiser) ));
 
       "package_module_query_updates_ifelapsed" -> { "CFE-2771" }
