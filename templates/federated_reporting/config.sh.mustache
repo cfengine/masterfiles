@@ -76,3 +76,5 @@ CFE_FR_IMPORT_FILTERS_DIR="${CFE_FR_IMPORT_FILTERS_DIR:-$DEFAULT_PREFIX/superhub
 CFE_FR_INVENTORY_REFRESH_CMD="{{inventory_refresh_cmd}}"
 CFE_FR_DB_USER="{{db_user}}"
 CFE_FR_DB_USER="${CFE_FR_DB_USER:-cfpostgres}"
+CFE_FR_HANDLE_DUPLICATES="{{handle_duplicates}}"   # default is no (don't handle duplicates as it adds to time to import)
+CFE_FR_HANDLE_DUPLICATES="${CFE_FR_HANDLE_DUPLICATES:-no}"
