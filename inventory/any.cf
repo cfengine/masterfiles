@@ -198,6 +198,22 @@ bundle agent cfe_autorun_inventory_memory
 
 }
 
+bundle agent cfe_autorun_inventory_timezone
+# @brief Inventory timezone and GMT offset
+{
+  vars:
+      "_now" int => now();
+
+      "timezone" -> { "ENT-6161" }
+        string => strftime( localtime, "%Z", $(_now) ),
+        meta => { "inventory", "attribute_name=Timezone" };
+
+      "gmt_offset" -> { "ENT-6161" }
+        string => strftime( localtime, "%z", $(_now) ),
+        meta => { "inventory", "attribute_name=Timezone GMT Offset" };
+
+}
+
 bundle agent cfe_autorun_inventory_loadaverage
 # @brief Inventory the loadaverage (Enterprise only)
 {
