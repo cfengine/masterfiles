@@ -326,7 +326,7 @@ This [augments file][Augments] will defines `trigger_upgrade` on hosts with IPv4
     "trigger_upgrade": [
       "ipv4_10_10_1",
       "ipv4_10_10_2",
-      "cfengine_3_10_(?!2$)\d+"
+      "cfengine_3_10_(?!2$)\\d+"
     ]
    }
 }
@@ -402,7 +402,7 @@ This example illustrates enabling management of components on systemd hosts havi
 
 ```json
 {
-  "classes:" {
+  "classes": {
     "mpf_enable_cfengine_systemd_component_management": [ "redhat_8" ]
   }
 }
@@ -1091,7 +1091,7 @@ For example:
 {
   "vars":{
     "control_common_bundlesequence_end": [ "mybundle1", "mybundle2" ]
-  }
+  },
 
   "inputs": [ "services/mybundles.cf" ]
 }
