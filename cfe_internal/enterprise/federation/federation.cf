@@ -1,3 +1,18 @@
+# @brief This policy file handles Federated Reporting setup and ongoing operations.
+#
+# There are several augments which can be used to tune the behavior of this policy:
+#
+# - `cfengine_mp_fr_dependencies_auto_install` class
+
+#   If defined then all non-shipped dependencies needed for Federated Reporting will be installed.
+#
+# ```json
+# {
+#   "classes": {
+#     "cfengine_mp_fr_dependencies_auto_install": [ "any::" ]
+#   }
+# }
+# ```
 body file control
 {
         namespace => "cfengine_enterprise_federation";
@@ -307,6 +322,21 @@ bundle agent clean_when_off
 
 bundle agent federation_manage_files
 # @brief Manage files, directories and permissions in $(cfengine_enterprise_federation:config.federation_dir)
+#
+# By default the import process will not prohibit the inclusion of duplicate hostkey data from feeders.
+# By defining the `cfengine_mp_fr_handle_duplicate_hostkeys` class in augments a step will be performed
+# during import which will find the which feeder's data is most recent for each duplicate hostkey and
+# use that data. Duplicate hostkey data will be moved to a `dup` schema for analysis.
+#
+# This class only applies to superhubs.
+#
+# ```json
+# {
+#   "classes": {
+#     "cfengine_mp_fr_handle_duplicate_hostkeys": [ "any::" ]
+#   }
+# }
+# ```
 {
 
   vars:
