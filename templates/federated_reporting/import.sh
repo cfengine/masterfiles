@@ -108,8 +108,8 @@ else
   # attach_feeder_schema() makes sure the feeder's import schema is removed in
   # case of failure
   log "Attaching schemas: FAILED"
-  log "last 10 lines of schema_attach.log"
-  tail -n 10 schema_attach.log
+  log "contents of schema_attach.log"
+  cat schema_attach.log
   exit 1
 fi
 
