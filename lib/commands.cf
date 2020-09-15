@@ -27,6 +27,25 @@ bundle agent daemonize(command)
 ## contain
 ##-------------------------------------------------------
 
+body contain powershell
+# @brief Run command with powershell (windows only)
+#
+# **Example:**
+#
+# ```cf3
+#  commands:
+#    windows::
+#      'schtasks /DELETE /TN "$(_taskname)" /F'
+#        contain => powershell;
+# ```
+#
+# **History:**
+#
+# * Introduced in 3.17.0
+{
+        useshell => "powershell";
+}
+
 body contain silent
 # @brief suppress command output
 {
