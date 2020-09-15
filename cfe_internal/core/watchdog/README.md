@@ -50,6 +50,20 @@ If there is less than 500MB of free space, the watchdog will clean up old archiv
 - Introduced check for too many concurrent cf-agent processes (3.15.0)
 - Introduced check for integrity issues identified by cf-check (3.15.0)
 
+## Windows Watchdog
+
+The Windows watchdog is implemented as a powershell script rendered via mustache template.
+
+When **enabled** the policy ensures that the watchdog script is scheduled for execution via the windows task scheduler.
+
+When **disabled** the policy ensures that the there it no scheduled task named `CFEngine-watchdog`.
+
+The watchdog logs to `$(sys.workdir)/watchdog.log` (`C:\Program Files\Cfengine\watchdog.log`). Note, this log file is **not** automatically rotated or purged.
+
+**History:**
+
+- Initially introduced with check to terminate any cf-agent processes that have been running for longer than 5 minutes. (3.17.0, 3.15.3)
+
 ### Symptoms of pathology
 
 The following conditions are included in the watchdog checks:
