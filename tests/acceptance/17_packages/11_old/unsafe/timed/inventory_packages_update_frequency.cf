@@ -71,11 +71,6 @@ bundle agent check
       "any" usebundle => dcs_check_diff("$(G.testdir)/first_update.txt",
                                         "$(G.testdir)/second_update.txt",
                                         "$(this.promise_filename)");
-
-  processes:
-     sles_15::
-       "gpg-agent" -> "ENT-6139"
-            signals         => { "term" , "kill" };
 }
 body package_method inventory_apt_get(update_interval)
 # @depends debian_knowledge
