@@ -34,4 +34,9 @@ bundle agent check
                                         "",
                                         "$(sys.cf_agent) -Dservices_autorun -v -f $(init.promises_cf_path) | $(G.grep) Hello",
                                         $(this.promise_filename));
+
+  processes:
+     sles_15::
+       "gpg-agent" -> "ENT-6139"
+            signals         => { "term" , "kill" };
 }
