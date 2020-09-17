@@ -41,6 +41,9 @@ zypper_options = ["--quiet", "-n"]
 
 NULLFILE = open(os.devnull, 'w')
 
+if 'CFENGINE_TEST_RPM_CMD' not in os.environ or 'CFENGINE_TEST_ZYPPER_CMD' not in os.environ:
+    sys.stderr.write("running zypper with real binary\n")
+
 redirection_is_broken_cached = -1
 zypper_supports_oldpackage_cached = -1
 
