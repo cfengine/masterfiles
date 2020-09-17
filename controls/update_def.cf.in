@@ -77,10 +77,10 @@ bundle common update_def
 
       # Default the input name patterns, if we don't find it defined in def
       # (from the augments_file).
-      "input_name_patterns"
+      "input_name_patterns" -> { "CFE-3425" }
         slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
                    ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb", ".*\.sed", ".*\.awk",
-                   "cf_promises_release_id", ".*\.json", ".*\.yaml" },
+                   "cf_promises_release_id", ".*\.json", ".*\.yaml", ".*\.csv" },
         comment => "Filename patterns to match when updating the policy
                     (see update/update_policy.cf)",
         handle => "common_def_vars_input_name_patterns_policy_default",
