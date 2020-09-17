@@ -363,7 +363,12 @@ bundle common def
       "policy_servers" slist => { "$(sys.policy_hub)", "@(standby_servers)" };
 
     !enable_cfengine_enterprise_hub_ha::
-      "policy_servers" slist => {"$(sys.policy_hub)"};
+      # Since this is used in the default ACL, we need to have a variable defined, even if it is empty
+      "policy_servers"
+        slist => { $(sys.policy_hub) },
+        if => not( isvariable( "$(this.promiser)" )),
+        comment => "An ordered list of policy servers",
+        handle => "mpf_def_policy_servers";
 
     enterprise_edition.policy_server::
       "control_hub_exclude_hosts"
