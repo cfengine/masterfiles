@@ -998,7 +998,7 @@ This can be configured via [augments][Augments]:
 ```
 {
   "vars":{
-      "control_serverd_maxconnections": "1000"
+      "control_server_maxconnections": "1000"
   }
 }
 ```
