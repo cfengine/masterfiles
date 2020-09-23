@@ -4,6 +4,30 @@
 # These body settings determine the behaviour of cf-execd,
 # including scheduling times and output capture to
 # $(sys.workdir)/outputs and relay via email.
+#
+# If different schedules are needed based on class expressions then
+# an override for this file can be specified as an augment variable:
+# `cf_execd_override_policy`. The value is a path relative to `$(sys.inputs)`
+# to load instead of `controls/cf_execd.cf`.
+#
+# ```json
+# {
+#   "vars": {
+#     "cf_execd_override_policy": "custom/cf_execd.cf"
+#   }
+# }
+# ```
+#
+# Typically a copy of the current `controls/cf_execd.cf` file should be made
+# and then modified to suit such as:
+#
+# ```cf3
+#   slow_host::
+#     schedule => { "Min00" };
+#   !slow_host::
+#     schedule => { @(def.control_executor_schedule_value) };
+# ```
+#
 ###############################################################################
 
 body executor control

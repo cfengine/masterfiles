@@ -287,7 +287,9 @@ bundle common cfengine_controls
         comment => "Agent control options";
 
       "input[cf_execd]"
-        string => "controls/cf_execd.cf",
+        string => ifelse(isvariable("def.cf_execd_override_policy"),
+                         "$(def.cf_execd_override_policy)",
+                         "controls/cf_execd.cf"),
         comment => "Executor (scheduler) control options";
 
       "input[cf_monitord]"
