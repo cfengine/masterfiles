@@ -82,7 +82,7 @@ body server control
 
 ###############################################################################
 
-bundle server access_rules()
+bundle server mpf_default_access_rules()
 # @brief Defines access to common resources
 {
   access:
