@@ -41,6 +41,11 @@ bundle agent inventory_autorun
       "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
       handle => "cfe_internal_autorun_inventory_packages";
 
+    !disable_inventory_policy_servers::
+      "Inventory Policy Servers"
+        handle => "cfe_internal_autorun_inventory_policy_servers",
+        usebundle => cfe_autorun_inventory_policy_servers;
+
     !disable_inventory_proc::
       "proc" usebundle => cfe_autorun_inventory_proc(),
       handle => "cfe_internal_autorun_inventory_proc";
@@ -1066,6 +1071,23 @@ bundle agent cfe_autorun_inventory_packages
         ifvarclass => "!have_inventory";
 }
 
+bundle agent cfe_autorun_inventory_policy_servers
+# @brief Inventory policy servers
+{
+  vars:
+
+    !disable_inventory_policy_servers::
+
+      "_primary_policy_server" -> { "ENT-6212" }
+        string => "$(sys.policy_hub)",
+        meta => { "inventory", "attribute_name=Primary Policy Server" };
+
+      "_policy_servers" -> { "ENT-6212" }
+        slist => { @(def.policy_servers) },
+        if => isgreaterthan( length( "def.policy_servers"), 0),
+        meta => { "inventory", "attribute_name=Policy Servers" };
+
+}
 body package_method inventory_lslpp(update_interval)
 # @brief AIX lslpp installation method for inventory purposes only
 # @param update_interval how often to update the package and patch list
