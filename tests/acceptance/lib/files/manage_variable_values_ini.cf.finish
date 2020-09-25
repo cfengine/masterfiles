@@ -15,3 +15,5 @@ keyone=1
 keytwo=valuetwo
 [section2]
 wat=WUT
+[CFE-3428]
+keepme=did you?
