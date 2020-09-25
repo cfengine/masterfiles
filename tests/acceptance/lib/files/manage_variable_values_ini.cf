@@ -49,6 +49,7 @@ bundle agent test
       "config[CFE-3221][variablename8]" string => "desired value8";
       "config[CFE-3244][keyone]" string => "1";
       "config[CFE-3244][keytwo]" string => "valuetwo";
+      "config[CFE-3428][keepme]" string => "did you?";
 
   files:
       "$(G.testfile).actual"
@@ -59,6 +60,8 @@ bundle agent test
 
       "$(G.testfile).actual" -> { "CFE-3244" }
         edit_line => manage_variable_values_ini( "test.config", "CFE-3244" );
+      "$(G.testfile).actual" -> { "CFE-3428" }
+        edit_line => manage_variable_values_ini( "test.config", "LAST" );
 
 }
 
