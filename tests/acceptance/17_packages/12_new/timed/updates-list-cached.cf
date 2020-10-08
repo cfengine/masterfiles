@@ -9,7 +9,9 @@ body common control
 bundle agent init
 {
   meta:
-    "test_skip_needs_work" string => "!linux";
+    # Test package module implemented only on Linux.
+    # On Debian 7 and Solaris 11 this test fails too often.
+    "test_skip_needs_work" string => "!linux|debian_7|sunos_5_11";
 
   files:
     test_pass_1::
