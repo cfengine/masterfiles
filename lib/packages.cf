@@ -33,8 +33,17 @@ bundle common package_module_knowledge
       "platform_default" string => "msiexec";
 @endif
 
+    alpinelinux::
+      "platform_default" string => "apk";
+
     termux::
       "platform_default" string => "apt_get";
+}
+
+body package_module apk
+{
+  query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
+  query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
 }
 
 body package_module apt_get
