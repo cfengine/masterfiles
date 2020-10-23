@@ -31,11 +31,11 @@ bundle common inventory_linux
     any::
       "proc_routes" data => data_readstringarrayidx("/proc/net/route",
                                                     "#[^\n]*","\s+",40,4k),
-        ifvarclass => fileexists("/proc/net/route");
+        if => fileexists("/proc/net/route");
       "routeidx" slist => getindices("proc_routes");
       "dgw_ipv4_iface" string => "$(proc_routes[$(routeidx)][0])",
         comment => "Name of the interface where default gateway is routed",
-        ifvarclass => strcmp("$(proc_routes[$(routeidx)][1])", "00000000");
+        if => strcmp("$(proc_routes[$(routeidx)][1])", "00000000");
 
     linux::
       "nfs_servers" -> { "CFE-3259" }

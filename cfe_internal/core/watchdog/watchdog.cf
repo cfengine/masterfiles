@@ -43,7 +43,7 @@ bundle agent cfe_internal_core_watchdog(state)
     DEBUG|DEBUG_cfe_internal_core_watchdog::
       "DEBUG $(this.bundle): Watchdog '$(state)'";
       "DEBUG $(this.bundle): Invalid state '$(state)' only enabled|disabled allowed"
-        ifvarclass => "invalid_state";
+        if => "invalid_state";
 
     !(use_cfe_internal_core_watchdog_cron_d|use_cfe_internal_core_watchdog_aix|use_cfe_internal_core_watchdog_windows)::
       "WARNING $(this.bundle): Currently only supports /etc/cron.d on systems that have pgrep in the the stdlib paths bundle, AIX and Windows hosts.";

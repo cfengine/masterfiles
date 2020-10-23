@@ -90,21 +90,21 @@ bundle agent cfe_internal_update_bins
       "novapkg"                 string => "CFEcfengine-nova",
       comment => "Name convention of Nova package on Solaris",
       handle => "cfe_internal_update_bins_vars_novapkg_solaris",
-      ifvarclass => "nova_edition";
+      if => "nova_edition";
 
     aix.enterprise::
 
       "novapkg"                 string => "cfengine.cfengine-nova",
       comment => "Name convention of Nova package on AIX",
       handle => "cfe_internal_update_bins_vars_novapkg_aix",
-      ifvarclass => "nova_edition";
+      if => "nova_edition";
 
     !(solarisx86|solaris|aix).enterprise::
 
       "novapkg"                 string => "cfengine-nova",
       comment => "Name convention of Nova package for all but not Solaris",
       handle => "cfe_internal_update_bins_vars_novapkg_not_solaris_aix",
-      ifvarclass => "nova_edition";
+      if => "nova_edition";
 
     solaris.!sunos_i86pc.enterprise::
 
@@ -162,7 +162,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "$(update_def.current_version)-1",
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition.have_software_dir",
+      if => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.(solaris|solarisx86).enterprise.trigger_upgrade.!bootstrap_mode::
@@ -175,7 +175,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "$(update_def.current_version)",
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition.have_software_dir",
+      if => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.windows.enterprise.trigger_upgrade.!bootstrap_mode::
@@ -188,7 +188,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "$(update_def.current_version)",
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition.have_software_dir",
+      if => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
     !am_policy_hub.aix.enterprise.trigger_upgrade.!bootstrap_mode::
@@ -201,7 +201,7 @@ bundle agent cfe_internal_update_bins
       package_architectures => { "$(pkgarch)" },
       package_version => "$(update_def.current_version).0",
       package_method => u_generic( "$(local_software_dir)" ),
-      ifvarclass => "nova_edition.have_software_dir",
+      if => "nova_edition.have_software_dir",
       classes => u_if_else("bin_update_success", "bin_update_fail");
 
       #
@@ -236,13 +236,13 @@ bundle agent cfe_internal_update_bins
       edit_defaults => u_empty_no_backup,
       edit_line => u_admin_file,
       perms => u_m("0644"),
-      ifvarclass => "solarisx86|solaris";
+      if => "solarisx86|solaris";
 
       "$(backup_script)"
       comment => "Create a backup script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_backup_script",
       create => "true",
-      ifvarclass => "!windows",
+      if => "!windows",
       edit_defaults => u_empty_no_backup,
       edit_line => u_backup_script,
       perms => u_m("0755");
@@ -251,7 +251,7 @@ bundle agent cfe_internal_update_bins
       comment => "Create an install script for cf-upgrade",
       handle => "cfe_internal_update_bins_files_install_script",
       create => "true",
-      ifvarclass => "!windows",
+      if => "!windows",
       edit_defaults => u_empty_no_backup,
       edit_line => u_install_script,
       perms => u_m("0755");
@@ -280,7 +280,7 @@ bundle agent cfe_internal_update_bins
   reports:
     DEBUG|DEBUG_cfe_internal_update_bins::
       "DEBUG $(this.bundle): Evaluating binaries for upgrade using internal update mechanism"
-        ifvarclass => "trigger_upgrade";
+        if => "trigger_upgrade";
 
 }
 

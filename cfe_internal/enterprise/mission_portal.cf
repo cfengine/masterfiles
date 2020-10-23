@@ -111,7 +111,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
     "$(config)"
       copy_from => local_dcp( $(staged_config) ),
-      ifvarclass => returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
+      if => returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
       classes => results("bundle", "mission_portal_apache_config"),
       comment => "We make sure that the deployed config is a copy of the staged
                   config if the staged config passes a syntax check. We redirect
@@ -136,10 +136,10 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
   reports:
     DEBUG|DEBUG_mission_portal_apache_from_stage::
       "DEBUG $(this.bundle): '$(config)' should be a copy of '$(staged_config)' because it validates with '$(validate_config)'"
-      ifvarclass => returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell");
+      if => returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell");
 
       "DEBUG $(this.bundle): '$(config)' should *not* be a copy of '$(staged_config)' because it failed to validate with '$(validate_config)'"
-      ifvarclass => not(returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"));
+      if => not(returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"));
 }
 
 ##################################################################
@@ -275,8 +275,8 @@ bundle agent cfe_enterprise_selfsigned_cert
     DEBUG|DEBUG_cfe_enterprise_selfsigned_cert::
 
       "DEBUG $(this.bundle): Certificate Generation Requested"
-        ifvarclass => "_cfe_enterprise_selfsigned_cert_regenerate_certificate";
+        if => "_cfe_enterprise_selfsigned_cert_regenerate_certificate";
 
       "DEBUG $(this.bundle): No Certificate Generation Requested"
-        ifvarclass => "!_cfe_enterprise_selfsigned_cert_regenerate_certificate";
+        if => "!_cfe_enterprise_selfsigned_cert_regenerate_certificate";
 }

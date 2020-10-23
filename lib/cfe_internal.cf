@@ -79,6 +79,6 @@ bundle agent cfe_internal_cleanup_agent_reports
       "DEBUG $(this.bundle): Size of all reports = '$(total_report_size)'";
       "DEBUG $(this.bundle): Purge threshold = '$(def.max_client_history_size)'";
       "DEBUG $(this.bundle): Client history purge triggered"
-        ifvarclass => "cfe_internal_purge_reports";
+        if => "cfe_internal_purge_reports";
 
 }

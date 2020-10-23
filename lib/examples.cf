@@ -50,14 +50,14 @@ bundle agent probabilistic_usebundle(probability, bundlename)
       "Activate bundle probabilistically"
         handle => "probabilistic_usebundle_methods_special_case_fifty_fifty_activate_bundle",
         usebundle => $(bundlename),
-        ifvarclass => "activate_bundle_$(probability)000",
+        if => "activate_bundle_$(probability)000",
         comment => "Activate $(bundlename) $(probability)%ish of the time";
 
     not_fifty_fifty::
       "Activate bundle probabilistically"
         handle => "probabilistic_usebundle_methods_activate_bundle",
         usebundle => $(bundlename),
-        ifvarclass => "activate_bundle_$(probability)",
+        if => "activate_bundle_$(probability)",
         comment => "Activate $(bundlename) $(probability)% of the time";
 
 
@@ -66,8 +66,8 @@ bundle agent probabilistic_usebundle(probability, bundlename)
       "$(this.bundle) Special case for 50/50";
 
       "$(this.bundle) activate_bundle_$(probability)000"
-        ifvarclass => "activate_bundle_$(probability)000";
+        if => "activate_bundle_$(probability)000";
 
       "$(this.bundle) activate_bundle_$(probability)001"
-        ifvarclass => "activate_bundle_$(probability)001";
+        if => "activate_bundle_$(probability)001";
 }

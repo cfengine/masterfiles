@@ -249,7 +249,7 @@ bundle agent cfe_internal_postgresql_maintenance
 
       "cf_consumer_pid" -> { "ENT-2797" }
         string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
-        ifvarclass => fileexists( "$(sys.workdir)/cf-consumer.pid" ),
+        if => fileexists( "$(sys.workdir)/cf-consumer.pid" ),
         comment => "Read cf-consumer.pid for the main cf-consumer PID";
 
   classes:

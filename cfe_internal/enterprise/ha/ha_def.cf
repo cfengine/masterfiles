@@ -24,7 +24,7 @@ bundle common ha_def
 
 
    "replication_only_node[$(ips)]"
-      string => "dummy", ifvarclass => strcmp("$(config[$(ips)][is_in_cluster])", "false");
+      string => "dummy", if => strcmp("$(config[$(ips)][is_in_cluster])", "false");
 
    "replication_only_nodes"
       slist => getindices("replication_only_node");

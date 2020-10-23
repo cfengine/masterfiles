@@ -110,7 +110,7 @@ bundle agent cfe_autorun_inventory_listening_ports
       "ports" -> { "ENT-150" }
         slist => sort( "mon.listening_ports", "int"),
         meta => { "inventory", "attribute_name=Ports listening" },
-        ifvarclass => some("[0-9]+", "mon.listening_ports"),
+        if => some("[0-9]+", "mon.listening_ports"),
         comment => "We only want to inventory the listening ports if we have
                     values that make sense.";
 }
@@ -442,11 +442,11 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
     _have_cpuinfo::
       "cpuinfo_physical_cores"
         string => "$(default:cfe_autorun_inventory_proc.cpuinfo[cpu cores])",
-        ifvarclass => "have_cpuinfo_cpu_cores";
+        if => "have_cpuinfo_cpu_cores";
 
       "cpuinfo_cpu_model_name"
         string => "$(default:cfe_autorun_inventory_proc.cpuinfo[model name])",
-        ifvarclass => "have_cpuinfo_model_name";
+        if => "have_cpuinfo_model_name";
 
     # We need to be able to count the number of unique physical id lines in
     # /proc/cpu in order to get a physical processor count.
@@ -492,9 +492,9 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
      "DEBUG $(this.bundle)";
      "$(const.t)cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])] = $(default:cfe_autorun_inventory_proc.cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])])";
      "$(const.t)CPU physical cores: '$(cpuinfo_physical_cores)'"
-        ifvarclass => "have_cpuinfo_cpu_cores";
+        if => "have_cpuinfo_cpu_cores";
      "$(const.t)CPU model name: '$(cpuinfo_cpu_model_name)'"
-        ifvarclass => "have_cpuinfo_model_name";
+        if => "have_cpuinfo_model_name";
      "$(const.t)CPU Physical Sockets: '$(cpuinfo_physical_socket_inventory)'";
 }
 
@@ -514,7 +514,7 @@ bundle agent cfe_autorun_inventory_cpuinfo
     _have_proc_cpu_physical_cores::
       "cpuinfo_physical_cores"
         string => "$(default:cfe_autorun_inventory_proc.cpuinfo[cpu cores])",
-        #ifvarclass => "have_cpuinfo_cpu_cores",
+        #if => "have_cpuinfo_cpu_cores",
         meta => { "inventory", "attribute_name=CPU physical cores", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
 
     _have_proc_cpu_model_name::
@@ -1065,9 +1065,9 @@ bundle agent cfe_autorun_inventory_packages
     DEBUG|DEBUG_cfe_autorun_inventory_packages::
       "DEBUG $(this.bundle): refresh interval is $(refresh)";
       "DEBUG $(this.bundle): we have the inventory files."
-        ifvarclass => "have_inventory";
+        if => "have_inventory";
       "DEBUG $(this.bundle): we don't have the inventory files."
-        ifvarclass => "!have_inventory";
+        if => "!have_inventory";
 }
 
 bundle agent cfe_autorun_inventory_policy_servers
@@ -1152,11 +1152,11 @@ bundle agent inventory_cmdb_load(file)
   vars:
       "cmdb"
         data => readjson($(file), "999999"),
-        ifvarclass => fileexists( $(file) );
+        if => fileexists( $(file) );
 
       "cmdb_string"
       string => format("%S", cmdb),
-        ifvarclass => isvariable( cmdb );
+        if => isvariable( cmdb );
 
       "bkeys" slist => getindices("cmdb[vars]");
       "vkeys_$(bkeys)" slist => getindices("cmdb[vars][$(bkeys)]");
@@ -1167,13 +1167,13 @@ bundle agent inventory_cmdb_load(file)
   reports:
     DEBUG|DEBUG_inventory_cmdb_load::
       "DEBUG $(this.bundle): Got CMDB data from $(file): $(cmdb_string)"
-        ifvarclass => "have_cmdb_data";
+        if => "have_cmdb_data";
       "DEBUG $(this.bundle): Got CMDB key = $(vkeys_$(bkeys)), CMDB value = $((vkeys_$(bkeys)))"
-        ifvarclass => "have_cmdb_data";
+        if => "have_cmdb_data";
       "DEBUG $(this.bundle): Got CMDB class = $(ckeys)"
-        ifvarclass => "have_cmdb_data";
+        if => "have_cmdb_data";
       "DEBUG $(this.bundle): Could not read the CMDB data from $(file)"
-        ifvarclass => "!have_cmdb_data";
+        if => "!have_cmdb_data";
 }
 
 body copy_from inventory_cmdb_copy_from

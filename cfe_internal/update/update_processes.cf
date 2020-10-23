@@ -121,13 +121,13 @@ bundle agent cfe_internal_update_processes
         comment => "CFE processes that should not be enabled",
         handle => "cfe_internal_update_processes_vars_agents_to_be_disabled",
         slist => { @(def.agents_to_be_disabled) },
-        ifvarclass => isvariable( "def.agents_to_be_disabled" );
+        if => isvariable( "def.agents_to_be_disabled" );
 
       "agents_to_be_disabled"
         comment => "The default agents that should not be enabled.",
         handle => "cfe_internal_update_processes_vars_default_agents_to_be_disabled",
         slist => { },
-        ifvarclass => not( isvariable("def.agents_to_be_disabled") );
+        if => not( isvariable("def.agents_to_be_disabled") );
 
       # An agent is disabled if there is a persistently defined disablement
       # class OR if the agent is found in a list of agents to be specifically
@@ -135,7 +135,7 @@ bundle agent cfe_internal_update_processes
 
       "disabled[$(all_agents)]"
         string => "$(all_agents)",
-        ifvarclass => or( canonify( "persistent_disable_$(all_agents)" ),
+        if => or( canonify( "persistent_disable_$(all_agents)" ),
                           some( "$(all_agents)", agents_to_be_disabled ));
 
     systemd_supervised.policy_server.enterprise.hub_passive|(ha_replication_only_node.!failover_to_repliacation_node_enabled)::
@@ -193,7 +193,7 @@ bundle agent cfe_internal_update_processes
 
       "CHECKING FOR PERSISTENTLY DISABLED CFE AGENTS"
       usebundle => disable_cfengine_agents($(all_agents)),
-      ifvarclass => canonify("persistent_disable_$(all_agents)"),
+      if => canonify("persistent_disable_$(all_agents)"),
       comment => "Call a bundle to disable CFEngine given processes if persistent_disable_x is set",
       handle => "cfe_internal_update_processes_methods_maybe_disabling_cfe_agents";
 
@@ -254,7 +254,7 @@ bundle agent maintain_cfe_hub_process
       restart_class => "no_vacuumdb",
       comment => "Monitor vacuumdb process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
-      ifvarclass => "nova|enterprise";
+      if => "nova|enterprise";
 
    am_policy_hub.cfredis_in_enterprise::
 
@@ -263,27 +263,27 @@ bundle agent maintain_cfe_hub_process
       restart_class => "start_redis_server",
       comment => "Monitor redis-server process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_redis",
-      ifvarclass => "nova|enterprise";
+      if => "nova|enterprise";
 
     am_policy_hub.cfconsumer_in_enterprise::
       "$(cfe_internal_process_knowledge.bindir)/cf-consumer" -> { "ENT-2797" }
       restart_class => "start_cf_consumer",
       comment => "Monitor cf-consumer process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_consumer",
-      ifvarclass => "(nova|enterprise).no_vacuumdb";
+      if => "(nova|enterprise).no_vacuumdb";
 
    am_policy_hub.!enable_cfengine_enterprise_hub_ha::
       "$(cfe_internal_process_knowledge.bindir)/postgres"
       restart_class => "start_postgres_server",
       comment => "Monitor postgres process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_postgres",
-      ifvarclass => "nova|enterprise";
+      if => "nova|enterprise";
 
     am_policy_hub.!enable_cfengine_enterprise_hub_ha.files_ok.!windows|ha_run_hub_process::
       "cf-hub"      restart_class => "start_hub",
       comment => "Monitor cf-hub process",
       handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
-      ifvarclass => and( "(nova|enterprise).no_vacuumdb",
+      if => and( "(nova|enterprise).no_vacuumdb",
                          "!persistent_disable_cf_hub" ); # Don't start it if it's persistently disabled
 
     am_policy_hub.ha_kill_hub_process::
@@ -373,7 +373,7 @@ bundle agent disable_cfengine_agents(process)
       signals => { "term" },
       comment => "Terminate $(process)",
       handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
-      ifvarclass => "disable_$(cprocess)";
+      if => "disable_$(cprocess)";
 
 }
 
@@ -410,7 +410,7 @@ bundle agent enable_cfengine_agents(process)
       restart_class => "restart_$(cprocess)",
       comment => "Create a class to restart a process",
       handle => "cfe_internal_enable_cfengine_agents_processes_restart_process",
-      ifvarclass => "enable_$(cprocess)";
+      if => "enable_$(cprocess)";
 
       #
 
@@ -422,21 +422,21 @@ bundle agent enable_cfengine_agents(process)
       comment => "Restart a process",
       handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
       classes => u_kept_successful_command,
-      ifvarclass => and( "restart_$(cprocess)",
+      if => and( "restart_$(cprocess)",
                          isvariable( "sys.$(cprocess)" ) );
 
   reports:
       "The process $(process) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."
-      ifvarclass => and( "persistent_disable_$(cprocess)",
+      if => and( "persistent_disable_$(cprocess)",
                          isvariable( "sys.$(cprocess)" ));
 
       "The process $(process) has been re-enabled.  Run with '-Dset_persistent_disable_$(cprocess)' to disable it persistently again."
-      ifvarclass => and( "clear_persistent_disable_$(cprocess)",
+      if => and( "clear_persistent_disable_$(cprocess)",
                          isvariable( "sys.$(cprocess)" )),
       classes => u_clear_always("persistent_disable_$(cprocess)");
 
       "The process $(process) has been disabled persistently.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."
-      ifvarclass => "set_persistent_disable_$(cprocess)",
+      if => "set_persistent_disable_$(cprocess)",
       classes => u_always_forever("persistent_disable_$(cprocess)");
 }
 
