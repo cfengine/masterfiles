@@ -33,11 +33,11 @@ bundle common update_def
 
       "augments_inputs"
         slist => {},
-        ifvarclass => not( isvariable( "def.update_inputs" ) );
+        if => not( isvariable( "def.update_inputs" ) );
 
       "augments_inputs"
         slist => { @(def.update_inputs) },
-        ifvarclass => isvariable( "def.update_inputs" );
+        if => isvariable( "def.update_inputs" );
 
       # Default the input name patterns, if we don't find it defined in def
       # (from the augments_file).
@@ -48,9 +48,9 @@ bundle common update_def
         comment => "Filename patterns to match when updating the policy
                     (see update/update_policy.cf)",
         handle => "common_def_vars_input_name_patterns_policy_default",
-        ifvarclass => and(and(not(isvariable("override_data_acl")),
-                          not(isvariable("input_name_patterns"))),
-                          not(isvariable("def.input_name_patterns"))),
+        if => and(and(not(isvariable("override_data_acl")),
+                  not(isvariable("input_name_patterns"))),
+                  not(isvariable("def.input_name_patterns"))),
         meta => { "defvar" };
 
       # define based on data in def (which comes from augments file), if
@@ -60,7 +60,7 @@ bundle common update_def
         comment => "Filename patterns to match when updating the policy
                     (see update/update_policy.cf)",
         handle => "common_def_vars_input_name_patterns",
-        ifvarclass => and( isvariable("def.input_name_patterns"),
+        if => and( isvariable("def.input_name_patterns"),
                            not(isvariable("input_name_patterns"))),
         meta => { "defvar" };
 

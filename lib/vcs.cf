@@ -309,7 +309,7 @@ bundle agent git(repo_path, subcmd, args)
       # not be able to commit as a normal user.
       "need_to_drop"
         not => strcmp($(this.promiser_uid), $(repo_uid)),
-        ifvarclass => isvariable( repo_uid );
+        if => isvariable( repo_uid );
 
     am_root.need_to_drop::
       # This regular expression could be tightened up
@@ -319,7 +319,7 @@ bundle agent git(repo_path, subcmd, args)
         expression => regextract( ".*:.*:\d+:\d+:.*:(.*):.*",
                                   $(repo_uid_passwd_ent),
                                   "repo_uid_passwd" ),
-        ifvarclass => isvariable("repo_uid_passwd_ent");
+        if => isvariable("repo_uid_passwd_ent");
 
   commands:
     am_root.need_to_drop::
@@ -342,7 +342,7 @@ bundle agent git(repo_path, subcmd, args)
   reports:
     "DEBUG|DEBUG_$(this.bundle).am_root.need_to_drop"::
       "DEBUG $(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(paths.env) HOME=\"$(repo_uid_passwd[1])\" $(oneliner) $(subcmd) $(args)'"
-        ifvarclass => isvariable("repo_uid_passwd[1]");
+        if => isvariable("repo_uid_passwd[1]");
 
     "DEBUG|DEBUG_$(this.bundle).(!am_root|!need_to_drop)"::
       "DEBUG $(this.bundle): with current privileges, in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'";

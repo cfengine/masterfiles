@@ -549,17 +549,17 @@ bundle agent cfe_internal_enterprise_maintenance
 
       "Enterprise Maintenance"
         usebundle => $(enterprise_maintenance_bundles),
-        ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+        if => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
 
   reports:
 
     "DEBUG|DEBUG_$(this.bundle)"::
 
       "DEBUG $(this.bundle): $(enterprise_maintenance_bundle_count) CFEngine Enterprise Maintenance Bundles"
-        ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+        if => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
 
       "DEBUG $(this.bundle): $(enterprise_maintenance_bundles) CFEngine Enterprise Maintenance Bundles"
-        ifvarclass => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+        if => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
 }
 
 bundle agent cfe_internal_refresh_inventory_view

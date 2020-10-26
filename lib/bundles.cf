@@ -335,9 +335,9 @@ bundle agent url_ping(host, method, port, uri)
   reports:
     verbose_mode::
       "$(this.bundle): $(method) $(host):$(port)/$(uri) got 200 OK"
-      ifvarclass => "url_ok_$(chost)";
+      if => "url_ok_$(chost)";
       "$(this.bundle): $(method) $(host):$(port)/$(uri) did *not* get 200 OK"
-      ifvarclass => "url_not_ok_$(chost)";
+      if => "url_not_ok_$(chost)";
 }
 
 bundle agent cmerge(name, varlist)
@@ -491,8 +491,8 @@ bundle agent run_ifdefined(namespace, mybundle)
 
   methods:
       "any"
-      usebundle  => $(bundlesfound),
-      ifvarclass => strcmp(1, $(count));
+      usebundle => $(bundlesfound),
+      if        => strcmp(1, $(count));
 
   reports:
     verbose_mode::

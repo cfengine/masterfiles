@@ -219,26 +219,26 @@ bundle agent u_systemd_services(service,state)
       # conveniently, systemd states map to `services` states, except
       # for `enable`
 
-      "$(call_systemctl) -q start $(service)"   ifvarclass => "action_start";
-      "$(call_systemctl) -q stop $(service)"    ifvarclass => "action_stop";
-      "$(call_systemctl) -q reload $(service)"  ifvarclass => "action_reload";
-      "$(call_systemctl) -q restart $(service)" ifvarclass => "action_restart";
-      "$(call_systemctl) -q enable $(service)"  ifvarclass => "action_enable";
-      "$(call_systemctl) -q disable $(service)" ifvarclass => "action_disable";
+      "$(call_systemctl) -q start $(service)"   if => "action_start";
+      "$(call_systemctl) -q stop $(service)"    if => "action_stop";
+      "$(call_systemctl) -q reload $(service)"  if => "action_reload";
+      "$(call_systemctl) -q restart $(service)" if => "action_restart";
+      "$(call_systemctl) -q enable $(service)"  if => "action_enable";
+      "$(call_systemctl) -q disable $(service)" if => "action_disable";
 
       # Custom action for any of the non-standard systemd actions such a
       # status, try-restart, isolate, et al.
-      "$(call_systemctl) $(state) $(service)" ifvarclass => "action_custom";
+      "$(call_systemctl) $(state) $(service)" if => "action_custom";
 
   reports:
     DEBUG|DEBUG_u_systemd_service::
       "DEBUG $(this.bundle): using systemd layer to $(state) $(service)";
 
       "DEBUG $(this.bundle): Service $(service) unit file is not loaded; doing nothing"
-        ifvarclass => "systemd.!service_loaded";
+        if => "systemd.!service_loaded";
 
       "DEBUG $(this.bundle): Could not find service: $(service)"
-        ifvarclass => "systemd.service_notfound";
+        if => "systemd.service_notfound";
 }
 
 body perms u_mog(mode,user,group)
