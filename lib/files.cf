@@ -1076,6 +1076,59 @@ bundle edit_line converge(marker, lines)
       "$(lines)" comment => "Insert the given lines";
 }
 
+bundle edit_line converge_prepend(marker, lines)
+# @brief Converge `lines` marked with `marker` to start of content.
+#
+# Any content marked with `marker` is removed, then `lines` are
+# inserted at *start* of content.  Every `line` should contain `marker`.
+#
+# This is helpful for files where order matters, like `pam.d/common-auth`,
+# and you want the content at the top. If you want to maintain the order
+# of multiple lines, pass one item with a newline in it like this:
+#
+# **Example:**
+#
+# ```cf3
+# files:
+#   "/etc/pam.conf"
+#     edit_line => converge_prepend("session", "session required pam_loginuid.so
+#session required pam_env.so
+#session required pam_env.so envfile=/etc/default/locale
+#session required pam_limits.so");
+# ```
+#
+# @param marker The marker (not a regular expression; will be escaped)
+# @param lines The lines to insert; all must contain `marker`
+#
+# **Example:**
+#
+# ```cf3
+# bundle agent pam_d_su_session
+# # @brief Ensure /etc/pam.d/su has session configured properly
+# {
+#   files:
+#     ubuntu::
+#       "/etc/pam.d/su"
+#         edit_line => converge_prepend( "session", "session       required   pam_env.so readenv=1 envfile=/etc/default/locale
+# session    optional   pam_mail.so nopen
+# session    required   pam_limits.so" );
+# }
+# ```
+#
+# **History:**
+#
+# * Introduced in 3.17.0
+{
+  vars:
+      "regex" string => escape($(marker));
+
+  delete_lines:
+      ".*$(regex).*" comment => "Delete lines matching the marker";
+  insert_lines:
+      "$(lines)" location => start, comment => "Insert the given lines";
+}
+
+
 bundle edit_line fstab_option_editor(method, mount, option)
 # @brief Add or remove `/etc/fstab` options for a mount
 #
