@@ -1071,10 +1071,29 @@ bundle edit_line converge(marker, lines)
       "regex" string => escape($(marker));
 
   delete_lines:
-      "$(regex)" comment => "Delete lines matching the marker";
+      ".*$(regex).*" comment => "Delete lines matching the marker";
   insert_lines:
       "$(lines)" comment => "Insert the given lines";
 }
+
+bundle edit_line converge_prepend(marker, lines)
+# @brief Converge `lines` marked with `marker` to start of content
+#
+# Any content marked with `marker` is removed, then `lines` are
+# inserted at *start* of content.  Every `line` should contain `marker`.
+#
+# @param marker The marker (not a regular expression; will be escaped)
+# @param lines The lines to insert; all must contain `marker`
+{
+  vars:
+      "regex" string => escape($(marker));
+
+  delete_lines:
+      ".*$(regex).*" comment => "Delete lines matching the marker";
+  insert_lines:
+      "$(lines)" location => start, comment => "Insert the given lines";
+}
+
 
 bundle edit_line fstab_option_editor(method, mount, option)
 # @brief Add or remove `/etc/fstab` options for a mount
