@@ -651,6 +651,10 @@ bundle common paths
       "tmp_path[$(tmp_paths)]" string => "$(files_path)$(path[$(tmp_paths)])";
       "path[$(tmp_paths)]" string => "$(tmp_path[$(tmp_paths)])";
 
+    windows:
+      "path[true]"          string => "exit 0"; # designed to be used with contain => in_shell
+
+
     !(termux|windows)::
       # reasonable defaults for unix systems to allow for writing
       # more portable paths between termux and other systems
