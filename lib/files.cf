@@ -1113,7 +1113,7 @@ bundle edit_line converge_prepend(marker, lines)
 #
 # ```cf3
 # bundle agent pam_d_su_session
-# # @brief Ensure /etc/pam.d/su has session configured properly
+# #@brief Ensure /etc/pam.d/su has session configured properly
 # {
 #   files:
 #     ubuntu::
