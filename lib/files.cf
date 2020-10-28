@@ -1077,10 +1077,18 @@ bundle edit_line converge(marker, lines)
 }
 
 bundle edit_line converge_prepend(marker, lines)
-# @brief Converge `lines` marked with `marker` to start of content
+# @brief Converge `lines` marked with `marker` to start of content.
 #
 # Any content marked with `marker` is removed, then `lines` are
 # inserted at *start* of content.  Every `line` should contain `marker`.
+#
+# This is helpful for files where order matters, like `pam.d/common-auth`,
+# and you want the content at the top. If you want to maintain the order
+# of multiple lines, pass one item with a newline in it like this:
+# ```
+# "" usebundle => converge_prepend("covfefe", "first line of covfefe
+# second line of covfefe");
+# ```
 #
 # @param marker The marker (not a regular expression; will be escaped)
 # @param lines The lines to insert; all must contain `marker`
