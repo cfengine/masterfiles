@@ -1121,7 +1121,7 @@ bundle edit_line converge_prepend(marker, lines)
 #
 # **History:**
 #
-# * Introduced in 3.17.0
+# * Introduced in 3.17.0, 3.15.3, 3.12.6
 {
   vars:
       "regex" string => escape($(marker));
