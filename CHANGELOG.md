@@ -1,6 +1,36 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.3:
+	- Added .csv to the list of file extensions considered by default during policy update
+	  (CFE-3425)
+	- Added ability to extend known paths without modifying vendored policy
+	  (CFE-3426)
+	- Added docs for Federated Reporting Duplicate Host Handling and small re-org
+	  (ENT-6035)
+	- Added inventory for Timezone and GMT Offset (ENT-6161)
+	- Added inventory for policy servers (ENT-6212)
+	- Added optional handle duplicates step in federated reporting import
+	  (ENT-6035)
+	- Added replace_uncommented_substrings (ENT-6117)
+	- Added service states "active" and "inactive" for systemd (ENT-6074)
+	- Added watchdog for Windows (ENT-5538)
+	- Aligned systemd services behavior for service_policy => "enable|enabled|disable|disabled"
+	  (ENT-6073)
+	- Changed group for state dir files promise to match defaults per OS
+	  (CFE-3362)
+	- Removed unnecessary packages promise on SuSE (ENT-5480, ENT-6375)
+	- Replaced @ignore with useful doc strings (CFE-3378)
+	- Stopped disabling disabled systemd unit each run when disabled state requested
+	  (CFE-3367)
+	- Stopped trying to edit fields in manage_variable_values_ini
+	  (CFE-3372)
+	 - Fixed converge edit_line bundle not deleting lines containing marker
+	  (CFE-3482)
+	 - Added bundle edit_line converge_prepend with same behavior as bundle edit_line converge,
+	   but inserting at start of content. (CFE-3483)
+	 - Fixed interpretation of cf-hub --show-license from REPAIRED to KEPT (ENT-6473)
+
 3.15.2:
 	- Admitted ::1 as a query source on Enterprise hubs (ENT-5531)
 	- Changed m_inventory dumping behavior to exclude when values are null
