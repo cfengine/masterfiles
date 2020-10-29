@@ -158,3 +158,105 @@ Skipped tests: 0
 Soft failures: 0
 Total tests:   1
 #+END_EXAMPLE
+
+** Check test
+
+#+NAME: run-test
+#+CAPTION: Running a test manually
+#+begin_src sh :results output :exports both :var TESTFILE="./lib/files/edit_line_converge.cf"
+  exec 2>&1
+  find ../../lib/ -name "*.cf" | xargs chmod 600
+  chmod 600 ${TESTFILE}
+  ./testall \
+      --bindir="/var/cfengine/bin/" \
+      --printlog ${TESTFILE}
+  :
+#+end_src
+
+#+CALL: run-test(TESTFILE="./lib/files/edit_line_converge.cf ./lib/files/edit_line_converge_prepend.cf")
+
+#+RESULTS:
+#+begin_example
+======================================================================
+Testsuite started at 2020-10-29 11:49:33
+----------------------------------------------------------------------
+Total tests: 2
+
+        COMMON_TESTS: enabled
+         TIMED_TESTS: enabled
+          SLOW_TESTS: enabled
+     ERROREXIT_TESTS: enabled
+        SERIAL_TESTS: enabled
+       NETWORK_TESTS: enabled
+       LIBXML2_TESTS: enabled
+       LIBCURL_TESTS: enabled
+        UNSAFE_TESTS: disabled
+       STAGING_TESTS: disabled
+
+Test run is not parallel
+
+./lib/files/edit_line_converge.cf Pass
+./lib/files/edit_line_converge_prepend.cf Pass
+
+======================================================================
+Testsuite finished at 2020-10-29 11:49:35 (2 seconds)
+
+Passed tests:  2
+Failed tests:  0
+Skipped tests: 0
+Soft failures: 0
+Total tests:   2
+======================================================================
+Testsuite started at 2020-10-29 11:49:33
+----------------------------------------------------------------------
+Total tests: 2
+
+        COMMON_TESTS: enabled
+         TIMED_TESTS: enabled
+          SLOW_TESTS: enabled
+     ERROREXIT_TESTS: enabled
+        SERIAL_TESTS: enabled
+       NETWORK_TESTS: enabled
+       LIBXML2_TESTS: enabled
+       LIBCURL_TESTS: enabled
+        UNSAFE_TESTS: disabled
+       STAGING_TESTS: disabled
+
+Test run is not parallel
+
+----------------------------------------------------------------------
+./lib/files/edit_line_converge.cf
+----------------------------------------------------------------------
+2020-10-29T11:49:33-0500    error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_cf/modules (mode 775) was not private!
+   error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_cf/modules (mode 775) was not private!
+R: test description: Test that converge edit_line bundle works as expected
+R: Diff command: /usr/bin/diff -u /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge.cf.expected /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_cf/tmp/TEST.cfengine 2>/dev/null
+R: /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge.cf Pass
+
+Return code is 0.
+
+  ==> Pass
+
+----------------------------------------------------------------------
+./lib/files/edit_line_converge_prepend.cf
+----------------------------------------------------------------------
+2020-10-29T11:49:34-0500    error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_prepend_cf/modules (mode 775) was not private!
+   error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_prepend_cf/modules (mode 775) was not private!
+R: test description: Test that converge_prepend works as expected
+R: Diff command: /usr/bin/diff -u /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge_prepend.cf.expected /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_prepend_cf/tmp/TEST.cfengine 2>/dev/null
+R: /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge_prepend.cf Pass
+
+Return code is 0.
+
+  ==> Pass
+
+
+======================================================================
+Testsuite finished at 2020-10-29 11:49:35 (2 seconds)
+
+Passed tests:  2
+Failed tests:  0
+Skipped tests: 0
+Soft failures: 0
+Total tests:   2
+#+end_example
