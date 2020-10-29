@@ -430,8 +430,9 @@ bundle agent inventory_cfengine_enterprise_license_utilization
 
    have_cf_hub::
 
-      "$(sys.cf_hub)"
-        arglist => {  "--show-license", ">",  $(cf_hub_show_license_output) },
+      "$(sys.cf_hub) --show-license"
+        arglist => { ">",  $(cf_hub_show_license_output) },
+        handle => "enterprise_hub_license_info_cache",
         contain => in_shell,
         inform => "false",
         classes => ENT_5279;
@@ -442,12 +443,13 @@ bundle agent inventory_cfengine_enterprise_license_utilization
 body classes ENT_5279
 # @brief Work around ENT-5279, cf-hub --show-license returns 1 when no license is installed
 {
+        kept_returncodes => { "0" };
 
-  # TODO: Redact when 3.15.x is no longer supported
-  # considered kept on affected versions.
+      # TODO: Redact when 3.15.x is no longer supported
+      # considered kept on affected versions.
 
-  cfengine_3_15_0::
-    kept_returncodes => { "0", "1" };
+    cfengine_3_15_0::
+        kept_returncodes => { "0", "1" };
 }
 
 bundle agent log_cfengine_enterprise_license_utilization
