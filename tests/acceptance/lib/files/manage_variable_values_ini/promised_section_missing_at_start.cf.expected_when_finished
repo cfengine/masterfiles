@@ -1,0 +1,7 @@
+[CFE-3428]
+keepme=Should be only key in CFE-3428 when finished.
+[section]
+keyone=1
+keytwo=valuetwo
+[should_remain_unchanged]
+wat=WUT

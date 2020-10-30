@@ -1,0 +1,64 @@
+#######################################################
+#
+# Test manage_variable_values_ini
+#
+#######################################################
+
+body common control
+{
+      inputs => { '../../../default.cf.sub' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+#######################################################
+
+bundle agent init
+{
+  files:
+      # The tested file "actual" is copied from our seeded starting position.
+      "$(G.testfile)"
+      copy_from => local_cp("$(this.promise_filename).start");
+}
+
+#######################################################
+
+bundle agent test
+{
+  meta:
+      "description" -> { "CFE-3428" }
+
+        string => "Test expected behavior of manage_variable_values_ini when the
+                   promised section does not exist to begin with. When the
+                   section does not exist, it should be inserted at the top of
+                   the file with all of the proper content in the section.";
+
+  classes:
+
+      "test_soft_fail"
+        expression => "any",
+        meta => { "CFE-3428" };
+
+  vars:
+      "config[section][keyone]" string => "1";
+      "config[section][keytwo]" string => "valuetwo";
+      "config[CFE-3428][keepme]" string => "Should be only key in CFE-3428 when finished.";
+
+  files:
+      "$(G.testfile)"
+        edit_line => manage_variable_values_ini( "test.config", "section" );
+
+      "$(G.testfile)" -> { "CFE-3428" }
+        edit_line => manage_variable_values_ini( "test.config", "CFE-3428" );
+
+}
+
+#######################################################
+
+bundle agent check
+{
+  methods:
+      "check"
+      usebundle => dcs_check_diff( "$(G.testfile)", "$(this.promise_filename).expected_when_finished",
+                                $(this.promise_filename));
+
+}

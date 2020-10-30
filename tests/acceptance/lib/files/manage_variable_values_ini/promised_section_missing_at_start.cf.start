@@ -1,0 +1,6 @@
+[section]
+keyone=valueone
+keytwo=value2
+keythree=should disappear
+[should_remain_unchanged]
+wat=WUT

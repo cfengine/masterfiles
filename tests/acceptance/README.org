@@ -173,14 +173,14 @@ Total tests:   1
   :
 #+end_src
 
-#+CALL: run-test(TESTFILE="./lib/files/edit_line_converge.cf ./lib/files/edit_line_converge_prepend.cf")
+#+CALL: run-test(TESTFILE="./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf")
 
 #+RESULTS:
 #+begin_example
 ======================================================================
-Testsuite started at 2020-10-29 11:49:33
+Testsuite started at 2020-10-30 15:14:08
 ----------------------------------------------------------------------
-Total tests: 2
+Total tests: 1
 
         COMMON_TESTS: enabled
          TIMED_TESTS: enabled
@@ -195,21 +195,20 @@ Total tests: 2
 
 Test run is not parallel
 
-./lib/files/edit_line_converge.cf Pass
-./lib/files/edit_line_converge_prepend.cf Pass
+./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf Soft fail (CFE-3428)
 
 ======================================================================
-Testsuite finished at 2020-10-29 11:49:35 (2 seconds)
+Testsuite finished at 2020-10-30 15:14:08 (0 seconds)
 
-Passed tests:  2
+Passed tests:  0
 Failed tests:  0
 Skipped tests: 0
-Soft failures: 0
-Total tests:   2
+Soft failures: 1
+Total tests:   1
 ======================================================================
-Testsuite started at 2020-10-29 11:49:33
+Testsuite started at 2020-10-30 15:14:08
 ----------------------------------------------------------------------
-Total tests: 2
+Total tests: 1
 
         COMMON_TESTS: enabled
          TIMED_TESTS: enabled
@@ -225,38 +224,89 @@ Total tests: 2
 Test run is not parallel
 
 ----------------------------------------------------------------------
-./lib/files/edit_line_converge.cf
+./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf
 ----------------------------------------------------------------------
-2020-10-29T11:49:33-0500    error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_cf/modules (mode 775) was not private!
-   error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_cf/modules (mode 775) was not private!
-R: test description: Test that converge edit_line bundle works as expected
-R: Diff command: /usr/bin/diff -u /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge.cf.expected /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_cf/tmp/TEST.cfengine 2>/dev/null
-R: /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge.cf Pass
+2020-10-30T15:14:08-0500    error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/modules (mode 775) was not private!
+   error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/modules (mode 775) was not private!
+R: test description: Test expected behavior of manage_variable_values_ini when the
+                   promised section does not exist to begin with. When the
+                   section does not exist, it should be inserted at the top of
+                   the file with all of the proper content in the section.
+R: /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/manage_variable_values_ini/../../../dcs.cf.sub SFAIL/CFE-3428
+2020-10-30T15:14:08-0500    error: The promised line deletion '.*' could not select an edit region in '/home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine' (but the delimiters were expected in the file)
+2020-10-30T15:14:08-0500    error: The promised line insertion 'keepme=Should be only key in CFE-3428 when finished.' could not select an edit region in '/home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine'
+2020-10-30T15:14:08-0500    error: The promised line deletion '.*' could not select an edit region in '/home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine' (but the delimiters were expected in the file)
+2020-10-30T15:14:08-0500    error: The promised line insertion 'keepme=Should be only key in CFE-3428 when finished.' could not select an edit region in '/home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine'
+2020-10-30T15:14:08-0500    error: The promised line deletion '.*' could not select an edit region in '/home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine' (but the delimiters were expected in the file)
+2020-10-30T15:14:08-0500    error: The promised line insertion 'keepme=Should be only key in CFE-3428 when finished.' could not select an edit region in '/home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine'
+R: FILES DIFFER BUT SHOULD BE THE SAME
+R: CONTENTS OF /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine:
+[section]
+keyone=1
+keytwo=valuetwo
+[should_remain_unchanged]
+wat=WUT
+[CFE-3428]
+
+R: CONTENTS OF /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf.expected_when_finished:
+[CFE-3428]
+keepme=Should be only key in CFE-3428 when finished.
+[section]
+keyone=1
+keytwo=valuetwo
+[should_remain_unchanged]
+wat=WUT
+R: *** /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf.expected_when_finished	Fri Oct 30 15:00:20 2020
+--- /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine	Fri Oct 30 15:14:08 2020
+,***************
+,*** 1,7 ****
+- [CFE-3428]
+- keepme=Should be only key in CFE-3428 when finished.
+  [section]
+  keyone=1
+  keytwo=valuetwo
+  [should_remain_unchanged]
+! wat=WUT
+\ No newline at end of file
+--- 1,6 ----
+  [section]
+  keyone=1
+  keytwo=valuetwo
+  [should_remain_unchanged]
+! wat=WUT
+! [CFE-3428]
+R: hexdump /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine:
+00000000  5b 73 65 63 74 69 6f 6e  5d 0a 6b 65 79 6f 6e 65  |[section].keyone|
+00000010  3d 31 0a 6b 65 79 74 77  6f 3d 76 61 6c 75 65 74  |=1.keytwo=valuet|
+00000020  77 6f 0a 5b 73 68 6f 75  6c 64 5f 72 65 6d 61 69  |wo.[should_remai|
+00000030  6e 5f 75 6e 63 68 61 6e  67 65 64 5d 0a 77 61 74  |n_unchanged].wat|
+00000040  3d 57 55 54 0a 5b 43 46  45 2d 33 34 32 38 5d 0a  |=WUT.[CFE-3428].|
+00000050
+R: hexdump /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf.expected_when_finished:
+00000000  5b 43 46 45 2d 33 34 32  38 5d 0a 6b 65 65 70 6d  |[CFE-3428].keepm|
+00000010  65 3d 53 68 6f 75 6c 64  20 62 65 20 6f 6e 6c 79  |e=Should be only|
+00000020  20 6b 65 79 20 69 6e 20  43 46 45 2d 33 34 32 38  | key in CFE-3428|
+00000030  20 77 68 65 6e 20 66 69  6e 69 73 68 65 64 2e 0a  | when finished..|
+00000040  5b 73 65 63 74 69 6f 6e  5d 0a 6b 65 79 6f 6e 65  |[section].keyone|
+00000050  3d 31 0a 6b 65 79 74 77  6f 3d 76 61 6c 75 65 74  |=1.keytwo=valuet|
+00000060  77 6f 0a 5b 73 68 6f 75  6c 64 5f 72 65 6d 61 69  |wo.[should_remai|
+00000070  6e 5f 75 6e 63 68 61 6e  67 65 64 5d 0a 77 61 74  |n_unchanged].wat|
+00000080  3d 57 55 54                                       |=WUT|
+00000084
+R: Diff command: /usr/bin/diff -u /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf.expected_when_finished /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_manage_variable_values_ini_promised_section_missing_at_start_cf/tmp/TEST.cfengine 2>/dev/null
+R: /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/manage_variable_values_ini/promised_section_missing_at_start.cf FAIL
 
 Return code is 0.
 
-  ==> Pass
-
-----------------------------------------------------------------------
-./lib/files/edit_line_converge_prepend.cf
-----------------------------------------------------------------------
-2020-10-29T11:49:34-0500    error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_prepend_cf/modules (mode 775) was not private!
-   error: UNTRUSTED: Module directory /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_prepend_cf/modules (mode 775) was not private!
-R: test description: Test that converge_prepend works as expected
-R: Diff command: /usr/bin/diff -u /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge_prepend.cf.expected /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/workdir/__lib_files_edit_line_converge_prepend_cf/tmp/TEST.cfengine 2>/dev/null
-R: /home/nickanderson/Northern.Tech/CFEngine/masterfiles/tests/acceptance/./lib/files/edit_line_converge_prepend.cf Pass
-
-Return code is 0.
-
-  ==> Pass
+  ==> Soft fail (CFE-3428)
 
 
 ======================================================================
-Testsuite finished at 2020-10-29 11:49:35 (2 seconds)
+Testsuite finished at 2020-10-30 15:14:08 (0 seconds)
 
-Passed tests:  2
+Passed tests:  0
 Failed tests:  0
 Skipped tests: 0
-Soft failures: 0
-Total tests:   2
+Soft failures: 1
+Total tests:   1
 #+end_example
