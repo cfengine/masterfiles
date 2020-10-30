@@ -407,7 +407,6 @@ bundle edit_line manage_variable_values_ini(tab, sectionName)
 
   insert_lines:
       "[$(sectionName)]"
-      location => start,
       comment => "Insert lines";
 
       "$(index)=$($(tab)[$(sectionName)][$(index)])"
