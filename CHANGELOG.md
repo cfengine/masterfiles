@@ -1,6 +1,20 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.6:
+	- Added inventory for Timezone and GMT Offset (ENT-6161)
+	- Added inventory for policy servers (ENT-6212)
+	- Aligned systemd services behavior for service_policy => "enable|enabled|disable|disabled"
+	  (ENT-6073)
+	- Changed group for state dir files promise to match defaults per OS (CFE-3362)
+	- Replaced @ignore with useful doc strings (CFE-3378)
+	- Stopped disabling disabled systemd unit each run when disabled state requested
+	  (CFE-3367)
+	- Stopped trying to edit fields in manage_variable_values_ini (CFE-3372)
+	- Fixed converge edit_line bundle not deleting lines containing marker (CFE-3482)
+	- Added bundle edit_line converge_prepend with same behavior as bundle edit_line converge,
+	  but inserting at start of content. (CFE-3483)
+
 3.12.5:
 	- Admitted ::1 as a query source on Enterprise hubs (ENT-5531)
 	- Changed m_inventory dumping behavior to exclude when values are null
