@@ -650,6 +650,28 @@ bundle agent cfe_internal_refresh_events_table
         if => fileexists( "$(cfe_internal_hub_vars.docroot)/api/resource-v1/Event.php" );
 }
 
+bundle agent cfe_internal_update_health_failures
+# @brief Update table that contains health diagnostics failures hosts
+{
+  meta:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+
+      "tags" slist => { "enterprise_maintenance" };
+
+  commands:
+
+    (policy_server|am_policy_hub).enterprise_edition.active_hub::
+
+      "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-6228" }
+        args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks update_health_failures",
+        contain => silent,
+        comment => "This updates health diagnostics failures table. If the table is not updated then it will contain stale data.",
+        handle  => "mpf_update_health_failures",
+        if => isgreaterthan(countlinesmatching(".*update_health_failures.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
+
+}
+
 body classes cfe_internal_log_utilization(time)
 # @brief Define persistent class for period of time to control log volume
 {
