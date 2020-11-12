@@ -11,6 +11,7 @@ bundle common classes
   classes:
 
       "testing_masterfiles_policy_framework"
+        expression => "any",
         scope => "namespace",
         comment => "This class is needed so that dcs.cf.sub includes the stdlib instead of using plucked.cf.sub from core which might get out of date and cause us to not test current code from the MPF.";
 }
