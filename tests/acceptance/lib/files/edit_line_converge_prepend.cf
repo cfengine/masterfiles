@@ -33,6 +33,10 @@ bundle agent test
       "description" -> { "CFE-3483" }
         string => "Test that converge_prepend works as expected";
 
+      "test_soft_fail" string => "cfengine_3_7",
+        meta  => { "CFE-3483" };
+
+
   files:
       "$(G.testfile)"
         edit_line => converge_prepend( "covfefe", "Despite the constant negative press covfefe" );
