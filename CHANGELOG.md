@@ -1,6 +1,42 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.17.0:
+	- Added .csv to the list of file extensions considered by default during
+          policy update (CFE-3425)
+	- Added ability to extend known paths without modifying vendored policy
+	  (CFE-3426)
+	- Added apk package module support for alpinelinux (CFE-3451)
+	- Added bundle edit_line converge_prepend with same behavior as bundle
+	  edit_line converge, but inserting at start of content. (CFE-3483)
+	- Added inventory for Timezone and GMT Offset (ENT-6161)
+	- Added inventory for policy servers (ENT-6212)
+	- Added maintenance policy to update health diagnostics failures table on
+          enterprise hubs (ENT-6228)
+	- Added optional handle duplicates step in federated reporting import
+	  (ENT-6035)
+	- Added replace_uncommented_substrings (ENT-6117)
+	- Added service states "active" and "inactive" for systemd (ENT-6074)
+	- Added watchdog for Windows (ENT-5538)
+	- Adjusted package_module and paths for termux platform (CFE-3288)
+	- Aligned systemd services behavior for service_policy => "enable|enabled|disable|disabled"
+	  (ENT-6073)
+	- Changed bundle server access_rules to mpf_default_access_rules
+	  (CFE-3427)
+	- Cleaned up Mission Portal OS variable (inventory_os.description) on RHEL 5 & 6
+	  (ENT-6124)
+	- De-duplicated license headers (ENT-6040)
+	- Fixed converge edit_line bundle not deleting lines containing marker
+	  (CFE-3482)
+	- Fixed interpretation of cf-hub --show-license from REPAIRED to KEPT
+	  (ENT-6473)
+	- Inventory OS variable (inventory_os.description in policy) is now based on os-release
+	- Made git_stash only stash untracked files when capable (CFE-3383)
+	- Moved systemd service management to own bundle (CFE-3381)
+	- Removed delay in refreshing software installed inventory (ENT-6154)
+	- Removed unnecessary packages promise on SuSE (ENT-5480, ENT-6375)
+	- Replaced @ignore with useful doc strings (CFE-3378)
+
 3.16.0:
 	- /var/cfengine/bin/python symlink creation on SLES was fixed
 	- Added 'data' shortcut to cf-serverd, defaults to sys.workdir/data
