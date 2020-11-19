@@ -2,6 +2,10 @@ bundle common inventory_os
 {
 vars:
 
+# NOTE TODO: This first part is the old implementation
+#            scroll down to the @if minimum_version part for the
+#            current implementation.
+
 # This bundle uses variable overwriting, so the definitions further
 # down are prioritized.
 
@@ -40,4 +44,70 @@ any::
   "description" string => "$(sys.os_release[PRETTY_NAME])",
                     if => isvariable("sys.os_release[PRETTY_NAME]"),
                 meta => { "inventory", "attribute_name=OS", "derived-from=sys.os_release" };
+
+
+# TODO: Remove promises above this line once 3.15+ is what we care about
+# New style for Inventory OS variable:
+# As short and human-friendly as possible, and consistent across platforms(!)
+# Examples: CentOS 7, Ubuntu 18, Debian 9, SUSE 12, etc.
+@if minimum_version(3.15)
+
+!_inventory_lsb_found.!windows::
+  "description" string => "$(sys.flavor) (LSB missing)",
+                  meta => { "inventory", "attribute_name=OS" };
+
+_inventory_lsb_found::
+  "description" string => "$(inventory_lsb.os) $(inventory_lsb.release)",
+                  meta => { "inventory", "attribute_name=OS" };
+
+windows::
+  "description" string => string_replace(string_replace(
+                            "$(sys.release)",
+                            "Windows Server", "Windows"),
+                            "2012 R2", "2012"),
+                  meta => { "inventory", "attribute_name=OS" };
+# os-release is preferred over LSB:
+any::
+  # os-release PRETTY_NAME
+  "description" string => string_replace(string_replace(string_replace(
+                            "$(sys.os_release[PRETTY_NAME])",
+                            "Red Hat Enterprise Linux Server", "RHEL"),
+                            "Debian GNU/Linux", "Debian"),
+                            "CentOS Linux", "CentOS"),
+                    if => isvariable("sys.os_release[PRETTY_NAME]"),
+                  meta => { "inventory", "attribute_name=OS", "derived-from=sys.os_release" };
+
+  "major_version_from_os_release" string => nth(string_split("$(sys.os_release[VERSION_ID])", "\.", 2), 0),
+                                  if => isvariable("sys.os_release[VERSION_ID]");
+
+  # os-release NAME VERSION_ID - preferred when available
+  "description" string => string_replace(string_replace(string_replace(string_replace(string_replace(
+                            "$(sys.os_release[NAME]) $(major_version_from_os_release)",
+                            "Red Hat Enterprise Linux Server", "RHEL"), # Seen on RHEL 7...
+                            "Red Hat Enterprise Linux", "RHEL"), # On RHEL 8 they changed their mind
+                            "Debian GNU/Linux", "Debian"),
+                            "CentOS Linux", "CentOS"),
+                            "SLES", "SUSE"),
+                    if => and(isvariable("sys.os_release[NAME]"),
+                              isvariable("major_version_from_os_release")),
+                  meta => { "inventory", "attribute_name=OS", "derived-from=sys.os_release" };
+
+# Hard coded values for exceptions / platforms without os-release:
+redhat_5.redhat_pure::
+  "description" string => "RHEL 5",
+                  meta => { "inventory", "attribute_name=OS", "derived-from=redhat_5" };
+
+redhat_6.redhat_pure::
+  "description" string => "RHEL 6",
+                  meta => { "inventory", "attribute_name=OS", "derived-from=redhat_6" };
+
+centos_5::
+  "description" string => "CentOS 5",
+                  meta => { "inventory", "attribute_name=OS", "derived-from=centos_5" };
+
+centos_6::
+  "description" string => "CentOS 6",
+                  meta => { "inventory", "attribute_name=OS", "derived-from=centos_6" };
+
+@endif
 }
