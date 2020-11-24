@@ -55,6 +55,15 @@ bundle agent cfe_internal_enterprise_mission_portal_apache
   reports:
     DEBUG|DEBUG_cfe_internal_enterprise_mission_portal_apache::
       "DEBUG $(this.bundle): Should stage '$(staged_config)' from '$(template)'.";
+
+  classes:
+
+    (policy_server|am_policy_hub).enterprise_edition::
+      "mission_portal_index_php_redirect_enabled"
+        expression => isgreaterthan(countlinesmatching(".*config\['index_page'\] = \"\".*", "$(cfe_internal_hub_vars.docroot)/application/config/config.php"), 0),
+        comment => "We need to know if index_page config in Mission Portal
+                    is empty to enable redirect from /index.php/path to /path
+                    in httpd.conf";
 }
 
 bundle agent mission_portal_apache_from_stage(config, staged_config)
