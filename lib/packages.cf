@@ -54,6 +54,18 @@ bundle common package_module_knowledge
 # platforms.
 {
   vars:
+
+      # Package inventory refresh
+      "query_installed_ifelapsed" -> { "CFE-2771", "CFE-3504" }
+        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
+                          "$(def.package_module_$(this.promiser))",
+                          "0"); # Always refresh local package inventory
+
+      "query_updates_ifelapsed" -> { "CFE-2771", "CFE-3504" }
+        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
+                          "$(def.package_module_$(this.promiser))",
+                          "1440"); # Refresh software updates available once a day
+
     debian::
       "platform_default" string => "apt_get";
 
@@ -83,15 +95,15 @@ bundle common package_module_knowledge
 
 body package_module apt_get
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
     #default_options =>  {};
 }
 
 body package_module zypper
 {
-      query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-      query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+      query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+      query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
       #default_options =>  {};
 }
 
@@ -112,8 +124,8 @@ body package_module nimclient
 # }
 # ```
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
     # This would likey be customized based on your infrastructure specifics
     # you may for example want to default the lpp_source based on something
     # like `oslevel -s` output.
@@ -134,39 +146,39 @@ body package_module pkgsrc
 # }
 # ```
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
 }
 
 body package_module yum
 # @brief Define details used when interfacing with yum
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
     #default_options => {};
 }
 
 body package_module slackpkg
 # @brief Define details used when interfacing with slackpkg
 {
-      query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-      query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+      query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+      query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
       #default_options =>  {};
 }
 
 body package_module pkg
 # @brief Define details used when interfacing with pkg
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
     #default_options => {};
 }
 
 body package_module snap
 # @brief Define details used when interfacing with snapcraft
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
     #default_options => {};
 }
 
@@ -190,8 +202,8 @@ body package_module freebsd_ports
 # }
 # ```
 {
-    query_installed_ifelapsed => "$(def.package_module_query_installed_ifelapsed)";
-    query_updates_ifelapsed => "$(def.package_module_query_updates_ifelapsed)";
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
 }
 
 bundle common packages_common

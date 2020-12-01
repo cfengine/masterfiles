@@ -246,15 +246,6 @@ bundle common def
         int => "200",
         ifvarclass => not( isvariable( "control_server_maxconnections" ) );
 
-      # Package inventory refresh
-      "package_module_query_installed_ifelapsed" -> { "CFE-2771" }
-        string => "60", # 1 hour
-        if => not( isvariable( $(this.promiser) ));
-
-      "package_module_query_updates_ifelapsed" -> { "CFE-2771" }
-        string => "1440", # 1 day
-        if => not( isvariable( $(this.promiser) ));
-
     debian::
       "environment_vars"
         handle => "common_def_vars_environment_vars",
