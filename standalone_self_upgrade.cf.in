@@ -358,8 +358,9 @@ bundle agent cfengine_software_version_packages1
 
       "local_software_dir" string => "$(cfengine_software.local_software_dir)";
 
-      "desired_version"
+      "desired_version" -> { "ENT-4094" }
         string => ifelse("linux", "$(cfengine_software.pkg_version)-$(cfengine_software.pkg_release)",
+                         "windows", "$(cfengine_software.pkg_version).$(cfengine_software.pkg_release)", # ENT-4094
                          "aix", "$(cfengine_software.pkg_version).0",
                          $(cfengine_software.pkg_version) ),
         comment => "The version attribute sometimes contains package release
