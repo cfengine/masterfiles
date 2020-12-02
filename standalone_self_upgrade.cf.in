@@ -129,6 +129,34 @@ bundle agent cfengine_software
 
       "$(sys.statedir)/MPF/desired-cfengine-package-version.json" -> { "ENT-3592", "ENT-3937" }
         edit_line => cfengine_software_version_data;
+
+    windows::
+      "$(sys.bindir)$(const.dirsep)vercmp.ps1"
+        create => "true",
+        template_method => "inline_mustache",
+        edit_template_string => `param([string]$version1,[string]$comparison,[string]$version2)
+if ( "$comparison" -eq "lt" ) {
+  if ([System.Version]"$version1" -lt [System.Version]"$version2") {
+    "$version1 is less than $version2"
+    exit 0
+  } else {
+      "$version1 is not less than $version2"
+      exit 1
+  }
+}
+if ( "$comparison" -eq "eq" ) {
+  if ([System.Version]"$version1" -eq [System.Version]"$version2") {
+    "$version1 is equal to $version2"
+    exit 0
+  } else {
+      "$version1 is not equal to $version2"
+      exit 1
+  }
+} else {
+    "PROGRAMMING ERROR"
+    exit 3
+}`;
+
 }
 
 bundle edit_line cfengine_software_version_data
