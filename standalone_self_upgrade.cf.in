@@ -203,7 +203,7 @@ bundle agent cfengine_software_version
 # upgrading.
 {
   classes:
-      "__supported_platform" -> { "ENT-5045", "ENT-5152" }
+      "__supported_platform" -> { "ENT-5045", "ENT-5152", "ENT-4094" }
         or => {
                 "redhat.!redhat_4",
                 "centos.!centos_4",
@@ -213,6 +213,7 @@ bundle agent cfengine_software_version
                 "aix",
                 "SUSE_11",
                 "SUSE_12",
+                "windows", # ENT-4094
         };
 
       # Add "windows" to __new_implementation classes with ENT-6823
