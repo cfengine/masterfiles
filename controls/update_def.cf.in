@@ -44,7 +44,8 @@ bundle common update_def
       "input_name_patterns" -> { "CFE-3425" }
         slist => { ".*\.cf",".*\.dat",".*\.txt", ".*\.conf", ".*\.mustache",
                    ".*\.sh", ".*\.pl", ".*\.py", ".*\.rb", ".*\.sed", ".*\.awk",
-                   "cf_promises_release_id", ".*\.json", ".*\.yaml", ".*\.csv" },
+                   "cf_promises_release_id", ".*\.json", ".*\.yaml", ".*\.csv",
+                   ".*\.ps1" },
         comment => "Filename patterns to match when updating the policy
                     (see update/update_policy.cf)",
         handle => "common_def_vars_input_name_patterns_policy_default",
