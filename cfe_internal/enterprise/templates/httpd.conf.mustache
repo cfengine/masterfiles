@@ -249,6 +249,12 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
     RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
     {{/classes.cfe_enterprise_enable_plain_http}}
 
+    {{#classes.mission_portal_index_php_redirect_enabled}}
+    # redirect from `index.php/path` to `/path`
+    RewriteCond %{THE_REQUEST} /index\.php/(.+)\sHTTP [NC]
+    RewriteRule ^ /%1 [NE,L,R]
+    {{/classes.mission_portal_index_php_redirect_enabled}}
+
     RewriteCond %{REQUEST_FILENAME} -s [OR]
     RewriteCond %{REQUEST_FILENAME} -l [OR]
     RewriteCond %{REQUEST_FILENAME} -d
