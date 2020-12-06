@@ -171,7 +171,10 @@ bundle agent standard_services(service,state)
 
       "have_init" expression => fileexists($(init));
 
-    chkconfig.have_init::
+    chkconfig.have_init.freebsd::
+      "running" expression => returnszero("$(init) onestatus > /dev/null", "useshell");
+      
+    chkconfig.have_init.!freebsd::
       "running" expression => returnszero("$(init) status > /dev/null", "useshell");
 
     sysvservice.have_init::
