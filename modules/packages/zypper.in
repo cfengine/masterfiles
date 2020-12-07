@@ -1,4 +1,4 @@
-#!@bindir@/python
+#!@bindir@/cfengine-selected-python
 
 #####################################################################################
 # Copyright 2016 Normation SAS

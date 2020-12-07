@@ -1,4 +1,4 @@
-#!@bindir@/python
+#!@bindir@/cfengine-selected-python
 
 import sys
 import os

@@ -133,6 +133,14 @@ bundle agent cfe_internal_setup_python_symlink(symlink_path)
         link_from => u_ln_s("$(python)"),
         move_obstructions => "true",
         if => isvariable("python");
+
+      "$(sys.bindir)/python" -> { "CFE-3512" }
+        delete => u_tidy,
+        if => islink( $(this.promiser) ),
+        comment => concat( "We don't want to leave a python that is potentially in $PATH ",
+                           "after having re-named our python symlink that is used for various ",
+                           "modules");
+
 }
 
 bundle agent cfe_internal_update_policy_cpv
@@ -195,7 +203,8 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "File where Postgres database files will be logging -",
         handle => "cfe_internal_update_policy_postgresdb_log_file";
 
-      "python_symlink"        string => "$(sys.bindir)/python",
+      "python_symlink" -> { "CFE-2602", "CFE-3512" }
+        string => "$(sys.bindir)/cfengine-selected-python",
         comment => "Symlink to Python we found (if any)",
         handle => "cfe_internal_update_policy_python_symlink";
 
@@ -295,7 +304,8 @@ bundle agent cfe_internal_update_policy_cpv
   methods:
     debian|redhat|amazon_linux|suse|sles|opensuse::
       # Only needed on distros with Python-based package modules
-      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_symlink)");
+      "setup_python_symlink" -> { "CFE-2602" }
+        usebundle => cfe_internal_setup_python_symlink("$(python_symlink)");
 }
 
 #########################################################
