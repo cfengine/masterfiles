@@ -60,6 +60,9 @@ body common control
       };
 
       inputs => {
+                  # User policy init, for example for defining custom promise types:
+                  "services/init.cf",
+
                  # File definition for global variables and classes
                   @(cfengine_controls.def_inputs),
 
