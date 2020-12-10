@@ -285,6 +285,11 @@ bundle common cfengine_controls
                  },
         comment => "We strictly order the def inputs because they should be parsed first";
 
+      "input[custom_promise_types]" -> { "CFE-3510" }
+        string => "services/init.cf",
+        if => fileexists( "$(this.promise_dirname)/services/init.cf"),
+        comment => "Users should use this file to define custom promise types. The file is only added to inputs if it is present. The file is not vendored as part of the Masterfiles Policy Framework";
+
 
       "input[cf_agent]"
         string => "controls/cf_agent.cf",
