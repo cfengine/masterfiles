@@ -608,6 +608,15 @@ Prevent automatic trust for any host by specifying an empty value:
     }
 }
 ```
+### Append to inputs used by main policy
+
+The `inputs` key in augments can be used to add additional custom policy files.
+
+**See Also:** [Append to inputs used by update policy][Append to inputs used by update policy]
+
+**History:**
+
+* Introduced in CFEngine 3.7.3, 3.12.0
 
 ### services\_autorun
 
@@ -629,6 +638,25 @@ bundle agent example
 included in inputs even when the ```services_autorun``` class is **not**
 defined. Bundles tagged with ```autorun``` are **not required** to be placed in
 `services/autorun/` in order to be automatically actuated.
+
+#### Additional automatically loaded inputs
+
+When `def.mpf_extra_autorun_inputs` is defined (and services_autorun is defined), the policy files (`*.cf`) in those directories will be added to inputs. If a directory is specified but is not a directory, it will be skipped.
+
+```json
+{
+  "vars": {
+    "mpf_extra_autorun_inputs": [ "$(sys.policy_entry_dirname)/services/autorun/custom2",
+                                    "$(sys.policy_entry_dirname)/services/custom1" ]
+  }
+}
+```
+
+**See Also:** [Append to inputs used by main policy][Append to inputs used by main policy], [Append to inputs used by update policy][Append to inputs used by update policy]
+
+**History:**
+
+* Added in CFEngine 3.18.0
 
 ### postgresql\_full\_maintenance
 
@@ -663,7 +691,6 @@ This class can be defined by an [augments file][Augments]. For example:
 This class enables policy that cleans up report diffs when they exceed
 `def.max_client_history_size`. By default is is **off** unless a CFEngine
 Enterprise agent is detected.
-
 
 ### Configure splaytime
 
