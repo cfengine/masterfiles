@@ -1,0 +1,17 @@
+################################################################################
+#
+# User policy init
+# This file is added to inputs before autorun and main.cf policy files.
+# Thus, it is parsed before other user-written policy.
+# You should not put bundles and promises here.
+# This is a good place to put promise blocks (promise type definitions).
+# This is loaded very early, only use hard classes or classes from def.json here.
+#
+###############################################################################
+
+# For example:
+# promise agent git
+# {
+#   path => "/var/cfengine/modules/promises/git_using_lib.py";
+#   interpreter => "/usr/bin/python3";
+# }
