@@ -1079,7 +1079,27 @@ Primarily for developer conveniance, this setting allows you to easily disable t
 }
 ```
 
-### Append to the main bundlesequence
+### Bundlesequence
+
+#### Classification bundles before autorun
+
+You can specify a list of bundles which should be run before autorun policies (if enabled).
+
+```json
+{
+  "vars":{
+    "control_common_bundlesequence_classification": [ "classification_one", "classification_two" ]
+  },
+
+  "inputs": [ "services/my_classificaton.cf" ]
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.18.0
+
+#### Append to the main bundlesequence
 
 You can specify bundles which should be run at the end of the default
 bundlesequence by defining ```control_common_bundlesequence_end``` in the vars

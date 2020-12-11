@@ -15,6 +15,9 @@ body common control
                           def,
                           @(cfengine_enterprise_hub_ha.classification_bundles),
 
+                          # Custom classification
+                          @(def.bundlesequence_classification),
+
                           # autorun system
                           services_autorun,
                           @(services_autorun.bundles),
