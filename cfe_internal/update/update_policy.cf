@@ -136,7 +136,7 @@ bundle agent cfe_internal_setup_python_symlink(symlink_path)
 
       "$(sys.bindir)/python" -> { "CFE-3512" }
         delete => u_tidy,
-        if => islink( $(this.promiser) ),
+        if => islink( "$(sys.bindir)/python" ),
         comment => concat( "We don't want to leave a python that is potentially in $PATH ",
                            "after having re-named our python symlink that is used for various ",
                            "modules");
