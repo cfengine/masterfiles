@@ -59,17 +59,13 @@ read_options() {
             eval `parse_line "${INPUT}"`
             case "${KEYWORD}" in
                 File|Name)
-                    VER=''
                     if [ "${KEYWORD}" = 'File' ] ; then
                         PKG="${VALUE}"
                     else
                         NAM="${VALUE}"
                     fi
                     ;;
-                Version)
-                    VER="${VALUE}"
-                    ;;
-                Architecture)
+                Version|Architecture)
                     # Do not store the value separately, as process_inputs()
                     # will get it from $INPUTLIST
                     ;;
@@ -110,7 +106,6 @@ process_inputs() {
                 else
                     fatal "Bad Input: '${OPT}' (should be Name=...)."
                 fi
-                VER=''
                 ;;
             Name*)
                 if [ "${CMD}" != 'file-install' ] ; then
@@ -118,7 +113,6 @@ process_inputs() {
                 else
                     fatal "Bad Input: '${OPT}' (should be File=...)"
                 fi
-                VER=''
                 ;;
             Version*)
                 PKG="${PKG}-${VALUE}"
