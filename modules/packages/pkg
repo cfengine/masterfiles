@@ -68,10 +68,11 @@ read_options() {
                     # Do not store the value separately, as process_inputs()
                     # will get it from $INPUTLIST
                     ;;
-                options*)
-                    if [ -n "${repository}" ] ; then
-                        REPO="-r ${repository}"
-                    fi
+                options)
+                    eval `parse_line "${VALUE}"`
+                    case "${KEYWORD}" in
+                        repo|repository) REPO="-r ${VALUE}";;
+                    esac
                     continue
                     ;;
                 PackageType*)
