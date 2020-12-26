@@ -46,11 +46,10 @@ fatal() {
 }
 
 parse_line() {
-    INPUTP="$1"
-
-    echo "${INPUTP}" | awk -F= '{print "KEYWORD=" $1 "; VALUE=" $2;}' 2>/dev/null
-
-    unset INPUTP
+    echo "$1" | awk -F= '{
+        i=index($0,"=");
+        print "KEYWORD=\"" $1 "\"" "; VALUE=\"" substr($0, i+1) "\"";
+    }' 2>/dev/null
 }
 
 read_options() {
