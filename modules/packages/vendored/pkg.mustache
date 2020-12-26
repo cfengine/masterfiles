@@ -15,7 +15,28 @@ fi
 
 CMD="$1"
 
-DEFARCH=`uname -m`
+mangle_arch() {
+    awk 'BEGIN {
+            arch["x86:32"] = "i386";
+            arch["x86:64"] = "amd64";
+            arch["aarch64:64"] = "aarch64";
+            arch["armv6:32:el:eabi:softfp"] = "armv6";
+            arch["armv7:32:el:eabi:softfp"] = "armv7";
+            arch["mips:32:eb:o32"] = "mips";
+            arch["mips:64:eb:n64"] = "mips64";
+            arch["powerpc:64:eb"] = "powerpc64";
+        }
+        {
+            for (a in arch) {
+                re = ":" a "$";
+                sub(re, ":" arch[a]);
+            }
+            sub(/[Ff]ree[Bb][Ss][Dd]:[0-9]*:/, "");
+        }
+        $0'
+}
+
+ARCH=$(pkg config abi | mangle_arch)
 REPO=''
 INPUTLIST=''
 
@@ -30,7 +51,6 @@ parse_line() {
     echo "${INPUTP}" | awk -F= '{print "KEYWORD=" $1 "; VALUE=" $2;}' 2>/dev/null
 
     unset INPUTP
-
 }
 
 read_options() {
@@ -40,7 +60,6 @@ read_options() {
             case "${KEYWORD}" in
                 File|Name)
                     VER=''
-                    ARCH=''
                     if [ "${KEYWORD}" = 'File' ] ; then
                         PKG="${VALUE}"
                     else
@@ -51,7 +70,8 @@ read_options() {
                     VER="${VALUE}"
                     ;;
                 Architecture)
-                    ARCH=${VALUE:=${DEFARCH}}
+                    # Do not store the value separately, as process_inputs()
+                    # will get it from $INPUTLIST
                     ;;
                 options*)
                     if [ -n "${repository}" ] ; then
@@ -105,8 +125,8 @@ process_inputs() {
                 ;;
             Architecture*)
                 if [ -n "${VALUE}" ] &&
-                       [ "${VALUE}" != "${DEFARCH}" ] ; then
-                    fatal "Bad Input: Architecture ${VALUE} does not match ${DEFARCH}."
+                       [ "${VALUE}" != "${ARCH}" ] ; then
+                    fatal "Bad Input: Architecture ${VALUE} does not match ${ARCH}."
                 fi
                 ;;
             PackageType*)
@@ -117,6 +137,10 @@ process_inputs() {
                 ;;
         esac
     done
+}
+
+_pkg_query() {
+    pkg query "$@" "Name=%n\nVersion=%v\nArchitecture=${ARCH}"
 }
 
 get_package_data() {
@@ -155,11 +179,7 @@ get_package_data() {
             #     echo "Version=${PKGVER}"
             # fi
         else
-            pkg query --file "${PKG}"  'Name=%n\nVersion=%v\nArchitecture=%q' | \
-                                      sed -e 's/=freebsd:[0-9]*:/=:/' \
-                                      -e 's/:x86:32/i386/' \
-                                      -e 's/:x86:64/amd64/'
-
+            _pkg_query --file "${PKG}"
         fi
     fi
 }
@@ -176,11 +196,7 @@ case "${CMD}" in
         get_package_data
         ;;
     list-installed)
-        pkg query -a 'Name=%n\nVersion=%v\nArchitecture=%q' | \
-            sed -e 's/=freebsd:[0-9]*:/=:/' \
-                -e 's/:x86:32/i386/' \
-                -e 's/:x86:64/amd64/'
-
+        _pkg_query -a
         ;;
     list-updates-local|list-updates)
         if [ "${CMD}" = 'list-updates-local' ] ; then
@@ -189,17 +205,17 @@ case "${CMD}" in
             LOCALUPDATE=''
         fi
         pkg version ${LOCALUPDATE} -vl'<' | \
-            awk 'BEGIN { cmd="uname -m"; cmd | getline arch}
-/ repositor(y|ies) / { next; }
-{
-  pkgname = $1;
-  pkgver  = $7;
-  sub(/-[0-9_.,]*$/,"",pkgname);
-  sub(/\)/, "", pkgver);
-  print "Name=" pkgname;
-  print "Version=" pkgver;
-  print "Architecture=" arch;
-}'
+            awk -v arch="${ARCH}" \
+                '/ repositor(y|ies) / { next; }
+                {
+                  pkgname = $1;
+                  pkgver  = $7;
+                  sub(/-[0-9_.,]*$/, "", pkgname);
+                  sub(/\)/, "", pkgver);
+                  print "Name=" pkgname;
+                  print "Version=" pkgver;
+                  print "Architecture=" arch;
+                }'
         ;;
     repo-install|file-install|remove)
         process_inputs "${CMD}" "${INPUTLIST}"
