@@ -293,11 +293,30 @@ bundle common cfengine_controls
 
 bundle common services_autorun
 # @brief Include autorun policy and discover autorun bundles if enabled
+#
+# Files inside directories listed in `def.mpf_extra_autorun_inputs` will be
+# added to inputs automatically.
 {
   vars:
     services_autorun::
       "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
-      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
+
+      "_default_autorun_input_dir"
+        string => "$(this.promise_dirname)/services/autorun";
+      "_default_autorun_inputs"
+        slist => lsdir( "$(_default_autorun_input_dir)", ".*\.cf", "true");
+
+      "_extra_autorun_input_dirs"
+        slist => { @(def.mpf_extra_autorun_inputs) },
+        if => isvariable( "def.mpf_extra_autorun_inputs" );
+
+      "_extra_autorun_inputs[$(_extra_autorun_input_dirs)]"
+        slist => lsdir("$(_extra_autorun_input_dirs)/.", ".*\.cf", "true"),
+        if => isdir( $(_extra_autorun_input_dirs) );
+
+      "found_inputs" slist => { @(_default_autorun_inputs),
+                                sort( getvalues(_extra_autorun_inputs), "lex") };
+
       "bundles" slist => { "autorun" }; # run loaded bundles
 
     !services_autorun::
