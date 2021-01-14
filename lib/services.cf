@@ -171,14 +171,15 @@ bundle agent standard_services(service,state)
 
       "have_init" expression => fileexists($(init));
 
-    chkconfig.have_init.freebsd::
-      "running" -> { "CFE-3513" }
-        expression => returnszero("$(init) onestatus > /dev/null", "useshell");
-
-    chkconfig.have_init.!freebsd::
+    chkconfig.have_init::
       "running" expression => returnszero("$(init) status > /dev/null", "useshell");
 
-    sysvservice.have_init::
+    sysvservice.have_init.freebsd::
+      "running" -> { "CFE-3513" }
+        expression => returnszero("$(init) onestatus > /dev/null", "useshell");
+      "enabled" expression => strcmp(execresult("/usr/sbin/sysrc -n $(service)_enable", "noshell"), "YES");
+
+    sysvservice.have_init.!freesd::
       "running" expression => returnszero("$(paths.service) $(service) status > /dev/null", "useshell");
 
     chkconfig.SuSE::
@@ -217,6 +218,16 @@ bundle agent standard_services(service,state)
     chkconfig.have_init.(((start|restart).!running)|((stop|restart|reload).running)).non_disabling::
       "$(init) $(state)"
       contain => silent;
+
+    sysvservice.freebsd.start.!enabled::
+      "/usr/sbin/sysrc $(service)_enable=YES"
+      handle => "standard_services_sysvservice_enable",
+      comment => "If the service should be running, make sure it is enabled";
+
+    sysvservice.freebsd.stop.enabled::
+      "/usr/sbin/sysrc $(service)_enable=NO"
+      handle => "standard_services_sysvservice_disable",
+      comment => "If the service should not be running, make sure it is disabled";
 
     sysvservice.start.!running::
       "$(paths.service) $(service) start"
