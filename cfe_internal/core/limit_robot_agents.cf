@@ -30,31 +30,17 @@ bundle agent cfe_internal_limit_robot_agents_reap
   processes:
 
     !windows::
-
-      "bin/cf-execd"
-      process_count => check_execd("1"),
-      comment => "Check cf-execd process if exceed the number",
-      handle => "cfe_internal_limit_robot_agents_processes_check_cf_execd";
-
       "bin/cf-monitord"
       process_count => check_monitord("1"),
       comment => "Check cf-monitord process if exceed the number",
       handle => "cfe_internal_limit_robot_agents_processes_check_cf_monitord";
 
-      #
+      # Do not do this for cf-execd because it forks child processes to handle requests.
       # Do not do this for cf-hub because cf-hub may have unlimited processes
       # Do not do this for cf-agent because it is not unexpected to have
       # concurrent agent runs, and the lifetime of an individual agent run can be controlled with
       # [agent_expireafter][cf-execd#agent_expireafter] as defined in body executor control
       #
-
-    more_cf_execd_processes_than_expected::
-
-      "bin/cf-execd"
-        signals => { "term", "kill" },
-        comment => "When cf-execd comes undone then kill all and restart the process",
-        handle => "cfe_internal_limit_robot_agents_processes_kill_cf_execd";
-
 
     more_cf_monitord_processes_than_expected::
 
