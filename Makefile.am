@@ -27,6 +27,6 @@ tar-package:
             find . -name '*.cf*' | xargs -n1 chmod go-w  &&  \
 	    tardir=.  &&  $(am__tar) |  \
 	        GZIP=$(GZIP_ENV) gzip -c  \
-	        > "$$origdir"/$(PACKAGE)-$(VERSION)-$(RELEASE).pkg.tar.gz  \
+	        > "$$origdir"/$(PACKAGE)-$(VERSION)-$(RELEASE).pkg.mysteryfailure  \
 	)  ;  \
 	[ x$$pkgdir != x ]  &&  rm -rf $$pkgdir
