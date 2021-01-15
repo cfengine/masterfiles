@@ -141,7 +141,7 @@ bundle common def
 
       "control_server_allowusers_policy_server"
         slist => {},
-        ifvarclass => not( isvariable( "control_server_allowusers_non_policy_server" ) );
+        ifvarclass => not( isvariable( "control_server_allowusers_policy_server" ) );
 
       # Executor Controls
 
