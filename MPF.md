@@ -758,7 +758,19 @@ cf-serverd only allows specified users to request unscheduled execution remotely
 
 By default the MPF allows `root` to request unscheduled execution of non policy servers and does not allow any users to request unscheduled execution from policy servers.
 
-To configure the list of users allowed to request unscheduled execution from non policy servers define `vars.control_server_allowusers_non_policy_server`. This example allows the users `hubmanager` and  `cfoperator` to request unscheduled execution from policy servers and no users are allowed to request unscheduled runs from non policy servers.
+To configure the list of users allowed to request unscheduled execution define `vars.control_server_allowusers`.
+
+```
+{
+  "vars": {
+    "control_server_allowusers": [ "root", "nickanderson", "cfapache" ],
+  }
+}
+```
+
+It's possible to configure different users that are allowed for policy servers versus non policy servers via `vars.control_server_allowusers_non_policy_server` and `vars.control_server_allowusers_policy_server`. However, if  `vars.control_server_allowusers` is defined, it has precedence.
+
+This example allows the users `hubmanager` and  `cfoperator` to request unscheduled execution from policy servers and no users are allowed to request unscheduled runs from non policy servers.
 
 ```
 {
@@ -772,6 +784,7 @@ To configure the list of users allowed to request unscheduled execution from non
 **History:**
 
 - Added in 3.13.0, 3.12.1
+- Added `vars.control_server_allowusers` in 3.18.0
 
 ### Configure retention for files in log directories
 

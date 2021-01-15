@@ -92,7 +92,20 @@ bundle common def
         slist => {},
         if => not( isvariable( "control_server_allowusers_policy_server" ) );
 
-      # Executor Controls
+    policy_server::
+      "control_server_allowusers" -> { "CFE-3544" }
+        handle => "def_control_server_allowusers_policy_server",
+        slist => { @(control_server_allowusers_policy_server) },
+        if => not(isvariable("control_server_allowusers"));
+
+    !policy_server::
+      "control_server_allowusers" -> { "CFE-3544" }
+        handle => "def_control_server_allowusers_non_policy_server",
+        slist => { @(control_server_allowusers_non_policy_server) },
+        if => not(isvariable("control_server_allowusers"));
+
+    # Executor controls
+    any::
 
       ## Default splaytime to 4 unless it's already defined (via augments)
       "control_executor_splaytime"
