@@ -1832,7 +1832,7 @@ body acl strict
 
 body depth_search recurse(d)
 # @brief Search files and direcories recursively, up to the specified depth
-# Directories on different devices are included.
+# Directories on different devices are excluded.
 #
 # @param d The maximum search depth
 {
@@ -1864,7 +1864,7 @@ body depth_search include_base
 
 body depth_search recurse_with_base(d)
 # @brief Search files and directories recursively up to the specified
-# depth, starting from the base directory and including directories on
+# depth, starting from the base directory excluding directories on
 # other devices.
 #
 # @param d The maximum search depth
