@@ -142,10 +142,10 @@ bundle server mpf_default_access_rules()
           admit_ips => { @(def.mpf_access_rules_collect_calls_admit_ips) };
 
     !windows::
-      "$(def.cf_runagent_shell)"
+      "$(def.cf_runagent_shell)" -> { "ENT-6673" }
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
-      admit => { @(def.policy_servers) };
+      admit => { @(def.mpf_admit_cf_runagent_shell_selected) };
 
     policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/ppkeys/"

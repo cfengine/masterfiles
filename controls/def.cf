@@ -106,6 +106,21 @@ bundle common def
 
     # Executor controls
     any::
+      "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673" }
+        handle => "mpf_admit_cf_runagent_shell_default",
+        if => not( isvariable( "mpf_admit_cf_runagent_shell" )),
+        slist => { @(def.policy_servers) },
+        comment => concat( "By default we admit our policy servers to initiate",
+                           "agent runs via cf-runagent");
+
+      "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673" }
+        handle => "mpf_admit_cf_runagent_shell_augments",
+        if => isvariable( "mpf_admit_cf_runagent_shell" ),
+        slist => { @(def.mpf_admit_cf_runagent_shell) },
+        comment => concat( "Users can override the default set of hosts that ",
+                           "can initiate agent runs via cf-runagent.");
+
+      # Executor Controls
 
       ## Default splaytime to 4 unless it's already defined (via augments)
       "control_executor_splaytime"
