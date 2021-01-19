@@ -786,6 +786,35 @@ This example allows the users `hubmanager` and  `cfoperator` to request unschedu
 - Added in 3.13.0, 3.12.1
 - Added `vars.control_server_allowusers` in 3.18.0
 
+**See Also:** [Configure hosts allowed to initate execution via cf-runagent][Configure hosts allowed to initate execution via cf-runagent]
+
+### Configure hosts allowed to initate execution via cf-runagent
+
+cf-serverd only allows specified hosts to request unscheduled execution remotely via `cf-runagent`.
+
+By default the MPF allows policy servers (as defined by `def.policy-servers`) to initiate agent runs via `cf-runagent`.
+
+
+To configure the list of hosts allowed to request unscheduled execution define `vars.mpf_admit_cf_runagnet_shell`. This example allows the IPv4 address `192.168.42.10`, the host `bastion.example.com`, and the host with identity `SHA=43c979e264924d0b4a2d3b568d71ab8c768ef63487670f2c51cd85e8cec63834` and policy servers the ability to initiate agent runs via `cf-runagent`.
+
+```json
+{
+    "vars": {
+        "mpf_admit_cf_runagent_shell": [ "192.168.42.10",
+                                         "bastion.example.com",
+                                         "SHA=43c979e264924d0b4a2d3b568d71ab8c768ef63487670f2c51cd85e8cec63834",
+                                         "@(def.policy_servers)"
+                                       ]
+    }
+}
+```
+
+**See Also:** [Configure users allowed to initate execution via cf-runagent][Configure users allowed to initate execution via cf-runagent]
+
+**History:**
+
+- Added in CFEngine 3.18.0
+
 ### Configure retention for files in log directories
 
 By default the MPF rotates managed log files when they reach 1M in size. To configure this limit via augments define `vars.mpf_log_file_max_size`.
