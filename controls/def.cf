@@ -93,30 +93,34 @@ bundle common def
         if => not( isvariable( "control_server_allowusers_policy_server" ) );
 
     policy_server::
-      "control_server_allowusers" -> { "CFE-3544" }
+      "control_server_allowusers" -> { "CFE-3544", "ENT-6666" }
         handle => "def_control_server_allowusers_policy_server",
         slist => { @(control_server_allowusers_policy_server) },
+        meta => { "inventory", "attribute_name=Allowed users for cf-runagent" },
         if => not(isvariable("control_server_allowusers"));
 
     !policy_server::
-      "control_server_allowusers" -> { "CFE-3544" }
+      "control_server_allowusers" -> { "CFE-3544", "ENT-6666" }
         handle => "def_control_server_allowusers_non_policy_server",
         slist => { @(control_server_allowusers_non_policy_server) },
+        meta => { "inventory", "attribute_name=Allowed users for cf-runagent" },
         if => not(isvariable("control_server_allowusers"));
 
     # Executor controls
     any::
-      "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673" }
+      "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673", "ENT-6666" }
         handle => "mpf_admit_cf_runagent_shell_default",
         if => not( isvariable( "mpf_admit_cf_runagent_shell" )),
         slist => { @(def.policy_servers) },
+        meta => { "inventory", "attribute_name=Allowed hosts for cf-runagent", "derived-from=def.policy_servers" },
         comment => concat( "By default we admit our policy servers to initiate",
                            "agent runs via cf-runagent");
 
-      "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673" }
+      "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673", "ENT-6666" }
         handle => "mpf_admit_cf_runagent_shell_augments",
         if => isvariable( "mpf_admit_cf_runagent_shell" ),
         slist => { @(def.mpf_admit_cf_runagent_shell) },
+        meta => { "inventory", "attribute_name=Allowed hosts for cf-runagent", "derived-from=def.mpf_admit_cf_runagent_shell" },
         comment => concat( "Users can override the default set of hosts that ",
                            "can initiate agent runs via cf-runagent.");
 
