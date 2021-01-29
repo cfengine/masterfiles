@@ -251,6 +251,7 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
 
     {{#classes.mission_portal_index_php_redirect_enabled}}
     # redirect from `index.php/path` to `/path`
+    RewriteCond %{REQUEST_URI} !(.*)/api/(.*) [NC]  #do not apply redirect to internal APIs for backward compatibility
     RewriteCond %{THE_REQUEST} /index\.php/(.+)\sHTTP [NC]
     RewriteRule ^ /%1 [NE,L,R]
     {{/classes.mission_portal_index_php_redirect_enabled}}
