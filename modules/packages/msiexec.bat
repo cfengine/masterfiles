@@ -73,19 +73,9 @@ goto :EOF
 
 
 
-rem Process output of 'wmic product get name,version /value' command
+rem Call vbs script to read installed software from registry
 :list_installed
-  rem Escape comma in for expression so it's not counted as a command separator
-  rem (quotes can't help here - they get appended to program arguments and break it)
-  for /f "usebackq delims=" %%a in (`%WMIC% product get name^,version /value`) do (
-    set "_q=%%a"
-    rem * Do not print lines consisting of a single character (it's LF anyway)
-    rem * Print lines excluding last character (it's LF anyway)
-    if not "!_q:~0,-1!"=="" echo !_q:~0,-1!
-    rem In lack of other information we assume that all packages have CPU architecture
-    if "!_q:~0,8!"=="Version=" echo Architecture=%PROCESSOR_ARCHITECTURE%
-    timeout 0 >nul
-  )
+  %CSCRIPT% /nologo "%~dp0\msiexec-list.vbs"
 goto :EOF
 
 
