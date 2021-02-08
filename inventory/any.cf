@@ -245,6 +245,9 @@ bundle agent cfe_autorun_inventory_setuid
     !disable_inventory_setuid::
       "candidates" slist => lsdir( "$(sys.workdir)", "cfagent\..*\.log", true );
 
+      "_reg_setuid_filestat_modeoct" string => "10(4|5|6|7)\d+";
+      "_reg_setgid_filestat_modeoct" string => "10(2|3|6|7)\d+";
+
       "setuid_log_path"
         comment => "We select the file that matches the downcased version of the
                     hostname since sys.fqhost always returns lower case",
@@ -257,21 +260,22 @@ bundle agent cfe_autorun_inventory_setuid
       "setuid[$(files)]"
         string => "$(files)",
         meta => { "inventory", "attribute_name=Setuid files" },
-        if => regcmp( "104\d+", filestat( $(files), modeoct ) );
+        if => regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) );
 
       "rootsetuid[$(files)]"
         string => "$(files)",
         meta => { "inventory", "attribute_name=Root owned setuid files" },
-        if => and( regcmp( "104\d+", filestat( $(files), modeoct ) ),
+        if => and( regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) ),
                    regcmp( "0", filestat( $(files), uid ) ));
 
     files:
     !disable_inventory_setuid::
       "$(setuid_log_path)"
-        comment => "If the logged file is not currently setuid then we can
-                    safely purge it from the list to avoid unnecessary work.",
+        comment => concat( "If the logged file is not currently setuid|setgid then we can",
+                           "safely purge it from the list to avoid unnecessary work."),
         edit_line => delete_lines_matching( escape( $(files) ) ),
-        if => not( regcmp( "104\d+", filestat( $(files), modeoct ) ) );
+        if => not( regcmp( "($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))",
+                           filestat( $(files), modeoct ) ) );
 
   reports:
     !disable_inventory_setuid.(DEBUG|DEBUG_cfe_autorun_inventory_setuid)::
@@ -280,24 +284,27 @@ bundle agent cfe_autorun_inventory_setuid
 
 @if minimum_version(3.11)
 
-      "Candidate: setuid Files: $(files) modeoct=$(with)"
+      "Previously logged (setuid|setgid) file: $(files) modeoct=$(with)"
         with => filestat( $(files), modeoct );
 
-      "Remove $(files) from log by matching $(with)"
-        comment => "If the logged file is not currently setuid then we can
-                    safely purge it from the list to avoid unnecessary work.",
-        with =>  escape( $(files) ),
-        if => not( regcmp( "104\d+", filestat( $(files), modeoct ) ) );
+      "Should remove '$(files)' from '$(setuid_log_path)' because `filestat ($(files), modeoct )` returns '$(with)' which does not match '($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))' (setgid|setuid)"
+        comment => concat( "If the logged file is not currently set(uid&|gid) then we can",
+                           "safely purge it from the list to avoid unnecessary work."),
+
+        with => filestat( $(files), modeoct ),
+        if => not( regcmp( "($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))",
+                           filestat( $(files), modeoct ) ) );
 
       # The `with` attribute was introduced in 3.11
       "Inventory: setuid Files: $(files) modeoct=$(with)"
         with => filestat( $(files), modeoct ),
-        if => regcmp( "104\d+", filestat( $(files), modeoct ) );
+        if => regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) );
 
       "Inventory: root owned setuid Files: $(files) modeoct=$(with)"
         with => filestat( $(files), modeoct ),
-        if => and( regcmp( "104\d+", filestat( $(files), modeoct ) ),
+        if => and( regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) ),
                    regcmp( "0", filestat( $(files), uid ) ));
+
 @endif
 
 }
