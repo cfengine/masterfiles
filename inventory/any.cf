@@ -240,6 +240,10 @@ bundle agent cfe_autorun_inventory_memory
 
 bundle agent cfe_autorun_inventory_setuid
 # @brief Inventory setuid files and prune invalid entries from the setuid log
+# @inventory Setuid files
+# @inventory Root owned setuid files
+# @inventory Setgid files
+# @inventory Root owned setgid files
 {
   vars:
     !disable_inventory_setuid::
@@ -267,6 +271,17 @@ bundle agent cfe_autorun_inventory_setuid
         meta => { "inventory", "attribute_name=Root owned setuid files" },
         if => and( regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) ),
                    regcmp( "0", filestat( $(files), uid ) ));
+
+      "setgid[$(files)]" -> { "ENT-6793" }
+        string => "$(files)",
+        meta => { "inventory", "attribute_name=Setgid files" },
+        if => regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) );
+
+      "rootsetgid[$(files)]" -> { "ENT-6793" }
+        string => "$(files)",
+        meta => { "inventory", "attribute_name=Root owned setgid files" },
+        if => and( regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) ),
+                   regcmp( "0", filestat( $(files), gid ) ));
 
     files:
     !disable_inventory_setuid::
