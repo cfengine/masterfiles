@@ -104,7 +104,9 @@ bundle common paths
 
     !(freebsd|darwin|smartos)::
       "path[npm]"      string => "/usr/bin/npm";
-      "path[pip]"      string => "/usr/bin/pip";
+      "path[pip]"      string => ifelse(
+        fileexists("/usr/bin/pip3"), "/usr/bin/pip3",
+        "/usr/bin/pip");
       "path[virtualenv]" string => "/usr/bin/virtualenv";
 
     !(freebsd|darwin)::
