@@ -181,8 +181,8 @@ LogLevel warn
   # A more secure setting might be:
   # SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
 
-  # Some versions of SSL are known to be insecure
-  SSLProtocol all -SSLv2 -SSLv3
+  # Some versions of SSL and TLS are known to be insecure, so we disable them by default
+  SSLProtocol all -SSLv2 -SSLv3 -TLSv1
 
   SSLRandomSeed startup builtin
   SSLRandomSeed connect builtin
