@@ -27,7 +27,7 @@ list_installed() {
   # Name=busybox
   # Version=1.32.0-r3
   # Architecture=x86_64
-  apk list --installed | sed 's/-/ /' | awk '
+  apk list --installed | sed 's/-\([0-9]\)/ \1/' | awk '
 {
     printf("Name=%s\n",$1)
     printf("Version=%s\n",$2)
@@ -52,7 +52,7 @@ file_install() {
 
 list_updates() {
 # for some odd reason --upgradable does not work where -u does
-  apk list -u | sed 's/-/ /' | awk '
+  apk list -u | sed 's/-\([0-9]\)/ \1/' | awk '
 {
     printf("Name=%s\n",$1)
     printf("Version=%s\n",$2)
