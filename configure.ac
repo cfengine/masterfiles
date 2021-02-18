@@ -221,7 +221,7 @@ do
 done
 for i in templates cfe_internal
 do
-    for j in `find "$srcdir/$i" -name '*.mustache' -o -name '*.sh' -o -name '*.awk' -o -name '*.sed'`
+    for j in `find "$srcdir/$i" -name '*.mustache' -o -name '*.sh' -o -name '*.awk' -o -name '*.sed' -o -name '*.ps1'`
     do
         MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
     done
