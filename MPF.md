@@ -755,6 +755,22 @@ Example configuration via augments:
 
 The above configuration would result in exec_command being triggered at the top and half hour and sleeping for up to `splaytime` before agent execution.
 
+### Configure cf-execd runagent socket users
+
+On Enterprise hubs, access to cf-execd sockets can be configured as a list of users who should be allowed by defining `vars.control_executor_runagent_socket_allow_users`. By default on Enterprise Hubs, `cfapache` is allowed to access runagent sockets.
+
+```
+{
+  "vars": {
+    "control_executor_runagent_socket_allow_users": [ "cfapache", "vpodzime" ]
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.18.0
+
 ### Allow connections from the classic/legacy protocol
 
 By default since 3.9.0 `cf-serverd` disallows connections from the classic protocol by default. To allow clients using the legacy protocol (versions prior to 3.7.0 by default) define ```control_server_allowlegacyconnects``` as a list of networks.

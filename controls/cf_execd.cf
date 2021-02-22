@@ -16,6 +16,11 @@ body executor control
 
       agent_expireafter  => "$(def.control_executor_agent_expireafter)";
 
+@if minimum_version(3.18.0)
+    _have_control_executor_runagent_socket_allow_users::
+      runagent_socket_allow_users => { @(def.control_executor_runagent_socket_allow_users) };
+@endif
+
     cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
       mailto     => "$(def.mailto)";
       mailfrom   => "$(def.mailfrom)";
