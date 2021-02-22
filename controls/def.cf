@@ -161,6 +161,12 @@ bundle common def
         comment => "This variable defines the list of classes that should
                     trigger exec_command if any of them are defined.";
 
+      # Users allowed on sockets
+      # Set the users allowed by default, if not already set (e.g. via augments)
+      "control_executor_runagent_socket_allow_users"
+        slist => { "cfapache" },
+        unless => isvariable( $(this.promiser) ),
+        if => and( "enterprise_edition", "am_policy_hub");
 
       # Agent Controls
 
@@ -451,6 +457,9 @@ bundle common def
         unless => isvariable( default_data_select_policy_hub_monitoring_include );
 
   classes:
+
+      "_have_control_executor_runagent_socket_allow_users"
+        expression => isvariable( "def.control_executor_runagent_socket_allow_users" );
 
       "cfengine_recommendations_enabled"
         expression => "!cfengine_recommendations_disabled";
