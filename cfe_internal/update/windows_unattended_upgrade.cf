@@ -1,0 +1,98 @@
+bundle agent windows_unattended_upgrade
+# @brief This bundle creates two scripts: one to schedule a cfengine agent upgrade
+# and one to actually perform the upgrade after the scripts are rendered the schedule script is run.
+# If the requested version and release is already installed the scripts will be deleted.
+{
+  classes:
+    windows::
+      "_expected_version_installed" expression => and(
+        strcmp( $(sys.cf_version), $(cfengine_software.pkg_version) ),
+        strcmp( $(sys.cf_version_release), $(cfengine_software.pkg_release) )
+      );
+
+  vars:
+    windows::
+      "_schedule_upgrade_script"
+        string => "$(const.dirsep)schedule_unattended_upgrade.ps1",
+        comment => "sys.bindir has issues when used as execution path"; # TODO examine and fix/document specific issue(s)
+
+      "_upgrade_script"
+        string => "$(sys.bindir)$(const.dirsep)unattended-upgrade.bat";
+
+      "_scripts" slist => { "$(_schedule_upgrade_script)", "$(_upgrade_script)" };
+
+      "_min_offset" string => "2";
+
+  files:
+    windows::
+      # /sigh/. In order to make a stable promise, we render a script that runs
+      # to create the scheduled task that runs another script to perform the
+      # upgrade outside of cf-agent. Since the command differs based on the time
+      # of of day, the only way to have a stable promise is to promise a script
+      # where the time base difference is handeled inside the script. One
+      # alternative would be to use inline subshell exection (iex)
+      "$(_schedule_upgrade_script)"
+        create => "true",
+        edit_template_string => `
+$scheduled_time_to_upgrade = (Get-Date).AddMinutes($(_min_offset)).ToString("HH:mm")
+$schedule = "/SC ONCE"
+$taskname = '/TN "CFEngine Agent Upgrade"'
+$starttime = "/ST $scheduled_time_to_upgrade"
+$taskrun = '/TR "$(_upgrade_script)"'
+$schtasks = "$(sys.winsysdir)$(const.dirsep)schtasks.exe"
+$username = '/RU "System"'
+$force = "/F"
+Invoke-Expression "$schtasks /Create $schedule $taskname $taskrun $starttime $username $force"
+`,
+        template_method => "inline_mustache",
+        template_data => '{}';
+
+      "$(_upgrade_script)"
+        edit_template_string => `
+set LOGFILE=$(sys.workdir)$(const.dirsep)outputs/standalone_self_upgrade_bat.log
+call :SCRIPT > "%LOGFILE%" 2>&1
+exit /B
+
+:SCRIPT
+REM kill all cf procs first so that installed can run
+Taskkill /IM cf-execd.exe /F
+Taskkill /IM cf-monitord.exe /F
+Taskkill /IM cf-serverd.exe /F
+Taskkill /IM cf-agent.exe /F
+set bat="$(sys.workdir)$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)msiexec.bat"
+echo File=$(cfengine_software.local_software_dir)$(const.dirsep)$(cfengine_package_names.my_pkg) | call %bat% file-install
+REM exit 0 so that scheduled task will not keep trying a failing situation
+REM looking at package module logs of one failure should help in debugging
+exit 0
+`,
+        template_method => "inline_mustache",
+        template_data => '{}',
+        create => "true",
+        ifvarclass => not( "_expected_version_installed" );
+
+      "$(_scripts)"
+        delete => windows_unattended_upgrade_tidy,
+        ifvarclass => "_expected_version_installed";
+
+  commands:
+    windows::
+      '$(_schedule_upgrade_script)'
+         ifvarclass => not( "_expected_version_installed" ),
+         contain => windows_unattended_upgrade:powershell;
+}
+
+body delete windows_unattended_upgrade_tidy
+{
+        dirlinks => "delete";
+        rmdirs => "true";
+}
+
+body file control
+{
+        namespace => "windows_unattended_upgrade";
+}
+
+body contain powershell
+{
+        useshell => "powershell";
+}
