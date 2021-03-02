@@ -623,6 +623,19 @@ The `inputs` key in augments can be used to add additional custom policy files.
 When the ```services_autorun``` class is defined bundles tagged with
 ```autorun``` are actuated in lexical order.
 
+Example definition of ```services_autorun``` using [Augments (def.json)][Augments]:
+
+
+```json
+{
+  "classes": {
+    "services_autorun": [ "any::" ]
+  }
+}
+```
+
+Example policy with bundle tagged for execution when ```services_autorun``` is defined:
+
 ```cf3
 bundle agent example
 {
@@ -638,6 +651,10 @@ bundle agent example
 included in inputs even when the ```services_autorun``` class is **not**
 defined. Bundles tagged with ```autorun``` are **not required** to be placed in
 `services/autorun/` in order to be automatically actuated.
+
+**History:**
+
+* Added in CFEngine 3.6.0
 
 #### Additional automatically loaded inputs
 
