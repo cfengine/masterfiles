@@ -221,6 +221,28 @@ bundle agent cfe_internal_permissions
 # @brief Specific expectations for permissions and ownership of CFEngine with respect to the Enterprise Edition
 {
 
+  vars:
+
+    # nonstandard directories in statedir
+    "_statedir_standard_perm_exceptions"
+      slist => { "pg", "cf-execd.sockets" };
+
+    # Derive the users that should be able to access cf-execd sockets
+    "_cf_execd_socket_allow_users"
+      slist => { @(def.control_executor_runagent_socket_allow_users) };
+
+    "_cf_statedir_allow_users"
+      slist => { "cfpostgres", "cfapache", @(def.control_executor_runagent_socket_allow_users) },
+      if => "enterprise_edition.(policy_server|am_policy_hub)";
+
+    # Derive the aces for users allowed to access cf-execd sockets
+    "_cf_execd_socket_dir_user_aces" -> { "ENT-6777" }
+      slist => maplist( "user:$(this):rx:allow", @(_cf_execd_socket_allow_users) );
+    "_cf_execd_socket_runagent_user_aces" -> { "ENT-6777" }
+      slist => maplist( "user:$(this):rw:allow", @(_cf_execd_socket_allow_users) );
+    "_cf_statedir_user_aces" -> { "ENT-6777" }
+      slist => maplist( "user:$(this):rx:allow", @(_cf_statedir_allow_users) );
+
   files:
 
     !(policy_server|am_policy_hub)::
@@ -233,12 +255,13 @@ bundle agent cfe_internal_permissions
     enterprise_edition.(policy_server|am_policy_hub)::
 
      "$(sys.statedir)/."
-        perms => mog("0640", "root", "cfpostgres"),
+        perms => mog("0750", "root", "cfpostgres"),
+        acl => cf_statedir_acl( @(_cf_statedir_user_aces) ),
         comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
 
      "$(sys.statedir)/."
         perms => state_dir_system_owned(),
-        depth_search => recurse_except( inf, "pg" ),
+        depth_search => recurse_except( inf, @(_statedir_standard_perm_exceptions) ),
         file_select => all,
         comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
 
@@ -246,20 +269,137 @@ bundle agent cfe_internal_permissions
         perms => mog("0600", "cfpostgres", "cfpostgres"),
         depth_search => recurse_with_base( inf ),
         comment => "No one except for the database user needs to access where the db is installed.";
+
+      "$(sys.statedir)/cf-execd.sockets/." -> { "ENT-6777" }
+        acl => cf_execd_socket_dir_acl( @(_cf_execd_socket_dir_user_aces) ),
+        if => isdir( "$(sys.statedir)/cf-execd.sockets" );
+
+      "$(sys.statedir)/cf-execd.sockets/runagent.socket" -> { "ENT-6777" }
+        acl => cf_execd_socket_runagent_acl( @(_cf_execd_socket_runagent_user_aces) ),
+        if => fileexists( "$(sys.statedir)/cf-execd.sockets/runagent.socket" );
+}
+
+
+body acl cf_statedir_acl( aces )
+# @brief Describe ACL for state directory (sys.statedir)
+# @param aces A list of additional access control rules that should be used
+#
+# * User is allowed read, write, execute
+# * Group is allowed read, execute
+# * Permissions described by @(aces)
+# * Other is allowed nothing
+#
+# **Example:**
+#
+# ```
+# bundle agent example
+# {
+#   vars:
+#     "_cf_statedir_allow_users"
+#       slist => { "root", "cfpostgres", "cfapache" };
+#     "_cf_statedir_user_aces"
+#       slist => maplist( "user:$(this):rx:allow", @(_cf_statedir_allow_users) );
+#   files:
+#     "$(sys.statedir)/."
+#       acl => cf_statedir_aces( @(_cf_statedir_user_aces) );
+# }
+# ```
+#
+{
+        acl_method => "overwrite";
+        acl_type => "posix";
+        aces => { "user:*:rwx:allow",
+                  "group:*:rx:allow",
+                  @(aces),
+                  "all:---:allow"
+        };
+}
+body acl cf_execd_socket_dir_acl( aces )
+# @brief Describe ACL for cf-execd socket directory
+# @param aces A list of additional access control rules that should be used
+#
+# * Owner is allowed read, write, execute
+# * Group is allowed nothing
+# * Permissions described by @(aces)
+# * Other is allowed nothing
+#
+# **Example:**
+#
+# ```
+# bundle agent example
+# {
+#   vars:
+#     "_cf_execd_socket_allow_users"
+#       slist => { "cfapache" };
+#     "_cf_execd_socket_dir_user_aces"
+#       slist => maplist( "user:$(this):rx:allow", @(_cf_execd_socket_allow_users) );
+#   files:
+#     "$(sys.statedir)/cf-execd.sockets/runagent.socket"
+#       acl => cf_execd_socket_dir_aces( @(_cf_execd_socket_runagent_dir_aces) );
+# }
+# ```
+#
+{
+  acl_method => "overwrite";
+  acl_type => "posix";
+  aces => { "user:*:rwx:allow",
+            "group:*:---:allow",
+            @(aces),
+            "all:---:allow"
+          };
+}
+
+body acl cf_execd_socket_runagent_acl( aces )
+# @brief Describe ACL for cf-execd runagent socket
+# @param aces A list of additional access control rules that should be used
+#
+# * Owner is allowed read, write
+# * Group is allowed nothing
+# * Permissions described by @(aces)
+# * Other is allowed nothing
+#
+# **Example:**
+#
+# ```
+# bundle agent example
+# {
+#   vars:
+#     "_cf_execd_socket_allow_users"
+#       slist => { "cfapache" };
+#     "_cf_execd_socket_runagent_user_aces"
+#       slist => maplist( "user:$(this):rx:allow", @(_cf_execd_socket_allow_users) );
+#   files:
+#     "$(sys.statedir)/cf-execd.sockets/runagent.socket"
+#       acl => cf_execd_socket_runagent_acl( @(_cf_execd_socket_dir_user_aces) );
+# }
+# ```
+#
+{
+  acl_method => "overwrite";
+  acl_type => "posix";
+  aces => { "user:*:rw:allow",
+            "group:*:---:allow",
+            @(aces),
+            "all:---:allow"
+          };
 }
 
 #############################################################################
-body depth_search recurse_except( d, exception)
+body depth_search recurse_except( d, exceptions)
+# @breif Recurse (across device boundaires) `d` levels (excluding basedir) excluding `exceptions`
+# @param `d` Levels to decend in recursion
+# @param `exceptions` List of directories to exclude from depth search
 {
         depth => "$(d)";
         include_basedir => "false";
-        exclude_dirs => { $(exception) };
+        exclude_dirs => { @(exceptions) };
 }
 
 ############################################################################
 
 body depth_search recurse_basedir(d)
 # @brief Search `d` levels deep including the base dir
+# @param `d` Levels to decend in recursion
 {
       depth => "$(d)";
       include_basedir => "true";
