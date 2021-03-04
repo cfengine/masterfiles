@@ -305,6 +305,10 @@ bundle monitor measure_psql
 {
   measurements:
     policy_server|am_policy_hub::
+
+      # We average the time for all entries in /var/log/postgresql.log that
+      # PostgreSQL waited before acquiring a lock and measure that over time.
+
       "/var/log/postgresql.log"
         if => fileexists( "/var/log/postgresql.log"),
         handle => "psql_lock_wait_before_acquisition",
@@ -312,11 +316,15 @@ bundle monitor measure_psql
         data_type => "real",
         history_type => "weekly",
         units => "ms",
-        match_value => acquired_lock;
+        match_value => acquired_lock,
+        comment => "Approximate length of time PostgreSQL waits before acquiring lock";
 }
 
 body match_value acquired_lock
 {
+  # Example log line
+  # 2019-06-11 18:49:39 GMT LOG: process 10427 acquired AccessShareLock on relation 17949 of database 16384 after 1122
+
   select_line_matching => ".*acquired.*Lock.*";
   extraction_regex => ".*after (\d+)";
   track_growing_file => "true";
