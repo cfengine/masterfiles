@@ -96,11 +96,16 @@ rem Install this file if it exists
     goto :EOF
   )
 
-  REM TODO: ENT-6824 save this logfile based on msi filename
-  set logfile="\cfengine_package_install.log"
-  %MSIEXEC% /quiet /passive /qn /norestart /l*vx %logfile% /i %1
+  set log_dir="\cfengine_package_logs\"
+  if not exist %log_dir% (
+    mkdir %log_dir%
+  )
+  for /F "delims=" %%i in (%1) do @set basename="%%~ni"
+  REM %log_dir:"=% replaces quotes with nothing, otherwise you get two double-quotes which causes failures
+  set log_file="%log_dir:"=%%basename:"=%_install.log"
+  %MSIEXEC% /quiet /passive /qn /norestart /l*vx %log_file% /i %1
   if not errorlevel 0 (
-    echo ErrorMessage=msiexec.exe ErrorLevel was %ErrorLevel% for file %1 logfile at %logfile%
+    echo ErrorMessage=msiexec.exe ErrorLevel was %ErrorLevel% for file %1 log at %log_file%
   )
 goto :EOF
 
