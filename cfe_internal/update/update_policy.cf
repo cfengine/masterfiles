@@ -274,7 +274,8 @@ bundle agent cfe_internal_update_policy_cpv
       depth_search => u_recurse("inf"),
       file_select  => u_input_files,
       action => u_immediate,
-      classes => u_results("bundle", "update_inputs");
+      classes => u_results("bundle", "update_inputs"),
+      move_obstructions => "true";
 
     update_inputs_not_kept::
 
