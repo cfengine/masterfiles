@@ -61,6 +61,10 @@ bundle agent cfe_internal_update_policy
       "Stock policy update"
         usebundle => cfe_internal_update_policy_cpv;
 
+    enterprise_edition::
+      "CMDB data update" -> { "ENT-6788" }
+        usebundle => cfe_internal_update_cmdb;
+
   reports:
 
     inform_mode|verbose_mode|DEBUG|DEBUG_cfe_internal_update_policy::
@@ -308,9 +312,33 @@ bundle agent cfe_internal_update_policy_cpv
         usebundle => cfe_internal_setup_python_symlink("$(python_symlink)");
 }
 
+bundle agent cfe_internal_update_cmdb
+# @brief Ensure local cache of CMDB data is up to date
+{
+  files:
+      "$(sys.workdir)/data/." create => "true";
+
+      "$(sys.workdir)/data/." -> { "ENT-6788" }
+        depth_search => u_recurse( inf ),
+        file_select => u_all,
+        copy_from => u_cmdb_data;
+}
 #########################################################
 # Self-contained bodies from the lib to avoid dependencies
 #########################################################
+
+body copy_from u_cmdb_data
+# @brief Sync CMDB data from policy server
+# Note: Not all hosts necessarily have CMDB data
+{
+        copy_backup => "false";
+        trustkey => "false";
+        compare => "digest";
+        source  => "hub_cmdb";
+        servers => { "$(sys.policy_hub)" };
+        purge => "true";
+        missing_ok => "true";
+}
 
 body perms u_m(p)
 # @brief Ensure file mode is `p`
@@ -342,6 +370,13 @@ body perms u_shared_lib_perms
 }
 
 #########################################################
+
+body file_select u_all
+# @brief Select all file system entries
+{
+        leaf_name => { ".*" };
+        file_result => "leaf_name";
+}
 
 body file_select u_cf3_files
 # @brief Select files starting with `cf-` (cfengine binaries)
