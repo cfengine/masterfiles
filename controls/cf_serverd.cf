@@ -136,10 +136,16 @@ bundle server mpf_default_access_rules()
         if => isdir( "$(sys.workdir)/master_software_updates" ),
         admit => { @(def.acl) };
 
-      enterprise_edition.policy_server::
-        "collect_calls"
-          resource_type => "query",
-          admit_ips => { @(def.mpf_access_rules_collect_calls_admit_ips) };
+    enterprise_edition.policy_server::
+      "collect_calls"
+        resource_type => "query",
+        admit_ips => { @(def.mpf_access_rules_collect_calls_admit_ips) };
+
+      "$(sys.workdir)/cmdb/$(connection.key)/" -> { "ENT-6788" }
+        handle => "server_access_grant_access_cmdb",
+        comment => "Grant access to host specific CMDB data",
+        shortcut => "hub_mdr",
+        admit_keys => { $(connection.key) };
 
     !windows::
       "$(def.cf_runagent_shell)" -> { "ENT-6673" }
