@@ -338,7 +338,9 @@ body copy_from u_cmdb_data
         source  => "hub_cmdb";
         servers => { "$(sys.policy_hub)" };
         purge => "true";
+@if minimum_version(3.12)
         missing_ok => "true";
+@endif
 }
 
 body perms u_m(p)

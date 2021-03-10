@@ -144,7 +144,7 @@ bundle server mpf_default_access_rules()
       "$(sys.workdir)/cmdb/$(connection.key)/" -> { "ENT-6788" }
         handle => "server_access_grant_access_cmdb",
         comment => "Grant access to host specific CMDB data",
-        shortcut => "hub_mdr",
+        shortcut => "hub_cmdb",
         admit_keys => { $(connection.key) };
 
     !windows::
