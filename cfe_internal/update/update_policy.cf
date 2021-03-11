@@ -61,7 +61,9 @@ bundle agent cfe_internal_update_policy
       "Stock policy update"
         usebundle => cfe_internal_update_policy_cpv;
 
-    enterprise_edition::
+    # Don't pull CMDB data on policy_hub self bootstrap because
+    # there will be no cf-serverd listening to serve files yet.
+    enterprise_edition.!(am_policy_hub.bootstrap_mode)::  # ENT-6840
       "CMDB data update" -> { "ENT-6788" }
         usebundle => cfe_internal_update_cmdb;
 
