@@ -106,8 +106,12 @@ rem Install this file if it exists
     goto :EOF
   )
 
-  %MSIEXEC% /quiet /passive /qn /norestart /i %1
-  rem TODO options, error checking
+  REM TODO: ENT-6824 save this logfile based on msi filename
+  set logfile="\cfengine_package_install.log"
+  %MSIEXEC% /quiet /passive /qn /norestart /l*vx %logfile% /i %1
+  if not errorlevel 0 (
+    echo ErrorMessage=msiexec.exe ErrorLevel was %ErrorLevel% for file %1 logfile at %logfile%
+  )
 goto :EOF
 
 
