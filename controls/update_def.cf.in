@@ -109,6 +109,18 @@ bundle common update_def
         string => "$(def.mpf_update_policy_master_location)",
         if => isvariable( "def.mpf_update_policy_master_location" );
 
+      "mpf_update_modules_master_location" -> { "CFE-3318" }
+        comment => "Directory where clients should get modules from.",
+        string => ifelse( isvariable("def.mpf_update_modules_master_location"),
+                          "$(def.mpf_update_modules_master_location)",
+                          "@prefix@/modules" );
+
+      "mpf_update_plugins_master_location" -> { "CFE-3318" }
+        comment => "Directory where clients should get plugins from.",
+        string => ifelse( isvariable("def.mpf_update_plugins_master_location"),
+                          "$(def.mpf_update_plugins_master_location)",
+                          "@prefix@/plugins" );
+
     # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 
