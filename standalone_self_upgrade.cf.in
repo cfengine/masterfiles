@@ -244,6 +244,7 @@ bundle agent cfengine_software_version
       "pkg_name" string => "$(cfengine_software.pkg_name)";
       "pkg_version" string => "$(cfengine_software.pkg_version)";
       "pkg_release" string => "$(cfengine_software.pkg_release)";
+      "_cf_version_release" string => ifelse( isvariable( "sys.cf_version_release" ), "$(sys.cf_version_release)", "1" );
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
       "package_dir" string => "$(cfengine_software.pkg_dir)";
       "local_software_dir" string => "$(cfengine_software.local_software_dir)";
@@ -265,7 +266,7 @@ bundle agent cfengine_software_version
           "windows",
           or(
               not(strcmp("$(cfengine_software.pkg_version)", "$(sys.cf_version)")),
-              not(strcmp("$(cfengine_software.pkg_release)", "$(sys.cf_version_release)"))
+              not(strcmp("$(cfengine_software.pkg_release)", "$(_cf_version_release)"))
             )
         );
 
