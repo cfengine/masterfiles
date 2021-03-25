@@ -246,7 +246,7 @@ bundle agent cfengine_software_version
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "_cf_version_release" string => ifelse( isvariable( "sys.cf_version_release" ), "$(sys.cf_version_release)", "1" );
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
-      "package_dir" string => "$(cfengine_software.pkg_dir)";
+      "package_dir" string => "$(cfengine_software.package_dir)";
       "local_software_dir" string => "$(cfengine_software.local_software_dir)";
 
   methods:
@@ -283,7 +283,7 @@ bundle agent cfengine_software_version_packages2
       "pkg_version" string => "$(cfengine_software.pkg_version)";
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
-      "package_dir" string => "$(cfengine_software.pkg_dir)";
+      "package_dir" string => "$(cfengine_software.package_dir)";
       "local_software_dir" string => "$(cfengine_software.local_software_dir)";
 
   packages:
@@ -515,7 +515,7 @@ bundle agent cfengine_master_software_content
       "pkg_version" string => "$(cfengine_software.pkg_version)";
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
-      "package_dir" string => "$(cfengine_software.pkg_dir)";
+      "package_dir" string => "$(cfengine_software.package_dir)";
       "base_url" string => "https://cfengine-package-repos.s3.amazonaws.com/enterprise/Enterprise-$(pkg_version)/agent";
 
       # Map platform/directory identifier to upstream package URLs
