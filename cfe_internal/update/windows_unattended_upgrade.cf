@@ -68,16 +68,16 @@ exit 0
         template_method => "inline_mustache",
         template_data => '{}',
         create => "true",
-        ifvarclass => not( "_expected_version_installed" );
+        if => not( "_expected_version_installed" );
 
       "$(_scripts)"
         delete => windows_unattended_upgrade_tidy,
-        ifvarclass => "_expected_version_installed";
+        if => "_expected_version_installed";
 
   commands:
     windows::
       '$(_schedule_upgrade_script)'
-         ifvarclass => not( "_expected_version_installed" ),
+         if => not( "_expected_version_installed" ),
          contain => windows_unattended_upgrade:powershell;
 }
 

@@ -251,7 +251,7 @@ bundle agent cfengine_software_version
       # when ENT-6823 allows us to use msiexec.bat packages module.
       "Windows Unattended Upgrade Workaround"
         usebundle => windows_unattended_upgrade,
-        ifvarclass => and(
+        if => and(
           "windows",
           or(
               not(strcmp("$(cfengine_software.pkg_version)", "$(sys.cf_version)")),
