@@ -130,9 +130,9 @@ bundle agent cfengine_internal_standalone_self_upgrade_execution
 
     trigger_upgrade.!at_desired_version::
 
-      "$(exec_prefix)$(sys.cf_agent)"
+      '$(exec_prefix)$(sys.cf_agent) --inform --timestamp --file "$(this.promise_dirname)$(const.dirsep)standalone_self_upgrade.cf" --define trigger_upgrade,update_cf_initiated >"$(sys.workdir)$(const.dirsep)outputs/standalone_self_upgrade_$(sys.cdate).log"'
       handle => "standalone_self_upgrade",
-      args => '--inform --timestamp --file "$(this.promise_dirname)$(const.dirsep)standalone_self_upgrade.cf" --define trigger_upgrade,update_cf_initiated';
+      contain => in_shell;
 
   reports:
 
@@ -155,4 +155,8 @@ body classes u_kept_successful_command
 {
       kept_returncodes => { "0" };
       failed_returncodes => { "1" };
+}
+body contain in_shell
+{
+  useshell => "true";
 }
