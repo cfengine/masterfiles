@@ -3,6 +3,17 @@
 # WARNING: Including this policy into the inputs of another policy may result in
 # duplicate definition of bundles.
 
+# TODO remove windows_unattended_upgrade.cf when ENT-6823 allows us to use msiexec packages module
+bundle common standalone_self_upgrade_file_control
+{
+  vars:
+    "inputs" slist => { "$(this.promise_dirname)$(const.dirsep)cfe_internal$(const.dirsep)update$(const.dirsep)windows_unattended_upgrade.cf" };
+}
+
+body file control
+{
+  inputs => { @(standalone_self_upgrade_file_control.inputs) };
+}
 bundle agent main
 # @brief This bundle drives the self upgrade. It actuates the appropriate
 # bundles to download binaries to the hub for serving to clients, caching the
@@ -192,7 +203,7 @@ bundle agent cfengine_software_version
 # upgrading.
 {
   classes:
-      "__supported_platform" -> { "ENT-5045", "ENT-5152" }
+      "__supported_platform" -> { "ENT-5045", "ENT-5152", "ENT-4094" }
         or => {
                 "redhat.!redhat_4",
                 "centos.!centos_4",
@@ -202,8 +213,10 @@ bundle agent cfengine_software_version
                 "aix",
                 "SUSE_11",
                 "SUSE_12",
+                "windows", # ENT-4094
         };
 
+      # Add "windows" to __new_implementation classes with ENT-6823
       "__new_implementation"
         or => { "redhat", "centos", "ubuntu", "debian" };
 
@@ -211,8 +224,9 @@ bundle agent cfengine_software_version
       "pkg_name" string => "$(cfengine_software.pkg_name)";
       "pkg_version" string => "$(cfengine_software.pkg_version)";
       "pkg_release" string => "$(cfengine_software.pkg_release)";
+      "_cf_version_release" string => ifelse( isvariable( "sys.cf_version_release" ), "$(sys.cf_version_release)", "1" );
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
-      "package_dir" string => "$(cfengine_software.pkg_dir)";
+      "package_dir" string => "$(cfengine_software.package_dir)";
       "local_software_dir" string => "$(cfengine_software.local_software_dir)";
 
   methods:
@@ -223,6 +237,18 @@ bundle agent cfengine_software_version
     __supported_platform.!__new_implementation::
       "Manage CFEngine Version"
         usebundle => cfengine_software_version_packages1;
+
+      # TODO, remove this and cfe_internal/enterprise/windows_unattended_upgrade.cf
+      # when ENT-6823 allows us to use msiexec.bat packages module.
+      "Windows Unattended Upgrade Workaround"
+        usebundle => windows_unattended_upgrade,
+        ifvarclass => and(
+          "windows",
+          or(
+              not(strcmp("$(cfengine_software.pkg_version)", "$(sys.cf_version)")),
+              not(strcmp("$(cfengine_software.pkg_release)", "$(_cf_version_release)"))
+            )
+        );
 
   reports:
       !__supported_platform.inform_mode::
@@ -237,7 +263,7 @@ bundle agent cfengine_software_version_packages2
       "pkg_version" string => "$(cfengine_software.pkg_version)";
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
-      "package_dir" string => "$(cfengine_software.pkg_dir)";
+      "package_dir" string => "$(cfengine_software.package_dir)";
       "local_software_dir" string => "$(cfengine_software.local_software_dir)";
 
   packages:
@@ -254,6 +280,12 @@ bundle agent cfengine_software_version_packages2
       package_module => apt_get,
       comment => "Ensure the latest package is installed";
 
+     # TODO, uncomment the following to enable msiexec packages module (ENT-6823)
+#    windows::
+#      "$(local_software_dir)$(const.dirsep)$(cfengine_package_names.my_pkg)"
+#        policy => "present",
+#        package_module => msiexec,
+#        comment => "Ensure the latest package is installed";
   reports:
 
     "DEBUG|DEBUG_$(this.bundle)"::
@@ -440,6 +472,9 @@ bundle common cfengine_package_names
 
       "pkg[$(cfengine_master_software_content._deb_dists)_$(cfengine_master_software_content._32bit_arches)]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian7_i386.deb";
 
+      # Windows
+      "pkg[windows_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release)-x86_64.msi";
+      "pkg[windows_i686]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release)-i686.msi";
       "my_pkg"
         string => "$(pkg[$(sys.flavor)_$(sys.arch)])",
         comment => "The package name for the currently executing platform.";
@@ -460,7 +495,7 @@ bundle agent cfengine_master_software_content
       "pkg_version" string => "$(cfengine_software.pkg_version)";
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
-      "package_dir" string => "$(cfengine_software.pkg_dir)";
+      "package_dir" string => "$(cfengine_software.package_dir)";
       "base_url" string => "https://cfengine-package-repos.s3.amazonaws.com/enterprise/Enterprise-$(pkg_version)/agent";
 
       # Map platform/directory identifier to upstream package URLs
@@ -915,6 +950,14 @@ body package_module apt_get
       query_updates_ifelapsed => "30";
 }
 
+body package_module msiexec
+# @brief msiexec package module default settings
+{
+      query_installed_ifelapsed => "10";
+      query_updates_ifelapsed => "30";
+      interpreter => "$(sys.winsysdir)$(const.dirsep)cmd.exe /c ";
+      module_path => "$(sys.workdir)$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)msiexec.bat";
+}
 body perms u_m(p)
 # @brief Ensure mode is `p`
 # @param p permissions
