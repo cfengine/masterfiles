@@ -10,8 +10,8 @@ bundle agent init
 {
   meta:
     # Test package module implemented only on Linux.
-    # On Debian 7 and Solaris 11 this test fails too often.
-    "test_skip_needs_work" string => "!linux|debian_7|sunos_5_11";
+    # This test fails too often and thus disabled on all platforms in ENT-6939
+    "test_skip_needs_work" string => "any";
 
   files:
     test_pass_1::
