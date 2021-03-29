@@ -202,6 +202,7 @@ bundle common paths
       "path[sed]"      string => "/usr/bin/sed";
       "path[sort]"     string => "/usr/bin/sort";
       "path[tr]"       string => "/usr/bin/tr";
+      "path[yum]"      string => "/usr/bin/yum";
 
     archlinux::
 
