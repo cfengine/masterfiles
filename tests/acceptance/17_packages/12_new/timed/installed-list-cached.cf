@@ -9,7 +9,9 @@ body common control
 bundle agent init
 {
   meta:
-    "test_skip_needs_work" string => "!linux";
+    # Test package module implemented only on Linux.
+    # This test fails too often and thus disabled on all platforms in ENT-6939
+    "test_skip_needs_work" string => "any";
 
   files:
     test_pass_1::
