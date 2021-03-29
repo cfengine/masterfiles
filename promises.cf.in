@@ -138,7 +138,7 @@ bundle common inventory
 # Tested to work properly against 3.5.x
 {
   classes:
-      "other_unix_os" expression => "!windows.!macos.!linux.!freebsd";
+      "other_unix_os" expression => "!(windows|macos|linux|freebsd|aix)";
       "specific_linux_os" expression => "redhat|debian|suse|sles";
 
   vars:
