@@ -11,12 +11,12 @@ body printfile head(file)
 # @param file The full path of the file to report
 {
         file_to_print => "$(file)";
-      # GNU head defaults to 10, but we start counting from 0
+      # GNU head defaults to 10
         number_of_lines => "10";
 }
 
 body printfile head_n(file, n)
-# @brief Report the first 10 lines of a file
+# @brief Report the first `n` lines of a file
 # @param file The full path of the file to report
 # @param n The number of lines to report
 {
