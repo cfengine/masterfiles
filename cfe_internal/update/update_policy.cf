@@ -171,27 +171,15 @@ bundle agent cfe_internal_update_policy_cpv
         comment => "The path to request updates from the policy server.",
         handle => "cfe_internal_update_policy_vars_master_location";
 
-    windows::
+      "modules_dir_source" -> { "CFE-3318" }
+        string => "$(update_def.mpf_update_modules_master_location)",
+        comment => "Directory containing CFEngine modules on the policy server.",
+        handle => "cfe_internal_update_policy_vars_modules_dir";
 
-      "modules_dir_source"        string => "/var/cfengine/masterfiles/modules",
-      comment => "Directory containing CFEngine modules",
-      handle => "cfe_internal_update_policy_vars_modules_dir_windows";
-
-      "plugins_dir_source"        string => "/var/cfengine/plugins",
-      comment => "Directory containing CFEngine plugins",
-      handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
-
-    !windows::
-
-      "modules_dir_source"        string => translatepath("$(master_location)/modules"),
-      comment => "Directory containing CFEngine modules",
-      handle => "cfe_internal_update_policy_vars_modules_dir";
-
-      "plugins_dir_source"        string => translatepath("$(sys.workdir)/plugins"),
-      comment => "Directory containing CFEngine plugins",
-      handle => "cfe_internal_update_policy_vars_plugins_dir";
-
-    any::
+      "plugins_dir_source" -> { "CFE-3318" }
+        string => "$(update_def.mpf_update_plugins_master_location)",
+        comment => "Directory containing CFEngine plugins on the policy server.",
+        handle => "cfe_internal_update_policy_vars_plugins_dir";
 
       "file_check"         string => translatepath("$(inputs_dir)/promises.cf"),
       comment => "Path to a policy file",
