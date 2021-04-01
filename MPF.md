@@ -137,8 +137,8 @@ For example:
 
 ### Specify the agent bundle used for policy update
 
-The MPF uses `cfe_internal_update_policy_cpv` to update inputs, modules, and
-plugins on remote agents. When new policy is verified by the agent
+The MPF uses `cfe_internal_update_policy_cpv` to update inputs and modules on
+remote agents. When new policy is verified by the agent
 `/var/cfengine/masterfiles/cf_promises_validated` is updated with the current
 timestamp. This file is used by remote agents to avoid unnecessary inspection of
 all files each time the update policy is triggered.

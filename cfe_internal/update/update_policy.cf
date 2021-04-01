@@ -152,14 +152,14 @@ bundle agent cfe_internal_setup_python_symlink(symlink_path)
 bundle agent cfe_internal_update_policy_cpv
 # @brief Update inputs from masterfiles when cf_promises_validated changes
 #
-# @description This bundle updates inputdir, modules, and plugins. It uses the
+# @description This bundle updates inputdir, and modules. It uses the
 #              cf_promises_validated file as a gating mechanism to prevent
 #              unnecessary burden on the server from remote agents checking to
 #              see if each individual file needs an update.
 # - The class `validated_updates_ready` is defined when `cf_promises_validated` is repaired
 # - Executing `cf-agent -KIf update.cf --define validated_updates_ready` will
-#   cause the update policy to scan all files in masterfiles, modules, and
-#   plugins to be scanned for update.
+#   cause the update policy to scan all files in masterfiles and modules to be
+#   scanned for update.
 {
   vars:
       "inputs_dir"         string => translatepath("$(sys.inputdir)"),
@@ -177,19 +177,11 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
-      "plugins_dir_source"        string => "/var/cfengine/plugins",
-      comment => "Directory containing CFEngine plugins",
-      handle => "cfe_internal_update_policy_vars_plugins_dir_windows";
-
     !windows::
 
       "modules_dir_source"        string => translatepath("$(master_location)/modules"),
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir";
-
-      "plugins_dir_source"        string => translatepath("$(sys.workdir)/plugins"),
-      comment => "Directory containing CFEngine plugins",
-      handle => "cfe_internal_update_policy_vars_plugins_dir";
 
     any::
 
@@ -257,16 +249,6 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "Always update modules files on client side",
       handle => "cfe_internal_update_policy_files_update_modules",
       copy_from => u_rcp("$(modules_dir_source)", @(update_def.policy_servers)),
-      depth_search => u_recurse("inf"),
-      perms => u_m("755"),
-      action => u_immediate;
-
-    !am_policy_hub::
-
-      "$(sys.workdir)$(const.dirsep)plugins"
-      comment => "Always update plugins files on client side",
-      handle => "cfe_internal_update_policy_files_update_plugins",
-      copy_from => u_rcp("$(plugins_dir_source)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
       perms => u_m("755"),
       action => u_immediate;
