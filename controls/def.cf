@@ -261,6 +261,12 @@ bundle common def
       comment => "Define modules path",
       handle => "common_def_vars_dir_modules";
 
+      # TODO: Remove after 3.15 is no longer supported (December 18th 2022)
+      "dir_plugins" -> { "CFE-3618" }
+      string => translatepath("$(sys.workdir)/plugins"),
+      comment => "Define plugins path",
+      handle => "common_def_vars_dir_plugins";
+
       "dir_templates"
         string => ifelse( isvariable( "def.dir_templates"),
                           $(def.dir_templates),
