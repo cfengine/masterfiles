@@ -15,6 +15,10 @@ fi
 
 CMD="$1"
 
+PKG_OPTIONS=''
+REPO=''
+INPUTLIST=''
+
 mangle_arch() {
     awk 'BEGIN {
             arch["x86:32"] = "i386";
@@ -35,10 +39,6 @@ mangle_arch() {
         }
         $0'
 }
-
-ARCH=$(pkg config abi | mangle_arch)
-REPO=''
-INPUTLIST=''
 
 fatal() {
     echo "ErrorMessage=$*"
@@ -72,6 +72,7 @@ read_options() {
                     eval `parse_line "${VALUE}"`
                     case "${KEYWORD}" in
                         repo|repository) REPO="-r ${VALUE}";;
+                        option) PKG_OPTIONS="${PKG_OPTIONS} -o ${VALUE}";;
                     esac
                     continue
                     ;;
@@ -133,8 +134,12 @@ process_inputs() {
     done
 }
 
+_pkg() {
+    pkg ${PKG_OPTIONS} "$@"
+}
+
 _pkg_query() {
-    pkg query "$@" "Name=%n\nVersion=%v\nArchitecture=${ARCH}"
+    _pkg query "$@" "Name=%n\nVersion=%v\nArchitecture=${ARCH}"
 }
 
 get_package_data() {
@@ -185,6 +190,7 @@ else
     read_options
 fi
 
+ARCH=$(_pkg config abi | mangle_arch)
 case "${CMD}" in
     get-package-data)
         get_package_data
@@ -198,7 +204,7 @@ case "${CMD}" in
         else
             LOCALUPDATE=''
         fi
-        pkg version ${LOCALUPDATE} -vl'<' | \
+        _pkg version ${LOCALUPDATE} -vl'<' | \
             awk -v arch="${ARCH}" \
                 '/ repositor(y|ies) / { next; }
                 {
@@ -215,13 +221,13 @@ case "${CMD}" in
         process_inputs "${CMD}" "${INPUTLIST}"
         case "${CMD}" in
             repo-install)
-                pkg install -qy ${REPO} ${PKG} 2>/dev/null >/dev/null
+                _pkg install -qy ${REPO} ${PKG} 2>/dev/null >/dev/null
                 ;;
             file-install)
-                pkg install -qy ${PKG} 2>/dev/null >/dev/null
+                _pkg install -qy ${PKG} 2>/dev/null >/dev/null
                 ;;
             remove)
-                pkg delete -Rqy ${PKG} 2>/dev/null >/dev/null
+                _pkg delete -Rqy ${PKG} 2>/dev/null >/dev/null
                 ;;
         esac
         RC=$?
