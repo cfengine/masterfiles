@@ -90,3 +90,20 @@ bundle common inventory_linux
       "DEBUG $(this.bundle)";
       "$(const.t)OS release ID = $(os_release_id), OS release version = $(os_release_version)";
 }
+
+bundle monitor measure_entropy_available
+# @brief Measure amount of entropy available
+{
+  measurements:
+    linux::
+      # A lack of entropy can cause agents to hang
+      "/proc/sys/kernel/random/entropy_avail" -> { "ENT-6495", "ENT-6494" }
+        if => fileexists( "/proc/sys/kernel/random/entropy_avail" ),
+        handle => "entropy_avail",
+        stream_type => "file",
+        data_type => "int",
+        units => "bits",
+        history_type => "weekly",
+        match_value => single_value("\d+"),
+        comment => "Amount of entropy available";
+}
