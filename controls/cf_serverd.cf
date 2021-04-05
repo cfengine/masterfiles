@@ -114,7 +114,8 @@ bundle server mpf_default_access_rules()
       if => isdir( "$(def.dir_modules)/" ),
       admit => { @(def.acl) };
 
-      "$(def.dir_plugins)/"
+      # TODO: Remove after 3.15 is no longer supported (December 18th 2022)
+      "$(def.dir_plugins)/" -> { "CFE-3618" }
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
       if => isdir( "$(def.dir_plugins)/" ),
