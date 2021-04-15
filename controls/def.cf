@@ -212,13 +212,15 @@ bundle common def
                           "false");
 
       # Agent controls
-
-      "control_agent_files_single_copy"
+@if minimum_version(3.18.0)
+      # TODO When 3.18 is the oldest supported LTS, redact this macro and associated protections
+      "control_agent_files_single_copy" -> { "CFE-3622" }
         slist => { },
-        if => not( some( ".*", "control_agent_files_single_copy") ),
+        if => not( isvariable( "control_agent_files_single_copy" ) ),
         comment => "Default files_single_copy to an empty list if it is not
                     defined. It is expected that users can override the default
                     by setting this value from the augments file (def.json).";
+@endif
 
       "control_server_maxconnections"
         int => "200",
@@ -464,6 +466,8 @@ bundle common def
 
   classes:
 
+      "_have_control_agent_files_single_copy" -> { "CFE-3622"}
+        expression => isvariable( "def.control_agent_files_single_copy" );
       "_have_control_executor_runagent_socket_allow_users"
         expression => isvariable( "def.control_executor_runagent_socket_allow_users" );
 
