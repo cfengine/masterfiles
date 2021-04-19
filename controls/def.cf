@@ -233,7 +233,7 @@ bundle common def
                           "false");
 
       # Agent controls
-@if minimum_version(3.18.0)
+@if minimum_version(3.18)
       # TODO When 3.18 is the oldest supported LTS, redact this macro and associated protections
       "control_agent_files_single_copy" -> { "CFE-3622" }
         slist => { },
