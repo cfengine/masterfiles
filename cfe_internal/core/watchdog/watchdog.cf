@@ -183,7 +183,7 @@ bundle agent cfe_internal_core_watchdog_aix(state)
       # NOTE The text `# CFEngine watchdog` is used to locate the specific entry in cron when disabling
       "$(my_statedir)/root-crontab"
         create => "true",
-        edit_line => lines_present( "* * * * * $(sys.bindir)/watchdog # CFEngine watchdog"),
+        edit_line => lines_present( "* * * * * $(sys.bindir)/watchdog >/dev/null 2>&1 # CFEngine watchdog"),
         classes => results( "bundle", "root_crontab" ),
         depends_on => { "aix_crontab_get_state" };
 
