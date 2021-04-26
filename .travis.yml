@@ -49,16 +49,6 @@ matrix:
           packages:
             - cfengine-community=3.12.*
 
-    # JOB 5
-    - env: CF_VERSION=3.10.x
-      addons:
-        apt:
-          sources:
-            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
-              key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
-          packages:
-            - cfengine-community=3.10.*
-
 script:
 - sudo apt-get install -y fakeroot
 - INSTDIR=$HOME/cf_install
