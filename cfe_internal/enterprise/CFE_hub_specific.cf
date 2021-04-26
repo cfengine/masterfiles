@@ -67,9 +67,12 @@ bundle common cfe_internal_hub_vars
       "SSLCertificateDaysValid" string => "3650";
 
       # Determine the version of PHP that is used
+      # TODO Drop this after 3.18 is no longer supported. It's used for Mission Portals httpd configuration.
 
-      "php_version"
-        string => ifelse( fileexists( "$(sys.workdir)/httpd/modules/libphp7.so" ), "7",
+      "php_version" -> { "ENT-7039" }
+        string => ifelse(
+                          fileexists( "$(sys.workdir)/httpd/modules/libphp.so" ), "", # ENT-7039 php 8+
+                          fileexists( "$(sys.workdir)/httpd/modules/libphp7.so" ), "7",
                           fileexists( "$(sys.workdir)/httpd/modules/libphp5.so" ), "5",
                           "UNKNOWN" );
 
