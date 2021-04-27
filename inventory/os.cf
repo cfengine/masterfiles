@@ -110,4 +110,12 @@ centos_6::
                   meta => { "inventory", "attribute_name=OS", "derived-from=centos_6" };
 
 @endif
+
+# TODO: Remove all of the logic above once 3.18 clients are expected everywhere
+@if minimum_version(3.18)
+any::
+  "description"
+    string => "$(sys.os_name_human) $(sys.os_name_major)",
+    meta => { "inventory", "attribute_name=OS" };
+@endif
 }
