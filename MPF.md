@@ -653,7 +653,7 @@ defined. Bundles tagged with ```autorun``` are **not required** to be placed in
 `services/autorun/` in order to be automatically actuated. If you have an
 automatically loaded policy file in `services/autorun` which loads additional
 policy dynamically, `cf-promises` may not be able to resolve syntax errors. Use
-[`mpf_extra_autorun_inputs`][Masterfiles Policy Framework#Additional automatically loaded inputs]
+[`mpf_extra_autorun_inputs`][mpf_extra_autorun_inputs]
 and or
 [`control_common_bundlesequence_classification`][Masterfiles Policy Framework#Classification bundles before autorun]
 to work around this limitation.
