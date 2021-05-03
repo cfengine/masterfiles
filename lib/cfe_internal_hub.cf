@@ -189,7 +189,7 @@ AND    t.$(settings[$(index)][time_key]) <= (z.latest - '$(settings[$(index)][hi
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-@if minimum_version(3.15.0)
+@if minimum_version(3.15)
         inform => "false",
 @endif
         contain => silent,
@@ -241,14 +241,14 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
-@if minimum_version(3.15.0)
+@if minimum_version(3.15)
         inform => "false",
 @endif
         contain => silent,
         handle => "cf_database_maintain_consumer_status";
 
       "$(sys.bindir)/psql cfdb -c \"$(delete_future_ts_query)\"" -> { "ENT-4362" }
-@if minimum_version(3.15.0)
+@if minimum_version(3.15)
         inform => "false",
 @endif
         contain => silent,
@@ -266,7 +266,7 @@ bundle agent cfe_internal_database_cleanup_diagnostics (settings)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
-@if minimum_version(3.15.0)
+@if minimum_version(3.15)
         inform => "false",
 @endif
         contain => silent,
@@ -286,14 +286,14 @@ bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
-@if minimum_version(3.15.0)
+@if minimum_version(3.15)
         inform => "false",
 @endif
         contain => silent,
         handle => "cf_database_maintain_promise_log_repaired";
 
       "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_notkept)\""
-@if minimum_version(3.15.0)
+@if minimum_version(3.15)
         inform => "false",
 @endif
         contain => silent,
@@ -312,7 +312,7 @@ bundle agent cfe_internal_database_partitioning()
 
   commands:
       "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
-@if minimum_version(3.15.0)
+@if minimum_version(3.15)
         inform => "false",
 @endif
         contain => silent,
