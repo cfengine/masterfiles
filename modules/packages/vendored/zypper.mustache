@@ -1,22 +1,63 @@
-#!@bindir@/cfengine-selected-python
+#!/usr/bin/python
+# Note that the shebang above is ignored when run in policy
+# See lib/packages.cf `package_module zypper` use of the
+# `interpreter` attribute to use cfengine-selected-python.
+
+#####################################################################################
+# Copyright 2016 Normation SAS
+#####################################################################################
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, Version 3.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#####################################################################################
+
+# This script is based on the CFEngine's masterfiles yum script:
+# https://github.com/cfengine/masterfiles/blob/master/modules/packages/yum
+
+# Licensed under:
+# MIT Public License
+# Copyright 2021 Northern.tech AS
 
 import sys
 import os
 import subprocess
 import re
+from distutils.version import StrictVersion
 
 
 rpm_cmd = os.environ.get('CFENGINE_TEST_RPM_CMD', "/bin/rpm")
 rpm_quiet_option = ["--quiet"]
-rpm_output_format = "Name=%{name}\nVersion=%{version}-%{release}\nArchitecture=%{arch}\n"
+rpm_output_format = "Name=%{name}\nVersion=%|EPOCH?{%{epoch}:}:{}|%{version}-%{release}\nArchitecture=%{arch}\n"
 
-yum_cmd = os.environ.get('CFENGINE_TEST_YUM_CMD', "/usr/bin/yum")
-yum_options = ["--quiet", "-y"]
+zypper_cmd = os.environ.get('CFENGINE_TEST_ZYPPER_CMD', "/usr/bin/zypper")
+zypper_options = ["--quiet", "-n"]
 
 NULLFILE = open(os.devnull, 'w')
 
-
 redirection_is_broken_cached = -1
+zypper_supports_oldpackage_cached = -1
+
+def zypper_supports_oldpackage():
+    # Suse zypper "--oldpackage" option is only supported greater that 1.6.169
+    global zypper_supports_oldpackage_cached
+    if zypper_supports_oldpackage_cached == -1:
+        zypper_version = subprocess.Popen([zypper_cmd, "-n", "--version"], stdout=subprocess.PIPE).communicate()[0]
+        zypper_version = zypper_version.decode().split(" ", 1)[1].rstrip()
+        if StrictVersion(zypper_version) >= StrictVersion("1.6.169"):
+            zypper_supports_oldpackage_cached = 1
+        else:
+            zypper_supports_oldpackage_cached = 0
+    return zypper_supports_oldpackage_cached
 
 def redirection_is_broken():
     # Older versions of Python have a bug where it is impossible to redirect
@@ -28,7 +69,7 @@ def redirection_is_broken():
     # and that's good, because it would have been much more tricky to solve.
     global redirection_is_broken_cached
     if redirection_is_broken_cached == -1:
-        cmd_line = [sys.executable, sys.argv[0], "internal-test-stderr"]
+        cmd_line = [sys.argv[0], "internal-test-stderr"]
         if subprocess.call(cmd_line, stdout=sys.stderr) == 0:
             redirection_is_broken_cached = 0
         else:
@@ -65,9 +106,18 @@ def subprocess_Popen(cmd, stdout=None, stderr=None):
     return result
 
 
+# If subprocess.PIPE is passed as stderr, it will re-write it in an ErrorMessage
 def subprocess_call(cmd, stdout=None, stderr=None):
     process = subprocess_Popen(cmd, stdout, stderr)
-    return process.wait()
+    outs, errs = process.communicate()
+    if stderr == subprocess.PIPE:
+        lines = [line for line in errs.decode().splitlines()]
+        if len(lines):
+            printed_error = "ErrorMessage=" + " ".join(lines)
+            sys.stdout.write(printed_error)
+            sys.stdout.flush()
+    return process.returncode
+
 
 
 def get_package_data():
@@ -84,7 +134,8 @@ def get_package_data():
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
-        return subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string])
+        subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string], stderr=subprocess.PIPE)
+        return 0
     elif re.search("[:,]", pkg_string):
         # Contains an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -99,57 +150,37 @@ def list_installed():
     # Ignore everything.
     sys.stdin.readlines()
 
-    return subprocess_call([rpm_cmd, "-qa", "--qf", rpm_output_format])
-
+    subprocess_call([rpm_cmd, "-qa", "--qf", rpm_output_format])
+    return 0
 
 def list_updates(online):
-    global yum_options
-    for line in sys.stdin:
-        line = line.strip()
-        if line.startswith("options="):
-            option = line[len("options="):]
-            if option.startswith("-"):
-                yum_options.append(option)
-            elif option.startswith("enablerepo=") or option.startswith("disablerepo="):
-                yum_options.append("--" + option)
+    # Ignore everything.
+    sys.stdin.readlines()
 
     online_flag = []
     if not online:
-        online_flag = ["-C"]
+        online_flag = ["--no-refresh"]
 
-    process = subprocess_Popen([yum_cmd] + yum_options + online_flag + ["check-update"], stdout=subprocess.PIPE)
-    (stdoutdata, _) = process.communicate()
-    # analyze return code from `yum check-update`:
-    # 0 means no updates
-    # 1 means there was an error
-    # 100 means that there are available updates
-    if process.returncode == 1 and not online:
-        # If we get an error when listing local updates, try again using the
-        # online method, so that the cache is generated
-        process = subprocess_Popen([yum_cmd] + yum_options + ["check-update"], stdout=subprocess.PIPE)
-        (stdoutdata, _) = process.communicate()
-    if process.returncode != 100:
-        # either there were no updates or error happened
-        # Nothing to do for us here anyway
-        return process.returncode
-    lastline = ""
-    for line in stdoutdata.decode("utf-8").splitlines():
-        # Combine multiline entries into one line. A line without at least three
-        # space separated fields gets combined with the next line, if that line
-        # starts with a space.
-        if lastline and (len(line) == 0 or not line[0].isspace()):
-            # Line does not start with a space. No combination.
-            lastline = ""
+    process = subprocess_Popen([zypper_cmd] + zypper_options + online_flag + ["list-updates"], stdout=subprocess.PIPE)
 
-        line = lastline + line
-        match = re.match("^\S+\s+\S+\s+\S+", line)
-        if match is None:
-            # Keep line
-            lastline = line
-            continue
+    for line in (line.decode() for line in process.stdout):
 
-        lastline = ""
-        match = re.match("^(?P<name>\S+)\.(?P<arch>[^.\s]+)\s+(?P<version>\S+)\s+\S+\s*$", line)
+# Zypper's output looks like:
+#
+# S | Repository        | Name         | Current Version                    | Available Version                              | Arch
+# --+-------------------+--------------+------------------------------------+------------------------------------------------+-------
+# v | Rudder repository | rudder-agent | 1398866025:3.2.6.release-1.SLES.11 | 1398866025:3.2.7.rc1.git201609190419-1.SLES.11 | x86_64
+#
+# Which gives:
+#
+# v    | Rudder repository | rudder-agent       | 1398866025:3.2.6.release-1.SLES.11 | 1398866025:3.2.7.rc1.git201609190419-1.SLES.11 | x86_64
+#        may contain         package name         old version, ignore it               version available                                architecture
+#        special chars
+# v\s+\|[^\|]+\            |\s+(?P<name>\S+)\s+\|\s+\S+\s+\                          |\s+(?P<version>\S+)\s+\                         |\s+(?P<arch>\S+)\s*$
+
+# The first char will always be "v" which means there is a new version avaialble on search outputs.
+
+        match = re.match("v\s+\|[^\|]+\|\s+(?P<name>\S+)\s+\|\s+\S+\s+\|\s+(?P<version>\S+)\s+\|\s+(?P<arch>\S+)\s*$", line)
         if match is not None:
             sys.stdout.write("Name=" + match.group("name") + "\n")
             sys.stdout.write("Version=" + match.group("version") + "\n")
@@ -162,7 +193,7 @@ def list_updates(online):
 # List 1: Contains arguments for a single command line.
 # List 2: Contains arguments for multiple command lines (see comments in
 #         repo_install()).
-def one_package_argument(name, arch, version, is_yum_install):
+def one_package_argument(name, arch, version, is_zypper_install):
     args = []
     archs = []
     exists = False
@@ -170,10 +201,10 @@ def one_package_argument(name, arch, version, is_yum_install):
     if arch:
         archs.append(arch)
 
-    if is_yum_install:
+    if is_zypper_install:
         process = subprocess_Popen([rpm_cmd, "--qf", "%{arch}\n",
                                     "-q", name], stdout=subprocess.PIPE)
-        existing_archs = [line.decode("utf-8").rstrip() for line in process.stdout]
+        existing_archs = [line.decode().rstrip() for line in process.stdout]
         process.wait()
         if process.returncode == 0 and existing_archs:
             exists = True
@@ -185,10 +216,10 @@ def one_package_argument(name, arch, version, is_yum_install):
 
     version_suffix = ""
     if version:
-        version_suffix = "-" + version
+        version_suffix = "=" + version
 
     if archs:
-        args += [name + version_suffix + "." + arch for arch in archs]
+        args += [name + "." + arch + version_suffix  for arch in archs]
     else:
         args.append(name + version_suffix)
 
@@ -211,7 +242,7 @@ def one_package_argument(name, arch, version, is_yum_install):
 #             |             +---- package2:amd64    -+
 #             +- sublist ---+                        +--- And these together
 #                           +---- package2:i386     -+
-def package_arguments_builder(is_yum_install):
+def package_arguments_builder(is_zypper_install):
     name = ""
     version = ""
     arch = ""
@@ -219,17 +250,10 @@ def package_arguments_builder(is_yum_install):
     multi_cmd_args = []     # List of lists of arguments
     old_name = ""
     for line in sys.stdin:
-        line = line.strip()
-        if line.startswith("options="):
-            option = line[len("options="):]
-            if option.startswith("-"):
-                yum_options.append(option)
-            elif option.startswith("enablerepo=") or option.startswith("disablerepo="):
-                yum_options.append("--" + option)
         if line.startswith("Name="):
             if name:
                 # Each new "Name=" triggers a new entry.
-                single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
+                single_list, multi_list = one_package_argument(name, arch, version, is_zypper_install)
                 single_cmd_args += single_list
                 if name == old_name:
                     # Packages that differ only by architecture should be
@@ -252,7 +276,7 @@ def package_arguments_builder(is_yum_install):
             arch = line.split("=", 1)[1].rstrip()
 
     if name:
-        single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
+        single_list, multi_list = one_package_argument(name, arch, version, is_zypper_install)
         single_cmd_args += single_list
         if name == old_name:
             # Packages that differ only by architecture should be
@@ -266,7 +290,7 @@ def package_arguments_builder(is_yum_install):
 
 
 def repo_install():
-    # Due to how yum works we need to split repo installs into several
+    # Due to how zypper works we need to split repo installs into several
     # components.
     #
     # 1. Installation of fresh packages is easy, we add all of them on one
@@ -275,15 +299,15 @@ def repo_install():
     #    also easy, we add that to the same command line.
     # 3. Up/downgrade of existing packages where version is specified is
     #    tricky, for several reasons:
-    #      a) There is no one yum command that will do both, "install" or
+    #      a) There is no one zypper command that will do both, "install" or
     #         "upgrade" will only upgrade, and "downgrade" will only downgrade.
-    #      b) There is no way rpm or yum will tell you which version is higher
+    #      b) There is no way rpm or zypper will tell you which version is higher
     #         than the other, and we know from experience with the old package
     #         promise implementation that we don't want to try to do such a
     #         comparison ourselves.
-    #      c) yum has no dry-run mode, so we cannot tell in advance which
+    #      c) zypper has no dry-run mode, so we cannot tell in advance which
     #         operation will succeed.
-    #      d) yum will not even tell you whether operation succeeded when you
+    #      d) zypper will not even tell you whether operation succeeded when you
     #         run it for real
     #
     # So here's what we need to do. We start by querying each package to find
@@ -293,59 +317,48 @@ def repo_install():
     # If we end up at 3. we need to split the work and do each package
     # separately. We do:
     #
-    # 1. Try to upgrade using "yum upgrade".
+    # 1. Try to upgrade using "zypper upgrade".
     # 2. Query the package again, see if it is the right version now.
-    # 3. If not, try to downgrade using "yum downgrade".
+    # 3. If not, try to downgrade using "zypper downgrade".
     # 4. Query the package again, see if it is the right version now.
-    # 5. Final safeguard, try installing using "yum install". This may happen
+    # 5. Final safeguard, try installing using "zypper install". This may happen
     #    in case we have one architecture already, but we are installing a
     #    second one. In this case only install will work.
     # 6. (No need to check again, CFEngine will do the final check)
     #
     # This is considerably more expensive than what we do for apt, but it's the
     # only way to cover all bases. In apt it will be one apt call for any number
-    # of packages, with yum it will in the worst case be:
+    # of packages, with zypper it will in the worst case be:
     #   1 + 5 * number_of_packages
     # although a more common case will probably be:
     #   1 + 2 * number_of_packages
     # since it's unlikely that people will do a whole lot of downgrades
     # simultaneously.
 
-    ret = 0
     single_cmd_args, multi_cmd_args = package_arguments_builder(True)
 
     if single_cmd_args:
-        cmd_line = [yum_cmd] + yum_options + ["install"]
+
+        cmd_line = [zypper_cmd] + zypper_options + ["install"]
+
+        if zypper_supports_oldpackage():
+            cmd_line += ["--oldpackage"]
+
         cmd_line.extend(single_cmd_args)
 
-        ret = subprocess_call(cmd_line, stdout=NULLFILE)
+        subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
 
     if multi_cmd_args:
         for block in multi_cmd_args:
             # Try to upgrade.
-            cmd_line = [yum_cmd] + yum_options + ["upgrade"] + block
-            subprocess_call(cmd_line, stdout=NULLFILE)
+            cmd_line = [zypper_cmd] + zypper_options + ["update"] + block
+            subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
 
             # See if it succeeded.
             success = True
             for item in block:
                 cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-                if subprocess_call(cmd_line, stdout=NULLFILE) != 0:
-                    success = False
-                    break
-
-            if success:
-                continue
-
-            # Try to downgrade.
-            cmd_line = [yum_cmd] + yum_options + ["downgrade"] + block
-            subprocess_call(cmd_line, stdout=NULLFILE)
-
-            # See if it succeeded.
-            success = True
-            for item in block:
-                cmd_line = [rpm_cmd] + rpm_quiet_option + ["-q", item]
-                if subprocess_call(cmd_line, stdout=NULLFILE) != 0:
+                if subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE) != 0:
                     success = False
                     break
 
@@ -353,19 +366,26 @@ def repo_install():
                 continue
 
             # Try to plain install.
-            cmd_line = [yum_cmd] + yum_options + ["install"] + block
-            subprocess_call(cmd_line, stdout=NULLFILE)
+
+            cmd_line = [zypper_cmd] + zypper_options + ["install"]
+
+            if zypper_supports_oldpackage():
+                cmd_line += ["--oldpackage"]
+
+            cmd_line += block
+
+            subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
 
             # No final check. CFEngine will figure out that it's missing
             # if it failed.
 
-    # ret == 0 doesn't mean we succeeded with everything, but it's expensive to
+    # return 0 doesn't mean we succeeded with everything, but it's expensive to
     # check, so let CFEngine do that.
-    return ret
+    return 0
 
 
 def remove():
-    cmd_line = [yum_cmd] + yum_options + ["remove"]
+    cmd_line = [zypper_cmd] + zypper_options + ["remove"]
 
     # package_arguments_builder will always return empty second element in case
     # of removals, so just drop it.         |
@@ -373,7 +393,7 @@ def remove():
     args = package_arguments_builder(False)[0]
 
     if args:
-        return subprocess_call(cmd_line + args, stdout=NULLFILE)
+        return subprocess_call(cmd_line + args, stdout=NULLFILE, stderr=subprocess.PIPE)
     return 0
 
 
@@ -388,7 +408,8 @@ def file_install():
     if not found:
         return 0
 
-    return subprocess_call(cmd_line, stdout=NULLFILE)
+    subprocess_call(cmd_line, stdout=NULLFILE, stderr=subprocess.PIPE)
+    return 0
 
 
 def main():
