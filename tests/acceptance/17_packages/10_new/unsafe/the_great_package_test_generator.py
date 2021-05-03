@@ -123,8 +123,11 @@ bundle agent init
       "test_soft_fail" string => "rhel_8",
         meta  => {"CFE-rhbz"};
 
+  # For setting up the cfengine-selected-python symlink we want to
+  # target $(sys.bindir) as that will be in the test WORKDIR.
   vars:
-      "python_path" string => execresult("/bin/sed '1s/#!//;q' $(sys.workdir)/modules/packages/yum", "noshell");
+    "python_path" string => "$(sys.bindir)/cfengine-selected-python";
+
 
   methods:
     debian|redhat::

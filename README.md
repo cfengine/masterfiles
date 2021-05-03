@@ -40,14 +40,6 @@ Instead simply unpack the tarball to the desired location using `tar`.
 For example:
 
 ```
-tar zxvf cfengine-masterfiles-MAJOR.MINOR.PATCH.pkg.tar.gz --exclude="modules" -C /var/cfengine/masterfiles --strip-components=2
-```
-
-**Note:** The above command installs only the policy from masterfiles. Typically
-the modules that are distributed within the masterfiles repository are not
-installed until the binaries are upgraded. However, if you wish to install the modules along with the policy you can use this simplified command:
-
-```
 tar zxvf cfengine-masterfiles-MAJOR.MINOR.PATCH.pkg.tar.gz /var/cfengine/masterfiles
 ```
 
