@@ -219,12 +219,18 @@ do
         MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $j | sed -e 's/\.in$//'`"
     done
 done
-for i in templates cfe_internal
+for i in templates cfe_internal modules/packages/vendored
 do
     for j in `find "$srcdir/$i" -name '*.mustache' -o -name '*.sh' -o -name '*.awk' -o -name '*.sed' -o -name '*.ps1'`
     do
         MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
     done
+done
+
+for i in `find "$srcdir/modules/packages/vendored" -type f`
+do
+    # add .mustache files, but from build dir instead to support ci/tests
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $i | sed -e 's,vendored/,,' -e 's,modules,build/modules,' -e 's,.mustache,,'`"
 done
 
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
@@ -235,10 +241,6 @@ dnl ######################################################################
 
 AC_CONFIG_FILES([Makefile
                 controls/update_def.cf
-                modules/packages/Makefile
-                modules/packages/apt_get
-                modules/packages/yum
-                modules/packages/zypper
                 promises.cf
                 standalone_self_upgrade.cf
                 tests/Makefile
@@ -248,11 +250,6 @@ AC_CONFIG_FILES([Makefile
 
 AC_OUTPUT
 
-dnl The package modules generated from the .in files are not executable and we need
-dnl the to be for tests.
-for pkg_module in modules/packages/apt_get modules/packages/yum modules/packages/zypper; do
-    chmod a+x $pkg_module
-done
 
 AC_MSG_RESULT()
 AC_MSG_RESULT(DONE: Configuration done. Run "make install" to install CFEngine Masterfiles.)
