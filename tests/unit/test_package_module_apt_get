@@ -9,7 +9,7 @@ except ImportError:
     # Redhat 4 doesn't have subprocess. 77 means "skip test"
     sys.exit(77)
 
-apt_get_module = "../../modules/packages/apt_get"
+apt_get_module = "../../build/modules/packages/apt_get"
 
 cwd = os.getcwd()
 # Will cause the package module to call these instead.

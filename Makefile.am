@@ -1,7 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
-	modules/packages \
 	tests/
 
 # See configure.ac for MASTERFILES_INSTALL_TARGETS.
@@ -30,3 +29,19 @@ tar-package:
 	        > "$$origdir"/$(PACKAGE)-$(VERSION)-$(RELEASE).pkg.tar.gz  \
 	)  ;  \
 	[ x$$pkgdir != x ]  &&  rm -rf $$pkgdir
+
+# render packages modules for tests
+vendored := modules/packages/vendored
+modules := $(patsubst $(vendored)/%.mustache,build/modules/packages/%,$(wildcard $(vendored)/*.mustache))
+
+all-local: $(modules)
+
+build/modules/packages/%:
+	mkdir -p build/modules/packages
+	TEMPLATE=$$(echo $@ | sed 's,build/modules/packages,modules/packages/vendored,'); \
+	PYTHON=$$(which python); \
+	sed "/cfengine-selected-python/c#!\"$$PYTHON\"/" $$TEMPLATE.mustache > $@
+	chmod +x $@
+
+clean-local:
+	rm -rf build
