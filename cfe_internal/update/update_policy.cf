@@ -391,7 +391,7 @@ body copy_from u_rcp(from,server)
       source      => "$(from)";
       compare     => "digest";
       trustkey    => "false";
-
+      purge => "true"; # CFE-3662
 
       # CFE-2932 For testing, we want to be able to avoid this local copy optimiztion
     !am_policy_hub|mpf_skip_local_copy_optimizaton::
@@ -403,8 +403,8 @@ body copy_from u_rcp(from,server)
     cfengine_internal_encrypt_transfers::
       encrypt => "true";
 
-    cfengine_internal_purge_policies::
-      purge => "true";
+    cfengine_internal_purge_policies_disabled::
+      purge => "false";
 
     cfengine_internal_preserve_permissions::
       preserve => "true";
