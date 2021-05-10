@@ -9,6 +9,6 @@ body file control
 bundle agent main
 {
   reports:
-    "My first line"
-      printfile => head_n( "$(this.promise_dirname)/printfile.txt", 4);
+    "My last lines"
+      printfile => tail_n( "$(this.promise_dirname)/printfile.txt", 4);
 }
