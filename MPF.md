@@ -255,21 +255,28 @@ If you want to periodically perform a full scan consider adding custom policy to
 simply remove ```$(sys.inputdir)/cf_promises_validated```. This will cause the
 file to be repaired during the next update run triggering a full scan.
 
-### Automatically remove files not present upstream (SYNC masterfiles)
+### Disable automatically removing files not present upstream (SYNC masterfiles)
 
-If the class ```cfengine_internal_purge_policies``` is defined the update
-behavior to change from only copying changed files down to performing a
-synchronization by purging files on the client that do not exist on the server.
+By default, the MPF will keep inputdir in sync with masterfiles on the hub. If
+the class ```cfengine_internal_purge_policies_disabled``` is defined the update
+behavior will only keep files that exist on the remote up to date locally, files
+that exist locally that do not exist upstream will be left behind. Note, if this
+is disabled and a policy file that is dynamically loaded based on it's presence
+is renamed, duplicate definition errors may occur, preventing policy execution.
 
 This [augments file][Augments] will enable this behavior for all clients.
 
 ```
 {
   "classes": {
-    "cfengine_internal_purge_policies": [ "any" ]
+    "cfengine_internal_purge_policies_disabled": [ "any" ]
   }
 }
 ```
+
+**History:**
+
+- Introduced in 3.18.0, previously, the default behavior was opposite and the class `cfengine_internal_purge_policies`  had to be enabled to keep inputs in sync with masterfiles.
 
 ### Disable limiting robot agents
 

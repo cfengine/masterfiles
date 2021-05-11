@@ -511,13 +511,13 @@ bundle common def
 
       "cfengine_internal_encrypt_transfers" expression => "!any";
 
-      # Purge policies that don't exist on the server side.
+      # Do not purge policies that don't exist on the server side.
       # you can also request it from the command line with
-      # -Dcfengine_internal_purge_policies
+      # -Dcfengine_internal_purge_policies_disabled
 
       # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
 
-      "cfengine_internal_purge_policies" expression => "!any";
+      "cfengine_internal_purge_policies_disabled" expression => "!any";
 
       # Preserve permissions of the policy server's masterfiles.
       # you can also request it from the command line with
