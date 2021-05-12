@@ -115,7 +115,7 @@ centos_6::
 @if minimum_version(3.18)
 any::
   "description"
-    string => "$(sys.os_name_human) $(sys.os_name_major)",
+    string => "$(sys.os_name_human) $(sys.os_version_major)",
     meta => { "inventory", "attribute_name=OS" };
 @endif
 }
