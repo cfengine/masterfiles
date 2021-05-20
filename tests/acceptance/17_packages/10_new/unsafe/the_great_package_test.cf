@@ -34146,8 +34146,9 @@ bundle agent check
         };
 
   reports:
-    !ok::
       "$(this.promise_filename) FAIL";
-    ok::
-      "$(this.promise_filename) Pass";
+    # !ok::
+    #   "$(this.promise_filename) FAIL";
+    # ok::
+    #   "$(this.promise_filename) Pass";
 }
