@@ -41,9 +41,15 @@ bundle agent init
         meta  => {"CFE-rhbz"};
 
   vars:
+      "python_path" string => execresult("/bin/sed '1s/#!//;q' $(sys.workdir)/modules/packages/yum", "noshell");
+
       "stuff_in_workdir_modules" -> { "ENT-5752" }
         slist => findfiles( "$(sys.workdir)/modules" ),
         comment => "ENT-5752, debugging";
+
+  methods:
+    debian|redhat::
+      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_path)");
 
   reports:
     "Stuff under workdir/modules"; # ENT-5752, debugging
