@@ -45,8 +45,7 @@ bundle agent init
 
       "python_symlink" -> { "CFE-2602", "CFE-3512" }
         string => "$(sys.bindir)/cfengine-selected-python",
-        comment => "Symlink to Python we found (if any)",
-        handle => "cfe_internal_update_policy_python_symlink";
+        comment => "Symlink to Python we found (if any)";
 
       "stuff_in_workdir_modules" -> { "ENT-5752" }
         slist => findfiles( "$(sys.workdir)/modules" ),
