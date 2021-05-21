@@ -55,6 +55,9 @@ bundle agent init
     debian|redhat::
       "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_symlink)");
 
+      "Ensure module presence"
+        usebundle => modules_presence;
+
   reports:
     "Stuff under workdir/modules"; # ENT-5752, debugging
     "$(stuff_in_workdir_modules)"; # ENT-5752, debugging
