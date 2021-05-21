@@ -43,13 +43,18 @@ bundle agent init
   vars:
       "python_path" string => execresult("/bin/sed '1s/#!//;q' $(sys.workdir)/modules/packages/yum", "noshell");
 
+      "python_symlink" -> { "CFE-2602", "CFE-3512" }
+        string => "$(sys.bindir)/cfengine-selected-python",
+        comment => "Symlink to Python we found (if any)",
+        handle => "cfe_internal_update_policy_python_symlink";
+
       "stuff_in_workdir_modules" -> { "ENT-5752" }
         slist => findfiles( "$(sys.workdir)/modules" ),
         comment => "ENT-5752, debugging";
 
   methods:
     debian|redhat::
-      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_path)");
+      "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_symlink)");
 
   reports:
     "Stuff under workdir/modules"; # ENT-5752, debugging
