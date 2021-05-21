@@ -62,6 +62,7 @@ body package_module apt_get
 {
     query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
     query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
+    interpreter => "$(sys.bindir)/cfengine-selected-python";
     #default_options =>  {};
 @if minimum_version(3.12.2)
     termux::
@@ -124,6 +125,7 @@ body package_module yum
 {
     query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
     query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
+    interpreter => "$(sys.bindir)/cfengine-selected-python";
     #default_options => {};
 }
 
