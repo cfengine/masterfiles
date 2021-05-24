@@ -61,9 +61,7 @@ bundle agent cfe_internal_update_policy
       "Stock policy update"
         usebundle => cfe_internal_update_policy_cpv;
 
-    # Don't pull CMDB data on policy_hub self bootstrap because
-    # there will be no cf-serverd listening to serve files yet.
-    enterprise_edition.!(am_policy_hub.bootstrap_mode)::  # ENT-6840
+    any::
       "CMDB data update" -> { "ENT-6788" }
         usebundle => cfe_internal_update_cmdb;
 
@@ -300,13 +298,120 @@ bundle agent cfe_internal_update_policy_cpv
 bundle agent cfe_internal_update_cmdb
 # @brief Ensure local cache of CMDB data is up to date
 {
+  methods:
+
+    policy_server.enterprise_edition::
+      "cfe_internal_update_cmdb_data_distribution";
+
+@if feature(host_specific_data_load)
+      # Only hosts with this feature, introduced in 3.18.0 can use the data.
+
+      # Don't pull CMDB data on policy_hub self bootstrap because
+      # there will be no cf-serverd listening to serve files yet.
+    enterprise_edition.!(bootstrap_mode)::  # ENT-6840
+      "cfe_internal_update_cmdb_data_consumption";
+@endif
+}
+
+bundle agent cfe_internal_update_cmdb_data_distribution
+# @brief Ensure data is ready for agents to download
+{
+  vars:
+    !bootstrap_mode.(policy_server.enterprise_edition)::
+
+      # The API response for host specific data from cmdb tells us the timestamp of the last data change
+      # We store this timestamp and use it for the next request.
+      "_cmdb_next_request_state_file"
+        string => "$(sys.statedir)/cmdb_next_request_from.dat";
+
+      # If we have the timestamp from a previous response we use it, else we start from 0
+      "_cmdb_previous_next_request_from"
+        string => readfile( $(_cmdb_next_request_state_file), inf ),
+        if => regline( "^\d+$", $(_cmdb_next_request_state_file) );
+
+      "_cmdb_previous_next_request_from"
+        string => "0",
+        unless => regline( "^\d+$", $(_cmdb_next_request_state_file) );
+
+      # We need a script to call that should return the API response
+      "_get_cmdb_data_bin" string => "$(sys.workdir)/httpd/htdocs/scripts/get_cmdb.php";
+      "_get_cmdb_data_cmd" string => "/var/cfengine/httpd/php/bin/php $(_get_cmdb_data_bin) $(_cmdb_previous_next_request_from)";
+
+      # We call the script and we pass it the timestamp from the prior call
+      "_get_cmdb_data_response"
+        string => execresult( $(_get_cmdb_data_cmd), useshell ),
+        if => fileexists( $(_get_cmdb_data_bin) );
+
+      "_get_cmdb_data_response_d"
+        data => parsejson('$(_get_cmdb_data_response)'),
+        if => validjson( '$(_get_cmdb_data_response)' );
+
+      # So that we can write a JSON file for each host we get the indicies of data in the response
+      "_i" slist => getindices( "_get_cmdb_data_response_d[data]");
+
+      # We need to store the timestamp from the most recent change so that we can use that as a starting point for future requests.
+      "_next_request_from"
+        string => "$(_get_cmdb_data_response_d[meta][cmdb_epoch])";
+
   files:
-      "$(sys.workdir)/data/." create => "true";
+      # "$(_get_cmdb_data_cmd)" perms => m( 700 );
+
+@if minimum_version(3.18)
+      # This functionality is only present on 3.18.0+ Enterprise hubs, and this
+      # promise uses the /content/ attribute which was first introduced in
+      # 3.16.0.
+
+      # If the next request state file doesn't exist, we seed one with 0, the
+      # lowest epoch value possible. because we populate variables from this
+      # file content.
+      "$(_cmdb_next_request_state_file)"
+        content => "0$(const.n)",
+        handle => "cmdb_data_change_next_seed",
+        unless => fileexists("$(_cmdb_next_request_state_file)" );
+@endif
+
+      # Write out the data for each host that had a data change
+      "$(sys.workdir)/cmdb/$(_i)/host_specific.json"
+        create => "true", # CFE-2329, ENT-4792
+        template_data => mergedata("_get_cmdb_data_response_d[data][$(_i)]" ), # mergedata() is necessary in order to pick out a substructure, parsejson() is insufficient because expanding a key results in iteration of /values/ under that key
+        template_method => "inline_mustache",
+        edit_template_string => string_mustache( "{{$-top-}}", "_get_cmdb_data_response_d[data][$(_i)]" ),
+        if => isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) );
+
+@if minimum_version(3.18)
+      # This functionality is only present on 3.18.0+ Enterprise hubs, and this
+      # promise uses the /content/ attribute which was first introduced in
+      # 3.16.0.
+
+      # Write out the last data change timestamp so we can use it as a startring point
+      "$(_cmdb_next_request_state_file)"
+        handle => "cmdb_data_change_next_update",
+        content => "$(_next_request_from)$(const.n)",
+        if => isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) );
+@endif
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_update_cmdb_data_distribution::
+      "'$(_get_cmdb_data_cmd)' response indicates '$(sys.workdir)/cmdb/$(_i)/host_specific.json' needs refreshed"
+        if => and( isvariable( "_i" ),
+                   isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) ));
+
+}
+
+bundle agent cfe_internal_update_cmdb_data_consumption
+# @brief Ensure data to load is up to date
+{
+  files:
+      "$(sys.workdir)/data/."
+        create => "true",
+        comment => "If a host is to load data from the CMDB, it needs to have a directory where said data is cached.";
 
       "$(sys.workdir)/data/." -> { "ENT-6788" }
         depth_search => u_recurse( inf ),
         file_select => u_all,
-        copy_from => u_cmdb_data;
+        copy_from => u_cmdb_data,
+        comment => "So that hosts have access to the most recent CMDB data, we make sure that it's up to date.";
+
 }
 #########################################################
 # Self-contained bodies from the lib to avoid dependencies
