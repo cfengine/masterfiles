@@ -346,7 +346,7 @@ bundle agent federation_manage_files
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
     "feeder" data => parsejson('{"feeder": "$(sys.key_digest)"}');
     "cf_version" data => parsejson('{"cf_version":"$(sys.cf_version)"}');
-    "handle_duplicates_value" string => ifelse("cfengine_mp_fr_handle_duplicate_hostkeys", "yes", "no");
+    "handle_duplicates_value" string => ifelse("default:cfengine_mp_fr_handle_duplicate_hostkeys", "yes", "no");
     "handle_duplicates" data => parsejson('{"handle_duplicates":"$(handle_duplicates_value)"}');
 
   files:
