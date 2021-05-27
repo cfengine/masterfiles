@@ -1,4 +1,4 @@
-bundle agent MPF_class_reccomendations
+bundle agent MPF_class_recommendations
 {
   meta:
     (policy_server|am_policy_hub).enterprise_edition::
@@ -10,7 +10,7 @@ bundle agent MPF_class_reccomendations
 }
 
 
-bundle agent postgresql_conf_reccomendations
+bundle agent postgresql_conf_recommendations
 # @brief Recommendations about the configuration of postgresql.conf for CFEngine Enterprise Hubs
 {
   meta:
