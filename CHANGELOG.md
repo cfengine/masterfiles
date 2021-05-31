@@ -1,6 +1,29 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.12.7:
+	- Added .ps1 to list of file patterns considered during policy update
+	  (CFE-3425, ENT-4094)
+	- Added apk package module support for alpinelinux (CFE-3451)
+	- Added default cf_version_release of 1 when sys var missing (ENT-6219)
+	- Added missing packages modules scripts in makefile (ENT-6814)
+	- Added standalone self upgrade capability for Windows agents
+	  (ENT-6219, ENT-6823, ENT-4094)
+	- Added verbose logfile for msiexec package module file installs
+	  (ENT-6220, ENT-6824)
+	- Adjust modules/packages/Makefile.am for lack of msiexec packages module
+	  (CFE-3607)
+	- Disabled TLSv1 by default for Mission Portal's web server (ENT-6783)
+	- Fixed ability to define users authorized for using cf-runagent on policy servers
+	  (CFE-3546)
+	- Fixed alpine apk packages module to parse names properly (CFE-3585)
+	- Fixed docs describing xdev behavior in depth_search bodies (CFE-3541)
+	- Fixed loading of platform specific inventory on AIX (CFE-3614)
+	- Suppressed output from watchdog on AIX to prevent the mail spool from filling up
+	  (CFE-3630)
+	- Use VBScript to enumerate installed packages on Windows (ENT-4669)
+	- service status on FreeBSD now uses onestatus (CFE-3515)
+
 3.12.6:
 	- Added inventory for Timezone and GMT Offset (ENT-6161)
 	- Added inventory for policy servers (ENT-6212)
