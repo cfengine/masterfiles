@@ -1,6 +1,40 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.4:
+	- Added ability to specify a list of bundles to run before autorun (for classification)
+	  (ENT-6603)
+	- Added ability to specify additional directories to add autorun policy from
+	  (CFE-3524)
+	- Added apk package module support for alpinelinux (CFE-3451)
+	- Added default cf_version_release of 1 when sys var missing (ENT-6219)
+	- Added description of psql_lock_wait_before_acquisition measurement
+	  (ENT-6841)
+	- Added inventory of Setgid files and Setgid files that are root owned
+	  (ENT-6793)
+	- Added missing packages modules scripts in makefile (ENT-6814)
+	- Added standalone self upgrade capability for Windows agents
+	  (ENT-6219, ENT-6823)
+	- Added verbose logfile for msiexec package module file installs
+	  (ENT-6220, ENT-6824)
+	- Disabled TLSv1 by default for Mission Portal's web server (ENT-6783)
+	- Enabled packages promises using package_module without bundle def
+	  (CFE-3504)
+	- Fixed ability to define users authorized for using cf-runagent on policy servers
+	  (CFE-3546)
+	- Fixed alpine apk packages module to parse names properly (CFE-3585)
+	- Fixed docs describing xdev behavior in depth_search bodies (CFE-3541)
+	- Fixed loading of platform specific inventory on AIX (CFE-3614)
+	- Prevent setgid files from causing continual repair related to setuid file inventory
+	  (ENT-6782)
+	- Suppressed inform output from Enterprise Hub database maintenance operations
+	  (ENT-6563)
+	- Suppressed output from watchdog on AIX to prevent the mail spool from filling up
+	  (CFE-3630)
+	- Use VBScript to enumerate installed packages on Windows (ENT-4669)
+	- add /usr/bin/yum to paths.cf for aix (CFE-3615)
+	- service status on FreeBSD now uses onestatus (CFE-3515)
+
 3.15.3:
 	- Added .csv to the list of file extensions considered by default during policy update
 	  (CFE-3425)
