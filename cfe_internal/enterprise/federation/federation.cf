@@ -25,6 +25,7 @@ bundle agent config
       "federation_dir" string => "/opt/cfengine/federation";
       "bin_dir" string => "$(federation_dir)/bin";
       "path" string => "$(federation_dir)/cfapache/federation-config.json";
+      "path_setup_status" string => "$(federation_dir)/cfapache/setup-status.json";
 
       # TODO: Instrument augments
       "dump_interval" -> {"ENT-4806"}
@@ -294,7 +295,6 @@ bundle agent transport_user
 bundle agent clean_when_off
 # @brief cleanup changes made for federated reporting on a feeder
 # NOTE: a superhub turned off by removing federation-config.json or setting
-# target_state=off will not revert schema changes.
 # federation_manage_files will always run regardless of off or not
 # so as to be prepared for enablement via Mission Portal UI
 {
@@ -306,6 +306,11 @@ bundle agent clean_when_off
     "$(user)"
       policy => "absent";
 
+  files:
+      "$(cfengine_enterprise_federation:config.path_setup_status)" -> { "ENT-7233" }
+        comment => "We must remove this file for Mission Portal to understand that the federation is not configured",
+        delete => default:tidy;
+
   methods:
     "rm_rf_cftransport_home_dir" usebundle => default:rm_rf("$(home)");
 
@@ -314,7 +319,12 @@ bundle agent clean_when_off
       "has_cftransport_fcontext" expression => returnszero("$(paths.semanage) fcontext -l | grep $(home)", "useshell");
 
   commands:
-    # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
+      am_superhub::
+      # Oh, the humanity! Where for art thou databases: promises for psql!
+      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" };
+      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE federated_reporting_settings" -> { "ENT-7233" }`;
+
+      # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
     selinux_enabled.default:_stdlib_path_exists_semanage.has_cftransport_fcontext::
       "$(paths.semanage) fcontext -d '$(home)/.ssh(/.*)?'";
 
@@ -745,7 +755,7 @@ bundle agent setup_status
 
   files:
     superhub_setup_status_complete::
-      "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/setup-status.json"
+      "$(cfengine_enterprise_federation:config.path_setup_status)"
         create => "true",
         perms => default:mog( "600", "cfapache", "root" ),
         template_method => "inline_mustache",
