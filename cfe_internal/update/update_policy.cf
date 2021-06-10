@@ -387,7 +387,7 @@ bundle agent cfe_internal_update_cmdb_data_distribution
       "$(_cmdb_next_request_state_file)"
         handle => "cmdb_data_change_next_update",
         content => "$(_next_request_from)$(const.n)",
-        if => isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) );
+        unless => strcmp( $(_next_request_from), $(_cmdb_previous_next_request_from) );
 @endif
 
   reports:
