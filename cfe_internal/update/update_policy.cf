@@ -367,7 +367,8 @@ bundle agent cfe_internal_update_cmdb_data_distribution
       "$(_cmdb_next_request_state_file)"
         content => "0$(const.n)",
         handle => "cmdb_data_change_next_seed",
-        unless => fileexists("$(_cmdb_next_request_state_file)" );
+        unless => fileexists("$(_cmdb_next_request_state_file)" ),
+        if => isvariable( "_cmdb_next_request_state_file" );
 @endif
 
       # Write out the data for each host that had a data change
