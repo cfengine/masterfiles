@@ -1,6 +1,75 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.18.0:
+	- Added .ps1 to list of file patterns considered during policy update
+	  (ENT-4094)
+	- Added ability to specify additional directories to add autorun policy from
+	  (CFE-3524)
+	- Added default cf_version_release of 1 when sys var missing (ENT-6219)
+	- Added description of psql_lock_wait_before_acquisition measurement
+	  (ENT-6841)
+	- Added inventory of Setgid files and Setgid files that are root owned
+	  (ENT-6793)
+	- Added inventory of users and hosts allowed to use cf-runagent
+	  (ENT-6666)
+	- Added measurement of entropy available on linux systems (ENT-6495)
+	- Added missing packages modules scripts in makefile (ENT-6814)
+	- Added new interface for controlling users allowed to initiate cf-agent via cf-runagent
+	  (CFE-3544)
+	- Added policy for permissions on cf-execd sockets on Enterprise Hubs
+	  (ENT-6777)
+	- Added redirect to remove index.php from Mission Portal's URL
+	  (ENT-6464)
+	- Added standalone self upgrade capability for Windows agents
+	  (ENT-6219, ENT-6823)
+	- Added tail & tail_n to standard library (CFE-3558)
+	- Added vars.mpf_admit_cf_runagent_shell to control admission for cf-runagent requests
+	  (ENT-6673)
+	- Added verbose logfile for msiexec package module file installs
+	  (ENT-6220, ENT-6824)
+	- Changed default behavior of policy update to keep inputs in sync with masterfiles
+	  Prior to this change, the default behavior of the MPF was to only ensure that
+	  files in masterfiles were up to date with the files in inputs. Files in inputs
+	  that did not exist in masterfiles were left undisturbed. To enable sync
+	  behavior (a common user expectation) you had to explicitly define
+	  'cfengine_internal_purge_policies'. Now, if you wish to return to the previous
+	  default behavior, define the class 'cfengine_internal_purge_policies_disabled'.
+	  Ticket: (CFE-3662)
+	- Changed msiexec package module install logs to be unique for each msi file
+	  (ENT-6824)
+	- Disabled TLSv1 by default for Mission Portal's web server (ENT-6783)
+	- Do not apply redirect from index.php to internal APIs (ENT-6464)
+	- Enabled packages promises using package_module without bundle def
+	  (CFE-3504)
+	- Fixed ability to define users authorized for using cf-runagent on policy servers
+	  (CFE-3546)
+	- Fixed alpine apk packages module to parse names properly (CFE-3585)
+	- Fixed cfengine_mp_fr_handle_duplicate_hostkeys class usage in policy
+	  (ENT-7094)
+	- Fixed docs describing xdev behavior in depth_search bodies (CFE-3541)
+	- Fixed loading of platform specific inventory on AIX (CFE-3614)
+	- Made Enterprise CMDB data update after policy update (ENT-6788)
+	- Prevent setgid files from causing continual repair related to setuid file inventory
+	  (ENT-6782)
+	- Removed stale unused copy of u_kept_successful_command body. If you
+      receive an error about undefined body, alter your policy to use
+      kept_successful_command instead (CFE-3617)
+	- Removed unused plugins directory (CFE-3618)
+	- Renamed python symlink to cfengine-selected-python (CFE-3512)
+	- Shortened Inventory OS attribute to be more readable (ENT-6536)
+	- Stopped testing MPF against 3.10.x (CFE-3642)
+	- Suppressed inform output from Enterprise Hub database maintenance operations
+	  (ENT-6563)
+	- Suppressed output from watchdog on AIX to prevent the mail spool from filling up
+	  (CFE-3630)
+	- Added ability to specify a list of bundles to run before autorun (for classification) (ENT-6603)
+	- Update policy now moves obstructions (CFE-2984)
+	- Use VBScript to enumerate installed packages (ENT-4669)
+	- Worked around CI deployment test failure (ENT-6840)
+	- add /usr/bin/yum to paths.cf for aix (CFE-3615)
+	- service status on FreeBSD now uses onestatus (CFE-3515)
+
 3.17.0:
 	- Added .csv to the list of file extensions considered by default during
           policy update (CFE-3425)
