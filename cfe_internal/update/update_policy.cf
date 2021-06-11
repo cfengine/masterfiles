@@ -293,8 +293,6 @@ bundle agent cfe_internal_update_policy_cpv
       "modules_presence";
 }
 
-}
-
 #########################################################
 # Self-contained bodies from the lib to avoid dependencies
 #########################################################
