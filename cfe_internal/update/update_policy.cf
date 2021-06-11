@@ -410,7 +410,9 @@ body copy_from u_cp_missing_ok(from)
 # @brief same as u_cp but allow from to be missing
 {
       inherit_from => u_cp($(from));
+@if minimum_version(3.12.0)
       missing_ok => "true";
+@endif
 }
 
 #########################################################
@@ -659,7 +661,9 @@ bundle agent modules_presence
         if => "override_vendored_module_$(_vendored_modules)";
       "override_module_$(_override_modules)"
         if => "override_module_$(_override_modules)";
+@if minimum_version(3.11.0)
       "canonified: $(with)" with => canonify("override_vendored_module_$(_vendored_modules)");
+@endif
 }
 
 body file_select not_vendored_modules(pathname)
