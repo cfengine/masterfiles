@@ -1,7 +1,7 @@
 @echo off
 
 set CFENGINE_MSIEXEC_TEST=call %~dp0\mock_msi.bat
-set msi_module="../../modules/packages/msiexec.bat"
+set msi_module="../../build/modules/packages/msiexec.bat"
 set error=0
 
 
