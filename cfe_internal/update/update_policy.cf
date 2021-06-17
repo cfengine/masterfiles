@@ -361,6 +361,7 @@ bundle agent cfe_internal_update_cmdb_data_distribution
       # "$(_get_cmdb_data_cmd)" perms => m( 700 );
 
 @if minimum_version(3.18)
+    !bootstrap_mode.(policy_server.enterprise_edition)::
       # This functionality is only present on 3.18.0+ Enterprise hubs, and this
       # promise uses the /content/ attribute which was first introduced in
       # 3.16.0.
@@ -371,8 +372,8 @@ bundle agent cfe_internal_update_cmdb_data_distribution
       "$(_cmdb_next_request_state_file)"
         content => "0$(const.n)",
         handle => "cmdb_data_change_next_seed",
-        unless => fileexists("$(_cmdb_next_request_state_file)" ),
-        if => isvariable( "_cmdb_next_request_state_file" );
+        if => and( not(fileexists("$(_cmdb_next_request_state_file)" )),
+                   isvariable( "_cmdb_next_request_state_file" ));
 @endif
 
       # Write out the data for each host that had a data change
