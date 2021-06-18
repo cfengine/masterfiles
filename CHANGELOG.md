@@ -1,6 +1,8 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.19.0:
+
 3.18.0:
 	- Added .ps1 to list of file patterns considered during policy update
 	  (ENT-4094)
