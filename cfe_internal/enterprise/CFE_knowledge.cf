@@ -508,7 +508,8 @@ body depth_search cfe_internal_docroot_application_perms
 body perms state_dir_system_owned
 {
       mode   => "0600";
-      owners => { "root" };
+      !windows::
+        owners => { "root" };
 
       freebsd|openbsd|netbsd|darwin::
         groups => { "wheel" };
