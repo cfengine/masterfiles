@@ -69,6 +69,7 @@ Notable changes to the framework should be documented here
 	- Worked around CI deployment test failure (ENT-6840)
 	- add /usr/bin/yum to paths.cf for aix (CFE-3615)
 	- service status on FreeBSD now uses onestatus (CFE-3515)
+    - Guard again enforcing root ownership for CFEngine files on Windows (ENT-4628)
 
 3.17.0:
 	- Added .csv to the list of file extensions considered by default during
