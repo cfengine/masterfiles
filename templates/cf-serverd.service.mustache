@@ -4,7 +4,7 @@ After=syslog.target
 After=network.target
 ConditionPathExists={{{vars.sys.bindir}}}/cf-serverd
 ConditionPathExists={{{vars.sys.workdir}}}/policy_server.dat
-ConditionPathExists={{{vars.sys.workdir}}}/inputs/promises.cf
+ConditionPathExists={{{vars.sys.default_policy_path}}}
 PartOf=cfengine3.service
 
 [Service]
