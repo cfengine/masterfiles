@@ -167,7 +167,7 @@ bundle agent cfe_internal_update_policy_cpv
 
     windows::
 
-      "modules_dir_source"        string => "/var/cfengine/modules",
+      "modules_dir_source"        string => "/var/cfengine/masterfiles/modules",
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
@@ -177,7 +177,7 @@ bundle agent cfe_internal_update_policy_cpv
 
     !windows::
 
-      "modules_dir_source"        string => translatepath("$(sys.workdir)/modules"),
+      "modules_dir_source"        string => translatepath("$(master_location)/modules"),
       comment => "Directory containing CFEngine modules",
       handle => "cfe_internal_update_policy_vars_modules_dir";
 
