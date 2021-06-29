@@ -2,7 +2,7 @@
 Description=CFEngine Enterprise Hub Report Collector
 PartOf=cfengine3.service
 ConditionPathExists={{{vars.sys.bindir}}}/cf-hub
-ConditionPathExists={{{vars.sys.inputdir}}}/promises.cf
+ConditionPathExists={{{vars.sys.default_policy_path}}}
 After=syslog.target
 After=network.target
 
