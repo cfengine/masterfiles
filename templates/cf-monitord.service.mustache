@@ -2,7 +2,7 @@
 Description=CFEngine Monitor Daemon
 After=syslog.target
 ConditionPathExists={{{vars.sys.bindir}}}/cf-monitord
-ConditionPathExists={{{vars.sys.inputdir}}}/promises.cf
+ConditionPathExists={{{vars.sys.default_policy_path}}}
 PartOf=cfengine3.service
 
 [Service]
