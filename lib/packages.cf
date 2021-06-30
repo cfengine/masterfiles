@@ -57,13 +57,13 @@ bundle common package_module_knowledge
 
       # Package inventory refresh
       "query_installed_ifelapsed" -> { "CFE-2771", "CFE-3504" }
-        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
-                          "$(def.package_module_$(this.promiser))",
+        string => ifelse( isvariable( "def.package_module_query_installed_ifelapsed" ),
+                          "$(def.package_module_query_installed_ifelapsed)",
                           "0"); # Always refresh local package inventory
 
       "query_updates_ifelapsed" -> { "CFE-2771", "CFE-3504" }
-        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
-                          "$(def.package_module_$(this.promiser))",
+        string => ifelse( isvariable( "def.package_module_query_updates_ifelapsed" ),
+                          "$(def.package_module_query_updates_ifelapsed)",
                           "1440"); # Refresh software updates available once a day
 
     debian::
