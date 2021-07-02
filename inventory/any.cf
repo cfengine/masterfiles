@@ -965,7 +965,7 @@ bundle agent cfe_autorun_inventory_dmidecode
       "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
 
     windows.powershell::
-      "bios_match" expression => regextract(".*Manufacturer\s+:\s([a-zA-Z0-9 ]+)\n.*SerialNumber\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+).*Version\W+([a-zA-Z0-9 -]+)",
+      "bios_match" expression => regextract(".*Manufacturer\s+:\s([a-zA-Z0-9 ]+)\n.*SerialNumber\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9. ]+).*Version\W+([a-zA-Z0-9 -]+)",
                                             execresult("gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer, SerialNumber, Version FROM WIN32_BIOS'", "powershell"),
                                             "bios_array");
 
