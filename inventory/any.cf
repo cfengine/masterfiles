@@ -633,8 +633,9 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
         action => if_elapsed_day,
         if => strcmp( "daily_dummy_job_$(v)", "daily_dummy_job_suppress_inform_incapable" );
 
+# If 3.15.0 or greater we can suppress output of /bin/true with `inform => "false"`.
 @if minimum_version(3.15.0)
-      "$(paths.true)"
+      "$(_true_command)"
         comment => "This promise is used for delaying execution of url_get, since locking does not work directly on vars type promises",
         classes => kept_successful_command,
         handle => "daily_dummy_job_suppress_inform_capable",
