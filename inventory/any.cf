@@ -612,7 +612,8 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
       "URL"       string => "http://169.254.169.254/latest/dynamic/instance-identity/document";
       "cache"     string => "$(sys.statedir)/aws_ec2_metadata";
-      "_true_command" string => ifelse( "windows", '$(sys.winsysdir)\cmd.exe /q /c "(exit 0)"', $(paths.true) );
+      "_paths_true" string => ifelse( "_stdlib_path_exists_true", "$(paths.true)", "" );
+      "_true_command" string => ifelse( "windows", '$(sys.winsysdir)\cmd.exe /q /c "(exit 0)"', $(_paths_true) );
 
       "v" -> { "ENT-5233" }
         string => ifelse( isgreaterthan( $(sys.cf_version_minor), 14), "suppress_inform_capable",
