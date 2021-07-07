@@ -9,7 +9,7 @@ except ImportError:
     # Redhat 4 doesn't have subprocess. 77 means "skip test"
     sys.exit(77)
 
-yum_module = "../../modules/packages/yum"
+yum_module = "../../build/modules/packages/yum"
 
 cwd = os.getcwd()
 # Will cause the package module to call these instead.

@@ -1,4 +1,7 @@
-#!@bindir@/python
+#!/usr/bin/python
+# Note that the shebang above is ignored when run in policy
+# See lib/packages.cf `package_module apt_get` use of the
+# `interpreter` attribute to use cfengine-selected-python.
 
 import sys
 import os
