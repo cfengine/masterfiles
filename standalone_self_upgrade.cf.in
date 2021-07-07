@@ -941,6 +941,9 @@ body package_module yum
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
+@if minimum_version(3.12.2)
+      interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
 }
 
 body package_module apt_get
@@ -948,6 +951,9 @@ body package_module apt_get
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
+@if minimum_version(3.12.2)
+      interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
 }
 
 body package_module msiexec
@@ -955,7 +961,9 @@ body package_module msiexec
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
+@if minimum_version(3.12.2)
       interpreter => "$(sys.winsysdir)$(const.dirsep)cmd.exe /c ";
+@endif
       module_path => "$(sys.workdir)$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)msiexec.bat";
 }
 body perms u_m(p)
