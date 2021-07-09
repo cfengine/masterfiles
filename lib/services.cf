@@ -91,6 +91,21 @@ body service_method systemd_services
         service_bundle => default:systemd_services( $(this.promiser), $(this.service_policy) );
 }
 
+body service_method openrc_services
+# @brief openrc service method
+#
+# **Example:**
+#
+# ```cf3
+# services:
+#     "ntpd"
+#       service_policy => "start",
+#       service_method => openrc_services;
+# ```
+{
+        service_bundle => default:openrc_services( $(this.promiser), $(this.service_policy) );
+}
+
 bundle agent standard_services(service,state)
 # @brief Standard services bundle, used by CFEngine by default
 # @author CFEngine AS
@@ -165,9 +180,10 @@ bundle agent standard_services(service,state)
       "non_disabling" or => { "start", "stop", "restart", "reload" };
 
       "chkconfig" expression => "!systemd._stdlib_path_exists_chkconfig";
-      "sysvservice" expression => "!systemd.!chkconfig._stdlib_path_exists_service";
-      "smf" expression => "!systemd.!chkconfig.!sysvservice._stdlib_path_exists_svcadm";
-      "fallback" expression => "!systemd.!chkconfig.!sysvservice.!smf";
+      "openrc" expression => "!systemd.!chkconfig._stdlib_path_exists_rcupdate";
+      "sysvservice" expression => "!systemd.!chkconfig.!openrc._stdlib_path_exists_service";
+      "smf" expression => "!systemd.!chkconfig.!openrc.!sysvservice._stdlib_path_exists_svcadm";
+      "fallback" expression => "!systemd.!chkconfig.!openrc.!sysvservice.!smf";
 
       "have_init" expression => fileexists($(init));
 
@@ -263,6 +279,10 @@ bundle agent standard_services(service,state)
     fallback::
       "classic" usebundle => classic_services($(service), $(state));
 
+    openrc::
+      "openrc"
+        usebundle => openrc_services( $(service), $(state) );
+
     systemd::
       "systemd"
         usebundle => systemd_services( $(service), $(state) );
@@ -285,6 +305,34 @@ bundle agent standard_services(service,state)
     verbose_mode.fallback::
       "$(this.bundle): falling back to classic_services to $(state) $(service)";
 
+}
+
+bundle agent openrc_services(service, state)
+{
+  classes:
+    "request_enabled" expression => strcmp("enabled", "$(state)");
+    "request_disabled" expression => strcmp("disabled", "$(state)");
+
+  commands:
+    request_enabled._stdlib_path_exists_rcupdate::
+      "$(paths.rcupdate) add $(service) default"
+        handle => "openrc_service_enabled";
+    request_disabled._stdlib_path_exists_rcupdate::
+      "$(paths.rcupdate) del $(service) default"
+        handle => "openrc_service_disabled";
+
+  methods:
+    request_enabled::
+      "start service after adding to default runlevel"
+        usebundle => classic_services("$(service)", "start"),
+        depends_on => { "openrc_service_enabled" };
+    request_disabled::
+      "stop service after removing from default runlevel"
+        usebundle => classic_services("$(service)", "stop"),
+        depends_on => { "openrc_service_disabled" };
+    !request_enabled.!request_disabled::
+      "classic_services"
+        usebundle => classic_services("$(service)", "$(state)");
 }
 
 bundle agent systemd_services(service,state)
