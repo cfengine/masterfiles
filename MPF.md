@@ -1055,10 +1055,14 @@ memory related probes on policy servers:
 {
   "vars": {
     "default_data_select_host_monitoring_include": [ ".*" ],
-    "default_data_select_policy_hub_monitoring_include": [ "mem_.*", "cpu_.*" ]
+    "default_data_select_policy_hub_monitoring_include": [ "mem_.*", "cpu.*" ]
   }
 }
 ```
+
+**History:**
+
+* Added in 3.10.2, 3.11.0
 
 ### Configure Enterprise Mission Portal Docroot
 
