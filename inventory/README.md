@@ -218,13 +218,6 @@ R: cfe_autorun_inventory_fstab: we have a cifs fstab entry under /backups/load
 R: cfe_autorun_inventory_fstab: we have a auto fstab entry under /mnt/cdrom
 ```
 
-## CMDB
-
-* lives in: `any.cf`
-* parses: `me.json` (which is copied from the policy server; see implementation)
-* provides classes: `CLASS` for each CLASS found under the ```classes``` key in the JSON data
-* provides variables: `inventory_cmdb_load.VARNAME` for each VARNAME found under the `vars` key in the JSON data
-
 ## DMI decoding
 
 * lives in: `any.cf`
