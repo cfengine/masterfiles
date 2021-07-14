@@ -42,5 +42,16 @@ build/modules/packages/%:
 	cp $$TEMPLATE.mustache $@
 	chmod +x $@
 
+lib_cf := cfe_internal/update/lib.cf
+$(lib_cf): lib/*.cf
+	rm -f $(lib_cf)
+	misc/pluck-for-update.sh classes results >> $(lib_cf)
+	misc/pluck-for-update.sh depth_search recurse >> $(lib_cf)
+	misc/pluck-for-update.sh classes command_results >> $(lib_cf)
+	misc/pluck-for-update.sh service_method systemd_services >> $(lib_cf)
+	misc/pluck-for-update.sh agent systemd_services >> $(lib_cf)
+	misc/pluck-for-update.sh perms mog >> $(lib_cf)
+
+
 clean-local:
 	rm -rf build
