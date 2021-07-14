@@ -1,5 +1,8 @@
 ENV_FILE=testall.env
 
+pluck: ../../lib/*.cf
+	make -C $(core_dir)/tests/acceptance plucked.cf.sub
+
 copy:
 	cp $(core_dir)/tests/acceptance/*.cf.sub .
 
@@ -10,7 +13,7 @@ if HAVE_ENTERPRISE
 	echo export CFENGINE_TEST_OVERRIDE_EXTENSION_LIBRARY_DIR=\"$(enterprise_dir)/enterprise-plugin/.libs\" >> $(ENV_FILE)
 endif
 
-create-env: copy env
+create-env: pluck copy env
 
 
 clean-local:
