@@ -8,13 +8,29 @@ PartOf=cfengine3.service
 Type=forking
 WorkingDirectory=/tmp
 User=cfpostgres
-ExecStart={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log start
-ExecStop={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log stop -m fast
-
-ExecReload={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log reload -m fast
-PIDFile={{{vars.sys.statedir}}}/pg/data/postmaster.pid
 Restart=always
 RestartSec=10
+
+PIDFile={{{vars.sys.statedir}}}/pg/data/postmaster.pid
+SyslogIdentifier=postgres
+
+# Disable OOM kill on the postmaster
+OOMScoreAdjust=-1000
+# ... but allow it still to be effective for child processes
+# (note that these settings are ignored by Postgres releases before 9.5)
+Environment=PG_OOM_ADJUST_FILE=/proc/self/oom_score_adj
+Environment=PG_OOM_ADJUST_VALUE=0
+
+# Maximum number of seconds pg_ctl will wait for postgres to start.  Note that
+# PGSTARTTIMEOUT should be less than TimeoutSec value.
+#Environment=PGSTARTTIMEOUT=270
+
+Environment=PGDATA={{{vars.sys.statedir}}}/pg/data
+
+
+ExecStart={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log start
+ExecStop={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log stop -m fast
+ExecReload={{{vars.sys.bindir}}}/pg_ctl -w -D {{{vars.sys.statedir}}}/pg/data -l /var/log/postgresql.log reload -m fast
 
 [Install]
 WantedBy=multi-user.target
