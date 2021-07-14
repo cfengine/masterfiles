@@ -356,6 +356,13 @@ body classes diff_results(scope, x)
 }
 @endif
 
+
+body classes command_results(scope, class_prefix)
+{
+  kept_returncodes => { "0" };
+  failed_returncodes => { "1" };
+  inherit_from => results( $(scope), $(class_prefix) );
+}
 body classes scoped_classes_generic(scope, x)
 # @brief Define `x` prefixed/suffixed with promise outcome
 # **See also:** `scope`
