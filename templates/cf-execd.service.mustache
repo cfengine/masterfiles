@@ -2,11 +2,12 @@
 Description=CFEngine Execution Scheduler
 After=syslog.target
 ConditionPathExists={{{vars.sys.bindir}}}/cf-execd
+ConditionPathExists={{{vars.sys.default_policy_path}}}
 PartOf=cfengine3.service
 
 [Service]
 Type=simple
-ExecStart={{{vars.sys.bindir}}}/cf-execd --no-fork --verbose
+ExecStart={{{vars.sys.bindir}}}/cf-execd --no-fork
 Restart=always
 RestartSec=10
 KillMode=process
