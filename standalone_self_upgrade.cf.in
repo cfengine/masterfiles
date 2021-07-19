@@ -217,17 +217,16 @@ bundle agent cfengine_software_version
                 "redhat.!redhat_4",
                 "centos.!centos_4",
                 "debian",
+                "suse|opensuse",
                 "ubuntu",
                 "hpux",
                 "aix",
-                "SUSE_11",
-                "SUSE_12",
                 "windows", # ENT-4094
         };
 
       # Add "windows" to __new_implementation classes with ENT-6823
       "__new_implementation"
-        or => { "redhat", "centos", "ubuntu", "debian" };
+        or => { "redhat", "centos", "ubuntu", "debian", "suse", "opensuse" };
 
   vars:
       "pkg_name" string => "$(cfengine_software.pkg_name)";
@@ -288,6 +287,12 @@ bundle agent cfengine_software_version_packages2
       policy => "present",
       package_module => apt_get,
       comment => "Ensure the latest package is installed";
+
+    (opensuse|suse).!__supported::
+      "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
+        policy => "present",
+        package_module => zypper,
+        comment => "Ensure the latest package is installed";
 
      # TODO, uncomment the following to enable msiexec packages module (ENT-6823)
 #    windows::
@@ -965,6 +970,16 @@ body package_module apt_get
       query_updates_ifelapsed => "30";
 @if minimum_version(3.12.2)
       interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
+}
+
+body package_module zypper
+{
+        query_installed_ifelapsed => "0";
+        query_updates_ifelapsed => "30";
+      #default_options =>  {};
+@if minimum_version(3.12.2)
+        interpreter => "$(sys.bindir)/cfengine-selected-python";
 @endif
 }
 
