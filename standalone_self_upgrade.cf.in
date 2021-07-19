@@ -276,19 +276,19 @@ bundle agent cfengine_software_version_packages2
 
   packages:
 
-    (redhat|centos).!__supported::
+    (redhat|centos)::
       "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
       policy => "present",
       package_module => yum,
       comment => "Ensure the latest package is installed";
 
-    (debian|ubuntu).!__supported::
+    (debian|ubuntu)::
       "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
       policy => "present",
       package_module => apt_get,
       comment => "Ensure the latest package is installed";
 
-    (opensuse|suse).!__supported::
+    (opensuse|suse)::
       "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
         policy => "present",
         package_module => zypper,
