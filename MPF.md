@@ -661,7 +661,7 @@ independently of each-other. If you have an automatically loaded policy file in
 not be able to resolve syntax errors. Use
 [`mpf_extra_autorun_inputs`][mpf_extra_autorun_inputs]
 and or
-[`control_common_bundlesequence_classification`][Masterfiles Policy Framework#Classification bundles before autorun]
+[`control_common_bundlesequence_classification`][mpf-classification-bundles]
 to work around this limitation.
 
 **History:**
