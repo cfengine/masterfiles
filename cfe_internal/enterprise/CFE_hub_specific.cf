@@ -355,8 +355,10 @@ bundle agent cfe_internal_truncate_events
 bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
 # @brief Clean up scheduled reports older than `days` days old
 {
+  vars:
+    "tmp_directories_list" slist => {"$(cfe_internal_hub_vars.public_docroot)/tmp/.", "$(cfe_internal_hub_vars.docroot)/temp/."};
   files:
-    "$(cfe_internal_hub_vars.public_docroot)/tmp/."
+    "$(tmp_directories_list)"
       handle => "cfe_internal_purge_scheduled_reports_files_docroot_tmp",
       delete => tidy,
       depth_search => recurse("inf"),
