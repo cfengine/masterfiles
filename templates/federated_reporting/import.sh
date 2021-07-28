@@ -24,16 +24,6 @@ if ! type "$CFE_FR_EXTRACTOR" >/dev/null; then
   exit 1
 fi
 
-tries=6
-while [ $tries -gt 0 ] && ps -e | grep cf-hub >/dev/null; do
-  log "Waiting for cf-hub process to terminate before DB schema manipulation"
-  sleep 10;
-  tries=$(($tries - 1))
-done
-if [ $tries -eq 0 ]; then
-  log "Warning: cf-hub process running while doing schema manipulations!"
-fi
-
 # TODO: we should do some validation of the files here
 mkdir -p "$CFE_FR_SUPERHUB_IMPORT_DIR"
 no_drop_files=0
