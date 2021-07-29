@@ -453,7 +453,7 @@ body perms u_mo(p,o)
 # @param p Desired file owner (username or uid)
 {
       mode   => "$(p)";
-      !windows::
+      !(windows|termux)::
         owners => {"$(o)"};
 }
 
