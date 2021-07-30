@@ -345,7 +345,7 @@ def remove():
     return ret
 
 def file_install():
-    cmd_line = [dpkg_cmd] + dpkg_options + ["-i"]
+    cmd_line = [apt_get_cmd] + apt_get_options + ["install"]
 
     found = False
     for line in sys.stdin:
