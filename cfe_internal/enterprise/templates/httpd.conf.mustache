@@ -294,3 +294,8 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
   Deny from all
   AllowOverride None
 </Directory>
+
+<Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/static">
+  Deny from all
+  AllowOverride None
+</Directory>
