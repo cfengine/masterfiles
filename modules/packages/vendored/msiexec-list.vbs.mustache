@@ -32,13 +32,28 @@ For Each strKey in strKeys
       ' Read the InstallDate
       objReg.GetStringValue HKLM, strKey & strSubkey, strInstallDateEntry, strInstallDateValue
       ' Read the DisplayVersion
-      objReg.GetStringValue HKLM, strKey & strSubkey, strDisplayVersionEntry, strDisplayVersionValue
+      intRet2 = objReg.GetStringValue( HKLM, strKey & strSubkey, strDisplayVersionEntry, strDisplayVersionValue )
+      If intRet2 <> 0 Then
+        ' DisplayVersion is missing, so try to fall back InstalledVersion
+        intRet2 = objReg.GetStringValue( HKLM, strKey & strSubKey, "InstalledVersion", strDisplayVersionValue )
+      End If
+      If intRet2 <> 0 Then
+        ' DisplayVersion and InstalledVersion are missing, so try to fall back to a key of the same name as the node, i.e. AOMEI Backupper Server.
+        intRet2 = objReg.GetStringValue( HKLM, strKey & strDisplayNameValue, strDisplayNameValue, strDisplayVersionValue )
+      End If
       ' Replace whitespace with dashes for CFEngine
       ' strDisplayNameValue = Replace(strDisplayNameValue, " ", "-")
       ' Print out the DisplayName
       WScript.Echo "Name=" & LCase(strDisplayNameValue)
       ' Print out the DisplayVersion
-      WScript.Echo "Version=" & LCase(strDisplayVersionValue)
+      ' Ensure that Version is set to something, else it can't be inserted into the database.
+      If intRet2 <> 0 Then
+        ' Unable to find a version, set it to "unknown" so that it can be inserted into the database and not result in patch failure
+        WScript.Echo "Version=unknown"
+      Else
+        ' Must have a legit version
+        WScript.Echo "Version=" & LCase(strDisplayVersionValue)
+      End If
       ' Print out the Architecture
       If InStr(strKey, "6432") = 0 Then
         WScript.Echo "Architecture=amd64"
