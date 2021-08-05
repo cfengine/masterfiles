@@ -7,7 +7,7 @@ body file control
 bundle agent autorun
 {
   vars:
-    services_autorun::
+    services_autorun|services_autorun_bundles::
       "bundles" slist => bundlesmatching(".*", "autorun");
 
       "sorted_bundles"

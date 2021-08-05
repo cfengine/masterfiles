@@ -627,8 +627,8 @@ The `inputs` key in augments can be used to add additional custom policy files.
 
 ### services\_autorun
 
-When the ```services_autorun``` class is defined bundles tagged with
-```autorun``` are actuated in lexical order.
+When the ```services_autorun``` class is defined ```.cf``` files located in `services/autorun/` are automatically
+included in inputs and bundles tagged with ```autorun``` are actuated in lexical order.
 
 Example definition of ```services_autorun``` using [Augments (def.json)][Augments]:
 
@@ -654,12 +654,11 @@ bundle agent example
 }
 ```
 
-**Note:** ```.cf``` files located in `services/autorun/` are automatically
-included in inputs even when the ```services_autorun``` class is **not**
-defined. Bundles tagged with ```autorun``` are **not required** to be placed in
-`services/autorun/` in order to be automatically actuated. If you have an
-automatically loaded policy file in `services/autorun` which loads additional
-policy dynamically, `cf-promises` may not be able to resolve syntax errors. Use
+**Note:** The `services_autorun_inputs` and `services_autorun_bundles` classes
+allow policy files to be dynamically loaded or tagged bundles to be run
+independently of each-other. If you have an automatically loaded policy file in
+`services/autorun` which loads additional policy dynamically, `cf-promises` may
+not be able to resolve syntax errors. Use
 [`mpf_extra_autorun_inputs`][mpf_extra_autorun_inputs]
 and or
 [`control_common_bundlesequence_classification`][mpf-classification-bundles]
@@ -668,6 +667,43 @@ to work around this limitation.
 **History:**
 
 * Added in CFEngine 3.6.0
+
+#### Automatically add policy files to inputs
+
+When the ```services_autorun_inputs``` class is defined ```.cf``` files located
+in `services/autorun/` are automatically included in inputs.
+
+Example definition of ```services_autorun_inputs``` using [Augments (def.json)][Augments]:
+
+```json
+{
+  "classes": {
+    "services_autorun_inputs": [ "any::" ]
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.19.0, 3.18.1
+
+#### Automatically run bundles tagged autorun
+
+When the ```services_autorun_bundles``` class is defined bundles tagged with ```autorun``` are actuated in lexical order.
+
+Example definition of ```services_autorun_bundles``` using [Augments (def.json)][Augments]:
+
+```json
+{
+  "classes": {
+    "services_autorun_bundles": [ "any::" ]
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.19.0, 3.18.1
 
 #### Additional automatically loaded inputs
 
