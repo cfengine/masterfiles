@@ -93,7 +93,7 @@ assert check("supports-api-version", [], 1, ["1"], 1, ["apt-get -v"])
 
 assert check("file-install", ["File=/path/to/pkg"], 0, [], 3, ["""apt-get -v
 apt-get -v
-dpkg --force-confold --force-confdef -i /path/to/pkg"""])
+apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --allow-downgrades --allow-remove-essential --allow-change-held-packages install /path/to/pkg"""])
 assert check("file-install", ["File=/path/to/pkg","File=/path/to/pkg2"], 0, [], 3, ["""apt-get -v
 apt-get -v
 dpkg --force-confold --force-confdef -i /path/to/pkg /path/to/pkg2"""])
