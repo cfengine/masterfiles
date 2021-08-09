@@ -96,7 +96,7 @@ apt-get -v
 apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --allow-downgrades --allow-remove-essential --allow-change-held-packages install /path/to/pkg"""])
 assert check("file-install", ["File=/path/to/pkg","File=/path/to/pkg2"], 0, [], 3, ["""apt-get -v
 apt-get -v
-dpkg --force-confold --force-confdef -i /path/to/pkg /path/to/pkg2"""])
+apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y --allow-downgrades --allow-remove-essential --allow-change-held-packages install /path/to/pkg /path/to/pkg2"""])
 
 assert check("repo-install", ["Name=a\nVersion=1\nArchitecture=x",
                               "Name=b\nArchitecture=y",
