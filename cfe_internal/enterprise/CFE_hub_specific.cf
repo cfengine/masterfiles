@@ -38,6 +38,10 @@ bundle common cfe_internal_hub_vars
         comment => "Root directory of Enterprise Web interface",
         handle => "cfe_internal_hub_vars_docroot";
 
+      "public_docroot" string => ifelse( isdir("$(cfe_internal_hub_vars.docroot)/public"), "$(cfe_internal_hub_vars.docroot)/public",
+                                                $(cfe_internal_hub_vars.docroot)),
+        comment => "Public root directory of Enterprise Web interface";
+
       # TODO Consider tagging these files for file integrity monitoring.
 
       "SSLCertificateFile"
@@ -414,12 +418,15 @@ bundle agent cfe_internal_truncate_events
 bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
 # @brief Clean up scheduled reports older than `days` days old
 {
+  vars:
+    "tmp_directories_list" slist => {"$(cfe_internal_hub_vars.public_docroot)/tmp/.", "$(cfe_internal_hub_vars.docroot)/static/."};
   files:
-    "$(cfe_internal_hub_vars.docroot)/tmp/."
+    "$(tmp_directories_list)"
       handle => "cfe_internal_purge_scheduled_reports_files_docroot_tmp",
       delete => tidy,
       depth_search => recurse("inf"),
       file_select => filetype_older_than("plain", $(days) ),
+      if => isdir( $(tmp_directories_list) ),
       comment => "Mission Portals scheduled reports are written here. They need
                   to be purged after some time so that they do not fill the disk.";
 
