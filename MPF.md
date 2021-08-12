@@ -627,7 +627,7 @@ The `inputs` key in augments can be used to add additional custom policy files.
 
 ### services\_autorun
 
-See documentation for [services/autorun][services/autorun].
+See documentation for [mpf-services-autorun][mpf-services-autorun].
 
 ### postgresql\_full\_maintenance
 
