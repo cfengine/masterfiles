@@ -7,7 +7,7 @@ SUBDIRS = \
 nobase_dist_masterfiles_DATA = @MASTERFILES_INSTALL_TARGETS@
 masterfilesdir=$(prefix)/masterfiles
 
-EXTRA_DIST = README.md inventory/README.md lib/README.md CONTRIBUTING.md LICENSE CFVERSION
+EXTRA_DIST = README.md inventory/README.md lib/README.md CONTRIBUTING.md LICENSE CFVERSION modules/promises
 
 # Do not reveal usernames of the buildslave
 TAR_OPTIONS = --owner=0 --group=0
