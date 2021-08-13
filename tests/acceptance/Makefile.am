@@ -30,6 +30,8 @@ EXTRA_DIST  = README.md
 EXTRA_DIST += lib
 # Distribute all custom test packages and related files
 EXTRA_DIST += 17_packages
+# Distribute custom promise type tests
+EXTRA_DIST += 30_custom_promise_types
 # Also distribute the '.cf*' files and the testall script itself.
 # TODO this should be set as a dependency to check-local, e.g. with
 # check-local_SOURCE. Unfortunately I couldn't find a way so that
