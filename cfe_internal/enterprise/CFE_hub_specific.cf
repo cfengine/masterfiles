@@ -579,6 +579,27 @@ bundle agent cfe_internal_refresh_inventory_args
       "args" string => "inventory_refresh";
 }
 
+bundle agent cfe_internal_exported_report_location
+# @brief Ensure that exported reports are in the correct directory
+{
+  meta:
+    am_policy_hub.enterprise_edition::
+      "tags" slist => { "enterprise_maintenance" };
+
+  files:
+
+    am_policy_hub.enterprise_edition::
+
+      "$(cfe_internal_hub_vars.public_docroot)/tmp/." -> { "ENT-7465" }
+        depth_search => recurse( inf ),
+        file_select => by_name( '.*\.(csv|pdf)' ),
+        transformer => "/bin/mv $(this.promiser) $(cfe_internal_hub_vars.docroot)/static/",
+        if => isdir( "$(cfe_internal_hub_vars.docroot)/static/." ),
+        comment => "Generated reports (CSV and PDF) should be in the static directory if it exists.";
+
+
+}
+
 bundle agent cfe_internal_refresh_inventory_view
 # @brief Refresh materialized view every 5 minutes
 {
