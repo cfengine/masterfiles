@@ -17,12 +17,15 @@ bundle common python_check
   classes:
     "python_version_compatible_with_cfengine_library"
       expression => returnszero("/usr/bin/python3 -c 'import sys; assert sys.version_info >= (3,6)'", "useshell");
+@if minimum_version(3.17)
+    "cfengine_supports_custom_promises" expression => "any";
+@endif
 }
 
 bundle agent init
 {
   meta:
-      "test_skip_unsupported" string => "!python_version_compatible_with_cfengine_library";
+      "test_skip_unsupported" string => "!python_version_compatible_with_cfengine_library|!cfengine_supports_custom_promises";
 
   vars:
     "test_string"
@@ -49,6 +52,7 @@ body delete init_delete
 
 #######################################################
 
+@if minimum_version(3.17)
 promise agent copy
 {
     interpreter => "/usr/bin/python3";
@@ -65,6 +69,7 @@ bundle agent test
     "$(G.testfile).dst"
       from => "$(G.testfile).src";
 }
+@endif
 
 #######################################################
 

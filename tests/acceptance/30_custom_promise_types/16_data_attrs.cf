@@ -15,14 +15,17 @@ body common control
 bundle common python_check
 {
   classes:
-      "python_version_compatible_with_cfengine_library"
-        expression => returnszero("/usr/bin/python3 -c 'import sys; assert sys.version_info >= (3,6)'", "useshell");
+    "python_version_compatible_with_cfengine_library"
+      expression => returnszero("/usr/bin/python3 -c 'import sys; assert sys.version_info >= (3,6)'", "useshell");
+@if minimum_version(3.17)
+    "cfengine_supports_custom_promises" expression => "any";
+@endif
 }
 
 bundle agent init
 {
   meta:
-      "test_skip_unsupported" string => "!python_version_compatible_with_cfengine_library";
+      "test_skip_unsupported" string => "!python_version_compatible_with_cfengine_library|!cfengine_supports_custom_promises";
 
   files:
       "$(this.promise_dirname)/cfengine.py"
@@ -31,6 +34,7 @@ bundle agent init
 
 #######################################################
 
+@if minimum_version(3.17)
 promise agent json_insert
 {
         interpreter => "/usr/bin/python3";
@@ -60,6 +64,7 @@ bundle agent test
       "$(G.testfile)2"
         json_data => @(sample_data);
 }
+@endif
 
 #######################################################
 

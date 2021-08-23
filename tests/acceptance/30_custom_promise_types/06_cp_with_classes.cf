@@ -12,8 +12,19 @@ body common control
 
 #######################################################
 
+bundle common version_check
+{
+@if minimum_version(3.17)
+  classes:
+    "cfengine_supports_custom_promises" expression => "any";
+@endif
+}
+
 bundle agent init
 {
+  meta:
+      "test_skip_unsupported" string => "!cfengine_supports_custom_promises";
+
   vars:
     "test_string"
       string => "hello, modules";
@@ -38,6 +49,7 @@ body delete init_delete
 
 #######################################################
 
+@if minimum_version(3.17)
 promise agent cp
 {
     interpreter => "/bin/bash";
@@ -59,6 +71,7 @@ bundle agent test
         expression => canonify("cp_repaired"),
         scope => "namespace";
 }
+@endif
 
 #######################################################
 
