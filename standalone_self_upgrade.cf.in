@@ -86,6 +86,11 @@ bundle agent cfengine_software
       "pkg_release" string => ifelse( isvariable( "def.cfengine_software_pkg_release" ), $(def.cfengine_software_pkg_release), "1");
       "pkg_arch" string => ifelse( isvariable( "def.cfengine_software_pkg_arch" ), $(def.cfengine_software_pkg_arch), "x86_64");
       "package_dir" string => ifelse( isvariable( "def.cfengine_software_pkg_dir" ), $(def.cfengine_software_pkg_dir), "$(sys.flavour)_$(sys.arch)");
+      "pkg_edition_path" string => ifelse( isvariable( "def.cfengine_software_pkg_edition_path" ), $(def.cfengine_software_pkg_edition_path), "enterprise/Enterprise-$(pkg_version)/agent");
+
+    community_edition::
+      "pkg_name" string => "cfengine-community";
+      "pkg_edition_path" string => "community_binaries/Community-$(pkg_version)";
 
     aix::
       "pkg_name" string => "cfengine.cfengine-nova";
@@ -511,7 +516,8 @@ bundle agent cfengine_master_software_content
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
       "package_dir" string => "$(cfengine_software.package_dir)";
-      "base_url" string => "https://cfengine-package-repos.s3.amazonaws.com/enterprise/Enterprise-$(pkg_version)/agent";
+      "pkg_edition" string => "$(cfengine_software.pkg_edition_path)";
+      "base_url" string => "https://cfengine-package-repos.s3.amazonaws.com/$(pkg_edition)";
 
       # Map platform/directory identifier to upstream package URLs
       # Better to read in an external explicit data structure?
