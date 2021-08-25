@@ -87,11 +87,11 @@ bundle agent cfengine_software
       "pkg_arch" string => ifelse( isvariable( "def.cfengine_software_pkg_arch" ), $(def.cfengine_software_pkg_arch), "x86_64");
       "package_dir" string => ifelse( isvariable( "def.cfengine_software_pkg_dir" ), $(def.cfengine_software_pkg_dir), "$(sys.flavour)_$(sys.arch)");
       "pkg_edition_path" string => ifelse( isvariable( "def.cfengine_software_pkg_edition_path" ), $(def.cfengine_software_pkg_edition_path), "enterprise/Enterprise-$(pkg_version)/agent");
-    
+
     community_edition::
       "pkg_name" string => "cfengine-community";
       "pkg_edition_path" string => "community_binaries/Community-$(pkg_version)";
-    
+
     aix::
       "pkg_name" string => "cfengine.cfengine-nova";
       "pkg_arch" string => "default";
