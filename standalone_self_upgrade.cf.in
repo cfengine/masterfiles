@@ -38,7 +38,7 @@ bundle agent main
 
       "cfengine_software";
 
-    am_policy_hub|policy_server::
+    (am_policy_hub|policy_server).!mpf_disable_hub_masterfiles_software_update_seed::
 
       "Master Software Repository Data"
         usebundle => cfengine_master_software_content;
