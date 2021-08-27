@@ -367,6 +367,27 @@ For example:
 **History:**
 - Introduced 3.15.0, 3.12.3, 3.10.8
 
+#### Disable seeding binaries on hub
+
+By default when `trigger_upgrade` is defined on a hub, the hub will download
+packages for agents to use during self upgrade. This automatic download behavior
+is disabled when the class `mpf_disable_hub_masterfiles_software_update_seed` is
+defined.
+
+For example:
+
+```json
+{
+   "classes": {
+     "mpf_disable_hub_masterfiles_software_update_seed": [ "policy_server::" ]
+   }
+}
+```
+
+**History:**
+
+- Introduced 3.19.0, 3.18.1
+
 ### Files considered for copy during policy updates
 
 The default update policy only copies files that match regular expressions
