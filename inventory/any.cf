@@ -1043,7 +1043,7 @@ bundle agent cfe_autorun_inventory_packages
                                 fileexists("$(sys.workdir)/state/software_packages.csv"),
       };
 
-      "use_package_module_for_inventory" or => { "redhat", "debian", "suse", "sles", "alpinelinux" };
+      "use_package_module_for_inventory" or => { "redhat", "debian", "suse", "sles", "alpinelinux", "windows" };
       "use_package_method_for_inventory" or => { "gentoo", "aix" };
       "use_package_method_generic_for_inventory"
         not => "use_package_module_for_inventory|use_package_method_for_inventory";
