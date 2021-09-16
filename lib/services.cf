@@ -296,7 +296,21 @@ body action fresh_systemd_state
 # Although it's now the same as the 'immediate' action body, this may change in
 # the future.
 {
+    cfengine::
+      # ^Needed for versions 3.15.x and older that did not
+      # support empty bodies. When 3.15.x is no longer
+      # supported, this can be removed.
+
+@if minimum_version(3.18.1)
+      # Beginning with 3.18.1 ifelapsed being set to 0 results in bypassing of
+      # function caching. In versions prior to 3.18, if an action body with
+      # ifelapsed set to 0 was used in a vars type promise a warning was
+      # emitted. This is guarded to suppress that warning in older versions
+      # where this setting would not change the behavior.
+
     ifelapsed => "0";
+@endif
+
 }
 
 bundle agent systemd_services(service,state)
@@ -346,16 +360,10 @@ bundle agent systemd_services(service,state)
       "systemd_properties"
         string => "-pLoadState,CanStop,UnitFileState,ActiveState,LoadState,CanStart,CanReload";
 
-@if minimum_version(3.18.1)
       "systemd_service_info"
         slist => string_split(execresult("$(call_systemctl) $(systemd_properties) show $(service)",
                                          "noshell"), "\n", "10"),
         action => fresh_systemd_state;  # Ensure this info is always fresh and not cached [CFE-3753]
-@else
-      "systemd_service_info"
-        slist => string_split(execresult("$(call_systemctl) $(systemd_properties) show $(service)",
-                                         "noshell"), "\n", "10");
-@endif
 
   classes:
     systemd::
