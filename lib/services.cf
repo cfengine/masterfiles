@@ -287,6 +287,18 @@ bundle agent standard_services(service,state)
 
 }
 
+body action fresh_systemd_state
+# @brief An 'action' body ensuring the state information for a systemd service is always fresh
+#
+# This 'action' body disables caching for functions, in particular the
+# execresult*() family of functions.
+#
+# Although it's now the same as the 'immediate' action body, this may change in
+# the future.
+{
+    ifelapsed => "0";
+}
+
 bundle agent systemd_services(service,state)
 # @brief Manage systemd service state
 # @author Bryan Burke
@@ -334,9 +346,16 @@ bundle agent systemd_services(service,state)
       "systemd_properties"
         string => "-pLoadState,CanStop,UnitFileState,ActiveState,LoadState,CanStart,CanReload";
 
+@if minimum_version(3.18.1)
+      "systemd_service_info"
+        slist => string_split(execresult("$(call_systemctl) $(systemd_properties) show $(service)",
+                                         "noshell"), "\n", "10"),
+        action => fresh_systemd_state;  # Ensure this info is always fresh and not cached [CFE-3753]
+@else
       "systemd_service_info"
         slist => string_split(execresult("$(call_systemctl) $(systemd_properties) show $(service)",
                                          "noshell"), "\n", "10");
+@endif
 
   classes:
     systemd::
