@@ -3,13 +3,28 @@
 # There are several augments which can be used to tune the behavior of this policy:
 #
 # - `cfengine_mp_fr_dependencies_auto_install` class
-
+#
 #   If defined then all non-shipped dependencies needed for Federated Reporting will be installed.
 #
 # ```json
 # {
 #   "classes": {
 #     "cfengine_mp_fr_dependencies_auto_install": [ "any::" ]
+#   }
+# }
+# ```
+#
+# - `cfengine_mp_fr_enable_distributed_cleanup` class
+#    If defined then the distributed_cleanup script is partially setup and enabled to run.
+#    Setup involves some manual steps detailed in templates/federated/distributed_cleanup.py.
+#    The script deletes hosts on feeder hubs when a different feeder has a more recent
+#    incoming communication (last seen database). Each feeder queries the superhub for
+#    last seen information from other feeders.
+#
+# ```json
+# {
+#   "classes": {
+#     "cfengine_mp_fr_enable_distributed_cleanup": [ "any::" ]
 #   }
 # }
 # ```
@@ -356,6 +371,7 @@ bundle agent federation_manage_files
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
     "feeder" data => parsejson('{"feeder": "$(sys.key_digest)"}');
     "cf_version" data => parsejson('{"cf_version":"$(sys.cf_version)"}');
+    "workdir" data => parsejson('{"workdir":"$(sys.workdir)"}');
     "handle_duplicates_value" string => ifelse("default:cfengine_mp_fr_handle_duplicate_hostkeys", "yes", "no");
     "handle_duplicates" data => parsejson('{"handle_duplicates":"$(handle_duplicates_value)"}');
 
@@ -462,6 +478,20 @@ bundle agent federation_manage_files
       "$(cfengine_enterprise_federation:config.federation_dir)/superhub/import/filters/10-base_filter.sed"
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/10-base_filter.sed" ),
         perms => default:mog( "600", "root", "root" );
+
+    am_superhub.default:cfengine_mp_fr_enable_distributed_cleanup::
+      "$(cfengine_enterprise_federation:config.bin_dir)/transfer_distributed_cleanup_items.sh"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/transfer_distributed_cleanup_items.sh" ),
+        perms => default:mog( "500", "$(transport_user)", "root" );
+      "$(cfengine_enterprise_federation:config.bin_dir)/distributed_cleanup.py"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/distributed_cleanup.py" ),
+        perms => default:mog( "500", "root", "root" );
+      "$(cfengine_enterprise_federation:config.bin_dir)/nova_api.py"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/nova_api.py" ),
+        perms => default:mog( "500", "root", "root" );
+      "$(cfengine_enterprise_federation:config.bin_dir)/cfsecret.py"
+        copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/cfsecret.py" ),
+        perms => default:mog( "500", "root", "root" );
 }
 
 bundle agent postgres_config
@@ -557,6 +587,10 @@ bundle agent data_transport
     am_puller.!am_paused::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh pull $(pull_args)"},
+        contain => contain_transport_user;
+    am_puller.!am_paused.default:cfengine_mp_fr_enable_distributed_cleanup::
+      "/bin/bash"
+        arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transfer_distributed_cleanup_items.sh $(pull_args)"},
         contain => contain_transport_user;
 }
 
@@ -676,6 +710,16 @@ bundle agent entry
         depends_on => { "transport_user", "ensure_feeders" },
         usebundle => imported_data;
 
+    default:cfengine_mp_fr_enable_distributed_cleanup::
+      "Distributed Cleanup Setup"
+        handle => "distributed_cleanup_setup",
+        depends_on => { "data_transport" },
+        usebundle => "distributed_cleanup_setup";
+      "Distributed Federated Host Cleanup"
+        handle => "distributed_cleanup",
+        depends_on => { "imported_data", "distributed_cleanup_setup" },
+        usebundle => distributed_cleanup_run;
+
   reports:
     !enterprise_edition::
       "Federated reporting is only available in CFEngine Enterprise.";
@@ -719,6 +763,34 @@ bundle agent setup_status
           "transport_ssh_server_fingerprint": "$(ssh_server_fingerprint)",
         }',
         if => isvariable( ssh_pub_key );
+}
+
+bundle agent distributed_cleanup_setup
+{
+  vars:
+    "distributed_cleanup_dir" string => "/opt/cfengine/federation/cftransport/distributed_cleanup";
+
+  files:
+    am_superhub|am_feeder::
+      "${distributed_cleanup_dir}/."
+        create => "true";
+      "${distributed_cleanup_dir}/${sys.host}.pub"
+        copy_from => default:local_cp("${sys.workdir}/ppkeys/localhost.pub");
+      "${distributed_cleanup_dir}/${sys.host}.cert"
+        copy_from => default:local_cp("${sys.workdir}/httpd/ssl/certs/${sys.host}.cert");
+}
+
+bundle agent distributed_cleanup_run
+{
+  vars:
+    "_arglist" slist => { ifelse("debug_mode", "--debug",
+                                 "inform_mode",  "--inform",
+                                 "") };
+  commands:
+    am_superhub.!am_paused.default:cfengine_mp_fr_enable_distributed_cleanup::
+      "$(sys.bindir)/cfengine-selected-python"
+        args => "$(cfengine_enterprise_federation:config.bin_dir)/distributed_cleanup.py",
+        arglist => { @(_arglist) };
 }
 
 body file control
