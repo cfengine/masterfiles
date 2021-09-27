@@ -1,0 +1,85 @@
+######################################################
+#
+#  Basic test of custom promise using the 'handle' attribute
+#
+#####################################################
+body common control
+{
+        inputs => { "../default.cf.sub" };
+        bundlesequence  => { default("$(this.promise_filename)") };
+        version => "1.0";
+}
+
+#######################################################
+
+bundle common python_check
+{
+  classes:
+    "python_version_compatible_with_cfengine_library"
+      expression => returnszero("/usr/bin/python3 -c 'import sys; assert sys.version_info >= (3,6)'", "useshell");
+@if minimum_version(3.17)
+    "cfengine_supports_custom_promises" expression => "any";
+@endif
+}
+
+bundle agent init
+{
+  meta:
+      "test_skip_unsupported" string => "!python_version_compatible_with_cfengine_library|!cfengine_supports_custom_promises";
+
+  files:
+      "$(this.promise_dirname)/cfengine.py"
+      copy_from => local_cp("$(this.promise_dirname)/../../../modules/promises/cfengine.py");
+}
+
+#######################################################
+
+@if minimum_version(3.17)
+promise agent multiline_insert
+{
+        interpreter => "/usr/bin/python3";
+        path => "$(this.promise_dirname)/multiline_insert.py";
+}
+
+bundle agent test
+{
+  meta:
+      "description" -> { "CFE-3439" }
+        string => "Test a custom promise using the 'handle' attribute";
+
+  commands:
+      "$(G.cp) $(G.testfile) $(G.testfile)2"
+        depends_on => { "example_handle" },
+        comment => "creates a copy of the file *after* it was populated below";
+
+  multiline_insert:
+      "$(G.testfile)"
+        lines => { "handle is:", "$(this.handle)" },
+        handle => "example_handle";
+}
+@endif
+
+#######################################################
+
+bundle agent check
+{
+  vars:
+      "expected_lines" slist => { "handle is:", "example_handle" };
+
+  classes:
+      "ok1"
+        expression => strcmp(join("$(const.n)", @(expected_lines)), readfile("$(G.testfile)")),
+        if => fileexists("$(G.testfile)");
+
+      "ok2"
+        expression => strcmp(join("$(const.n)", @(expected_lines)), readfile("$(G.testfile)2")),
+        if => fileexists("$(G.testfile)2");
+
+      "ok" and => { "ok1", "ok2" };
+
+  reports:
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}
