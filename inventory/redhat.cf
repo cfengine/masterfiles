@@ -4,9 +4,11 @@ bundle common inventory_redhat
 # This common bundle is for Red Hat Linux inventory work.
 {
   classes:
-      "redhat_pure" expression => "redhat.!(centos|oracle|fedora)",
-      comment => "pure Red Hat",
-      meta => { "inventory", "attribute_name=none" };
+      "redhat_pure" or => { strcmp( "$(sys.os_release[ID])" , "rhel" ),  # Red Hat > 7 have /etc/os-release and the ID field is set to rhel
+                            and( "redhat.!(centos|oracle|fedora|rocky)", # Red Hat < 7 does not have /etc/os-release, and is pure if we don't find another known derivative
+                                 not( isvariable( "sys.os_release" )))},
+        comment => "pure Red Hat",
+        meta => { "inventory", "attribute_name=none" };
 
       "redhat_derived" expression => "redhat.!redhat_pure",
       comment => "derived from Red Hat",
