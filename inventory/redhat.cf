@@ -5,8 +5,8 @@ bundle common inventory_redhat
 {
   classes:
       "redhat_pure" or => { strcmp( "$(sys.os_release[ID])" , "rhel" ),  # Red Hat > 7 have /etc/os-release and the ID field is set to rhel
-                            and( "redhat.!(centos|oracle|fedora|rocky|almalinux)", # Red Hat < 7 does not have /etc/os-release, and is pure if we don't find another known derivative
-                                 not( isvariable( "sys.os_release" )))},
+                            strcmp( "any", and( "redhat.!(centos|oracle|fedora|rocky|almalinux)", # Red Hat < 7 does not have /etc/os-release, and is pure if we don't find another known derivative
+                                 not( isvariable( "sys.os_release" ))))},
         comment => "pure Red Hat",
         meta => { "inventory", "attribute_name=none" };
 
