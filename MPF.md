@@ -1328,6 +1328,8 @@ pick up changes made outside packages promises.
 WARNING: Be ware of setting `package_module_query_update_ifelapsed` too low,
 especially with public repositories or you may be banned for abuse.
 
+**See also:** `packagesmatching()`, `packageupdatesmatching()`
+
 **History**:
 
 * Added in 3.15.0, 3.12.3
