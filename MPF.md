@@ -309,6 +309,24 @@ directly in ```/opt/cfengine/dc-scripts```.
 will be deleted the first time this tooling runs. Be wary of local modifications
 before enabling.
 
+### Policy Analyzer Exclude Files
+
+When the policy analyzer is enabled, a copy of the policy is made available for viewing from Mission Portal. To exclude files from this view you can define ```def.cfengine_enterprise_policy_analyzer_exclude_files``` as a list of regular expressions matching files that you do not want to be viewable from Policy Analyzer.
+
+This [augments file][Augments] will prevent any files named `please-no-copy` and any file names that contain `no-copy-me` from being copied and visible from Policy Analyzer.
+
+```json
+{
+  "vars": {
+    "cfengine_enterprise_policy_analyzer_exclude_files": [ "please-no-copy", ".*no-copy-me.*" ]
+  },
+}
+```
+
+**History:**
+
+* Added in 3.19.0, 3.18.1
+
 ### Policy Permissions
 
 By default the policy enforces permissions of ```0600``` meaning that inputs are
