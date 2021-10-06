@@ -740,6 +740,18 @@ bundle agent cfe_internal_enterprise_policy_analyzer
       "analyzer_dir" string => "/opt/cfengine/analyzer/policy/masterfiles";
       "analyzer_source" string => "$(sys.masterdir)";
 
+      "exclude_files" -> { "ENT-7684" }
+        slist => { "" },
+        unless => isvariable( "def.cfengine_enterprise_policy_analyzer_exclude_files" ),
+        comment => concat( "By default policy analyzer will get access to all files, ",
+                           "that are part of the policy." );
+
+      "exclude_files" -> { "ENT-7684" }
+        slist => { "@(def.cfengine_enterprise_policy_analyzer_exclude_files)" },
+        if => isvariable( "def.cfengine_enterprise_policy_analyzer_exclude_files" ),
+        comment => concat( "A list of regular expressions matching file leaf names ",
+                           "that should not be copied for access by policy analyzer." );
+
   classes:
 
     enterprise_edition.policy_server::
@@ -756,7 +768,7 @@ bundle agent cfe_internal_enterprise_policy_analyzer
 
        "$(analyzer_dir)/."
          copy_from => analyzer_sync( $(analyzer_source) ),
-         file_select => all,
+         file_select => default:ex_list( @(exclude_files) ),
          depth_search => recurse_with_base( inf ),
          perms => mog( "400", $(def.cf_apache_user), $(def.cf_apache_group) );
 
