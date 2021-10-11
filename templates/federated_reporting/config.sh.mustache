@@ -4,6 +4,9 @@
 DEFAULT_PREFIX="{{prefix}}"
 DEFAULT_PREFIX="${DEFAULT_PREFIX:-/opt/cfengine/federation/}"
 
+WORKDIR="{{workdir}}"
+WORKDIR="${WORKDIR:-/var/cfengine/}"
+
 # generic configuration
 CFE_BIN_DIR="{{bindir}}"
 CFE_BIN_DIR="${CFE_BIN_DIR:-/var/cfengine/bin}"
@@ -78,3 +81,7 @@ CFE_FR_DB_USER="{{db_user}}"
 CFE_FR_DB_USER="${CFE_FR_DB_USER:-cfpostgres}"
 CFE_FR_HANDLE_DUPLICATES="{{handle_duplicates}}"   # default is no (don't handle duplicates as it adds to time to import)
 CFE_FR_HANDLE_DUPLICATES="${CFE_FR_HANDLE_DUPLICATES:-no}"
+
+# distributed_cleanup dir
+CFE_FR_DISTRIBUTED_CLEANUP_DIR="{{distributed_cleanup_dir}}"
+CFE_FR_DISTRIBUTED_CLEANUP_DIR="${CFE_FR_DISTRIBUTED_CLEANUP_DIR:-$DEFAULT_PREFIX/$CFE_FR_FEEDER_USERNAME/distributed_cleanup}"
