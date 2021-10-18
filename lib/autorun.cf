@@ -15,7 +15,9 @@ bundle agent autorun
 
   methods:
     services_autorun::
-      "autorun" usebundle => $(sorted_bundles);
+      "autorun" -> { "CFE-3795" }
+        usebundle => $(sorted_bundles),
+        action => immediate;
 
   reports:
     DEBUG|DEBUG_autorun|DEBUG_services_autorun::
