@@ -987,7 +987,7 @@ bundle agent cfe_autorun_inventory_dmidecode
 
     have_dmidecode::
 
-      "$(decoder) -t 17 | $(paths.awk) '/Size.*MB/ {s+=$2} END {print s}' > '$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt'" -> { "CFE-2896" }
+      "$(decoder) -t 17 | $(paths.awk) '/^\tSize:.*MB/ {a+=$2} /^\tSize:.*GB/ {b+=$2*1024} END {print a+b}' > '$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt'" -> { "CFE-2896", "ENT-7714" }
         contain => in_shell,
         if => not( fileexists( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt") );
 
