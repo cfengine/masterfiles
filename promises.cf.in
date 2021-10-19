@@ -340,8 +340,6 @@ bundle common services_autorun
 {
   vars:
     services_autorun|services_autorun_inputs::
-      "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
-
       "_default_autorun_input_dir"
         string => "$(this.promise_dirname)/services/autorun";
       "_default_autorun_inputs"
@@ -366,6 +364,7 @@ bundle common services_autorun
       "bundles" slist => { "services_autorun" }; # run self
 
     services_autorun|services_autorun_inputs|services_autorun_bundles::
+      "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
       "bundles" slist => { "autorun" }; # run loaded bundles
 
   reports:

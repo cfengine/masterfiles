@@ -15,7 +15,7 @@ bundle agent autorun
         comment => "Lexicographically sorted bundles for predictable order";
 
   methods:
-    services_autorun::
+    services_autorun|services_autorun_bundles::
       "autorun" -> { "CFE-3795" }
         usebundle => $(sorted_bundles),
         action => immediate;
