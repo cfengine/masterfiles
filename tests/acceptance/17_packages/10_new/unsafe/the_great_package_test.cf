@@ -50,6 +50,16 @@ bundle agent init
     debian|redhat::
       "setup_python_symlink" usebundle => cfe_internal_setup_python_symlink("$(python_path)");
 
+  files:
+    "${sys.workdir}/modules/packages/."
+      create => "true";
+
+    debian::
+      "${sys.workdir}/modules/packages/apt_get"
+        copy_from => local_cp("${sys.workdir}/modules/packages/vendored/apt_get.mustache");
+    redhat::
+      "${sys.workdir}/modules/packages/yum"
+        copy_from => local_cp("${sys.workdir}/modules/packages/vendored/yum.mustache");
 }
 
 bundle agent log_test_case(msg)
