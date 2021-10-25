@@ -260,7 +260,6 @@ bundle agent cfe_internal_update_policy_cpv
       handle => "cfe_internal_update_policy_files_modules_dir",
       copy_from => u_rcp("$(modules_dir_source)", @(update_def.policy_servers)),
       depth_search => u_recurse("inf"),
-      perms => u_m("755"),
       action => u_immediate;
 
     update_inputs_not_kept::
