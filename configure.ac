@@ -227,6 +227,11 @@ do
     done
 done
 
+for i in `find "$srcdir/modules/packages/vendored" -type f`
+do
+    # add .mustache files, but from build dir instead to support ci/tests
+    MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $i | sed -e 's,vendored/,,' -e 's,modules,build/modules,' -e 's,.mustache,,'`"
+done
 
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
 
