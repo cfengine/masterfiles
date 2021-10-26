@@ -30,5 +30,17 @@ tar-package:
 	)  ;  \
 	[ x$$pkgdir != x ]  &&  rm -rf $$pkgdir
 
+# copy package modules for tests to build directory
+vendored := modules/packages/vendored
+modules := $(patsubst $(vendored)/%.mustache,build/modules/packages/%,$(wildcard $(vendored)/*.mustache))
+
+all-local: $(modules)
+
+build/modules/packages/%:
+	mkdir -p build/modules/packages
+	TEMPLATE=$$(echo $@ | sed 's,build/modules/packages,modules/packages/vendored,'); \
+	cp $$TEMPLATE.mustache $@
+	chmod +x $@
+
 clean-local:
 	rm -rf build
