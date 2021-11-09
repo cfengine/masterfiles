@@ -1,0 +1,91 @@
+######################################################
+#
+#  Test that attribute with works with custom promise types
+#
+#####################################################
+body common control
+{
+    inputs => { "../default.cf.sub" };
+    bundlesequence  => { default("$(this.promise_filename)") };
+    version => "1.0";
+}
+
+#######################################################
+
+bundle common version_check
+{
+  classes:
+    "python_version_compatible_with_cfengine_library"
+      expression => returnszero("/usr/bin/python3 -c 'import sys; assert sys.version_info >= (3,6)'", "useshell");
+@if minimum_version(3.18.1)
+    "custom_promises_supports_with" expression => "any";
+@endif
+}
+
+bundle agent init
+{
+  meta:
+      "test_skip_unsupported" string => "!custom_promises_supports_with|!python_version_compatible_with_cfengine_library";
+
+  files:
+      "$(G.testfile)"
+        delete => init_delete;
+
+      "$(this.promise_dirname)/cfengine.py"
+        copy_from => local_cp("$(this.promise_dirname)/../../../modules/promises/cfengine.py");
+}
+
+body delete init_delete
+{
+      dirlinks => "delete";
+      rmdirs   => "true";
+}
+
+#######################################################
+
+@if minimum_version(3.18.1)
+promise agent append
+{
+    interpreter => "/usr/bin/python3";
+    path => "$(this.promise_dirname)/append_promises.py";
+}
+
+bundle agent test
+{
+  meta:
+    "description" -> { "CFE-3438" }
+      string => "Test that depends_on works with custom promise types";
+
+  vars:
+    "letters"
+      slist => { "A", "B", "C", "D", "E", "F" };
+
+  append:
+    "$(G.testfile)"
+      string => "$(with)",
+      with => string_downcase("$(letters)");
+}
+@endif
+
+#######################################################
+
+bundle agent check
+{
+  vars:
+      "expected"
+        string => "abcdef";
+      "found"
+        string => readfile("$(G.testfile)");
+
+  classes:
+      "ok"
+        expression => strcmp("$(expected)", "$(found)");
+
+  reports:
+    DEBUG::
+      "Expected '$(expected)', found '$(found)'";
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}
