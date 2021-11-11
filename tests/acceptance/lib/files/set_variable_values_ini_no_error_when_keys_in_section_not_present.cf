@@ -30,6 +30,6 @@ bundle agent check
   methods:
 
       "Pass/FAIL"
-        usebundle => dcs_passif_output(".*", ".*error.*", "$(sys.cf_agent) -Kf $(this.promise_filename).sub --define AUTO", $(this.promise_filename));
+        usebundle => dcs_passif_output(".*$(this.promise_filename).sub Pass", ".*error.*", "$(sys.cf_agent) -Kf $(this.promise_filename).sub --define AUTO,DEBUG,EXTRA", $(this.promise_filename));
 
 }
