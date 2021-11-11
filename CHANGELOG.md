@@ -63,7 +63,7 @@ Notable changes to the framework should be documented here
 	- Switched build badges from travis-ci.org to travis-ci.com (ENT-7448)
 	- Switched from using package_method generic to default package_module for windows software inventory
 	  (ENT-2589)
-	- Ticket (ENT-7628)
+	- redhat_pure is no longer defined on rocky linux (ENT-7628)
 	- Use advisory lock for Federated Reporting operations (ENT-7474)
 	- controls/cf_serverd.cf no longer specifies explicit
 	             default for bindtointerface and relies on the default
