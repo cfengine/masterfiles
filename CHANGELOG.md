@@ -35,7 +35,7 @@ Notable changes to the framework should be documented here
 	  (ENT-7714)
 	- Removed build dir from install/dist targets (ENT-7359)
 	- Renamed python symlink to cfengine-selected-python (CFE-3512)
-	- Ticket (ENT-7628)
+	- redhat_pure is no longer defined on rocky linux (ENT-7628)
 	- Use masterfiles/modules or $(master_location)/modules as source for modules update
 	  (ENT-5752)
 
