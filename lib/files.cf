@@ -453,6 +453,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
       "\s*$(index)\s*=.*"
       edit_field => col("\s*=\s*","2","$($(tab)[$(sectionName)][$(index)])","set"),
       select_region => INI_section(escape("$(sectionName)")),
+      classes => results("bundle", "set_variable_values_ini_not_$(cindex[$(index)])"),
       if => and(canonify("_section_$(section_name)_present_reached"),
                 "edit_$(cindex[$(index)])");
   insert_lines:
@@ -463,7 +464,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
       "$(index)=$($(tab)[$(sectionName)][$(index)])"
       select_region => INI_section(escape("$(sectionName)")),
-      if => "edit_$(cindex[$(index)])";
+      if => "!(set_variable_values_ini_not_$(cindex[$(index)])_kept|set_variable_values_ini_not_$(cindex[$(index)])_repaired).edit_$(cindex[$(index)])";
 
 }
 
