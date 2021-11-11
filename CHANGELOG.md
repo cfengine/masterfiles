@@ -60,7 +60,6 @@ Notable changes to the framework should be documented here
 	  permission flip-flopping in some environments. Permissions on modules in the
 	  modules dir (sys.workdir)/modules are still enforced.
 	  Ticket: (ENT-7733)
-	- Switched build badges from travis-ci.org to travis-ci.com (ENT-7448)
 	- Switched from using package_method generic to default package_module for windows software inventory
 	  (ENT-2589)
 	- redhat_pure is no longer defined on rocky linux (ENT-7628)
