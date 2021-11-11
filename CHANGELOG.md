@@ -1,6 +1,75 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.18.1:
+	- Add interpreter attribute to standalone self upgrade package_module bodies
+	  (CFE-3703, ENT-5752)
+	- Added almalinux as a know derivative of rhel (ENT-7644)
+	- Added class to prevent hub from seeding binary packages for use in self upgrade
+	  (ENT-7544)
+	- Added cleanup of database and status semaphore when federation target_state is off
+	  (ENT-7233)
+	- Added custom promise python library
+	- Added distributed_cleanup utility for Federated Reporting (ENT-7215)
+	- Added fallback logic for determining installed software version on Windows
+	  (ENT-7501)
+	- Added lsmod to well known paths (CFE-3790)
+	- Added self upgrade support for SUSE (ENT-7446)
+	- Added separate classes for controlling autorun inputs and bundles
+	  The class services_autorun continues to enable both automatic inclusion of .cf
+	  files in services/autorun and the running of bundles tagged with autorun.
+	  This change adds the classes services_autorun_inputs and
+	  services_autorun_bundles for independently enabling addition of .cf files in
+	  services/autorun and automatic execution of bundles tagged with autorun
+	  respectively.
+	  Ticket: (CFE-3715)
+	- Added support for downloading community packages on hub in preparation for binary upgrades
+	- Added variable for excluding files from Policy Analyzer (ENT-7684)
+	- Adjusted permissions for Mission Portal public tmp files (ENT-7261)
+	- Autorun bundles now run regardless of locks
+	  Previously, when the autorun feature was enabled to automatically run bundles
+	  tagged with autorun the bundle actuation was affected by promise locking. The
+	  effect of this is that agent runs that happen close together would skip running
+	  bundles run within the last minute. Now autorun bundles no longer wait for a
+	  lock to expire, they will be actuated each agent execution. Note, promises
+	  within those bundles have their own locks which still apply.
+	  Ticket: (CFE-3795)
+	- Fixed package module augments settings usage for pre 3.15.3 binaries
+	  (ENT-7356, ENT-7358)
+	- Fixed path in permissions and ownership promise for application log dir
+	  (ENT-7731)
+	- Fixed services_autorun_bundles only case (CFE-3799)
+	- Fixup zypper package module script to work properly with interpreter attribute
+	  (ENT-7442)
+	- Insured exported reports from Mission Portal are in the correct location
+	  (ENT-7465)
+	- Physical Memory (MB) inventory now handles dmidecode MB or GB units
+	  (ENT-7714)
+	- Reduced scope of report informing of missing systemd service
+	  (CFE-290, ENT-7360)
+	- Removed build dir from install/dist targets (ENT-7359)
+	- Removed stale CMDB inventory policy (CFE-3712)
+	- Skip ownership of package modules on termux (CFE-3721)
+	- State changes of systemd services during agent run are now properly registered
+	  (CFE-3753)
+	- Stopped enforcing permissions of modules in inputs
+	  This change removes explicit enforcement of permissions for modules in inputs.
+	  Instead of explicitly enforcing permissions in inputs, we rely on the default
+	  permissions (600). The previous explicit permissions (755) are un-necessary as
+	  modules are not executed from within the inputs directory and have resulted in
+	  permission flip-flopping in some environments. Permissions on modules in the
+	  modules dir (sys.workdir)/modules are still enforced.
+	  Ticket: (ENT-7733)
+	- Switched build badges from travis-ci.org to travis-ci.com (ENT-7448)
+	- Switched from using package_method generic to default package_module for windows software inventory
+	  (ENT-2589)
+	- Ticket (ENT-7628)
+	- Use advisory lock for Federated Reporting operations (ENT-7474)
+	- controls/cf_serverd.cf no longer specifies explicit
+	             default for bindtointerface and relies on the default
+	             binding to both :: and 0.0.0.0 on IPV6-enabled hosts
+	  (ENT-7362)
+
 3.18.0:
 	- Added .ps1 to list of file patterns considered during policy update
 	  (ENT-4094)
