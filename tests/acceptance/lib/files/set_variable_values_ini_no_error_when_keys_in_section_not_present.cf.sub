@@ -37,7 +37,6 @@ bundle agent test
   vars:
       "config[section 1][present_at_start]" string => "1";
       "config[section 1][absent_at_start]" string => "1";
-      "config[section 2][present_at_start]" string => "two";
       "sections" slist => getindices( config );
 
   files:
