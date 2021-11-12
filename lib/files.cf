@@ -447,7 +447,7 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
       # expected in the case of promising a new file or section. How can this be
       # guarded against executing? The only thought I have is ...
       # if => regcmp( "some regex I dunno how to craft", readfile( $(edit.filename) )
-      
+
       # # If the line is there, but commented out, first uncomment it
       # "#+\s*$(index)\s*=.*"
       # select_region => INI_section(escape("$(sectionName)")),
@@ -456,12 +456,15 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
       #           "edit_$(cindex[$(index)])");
       # If the line is there, but commented out, first uncomment it
       "#+\s*$(index)\s*=.*"
+        if => and(
+                   #canonify("_section_$(sectionName)_present_reached"),
+                   #"edit_$(cindex[$(index)])",
+                   # regcmp matches if the promised file contains [$(sectionName)] with a commented out $(index)
+                   regcmp( concat("\[", escape($(sectionName)), "\]",
+                                  "[^#\[]*#\s*", escape($(index)), "\s*=.*"),
+                           readfile( $(edit.filename) ))),
         select_region => INI_section(escape("$(sectionName)")),
-        edit_field => col("\s*=\s*","1","$(index)","set"),
-        if => and( canonify("_section_$(sectionName)_present_reached"),
-                   "edit_$(cindex[$(index)])",
-                   regcmp( concat("\[", escape($(sectionName)), "\](?:[^#]#?+)+$(index)\s*=[^\[]++"),
-                           readfile( $(edit.filename) )));
+        edit_field => col("\s*=\s*","1","$(index)","set");
 
       # match a line starting like the key something
       "\s*$(index)\s*=.*"
