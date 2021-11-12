@@ -160,7 +160,6 @@ bundle agent cfe_internal_setup_knowledge
       create => "true",
       perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group));
 
-      # Current MP Default: -rw-r--r--. 1 cfapache cfapache 351 Nov 11 17:24 log-2021-11-11.log
       "$(sys.workdir)/httpd/logs/application/." -> { "ENT-7730" }
         comment => "Ensure permissions for $(sys.workdir)/httpd/logs/application/.*",
         handle => "cfe_internal_setup_knowledge_files_httpd_application_log_files",
