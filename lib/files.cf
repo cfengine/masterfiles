@@ -435,6 +435,8 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
       # Be careful if the index string contains funny chars
       "cindex[$(index)]" string => canonify("$(index)");
+      "_escaped_key[$(index)]" string => escape("$(index)");
+      "_escaped_section[$(sectionName)]" string => escape("$(sectionName)");
 
   classes:
       "edit_$(cindex[$(index)])"     not => strcmp("$($(tab)[$(sectionName)][$(index)])","dontchange"),
@@ -455,15 +457,15 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
       # if => and(canonify("_section_$(sectionName)_present_reached"),
       #           "edit_$(cindex[$(index)])");
       # If the line is there, but commented out, first uncomment it
-      "#+\s*$(index)\s*=.*"
+      "#+\s*$(_escaped_key[$(index)])\s*=.*"
         if => and(
-                   #canonify("_section_$(sectionName)_present_reached"),
-                   #"edit_$(cindex[$(index)])",
+                   #canonify("_section_$(sectionName)_present_reached"), # I don't think this helps because the class is based on the promise running on a buffer of the file, we are only checking the file as it exists before the promise finished
+                   #"edit_$(cindex[$(index)])", # is it useful? why would you do not change? this bundle only asserts keys provided in dataset, providing a key with value donotchange is tantemount to not providing the key
                    # regcmp matches if the promised file contains [$(sectionName)] with a commented out $(index)
-                   regcmp( concat("\[", escape($(sectionName)), "\]",
-                                  "[^#\[]*#\s*", escape($(index)), "\s*=.*"),
+                   regcmp( concat("\[$(_escaped_section[$(sectionName)])\]",
+                                  "[^#\[]*#\s*$(_escaped_key[$(index)])\s*=.*"),
                            readfile( $(edit.filename) ))),
-        select_region => INI_section(escape("$(sectionName)")),
+        select_region => INI_section( "$(_escaped_section[$(sectionName)])" ),
         edit_field => col("\s*=\s*","1","$(index)","set");
 
       # match a line starting like the key something
