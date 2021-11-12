@@ -442,18 +442,15 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
   field_edits:
 
-      # This is emitting an /error/ when no commented out managed key line is
-      # found within the selected region. The missing keys is completely
-      # expected in the case of promising a new file or section. How can this be
-      # guarded against executing? The only thought I have is ...
-      # if => regcmp( "some regex I dunno how to craft", readfile( $(edit.filename) )
-
       # # If the line is there, but commented out, first uncomment it
-      # "#+\s*$(index)\s*=.*"
-      # select_region => INI_section(escape("$(sectionName)")),
-      # edit_field => col("\s*=\s*","1","$(index)","set"),
-      # if => and(canonify("_section_$(sectionName)_present_reached"),
-      #           "edit_$(cindex[$(index)])");
+      "#+\s*$(index)\s*=.*"
+      select_region => INI_section(escape("$(sectionName)")),
+      edit_field => col("\s*=\s*","1","$(index)","set"),
+      if => and( canonify("_section_$(sectionName)_present_reached"),
+                 "edit_$(cindex[$(index)])",
+                 regcmp( "\[$(sectionName)\](?s:.)#\s+$(index)\s+=\s+[^\[]*",
+                         readfile( $(edit.filename) )));
+
 
       # match a line starting like the key something
       "\s*$(index)\s*=.*"
