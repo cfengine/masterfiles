@@ -21,8 +21,7 @@ Notable changes to the framework should be documented here
 	  This change adds the classes services_autorun_inputs and
 	  services_autorun_bundles for independently enabling addition of .cf files in
 	  services/autorun and automatic execution of bundles tagged with autorun
-	  respectively.
-	  Ticket: (CFE-3715)
+	  respectively. (CFE-3715)
 	- Added support for downloading community packages on hub in preparation for binary upgrades
 	- Added variable for excluding files from Policy Analyzer (ENT-7684)
 	- Adjusted permissions for Mission Portal public tmp files (ENT-7261)
@@ -32,8 +31,7 @@ Notable changes to the framework should be documented here
 	  effect of this is that agent runs that happen close together would skip running
 	  bundles run within the last minute. Now autorun bundles no longer wait for a
 	  lock to expire, they will be actuated each agent execution. Note, promises
-	  within those bundles have their own locks which still apply.
-	  Ticket: (CFE-3795)
+	  within those bundles have their own locks which still apply. (CFE-3795)
 	- Fixed package module augments settings usage for pre 3.15.3 binaries
 	  (ENT-7356, ENT-7358)
 	- Fixed path in permissions and ownership promise for application log dir
@@ -45,10 +43,13 @@ Notable changes to the framework should be documented here
 	  (ENT-7465)
 	- Physical Memory (MB) inventory now handles dmidecode MB or GB units
 	  (ENT-7714)
+	- Promised permissions for Mission Portal application and Apache log files
+	  (ENT-7730)
 	- Reduced scope of report informing of missing systemd service
 	  (CFE-290, ENT-7360)
 	- Removed build dir from install/dist targets (ENT-7359)
 	- Removed stale CMDB inventory policy (CFE-3712)
+	- Set apache umask to 0177 (ENT-7948)
 	- Skip ownership of package modules on termux (CFE-3721)
 	- State changes of systemd services during agent run are now properly registered
 	  (CFE-3753)
@@ -58,16 +59,14 @@ Notable changes to the framework should be documented here
 	  permissions (600). The previous explicit permissions (755) are un-necessary as
 	  modules are not executed from within the inputs directory and have resulted in
 	  permission flip-flopping in some environments. Permissions on modules in the
-	  modules dir (sys.workdir)/modules are still enforced.
-	  Ticket: (ENT-7733)
-	- Switched from using package_method generic to default package_module for windows software inventory
-	  (ENT-2589)
+	  modules dir (sys.workdir)/modules are still enforced. (ENT-7733)
+	- Switched from using package_method generic to default package_module for windows
+	  software inventory (ENT-2589)
 	- redhat_pure is no longer defined on rocky linux (ENT-7628)
 	- Use advisory lock for Federated Reporting operations (ENT-7474)
 	- controls/cf_serverd.cf no longer specifies explicit
-	             default for bindtointerface and relies on the default
-	             binding to both :: and 0.0.0.0 on IPV6-enabled hosts
-	  (ENT-7362)
+	  default for bindtointerface and relies on the default
+	  binding to both :: and 0.0.0.0 on IPV6-enabled hosts (ENT-7362)
 
 3.18.0:
 	- Added .ps1 to list of file patterns considered during policy update
