@@ -180,6 +180,11 @@ bundle agent cfe_internal_setup_knowledge
         depth_search => recurse_with_base( "0" ),
         perms => mog("0600", root, root);
 
+      "/var/log/postgresql.log" -> { "ENT-7961" }
+        comment => "Ensure permissions for PostgreSQL log",
+        handle => "cfe_internal_setup_knowledge_files_postgresql_log_file",
+        perms => mog("0600", "cfpostgres", "cfpostgres");
+
       "$(cfe_internal_hub_vars.docroot)/../ssl/."
         perms => mog("0440", "root", "root" ),
         if => not( "ENT_3572" );
