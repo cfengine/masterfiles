@@ -1,6 +1,45 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.5:
+	- Add interpreter attribute to standalone self upgrade package_module bodies
+	  (CFE-3703, ENT-5752)
+	- Added almalinux as a know derivative of rhel (ENT-7644)
+	- Added cleanup of database and status semaphore when federation target_state is off
+	  (ENT-7233)
+	- Added fallback logic for determining installed software version on Windows
+	  (ENT-7501)
+	- Added lsmod to well known paths (CFE-3790)
+	- Adjusted permissions for Mission Portal public tmp files (ENT-7261)
+	- Always update modules from masterfiles to $(sys.workdir)/modules (ENT-5752)
+	- Autorun bundles now run regardless of locks
+	  Previously, when the autorun feature was enabled to automatically run bundles
+	  tagged with autorun the bundle actuation was affected by promise locking. The
+	  effect of this is that agent runs that happen close together would skip running
+	  bundles run within the last minute. Now autorun bundles no longer wait for a
+	  lock to expire, they will be actuated each agent execution. Note, promises
+	  within those bundles have their own locks which still apply. (CFE-3795)
+	- Fixed package module augments settings usage for pre 3.15.3 binaries
+	  (ENT-7356, ENT-7358)
+	- Fixed path in permissions and ownership promise for application log dir
+	  (ENT-7731)
+	- Fixup zypper package module script to work properly with interpreter attribute
+	  (ENT-7442)
+	- Stopped enforcing root ownership for CFEngine files on Windows
+	  (ENT-4628)
+	- Ensured exported reports from Mission Portal are in the correct location
+	  (ENT-7465)
+	- Physical Memory (MB) inventory now handles dmidecode MB or GB units
+	  (ENT-7714)
+	- Enforced permissions for Mission Portal application and Apache log files
+	  (ENT-7730)
+	- Removed build dir from install/dist targets (ENT-7359)
+	- Renamed python symlink to cfengine-selected-python (CFE-3512)
+	- redhat_pure is no longer defined on rocky linux (ENT-7628)
+	- Set apache umask to 0177 (ENT-7948)
+	- Use masterfiles/modules or $(master_location)/modules as source for modules update
+	  (ENT-5752)
+
 3.15.4:
 	- Added ability to specify a list of bundles to run before autorun (for classification)
 	  (ENT-6603)
