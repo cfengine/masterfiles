@@ -39,6 +39,8 @@ Notable changes to the framework should be documented here
 	- Set apache umask to 0177 (ENT-7948)
 	- Use masterfiles/modules or $(master_location)/modules as source for modules update
 	  (ENT-5752)
+	- setup-status.json is no longer being repaired over and over on FR feeder hubs
+	  (ENT-7967)
 
 3.15.4:
 	- Added ability to specify a list of bundles to run before autorun (for classification)
