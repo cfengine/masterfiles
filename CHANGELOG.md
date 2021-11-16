@@ -65,6 +65,8 @@ Notable changes to the framework should be documented here
 	- controls/cf_serverd.cf no longer specifies explicit
 	  default for bindtointerface and relies on the default
 	  binding to both :: and 0.0.0.0 on IPV6-enabled hosts (ENT-7362)
+	- setup-status.json is no longer being repaired over and over on FR feeder hubs
+	  (ENT-7967)
 
 3.18.0:
 	- Added .ps1 to list of file patterns considered during policy update
