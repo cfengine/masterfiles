@@ -25,13 +25,13 @@ Notable changes to the framework should be documented here
 	  (ENT-7731)
 	- Fixup zypper package module script to work properly with interpreter attribute
 	  (ENT-7442)
-	- Guard again enforcing root ownership for CFEngine files on Windows
+	- Stopped enforcing root ownership for CFEngine files on Windows
 	  (ENT-4628)
-	- Insured exported reports from Mission Portal are in the correct location
+	- Ensured exported reports from Mission Portal are in the correct location
 	  (ENT-7465)
 	- Physical Memory (MB) inventory now handles dmidecode MB or GB units
 	  (ENT-7714)
-	- Promised permissions for Mission Portal application and Apache log files
+	- Enforced permissions for Mission Portal application and Apache log files
 	  (ENT-7730)
 	- Removed build dir from install/dist targets (ENT-7359)
 	- Renamed python symlink to cfengine-selected-python (CFE-3512)
