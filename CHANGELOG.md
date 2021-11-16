@@ -9,7 +9,7 @@ Notable changes to the framework should be documented here
 	  (ENT-7544)
 	- Added cleanup of database and status semaphore when federation target_state is off
 	  (ENT-7233)
-	- Added custom promise python library
+	- Added custom promise type python library
 	- Added distributed_cleanup utility for Federated Reporting (ENT-7215)
 	- Added fallback logic for determining installed software version on Windows
 	  (ENT-7501)
@@ -47,7 +47,6 @@ Notable changes to the framework should be documented here
 	  (ENT-7730)
 	- Reduced scope of report informing of missing systemd service
 	  (CFE-290, ENT-7360)
-	- Removed build dir from install/dist targets (ENT-7359)
 	- Removed stale CMDB inventory policy (CFE-3712)
 	- Set apache umask to 0177 (ENT-7948)
 	- Skip ownership of package modules on termux (CFE-3721)
@@ -63,7 +62,6 @@ Notable changes to the framework should be documented here
 	- Switched from using package_method generic to default package_module for windows
 	  software inventory (ENT-2589)
 	- redhat_pure is no longer defined on rocky linux (ENT-7628)
-	- Use advisory lock for Federated Reporting operations (ENT-7474)
 	- controls/cf_serverd.cf no longer specifies explicit
 	  default for bindtointerface and relies on the default
 	  binding to both :: and 0.0.0.0 on IPV6-enabled hosts (ENT-7362)
