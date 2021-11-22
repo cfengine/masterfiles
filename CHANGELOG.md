@@ -32,6 +32,7 @@ Notable changes to the framework should be documented here
 	  bundles run within the last minute. Now autorun bundles no longer wait for a
 	  lock to expire, they will be actuated each agent execution. Note, promises
 	  within those bundles have their own locks which still apply. (CFE-3795)
+	- Enforced permissions for Postgres log (ENT-7961)
 	- Fixed package module augments settings usage for pre 3.15.3 binaries
 	  (ENT-7356, ENT-7358)
 	- Fixed path in permissions and ownership promise for application log dir
@@ -47,6 +48,7 @@ Notable changes to the framework should be documented here
 	  (ENT-7730)
 	- Reduced scope of report informing of missing systemd service
 	  (CFE-290, ENT-7360)
+	- Removed build dir from install/dist targets (ENT-7359)
 	- Removed stale CMDB inventory policy (CFE-3712)
 	- Set apache umask to 0177 (ENT-7948)
 	- Skip ownership of package modules on termux (CFE-3721)
