@@ -2,6 +2,9 @@
 Notable changes to the framework should be documented here
 
 3.15.5:
+	- Made apache restart more robust (ENT-8045)
+	- Moved httpd.pid to root of httpd workdir (ENT-7966)
+	- Enforced permissions for postgresql.log (ENT-7961)
 	- Add interpreter attribute to standalone self upgrade package_module bodies
 	  (CFE-3703, ENT-5752)
 	- Added almalinux as a know derivative of rhel (ENT-7644)
