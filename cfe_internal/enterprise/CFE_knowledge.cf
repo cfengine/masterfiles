@@ -52,10 +52,10 @@ bundle agent cfe_internal_setup_knowledge
         perms => mog("0600", "root", "root" );
 
       "$(cfe_internal_hub_vars.docroot)"
-      comment => "All files in there should be at least 0644",
+      comment => "All files in there should be at least 0460. Giving cfapache group full access",
       handle => "cfe_internal_setup_knowledge_files_doc_root_2",
       file_select => cfe_internal_docroot_perms,
-      perms => mog("0440", "root", $(def.cf_apache_group) ),
+      perms => mog("0460", "root", $(def.cf_apache_group) ),
       depth_search => recurse_exclude("inf");   # see exclude dirs in recurse_exclude() body
 
       "$(cfe_internal_hub_vars.docroot)/.htaccess"
