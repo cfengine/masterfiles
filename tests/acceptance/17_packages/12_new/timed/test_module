@@ -1,45 +1,60 @@
-#!/usr/bin/python
+#!/bin/sh
+# because we can't use $(...) with /bin/sh on SunOS 5.10
+# shellcheck disable=SC2006
+# another SunOS workaround
+command -v ggrep >/dev/null && GREP="ggrep"|| GREP="grep"
+set -e
+#set -x
+if [ "$1" = "supports-api-version" ]
+then
+  echo "1"
+  exit 0
+fi
 
-import sys
-import os
-import re
+_dir=`dirname "$0"`
+module_dir=`cd "$_dir" && pwd -P`
+log="$module_dir/test_module.log"
 
-if sys.argv[1] == "supports-api-version":
-    sys.stdout.write("1\n")
-    sys.exit(0)
+echo "$1" >> "$log"
 
-module_dir = os.path.dirname(sys.argv[0])
 
-log = open(module_dir + "/test_module.log", "a")
-log.write(sys.argv[1] + "\n")
-log.close()
+pkg_name=""
 
-pkg_name = ""
-for line in sys.stdin:
-    if line.startswith('File='):
-        pkg_name = line.split('=', 1)[1].rstrip()
-        break
+while read line
+do
+  echo "$line" | "$GREP" -q ^File= 2>/dev/null && pkg_name=`echo "$line" | cut -d= -f2`
+done
 
-log = open(module_dir + "/test_module.log", "r")
-install_found = False
-for line in log:
-    if line.find("repo-install") >= 0:
-        install_found = True
-log.close()
+install_found=false
+"$GREP" -q repo-install "$log" 2>/dev/null && install_found=true
 
-if sys.argv[1] == "list-installed":
-    if install_found:
-        sys.stdout.write("Name=cfe-present-package\nVersion=3\nArchitecture=amd64\n")
-    else:
-        sys.stdout.write("Name=cfe-present-package\nVersion=1\nArchitecture=amd64\n")
+if [ "$1" = "list-installed" ]; then
+  if $install_found; then
+    cat <<EOF
+Name=cfe-present-package
+Version=3
+Architecture=amd64
+EOF
+  else
+    cat <<EOF
+Name=cfe-present-package
+Version=1
+Architecture=amd64
+EOF
+  fi
+elif [ "$1" = "list-updates" ] || [ "$1" = "list-updates-local" ]; then
+  if ! $install_found; then
+    cat <<EOF
+Name=cfe-present-package
+Version=3
+Architecture=amd64
+EOF
+  fi
+elif [ "$1" = "get-package-data" ]; then
+  cat <<EOF
+PackageType=repo
+Name=$pkg_name
+EOF
+fi
 
-elif sys.argv[1] == "list-updates" or sys.argv[1] == "list-updates-local":
-    # Don't print anything if repo-install has been called. We simulate having
-    # installed the update.
-    if not install_found:
-        sys.stdout.write("Name=cfe-present-package\nVersion=3\nArchitecture=amd64\n")
-
-elif sys.argv[1] == "get-package-data":
-    sys.stdout.write("PackageType=repo\nName=" + pkg_name + "\n")
-
-sys.exit(0)
+exit 0
