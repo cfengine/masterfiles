@@ -2,7 +2,7 @@
 Notable changes to the framework should be documented here
 
 3.19.0:
-	- Add interpreter attribute to standalone self upgrade package_module bodies
+	- Added interpreter attribute to standalone self upgrade package_module bodies
 	  (CFE-3703, ENT-5752)
 	- Added almalinux as a know derivative of rhel (ENT-7644)
 	- Added class to prevent hub from seeding binary packages for use in self upgrade
@@ -61,7 +61,6 @@ Notable changes to the framework should be documented here
 	- Removed build dir from install/dist targets (ENT-7359)
 	- Removed stale CMDB inventory policy (CFE-3712)
 	- Set apache umask to 0177 (ENT-7948)
-	- Skip ownership of package modules on termux (CFE-3721)
 	- State changes of systemd services during agent run are now properly registered
 	  (CFE-3753)
 	- Stopped enforcing permissions of modules in inputs
@@ -73,14 +72,14 @@ Notable changes to the framework should be documented here
 	  modules dir (sys.workdir)/modules are still enforced.  (ENT-7733)
 	- Switched from using package_method generic to default package_module
 	  for windows software inventory (ENT-2589)
-	- Improve the reliability when detecting a Red Hat system.
+	- Improved the reliability when detecting a Red Hat system.
 	  Now if the ID field in /etc/os-release is set to rhel, the redhat_pure class
 	  will be defined.
 	  If the variable sys.os_release does not exist, redhat_pure is defined if we have already
 	  defined redhat and we do not find classes for well known derivatives
 	- rocky, a class defined on Rocky Linux was added to the list of well known derivatives
 	  (ENT-7628)
-	- Use advisory lock for Federated Reporting operations (ENT-7474)
+	- Added advisory lock for Federated Reporting operations (ENT-7474)
 	- controls/cf_serverd.cf no longer specifies explicit
 	  default for bindtointerface and relies on the default
 	  binding to both :: and 0.0.0.0 on IPV6-enabled hosts
@@ -145,7 +144,6 @@ Notable changes to the framework should be documented here
 	- Removed unused plugins directory (CFE-3618)
 	- Renamed python symlink to cfengine-selected-python (CFE-3512)
 	- Shortened Inventory OS attribute to be more readable (ENT-6536)
-	- Stopped testing MPF against 3.10.x (CFE-3642)
 	- Suppressed inform output from Enterprise Hub database maintenance operations
 	  (ENT-6563)
 	- Suppressed output from watchdog on AIX to prevent the mail spool from filling up
@@ -153,7 +151,6 @@ Notable changes to the framework should be documented here
 	- Added ability to specify a list of bundles to run before autorun (for classification) (ENT-6603)
 	- Update policy now moves obstructions (CFE-2984)
 	- Use VBScript to enumerate installed packages (ENT-4669)
-	- Worked around CI deployment test failure (ENT-6840)
 	- add /usr/bin/yum to paths.cf for aix (CFE-3615)
 	- service status on FreeBSD now uses onestatus (CFE-3515)
     - Guard again enforcing root ownership for CFEngine files on Windows (ENT-4628)
