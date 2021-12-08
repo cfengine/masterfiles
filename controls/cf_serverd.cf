@@ -93,6 +93,10 @@ bundle server mpf_default_access_rules()
       if => isdir( "$(def.dir_masterfiles)/" ),
       admit => { @(def.acl) };
 
+      "$(def.dir_masterfiles)/.no-distrib" -> { "ENT-8079" }
+      handle => "prevent_distribution_of_top_level_dot_no_distrib",
+      deny => { "0.0.0.0/0" };
+
       "$(def.dir_bin)/"
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
