@@ -70,7 +70,7 @@ bundle agent cfe_autorun_inventory_listening_ports
 
 Well, the slist copy is a CFEngine detail (we get the listening ports from the
 monitoring daemon), so just assume that the data is correct. What's important is
-the second line that starts with [`meta`][Promise Types#meta].
+the second line that starts with [`meta`](https://docs.cfengine.com/docs/master/reference-promise-types.html#meta).
 That defines metadata for the promise that CFEngine will use to determine that
 this data is indeed inventory data and should be reported to the CFEngine
 Enterprise Hub.
