@@ -52,9 +52,14 @@ declare -a hostkeys
 for file in $dump_files; do
   hostkey=$(basename "$file" | cut -d. -f1)
   hostkeys+=($hostkey)
-  "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
-                      -c "SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-    > schema_setup.log 2>&1 || failed=1
+  if [ -z $(psql --csv --tuples-only -U cfapache -d cfdb -c "SELECT hub_id FROM __hubs WHERE hostkey = '$hostkey';") ]; then
+    log "No feeder with hostkey $hostkey found in cfdb.__hubs, skipping the dump file $file, consider deleting this file or re-adding the feeder to superhub"
+    dump_files=$(echo "$dump_files" | sed "s,\s\?$file,," | xargs)
+  else
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                        -c "SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+      > schema_setup.log 2>&1 || failed=1
+  fi
 done
 if [ "$failed" = "0" ]; then
   log "Setting up schemas for import: DONE"
@@ -70,6 +75,11 @@ else
   exit 1
 fi
 
+# if we removed all the dump_files due to lack of __hubs table entry, just quit
+if [ -z "$dump_files" ]; then
+  log "No dump files left to process."
+  exit 0
+fi
 # make sure the script we are about to run is executable
 chmod u+x "$(dirname "$0")/import_file.sh"
 
