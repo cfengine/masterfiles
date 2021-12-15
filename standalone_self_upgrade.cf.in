@@ -203,8 +203,9 @@ bundle agent cfengine_software_version
 # upgrading.
 {
   classes:
-      "__supported_platform" -> { "ENT-5045", "ENT-5152", "ENT-4094" }
+      "__supported_platform" -> { "ENT-5045", "ENT-5152", "ENT-4094", "ENT-8247" }
         or => {
+                "amazon_linux",
                 "redhat.!redhat_4",
                 "centos.!centos_4",
                 "debian",
@@ -218,7 +219,7 @@ bundle agent cfengine_software_version
 
       # Add "windows" to __new_implementation classes with ENT-6823
       "__new_implementation"
-        or => { "redhat", "centos", "ubuntu", "debian" };
+        or => { "amazon_linux", "redhat", "centos", "ubuntu", "debian" };
 
   vars:
       "pkg_name" string => "$(cfengine_software.pkg_name)";
@@ -268,7 +269,7 @@ bundle agent cfengine_software_version_packages2
 
   packages:
 
-    (redhat|centos).!__supported::
+    (amazon_linux|redhat|centos).!__supported::
       "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
       policy => "present",
       package_module => yum,
