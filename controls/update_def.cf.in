@@ -14,6 +14,7 @@ bundle common update_def
       "sys_policy_hub_port_exists" expression => isvariable("sys.policy_hub_port");
   vars:
       "current_version" string => "@VERSION@";
+      "current_release" string => "@RELEASE@";
 
     !feature_def_json_preparse::
       "augments_file" string => "$(this.promise_dirname)/../../def.json";
