@@ -8,6 +8,7 @@ bundle common update_def
     any::
 
       "current_version" string => "@VERSION@";
+      "current_release" string => "@RELEASE@";
 
       # MPF Controls
 
