@@ -58,6 +58,11 @@ bundle agent cfe_internal_setup_knowledge
       perms => mog("0460", "root", $(def.cf_apache_group) ),
       depth_search => recurse_exclude("inf");   # see exclude dirs in recurse_exclude() body
 
+      "$(cfe_internal_hub_vars.docroot)/."
+      comment => "The top level docroot dir should be at least 0460 with root:cfapache",
+      handle => "cfe_internal_setup_knowledge_dir_doc_root",
+      perms => mog("0460", "root", $(def.cf_apache_group) );
+
       "$(cfe_internal_hub_vars.docroot)/.htaccess"
       comment => "Correct up htaccess file in doc root",
       handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
