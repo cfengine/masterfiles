@@ -319,10 +319,9 @@ bundle agent clean_when_off
       "has_cftransport_fcontext" expression => returnszero("$(paths.semanage) fcontext -l | grep $(home)", "useshell");
 
   commands:
-      am_superhub::
       # Oh, the humanity! Where for art thou databases: promises for psql!
       `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" };
-      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE federated_reporting_settings" -> { "ENT-7233" }`;
+      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE federated_reporting_settings"` -> { "ENT-7233" };
 
       # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
     selinux_enabled.default:_stdlib_path_exists_semanage.has_cftransport_fcontext::
