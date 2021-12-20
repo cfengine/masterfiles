@@ -495,6 +495,7 @@ bundle common cfengine_package_names
       # Windows
       "pkg[windows_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release)-x86_64.msi";
       "pkg[windows_i686]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release)-i686.msi";
+
       "my_pkg"
         string => "$(pkg[$(sys.flavor)_$(sys.arch)])",
         comment => "The package name for the currently executing platform.";
@@ -570,6 +571,10 @@ bundle agent cfengine_master_software_content
                               "ubuntu_18" };
 
       "dir[$(_deb_dists)_$(_32bit_arches)]" string => "agent_deb_i386";
+
+      # Windows
+      "dir[windows_x86_64]" string => "windows_x86_64";
+      "dir[windows_i686]"   string => "windows_i686";
 
       "platform_dir" slist => getindices( dir );
       "download_dir" string => "$(sys.workdir)/master_software_updates";
