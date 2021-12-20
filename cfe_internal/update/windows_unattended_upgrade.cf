@@ -16,8 +16,10 @@ bundle agent windows_unattended_upgrade
         string => "$(const.dirsep)schedule_unattended_upgrade.ps1",
         comment => "sys.bindir has issues when used as execution path"; # TODO examine and fix/document specific issue(s)
 
+      "_upgrade_script_name" string => "unattended-upgrade.bat";
+
       "_upgrade_script"
-        string => "$(sys.bindir)$(const.dirsep)unattended-upgrade.bat";
+        string => "$(sys.bindir)$(const.dirsep)$(_upgrade_script_name)";
 
       "_scripts" slist => { "$(_schedule_upgrade_script)", "$(_upgrade_script)" };
 
@@ -38,11 +40,13 @@ $scheduled_time_to_upgrade = (Get-Date).AddMinutes($(_min_offset)).ToString("HH:
 $schedule = "/SC ONCE"
 $taskname = '/TN "CFEngine Agent Upgrade"'
 $starttime = "/ST $scheduled_time_to_upgrade"
-$taskrun = '/TR "$(_upgrade_script)"'
+$taskrun = @"
+"cmd /c '$(_upgrade_script)'"
+"@
 $schtasks = "$(sys.winsysdir)$(const.dirsep)schtasks.exe"
 $username = '/RU "System"'
 $force = "/F"
-Invoke-Expression "$schtasks /Create $schedule $taskname $taskrun $starttime $username $force"
+Invoke-Expression "$schtasks /Create $schedule $taskname /TR $taskrun $starttime $username $force"
 `,
         template_method => "inline_mustache",
         template_data => '{}';
@@ -76,7 +80,7 @@ exit 0
 
   commands:
     windows::
-      '$(_schedule_upgrade_script)'
+      'powershell -NoProfile -ExecutionPolicy bypass -F $(_schedule_upgrade_script)'
          if => not( "_expected_version_installed" ),
          contain => windows_unattended_upgrade:powershell;
 }
