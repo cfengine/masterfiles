@@ -319,6 +319,7 @@ bundle agent clean_when_off
       "has_cftransport_fcontext" expression => returnszero("$(paths.semanage) fcontext -l | grep $(home)", "useshell");
 
   commands:
+    am_superhub|am_feeder::
       # Oh, the humanity! Where for art thou databases: promises for psql!
       `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" };
       `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE federated_reporting_settings"` -> { "ENT-7233" };
