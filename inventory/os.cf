@@ -69,11 +69,12 @@ windows::
 # os-release is preferred over LSB:
 any::
   # os-release PRETTY_NAME
-  "description" string => string_replace(string_replace(string_replace(
+  "description" string => string_replace(string_replace(string_replace(string_replace(
                             "$(sys.os_release[PRETTY_NAME])",
                             "Red Hat Enterprise Linux Server", "RHEL"),
                             "Debian GNU/Linux", "Debian"),
                             "CentOS Linux", "CentOS"),
+                            "Rocky Linux", "Rocky"),
                     if => isvariable("sys.os_release[PRETTY_NAME]"),
                   meta => { "inventory", "attribute_name=OS", "derived-from=sys.os_release" };
 
@@ -81,12 +82,13 @@ any::
                                   if => isvariable("sys.os_release[VERSION_ID]");
 
   # os-release NAME VERSION_ID - preferred when available
-  "description" string => string_replace(string_replace(string_replace(string_replace(string_replace(
+  "description" string => string_replace(string_replace(string_replace(string_replace(string_replace(string_replace(
                             "$(sys.os_release[NAME]) $(major_version_from_os_release)",
                             "Red Hat Enterprise Linux Server", "RHEL"), # Seen on RHEL 7...
                             "Red Hat Enterprise Linux", "RHEL"), # On RHEL 8 they changed their mind
                             "Debian GNU/Linux", "Debian"),
                             "CentOS Linux", "CentOS"),
+                            "Rocky Linux", "Rocky"),
                             "SLES", "SUSE"),
                     if => and(isvariable("sys.os_release[NAME]"),
                               isvariable("major_version_from_os_release")),
@@ -117,5 +119,10 @@ any::
   "description"
     string => "$(sys.os_name_human) $(sys.os_version_major)",
     meta => { "inventory", "attribute_name=OS" };
+
+rocky::
+   "description" -> { "ENT-8292" }
+     string => "Rocky $(sys.os_version_major)",
+     meta => { "inventory", "attribute_name=OS" };
 @endif
 }
