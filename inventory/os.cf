@@ -82,7 +82,7 @@ any::
                                   if => isvariable("sys.os_release[VERSION_ID]");
 
   # os-release NAME VERSION_ID - preferred when available
-   "description" string => string_replace(string_replace(string_replace(string_replace(string_replace(string_replace(
+  "description" string => string_replace(string_replace(string_replace(string_replace(string_replace(string_replace(
                             "$(sys.os_release[NAME]) $(major_version_from_os_release)",
                             "Red Hat Enterprise Linux Server", "RHEL"), # Seen on RHEL 7...
                             "Red Hat Enterprise Linux", "RHEL"), # On RHEL 8 they changed their mind
