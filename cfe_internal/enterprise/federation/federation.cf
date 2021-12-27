@@ -332,11 +332,15 @@ bundle agent clean_when_off
   classes:
     selinux_enabled.default:_stdlib_path_exists_semanage::
       "has_cftransport_fcontext" expression => returnszero("$(paths.semanage) fcontext -l | grep $(home)", "useshell");
+    "remote_hubs_table_empty" expression => returnszero(`[ $(const.dollar)($(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs") -eq "0"]`, "useshell");
+    "federated_reporting_settings_table_empty" expression => returnszero(`[ $(const.dollar)($(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings") -eq "0"]`, "useshell");
 
   commands:
       # Oh, the humanity! Where for art thou databases: promises for psql!
-      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" };
-      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE federated_reporting_settings"` -> { "ENT-7233" };
+      !remote_hubs_table_empty::
+        `$(sys.bindir)/psql cfsettings --quiet --command "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" };
+      !federated_reporting_settings_table_empty::
+        `$(sys.bindir)/psql cfsettings --quiet --command "TRUNCATE TABLE federated_reporting_settings"` -> { "ENT-7233" };
 
       # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
     selinux_enabled.default:_stdlib_path_exists_semanage.has_cftransport_fcontext::
@@ -669,10 +673,11 @@ bundle agent entry
       "CFEngine Enterprise Federation Configuration"
         handle => "config",
         usebundle => config;
-    am_off|config_not_exists::
+    am_policy_hub.(am_off|config_not_exists)::
       "CFEngine Enterprise Federation Transport Off"
         handle => "clean_when_off",
-        usebundle => clean_when_off;
+        usebundle => clean_when_off,
+        if => cf_version_minimum("3.15");
     enabled.am_on::
       "CFEngine Enterprise Federation Transport User"
         handle => "transport_user",
