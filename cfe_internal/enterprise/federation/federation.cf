@@ -301,6 +301,10 @@ bundle agent clean_when_off
   vars:
     "user" string => "$(cfengine_enterprise_federation:transport_user.user)";
     "home" string => "$(cfengine_enterprise_federation:transport_user.home)";
+@if minimum_version(3.15)
+    "remote_hubs_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs" 2>/dev/null`, useshell);
+    "federated_reporting_settings_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings" 2>/dev/null`, useshell);
+@endif
 
   users:
     "$(user)"
@@ -318,12 +322,15 @@ bundle agent clean_when_off
     selinux_enabled.default:_stdlib_path_exists_semanage::
       "has_cftransport_fcontext" expression => returnszero("$(paths.semanage) fcontext -l | grep $(home)", "useshell");
 
+
   commands:
       # Oh, the humanity! Where for art thou databases: promises for psql!
-      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" };
-      `$(sys.bindir)/psql cfsettings -c "TRUNCATE TABLE federated_reporting_settings"` -> { "ENT-7233" };
+      `$(sys.bindir)/psql cfsettings --quiet --command "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" }
+        if => isgreaterthan( "$(remote_hubs_table_row_count)", "0" );
+      `$(sys.bindir)/psql cfsettings --quiet --command "TRUNCATE TABLE federated_reporting_settings"` -> { "ENT-7233" }
+        if => isgreaterthan( "$(federated_reporting_settings_table_row_count)", "0" );
 
-      # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
+      # _stdlib_path_exists_<command> and paths.<command> are defined in masterfiles/lib/paths.cf
     selinux_enabled.default:_stdlib_path_exists_semanage.has_cftransport_fcontext::
       "$(paths.semanage) fcontext -d '$(home)/.ssh(/.*)?'";
 
@@ -649,7 +656,7 @@ bundle agent entry
       "CFEngine Enterprise Federation Configuration"
         handle => "config",
         usebundle => config;
-    am_off|config_not_exists::
+    am_policy_hub.(am_off|config_not_exists)::
       "CFEngine Enterprise Federation Transport Off"
         handle => "clean_when_off",
         usebundle => clean_when_off;
