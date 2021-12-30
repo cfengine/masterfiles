@@ -33,6 +33,9 @@ for template in $templates; do
   sed -e "s|@VERSION@|$version|g" -e "s|@RELEASE@|$release|g" -e "s|@prefix@|$prefix|g" $template > ${template%%.in}
 done
 
+find . -name .git -prune -o -type f -print | xargs chmod u=rw,g=-,o=-
+find . -name .git -prune -o -type d -print | xargs chmod u=rwx,g=-,o=-
+
 cat <<EOF | xargs rm -rf
 aclocal.m4
 autogen.sh
