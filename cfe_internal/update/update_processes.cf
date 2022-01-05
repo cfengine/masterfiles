@@ -79,6 +79,10 @@ bundle agent cfe_internal_update_processes
         string => "cf-hub",
         comment => "cf-hub is only relevant on Enterprise hubs";
 
+      "agent[cf_reactor]"
+        string => "cf-reactor",
+        comment => "cf-reactor is only provided on Enterprise hubs";
+
     systemd::
 
       # On systemd hosts the cfengine3 service acts as an umbrella for other
