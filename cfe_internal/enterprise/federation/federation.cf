@@ -676,8 +676,7 @@ bundle agent entry
     am_policy_hub.(am_off|config_not_exists)::
       "CFEngine Enterprise Federation Transport Off"
         handle => "clean_when_off",
-        usebundle => clean_when_off,
-        if => cf_version_minimum("3.15");
+        usebundle => clean_when_off;
     enabled.am_on::
       "CFEngine Enterprise Federation Transport User"
         handle => "transport_user",
