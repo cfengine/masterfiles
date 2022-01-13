@@ -642,6 +642,13 @@ bundle agent cfe_internal_refresh_hosts_view
 
 bundle agent cfe_internal_clear_last_seen_hosts_logs
 # @brief Clear last seen hosts log every 5 minutes
+# TODO Redact this bundle when 3.15 is no longer under standard support
+# (December 31st 2022). The commands in the policy are scoped to run only on
+# active enterprise hubs with =(cfengine_3_12|cfengine_3_13|cfengine_3_14)=.
+# 3.15.0 was released while 3.12.x was still supported and this bundle should
+# remain until 3.15.0 becomes EOL so that someone running 3.12.x could upgrade
+# to 3.15.x policy while still running 3.12.x binaries and this bundle will
+# continue to function as expected.
 {
   meta:
 
