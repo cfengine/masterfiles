@@ -83,7 +83,7 @@ bundle agent cfengine_software
       # Default desired CFEngine software
       "pkg_name" string => ifelse( isvariable( "def.cfengine_software_pkg_name" ), $(def.cfengine_software_pkg_name), "cfengine-nova");
       "pkg_version" string => ifelse( isvariable( "def.cfengine_software_pkg_version" ), $(def.cfengine_software_pkg_version), "@VERSION@");
-      "pkg_release" string => ifelse( isvariable( "def.cfengine_software_pkg_release" ), $(def.cfengine_software_pkg_release), "1");
+      "pkg_release" string => ifelse( isvariable( "def.cfengine_software_pkg_release" ), $(def.cfengine_software_pkg_release), "@RELEASE@");
       "pkg_arch" string => ifelse( isvariable( "def.cfengine_software_pkg_arch" ), $(def.cfengine_software_pkg_arch), "x86_64");
       "package_dir" string => ifelse( isvariable( "def.cfengine_software_pkg_dir" ), $(def.cfengine_software_pkg_dir), "$(sys.flavour)_$(sys.arch)");
       "pkg_edition_path" string => ifelse( isvariable( "def.cfengine_software_pkg_edition_path" ), $(def.cfengine_software_pkg_edition_path), "enterprise/Enterprise-$(pkg_version)/agent");
