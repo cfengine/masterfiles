@@ -1,0 +1,86 @@
+######################################################
+#
+#  Test that custom promises are only evaluated once, just like other promises
+#
+#####################################################
+body common control
+{
+    inputs => { "../default.cf.sub" };
+    bundlesequence => { "init", "test", "check" };
+}
+
+#######################################################
+
+bundle common version_check
+{
+  classes:
+    "python_version_compatible_with_cfengine_library"
+      expression => returnszero("/usr/bin/python3 -c 'import sys; assert sys.version_info >= (3,6)'", "useshell");
+@if minimum_version(3.20.0)
+    "custom_promises_locking" expression => "any";
+@endif
+}
+
+bundle agent init
+{
+  meta:
+      "test_skip_unsupported" string => "!custom_promises_locking|!python_version_compatible_with_cfengine_library";
+
+  files:
+      "$(G.testfile)"
+        delete => init_delete;
+
+      "$(this.promise_dirname)/cfengine.py"
+        copy_from => local_cp("$(this.promise_dirname)/../../../modules/promises/cfengine.py");
+}
+
+body delete init_delete
+{
+      dirlinks => "delete";
+      rmdirs   => "true";
+}
+
+#######################################################
+
+@if minimum_version(3.18.0)
+promise agent append
+{
+    interpreter => "/usr/bin/python3";
+    path => "$(this.promise_dirname)/append_promises.py";
+}
+
+bundle agent test
+{
+  meta:
+    "description" -> { "CFE-3434" }
+      string => "Test that custom promises are only evaluated once";
+
+  append:
+    "$(G.testfile)"
+      string => "hello",
+      always => "true";
+}
+@endif
+
+#######################################################
+
+bundle agent check
+{
+  vars:
+      "expected"
+        string => "hello";
+      "found"
+        string => readfile("$(G.testfile)");
+
+  classes:
+      "ok"
+        expression => strcmp("$(expected)", "$(found)");
+
+  reports:
+    DEBUG::
+      "Expected '$(expected)', found '$(found)'";
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}
