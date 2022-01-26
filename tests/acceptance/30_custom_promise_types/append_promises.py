@@ -31,11 +31,21 @@ class AppendPromiseTypeModule(PromiseModule):
         if type(attributes["string"]) != str:
             raise ValidationError("Attribute 'string' must be of type string")
 
+        if "always" in attributes and attributes["always"] not in ("true", "false"):
+            raise ValidationError("Attribute 'always' must be either 'true' or 'false'")
+
     def evaluate_promise(self, promiser, attributes):
         assert "string" in attributes
 
+        always = attributes.get("always", "false") == "true"
+
         try:
             with open(promiser, "a+") as f:
+                if always:
+                    f.write(attributes["string"])
+                    self.log_verbose("Promise '%s' repaired" % promiser)
+                    return Result.REPAIRED
+
                 f.seek(0)
                 if (attributes["string"] not in f.read()):
                     f.write(attributes["string"])
@@ -44,6 +54,7 @@ class AppendPromiseTypeModule(PromiseModule):
                 else:
                     self.log_verbose("Promise '%s' kept" % promiser)
                     return Result.KEPT
+
         except Exception as e:
             self.log_error(e)
             self.log_error("Promise '%s' not kept" % promiser)
