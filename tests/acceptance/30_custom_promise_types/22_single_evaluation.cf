@@ -6,7 +6,8 @@
 body common control
 {
     inputs => { "../default.cf.sub" };
-    bundlesequence => { "init", "test", "check" };
+    bundlesequence  => { default("$(this.promise_filename)") };
+    version => "1.0";
 }
 
 #######################################################
@@ -48,9 +49,11 @@ promise agent append
     interpreter => "/usr/bin/python3";
     path => "$(this.promise_dirname)/append_promises.py";
 }
+@endif
 
 bundle agent test
 {
+@if minimum_version(3.18.0)
   meta:
     "description" -> { "CFE-3434" }
       string => "Test that custom promises are only evaluated once";
@@ -59,8 +62,8 @@ bundle agent test
     "$(G.testfile)"
       string => "hello",
       always => "true";
-}
 @endif
+}
 
 #######################################################
 
