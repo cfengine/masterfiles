@@ -301,9 +301,12 @@ bundle agent cfe_internal_update_policy_cpv
 bundle agent cfe_internal_update_cmdb
 # @brief Ensure local cache of CMDB data is up to date
 {
+  classes:
+      "have_cf_reactor" expression => fileexists("$(sys.bindir)/cf-reactor");
+
   methods:
 
-    policy_server.enterprise_edition::
+    policy_server.enterprise_edition.(!have_cf_reactor|cmdb_data_files_updates_done_in_policy)::
       "cfe_internal_update_cmdb_data_distribution";
 
 @if feature(host_specific_data_load)
