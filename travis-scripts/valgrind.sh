@@ -144,11 +144,10 @@ function check_masterfiles_and_inputs {
 /var/cfengine/bin/cf-agent --version
 
 VG_OPTS="--leak-check=full --track-origins=yes --error-exitcode=1"
-BOOTSTRAP_IP="$(ifconfig | grep -A1 Ethernet | sed '2!d;s/.*addr:\([0-9.]*\).*/\1/')"
 
 valgrind $VG_OPTS /var/cfengine/bin/cf-key 2>&1 | tee cf-key.txt
 check_output cf-key.txt
-valgrind $VG_OPTS /var/cfengine/bin/cf-agent -B $BOOTSTRAP_IP 2>&1 | tee bootstrap.txt
+valgrind $VG_OPTS /var/cfengine/bin/cf-agent -B $HOSTNAME 2>&1 | tee bootstrap.txt
 check_output bootstrap.txt
 
 echo "127.0.0.1" > /var/cfengine/policy_server.dat
