@@ -247,7 +247,7 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "Copy policy updates from master source on policy server if a new validation was acquired",
       handle => "cfe_internal_update_policy_files_inputs_dir",
       copy_from => u_rcp("$(master_location)", @(update_def.policy_servers)),
-      depth_search => u_recurse("inf"),
+      depth_search => u_infinate_client_policy,
       file_select  => u_input_files,
       action => u_immediate,
       classes => u_results("bundle", "update_inputs"),
@@ -573,6 +573,16 @@ body depth_search u_recurse(d)
       exclude_dirs => { "\.svn", "\.git", "git-core" };
 }
 
+#########################################################
+
+body depth_search u_infinate_client_policy
+# @brief Search recursively for files excluding vcs related files and .no-distrib directories
+# @param d Maximum depth to search recursively
+# Duplicated in embedded bootstrap/failsafe
+{
+        depth => "inf";
+        exclude_dirs => { "\.svn", "\.git", "git-core", "\.no-distrib" };
+}
 #########################################################
 
 body depth_search u_recurse_basedir(d)

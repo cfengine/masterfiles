@@ -14,6 +14,7 @@ various aspects of the system.
 * `services/main.cf` - Contains an empty bundle agent main where custom policy
   can be integrated.
 * `services/autorun/` - Automatically included policy files.
+* `.no-distrib/` - A directory that is excluded from policy updates from remote agents.
 
 The MPF is continually updated. You can track its development
 on [github](https://github.com/cfengine/masterfiles/).
