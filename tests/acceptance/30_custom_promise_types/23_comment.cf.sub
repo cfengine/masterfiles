@@ -1,0 +1,12 @@
+promise agent noop
+{
+  interpreter => "/usr/bin/python3";
+  path => "$(this.promise_dirname)/noop_promises.py";
+}
+
+bundle agent __main__
+{
+  noop:
+      "any"
+        comment => "a verbal or written remark expressing an opinion or reaction";
+}
