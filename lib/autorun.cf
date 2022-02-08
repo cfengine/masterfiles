@@ -7,7 +7,7 @@ body file control
 bundle agent autorun
 {
   vars:
-    services_autorun::
+    services_autorun|services_autorun_bundles::
       "bundles" slist => bundlesmatching(".*", "autorun");
 
       "sorted_bundles"
@@ -15,8 +15,10 @@ bundle agent autorun
         comment => "Lexicographically sorted bundles for predictable order";
 
   methods:
-    services_autorun::
-      "autorun" usebundle => $(sorted_bundles);
+    services_autorun|services_autorun_bundles::
+      "autorun" -> { "CFE-3795" }
+        usebundle => $(sorted_bundles),
+        action => immediate;
 
   reports:
     DEBUG|DEBUG_autorun|DEBUG_services_autorun::

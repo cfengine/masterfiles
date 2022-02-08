@@ -1,0 +1,14 @@
+body file control
+{
+      # Include the stdlib directly so that we are always testing the most
+      # recent version
+      inputs => { '../../../../lib/reports.cf' };
+}
+
+
+bundle agent main
+{
+  reports:
+    "My last lines"
+      printfile => tail_n( "$(this.promise_dirname)/printfile.txt", 4);
+}

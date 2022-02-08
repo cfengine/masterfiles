@@ -339,9 +339,7 @@ bundle common services_autorun
 # added to inputs automatically.
 {
   vars:
-    services_autorun::
-      "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
-
+    services_autorun|services_autorun_inputs::
       "_default_autorun_input_dir"
         string => "$(this.promise_dirname)/services/autorun";
       "_default_autorun_inputs"
@@ -358,21 +356,32 @@ bundle common services_autorun
       "found_inputs" slist => { @(_default_autorun_inputs),
                                 sort( getvalues(_extra_autorun_inputs), "lex") };
 
-      "bundles" slist => { "autorun" }; # run loaded bundles
-
-    !services_autorun::
+    !(services_autorun|services_autorun_inputs|services_autorun_bundles)::
       # If services_autorun is not enabled, then we should not extend inputs
       # automatically.
       "inputs" slist => { };
       "found_inputs" slist => {};
       "bundles" slist => { "services_autorun" }; # run self
 
+    services_autorun|services_autorun_inputs|services_autorun_bundles::
+      "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
+      "bundles" slist => { "autorun" }; # run loaded bundles
+
   reports:
     DEBUG|DEBUG_services_autorun::
       "DEBUG $(this.bundle): Services Autorun Disabled"
-        if => "!services_autorun";
+        if => "!(services_autorun|services_autorun_bundles|services_autorun_inputs)";
 
       "DEBUG $(this.bundle): Services Autorun Enabled"
+        if => "services_autorun";
+
+      "DEBUG $(this.bundle): Services Autorun Bundles Enabled"
+        if => "services_autorun_bundles";
+
+      "DEBUG $(this.bundle): Services Autorun Inputs Enabled"
+        if => "services_autorun_inputs";
+
+      "DEBUG $(this.bundle): Services Autorun (Bundles & Inputs) Enabled"
         if => "services_autorun";
 
       "DEBUG $(this.bundle): adding input='$(inputs)'"

@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-import sys
 import os
+import shutil
+import sys
+import tempfile
 
 try:
     import subprocess
@@ -9,7 +11,11 @@ except ImportError:
     # Redhat 4 doesn't have subprocess. 77 means "skip test"
     sys.exit(77)
 
-yum_module = "../../modules/packages/yum"
+# if an exception occurs, this tmpdir won't be cleaned up, this is desired to aid in debugging
+tmpdir = tempfile.mkdtemp()
+mustache_file = os.path.realpath("../../modules/packages/vendored/yum.mustache")
+yum_module = os.path.join(tmpdir, "yum")
+shutil.copy(mustache_file, yum_module)
 
 cwd = os.getcwd()
 # Will cause the package module to call these instead.
@@ -156,3 +162,4 @@ assert check("get-package-data", ["File=repo_pkg"], 2,
 assert check("get-package-data", ["File=repo/pkg"], 2,
              ["PackageType=repo\nName=repo/pkg"],
              0, [])
+shutil.rmtree(tmpdir)

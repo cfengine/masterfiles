@@ -26,15 +26,24 @@ stamp-h1
 /ylwrap
 /test-driver
 CFVERSION
+CFRELEASE
+
+# Misc.
+/cf_promises_*
 modules/packages/apt_get
 modules/packages/yum
 modules/packages/zypper
 
-# Misc.
-/cf_promises_*
+# tests
+tests/acceptance/30_custom_promise_types/__pycache__/
+tests/acceptance/30_custom_promise_types/cfengine.py
+tests/unit/test-suite.log
+tests/unit/test_package_module_apt_get.log
+tests/unit/test_package_module_yum.log
 
 # vim
 .*.sw[po]
 
 # Atom-IDE
 .ropeproject
+build

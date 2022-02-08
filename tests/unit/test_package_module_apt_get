@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-import sys
 import os
+import shutil
+import sys
+import tempfile
 
 try:
     import subprocess
@@ -9,7 +11,11 @@ except ImportError:
     # Redhat 4 doesn't have subprocess. 77 means "skip test"
     sys.exit(77)
 
-apt_get_module = "../../modules/packages/apt_get"
+# if an exception occurs, this tmpdir won't be cleaned up, this is desired to aid in debugging
+tmpdir = tempfile.mkdtemp()
+mustache_file = os.path.realpath("../../modules/packages/vendored/apt_get.mustache")
+apt_get_module = os.path.join(tmpdir, "apt_get")
+shutil.copy(mustache_file, apt_get_module)
 
 cwd = os.getcwd()
 # Will cause the package module to call these instead.
@@ -239,3 +245,4 @@ assert check("get-package-data", ["File=repo/pkg"], 2,
              ["""PackageType=repo
 Name=repo/pkg"""],
              1, ["apt-get -v"])
+shutil.rmtree(tmpdir)

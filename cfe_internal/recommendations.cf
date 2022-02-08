@@ -1,4 +1,16 @@
-bundle agent postgresql_conf_reccomendations
+bundle agent MPF_class_recommendations
+{
+  meta:
+    (policy_server|am_policy_hub).enterprise_edition::
+      "tags" slist => { "cfengine_recommends" };
+
+  reports:
+      "`cfengine_internal_purge_polices` no longer has any effect. Please use `cfengine_internal_purge_policies_disabled` instead, to choose where you want to disable purging or remove the class completely if you want purging enabled everywhere (the new default in 3.18+)." -> { "CFE-3662" }
+        if => "cfengine_internal_purge_policies";
+}
+
+
+bundle agent postgresql_conf_recommendations
 # @brief Recommendations about the configuration of postgresql.conf for CFEngine Enterprise Hubs
 {
   meta:

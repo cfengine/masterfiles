@@ -1,12 +1,5 @@
-| Version | Core                                                                                                               | MPF                                                                                                                             |
-|---------|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-|  master | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=master)](https://travis-ci.org/cfengine/core) | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=master)](https://travis-ci.org/cfengine/masterfiles) |
-|  3.15.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.15.x)](https://travis-ci.org/cfengine/core) | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=3.15.x)](https://travis-ci.org/cfengine/masterfiles) |
-|  3.12.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.12.x)](https://travis-ci.org/cfengine/core) | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=3.12.x)](https://travis-ci.org/cfengine/masterfiles) |
-|  3.10.x | [![Core Build Status](https://travis-ci.org/cfengine/core.svg?branch=3.10.x)](https://travis-ci.org/cfengine/core) | [![MPF Build Status](https://travis-ci.org/cfengine/masterfiles.svg?branch=3.10.x)](https://travis-ci.org/cfengine/masterfiles) |
-
 Looking for help?
-[![Gitter chat](https://badges.gitter.im/cfengine/core.png)](https://gitter.im/cfengine/core) | [![IRC channel](https://kiwiirc.com/buttons/irc.cfengine.com/cfengine.png)](https://kiwiirc.com/client/irc.freenode.net/#cfengine)
+[![Gitter chat](https://badges.gitter.im/cfengine/core.png)](https://gitter.im/cfengine/core) | [![IRC channel](https://kiwiirc.com/buttons/irc.cfengine.com/cfengine.png)](https://web.libera.chat?channel=#cfengine)
 
 # CFEngine 3 masterfiles
 
@@ -38,14 +31,6 @@ a [package tarball from our website](https://cfengine.com/product/community/)
 Instead simply unpack the tarball to the desired location using `tar`.
 
 For example:
-
-```
-tar zxvf cfengine-masterfiles-MAJOR.MINOR.PATCH.pkg.tar.gz --exclude="modules" -C /var/cfengine/masterfiles --strip-components=2
-```
-
-**Note:** The above command installs only the policy from masterfiles. Typically
-the modules that are distributed within the masterfiles repository are not
-installed until the binaries are upgraded. However, if you wish to install the modules along with the policy you can use this simplified command:
 
 ```
 tar zxvf cfengine-masterfiles-MAJOR.MINOR.PATCH.pkg.tar.gz /var/cfengine/masterfiles

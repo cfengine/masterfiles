@@ -61,9 +61,7 @@ bundle agent cfe_internal_update_policy
       "Stock policy update"
         usebundle => cfe_internal_update_policy_cpv;
 
-    # Don't pull CMDB data on policy_hub self bootstrap because
-    # there will be no cf-serverd listening to serve files yet.
-    enterprise_edition.!(am_policy_hub.bootstrap_mode)::  # ENT-6840
+    any::
       "CMDB data update" -> { "ENT-6788" }
         usebundle => cfe_internal_update_cmdb;
 
@@ -243,27 +241,26 @@ bundle agent cfe_internal_update_policy_cpv
       action => u_immediate,
       classes => u_if_repaired("validated_updates_ready");
 
-    any::
-
-      "$(sys.workdir)$(const.dirsep)modules"
-      comment => "Always update modules files on client side",
-      handle => "cfe_internal_update_policy_files_update_modules",
-      copy_from => u_rcp("$(modules_dir_source)", @(update_def.policy_servers)),
-      depth_search => u_recurse("inf"),
-      perms => u_m("755"),
-      action => u_immediate;
-
     am_policy_hub|validated_updates_ready::  # policy hub should always put masterfiles in inputs in order to check new policy
 
       "$(inputs_dir)"
       comment => "Copy policy updates from master source on policy server if a new validation was acquired",
       handle => "cfe_internal_update_policy_files_inputs_dir",
       copy_from => u_rcp("$(master_location)", @(update_def.policy_servers)),
-      depth_search => u_recurse("inf"),
+      depth_search => u_infinite_client_policy,
       file_select  => u_input_files,
       action => u_immediate,
       classes => u_results("bundle", "update_inputs"),
       move_obstructions => "true";
+
+      # Note that here we do not filter with `update_def.input_name_patterns` so
+      # that we copy any and all modules scripts.
+      "$(inputs_dir)/modules"
+      comment => "Copy any files in modules from master source on policy server if a new validation was acquired",
+      handle => "cfe_internal_update_policy_files_modules_dir",
+      copy_from => u_rcp("$(modules_dir_source)", @(update_def.policy_servers)),
+      depth_search => u_recurse("inf"),
+      action => u_immediate;
 
     update_inputs_not_kept::
 
@@ -295,18 +292,134 @@ bundle agent cfe_internal_update_policy_cpv
       # Only needed on distros with Python-based package modules
       "setup_python_symlink" -> { "CFE-2602" }
         usebundle => cfe_internal_setup_python_symlink("$(python_symlink)");
+
+    any::
+      # Install vendored and user provided modules to $(sys.workdir) from $(sys.inputdir)
+      "modules_presence";
 }
 
 bundle agent cfe_internal_update_cmdb
 # @brief Ensure local cache of CMDB data is up to date
 {
+  classes:
+      "have_cf_reactor" expression => fileexists("$(sys.bindir)/cf-reactor");
+
+  methods:
+
+    policy_server.enterprise_edition.(!have_cf_reactor|cmdb_data_files_updates_done_in_policy)::
+      "cfe_internal_update_cmdb_data_distribution";
+
+@if feature(host_specific_data_load)
+      # Only hosts with this feature, introduced in 3.18.0 can use the data.
+
+      # Don't pull CMDB data on policy_hub self bootstrap because
+      # there will be no cf-serverd listening to serve files yet.
+    enterprise_edition.!(bootstrap_mode)::  # ENT-6840
+      "cfe_internal_update_cmdb_data_consumption";
+@endif
+}
+
+bundle agent cfe_internal_update_cmdb_data_distribution
+# @brief Ensure data is ready for agents to download
+{
+  vars:
+    !bootstrap_mode.(policy_server.enterprise_edition)::
+
+      # The API response for host specific data from cmdb tells us the timestamp of the last data change
+      # We store this timestamp and use it for the next request.
+      "_cmdb_next_request_state_file"
+        string => "$(sys.statedir)/cmdb_next_request_from.dat";
+
+      # If we have the timestamp from a previous response we use it, else we start from 0
+      "_cmdb_previous_next_request_from"
+        string => readfile( $(_cmdb_next_request_state_file), inf ),
+        if => regline( "^\d+$", $(_cmdb_next_request_state_file) );
+
+      "_cmdb_previous_next_request_from"
+        string => "0",
+        unless => regline( "^\d+$", $(_cmdb_next_request_state_file) );
+
+      # We need a script to call that should return the API response
+      "_get_cmdb_data_bin" string => "$(sys.workdir)/httpd/htdocs/scripts/get_cmdb.php";
+      "_get_cmdb_data_cmd" string => "/var/cfengine/httpd/php/bin/php $(_get_cmdb_data_bin) $(_cmdb_previous_next_request_from)";
+
+      # We call the script and we pass it the timestamp from the prior call
+      "_get_cmdb_data_response"
+        string => execresult( $(_get_cmdb_data_cmd), useshell ),
+        if => fileexists( $(_get_cmdb_data_bin) );
+
+      "_get_cmdb_data_response_d"
+        data => parsejson('$(_get_cmdb_data_response)'),
+        if => validjson( '$(_get_cmdb_data_response)' );
+
+      # So that we can write a JSON file for each host we get the indicies of data in the response
+      "_i" slist => getindices( "_get_cmdb_data_response_d[data]");
+
+      # We need to store the timestamp from the most recent change so that we can use that as a starting point for future requests.
+      "_next_request_from"
+        string => "$(_get_cmdb_data_response_d[meta][cmdb_epoch])";
+
   files:
-      "$(sys.workdir)/data/." create => "true";
+      # "$(_get_cmdb_data_cmd)" perms => m( 700 );
+
+@if minimum_version(3.18)
+    !bootstrap_mode.(policy_server.enterprise_edition)::
+      # This functionality is only present on 3.18.0+ Enterprise hubs, and this
+      # promise uses the /content/ attribute which was first introduced in
+      # 3.16.0.
+
+      # If the next request state file doesn't exist, we seed one with 0, the
+      # lowest epoch value possible. because we populate variables from this
+      # file content.
+      "$(_cmdb_next_request_state_file)"
+        content => "0$(const.n)",
+        handle => "cmdb_data_change_next_seed",
+        if => and( not(fileexists("$(_cmdb_next_request_state_file)" )),
+                   isvariable( "_cmdb_next_request_state_file" ));
+@endif
+
+      # Write out the data for each host that had a data change
+      "$(sys.workdir)/cmdb/$(_i)/host_specific.json"
+        create => "true", # CFE-2329, ENT-4792
+        template_data => mergedata("_get_cmdb_data_response_d[data][$(_i)]" ), # mergedata() is necessary in order to pick out a substructure, parsejson() is insufficient because expanding a key results in iteration of /values/ under that key
+        template_method => "inline_mustache",
+        edit_template_string => string_mustache( "{{$-top-}}", "_get_cmdb_data_response_d[data][$(_i)]" ),
+        if => isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) );
+
+@if minimum_version(3.18)
+      # This functionality is only present on 3.18.0+ Enterprise hubs, and this
+      # promise uses the /content/ attribute which was first introduced in
+      # 3.16.0.
+
+      # Write out the last data change timestamp so we can use it as a startring point
+      "$(_cmdb_next_request_state_file)"
+        handle => "cmdb_data_change_next_update",
+        content => "$(_next_request_from)$(const.n)",
+        unless => strcmp( $(_next_request_from), $(_cmdb_previous_next_request_from) );
+@endif
+
+  reports:
+    DEBUG|DEBUG_cfe_internal_update_cmdb_data_distribution::
+      "'$(_get_cmdb_data_cmd)' response indicates '$(sys.workdir)/cmdb/$(_i)/host_specific.json' needs refreshed"
+        if => and( isvariable( "_i" ),
+                   isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) ));
+
+}
+
+bundle agent cfe_internal_update_cmdb_data_consumption
+# @brief Ensure data to load is up to date
+{
+  files:
+      "$(sys.workdir)/data/."
+        create => "true",
+        comment => "If a host is to load data from the CMDB, it needs to have a directory where said data is cached.";
 
       "$(sys.workdir)/data/." -> { "ENT-6788" }
         depth_search => u_recurse( inf ),
         file_select => u_all,
-        copy_from => u_cmdb_data;
+        copy_from => u_cmdb_data,
+        comment => "So that hosts have access to the most recent CMDB data, we make sure that it's up to date.";
+
 }
 #########################################################
 # Self-contained bodies from the lib to avoid dependencies
@@ -342,7 +455,8 @@ body perms u_mo(p,o)
 # @param p Desired file owner (username or uid)
 {
       mode   => "$(p)";
-      owners => {"$(o)"};
+      !(windows|termux)::
+        owners => {"$(o)"};
 }
 
 #########################################################
@@ -391,7 +505,7 @@ body copy_from u_rcp(from,server)
       source      => "$(from)";
       compare     => "digest";
       trustkey    => "false";
-
+      purge => "true"; # CFE-3662
 
       # CFE-2932 For testing, we want to be able to avoid this local copy optimiztion
     !am_policy_hub|mpf_skip_local_copy_optimizaton::
@@ -403,8 +517,8 @@ body copy_from u_rcp(from,server)
     cfengine_internal_encrypt_transfers::
       encrypt => "true";
 
-    cfengine_internal_purge_policies::
-      purge => "true";
+    cfengine_internal_purge_policies_disabled::
+      purge => "false";
 
     cfengine_internal_preserve_permissions::
       preserve => "true";
@@ -434,6 +548,15 @@ body copy_from u_cp_nobck(from)
 
 #########################################################
 
+body copy_from u_cp_missing_ok(from)
+# @brief same as u_cp but allow from to be missing
+{
+      inherit_from => u_cp($(from));
+      missing_ok => "true";
+}
+
+#########################################################
+
 body action u_immediate
 # @brief Actuate the promise immediately, ignoring locks
 {
@@ -450,6 +573,16 @@ body depth_search u_recurse(d)
       exclude_dirs => { "\.svn", "\.git", "git-core" };
 }
 
+#########################################################
+
+body depth_search u_infinite_client_policy
+# @brief Search recursively for files excluding vcs related files and .no-distrib directories
+# @param d Maximum depth to search recursively
+# Duplicated in embedded bootstrap/failsafe
+{
+        depth => "inf";
+        exclude_dirs => { "\.svn", "\.git", "git-core", "\.no-distrib" };
+}
 #########################################################
 
 body depth_search u_recurse_basedir(d)
@@ -597,4 +730,93 @@ body delete u_tidy
       rmdirs   => "true";
 }
 
+bundle agent modules_presence
+# @brief Render vendored and user provided modules from $(sys.inputdir) to $(sys.workdir)
+#
+# @description This bundle manages the contents of $(sys.workdir)/modules by
+#              first dealing with package module scripts.
+#              Preference is given to user provided package module scripts in
+#              modules/packages directory. If a module there matches a mustache
+#              template in modules/packages/vendored directory then the user
+#              provided module will be installed.
+#
+#              e.g. modules/packages/apt_get takes precedence over modules/packages/apt_get.mustache
+#
+#              Any other files in the modules directory will be promised to
+#              be updated in $(sys.workdir)/modules, including any sub-directories.
+{
+  vars:
+    "_vendored_dir" string => "$(this.promise_dirname)/../../modules/packages/vendored/";
+    "_override_dir" string => "$(this.promise_dirname)/../../modules/packages/";
+    "_vendored_paths" slist => findfiles("$(_vendored_dir)*.mustache");
+    "_package_paths" slist => filter("$(_override_dir)vendored", _package_paths_tmp, "false", "true", 999);
+    windows::
+      "_package_paths_tmp" slist => findfiles("\Q$(_override_dir)\E*");
+      "_vendored_modules" slist => maplist(regex_replace("$(this)", "\Q$(_vendored_dir)\E(.*).mustache", "$1", "g"), @(_vendored_paths));
+      "_override_modules" slist => maplist(regex_replace("$(this)", "\Q$(_override_dir)\E(.*)", "$1", "g"), @(_package_paths));
+      # replace single backslashes in a windows path with double-backslashes
+      # to avoid problems with things like `C:\Program Files` and `\promises`
+      # causing PCRE to try and interpret special escape sequences.
+      "_not_vendored_modules_pathname_regex" string => regex_replace("$(sys.inputdir)$(const.dirsep)modules$(const.dirsep)(?!packages$(const.dirsep)vendored).*","\\\\","\\\\\\\\","g");
+    !windows::
+      "_package_paths_tmp" slist => findfiles("$(_override_dir)*");
+      "_vendored_modules" slist => maplist(regex_replace("$(this)", "$(_vendored_dir)(.*).mustache", "$1", "g"), @(_vendored_paths));
+      "_override_modules" slist => maplist(regex_replace("$(this)", "$(_override_dir)(.*)", "$1", "g"), @(_package_paths));
+      "_not_vendored_modules_pathname_regex" string => "$(sys.inputdir)/modules/(?!packages/vendored).*";
+
+  classes:
+    "override_vendored_module_$(_vendored_modules)" expression => fileexists("$(_override_dir)$(_vendored_modules)");
+    "override_module_$(_override_modules)" expression => fileexists("$(_override_dir)$(_override_modules)");
+
+# NOTE: here we are using the .mustache extension only to
+# ensure that the modules scripts are copied as part of
+# update (see controls/update_def.cf input_name_patterns var.
+
+  files:
+    "$(sys.workdir)/modules/packages/$(_vendored_modules)"
+      create => "true",
+      perms => u_mo("755", "root"),
+      unless => canonify("override_vendored_module_$(_vendored_modules)"),
+      edit_template => "$(_vendored_dir)$(_vendored_modules).mustache",
+      template_method => "mustache";
+
+    "$(sys.workdir)/modules/packages/$(_override_modules)"
+      copy_from => u_cp_missing_ok("$(_override_dir)$(_override_modules)"),
+      perms => u_mo("755", "root"),
+      if => or (
+        canonify("override_vendored_module_$(_override_modules)"),
+        canonify("override_module_$(_override_modules)"));
+
+    "$(sys.workdir)/modules"
+      comment => "Copy any non-packages modules",
+      handle => "cfe_internal_update_policy_files_nonpackages_modules",
+      copy_from => u_cp("$(sys.inputdir)$(const.dirsep)modules"),
+      if => fileexists("$(sys.inputdir)$(const.dirsep)modules"),
+      depth_search => u_recurse("inf"),
+      perms => u_mo("755", "root"),
+      action => u_immediate,
+      file_select => not_vendored_modules("$(_not_vendored_modules_pathname_regex)");
+
+
+  reports:
+    DEBUG::
+      "_not_vendored_modules_pathname_regex: $(_not_vendored_modules_pathname_regex)";
+      "_vendored_modules: $(_vendored_modules)";
+      "_override_modules: $(_override_modules)";
+      "_vendored_dir: $(_vendored_dir)";
+      "_vendored_paths: $(_vendored_paths)";
+      "_override_dir: $(_override_dir)";
+      "_package_paths: $(_package_paths)";
+      "override_vendored_module_$(_vendored_modules)"
+        if => "override_vendored_module_$(_vendored_modules)";
+      "override_module_$(_override_modules)"
+        if => "override_module_$(_override_modules)";
+      "canonified: $(with)" with => canonify("override_vendored_module_$(_vendored_modules)");
+}
+
+body file_select not_vendored_modules(pathname)
+{
+  path_name => { "$(pathname)" };
+  file_result => "path_name";
+}
 #########################################################

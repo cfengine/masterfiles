@@ -1,0 +1,34 @@
+body common control
+{
+        inputs => { '../../default.cf.sub' };
+        bundlesequence  => { default("$(this.promise_filename)") };
+        version => "1.0";
+}
+
+bundle agent test
+{
+  meta:
+      "description"
+        string => "Test that body printfile tail_n works as expected";
+@if before_version(3.18)
+      "test_skip_unsupported"
+        string => "any";
+@endif
+
+}
+bundle agent check
+{
+  vars:
+      "pass_reg"
+        string => ".*R: My last lines
+R: line 8
+R: line 9
+R: line 10
+R: line 11";
+
+      "command"
+        string => "$(sys.cf_agent) -K -f $(this.promise_filename).sub";
+
+  methods:
+      "" usebundle => dcs_passif_output("$(pass_reg)", "", $(command), $(this.promise_filename));
+}

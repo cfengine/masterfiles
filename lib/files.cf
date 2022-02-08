@@ -1005,16 +1005,12 @@ bundle edit_line append_user_field(group,field,allusers)
 # **Note:** To manage local users with CFEngine 3.6 and later,
 # consider making `users` promises instead of modifying system files.
 {
-  vars:
-
-      "val" slist => { @(allusers) };
-
   field_edits:
 
       "$(group):.*"
 
       comment => "Append users into a password file format",
-      edit_field => col(":","$(field)","$(val)","alphanum");
+      edit_field => col(":","$(field)","$(allusers)","alphanum");
 }
 
 ##

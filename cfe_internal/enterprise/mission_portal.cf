@@ -120,7 +120,8 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
     "$(config)"
       copy_from => local_dcp( $(staged_config) ),
-      if => returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
+      if => and( "apache_stop_after_new_staged_config_repaired",
+                 returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell")),
       classes => results("bundle", "mission_portal_apache_config"),
       comment => "We make sure that the deployed config is a copy of the staged
                   config if the staged config passes a syntax check. We redirect
@@ -129,18 +130,40 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
   commands:
 
-    mission_portal_apache_config_repaired.!systemd_supervised::
+    !systemd_supervised::
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
-        args => "restart",
-        classes => kept_successful_command,
+        args => "stop",
+        if => and( returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
+                   isnewerthan( $(staged_config), $(config) ) ),
         contain => in_shell,
-        comment => "We have to restart apache after a config change in order
-                    for the changes to take effect.";
+        classes => results( "bundle", "apache_stop_after_new_staged_config" ),
+        comment => concat( "We have to stop apache before trying to start with a",
+                           "new config, or the new config could prevent apache from stopping.");
 
+      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
+        args => "start",
+        if => and( "mission_portal_apache_config_repaired",
+                   "apache_stop_after_new_staged_config_repaired"),
+        contain => in_shell,
+        comment => concat( "We start apache after the new valid config is in ",
+                           "place only if we have stopped apache already.");
   services:
-    mission_portal_apache_config_repaired.systemd_supervised::
+    systemd_supervised::
       "cf-apache"
-        service_policy => "restart";
+        service_policy => "stop",
+        if => and( returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
+                   isnewerthan( $(staged_config), $(config) ) ),
+        classes => results( "bundle", "apache_stop_after_new_staged_config" ),
+        comment => concat( "We have to stop apache before trying to start with a",
+                           "new config, or the new config could prevent apache from stopping.");
+
+      "cf-apache"
+        service_policy => "start",
+        if => and( "mission_portal_apache_config_repaired",
+                   "apache_stop_after_new_staged_config_repaired"),
+        comment => concat( "We start apache after the new valid config is in ",
+                           "place only if we have stopped apache already.");
+
 
   reports:
     DEBUG|DEBUG_mission_portal_apache_from_stage::

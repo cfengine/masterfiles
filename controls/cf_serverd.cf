@@ -70,12 +70,11 @@ body server control
                            $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
                            $(sys.cf_agent) -I -D cf_runagent_initiated";
 
-    !windows.!(redhat_5|centos_5)::
-      # Bind to all interfaces including ipv6
-      # Adding this on windows will force ipv6 only, so limit to non-windows
-      # On RHEL/CentOS 5 binding to interface "::" fails.
-      bindtointerface => "::";
-
+    # Use bindtointerface to specify interface to bind to, the default is :: +
+    # 0.0.0.0/0 if IPV6 is supported or 0.0.0.0/0 if IPV6 is not supported. On
+    # Windows, binding to :: means only IPV6 connections will be accepted.
+    # !windows::
+    #   bindtointerface => "::";
 }
 
 ###############################################################################
@@ -93,6 +92,10 @@ bundle server mpf_default_access_rules()
       comment => "Grant access to the policy updates",
       if => isdir( "$(def.dir_masterfiles)/" ),
       admit => { @(def.acl) };
+
+      "$(def.dir_masterfiles)/.no-distrib" -> { "ENT-8079" }
+      handle => "prevent_distribution_of_top_level_dot_no_distrib",
+      deny => { "0.0.0.0/0" };
 
       "$(def.dir_bin)/"
       handle => "server_access_grant_access_binary",

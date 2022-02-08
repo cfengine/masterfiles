@@ -511,13 +511,13 @@ bundle common def
 
       "cfengine_internal_encrypt_transfers" expression => "!any";
 
-      # Purge policies that don't exist on the server side.
+      # Do not purge policies that don't exist on the server side.
       # you can also request it from the command line with
-      # -Dcfengine_internal_purge_policies
+      # -Dcfengine_internal_purge_policies_disabled
 
       # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
 
-      "cfengine_internal_purge_policies" expression => "!any";
+      "cfengine_internal_purge_policies_disabled" expression => "!any";
 
       # Preserve permissions of the policy server's masterfiles.
       # you can also request it from the command line with
@@ -645,10 +645,6 @@ bundle common inventory_control
       "disable_inventory_proc" expression => "disable_inventory|freebsd";
       "disable_inventory_proc" not => isdir($(proc));
 
-      # by default don't run the CMDB integration every time, even if
-      # disable_inventory is not set
-      "disable_inventory_cmdb" expression => "any";
-
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
@@ -666,8 +662,6 @@ bundle common inventory_control
       "$(this.bundle): proc module enabled";
     verbose_mode.!disable_inventory_package_refresh::
       "$(this.bundle): package_refresh module enabled";
-    verbose_mode.!disable_inventory_cmdb::
-      "$(this.bundle): CMDB module enabled";
 
     DEBUG|DEBUG_def::
 

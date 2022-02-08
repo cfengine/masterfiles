@@ -38,7 +38,7 @@ bundle agent main
 
       "cfengine_software";
 
-    am_policy_hub|policy_server::
+    (am_policy_hub|policy_server).!mpf_disable_hub_masterfiles_software_update_seed::
 
       "Master Software Repository Data"
         usebundle => cfengine_master_software_content;
@@ -83,9 +83,14 @@ bundle agent cfengine_software
       # Default desired CFEngine software
       "pkg_name" string => ifelse( isvariable( "def.cfengine_software_pkg_name" ), $(def.cfengine_software_pkg_name), "cfengine-nova");
       "pkg_version" string => ifelse( isvariable( "def.cfengine_software_pkg_version" ), $(def.cfengine_software_pkg_version), "@VERSION@");
-      "pkg_release" string => ifelse( isvariable( "def.cfengine_software_pkg_release" ), $(def.cfengine_software_pkg_release), "1");
+      "pkg_release" string => ifelse( isvariable( "def.cfengine_software_pkg_release" ), $(def.cfengine_software_pkg_release), "@RELEASE@");
       "pkg_arch" string => ifelse( isvariable( "def.cfengine_software_pkg_arch" ), $(def.cfengine_software_pkg_arch), "x86_64");
       "package_dir" string => ifelse( isvariable( "def.cfengine_software_pkg_dir" ), $(def.cfengine_software_pkg_dir), "$(sys.flavour)_$(sys.arch)");
+      "pkg_edition_path" string => ifelse( isvariable( "def.cfengine_software_pkg_edition_path" ), $(def.cfengine_software_pkg_edition_path), "enterprise/Enterprise-$(pkg_version)/agent");
+
+    community_edition::
+      "pkg_name" string => "cfengine-community";
+      "pkg_edition_path" string => "community_binaries/Community-$(pkg_version)";
 
     aix::
       "pkg_name" string => "cfengine.cfengine-nova";
@@ -212,22 +217,22 @@ bundle agent cfengine_software_version
 # upgrading.
 {
   classes:
-      "__supported_platform" -> { "ENT-5045", "ENT-5152", "ENT-4094" }
+      "__supported_platform" -> { "ENT-5045", "ENT-5152", "ENT-4094", "ENT-8247" }
         or => {
+                "amazon_linux",
                 "redhat.!redhat_4",
                 "centos.!centos_4",
                 "debian",
+                "suse|opensuse",
                 "ubuntu",
                 "hpux",
                 "aix",
-                "SUSE_11",
-                "SUSE_12",
                 "windows", # ENT-4094
         };
 
       # Add "windows" to __new_implementation classes with ENT-6823
       "__new_implementation"
-        or => { "redhat", "centos", "ubuntu", "debian" };
+        or => { "amazon_linux", "redhat", "centos", "ubuntu", "debian", "suse", "opensuse" };
 
   vars:
       "pkg_name" string => "$(cfengine_software.pkg_name)";
@@ -277,17 +282,23 @@ bundle agent cfengine_software_version_packages2
 
   packages:
 
-    (redhat|centos).!__supported::
+    (amazon_linux|redhat|centos)::
       "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
       policy => "present",
       package_module => yum,
       comment => "Ensure the latest package is installed";
 
-    (debian|ubuntu).!__supported::
+    (debian|ubuntu)::
       "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
       policy => "present",
       package_module => apt_get,
       comment => "Ensure the latest package is installed";
+
+    (opensuse|suse)::
+      "$(local_software_dir)/$(cfengine_package_names.my_pkg)"
+        policy => "present",
+        package_module => zypper,
+        comment => "Ensure the latest package is installed";
 
      # TODO, uncomment the following to enable msiexec packages module (ENT-6823)
 #    windows::
@@ -485,6 +496,7 @@ bundle common cfengine_package_names
       # Windows
       "pkg[windows_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release)-x86_64.msi";
       "pkg[windows_i686]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release)-i686.msi";
+
       "my_pkg"
         string => "$(pkg[$(sys.flavor)_$(sys.arch)])",
         comment => "The package name for the currently executing platform.";
@@ -506,7 +518,8 @@ bundle agent cfengine_master_software_content
       "pkg_release" string => "$(cfengine_software.pkg_release)";
       "pkg_arch" string => "$(cfengine_software.pkg_arch)";
       "package_dir" string => "$(cfengine_software.package_dir)";
-      "base_url" string => "https://cfengine-package-repos.s3.amazonaws.com/enterprise/Enterprise-$(pkg_version)/agent";
+      "pkg_edition" string => "$(cfengine_software.pkg_edition_path)";
+      "base_url" string => "https://cfengine-package-repos.s3.amazonaws.com/$(pkg_edition)";
 
       # Map platform/directory identifier to upstream package URLs
       # Better to read in an external explicit data structure?
@@ -559,6 +572,10 @@ bundle agent cfengine_master_software_content
                               "ubuntu_18" };
 
       "dir[$(_deb_dists)_$(_32bit_arches)]" string => "agent_deb_i386";
+
+      # Windows
+      "dir[windows_x86_64]" string => "windows_x86_64";
+      "dir[windows_i686]"   string => "windows_i686";
 
       "platform_dir" slist => getindices( dir );
       "download_dir" string => "$(sys.workdir)/master_software_updates";
@@ -953,6 +970,9 @@ body package_module yum
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
+@if minimum_version(3.12.2)
+      interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
 }
 
 body package_module apt_get
@@ -960,6 +980,19 @@ body package_module apt_get
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
+@if minimum_version(3.12.2)
+      interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
+}
+
+body package_module zypper
+{
+        query_installed_ifelapsed => "0";
+        query_updates_ifelapsed => "30";
+      #default_options =>  {};
+@if minimum_version(3.12.2)
+        interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
 }
 
 body package_module msiexec
@@ -967,7 +1000,9 @@ body package_module msiexec
 {
       query_installed_ifelapsed => "10";
       query_updates_ifelapsed => "30";
+@if minimum_version(3.12.2)
       interpreter => "$(sys.winsysdir)$(const.dirsep)cmd.exe /c ";
+@endif
       module_path => "$(sys.workdir)$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)msiexec.bat";
 }
 body perms u_m(p)

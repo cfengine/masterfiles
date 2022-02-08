@@ -1,14 +1,13 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
-	modules/packages \
 	tests/
 
 # See configure.ac for MASTERFILES_INSTALL_TARGETS.
 nobase_dist_masterfiles_DATA = @MASTERFILES_INSTALL_TARGETS@
 masterfilesdir=$(prefix)/masterfiles
 
-EXTRA_DIST = README.md inventory/README.md lib/README.md CONTRIBUTING.md LICENSE CFVERSION
+EXTRA_DIST = README.md inventory/README.md lib/README.md CONTRIBUTING.md LICENSE CFVERSION modules/promises
 
 # Do not reveal usernames of the buildslave
 TAR_OPTIONS = --owner=0 --group=0
@@ -30,3 +29,6 @@ tar-package:
 	        > "$$origdir"/$(PACKAGE)-$(VERSION)-$(RELEASE).pkg.tar.gz  \
 	)  ;  \
 	[ x$$pkgdir != x ]  &&  rm -rf $$pkgdir
+
+clean-local:
+	rm -rf build

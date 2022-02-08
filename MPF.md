@@ -14,6 +14,7 @@ various aspects of the system.
 * `services/main.cf` - Contains an empty bundle agent main where custom policy
   can be integrated.
 * `services/autorun/` - Automatically included policy files.
+* `.no-distrib/` - A directory that is excluded from policy updates from remote agents.
 
 The MPF is continually updated. You can track its development
 on [github](https://github.com/cfengine/masterfiles/).
@@ -255,21 +256,28 @@ If you want to periodically perform a full scan consider adding custom policy to
 simply remove ```$(sys.inputdir)/cf_promises_validated```. This will cause the
 file to be repaired during the next update run triggering a full scan.
 
-### Automatically remove files not present upstream (SYNC masterfiles)
+### Disable automatically removing files not present upstream (SYNC masterfiles)
 
-If the class ```cfengine_internal_purge_policies``` is defined the update
-behavior to change from only copying changed files down to performing a
-synchronization by purging files on the client that do not exist on the server.
+By default, the MPF will keep inputdir in sync with masterfiles on the hub. If
+the class ```cfengine_internal_purge_policies_disabled``` is defined the update
+behavior will only keep files that exist on the remote up to date locally, files
+that exist locally that do not exist upstream will be left behind. Note, if this
+is disabled and a policy file that is dynamically loaded based on it's presence
+is renamed, duplicate definition errors may occur, preventing policy execution.
 
 This [augments file][Augments] will enable this behavior for all clients.
 
 ```
 {
   "classes": {
-    "cfengine_internal_purge_policies": [ "any" ]
+    "cfengine_internal_purge_policies_disabled": [ "any" ]
   }
 }
 ```
+
+**History:**
+
+- Introduced in 3.18.0, previously, the default behavior was opposite and the class `cfengine_internal_purge_policies`  had to be enabled to keep inputs in sync with masterfiles.
 
 ### Disable limiting robot agents
 
@@ -301,6 +309,24 @@ directly in ```/opt/cfengine/dc-scripts```.
 **Note:** Any policy in the distribution location (/var/cfengine/masterfiles)
 will be deleted the first time this tooling runs. Be wary of local modifications
 before enabling.
+
+### Policy Analyzer Exclude Files
+
+When the policy analyzer is enabled, a copy of the policy is made available for viewing from Mission Portal. To exclude files from this view you can define ```def.cfengine_enterprise_policy_analyzer_exclude_files``` as a list of regular expressions matching files that you do not want to be viewable from Policy Analyzer.
+
+This [augments file][Augments] will prevent any files named `please-no-copy` and any file names that contain `no-copy-me` from being copied and visible from Policy Analyzer.
+
+```json
+{
+  "vars": {
+    "cfengine_enterprise_policy_analyzer_exclude_files": [ "please-no-copy", ".*no-copy-me.*" ]
+  },
+}
+```
+
+**History:**
+
+* Added in 3.19.0, 3.18.1
 
 ### Policy Permissions
 
@@ -359,6 +385,27 @@ For example:
 
 **History:**
 - Introduced 3.15.0, 3.12.3, 3.10.8
+
+#### Disable seeding binaries on hub
+
+By default when `trigger_upgrade` is defined on a hub, the hub will download
+packages for agents to use during self upgrade. This automatic download behavior
+is disabled when the class `mpf_disable_hub_masterfiles_software_update_seed` is
+defined.
+
+For example:
+
+```json
+{
+   "classes": {
+     "mpf_disable_hub_masterfiles_software_update_seed": [ "policy_server::" ]
+   }
+}
+```
+
+**History:**
+
+- Introduced 3.19.0, 3.18.1
 
 ### Files considered for copy during policy updates
 
@@ -620,60 +667,7 @@ The `inputs` key in augments can be used to add additional custom policy files.
 
 ### services\_autorun
 
-When the ```services_autorun``` class is defined bundles tagged with
-```autorun``` are actuated in lexical order.
-
-Example definition of ```services_autorun``` using [Augments (def.json)][Augments]:
-
-
-```json
-{
-  "classes": {
-    "services_autorun": [ "any::" ]
-  }
-}
-```
-
-Example policy with bundle tagged for execution when ```services_autorun``` is defined:
-
-```cf3
-bundle agent example
-{
-  meta:
-    "tags" slist => { "autorun" };
-
-  reports:
-    "I will report when 'services_autorun' is defined."
-}
-```
-
-**Note:** ```.cf``` files located in `services/autorun/` are automatically
-included in inputs even when the ```services_autorun``` class is **not**
-defined. Bundles tagged with ```autorun``` are **not required** to be placed in
-`services/autorun/` in order to be automatically actuated.
-
-**History:**
-
-* Added in CFEngine 3.6.0
-
-#### Additional automatically loaded inputs
-
-When `def.mpf_extra_autorun_inputs` is defined (and services_autorun is defined), the policy files (`*.cf`) in those directories will be added to inputs. If a directory is specified but is not a directory, it will be skipped.
-
-```json
-{
-  "vars": {
-    "mpf_extra_autorun_inputs": [ "$(sys.policy_entry_dirname)/services/autorun/custom2",
-                                    "$(sys.policy_entry_dirname)/services/custom1" ]
-  }
-}
-```
-
-**See Also:** [Append to inputs used by main policy][Append to inputs used by main policy], [Append to inputs used by update policy][Append to inputs used by update policy]
-
-**History:**
-
-* Added in CFEngine 3.18.0
+See the documentation in [services/autorun][mpf-services-autorun].
 
 ### postgresql\_full\_maintenance
 
@@ -1163,10 +1157,14 @@ memory related probes on policy servers:
 {
   "vars": {
     "default_data_select_host_monitoring_include": [ ".*" ],
-    "default_data_select_policy_hub_monitoring_include": [ "mem_.*", "cpu_.*" ]
+    "default_data_select_policy_hub_monitoring_include": [ "mem_.*", "cpu.*" ]
   }
 }
 ```
+
+**History:**
+
+* Added in 3.10.2, 3.11.0
 
 ### Configure Enterprise Mission Portal Docroot
 
@@ -1348,6 +1346,8 @@ pick up changes made outside packages promises.
 
 WARNING: Be ware of setting `package_module_query_update_ifelapsed` too low,
 especially with public repositories or you may be banned for abuse.
+
+**See also:** `packagesmatching()`, `packageupdatesmatching()`
 
 **History**:
 

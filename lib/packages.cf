@@ -10,13 +10,13 @@ bundle common package_module_knowledge
 
       # Package inventory refresh
       "query_installed_ifelapsed" -> { "CFE-2771", "CFE-3504" }
-        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
-                          "$(def.package_module_$(this.promiser))",
+        string => ifelse( isvariable( "def.package_module_query_installed_ifelapsed" ),
+                          "$(def.package_module_query_installed_ifelapsed)",
                           "0"); # Always refresh local package inventory
 
       "query_updates_ifelapsed" -> { "CFE-2771", "CFE-3504" }
-        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
-                          "$(def.package_module_$(this.promiser))",
+        string => ifelse( isvariable( "def.package_module_query_updates_ifelapsed" ),
+                          "$(def.package_module_query_updates_ifelapsed)",
                           "1440"); # Refresh software updates available once a day
 
     debian::
@@ -66,6 +66,8 @@ body package_module apt_get
 @if minimum_version(3.12.2)
     termux::
       interpreter => "$(paths.bin_path)/python";
+    !termux::
+      interpreter => "$(sys.bindir)/cfengine-selected-python";
 @endif
 }
 
@@ -74,6 +76,9 @@ body package_module zypper
       query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
       query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
       #default_options =>  {};
+@if minimum_version(3.12.2)
+      interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
 }
 
 body package_module nimclient
@@ -125,6 +130,9 @@ body package_module yum
     query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
     query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
     #default_options => {};
+@if minimum_version(3.12.2)
+    interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
 }
 
 body package_module slackpkg
