@@ -15,9 +15,30 @@ fi
 
 CMD="$1"
 
-DEFARCH=`uname -m`
+PKG_OPTIONS=''
 REPO=''
 INPUTLIST=''
+
+mangle_arch() {
+    awk 'BEGIN {
+            arch["x86:32"] = "i386";
+            arch["x86:64"] = "amd64";
+            arch["aarch64:64"] = "aarch64";
+            arch["armv6:32:el:eabi:softfp"] = "armv6";
+            arch["armv7:32:el:eabi:softfp"] = "armv7";
+            arch["mips:32:eb:o32"] = "mips";
+            arch["mips:64:eb:n64"] = "mips64";
+            arch["powerpc:64:eb"] = "powerpc64";
+        }
+        {
+            for (a in arch) {
+                re = ":" a "$";
+                sub(re, ":" arch[a]);
+            }
+            sub(/[Ff]ree[Bb][Ss][Dd]:[0-9]*:/, "");
+        }
+        $0'
+}
 
 fatal() {
     echo "ErrorMessage=$*"
@@ -25,12 +46,10 @@ fatal() {
 }
 
 parse_line() {
-    INPUTP="$1"
-
-    echo "${INPUTP}" | awk -F= '{print "KEYWORD=" $1 "; VALUE=" $2;}' 2>/dev/null
-
-    unset INPUTP
-
+    echo "$1" | awk -F= '{
+        i=index($0,"=");
+        print "KEYWORD=\"" $1 "\"" "; VALUE=\"" substr($0, i+1) "\"";
+    }' 2>/dev/null
 }
 
 read_options() {
@@ -39,24 +58,22 @@ read_options() {
             eval `parse_line "${INPUT}"`
             case "${KEYWORD}" in
                 File|Name)
-                    VER=''
-                    ARCH=''
                     if [ "${KEYWORD}" = 'File' ] ; then
                         PKG="${VALUE}"
                     else
                         NAM="${VALUE}"
                     fi
                     ;;
-                Version)
-                    VER="${VALUE}"
+                Version|Architecture)
+                    # Do not store the value separately, as process_inputs()
+                    # will get it from $INPUTLIST
                     ;;
-                Architecture)
-                    ARCH=${VALUE:=${DEFARCH}}
-                    ;;
-                options*)
-                    if [ -n "${repository}" ] ; then
-                        REPO="-r ${repository}"
-                    fi
+                options)
+                    eval `parse_line "${VALUE}"`
+                    case "${KEYWORD}" in
+                        repo|repository) REPO="-r ${VALUE}";;
+                        option) PKG_OPTIONS="${PKG_OPTIONS} -o ${VALUE}";;
+                    esac
                     continue
                     ;;
                 PackageType*)
@@ -90,7 +107,6 @@ process_inputs() {
                 else
                     fatal "Bad Input: '${OPT}' (should be Name=...)."
                 fi
-                VER=''
                 ;;
             Name*)
                 if [ "${CMD}" != 'file-install' ] ; then
@@ -98,15 +114,14 @@ process_inputs() {
                 else
                     fatal "Bad Input: '${OPT}' (should be File=...)"
                 fi
-                VER=''
                 ;;
             Version*)
                 PKG="${PKG}-${VALUE}"
                 ;;
             Architecture*)
                 if [ -n "${VALUE}" ] &&
-                       [ "${VALUE}" != "${DEFARCH}" ] ; then
-                    fatal "Bad Input: Architecture ${VALUE} does not match ${DEFARCH}."
+                       [ "${VALUE}" != "${ARCH}" ] ; then
+                    fatal "Bad Input: Architecture ${VALUE} does not match ${ARCH}."
                 fi
                 ;;
             PackageType*)
@@ -117,6 +132,14 @@ process_inputs() {
                 ;;
         esac
     done
+}
+
+_pkg() {
+    pkg ${PKG_OPTIONS} "$@"
+}
+
+_pkg_query() {
+    _pkg query "$@" "Name=%n\nVersion=%v\nArchitecture=${ARCH}"
 }
 
 get_package_data() {
@@ -155,11 +178,7 @@ get_package_data() {
             #     echo "Version=${PKGVER}"
             # fi
         else
-            pkg query --file "${PKG}"  'Name=%n\nVersion=%v\nArchitecture=%q' | \
-                                      sed -e 's/=freebsd:[0-9]*:/=:/' \
-                                      -e 's/:x86:32/i386/' \
-                                      -e 's/:x86:64/amd64/'
-
+            _pkg_query --file "${PKG}"
         fi
     fi
 }
@@ -171,16 +190,13 @@ else
     read_options
 fi
 
+ARCH=$(_pkg config abi | mangle_arch)
 case "${CMD}" in
     get-package-data)
         get_package_data
         ;;
     list-installed)
-        pkg query -a 'Name=%n\nVersion=%v\nArchitecture=%q' | \
-            sed -e 's/=freebsd:[0-9]*:/=:/' \
-                -e 's/:x86:32/i386/' \
-                -e 's/:x86:64/amd64/'
-
+        _pkg_query -a
         ;;
     list-updates-local|list-updates)
         if [ "${CMD}" = 'list-updates-local' ] ; then
@@ -188,30 +204,30 @@ case "${CMD}" in
         else
             LOCALUPDATE=''
         fi
-        pkg version ${LOCALUPDATE} -vl'<' | \
-            awk 'BEGIN { cmd="uname -m"; cmd | getline arch}
-/ repositor(y|ies) / { next; }
-{
-  pkgname = $1;
-  pkgver  = $7;
-  sub(/-[0-9_.,]*$/,"",pkgname);
-  sub(/\)/, "", pkgver);
-  print "Name=" pkgname;
-  print "Version=" pkgver;
-  print "Architecture=" arch;
-}'
+        _pkg version ${LOCALUPDATE} -vl'<' | \
+            awk -v arch="${ARCH}" \
+                '/ repositor(y|ies) / { next; }
+                {
+                  pkgname = $1;
+                  pkgver  = $7;
+                  sub(/-[0-9_.,]*$/, "", pkgname);
+                  sub(/\)/, "", pkgver);
+                  print "Name=" pkgname;
+                  print "Version=" pkgver;
+                  print "Architecture=" arch;
+                }'
         ;;
     repo-install|file-install|remove)
         process_inputs "${CMD}" "${INPUTLIST}"
         case "${CMD}" in
             repo-install)
-                pkg install -qy ${REPO} ${PKG} 2>/dev/null >/dev/null
+                _pkg install -qy ${REPO} ${PKG} 2>/dev/null >/dev/null
                 ;;
             file-install)
-                pkg install -qy ${PKG} 2>/dev/null >/dev/null
+                _pkg install -qy ${PKG} 2>/dev/null >/dev/null
                 ;;
             remove)
-                pkg delete -Rqy ${PKG} 2>/dev/null >/dev/null
+                _pkg delete -Rqy ${PKG} 2>/dev/null >/dev/null
                 ;;
         esac
         RC=$?
