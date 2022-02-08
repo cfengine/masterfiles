@@ -141,7 +141,15 @@ if [ "${_COUNT_CF_EXECD_PROCS}" -lt "1" ]; then
 fi
 
 # Pathology #1.5: More than one cf-execd is running.
-if [ "${_COUNT_CF_EXECD_PROCS}" -gt "1" ]; then
+/var/cfengine/bin/cf-promises --show-vars=default:sys.cf > "${COLLECTION_DIR}/cf-promises_--show-vars=default:sys.cf.txt"
+CF_VERSION_MINOR_RUNNING="$(awk '/cf_version_minor / {print $2}' ${COLLECTION_DIR}/cf-promises_--show-vars=default:sys.cf.txt)"
+# At 3.18.0 cf-execd began running cf-agent from a child process instead of a thread on POSIX systems (ENT-6182)
+_COUNT_CF_EXECD_PROCS_THRESHOLD=1
+if [ "${CF_VERSION_MINOR_RUNNING}" -ge "18" ]; then
+    _COUNT_CF_EXECD_PROCS_THRESHOLD=2
+fi
+
+if [ "${_COUNT_CF_EXECD_PROCS}" -gt "${_COUNT_CF_EXECD_PROCS_THRESHOLD}" ]; then
     echo "$(date) Found ${_COUNT_CF_EXECD_PROCS} cf-execd processes running" >> ${LOGFILE}
     echo "- Found ${_COUNT_CF_EXECD_PROCS} cf-execd running" >> ${COLLECTION_REPORT}
     PATHOLOGY_COUNT=$((${PATHOLOGY_COUNT}+1))
