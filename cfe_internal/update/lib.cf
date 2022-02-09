@@ -114,34 +114,10 @@ body classes u_kept_successful_command_results(scope, class_prefix)
 # @param class_prefix The prefix for the classes defined
 #
 # **See also:** `scope`, `scoped_classes_generic`, `classes_generic`, `results`
-# TODO After cfengine_3_10 is no longer supported inherit from u_results and add
-# in the return code differences.
 {
+  inherit_from =>  u_results( "$(scope)", "$(class_prefix)" );
   kept_returncodes => { "0" };
   failed_returncodes => { "1" };
-
-  scope => "$(scope)";
-
-  promise_kept => { "$(class_prefix)_reached",
-                    "$(class_prefix)_kept" };
-
-  promise_repaired => { "$(class_prefix)_reached",
-                        "$(class_prefix)_repaired" };
-
-  repair_failed => { "$(class_prefix)_reached",
-                     "$(class_prefix)_error",
-                     "$(class_prefix)_not_kept",
-                     "$(class_prefix)_failed" };
-
-  repair_denied => { "$(class_prefix)_reached",
-                     "$(class_prefix)_error",
-                     "$(class_prefix)_not_kept",
-                     "$(class_prefix)_denied" };
-
-  repair_timeout => { "$(class_prefix)_reached",
-                      "$(class_prefix)_error",
-                      "$(class_prefix)_not_kept",
-                      "$(class_prefix)_timeout" };
 }
 
 body service_method u_systemd_services

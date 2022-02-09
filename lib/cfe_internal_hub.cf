@@ -273,7 +273,7 @@ bundle agent cfe_internal_postgresql_maintenance
       handle => "cfe_internal_postgresql_maintenance_vacuum_full";
 
     policy_server.enterprise.cfconsumer_in_enterprise::
-      # TODO Remove after 3.12 EOL
+      # TODO Remove after 3.15 is EOL (3.12 was last version containing cf-consumer 3.15 was released while 3.12 was supported)
 
       "cf_consumer_pid" -> { "ENT-2797" }
         string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
