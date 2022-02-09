@@ -63,6 +63,11 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_dir_doc_root",
       perms => mog("0460", "root", $(def.cf_apache_group) );
 
+      "$(sys.workdir)/httpd/."
+      comment => "httpd dir should be 755",
+      handle => "cfe_internal_setup_knowledge_dir_httpd",
+      perms => mog("755", "root", "root");
+
       "$(cfe_internal_hub_vars.docroot)/.htaccess"
       comment => "Correct up htaccess file in doc root",
       handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
