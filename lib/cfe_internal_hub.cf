@@ -272,22 +272,6 @@ bundle agent cfe_internal_postgresql_maintenance
       comment => "Vacuum Full PostgreSQL (database: cfdb)",
       handle => "cfe_internal_postgresql_maintenance_vacuum_full";
 
-    policy_server.enterprise.cfconsumer_in_enterprise::
-      # TODO Remove after 3.15 is EOL (3.12 was last version containing cf-consumer 3.15 was released while 3.12 was supported)
-
-      "cf_consumer_pid" -> { "ENT-2797" }
-        string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
-        if => fileexists( "$(sys.workdir)/cf-consumer.pid" ),
-        comment => "Read cf-consumer.pid for the main cf-consumer PID";
-
-  classes:
-
-    cfconsumer_in_enterprise::
-      # TODO Remove after 3.12 EOL
-      "cf_consumer_pid_correct" -> { "ENT-2972" }
-        expression => isvariable("cf_consumer_pid"),
-        comment => "Check if cf-consumer pid is correctly defined";
-
   processes:
 
     any::
@@ -295,15 +279,6 @@ bundle agent cfe_internal_postgresql_maintenance
       "cf-hub"      signals => { "term" },
       comment => "Terminate cf-hub while doing PostgreSQL maintenance",
       handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
-
-    cf_consumer_pid_correct.cfconsumer_in_enterprise::
-      # TODO Remove from MPF after 3.12 EOL
-
-      "cf-consumer" -> { "ENT-2797" }
-        signals => { "kill" },
-        process_select => by_pid("$(cf_consumer_pid)"),
-        comment => "Kill cf-consumer while doing PostgreSQL maintenance",
-        handle => "cfe_internal_postgresql_maintenance_processes_kill_cf_consumer";
 
   commands:
 
