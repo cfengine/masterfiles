@@ -92,8 +92,8 @@ bundle agent cfe_internal_hub_maintain
       usebundle => cfe_internal_database_cleanup_reports(@(report_settings)),
       action => if_elapsed_day;
 
-      "Remove cf-consumer history"
-      usebundle => cfe_internal_database_cleanup_consumer_status("3"),
+      "Remove cf-hub status history"
+      usebundle => cfe_internal_database_cleanup_cf_hub_status("3"),
       action => if_elapsed_day;
 
       "Remove diagnostics history"
@@ -141,10 +141,8 @@ AND    t.$(settings[$(index)][time_key]) <= (z.latest - '$(settings[$(index)][hi
         handle => "cf_database_maintain_report_$(settings[$(index)][report])";
 }
 
-bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
+bundle agent cfe_internal_database_cleanup_cf_hub_status (row_count)
 # @brief keep up to row_count entries in the database
-# @note ENT-2797 After cf-consumer removal, this will still be necessary, functionality
-# of cf-consumer to be replaced with cf-hub-worker per Ole.
 {
 
   classes:
@@ -162,6 +160,10 @@ bundle agent cfe_internal_database_cleanup_consumer_status (row_count)
   vars:
 
     any::
+
+      # TODO Redact after 3.15.x is no longer under standard support. Since this
+      # is used in 3.12.x and 3.12.x was supported at the time 3.15.0 was
+      # released we need to maintain the path for people upgrading from 3.12.x
 
       # The status table changed it's name for 3.12.2 and 3.10.6, this handles
       # using the proper table name in the cleanup query
@@ -272,22 +274,6 @@ bundle agent cfe_internal_postgresql_maintenance
       comment => "Vacuum Full PostgreSQL (database: cfdb)",
       handle => "cfe_internal_postgresql_maintenance_vacuum_full";
 
-    policy_server.enterprise.cfconsumer_in_enterprise::
-      # TODO Remove after 3.15 is EOL (3.12 was last version containing cf-consumer 3.15 was released while 3.12 was supported)
-
-      "cf_consumer_pid" -> { "ENT-2797" }
-        string => readfile("$(sys.workdir)/cf-consumer.pid", 0),
-        if => fileexists( "$(sys.workdir)/cf-consumer.pid" ),
-        comment => "Read cf-consumer.pid for the main cf-consumer PID";
-
-  classes:
-
-    cfconsumer_in_enterprise::
-      # TODO Remove after 3.12 EOL
-      "cf_consumer_pid_correct" -> { "ENT-2972" }
-        expression => isvariable("cf_consumer_pid"),
-        comment => "Check if cf-consumer pid is correctly defined";
-
   processes:
 
     any::
@@ -295,15 +281,6 @@ bundle agent cfe_internal_postgresql_maintenance
       "cf-hub"      signals => { "term" },
       comment => "Terminate cf-hub while doing PostgreSQL maintenance",
       handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
-
-    cf_consumer_pid_correct.cfconsumer_in_enterprise::
-      # TODO Remove from MPF after 3.12 EOL
-
-      "cf-consumer" -> { "ENT-2797" }
-        signals => { "kill" },
-        process_select => by_pid("$(cf_consumer_pid)"),
-        comment => "Kill cf-consumer while doing PostgreSQL maintenance",
-        handle => "cfe_internal_postgresql_maintenance_processes_kill_cf_consumer";
 
   commands:
 
