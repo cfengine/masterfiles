@@ -226,6 +226,14 @@ bundle common def
         int => "200",
         if => not( isvariable( "control_server_maxconnections" ) );
 
+      "control_agent_environment_vars" ->  { "CFE-3925" }
+        slist => { },
+        if => not( isvariable( "control_agent_environment_vars" ) ),
+        comment => "Environment variables of the agent process. The values
+                    of environment variables are inherited by child commands.
+                    Defaults to an empty list, until user overrides it
+                    in augments (def.json).";
+
     debian::
       "environment_vars"
         handle => "common_def_vars_environment_vars",
