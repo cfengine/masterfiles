@@ -226,18 +226,60 @@ bundle common def
         int => "200",
         if => not( isvariable( "control_server_maxconnections" ) );
 
+      #+begin_src def.control_agent_environment_vars
+      # This configures environment_vars in body agent control
+
+      # It's configurable without having to modify policy, so the default values
+      # are only applied if the variable is not already defined (via augments).
+
+      # Platform defaults are set first, and the global default is set last so
+      # that global default does not override a platform specific setting since
+      # the promises are only applied if the variable is not already defined
+      # which is reverse of what you might normally do in CFEngine since
+      # typically the last promise wins.
+
+  classes:
+
+      "_control_agent_environment_vars_validated" -> { "CFE-3927" }
+        and => {
+                 # The variable must be defined
+                 isvariable( "default:def.control_agent_environment_vars" ),
+                 # The length of the variable must be greater than 0 (can't be an empty list)
+                 isgreaterthan( length( "default:def.control_agent_environment_vars" ), 0),
+                 # Each element of the list must be of the form KEY=VALUE
+                 every( ".+=.+", "default:def.control_agent_environment_vars"),
+                 # In 3.18 and greater we can validate the type of variable in use
+@if minimum_version(3.18.0)
+                 regcmp( "(policy slist|data array)", type( "default:def.control_agent_environment_vars", "true" ) ),
+@endif
+                 };
+
+  vars:
+
     debian::
-      "environment_vars"
-        handle => "common_def_vars_environment_vars",
-        comment => "Environment variables of the agent process. The values
-                    of environment variables are inherited by child commands.",
+
+      "control_agent_environment_vars_default" ->  { "CFE-3925" }
+        handle => "common_def_vars_debian_control_agent_environment_vars_default",
+        if => not( isvariable( "control_agent_environment_vars_default" ) ),
+        comment => "Set default environment variables for using Debian non-interactively",
         slist => {
                    "DEBIAN_FRONTEND=noninteractive",
                   # "APT_LISTBUGS_FRONTEND=none",
                   # "APT_LISTCHANGES_FRONTEND=none",
                  };
 
-      # End change #
+  any::
+
+      # Resolve the final state for environment vars if there is a default var
+      # or if there is a user extra and merge the defined entities
+      "control_agent_environment_vars" ->  { "CFE-3925" }
+        slist => { @(def.control_agent_environment_vars_default),
+                   @(def.control_agent_environment_vars_extra) },
+        policy => "ifdefined",
+        if => or( isvariable( "def.control_agent_environment_vars_default" ), # Protect against defining
+                  isvariable( "def.control_agent_environment_vars_extra" ));  # an empty variable
+
+      #+end_src Agent Environment Variables
 
     any::
       "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
