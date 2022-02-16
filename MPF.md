@@ -1392,6 +1392,44 @@ the watchdog will not be active.
 
 **See Also:** [Watchdog documentation][cfe_internal/core/watchdog]
 
+### Environment Variables
+
+Environment variables that should be inherited by child commands can be set using `def.control_agent_environment_vars_default`. The policy defaults are overridden if this is defined. This can be useful if you want to modify the default environment variables that are set.
+
+For example:
+
+```json
+{
+  "vars": {
+    "control_agent_environment_vars_default":
+      [ "DEBIAN_FRONTEND=noninteractive",
+        "XPG_SUS_ENV=ON" ]
+  }
+}
+```
+
+The environment variables can also be extended by defining `def.control_agent_environment_vars_extra`. The extra environment variables defined here are combined with the defaults (if they exist).
+
+```json
+{
+  "vars": {
+    "control_agent_environment_vars_extra": [ "XPG_SUS_ENV=ON" ]
+  }
+}
+```
+
+**Notes:**
+
+* Simple augments as shown above apply to *all* hosts. Consider using the
+  [augments key][Augments#augments] or [host specific data][Augments#host\_specific.json] if you want to set environment variables
+  differently across different sets of hosts. The value set via Augments takes
+  precedence over policy defaults, so be sure to take that into account when
+  configuring.
+
+**History:**
+
+* Introduced in 3.20.0, 3.18.2
+
 ### Modules
 
 Modules executed by the `usemodule()` function are expected to be found in

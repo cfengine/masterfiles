@@ -35,6 +35,15 @@ body agent control
       # Maximum number of outgoing connections to a remote cf-serverd.
       maxconnections => "$(def.control_agent_maxconnections)";
 
+      # Environment variables of the agent process.
+      # The values of environment variables are inherited by child commands
+      # EMPTY list is not valid for environment attribute Ref: CFE-3927. So, we
+      # do some validation on it so we can apply it selectively.
+
+   _control_agent_environment_vars_validated::
+
+      environment => { @(def.control_agent_environment_vars) };
+
     _have_control_agent_files_single_copy::
       # CFE-3622
 
@@ -50,9 +59,5 @@ body agent control
       default_repository => "$(def.control_agent_default_repository)";
 
       # Environment variables based on Distro
-
-    debian::
-
-      environment => { @(def.environment_vars) };
 
 }
