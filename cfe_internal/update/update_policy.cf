@@ -204,15 +204,6 @@ bundle agent cfe_internal_update_policy_cpv
         comment => "Symlink to Python we found (if any)",
         handle => "cfe_internal_update_policy_python_symlink";
 
-    cfredis_in_enterprise::
-
-      # TODO Remove from MPF after 3.12 EOL
-
-      "redis_conf_file" -> { "ENT-2797" }
-        string => translatepath("$(sys.workdir)/config/redis.conf"),
-        comment => "Path to Redis configuration file",
-        handle => "cfe_internal_update_policy_redis_conf_file";
-
   classes:
 
       "validated_updates_ready"
