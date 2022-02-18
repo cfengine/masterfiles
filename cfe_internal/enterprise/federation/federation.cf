@@ -302,8 +302,8 @@ bundle agent clean_when_off
     "user" string => "$(cfengine_enterprise_federation:transport_user.user)";
     "home" string => "$(cfengine_enterprise_federation:transport_user.home)";
 @if minimum_version(3.15)
-    "remote_hubs_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs" 2>/dev/null`, useshell);
-    "federated_reporting_settings_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings" 2>/dev/null`, useshell);
+    "remote_hubs_table_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs" 2>/dev/null`, useshell);
+    "federated_reporting_settings_table_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings" 2>/dev/null`, useshell);
 @endif
 
   users:
@@ -314,6 +314,9 @@ bundle agent clean_when_off
       "$(cfengine_enterprise_federation:config.path_setup_status)" -> { "ENT-7233" }
         comment => "We must remove this file for Mission Portal to understand that the federation is not configured",
         delete => default:tidy;
+      "$(cfengine_enterprise_federation:config.path)" -> { "ENT-7969" }
+         comment => "We must remove this file for Mission Portal to understand that the federation is not configured",
+         delete => default:tidy;
 
   methods:
     "rm_rf_cftransport_home_dir" usebundle => default:rm_rf("$(home)");
