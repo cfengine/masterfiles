@@ -1421,7 +1421,7 @@ The environment variables can also be extended by defining `def.control_agent_en
 **Notes:**
 
 * Simple augments as shown above apply to *all* hosts. Consider using the
-  [augments key][Augments#augments] or [host specific data][Augments#host\_specific.json] if you want to set environment variables
+  [augments key][Augments#augments] or [host specific data][Augments#host_specific.json] if you want to set environment variables
   differently across different sets of hosts. The value set via Augments takes
   precedence over policy defaults, so be sure to take that into account when
   configuring.
