@@ -27,7 +27,7 @@ bundle common inventory_debian
     any::
       "debian_derived_evaluated"
       scope => "bundle",
-      or => { "has_os_release", "has_lsb_release", "has_etc_linuxmint_info" } ;
+      or => { isvariable("sys.os_release"), "has_lsb_release", "has_etc_linuxmint_info" } ;
 
       "linuxmint"
       expression => "has_etc_linuxmint_info",
@@ -40,7 +40,7 @@ bundle common inventory_debian
       comment => "this is a Linux Mint system, of some sort",
       meta => { "inventory", "attribute_name=none" } ;
 
-    linuxmint.has_os_release::
+    linuxmint::
       "lmde"
       expression => regcmp('.*LMDE.*', "$(sys.os_release[NAME])"),
       comment => "this is a Linux Mint Debian Edition",
