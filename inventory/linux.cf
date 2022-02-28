@@ -4,7 +4,6 @@ bundle common inventory_linux
 # This common bundle is for Linux inventory work.
 #
 # Provides:
-#  has_os_release class based on presence of /etc/os-release
 #  systemd class based on linktarget of /proc/1/cmdline
 {
   vars:
@@ -49,9 +48,6 @@ bundle common inventory_linux
   classes:
 
     any::
-      "has_os_release" expression => fileexists("/etc/os-release"),
-      comment => "Check if we can get more info from /etc/os-release";
-
       "has_proc_1_cmdline" expression => fileexists("/proc/1/cmdline"),
       comment => "Check if we can read /proc/1/cmdline";
 
