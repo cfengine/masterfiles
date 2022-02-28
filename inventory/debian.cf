@@ -42,9 +42,9 @@ bundle common inventory_debian
 
     linuxmint.has_os_release::
       "lmde"
-      expression => regcmp('(?ms).*^NAME="Linux Mint LMDE"$.*', "$(inventory_linux.os_release_info)"),
+      expression => regcmp('.*LMDE.*', "$(sys.os_release[NAME])"),
       comment => "this is a Linux Mint Debian Edition",
-      meta => { "inventory", "attribute_name=none", "derived-from=inventory_linux.os_release_info" } ;
+      meta => { "inventory", "attribute_name=none", "derived-from=sys.os_release[NAME]" } ;
 
     linuxmint.has_lsb_release::
       "lmde"
