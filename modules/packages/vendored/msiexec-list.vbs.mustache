@@ -41,10 +41,8 @@ For Each strKey in strKeys
         ' DisplayVersion and InstalledVersion are missing, so try to fall back to a key of the same name as the node, i.e. AOMEI Backupper Server.
         intRet2 = objReg.GetStringValue( HKLM, strKey & strDisplayNameValue, strDisplayNameValue, strDisplayVersionValue )
       End If
-      ' Replace whitespace with dashes for CFEngine
-      ' strDisplayNameValue = Replace(strDisplayNameValue, " ", "-")
       ' Print out the DisplayName
-      WScript.Echo "Name=" & LCase(strDisplayNameValue)
+      WScript.Echo "Name=" & strDisplayNameValue
       ' Print out the DisplayVersion
       ' Ensure that Version is set to something, else it can't be inserted into the database.
       If intRet2 <> 0 Then
