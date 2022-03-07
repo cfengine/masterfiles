@@ -34,6 +34,10 @@ bundle agent test
         perms => m(600),
         depth_search => recurse("inf");
 
+      "$(sys.statedir)/am_policy_hub"
+        create => "true",
+        touch => "true";
+
   methods:
       "" usebundle => file_make("$(sys.inputdir)/secondary.cf", '
 bundle agent x
@@ -46,7 +50,8 @@ bundle agent x
       "" usebundle => file_copy("$(this.promise_filename).json", "$(sys.inputdir)/def.json");
 
   reports:
-      "$(with)" with => join("$(const.n)", findfiles( "$(sys.inputdir)/******" ));
+      "$(sys.inputdir):$(const.n)$(const.t)$(with)" with => join("$(const.n)$(const.t)", findfiles( "$(sys.inputdir)/******" ));
+      "$(sys.statedir):$(const.n)$(const.t)$(with)" with => join("$(const.n)$(const.t)", findfiles( "$(sys.statedir)/******" ));
 }
 
 #######################################################
@@ -55,7 +60,7 @@ bundle agent check
 {
   vars:
     #"command" string => "$(sys.cf_agent) -Kf $(sys.inputdir)/promises.cf|$(G.grep) 'R:'";
-      "command" string => "$(sys.cf_agent) --define policy_server,am_policy_hub --debug -Kf $(sys.inputdir)/promises.cf";
+      "command" string => "$(sys.cf_agent) --debug -Kf $(sys.inputdir)/promises.cf";
 
   methods:
       "" usebundle => dcs_passif_output(".*R: reporting actuation of bundle x.*", "", $(command), $(this.promise_filename));
