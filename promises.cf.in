@@ -73,7 +73,15 @@ body common control
                   @(inventory.inputs),
 
                  # CFEngine internal policy for the management of CFEngine itself
-                  @(cfe_internal_inputs.inputs),
+                  @(cfe_internal_inputs.inputs), # This is how the file
+                                                 # (cfe_internal/enterprise/main.cf)
+                                                 # that contains the promise to
+                                                 # run the missing bundle is
+                                                 # included in inputs. It's also
+                                                 # how the file
+                                                 # (cfe_internal/enterprise/CFE_hub_specific.cf)
+                                                 # containing the missing bundle
+                                                 # is included in inputs.
 
                  # Control body for all CFEngine robot agents
                   @(cfengine_controls.inputs),
@@ -216,7 +224,7 @@ bundle common cfe_internal_inputs
     enterprise_edition.(policy_server|am_policy_hub)::
 
       "input[enterprise_hub_specific]"
-        string => "cfe_internal/enterprise/CFE_hub_specific.cf",
+        string => "cfe_internal/enterprise/CFE_hub_specific.cf", # This is the file that contains the missing bundle
         comment => "Policy relating to CFEngine Enterprise Hub, for example
                     software updates, webserver configuration, and alerts";
 
@@ -233,7 +241,7 @@ bundle common cfe_internal_inputs
         comment => "Settings mostly releated to CFEngine Enteprise Mission Portal";
 
       "input[enterprise_main]"
-        string => "cfe_internal/enterprise/main.cf",
+        string => "cfe_internal/enterprise/main.cf", # This file contains the promise to run the missing bundle
         comment => "This policy activates other enterprise specific policies";
 
       "input[change_management]"
