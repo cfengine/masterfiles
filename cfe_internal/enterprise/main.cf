@@ -9,7 +9,7 @@ bundle agent cfe_internal_enterprise_main
         comment => "Basic change management",
         handle => "cfe_internal_enterprise_main_change_management";
 
-    am_policy_hub::
+    enterprise_edition.(policy_server|am_policy_hub)::
 
       "hub" usebundle => cfe_internal_update_folders,
       handle => "cfe_internal_management_update_folders",

@@ -34,9 +34,6 @@ bundle agent test
         perms => m(600),
         depth_search => recurse("inf");
 
-      "$(sys.statedir)/am_policy_hub"
-        create => "true",
-        touch => "true";
 
   methods:
       "" usebundle => file_make("$(sys.inputdir)/secondary.cf", '
@@ -49,9 +46,6 @@ bundle agent x
 
       "" usebundle => file_copy("$(this.promise_filename).json", "$(sys.inputdir)/def.json");
 
-  reports:
-      "$(sys.inputdir):$(const.n)$(const.t)$(with)" with => join("$(const.n)$(const.t)", findfiles( "$(sys.inputdir)/******" ));
-      "$(sys.statedir):$(const.n)$(const.t)$(with)" with => join("$(const.n)$(const.t)", findfiles( "$(sys.statedir)/******" ));
 }
 
 #######################################################
