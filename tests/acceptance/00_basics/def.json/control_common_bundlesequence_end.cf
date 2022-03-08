@@ -53,8 +53,7 @@ bundle agent x
 bundle agent check
 {
   vars:
-    # "command" string => "$(sys.cf_agent) -Kf $(sys.inputdir)/promises.cf|$(G.grep) 'R:'";
-      "command" string => "$(sys.cf_agent) --workdir='$(sys.workdir)' -Kf $(sys.inputdir)/promises.cf";
+      "command" string => "$(sys.cf_agent) -Kf $(sys.inputdir)/promises.cf";
 
   methods:
       "" usebundle => dcs_passif_output(".*R: reporting actuation of bundle x.*", "", $(command), $(this.promise_filename));
