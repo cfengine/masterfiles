@@ -34,7 +34,6 @@ bundle agent test
         perms => m(600),
         depth_search => recurse("inf");
 
-
   methods:
       "" usebundle => file_make("$(sys.inputdir)/secondary.cf", '
 bundle agent x
@@ -45,7 +44,6 @@ bundle agent x
 ');
 
       "" usebundle => file_copy("$(this.promise_filename).json", "$(sys.inputdir)/def.json");
-
 }
 
 #######################################################
