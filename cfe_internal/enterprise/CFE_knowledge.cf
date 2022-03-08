@@ -51,17 +51,63 @@ bundle agent cfe_internal_setup_knowledge
       "$(install_logs)" -> { "ENT-4506" }
         perms => mog("0600", "root", "root" );
 
-      "$(cfe_internal_hub_vars.docroot)"
-      comment => "All files in there should be at least 0460. Giving cfapache group full access",
-      handle => "cfe_internal_setup_knowledge_files_doc_root_2",
-      file_select => cfe_internal_docroot_perms,
-      perms => mog("0460", "root", $(def.cf_apache_group) ),
-      depth_search => recurse_exclude("inf");   # see exclude dirs in recurse_exclude() body
-
-      "$(cfe_internal_hub_vars.docroot)/."
-      comment => "The top level docroot dir should be at least 0460 with root:cfapache",
+      "$(cfe_internal_hub_vars.docroot)/." -> { "CFE-951" }
+      comment => "The top level docroot needs to be readable and executable by the web server.",
       handle => "cfe_internal_setup_knowledge_dir_doc_root",
-      perms => mog("0460", "root", $(def.cf_apache_group) );
+      perms => mog("0550", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.docroot)/vendor/." -> { "CFE-951" }
+        comment => "The vendor directory and sub-directories contains dependencies from the code ignitor framework and the directories need to be searchable by the web server.",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_vendor_dirs",
+        depth_search => recurse_with_base("inf"),
+        file_select => dirs,
+        perms => mog("0450", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.docroot)/vendor/." -> { "CFE-951" }
+        comment => "The files in the vendor directory contain dependencies from the code ignitor framework and need to be readable by the web server.",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_vendor_not_dir",
+        depth_search => recurse_with_base("inf"),
+        file_select => not_dir,
+        perms => mog("0440", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.public_docroot)/themes/." -> { "CFE-951" }
+        comment => "The public docroot themes directory needs to be searchable by the web server so that it can find css and images to make Mission Portal look as expected.",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_public_themes_dirs",
+        depth_search => recurse_with_base("inf"),
+        file_select => dirs,
+        perms => mog("0450", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.public_docroot)/themes/." -> { "CFE-951" }
+        comment => "The public docroot themes directory needs to be searchable by the web server so that it can find css and images to make Mission Portal look as expected.",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_public_themes_not_dir",
+        depth_search => recurse_with_base("inf"),
+        file_select => not_dir,
+        perms => mog("0440", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.public_docroot)/."
+        comment => "The public dir in the docroot needs the to be executable by the webserver",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_public",
+        perms => mog("0450", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.public_docroot)/index.php"
+        comment => "The public dir in the docroot needs the to be executable by the webserver",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_public_index_php",
+        perms => mog("0440", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.public_docroot)/images/." -> { "CFE-951" }
+        comment => "The public docroot images directory needs to be searchable by the webserver so that Mission Portal can load images and look as expected.",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_public_images_dirs",
+        depth_search => recurse_with_base("inf"),
+        file_select => dirs,
+        perms => mog("0450", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.public_docroot)/images/." -> { "CFE-951" }
+        comment => "The public docroot images directory needs to be searchable by the webserver so that Mission Portal can load images and look as expected.",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_public_images_not_dir",
+        depth_search => recurse_with_base("inf"),
+        file_select => not_dir,
+        perms => mog("0440", "root", $(def.cf_apache_group) );
+
 
       "$(sys.workdir)/httpd/."
       comment => "httpd dir should be 755",
@@ -73,23 +119,39 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
       copy_from => no_backup_cp("$(sys.workdir)/share/GUI/Apache-htaccess");
 
-      "$(cfe_internal_hub_vars.public_docroot)/scripts/."
+      "$(cfe_internal_hub_vars.public_docroot)/scripts/." -> { "CFE-951" }
       comment => "Ensure permissions for $(cfe_internal_hub_vars.public_docroot)/scripts",
-      handle => "cfe_internal_setup_knowledge_files_doc_root_scripts",
+      handle => "cfe_internal_setup_knowledge_files_doc_root_scripts_dir",
       create => "true",
-      depth_search => recurse_basedir("inf"),
-      perms => mog("0440", "root", $(def.cf_apache_group) );
+      perms => mog("0470", "root", $(def.cf_apache_group) );
 
-      "$(cfe_internal_hub_vars.docroot)/static/."
-      handle => "cfe_internal_setup_knowledge_files_doc_root_tmp",
+      "$(cfe_internal_hub_vars.public_docroot)/scripts/." -> { "CFE-951" }
+        comment => "Ensure permissions for $(cfe_internal_hub_vars.public_docroot)/scripts",
+        handle => "cfe_internal_setup_knowledge_files_doc_root_scripts_not_dir",
+        create => "true",
+        file_select => not_dir,
+        depth_search => recurse_basedir("inf"),
+        perms => mog("0440", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.docroot)/static/." -> { "CFE-951" }
+      handle => "cfe_internal_setup_knowledge_files_doc_root_static_dir",
       create => "true",
-      depth_search => recurse_basedir("inf"),
-      perms => mog("0660", "root", $(def.cf_apache_group)),
+      perms => mog("0670", "root", $(def.cf_apache_group)),
       comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/static.
                   This is where exported and scheduled reports generated by Mission Portal
                   (temp files to email)";
 
-      "$(cfe_internal_hub_vars.public_docroot)/tmp/."
+      "$(cfe_internal_hub_vars.docroot)/static/." -> { "CFE-951" }
+        handle => "cfe_internal_setup_knowledge_files_doc_root_static_not_dir",
+        create => "true",
+        depth_search => recurse_basedir("inf"),
+        file_select => not_dir,
+        perms => mog("0660", "root", $(def.cf_apache_group)),
+        comment => "Ensure permissions for $(cfe_internal_hub_vars.docroot)/static/*.
+                  This is where exported and scheduled reports generated by Mission Portal
+                  (temp files to email)";
+
+      "$(cfe_internal_hub_vars.public_docroot)/tmp/." -> { "CFE-951" }
       handle => "cfe_internal_setup_knowledge_files_public_doc_root_tmp_dir",
       create => "true",
       depth_search => recurse_basedir("inf"),
@@ -98,22 +160,31 @@ bundle agent cfe_internal_setup_knowledge
       comment => "Ensure permissions for $(cfe_internal_hub_vars.public_docroot)/tmp.
                   This is where css and js files generated by Mission Portal";
 
-      "$(cfe_internal_hub_vars.public_docroot)/tmp/."
-        handle => "cfe_internal_setup_knowledge_files_public_doc_root_tmp_files",
+      "$(cfe_internal_hub_vars.public_docroot)/tmp/." -> { "CFE-951" }
+        handle => "cfe_internal_setup_knowledge_files_public_doc_root_tmp_not_dir",
         create => "true",
         depth_search => recurse_basedir("inf"),
-        file_select => plain,
+        file_select => not_dir,
         perms => mog("0440", $(def.cf_apache_user), $(def.cf_apache_group)),
         comment => "Ensure permissions for $(cfe_internal_hub_vars.public_docroot)/tmp.
                   This is where css and js files generated by Mission Portal";
 
-
-      "$(cfe_internal_hub_vars.docroot)/application"
+      "$(cfe_internal_hub_vars.docroot)/application" -> { "CFE-951" }
       comment => "No one should be able to write to the application, and only
                   the webserver needs access",
-      handle => "cfe_internal_setup_knowledge_files_all_files_in_application",
+      handle => "cfe_internal_setup_knowledge_files_all_not_dir_in_application",
       depth_search => cfe_internal_docroot_application_perms,
+      file_select => not_dir,
       perms => mog("0440", "root", $(def.cf_apache_group) );
+
+      "$(cfe_internal_hub_vars.docroot)/application" -> { "CFE-951" }
+        comment => "No one should be able to write to the application, and only
+                  the webserver needs access",
+        handle => "cfe_internal_setup_knowledge_files_all_dirs_in_application",
+        depth_search => cfe_internal_docroot_application_perms,
+        file_select => dirs,
+        perms => mog("0550", "root", $(def.cf_apache_group) );
+
 
       "$(cfe_internal_hub_vars.docroot)/api/." -> { "ENT-4250" }
         comment => "The api directory and it's subdirectories need to be
@@ -121,7 +192,7 @@ bundle agent cfe_internal_setup_knowledge
         perms => mog("0550", "root", $(def.cf_apache_group) );
 
 
-      "$(cfe_internal_hub_vars.docroot)/api/." -> { "ENT-4250" }
+      "$(cfe_internal_hub_vars.docroot)/api/." -> { "ENT-4250", "CFE-951" }
         depth_search => recurse_ignore( "inf", "static" ),
         file_select => dirs,
         comment => "The api subdirectories need to be executable by cfapache,
@@ -129,7 +200,7 @@ bundle agent cfe_internal_setup_knowledge
                     well take care of it separately",
         perms => mog("0550", "root", $(def.cf_apache_group) );
 
-      "$(cfe_internal_hub_vars.docroot)/api/."
+      "$(cfe_internal_hub_vars.docroot)/api/." -> { "CFE-951" }
       depth_search => recurse_basedir("inf"),
       handle => "cfe_internal_setup_knowledge_files_doc_root_api",
       file_select => cfe_internal_exclude_sh_pl_scripts,
@@ -150,14 +221,14 @@ bundle agent cfe_internal_setup_knowledge
       comment => "This is where exported PDF and CSV reports from Mission
                   Portal are written, it be writeable by the webserver";
 
-      "$(cfe_internal_hub_vars.docroot)/api/static/."
-      comment => "Exported reports only need to be readable by the webserver.",
-      handle => "cfe_internal_setup_knowledge_files_doc_root_api_static",
-      depth_search => recurse("inf"),
-      file_select => cfe_internal_docroot_api_static_perms,
-      perms => mog("0440", "root", $(def.cf_apache_group) );
+      "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "CFE-951" }
+        comment => "Exported reports only need to be readable by the webserver.",
+        handle => "cfe_internal_setup_knowledge_files_doc_root_api_static_not_dir",
+        depth_search => recurse("inf"),
+        file_select => cfe_internal_docroot_api_static_perms,
+        perms => mog("0440", "root", $(def.cf_apache_group) );
 
-      "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "ENT-4551" }
+      "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "ENT-4551", "CFE-951" }
         comment => ".status, .pid, and potentially .abort files need to be writeable so that the async query API will function properly",
         handle => "cfe_internal_setup_knowledge_files_doc_root_api_static_async_query_status",
         depth_search => recurse("inf"),
@@ -177,11 +248,11 @@ bundle agent cfe_internal_setup_knowledge
         depth_search => recurse( "inf" ),
         perms => mog("0600", $(def.cf_apache_user), $(def.cf_apache_group));
 
-      "$(sys.workdir)/httpd/logs/."
+      "$(sys.workdir)/httpd/logs/." -> { "CFE-951" }
       comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
       handle => "cfe_internal_setup_knowledge_files_httpd_logs_dir",
       create => "true",
-      perms => mog("0640", $(def.cf_apache_user), $(def.cf_apache_group));
+      perms => mog("0750", $(def.cf_apache_user), $(def.cf_apache_group));
 
       "$(sys.workdir)/httpd/logs/." -> { "ENT-7730" }
         comment => "Ensure permissions for $(sys.workdir)/httpd/logs",
@@ -224,7 +295,7 @@ bundle agent cfe_internal_setup_knowledge
                     a request. For example Mission Portals api.";
 
 
-      "$(cfe_internal_hub_vars.docroot)/"
+      "$(cfe_internal_hub_vars.docroot)/." -> { "CFE-951"}
         depth_search => recurse_basedir("inf"),
         handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess_perms",
         file_select => cfe_internal_htaccess,
@@ -294,28 +365,49 @@ bundle agent cfe_internal_permissions
   files:
 
     !(policy_server|am_policy_hub)::
-      "$(sys.statedir)/." -> { "ENT-4773" }
-        perms => state_dir_system_owned(),
+      "$(sys.statedir)/." -> { "ENT-4773", "CFE-951" }
+        handle => "state_dir_not_dir_perms",
+        perms => state_dir_system_owned_files(),
         # Important to recurse across file system boundaries, as databases and or state are commonly on different filesystems
         depth_search => recurse_with_base( inf ),
-        file_select => all;
+        file_select => not_dir;
+
+      "$(sys.statedir)/." -> { "ENT-4773", "CFE-951" }
+        handle => "state_dir_dirs_perms",
+        perms => state_dir_system_owned_dirs(),
+        # Important to recurse across file system boundaries, as databases and or state are commonly on different filesystems
+        depth_search => recurse_with_base( inf ),
+        file_select => dirs;
 
     enterprise_edition.(policy_server|am_policy_hub)::
 
-     "$(sys.statedir)/."
+      "$(sys.statedir)/." -> { "CFE-951" }
         perms => mog("0750", "root", "cfpostgres"),
         acl => cf_statedir_acl( @(_cf_statedir_user_aces) ),
         comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
 
-     "$(sys.statedir)/."
-        perms => state_dir_system_owned(),
+     "$(sys.statedir)/." -> { "CFE-951" }
+        perms => state_dir_system_owned_files(),
         depth_search => recurse_except( inf, @(_statedir_standard_perm_exceptions) ),
-        file_select => all,
+        file_select => not_dir,
         comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
 
-      "$(sys.statedir)/pg/."
+      "$(sys.statedir)/." -> { "CFE-951" }
+        perms => state_dir_system_owned_dirs(),
+        depth_search => recurse_except( inf, @(_statedir_standard_perm_exceptions) ),
+        file_select => dirs,
+        comment => "The database user must be able to read the parent directory of the database or it won't be accessible";
+
+      "$(sys.statedir)/pg/." -> { "CFE-951" }
         perms => mog("0600", "cfpostgres", "cfpostgres"),
         depth_search => recurse_with_base( inf ),
+        file_select => not_dir,
+        comment => "No one except for the database user needs to access where the db is installed.";
+
+      "$(sys.statedir)/pg/." -> { "CFE-951" }
+        perms => mog("0700", "cfpostgres", "cfpostgres"),
+        depth_search => recurse_with_base( inf ),
+        file_select => dirs,
         comment => "No one except for the database user needs to access where the db is installed.";
 
       "$(sys.statedir)/cf-execd.sockets/." -> { "ENT-6777" }
@@ -466,13 +558,15 @@ body depth_search recurse_basedir_exclude(d)
 ############################################################################
 
 body file_select cfe_internal_docroot_perms
-# @brief Select files not named `.htacces` or `settings.ldap.php`
+# @brief Select files (not dirs) not named `.htaccess` or `settings.ldap.php`
 {
   leaf_name => { "\.htaccess", "settings.ldap.php", "ha_enabled" };
+  path_name => { "$(cfe_internal_hub_vars.docroot)/vendor/.*"};
+  file_types => { "dir" };
       # htaccess are going the way of the dodo bird
       # settings.ldap.php permissions are handled explicitly in it's own bundle
       # ha_enabled permissions is handled explicitly by cfengine_enterprise_ha_enabled_semaphore_present
-  file_result => "!leaf_name";
+  file_result => "!leaf_name.!file_types.!path_name";
 }
 
 ############################################################################
@@ -509,7 +603,8 @@ body file_select cfe_internal_htaccess
 # @brief select files named `.htaccess`
 {
   leaf_name => { "\.htaccess" };
-  file_result => "leaf_name";
+  file_types => { "dir" };
+  file_result => "leaf_name.!file_types";
 }
 
 ############################################################################
@@ -529,7 +624,8 @@ body file_select cfe_internal_docroot_api_static_perms
       # files here to avoid continual promise repair.
 
   leaf_name => { "\.htaccess", "\.status", "\.pid", "\.abort" };
-  file_result => "!leaf_name";
+  file_types => { "dir" };
+  file_result => "!leaf_name.!file_types";
 }
 ############################################################################
 
@@ -540,7 +636,8 @@ body file_select cfe_internal_docroot_api_static_async_query_status_status_perms
       # query mechanism need to be writeable by the webserver
 
         leaf_name => { "\.status", "\.pid", "\.abort" };
-        file_result => "leaf_name";
+        file_types => { "dir" };
+        file_result => "leaf_name.!file_types";
 }
 
 ############################################################################
@@ -553,9 +650,15 @@ body depth_search cfe_internal_docroot_application_perms
 
 ############################################################################
 
-body perms state_dir_system_owned
+body perms state_dir_system_owned_files
 {
-      rxdirs => "true";
+#+begin_ENT-951
+# Remove after 3.20 is not supported
+        rxdirs => "true";
+@if minimum_version(3.20)
+        rxdirs => "false";
+@endif
+#+end
 
       mode   => "0600";
       !windows::
@@ -572,4 +675,9 @@ body perms state_dir_system_owned
 
       !(freebsd|openbsd|netbsd|darwin|aix|hpux)::
         groups => { "root" };
+}
+body perms state_dir_system_owned_dirs
+{
+  inherit_from => state_dir_system_owned_files;
+  mode => "0700";
 }

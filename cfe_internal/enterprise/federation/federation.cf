@@ -260,10 +260,19 @@ bundle agent transport_user
   files:
     "$(create_files)"
       create => "true";
-    "$(home)/."
+
+    "$(home)/." -> { "CFE-951" }
       depth_search => default:recurse_with_base("inf"),
-      file_select => default:all,
-      perms => default:mog( "600", $(user), "root" );
+      file_select => default:dirs,
+      perms => default:mog( "700", $(user), "root" ),
+      comment => "The transport users home directory and children should be accessible only by the transport user itself.";
+
+    "$(home)/." -> { "CFE-951" }
+      depth_search => default:recurse_with_base("inf"),
+      file_select => default:not_dir,
+      perms => default:mog( "600", $(user), "root" ),
+      comment => "The files within the transport users home directory should be readable and writable by the transport user";
+
     "$(ssh_auth_keys)"
       create => "true",
       handle => "ssh_auth_keys_configured",
@@ -317,8 +326,10 @@ bundle agent clean_when_off
     "user" string => "$(cfengine_enterprise_federation:transport_user.user)";
     "home" string => "$(cfengine_enterprise_federation:transport_user.home)";
 @if minimum_version(3.15)
-    "remote_hubs_table_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs" 2>/dev/null`, useshell);
-    "federated_reporting_settings_table_row_count" string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings" 2>/dev/null`, useshell);
+      "remote_hubs_table_row_count"
+        string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs" 2>/dev/null`, useshell);
+      "federated_reporting_settings_table_row_count"
+        string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings" 2>/dev/null`, useshell);
 @endif
 
   users:
@@ -347,6 +358,7 @@ bundle agent clean_when_off
       # Oh, the humanity! Where for art thou databases: promises for psql!
       `$(sys.bindir)/psql cfsettings --quiet --command "TRUNCATE TABLE remote_hubs"` -> { "ENT-7233" }
         if => isgreaterthan( "$(remote_hubs_table_row_count)", "0" );
+
       `$(sys.bindir)/psql cfsettings --quiet --command "TRUNCATE TABLE federated_reporting_settings"` -> { "ENT-7233" }
         if => isgreaterthan( "$(federated_reporting_settings_table_row_count)", "0" );
 
@@ -389,20 +401,31 @@ bundle agent federation_manage_files
   files:
     enterprise_edition.(policy_server|am_policy_hub)::
       # Both cfpache and $(transport_user) need permission so adding o+x here
-      "$(cfengine_enterprise_federation:config.federation_dir)/."
+      "$(cfengine_enterprise_federation:config.federation_dir)/." -> { "CFE-951" }
         create => "true",
-        perms => default:mog( "661", "root", "root" );
+        perms => default:mog( "755", "root", "cfapache" );
+
       "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/."
         create => "true",
-        perms => default:mog( "600", "cfapache", "root" );
-      "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/."
+        perms => default:mog( "700", "cfapache", "root" );
+
+      "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/." -> { "CFE-951" }
         depth_search => default:recurse_with_base("inf"),
-        file_select => default:all,
-        perms => default:mog( "600", "cfapache", "root" );
+        file_select => default:dirs,
+        perms => default:mog( "700", "cfapache", "root" ),
+        comment => "The cfapache home directory and children need to be accessible by the web-server";
+
+      "$(cfengine_enterprise_federation:config.federation_dir)/cfapache/." -> { "CFE-951" }
+        depth_search => default:recurse_with_base("inf"),
+        file_select => default:not_dir,
+        perms => default:mog( "600", "cfapache", "root" ),
+        comment => "Files within the cfapache home directory need to be readable and writable by the web server.";
+
     enabled::
-      "$(cfengine_enterprise_federation:config.bin_dir)/."
+      "$(cfengine_enterprise_federation:config.bin_dir)/." -> { "CFE-951" }
         create => "true",
-        perms => default:mog( "660", "root", "$(transport_user)" );
+        perms => default:mog( "0770", "root", "$(transport_user)" );
+
     am_superhub::
       "$(cfengine_enterprise_federation:config.federation_dir)/superhub/."
         create => "true",
@@ -468,7 +491,7 @@ bundle agent federation_manage_files
         perms => default:mog( "600", "root", "root" );
 
     am_transporter::
-      "$(cfengine_enterprise_federation:config.bin_dir)/transport.sh"
+      "$(cfengine_enterprise_federation:config.bin_dir)/transport.sh" -> { "CFE-951" }
         copy_from => default:local_dcp( "$(this.promise_dirname)/../../../templates/federated_reporting/transport.sh" ),
         perms => default:mog( "500", "$(transport_user)", "root" );
 
@@ -599,6 +622,7 @@ bundle agent data_transport
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transport.sh pull $(pull_args)"},
         contain => contain_transport_user;
+
     am_puller.!am_paused.default:cfengine_mp_fr_enable_distributed_cleanup::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/transfer_distributed_cleanup_items.sh $(pull_args)"},
