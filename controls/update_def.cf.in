@@ -66,10 +66,17 @@ bundle common update_def
                            not(isvariable("input_name_patterns"))),
         meta => { "defvar" };
 
-      # the permissions for your masterfiles, which will propagate to inputs
-      "masterfiles_perms_mode" string => "0600",
-      handle => "common_def_vars_masterfiles_perms_mode",
-      meta => { "defvar" };
+      # the permissions for your masterfiles files (not dirs), which will propagate to inputs
+      "masterfiles_perms_mode_not_dir" -> { "CFE-951" }
+        string => "0600",
+        handle => "common_def_vars_masterfiles_perms_mode_not_dir",
+        meta => { "defvar" };
+
+      "masterfiles_perms_mode_dirs" -> { "CFE-951" }
+        string => "0700",
+        handle => "common_def_vars_masterfiles_perms_mode_dirs",
+        meta => { "defvar" };
+
 
       "dc_scripts" string => "$(sys.workdir)/httpd/htdocs/api/dc-scripts",
       comment => "Directory where VCS scripts are located on Enterprise Hub";
