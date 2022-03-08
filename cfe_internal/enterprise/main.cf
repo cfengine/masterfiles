@@ -15,8 +15,6 @@ bundle agent cfe_internal_enterprise_main
       handle => "cfe_internal_management_update_folders",
       comment => "Create empty directories for CFE self-upgrade";
 
-    am_policy_hub.enterprise::
-
       "hub" -> { "Mission Portal", "CFEngine Enterprise" }
         usebundle => cfe_internal_purge_scheduled_reports_older_than_days( $(def.purge_scheduled_reports_older_than_days) ),
         handle    => "cfe_internal_management_purge_scheduled_reports_older_than_days",
