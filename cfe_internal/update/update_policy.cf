@@ -436,14 +436,6 @@ body perms u_m(p)
 # @param p Desired file mode
 {
       mode  => "$(p)";
-
-#+begin_ENT-951
-# Remove after 3.20 is not supported
-        rxdirs => "true";
-@if minimum_version(3.20)
-        rxdirs => "false";
-@endif
-#+end
 }
 
 #########################################################
@@ -454,15 +446,6 @@ body perms u_mo(p,o)
 # @param p Desired file owner (username or uid)
 {
       mode   => "$(p)";
-
-#+begin_ENT-951
-# Remove after 3.20 is not supported
-        rxdirs => "true";
-@if minimum_version(3.20)
-        rxdirs => "false";
-@endif
-#+end
-
       !(windows|termux)::
         owners => {"$(o)"};
 }
@@ -472,14 +455,6 @@ body perms u_mo(p,o)
 body perms u_shared_lib_perms
 # @brief Shared library permissions
 {
-#+begin_ENT-951
-# Remove after 3.20 is not supported
-        rxdirs => "true";
-@if minimum_version(3.20)
-        rxdirs => "false";
-@endif
-#+end
-
     !hpux::
       mode => "0644";
     hpux::
