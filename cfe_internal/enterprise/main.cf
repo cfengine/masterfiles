@@ -9,13 +9,11 @@ bundle agent cfe_internal_enterprise_main
         comment => "Basic change management",
         handle => "cfe_internal_enterprise_main_change_management";
 
-    am_policy_hub::
+    enterprise_edition.(policy_server|am_policy_hub)::
 
       "hub" usebundle => cfe_internal_update_folders,
       handle => "cfe_internal_management_update_folders",
       comment => "Create empty directories for CFE self-upgrade";
-
-    am_policy_hub.enterprise::
 
       "hub" -> { "Mission Portal", "CFEngine Enterprise" }
         usebundle => cfe_internal_purge_scheduled_reports_older_than_days( $(def.purge_scheduled_reports_older_than_days) ),
@@ -36,12 +34,10 @@ bundle agent cfe_internal_enterprise_main
                  ENT-5432: must run after cfe_internal_enterprise_maintenance bundle
                  so that active_hub class is determined";
 
-    am_policy_hub.enterprise_edition::
-
       "Inventory Enterprise License Utilization" -> { "ENT-5089" }
         usebundle => inventory_cfengine_enterprise_license_utilization;
 
-    am_policy_hub.enterprise_edition.enable_log_cfengine_enterprise_license_utilization::
+    enterprise_edition.(policy_server|am_policy_hub).enable_log_cfengine_enterprise_license_utilization::
 
       "hub" -> { "ENT-3186" }
         usebundle => log_cfengine_enterprise_license_utilization,
@@ -50,7 +46,7 @@ bundle agent cfe_internal_enterprise_main
 
     # As passive hub is supposed to run read-only PostgreSQL instance
     # doing maintenance makes no sense and is not possible at all.
-    (am_policy_hub.enterprise.!enable_cfengine_enterprise_hub_ha)||(enable_cfengine_enterprise_hub_ha.hub_active)::
+    (enterprise_edition.(policy_server|am_policy_hub).!enable_cfengine_enterprise_hub_ha)||(enable_cfengine_enterprise_hub_ha.hub_active)::
 
       "hub" usebundle => cfe_internal_hub_maintain,
       handle => "cfe_internal_management_hub_maintain",
