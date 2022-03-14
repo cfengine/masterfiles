@@ -58,7 +58,7 @@ for file in $dump_files; do
   else
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
                         -c "SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-      > schema_setup.log 2>&1 || failed=1
+      >> "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_setup.log" 2>&1 || failed=1
   fi
 done
 if [ "$failed" = "0" ]; then
@@ -71,7 +71,7 @@ else
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
   done
   echo "last 10 lines of schema_setup.log"
-  tail -n 10 schema_setup.log
+  tail -n 10 "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_setup.log"
   exit 1
 fi
 
@@ -127,7 +127,7 @@ for file in $dump_files; do
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
                         --set "client_min_messages=DEBUG" \
                         -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-      >> schema_attach.log 2>&1 || failed=1
+      >> "CFE_FR_SUPERHUB_IMPORT_DIR/schema_attach.log" 2>&1 || failed=1
   else
     rm -f "${file}.failed"
   fi
@@ -139,7 +139,7 @@ else
   # case of failure
   log "Attaching schemas: FAILED"
   log "last 10 lines of schema_attach.log"
-  tail -n 10 schema_attach.log
+  tail -n 10 "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_attach.log"
   exit 1
 fi
 
