@@ -125,8 +125,9 @@ for file in $dump_files; do
   if [ ! -f "${file}.failed" ]; then
     hostkey=$(basename "$file" | cut -d. -f1)
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                        --set "client_min_messages=DEBUG" \
                         -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-      > schema_attach.log 2>&1 || failed=1
+      >> schema_attach.log 2>&1 || failed=1
   else
     rm -f "${file}.failed"
   fi
