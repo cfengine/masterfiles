@@ -49,6 +49,7 @@ table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
 failed=0
 log "Setting up schemas for import"
 declare -a hostkeys
+rm -f "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_setup.log"
 for file in $dump_files; do
   hostkey=$(basename "$file" | cut -d. -f1)
   hostkeys+=($hostkey)
@@ -120,6 +121,7 @@ if [ "$CFE_FR_HANDLE_DUPLICATES" = "yes" ]; then
 fi
 
 failed=0
+rm -f "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_attach.log"
 log "Attaching schemas"
 for file in $dump_files; do
   if [ ! -f "${file}.failed" ]; then
@@ -127,7 +129,7 @@ for file in $dump_files; do
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
                         --set "client_min_messages=DEBUG" \
                         -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-      >> "CFE_FR_SUPERHUB_IMPORT_DIR/schema_attach.log" 2>&1 || failed=1
+      >> "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_attach.log" 2>&1 || failed=1
   else
     rm -f "${file}.failed"
   fi
