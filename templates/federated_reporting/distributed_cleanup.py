@@ -10,7 +10,7 @@ This enables policy in cfe_internal/enterprise/federation/federation.cf
 ```json
 {
   "classes": {
-    "cfengine_mp_enable_fr_distributed_cleanup": [ "any::" ]
+    "cfengine_mp_fr_enable_distributed_cleanup": [ "any::" ]
   }
 }
 ```
