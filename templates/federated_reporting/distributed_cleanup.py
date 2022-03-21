@@ -59,14 +59,15 @@ CERT_PATH = os.path.join(DISTRIBUTED_CLEANUP_DIR, "hubs.cert")
 
 # Note: remove the file at DISTRIBUTED_CLEANUP_SECRET_PATH to reset everything.
 # api calls will overwrite fr_distributed_cleanup user and role on superhub and all feeders.
-DISTRIBUTED_CLEANUP_SECRET_PATH = os.path.join(WORKDIR, "state/fr_distributed_cleanup.cfsecret")
+DISTRIBUTED_CLEANUP_SECRET_PATH = os.path.join(
+    WORKDIR, "state/fr_distributed_cleanup.cfsecret"
+)
 
 
 def interactive_setup():
     fr_distributed_cleanup_password = "".join(random.choices(string.printable, k=20))
     admin_pass = getpass(
-        prompt="Enter admin password for superhub {}: ".format(
-            socket.getfqdn())
+        prompt="Enter admin password for superhub {}: ".format(socket.getfqdn())
     )
     api = NovaApi(api_user="admin", api_password=admin_pass)
 
