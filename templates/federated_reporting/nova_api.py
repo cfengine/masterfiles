@@ -26,7 +26,7 @@ print(api.put_role_permissions("yj", ["query.post"]))
 
 import json
 import os
-import platform
+import socket
 import sys
 import urllib3
 
@@ -36,9 +36,9 @@ _DEFAULT_SECRETS_PATH = "{}/httpd/secrets.ini".format(_WORKDIR)
 
 class NovaApi:
     def __init__(
-        self, hostname=None, api_user="CFE_ROBOT", api_password=None, cert_path=None
+        self, hostname=None, api_user="CFE_ROBOT", api_password=None, cert_path=None, ca_cert_dir=None
     ):
-        self._hostname = hostname or str(platform.node())
+        self._hostname = hostname or str(socket.getfqdn())
         self._api_user = api_user
         if api_password is None:
             self._api_password = self._get_robot_password()
@@ -46,14 +46,19 @@ class NovaApi:
             self._api_password = api_password
         if cert_path is None:
             self._cert_path = "{}/httpd/ssl/certs/{}.cert".format(
-                _WORKDIR, platform.node()
+                _WORKDIR, socket.getfqdn()
             )
         else:
             self._cert_path = cert_path
+        if ca_cert_dir is None:
+            self._ca_cert_dir = os.environ.get('SSL_CERT_DIR')
+        else:
+            self._ca_cert_dir = ca_cert_dir
 
         self._http = urllib3.PoolManager(
             cert_reqs="CERT_REQUIRED",
             ca_certs=self._cert_path,
+            ca_cert_dir=self._ca_cert_dir,
         )
         self._headers = urllib3.make_headers(
             basic_auth="{}:{}".format(self._api_user, self._api_password)
@@ -89,7 +94,8 @@ class NovaApi:
             payload = json.JSONEncoder().encode(body)
         else:
             payload = body
-        response = self._http.request(method, url, headers=self._headers, body=payload)
+        response = self._http.request(
+            method, url, headers=self._headers, body=payload)
         return self._build_response(response)
 
     def _build_response(self, response):

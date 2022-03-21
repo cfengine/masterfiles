@@ -27,7 +27,7 @@ if [ $# = 0 ]; then
 fi
 
 for feeder in $@; do
-  feeder_hostname=$("$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" hostname)
+  feeder_hostname=$("$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" hostname -f)
   "$CFE_FR_TRANSPORTER" $CFE_FR_TRANSPORTER_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}:/$CFE_FR_DISTRIBUTED_CLEANUP_DIR/${feeder_hostname}.pub" "$CFE_FR_DISTRIBUTED_CLEANUP_DIR/" &&
   "$CFE_FR_TRANSPORTER" $CFE_FR_TRANSPORTER_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}:/$CFE_FR_DISTRIBUTED_CLEANUP_DIR/${feeder_hostname}.cert" "$CFE_FR_DISTRIBUTED_CLEANUP_DIR/" ||
     log "Failed to pull fr_distributed_cleanup items from hub $feeder"

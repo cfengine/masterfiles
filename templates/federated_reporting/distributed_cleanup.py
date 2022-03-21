@@ -25,7 +25,7 @@ admin credentials on each feeder.
 import argparse
 import logging
 import os
-import platform
+import socket
 import string
 import random
 import subprocess
@@ -65,7 +65,8 @@ DISTRIBUTED_CLEANUP_SECRET_PATH = os.path.join(WORKDIR, "state/fr_distributed_cl
 def interactive_setup():
     fr_distributed_cleanup_password = "".join(random.choices(string.printable, k=20))
     admin_pass = getpass(
-        prompt="Enter admin password for superhub {}: ".format(platform.node())
+        prompt="Enter admin password for superhub {}: ".format(
+            socket.getfqdn())
     )
     api = NovaApi(api_user="admin", api_password=admin_pass)
 
