@@ -807,10 +807,10 @@ bundle agent distributed_cleanup_setup
     am_superhub|am_feeder::
       "${distributed_cleanup_dir}/."
         create => "true";
-      "${distributed_cleanup_dir}/${sys.host}.pub"
+      "${distributed_cleanup_dir}/${sys.fqhost}.pub"
         copy_from => default:local_cp("${sys.workdir}/ppkeys/localhost.pub");
-      "${distributed_cleanup_dir}/${sys.host}.cert"
-        copy_from => default:local_cp("${sys.workdir}/httpd/ssl/certs/${sys.host}.cert");
+      "${distributed_cleanup_dir}/${sys.fqhost}.cert"
+        copy_from => default:local_cp("${sys.workdir}/httpd/ssl/certs/${sys.fqhost}.cert");
 }
 
 bundle agent distributed_cleanup_run
