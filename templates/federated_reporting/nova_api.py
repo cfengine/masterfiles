@@ -36,7 +36,12 @@ _DEFAULT_SECRETS_PATH = "{}/httpd/secrets.ini".format(_WORKDIR)
 
 class NovaApi:
     def __init__(
-        self, hostname=None, api_user="CFE_ROBOT", api_password=None, cert_path=None, ca_cert_dir=None
+        self,
+        hostname=None,
+        api_user="CFE_ROBOT",
+        api_password=None,
+        cert_path=None,
+        ca_cert_dir=None,
     ):
         self._hostname = hostname or str(socket.getfqdn())
         self._api_user = api_user
@@ -51,7 +56,7 @@ class NovaApi:
         else:
             self._cert_path = cert_path
         if ca_cert_dir is None:
-            self._ca_cert_dir = os.environ.get('SSL_CERT_DIR')
+            self._ca_cert_dir = os.environ.get("SSL_CERT_DIR")
         else:
             self._ca_cert_dir = ca_cert_dir
 
@@ -94,8 +99,7 @@ class NovaApi:
             payload = json.JSONEncoder().encode(body)
         else:
             payload = body
-        response = self._http.request(
-            method, url, headers=self._headers, body=payload)
+        response = self._http.request(method, url, headers=self._headers, body=payload)
         return self._build_response(response)
 
     def _build_response(self, response):
