@@ -13,6 +13,7 @@ if [ $# -ne 2 ]; then
 fi
 
 TMP=$(mktemp)
+cd /tmp
 OUT=$(su - cfpostgres --command "{{{vars.sys.bindir}}}/psql --quiet --tuples-only --no-align --no-psqlrc \"$1\" --command=\"$2\"" 2> $TMP)
 RETURN_CODE=$?
 ERR=$(<$TMP)

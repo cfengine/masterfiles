@@ -1941,6 +1941,13 @@ body file_select exclude(name)
 
 ##
 
+body file_select not_dir
+# @brief Select all files that are not directories
+{
+      file_types => { "dir" };
+      file_result => "!file_types";
+}
+
 body file_select plain
 # @brief Select plain, regular files
 {
@@ -1971,7 +1978,7 @@ body file_select ex_list(names)
 # @brief Select all files except those that match `names`
 # @param names A list of regular expressions
 {
-      leaf_name  => { @(names)};
+      leaf_name  => { @(names) };
       file_result => "!leaf_name";
 }
 

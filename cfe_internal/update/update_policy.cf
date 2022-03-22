@@ -280,12 +280,22 @@ bundle agent cfe_internal_update_policy_cpv
 
     am_policy_hub::
 
-      "$(master_location)/."
-      comment => "Make sure masterfiles folder has right file permissions",
-      handle => "cfe_internal_update_policy_files_sys_workdir_masterfiles",
-      perms => u_m($(update_def.masterfiles_perms_mode)),
-      depth_search => u_recurse_basedir("inf"),
-      action => u_immediate;
+      "$(master_location)/." -> { "CFE-951" }
+        comment => "Make sure masterfiles folder has right file permissions",
+        handle => "cfe_internal_update_policy_files_sys_workdir_masterfiles_dirs",
+        perms => u_m($(update_def.masterfiles_perms_mode_dirs)),
+        file_select => u_dirs,
+        depth_search => u_recurse_basedir("inf"),
+        action => u_immediate;
+
+      "$(master_location)/." -> { "CFE-951" }
+        comment => "Make sure masterfiles folder has right file permissions",
+        handle => "cfe_internal_update_policy_files_sys_workdir_masterfiles_not_dir",
+        perms => u_m($(update_def.masterfiles_perms_mode_not_dir)),
+        file_select => u_not_dir,
+        depth_search => u_recurse_basedir("inf"),
+        action => u_immediate;
+
 
   methods:
     debian|redhat|amazon_linux|suse|sles|opensuse::
@@ -845,3 +855,17 @@ body file_select not_vendored_modules(pathname)
   file_result => "path_name";
 }
 #########################################################
+body file_select u_dirs
+# @brief Select directories
+{
+        file_types  => { "dir" };
+        file_result => "file_types";
+}
+body file_select u_not_dir
+# @brief Select all files that are not directories
+{
+        file_types => { "dir" };
+        file_result => "!file_types";
+}
+
+
