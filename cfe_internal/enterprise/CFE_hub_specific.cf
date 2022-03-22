@@ -765,19 +765,40 @@ bundle agent cfe_internal_enterprise_policy_analyzer
 
       "policy_analyzer_enabled" expression => fileexists( $(analyzer_flagfile) );
 
-    files:
+  files:
+
+    enterprise_edition.policy_server::
+
+      "$(cfe_internal_hub_vars.docroot)/analyzer/." -> { "CFE-951" }
+        create => "true",
+        handle => "cfe_internal_setup_knowledge_docroot_analyzer_dir",
+        perms => mog( "0470", "root", $(def.cf_apache_group) ),
+        comment => concat( "This directory holds the policy analyzer flag file ",
+                           "that is written by Mission Portal when someone ",
+                           "clicks to enable the feature. Thus, it needs to be ",
+                           "readable, writeable and executable for the web ",
+                           "server.");
+
 
     policy_analyzer_enabled::
 
-      "$(analyzer_dir)/."
-        create => "true",
-        perms => mog( "500", $(def.cf_apache_user), $(def.cf_apache_user) );
-
        "$(analyzer_dir)/."
+         create => "true",
+         handle => "policy_analyzer_sync_analyzer_source",
          copy_from => analyzer_sync( $(analyzer_source) ),
-         file_select => default:ex_list( @(exclude_files) ),
          depth_search => recurse_with_base( inf ),
-         perms => mog( "400", $(def.cf_apache_user), $(def.cf_apache_group) );
+         file_select => default:ex_list( @(exclude_files) );
+
+      "$(analyzer_dir)/." -> { "CFE-951" }
+        file_select => default:dirs,
+        depth_search => recurse_with_base( inf ),
+        perms => mog( "0450", "root", $(def.cf_apache_group) );
+
+      "$(analyzer_dir)/." -> { "CFE-951" }
+        file_select => default:not_dir,
+        depth_search => recurse_with_base( inf ),
+        perms => mog( "0450", "root", $(def.cf_apache_group) );
+
 
   reports:
       DEBUG|DEBUG_cfe_internal_enterprise_policy_analyzer::
@@ -785,7 +806,6 @@ bundle agent cfe_internal_enterprise_policy_analyzer
           if => "policy_analyzer_enabled";
 
 }
-
 body copy_from analyzer_sync(path)
 # @brief Keep promised files in sync with local `path`
 {
