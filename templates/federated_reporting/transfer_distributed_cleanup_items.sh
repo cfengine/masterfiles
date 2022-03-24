@@ -36,7 +36,7 @@ done
 
 # check that hubs.cert is the most recent *.cert file, if not then update it
 # from the other cert files (all the hubs).
-ls -t1 $CFE_FR_DISTRIBUTED_CLEANUP_DIR/*.cert | head -n1 | grep -q hubs.cert || cat $(ls $CFE_FR_DISTRIBUTED_CLEANUP_DIR/*.cert | grep -v hubs.cert) > "$CFE_FR_DISTRIBUTED_CLEANUP_DIR/hubs.cert"
+ls -t1 $CFE_FR_DISTRIBUTED_CLEANUP_DIR/*.cert | head -n1 | grep -q hubs.cert || sed -sn 'p' $(ls $CFE_FR_DISTRIBUTED_CLEANUP_DIR/*.cert | grep -v hubs.cert) > "$CFE_FR_DISTRIBUTED_CLEANUP_DIR/hubs.cert"
 
 for feeder in $@; do
   "$CFE_FR_TRANSPORTER" $CFE_FR_TRANSPORTER_ARGS "$CFE_FR_DISTRIBUTED_CLEANUP_DIR/hubs.cert" "$CFE_FR_FEEDER_USERNAME@${feeder}:/$CFE_FR_DISTRIBUTED_CLEANUP_DIR/" ||
