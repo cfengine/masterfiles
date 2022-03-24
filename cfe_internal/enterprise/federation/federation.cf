@@ -802,7 +802,16 @@ bundle agent distributed_cleanup_run
     am_superhub.!am_paused.default:cfengine_mp_fr_enable_distributed_cleanup::
       "$(sys.bindir)/cfengine-selected-python"
         args => "$(cfengine_enterprise_federation:config.bin_dir)/distributed_cleanup.py",
-        arglist => { @(_arglist) };
+        arglist => { @(_arglist) },
+        unless => isvariable( "default:def.DISTRIBUTED_CLEANUP_SSL_CERT_DIR" );
+
+      "SSL_CERT_DIR=$(default:def.DISTRIBUTED_CLEANUP_SSL_CERT_DIR) $(sys.bindir)/cfengine-selected-python" -> { "ENT-8477", "ENT-8464" }
+        args => "$(cfengine_enterprise_federation:config.bin_dir)/distributed_cleanup.py",
+        arglist => { @(_arglist) },
+        if => isvariable( "default:def.DISTRIBUTED_CLEANUP_SSL_CERT_DIR"),
+        contain => default:in_shell,
+        comment => "When custom SSL certificates are used from the non default location we need to let the script know where to find them.";
+
 }
 
 body file control
