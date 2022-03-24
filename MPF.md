@@ -1490,6 +1490,10 @@ For example, to define this class via Augments:
 }
 ```
 
+**History:**
+
+* Added in CFEngine 3.19.0, 3.18.1
+
 #### Configure SSL Certificate Directory for Federated Reporting Distributed Cleanup
 
 When custom certificates are in use distributed cleanup needs to know where to find them. To configure the path where certificates are found define `default:def.DISTRIBUTED_CLEANUP_SSL_CERT_DIR`, for example:
@@ -1501,6 +1505,10 @@ When custom certificates are in use distributed cleanup needs to know where to f
   }
 }
 ```
+
+**History:**
+
+* Added in CFEngine 3.20.0, 3.18.2
 
 ## Recommendations
 
