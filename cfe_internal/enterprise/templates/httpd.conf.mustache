@@ -9,6 +9,8 @@ Listen 80
 PidFile "{{{vars.sys.workdir}}}/httpd/httpd.pid"
 
 # Modules
+# Note: Not all modules that are built are loaded.
+# Find built modules in {{{vars.sys.workdir}}}/httpd/modules
 
 LoadModule authn_file_module modules/mod_authn_file.so
 LoadModule authn_dbm_module modules/mod_authn_dbm.so
@@ -41,12 +43,10 @@ LoadModule unique_id_module modules/mod_unique_id.so
 LoadModule setenvif_module modules/mod_setenvif.so
 LoadModule version_module modules/mod_version.so
 LoadModule mime_module modules/mod_mime.so
-LoadModule dav_module modules/mod_dav.so
 LoadModule status_module modules/mod_status.so
 LoadModule autoindex_module modules/mod_autoindex.so
 LoadModule asis_module modules/mod_asis.so
 LoadModule info_module modules/mod_info.so
-LoadModule dav_fs_module modules/mod_dav_fs.so
 LoadModule vhost_alias_module modules/mod_vhost_alias.so
 LoadModule negotiation_module modules/mod_negotiation.so
 LoadModule dir_module modules/mod_dir.so
