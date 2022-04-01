@@ -131,8 +131,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
   commands:
 
     !systemd_supervised::
-      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
-        args => "stop",
+      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl stop; sleep 2" -> { "ENT-8209" }
         if => and( returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
                    isnewerthan( $(staged_config), $(config) ) ),
         contain => in_shell,
