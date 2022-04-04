@@ -1,11 +1,11 @@
 ###############################################################################
 #
-# bundle agent main
+# bundle agent mpf_main
 #  - User/Site policy entry
 #
 ###############################################################################
 
-bundle agent main
+bundle agent mpf_main
 # User Defined Service Catalogue
 {
   methods:
