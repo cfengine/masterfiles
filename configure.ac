@@ -223,7 +223,7 @@ do
         MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS `echo $j | sed -e 's/\.in$//'`"
     done
 done
-for i in templates cfe_internal modules/packages/vendored
+for i in templates cfe_internal modules/packages/vendored lib/templates
 do
     for j in `find "$srcdir/$i" -name '*.mustache' -o -name '*.sh' -o -name '*.awk' -o -name '*.sed' -o -name '*.ps1' -o -name '*.py'`
     do
