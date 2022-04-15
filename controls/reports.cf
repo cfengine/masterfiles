@@ -27,10 +27,6 @@ bundle server report_access_rules
 
 body report_data_select default_data_select_host
 # @brief Data authorized by non policy servers for collection by cf-hub
-#
-# By convention variables and classes known to be internal, (having no
-# reporting value) should be prefixed with an underscore. By default cf-hub
-# explicitly excludes these variables and classes from collection.
 {
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
@@ -40,10 +36,6 @@ body report_data_select default_data_select_host
 
 body report_data_select default_data_select_policy_hub
 # @brief Data authorized by policy servers for collection by cf-hub
-#
-# By convention variables and classes known to be internal, (having no
-# reporting value) should be prefixed with an underscore. By default cf-hub
-# explicitly excludes these variables and classes from collection.
 {
       metatags_include => { "inventory", "report" };
       metatags_exclude => { "noreport" };
