@@ -270,7 +270,16 @@ def main():
             hostname=feeder_hostname,
         )
         response = feeder_api.status()
-        if response["status"] != 200:
+        if response["status"] == 401 and sys.stdout.isatty():
+            # auth error when running interactively
+            # assume it's a new feeder and offer to set it up interactively
+            hub_user = api.get( "user", "fr_distributed_cleanup")
+            if hub_user is None or 'email' not in hub_user:
+                email = 'fr_distributed_cleanup@{}'.format(hub['ui_name'])
+            else:
+                email = hub_user['email']
+            interactive_setup_feeder(hub, email, fr_distributed_cleanup_password)
+        elif response["status"] != 200:
             print(
                 "Unable to get status for feeder {}. Skipping".format(feeder_hostname)
             )
