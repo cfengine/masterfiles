@@ -1473,6 +1473,43 @@ config when it notices a change in *policy*.
 
 **History**: Added in 3.11.
 
+### Federated Reporting
+#### Enable Federated Reporting Distributed Cleanup
+
+Hosts that report to multiple feeders result in duplicate entries and other issues. Distributed cleanup helps to deal with this condition.
+
+To enable this functionality define the class `default:cfengine_mp_fr_enable_distributed_cleanup` on the _superhub_.
+
+For example, to define this class via Augments:
+
+```json
+{
+  "classes": {
+    "cfengine_mp_fr_enable_distributed_cleanup": [ "any::" ]
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.19.0, 3.18.1
+
+#### Configure SSL Certificate Directory for Federated Reporting Distributed Cleanup
+
+When custom certificates are in use distributed cleanup needs to know where to find them. To configure the path where certificates are found define `default:def.DISTRIBUTED_CLEANUP_SSL_CERT_DIR`, for example:
+
+```json
+{
+  "vars": {
+    "DISTRIBUTED_CLEANUP_SSL_CERT_DIR": "/path/to/my/cert/dir"
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.20.0, 3.18.2
+
 ## Recommendations
 
 The MPF includes policy that inspects the system and makes recommendations about
