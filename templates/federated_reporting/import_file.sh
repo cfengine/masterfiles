@@ -40,7 +40,6 @@ function awk_filters() {
 
 hostkey=$(basename "$file" | cut -d. -f1)
 
-table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
 
 mv "$file" "$file.importing"
 
