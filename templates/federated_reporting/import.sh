@@ -18,6 +18,7 @@ true "${CFE_FR_EXTRACTOR?undefined}"
 true "${CFE_FR_TABLES?undefined}"
 true "${CFE_FR_INVENTORY_REFRESH_CMD?undefined}"
 true "${CFE_FR_HANDLE_DUPLICATES?undefined}"
+true ${CFE_FR_PSQL_OPTIONS?undefined}"
 
 if ! type "$CFE_FR_EXTRACTOR" >/dev/null; then
   log "Extractor $CFE_FR_EXTRACTOR not available!"
@@ -127,7 +128,7 @@ for file in $dump_files; do
   if [ ! -f "${file}.failed" ]; then
     hostkey=$(basename "$file" | cut -d. -f1)
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
-                        --set "client_min_messages=DEBUG" \
+                        $CFE_FR_PSQL_OPTIONS \
                         -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
       >> "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_attach.log" 2>&1 || failed=1
   else
