@@ -58,7 +58,7 @@ EOF
 UPDATE public.__hubs SET last_import_ts = now() WHERE hostkey = '$hostkey';
 COMMIT;
 EOF
-} | "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb 2>&1 | "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS >"$file.log.$CFE_FR_COMPRESSOR_EXT" && {
+} | "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER $CFE_FR_PSQL_OPTIONS -d cfdb 2>&1 | "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS >"$file.log.$CFE_FR_COMPRESSOR_EXT" && {
   rm -f "$file.importing"
   exit 0
 } || {

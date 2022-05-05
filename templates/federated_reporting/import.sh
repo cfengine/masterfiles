@@ -59,6 +59,7 @@ for file in $dump_files; do
     dump_files=$(echo "$dump_files" | sed "s,\s\?$file,," | xargs)
   else
     "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                        $CFE_FR_PSQL_OPTIONS \
                         -c "SELECT ensure_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
       >> "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_setup.log" 2>&1 || failed=1
   fi
@@ -70,7 +71,9 @@ else
   # remove any newly created schemas (revert the changes)
   for file in $dump_files; do
     hostkey=$(basename "$file" | cut -d. -f1)
-    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb  \
+                        $CFE_FR_PSQL_OPTIONS \
+                        "SELECT drop_feeder_schema('$hostkey');" || true
   done
   echo "last 10 lines of schema_setup.log"
   tail -n 10 "$CFE_FR_SUPERHUB_IMPORT_DIR/schema_setup.log"
@@ -101,7 +104,9 @@ else
     log "Revert changes by dropping $hostkey feeder schema"
     # (the original/in-use/previous schema is left intact)
     hostkey=$(basename "$file" | cut -d. -f1)
-    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "SELECT drop_feeder_schema('$hostkey');" || true
+    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb \
+                        $CFE_FR_PSQL_OPTIONS \
+                        -c "SELECT drop_feeder_schema('$hostkey');" || true
   done
 fi
 
@@ -109,6 +114,7 @@ if [ "$CFE_FR_HANDLE_DUPLICATES" = "yes" ]; then
   log "Handle Duplicate Hostkeys"
   hostkey_list=$(printf "'%s'," ${hostkeys[*]} | sed -e 's/,$//')
   "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
+                      $CFE_FR_PSQL_OPTIONS \
                       -c "SELECT handle_duplicate_hostkeys_in_import(ARRAY[$hostkey_list]);"  \
     > duplicates.log 2>&1 || failed=1
   if [ "$failed" = "0" ]; then
