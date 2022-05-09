@@ -64,6 +64,62 @@ DISTRIBUTED_CLEANUP_SECRET_PATH = os.path.join(
 )
 
 
+def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password):
+    feeder_credentials = getpass(
+        prompt="Enter admin credentials for {} at {}: ".format(
+            hub["ui_name"], hub["api_url"]
+        )
+    )
+    feeder_hostname = hub["ui_name"]
+    feeder_api = NovaApi(
+        api_user="admin",
+        api_password=feeder_credentials,
+        cert_path=CERT_PATH,
+        hostname=feeder_hostname,
+    )
+
+    logger.info("Creating fr_distributed_cleanup role on %s", feeder_hostname)
+    response = feeder_api.put(
+        "role",
+        "fr_distributed_cleanup",
+        {
+            "description": "fr_distributed_cleanup Federated Host Cleanup role",
+            "includeContext": "cfengine",
+        },
+    )
+    if response["status"] != 201:
+        print(
+            "Problem creating fr_distributed_cleanup role on superhub. {}".format(
+                response
+            )
+        )
+        sys.exit(1)
+    response = feeder_api.put_role_permissions(
+        "fr_distributed_cleanup", ["host.delete"]
+    )
+    if response["status"] != 201:
+        print("Unable to set RBAC permissions on role fr_distributed_cleanup")
+        sys.exit(1)
+    logger.info("Creating fr_distributed_cleanup user on %s", feeder_hostname)
+    response = feeder_api.put(
+        "user",
+        "fr_distributed_cleanup",
+        {
+            "description": "fr_distributed_cleanup Federated Host Cleanup user",
+            "email": "{}".format(email),
+            "password": "{}".format(fr_distributed_cleanup_password),
+            "roles": ["fr_distributed_cleanup"],
+        },
+    )
+    if response["status"] != 201:
+        print(
+            "Problem creating fr_distributed_cleanup user on {}. {}".format(
+                feeder_hostname, response
+            )
+        )
+        sys.exit(1)
+
+
 def interactive_setup():
     fr_distributed_cleanup_password = "".join(random.choices(string.printable, k=20))
     admin_pass = getpass(
@@ -142,59 +198,7 @@ def interactive_setup():
         sys.exit(1)
 
     for hub in feederResponse["hubs"]:
-        feeder_credentials = getpass(
-            prompt="Enter admin credentials for {} at {}: ".format(
-                hub["ui_name"], hub["api_url"]
-            )
-        )
-        feeder_hostname = hub["ui_name"]
-        feeder_api = NovaApi(
-            api_user="admin",
-            api_password=feeder_credentials,
-            cert_path=CERT_PATH,
-            hostname=feeder_hostname,
-        )
-
-        logger.info("Creating fr_distributed_cleanup role on %s", feeder_hostname)
-        response = feeder_api.put(
-            "role",
-            "fr_distributed_cleanup",
-            {
-                "description": "fr_distributed_cleanup Federated Host Cleanup role",
-                "includeContext": "cfengine",
-            },
-        )
-        if response["status"] != 201:
-            print(
-                "Problem creating fr_distributed_cleanup role on superhub. {}".format(
-                    response
-                )
-            )
-            sys.exit(1)
-        response = feeder_api.put_role_permissions(
-            "fr_distributed_cleanup", ["host.delete"]
-        )
-        if response["status"] != 201:
-            print("Unable to set RBAC permissions on role fr_distributed_cleanup")
-            sys.exit(1)
-        logger.info("Creating fr_distributed_cleanup user on %s", feeder_hostname)
-        response = feeder_api.put(
-            "user",
-            "fr_distributed_cleanup",
-            {
-                "description": "fr_distributed_cleanup Federated Host Cleanup user",
-                "email": "{}".format(email),
-                "password": "{}".format(fr_distributed_cleanup_password),
-                "roles": ["fr_distributed_cleanup"],
-            },
-        )
-        if response["status"] != 201:
-            print(
-                "Problem creating fr_distributed_cleanup user on {}. {}".format(
-                    feeder_hostname, response
-                )
-            )
-            sys.exit(1)
+        interactive_setup_feeder(hub, email, fr_distributed_cleanup_password)
         write_secret(DISTRIBUTED_CLEANUP_SECRET_PATH, fr_distributed_cleanup_password)
 
 
@@ -268,7 +272,16 @@ def main():
             hostname=feeder_hostname,
         )
         response = feeder_api.status()
-        if response["status"] != 200:
+        if response["status"] == 401 and sys.stdout.isatty():
+            # auth error when running interactively
+            # assume it's a new feeder and offer to set it up interactively
+            hub_user = api.get( "user", "fr_distributed_cleanup")
+            if hub_user is None or 'email' not in hub_user:
+                email = 'fr_distributed_cleanup@{}'.format(hub['ui_name'])
+            else:
+                email = hub_user['email']
+            interactive_setup_feeder(hub, email, fr_distributed_cleanup_password)
+        elif response["status"] != 200:
             print(
                 "Unable to get status for feeder {}. Skipping".format(feeder_hostname)
             )
