@@ -36,3 +36,6 @@ CFRELEASE
 # Atom-IDE
 .ropeproject
 build
+
+# Emacs
+.*\.~undo-tree~
