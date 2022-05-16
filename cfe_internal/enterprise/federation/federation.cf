@@ -530,18 +530,40 @@ bundle agent federation_manage_files
 
 bundle agent postgres_config
 # @brief Customize postgres config for superhub
+# @variable cfengine_enterprise_federation:postgres_config.shared_buffers - Sets the maximum number of locks per transaction.
+# @variable cfengine_enterprise_federation:postgres_config.max_locks_per_transaction - Sets the maximum number of locks per transaction.
+# @variable cfengine_enterprise_federation:postgres_config.log_lock_waits - Logs long lock waits.
+# @variable cfengine_enterprise_federation:postgres_config.max_wal_size - Sets the WAL size that triggers a checkpoint.
+# @variable cfengine_enterprise_federation:postgres_config.checkpoint_timeout- Sets the maximum time between automatic WAL checkpoints.
 {
   vars:
     am_superhub::
-      "c[shared_buffers]"
-        string => "1GB",
+      "c[shared_buffers]" -> { "ENT-8617" }
+        string => ifelse( isvariable( "cfengine_enterprise_federation:postgres_config.shared_buffers"),
+                          $(cfengine_enterprise_federation:postgres_config.shared_buffers),
+                          "1GB"),
         comment => "Changing this setting requires restarting the database.";
-      "c[max_locks_per_transaction]"
-        string => "4000",
+      "c[max_locks_per_transaction]" -> { "ENT-8617" }
+        string => ifelse( isvariable( "cfengine_enterprise_federation:postgres_config.max_locks_per_transaction"),
+                          $(cfengine_enterprise_federation:postgres_config.max_locks_per_transaction),
+                          "4000"),
         comment => "Changing this setting requires restarting the database.";
-      "c[log_lock_waits]"
-        string => "on",
+      "c[log_lock_waits]" -> { "ENT-8617" }
+        string => ifelse( isvariable( "cfengine_enterprise_federation:postgres_config.log_lock_waits"),
+                          $(cfengine_enterprise_federation:postgres_config.log_lock_waits),
+                          "on"),
         comment => "Changing this setting requires restarting the database.";
+
+      "c[max_wal_size]" -> { "ENT-8617" }
+        string => ifelse( isvariable( "cfengine_enterprise_federation:postgres_config.max_wal_size"),
+                          $(cfengine_enterprise_federation:postgres_config.max_wal_size),
+                          "1GB");
+
+      "c[checkpoint_timeout]" -> { "ENT-8617" }
+        string => ifelse( isvariable( "cfengine_enterprise_federation:postgres_config.checkpoint_timeout"),
+                          $(cfengine_enterprise_federation:postgres_config.checkpoint_timeout),
+                          "5min");
+
   files:
     am_superhub::
       "$(sys.statedir)/pg/data/postgresql.conf"
