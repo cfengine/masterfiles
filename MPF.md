@@ -1388,6 +1388,107 @@ config when it notices a change in *policy*.
 
 **History**: Added in 3.11.
 
+### Federated Reporting
+#### PostgreSQL Configuration
+
+It's not uncommon to need to configure some PostgreSQL settings differently for Federated Reporting. The settings that are exposed as tunables which can be set via augments are listed here. These do not comprise all settings that may need adjusted, only those that are most commonly adjusted.
+
+**Note:** When [setting parameters for the PostgreSQL configuration](https://www.postgresql.org/docs/current/config-setting.html)
+file various units can be used. Valid memory units are B (bytes), kB
+(kilobytes), MB (megabytes), GB (gigabytes), and TB (terabytes). The multiplier
+for memory units is 1024, not 1000. Valid time units are us (microseconds), ms
+(milliseconds), s (seconds), min (minutes), h (hours), and d (days).
+
+##### shared_buffers
+
+Shared buffers are the amount of memory the database server uses for shared memory buffers. Settings significantly higher than the minimum are usually needed for good performance.
+
+The value should be set to 15% to 25% of the machine's total RAM. For example: if your machine's RAM size is 32 GB, then the recommended value for shared_buffers is 8 GB.
+
+To adjust this set `cfengine_enterprise_federation:postgres_config.shared_buffers` via Augments.
+
+For example:
+
+```json
+{
+  "variables": {
+    "cfengine_enterprise_federation:postgres_config.shared_buffers": "2560MB"
+  }
+}
+```
+
+**History:**
+
+* Added in 3.20.0, 3.18.2, 3.15.6
+
+##### max_locks_per_transaction
+
+The ```max_locks_per_transaction``` value indicates the number of database objects that can be locked simultaneously. When Federated Reporting is enabled, the MPF default is `4000`.
+
+```json
+{
+  "variables": {
+    "cfengine_enterprise_federation:postgres_config.max_locks_per_transaction": "4100"
+  }
+}
+```
+
+**History:**
+
+* Added in 3.20.0, 3.18.2, 3.15.6
+
+##### log_lock_waits
+
+Controls whether a log message is produced when a session waits longer than `deadlock_timeout` to acquire a lock. This is useful in determining if lock waits are causing poor performance. When Federated Reporting is enabled, the MPF default is `on`.
+
+```json
+{
+  "variables": {
+    "cfengine_enterprise_federation:postgres_config.log_lock_waits": "off"
+  }
+}
+```
+
+**History:**
+
+* Added in 3.20.0, 3.18.2, 3.15.6
+
+##### max_wal_size
+
+Sets the WAL size that triggers a checkpoint.
+
+Maximum size to let the WAL grow during automatic checkpoints. This is a soft limit; WAL size can exceed `max_wal_size` under special circumstances, such as heavy load, a failing `archive_command`, or a high `wal_keep_size` setting. If this value is specified without units, it is taken as megabytes. The default is 1 GB (`1024MB`). Increasing this parameter can increase the amount of time needed for crash recovery.
+
+```json
+{
+  "variables": {
+    "cfengine_enterprise_federation:postgres_config.max_wal_size": "20G"
+  }
+}
+```
+
+**History:**
+
+* Added in 3.20.0, 3.18.2, 3.15.6
+
+##### checkpoint_timeout
+
+Sets the maximum time between automatic WAL checkpoints.
+
+Maximum time between automatic WAL checkpoints. If this value is specified without units, it is taken as seconds. The valid range is between 30 seconds and one day. The default is five minutes (`5min`). Increasing this parameter can increase the amount of time needed for crash recovery.
+
+```json
+{
+  "variables": {
+    "cfengine_enterprise_federation:postgres_config.checkpoint_timeout": "30min"
+  }
+}
+```
+
+**History:**
+
+* Added in 3.20.0, 3.18.2, 3.15.6
+
 ## Recommendations
 
 The MPF includes policy that inspects the system and makes recommendations about
