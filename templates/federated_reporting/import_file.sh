@@ -6,6 +6,7 @@ set -e
 set -o pipefail
 
 source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/log.sh"
 
 true "${CFE_BIN_DIR?undefined}"
 true "${CFE_FR_IMPORT_FILTERS_DIR?undefined}"
@@ -43,6 +44,8 @@ hostkey=$(basename "$file" | cut -d. -f1)
 table_whitelist=$(printf "'%s'," $CFE_FR_TABLES | sed -e 's/,$//')
 
 mv "$file" "$file.importing"
+begin_time=$(date +%s)
+ret=0
 
 {
   cat<<EOF
@@ -60,8 +63,12 @@ COMMIT;
 EOF
 } | "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb 2>&1 | "$CFE_FR_COMPRESSOR" $CFE_FR_COMPRESSOR_ARGS >"$file.log.$CFE_FR_COMPRESSOR_EXT" && {
   rm -f "$file.importing"
-  exit 0
+  ret=0
 } || {
   mv "$file.importing" "$file.failed"
-  exit 1
+  ret=1
 }
+end_time=$(date +%s)
+duration=$((end_time - begin_time))
+log "Import for $hostkey took $duration seconds"
+exit $ret

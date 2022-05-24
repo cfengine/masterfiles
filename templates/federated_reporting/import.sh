@@ -50,6 +50,8 @@ failed=0
 log "Setting up schemas for import"
 declare -a hostkeys
 for file in $dump_files; do
+  file_size=$(stat --format %s "$file")
+  log "Processing $file with size $file_size bytes"
   hostkey=$(basename "$file" | cut -d. -f1)
   hostkeys+=($hostkey)
   if [ -z $("$CFE_BIN_DIR"/psql --csv --tuples-only -U cfapache -d cfdb -c "SELECT hub_id FROM __hubs WHERE hostkey = '$hostkey';") ]; then
