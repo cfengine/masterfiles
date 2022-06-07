@@ -1,0 +1,3 @@
+2022-06-07 added meta_skip.cf.sub here in masterfiles/tests/acceptance/17_packages
+so that there is one place that marks many tests as "skip_needs_work" or "skip_unsupported"
+since these many tests shared the same reasons for skipping.
