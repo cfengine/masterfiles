@@ -5,6 +5,9 @@ from __future__ import print_function
 import pprint
 import sys
 
+
+if sys.version_info.major != 3:
+  raise Exception("Only use python3 to execute this script")
 TEST_COUNT = 0
 PLATFORM_ARCH_32 = False
 
