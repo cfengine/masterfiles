@@ -18,6 +18,7 @@ bundle agent change_management
                    "/etc/passwd",
                    "/etc/group",
                    "/etc/services",
+                   "$(sys.statedir)/pg/data/postgresql.conf",
                   },
         comment => "These files will be watched for change, and diffs will be
                     reported back to mission portal if you are running CFEngine
