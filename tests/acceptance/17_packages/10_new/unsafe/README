@@ -1,0 +1,10 @@
+Run this generator and redirect the output to the resulting policy file.
+
+Only use python3.
+
+python3 the_great_package_test_generator.py > the_great_package_test.cf
+
+There should be minimal changes depending on what you changed in the generator.
+
+If there is a lot of unexpected change that you didn't intend, try a different
+version of python3 and document here which one to use.

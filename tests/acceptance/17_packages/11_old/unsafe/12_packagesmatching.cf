@@ -17,6 +17,7 @@
 body common control
 {
       inputs => { "../../packages-info.cf.sub",
+                  "../../meta_skip.cf.sub",
                   "../../../dcs.cf.sub",
                   "../../../../../inventory/any.cf",
                   "../../../../../$(sys.local_libdir)/stdlib.cf",
@@ -43,12 +44,6 @@ bundle agent init
       package_policy => "add",
       package_method => inventory_yum_rpm($(cfe_autorun_inventory_packages.refresh)),
       action => if_elapsed_day;
-
-  meta:
-      "test_skip_needs_work" string => "!redhat.!debian",
-        meta => { "redmine5866" };
-      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
-      "test_skip_unsupported" string => "redhat_4|centos_4";
 
   vars:
       "package_name" string => "$(p.name[1])";

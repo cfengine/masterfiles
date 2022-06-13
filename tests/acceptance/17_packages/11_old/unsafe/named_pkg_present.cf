@@ -15,6 +15,7 @@ body common control
                   "../../../../../$(sys.local_libdir)/stdlib.cf",
                   "../../../../../$(sys.local_libdir)/packages.cf",
                   "../../packages-info.cf.sub",
+                  "../../meta_skip.cf.sub",
                 };
       bundlesequence  => { default("$(this.promise_filename)") };
       version => "1.0";
@@ -27,12 +28,6 @@ body common control
 
 bundle agent init
 {
-  meta:
-      "test_skip_needs_work" string => "!redhat.!debian",
-        meta => { "redmine5866" };
-      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
-      "test_skip_unsupported" string => "redhat_4|centos_4";
-
   methods:
     "clear_packages" usebundle => clear_packages("dummy");
 }
