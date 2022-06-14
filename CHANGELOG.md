@@ -1,6 +1,58 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.18.2:
+	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
+	  (ENT-8618)
+	- Added PostgreSQL tunables for Federated Reporting (ENT-8617)
+	- Added lib/templates to packaged assets (ENT-8533)
+	- Added policy update exclusion for directories named .no-distrib
+	  (ENT-8079)
+	- Added support for 'option' option in pkg module (CFE-3568)
+	- Added support for Amazon Linux in standalone self upgrade (ENT-8274)
+	- Added support for downloading windows packages as part of self upgrade
+	  (ENT-8283)
+	- Adjusted MPF to handle rxdirs default from true to false (CFE-951)
+	- Adjusted rxdirs to have correct explicit default (CFE-951)
+	- Enable setting environment attribute in body agent control via augments
+	  (CFE-3925)
+	- Enforce 755 perms on hub htdocs dir (ENT-8212)
+	- Enforce proper owner and perms on docroot (ENT-8280)
+	- Fixed AIX watchdog default threshold for number of cf-execd processes
+	  (CFE-3915)
+	- Fixed FR clean bundle when off state (ENT-7969)
+	- Fixed inclusion of distributed cleanup python files during install
+	  (ENT-8393)
+	- Fixed inventory for OS on Rocky Linux (ENT-8292)
+	- Fixed parsing of options attribute and added repo alias for repository option in pkg module
+	  (CFE-3568)
+	- Fixed pkg module parsing input when values include equals (=)
+	  (CFE-3568)
+	- Fixed promise status from package upgrade when architecture specified in promise
+	  (CFE-3568)
+	- Fixed psql not found while FR import (ENT-8353)
+	- Fixed windows unattended self upgrade on Windows 2008 (ENT-8066)
+	- Only run clean_when_off FR bundle when needed (ENT-8294)
+	- Prevented def.dir_masterfiles/.no-distrib from being copied
+	  (ENT-8079)
+	- Removed unused variable in pkg module (CFE-3568)
+	- Skip invalid feeder dump files during import (ENT-8229)
+	- Stopped loading Apache modules by default on Enterprise Hubs:
+	  mod_actions (ENT-8503), mod_asis (ENT-8505), mod_auth_digest (ENT-8608),
+	  mod_authn_anon (ENT-8600), mod_authn_dbd (ENT-8601), mod_authn_dbm (ENT-8599),
+	  mod_authn_file (ENT-8598), mod_authnz_ldap (ENT-8512), mod_authz_groupfile
+	  (ENT-8603), mod_authz_user (ENT-8604), mod_autoindex (ENT-8514), mod_deflate
+	  (ENT-8523), mod_dumpio (ENT-8526), mod_env (ENT-8522), mod_expires (ENT-8610),
+	  mod_filter (ENT-8524), mod_include (ENT-8507), mod_ldap (ENT-8509),
+	  mod_log_forensic (ENT-8501), mod_mime_magic (ENT-8517), mod_negotiation
+	  (ENT-8511), mod_reqtimeout (ENT-8525), mod_unique_id (ENT-8519), mod_usertrack
+	  (ENT-8521), mod_version (ENT-8497), mod_vhost_alias (ENT-8513), speling_module
+	  (ENT-8499), substitute (ENT-8498), mod_info (ENT-8504), mod_status (ENT-8506),
+	  mod_dav (ENT-8495)
+	- Stopped lowercasing software inventory on Windows (ENT-8424)
+	- Updating host-specific CMDB data files now happens asynchronously
+	  (ENT-7357)
+
 3.18.1:
 	- Gave cfapache group full access to docroot (ENT-8065)
 	- Made apache restart more robust (ENT-8045)
