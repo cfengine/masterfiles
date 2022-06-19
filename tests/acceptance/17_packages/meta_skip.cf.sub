@@ -1,7 +1,7 @@
 bundle common 17_packages_meta
 {
   meta:
-    "test_skip_needs_work" string => "(!redhat.!debian)|aarch64",
+    "test_skip_needs_work" string => "(!redhat.!debian)|(!x86_64)",
       comment => "Need to create test packages for platforms other than x86 redhat and debian based distributions.",
       meta => { "CFE-3993", "CFE-3992"};
 
