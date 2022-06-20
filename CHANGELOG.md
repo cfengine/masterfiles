@@ -37,18 +37,6 @@ Notable changes to the framework should be documented here
 	  (ENT-8079)
 	- Removed unused variable in pkg module (CFE-3568)
 	- Skip invalid feeder dump files during import (ENT-8229)
-	- Stopped loading Apache modules by default on Enterprise Hubs:
-	  mod_actions (ENT-8503), mod_asis (ENT-8505), mod_auth_digest (ENT-8608),
-	  mod_authn_anon (ENT-8600), mod_authn_dbd (ENT-8601), mod_authn_dbm (ENT-8599),
-	  mod_authn_file (ENT-8598), mod_authnz_ldap (ENT-8512), mod_authz_groupfile
-	  (ENT-8603), mod_authz_user (ENT-8604), mod_autoindex (ENT-8514), mod_deflate
-	  (ENT-8523), mod_dumpio (ENT-8526), mod_env (ENT-8522), mod_expires (ENT-8610),
-	  mod_filter (ENT-8524), mod_include (ENT-8507), mod_ldap (ENT-8509),
-	  mod_log_forensic (ENT-8501), mod_mime_magic (ENT-8517), mod_negotiation
-	  (ENT-8511), mod_reqtimeout (ENT-8525), mod_unique_id (ENT-8519), mod_usertrack
-	  (ENT-8521), mod_version (ENT-8497), mod_vhost_alias (ENT-8513), speling_module
-	  (ENT-8499), substitute (ENT-8498), mod_info (ENT-8504), mod_status (ENT-8506),
-	  mod_dav (ENT-8495)
 	- Stopped lowercasing software inventory on Windows (ENT-8424)
 	- Updating host-specific CMDB data files now happens asynchronously
 	  (ENT-7357)
