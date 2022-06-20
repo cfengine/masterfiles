@@ -1,6 +1,23 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.6:
+	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
+	  (ENT-8618)
+	- Added PostgreSQL tunables for Federated Reporting (ENT-8617)
+	- Added lib/templates to packaged assets (ENT-8533)
+	- Added support for Amazon Linux in standalone self upgrade (ENT-8274)
+	- Added support for downloading windows packages as part of self upgrade
+	  (ENT-8283)
+	- Enforce 755 perms on hub htdocs dir (ENT-8212)
+	- Enforce proper owner and perms on docroot (ENT-8280)
+	- Fixed FR clean bundle when off state (ENT-7969)
+	- Fixed psql binary not found during Federated Reporting import (ENT-8353)
+	- Fixed windows unattended self upgrade on Windows 2008 (ENT-8066)
+	- Only run clean_when_off FR bundle when needed (ENT-8294)
+	- Invalid feeder dump files are now skipped during import (ENT-8229)
+	- Stopped lowercasing software inventory on Windows (ENT-8424)
+
 3.15.5:
 	- Gave cfapache full access to docroot (ENT-8065)
 	- Made apache restart more robust (ENT-8045)
