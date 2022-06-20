@@ -20,7 +20,10 @@ body common control
 bundle agent init
 {
   meta:
-      "test_skip_needs_work" string => "!redhat.!debian";
+      # need packages for platforms other than redhat and debian on x86_64 architecture
+      # see tests/acceptance/17_packages/meta_skip.cf.sub
+      "test_skip_needs_work" string => "(!redhat.!debian)|(!x86_64)",
+        meta => { "CFE-3992" };
       # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
       # And available patches is an Enterprise feature.
       "test_skip_unsupported" string => "redhat_4|centos_4|!enterprise";
