@@ -27,15 +27,49 @@ bundle agent apachectl_patched_for_upgrade
 # should make this bundle a no-op.
 #
 # TODO Redact when 3.21.0 is the oldest supported version
+#
+# NOTE The rendering of apachectl is done slightly differently for different
+# versions of CFEngine. We need to maintain support for 3.15.x and many macros
+# were not available at 3.15.0, so we use classes instead of macros.
+#
+# Versions prior to CFEngine 3.20.0 do not create files by default when managed
+# by a template, if the file is absent but it's presence was desired the use of
+# create => "true" or some other machinery is necessary.
+#
+# When 3.15.0 (Currently oldest supported version) was released, 3.10.0 was supported.
 {
+  vars:
+      "considered_versions"
+        slist => { "cfengine_3_10", "cfengine_3_11", "cfengine_3_12",
+                   "cfengine_3_13", "cfengine_3_14", "cfengine_3_15",
+                   "cfengine_3_16", "cfengine_3_17", "cfengine_3_18" };
+
+  classes:
+
+      "_running_cfengine_version_where_templated_files_automatically_created"
+        or => { @(considered_versions) };
+
+      "_running_cfengine_version_where_templated_files_NOT_automatically_created"
+        not => or( @(considered_versions) );
+
   files:
-      "$(sys.bindir)/apachectl"
+    _running_cfengine_version_where_templated_files_automatically_created::
+      "$(sys.workdir)/httpd/bin/apachectl"
         edit_template => "$(this.promise_dirname)/templates/apachectl.mustache",
-        handle => "apachectl_content",
+        handle => "apachectl_content_pre_create_default_templated_files",
         template_method => "mustache",
         template_data => parsejson( '{ "cfengine_enterprise_mission_portal_httpd_dir": "$(sys.workdir)/httpd" }');
 
-      "$(sys.bindir)/apachectl"
+    _running_cfengine_version_where_templated_files_NOT_automatically_created::
+      "$(sys.workdir)/httpd/bin/apachectl"
+        create => "true",
+        edit_template => "$(this.promise_dirname)/templates/apachectl.mustache",
+        handle => "apachectl_content_post_create_default_templated_files",
+        template_method => "mustache",
+        template_data => parsejson( '{ "cfengine_enterprise_mission_portal_httpd_dir": "$(sys.workdir)/httpd" }');
+
+    cfengine::
+      "$(sys.workdir)/httpd/bin/apachectl"
         handle => "apachectl_perms",
         perms => mog( "0755", "root", "root" );
 }
