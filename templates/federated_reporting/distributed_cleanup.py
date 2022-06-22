@@ -66,8 +66,8 @@ DISTRIBUTED_CLEANUP_SECRET_PATH = os.path.join(
 
 def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password):
     feeder_credentials = getpass(
-        prompt="Enter admin credentials for {} at {}: ".format(
-            hub["ui_name"], hub["api_url"]
+        prompt="Enter admin credentials for {}: ".format(
+            hub["ui_name"]
         )
     )
     feeder_hostname = hub["ui_name"]
@@ -212,6 +212,8 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--debug", action="store_true")
     group.add_argument("--inform", action="store_true")
+
+    parser.add_argument("--stdin", action="store_true")
     args = parser.parse_args()
 
     global logger
@@ -226,7 +228,7 @@ def main():
     logger.addHandler(ch)
 
     if not os.path.exists(DISTRIBUTED_CLEANUP_SECRET_PATH):
-        if sys.stdout.isatty():
+        if sys.stdout.isatty() or args.stdin:
             interactive_setup()
         else:
             print(
@@ -247,8 +249,10 @@ def main():
         and response["configured"]
     ):
         print(
-            "{} can only be run on a Federated Reporting hub configured to be superhub".format(
-                os.path.basename(__file__)
+            "{} can only be run on a properly configured superhub." +
+            " {}".format(
+                os.path.basename(__file__),
+                response
             )
         )
         sys.exit(1)

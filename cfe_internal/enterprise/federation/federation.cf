@@ -171,6 +171,56 @@ bundle agent config
       "I'm paused so won't do any import/dump";
 }
 
+bundle agent distributed_cleanup_dependencies
+# @brief warn if python3 and urllib3 required dependencies are not installed
+# if cfengine_mp_fr_enable_distributed_cleanup class is defined
+{
+  vars:
+    debian|ubuntu|redhat_8|centos_8::
+      "packages" slist => { "python3", "python3-urllib3" };
+
+    centos_7::
+      "packages" slist => { "python3" };
+
+  classes:
+    (redhat_6|centos_6)::
+      "cfengine_mp_fr_distributed_cleanup_python3_installed"
+        expression => returnszero(
+          "$(sys.bindir)/cfengine-selected-python --version | grep -q ' 3.'",
+          "useshell"
+        );
+
+    (redhat_6|centos_6|redhat_7|centos_7)::
+      "cfengine_mp_fr_distributed_cleanup_urllib3_installed"
+        expression => returnszero(
+          "echo 'import urllib3' | $(sys.bindir)/cfengine-selected-python 2>/dev/null",
+          "useshell"
+        );
+
+  packages:
+    debian|ubuntu::
+      "$(packages)"
+        policy => "present",
+        classes => default:results("bundle", "cfengine_mp_fr_distributed_cleanup_packages"),
+        action => default:policy ( "warn" ),
+        package_module => default:apt_get;
+
+    redhat.!(centos_6|redhat_6)::
+      "$(packages)"
+        policy => "present",
+        classes => default:results("bundle", "cfengine_mp_fr_distributed_cleanup_packages"),
+        action => default:policy ( "warn" ),
+        package_module => default:yum;
+
+  reports:
+    (redhat_6|centos_6).!cfengine_mp_fr_distributed_cleanup_python3_installed::
+      "error: python3 is required for distributed cleanup utility. On this platform it is recommened you install python3 from source (https://docs.python.org/3.10/using/unix.html#building-python)";
+    (redhat_6|centos_6).!cfengine_mp_fr_distributed_cleanup_urllib3_installed::
+      "error: python3 module urllib3 is required for distributed cleanup utility. On this platform it is recommend you install via pip3 after installing python3 from source";
+    (redhat_7|centos_7).!cfengine_mp_fr_distributed_cleanup_urllib3_installed::
+      "error: python3 module urllib3 is required for distributed cleanup utility. On this platform please install with the command `pip3 install urllib3`";
+}
+
 bundle agent semanage_installed
 # @brief Install semanage utility if selinux enabled and
 # cfengine_mp_fr_dependencies_auto_install class is defined
@@ -765,13 +815,17 @@ bundle agent entry
         depends_on => { "transport_user", "ensure_feeders" },
         usebundle => imported_data;
 
-    default:cfengine_mp_fr_enable_distributed_cleanup::
+    am_policy_hub.default:cfengine_mp_fr_enable_distributed_cleanup::
+      "Distributed Cleanup Dependencies"
+        handle => "distributed_cleanup_dependencies",
+        usebundle => "distributed_cleanup_dependencies";
       "Distributed Cleanup Setup"
         handle => "distributed_cleanup_setup",
-        depends_on => { "data_transport" },
+        depends_on => { "transport_user", "data_transport", "distributed_cleanup_dependencies" },
         usebundle => "distributed_cleanup_setup";
       "Distributed Federated Host Cleanup"
         handle => "distributed_cleanup",
+        if => "enabled.am_on.am_superhub.!am_paused",
         depends_on => { "imported_data", "distributed_cleanup_setup" },
         usebundle => distributed_cleanup_run;
 
