@@ -17,6 +17,7 @@ Notable changes to the framework should be documented here
 	- Only run clean_when_off FR bundle when needed (ENT-8294)
 	- Invalid feeder dump files are now skipped during import (ENT-8229)
 	- Stopped lowercasing software inventory on Windows (ENT-8424)
+	- Use simple numeric comparison in apt_get package module (CFE-3976)
 
 3.15.5:
 	- Gave cfapache full access to docroot (ENT-8065)
