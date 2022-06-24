@@ -62,8 +62,9 @@ bundle agent cfe_internal_update_policy
         usebundle => cfe_internal_update_policy_cpv;
 
     any::
-      "CMDB data update" -> { "ENT-6788" }
-        usebundle => cfe_internal_update_cmdb;
+      "CMDB data update" -> { "ENT-6788", "ENT-8847" }
+        usebundle => cfe_internal_update_cmdb,
+        action => u_immediate;
 
   reports:
 
@@ -325,7 +326,8 @@ bundle agent cfe_internal_update_cmdb
       # Don't pull CMDB data on policy_hub self bootstrap because
       # there will be no cf-serverd listening to serve files yet.
     enterprise_edition.!(bootstrap_mode)::  # ENT-6840
-      "cfe_internal_update_cmdb_data_consumption";
+      "cfe_internal_update_cmdb_data_consumption" -> { "ENT-8847" }
+        action => u_immediate;
 @endif
 }
 
@@ -424,11 +426,12 @@ bundle agent cfe_internal_update_cmdb_data_consumption
         create => "true",
         comment => "If a host is to load data from the CMDB, it needs to have a directory where said data is cached.";
 
-      "$(sys.workdir)/data/." -> { "ENT-6788" }
+      "$(sys.workdir)/data/." -> { "ENT-6788", "ENT-8847" }
         depth_search => u_recurse( inf ),
         file_select => u_all,
         copy_from => u_cmdb_data,
-        comment => "So that hosts have access to the most recent CMDB data, we make sure that it's up to date.";
+        comment => "So that hosts have access to the most recent CMDB data, we make sure that it's up to date.",
+        action => u_immediate;
 
 }
 #########################################################
