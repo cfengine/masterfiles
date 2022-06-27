@@ -40,7 +40,6 @@ Notable changes to the framework should be documented here
 	- Stopped lowercasing software inventory on Windows (ENT-8424)
 	- Updating host-specific CMDB data files now happens asynchronously
 	  (ENT-7357)
-	- Use simple numeric comparison in apt_get package module (CFE-3976)
 
 3.18.1:
 	- Gave cfapache group full access to docroot (ENT-8065)
