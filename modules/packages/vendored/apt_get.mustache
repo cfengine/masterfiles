@@ -7,7 +7,6 @@ import sys
 import os
 import subprocess
 import re
-from distutils.version import LooseVersion
 
 PY3 = sys.version_info > (3,)
 
@@ -32,7 +31,8 @@ apt_get_options = ["-o", "Dpkg::Options::=--force-confold",
                    "-o", "Dpkg::Options::=--force-confdef",
                    "-y"]
 
-if LooseVersion(apt_version) < LooseVersion("1.1"):
+# compare only the first two digits of the version so versions like 1.1.1ubuntu2 work
+if [int(x) for x in apt_version.split(".")[0:2]] < [1, 1]:
     apt_get_options.append("--force-yes")
 
 else:
