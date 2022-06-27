@@ -50,3 +50,4 @@ build
 
 # Emacs
 .*\.~undo-tree~
+flycheck_*
