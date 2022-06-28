@@ -7,7 +7,6 @@ Notable changes to the framework should be documented here
 	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
 	  (ENT-8618)
 	- Added PostgreSQL tunables for Federated Reporting (ENT-8617)
-	- Added direct link to correct docs (ENT-8262)
 	- Added lib/templates to packaged assets (ENT-8533)
 	- Added policy to patch apachectl for more robust stopping on Enterprise Hubs
 	  (ENT-8823)
