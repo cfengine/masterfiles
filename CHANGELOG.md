@@ -1,6 +1,58 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.20.0:
+	- Renamed bundle agent main to bundle agent mpf_main (CFE-3947)
+	- Added prelink to paths.cf
+	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
+	  (ENT-8618)
+	- Added PostgreSQL tunables for Federated Reporting (ENT-8617)
+	- Added lib/templates to packaged assets (ENT-8533)
+	- Added policy to patch apachectl for more robust stopping on Enterprise Hubs
+	  (ENT-8823)
+	- Added policy update exclusion for directories named .no-distrib
+	  (ENT-8079)
+	- Added support for 'option' option in pkg module (CFE-3568)
+	- Added support for Amazon Linux in standalone self upgrade (ENT-8274)
+	- Added support for downloading windows packages as part of self upgrade
+	  (ENT-8283)
+	- Adjusted MPF to handle rxdirs default from true to false (CFE-951)
+	- 755 perms on hub htdocs dir are now enforced (ENT-8212)
+	- Proper owner and perms on docroot are now enforced(ENT-8280)
+	- Prevented def.dir_masterfiles/.no-distrib from being copied
+	  (ENT-8079)
+	- Cleaned up policy related to versions prior to 3.12 (CFE-3920)
+	- Removed policy deprecated by sys.os_release (CFE-3933)
+	- Updated bundle names and wording to reflect current tooling
+	  (CFE-3921)
+	- Enabled setting environment attribute in body agent control via augments
+	  (CFE-3925)
+	- Fixed inclusion of distributed cleanup python files during install
+	  (ENT-8393)
+	- Fixed inventory for OS on Rocky Linux (ENT-8292)
+	- Fixed promise status from package upgrade when architecture specified in promise
+	  (CFE-3568)
+	- Made body classes u_kept_successful_command_results inherit_from u_results
+	  (CFE-3917)
+	- Made cmdb update ignore locks (ENT-8847)
+	- Updating host-specific CMDB data files now happens asynchronously
+	  (ENT-7357)
+	- Fixed issue with apt_get package module on Ubuntu 22 (CFE-3976)
+	- Fixed parsing of options attribute and added repo alias for repository option in pkg module
+	  (CFE-3568)
+	- Fixed pkg module parsing input when values include equals (=)
+	  (CFE-3568)
+	- Warn about missing dependencies for Distributed Cleanup utility
+	  (ENT-8832)
+	- Fixed AIX watchdog default threshold for number of cf-execd processes
+	  (CFE-3915)
+	- Stopped lowercasing software inventory on Windows (ENT-8424)
+	- Fixed windows unattended self upgrade on Windows 2008 (ENT-8066)
+	- Invalid feeder dump files are now skipped during import (ENT-8229)
+	- Fixed FR clean bundle when off state (ENT-7969)
+	- Fixed psql not found while FR import (ENT-8353)
+	- Now clean_when_off FR bundle is only run when needed (ENT-8294)
+
 3.19.0:
 	- Added interpreter attribute to standalone self upgrade package_module bodies
 	  (CFE-3703, ENT-5752)
