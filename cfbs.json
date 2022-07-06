@@ -1,0 +1,14 @@
+{
+  "name": "Masterfiles",
+  "description": "Official CFEngine Masterfiles Policy Framework (MPF)",
+  "type": "module",
+  "provides": {
+    "masterfiles": {
+      "description": "Official CFEngine Masterfiles Policy Framework (MPF)",
+      "tags": ["supported", "base"],
+      "repo": "https://github.com/cfengine/masterfiles",
+      "by": "https://github.com/cfengine",
+      "steps": ["run ./prepare.sh -y", "copy ./ ./"]
+    }
+  }
+}
