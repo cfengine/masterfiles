@@ -64,12 +64,20 @@ DISTRIBUTED_CLEANUP_SECRET_PATH = os.path.join(
 )
 
 
-def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password):
-    feeder_credentials = getpass(
-        prompt="Enter admin credentials for {}: ".format(
-            hub["ui_name"]
+def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password, force_interactive=False):
+    if force_interactive:
+        feeder_credentials = input(
+            "admin credentials for {}: ".format(
+                hub["ui_name"]
+            )
         )
-    )
+        print() # output newline for easier reading
+    else:
+        feeder_credentials = getpass(
+            prompt="Enter admin credentials for {}: ".format(
+                hub["ui_name"]
+            )
+        )
     feeder_hostname = hub["ui_name"]
     feeder_api = NovaApi(
         api_user="admin",
@@ -84,7 +92,7 @@ def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password):
         "fr_distributed_cleanup",
         {
             "description": "fr_distributed_cleanup Federated Host Cleanup role",
-            "includeContext": "cfengine",
+            "includeContext": "cfengine_3",
         },
     )
     if response["status"] != 201:
@@ -120,11 +128,16 @@ def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password):
         sys.exit(1)
 
 
-def interactive_setup():
-    fr_distributed_cleanup_password = "".join(random.choices(string.printable, k=20))
-    admin_pass = getpass(
-        prompt="Enter admin password for superhub {}: ".format(socket.getfqdn())
-    )
+def interactive_setup(force_interactive=False):
+    fr_distributed_cleanup_password = "".join(random.choices(string.digits + string.ascii_letters, k=20))
+    if force_interactive:
+        admin_pass = input("admin password for superhub {}: ".format(socket.getfqdn()))
+        print() # newline for easier reading
+    else:
+        admin_pass = getpass(
+            prompt="Enter admin password for superhub {}: ".format(socket.getfqdn())
+        )
+
     api = NovaApi(api_user="admin", api_password=admin_pass)
 
     # first confirm that this host is a superhub
@@ -155,6 +168,7 @@ def interactive_setup():
         sys.exit(1)
 
     email = input("Enter email for fr_distributed_cleanup accounts: ")
+    print() # newline for easier reading
 
     logger.info("Creating fr_distributed_cleanup role on superhub...")
     response = api.put(
@@ -162,7 +176,7 @@ def interactive_setup():
         "fr_distributed_cleanup",
         {
             "description": "fr_distributed_cleanup Federated Host Cleanup role",
-            "includeContext": "cfengine",
+            "includeContext": "cfengine_3",
         },
     )
     if response["status"] != 201:
@@ -198,7 +212,7 @@ def interactive_setup():
         sys.exit(1)
 
     for hub in feederResponse["hubs"]:
-        interactive_setup_feeder(hub, email, fr_distributed_cleanup_password)
+        interactive_setup_feeder(hub, email, fr_distributed_cleanup_password, force_interactive=force_interactive)
         write_secret(DISTRIBUTED_CLEANUP_SECRET_PATH, fr_distributed_cleanup_password)
 
 
@@ -213,7 +227,7 @@ def main():
     group.add_argument("--debug", action="store_true")
     group.add_argument("--inform", action="store_true")
 
-    parser.add_argument("--stdin", action="store_true")
+    parser.add_argument("--force-interactive", action="store_true", help="force interactive mode even when no tty, good for automation")
     args = parser.parse_args()
 
     global logger
@@ -228,8 +242,8 @@ def main():
     logger.addHandler(ch)
 
     if not os.path.exists(DISTRIBUTED_CLEANUP_SECRET_PATH):
-        if sys.stdout.isatty() or args.stdin:
-            interactive_setup()
+        if sys.stdout.isatty() or args.force_interactive:
+            interactive_setup(force_interactive=args.force_interactive)
         else:
             print(
                 "{} requires manual setup, please run as root interactively.".format(
@@ -249,11 +263,8 @@ def main():
         and response["configured"]
     ):
         print(
-            "{} can only be run on a properly configured superhub." +
-            " {}".format(
-                os.path.basename(__file__),
-                response
-            )
+            "{} can only be run on a properly configured superhub. ".format(os.path.basename(__file__)) +
+            " {}".format(response)
         )
         sys.exit(1)
 
