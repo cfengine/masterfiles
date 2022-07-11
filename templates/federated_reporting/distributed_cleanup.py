@@ -385,11 +385,13 @@ AND EXISTS(
         # simulate the host api delete process by setting current_timestamp in deleted column
         # and delete from all federated tables similar to the clear_hosts_references() pgplsql function.
         post_sql += "INSERT INTO __hosts (hostkey,deleted) VALUES"
+        deletes = []
         for hostkey in post_hostkeys:
-            delete_sql += "('{}', CURRENT_TIMESTAMP) ".format(hostkey)
+            deletes.append("('{}', CURRENT_TIMESTAMP)".format(hostkey))
 
+        delete_sql = ", ".join(deletes)
         delete_sql += (
-            "ON CONFLICT (hostkey,hub_id) DO UPDATE SET deleted = excluded.deleted;\n"
+            " ON CONFLICT (hostkey,hub_id) DO UPDATE SET deleted = excluded.deleted;\n"
         )
         clear_sql = "set schema 'public';\n"
         for table in CFE_FR_TABLES:
