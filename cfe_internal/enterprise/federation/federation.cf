@@ -885,10 +885,13 @@ bundle agent distributed_cleanup_setup
   files:
     am_superhub|am_feeder::
       "${distributed_cleanup_dir}/."
+        perms => default:mog( "700", "$(cfengine_enterprise_federation:config.transport_user)", "root" ),
         create => "true";
       "${distributed_cleanup_dir}/${sys.fqhost}.pub"
+        perms => default:mog( "600", "$(cfengine_enterprise_federation:config.transport_user)", "root" ),
         copy_from => default:local_cp("${sys.workdir}/ppkeys/localhost.pub");
       "${distributed_cleanup_dir}/${sys.fqhost}.cert"
+        perms => default:mog( "600", "$(cfengine_enterprise_federation:config.transport_user)", "root" ),
         copy_from => default:local_cp("${sys.workdir}/httpd/ssl/certs/${sys.fqhost}.cert");
 }
 
