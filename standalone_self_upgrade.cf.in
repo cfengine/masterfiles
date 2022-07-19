@@ -120,6 +120,16 @@ bundle agent cfengine_software
         comment => "The directory within software updates to look for packages.
                     On HPUX sys.flavor includes versions, so we use sys.class
                     instead.";
+
+    windows::
+
+      "package_dir" -> { "ENT-9010" }
+        string => "$(sys.class)_$(sys.arch)",
+        comment => concat( "The directory within software updates to look for ",
+                           "packages. Since one package is built for each",
+                           "supported architecture instead of each platform",
+                           "version architecture we use sys.class and sys.arch.");
+
     any::
 
       "local_software_dir"
@@ -498,7 +508,7 @@ bundle common cfengine_package_names
       "pkg[windows_i686]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release)-i686.msi";
 
       "my_pkg"
-        string => "$(pkg[$(sys.flavor)_$(sys.arch)])",
+        string => "$(pkg[$(cfengine_software.package_dir)])",
         comment => "The package name for the currently executing platform.";
 
   reports:
