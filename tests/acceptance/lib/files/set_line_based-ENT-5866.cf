@@ -51,6 +51,6 @@ bundle agent check
 
       "Pass/Fail"
         usebundle => dcs_check_diff( "$(G.testfile)",
-                                     "$(G.testfile).expected-result",
+                                     "$(this.promise_filename).expected-result",
                                      "$(this.promise_filename)");
 }
