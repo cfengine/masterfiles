@@ -71,7 +71,7 @@ bundle agent config
       # _stdlib_path_exists_getenforce and paths.getenforce are defined by masterfiles/lib/paths.cf
       default:_stdlib_path_exists_getenforce::
         "selinux_enabled"
-          expression => strcmp("Enforcing", execresult("$(paths.getenforce)", useshell)),
+          expression => strcmp("Enforcing", execresult("$(default:paths.getenforce)", useshell)),
           scope => "namespace";
 
 
@@ -204,9 +204,9 @@ bundle agent semanage_installed
 
   reports:
     default:DEBUG|DEBUG_semanage_installed::
-      "paths.semanage = $(paths.semanage)";
+      "paths.semanage = $(default:paths.semanage)";
     !default:_stdlib_path_exists_semanage.!default:cfengine_mp_fr_dependencies_auto_install::
-      "semanage command is not available at $(paths.semanage). Will only install needed package if cfengine_mp_fr_dependencies_auto_install class is defined in augments(def.json) or with --define cf-agent option.";
+      "semanage command is not available at $(default:paths.semanage). Will only install needed package if cfengine_mp_fr_dependencies_auto_install class is defined in augments(def.json) or with --define cf-agent option.";
 }
 
 bundle agent transport_user
@@ -298,8 +298,8 @@ bundle agent transport_user
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
     selinux_enabled.incorrect_ssh_context.default:_stdlib_path_exists_semanage.default:_stdlib_path_exists_restorecon::
-      "$(paths.semanage) fcontext -a -t ssh_home_t '$(home)/.ssh(/.*)?'";
-      "$(paths.restorecon) -R -F $(home)/.ssh/";
+      "$(default:paths.semanage) fcontext -a -t ssh_home_t '$(home)/.ssh(/.*)?'";
+      "$(default:paths.restorecon) -R -F $(home)/.ssh/";
 
     any::
       # Generate ssh keypair
@@ -311,9 +311,9 @@ bundle agent transport_user
 
   reports:
     selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_semanage::
-      "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf $(paths.semanage) does not resolve";
+      "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf $(default:paths.semanage) does not resolve";
     selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
-      "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf $(paths.restorecon) does not resolve";
+      "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf $(default:paths.restorecon) does not resolve";
 }
 
 bundle agent clean_when_off
@@ -349,7 +349,7 @@ bundle agent clean_when_off
 
   classes:
     selinux_enabled.default:_stdlib_path_exists_semanage::
-      "has_cftransport_fcontext" expression => returnszero("$(paths.semanage) fcontext -l | grep $(home)", "useshell");
+      "has_cftransport_fcontext" expression => returnszero("$(default:paths.semanage) fcontext -l | grep $(home)", "useshell");
     "remote_hubs_table_empty" expression => returnszero(`[ $(const.dollar)($(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs") -eq "0"]`, "useshell");
     "federated_reporting_settings_table_empty" expression => returnszero(`[ $(const.dollar)($(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings") -eq "0"]`, "useshell");
 
@@ -364,7 +364,7 @@ bundle agent clean_when_off
 
       # _stdlib_path_exists_<command> and paths.<command> are defined in masterfiles/lib/paths.cf
     selinux_enabled.default:_stdlib_path_exists_semanage.has_cftransport_fcontext::
-      "$(paths.semanage) fcontext -d '$(home)/.ssh(/.*)?'";
+      "$(default:paths.semanage) fcontext -d '$(home)/.ssh(/.*)?'";
 
 }
 
