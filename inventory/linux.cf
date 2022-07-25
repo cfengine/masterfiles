@@ -7,6 +7,15 @@ bundle common inventory_linux
 #  systemd class based on linktarget of /proc/1/cmdline
 {
   vars:
+    have_proc_device_tree::
+      "proc_device_tree_model" string => readfile("/proc/device-tree/model"),
+      comment => "Read model from /proc/device-tree",
+      meta => { "inventory", "attribute_name=System version" };
+
+      "proc_device_tree_serial_number" string => readfile("/proc/device-tree/serial-number"),
+      meta => { "inventory", "attribute_name=System serial number" };
+
+
     has_proc_1_cmdline::
       "proc_1_cmdline_split" slist => string_split(readfile("/proc/1/cmdline", "512"), " ", "2"),
       comment => "Read /proc/1/cmdline and split off arguments";

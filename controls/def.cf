@@ -633,6 +633,7 @@ bundle common inventory_control
     !freebsd::
 
       "dmidecoder" string => "/usr/sbin/dmidecode";
+      "proc_device_tree" string => "/proc/device-tree";
 
   classes:
       # setting this disables all the inventory modules except package_refresh
@@ -646,10 +647,15 @@ bundle common inventory_control
       "disable_inventory_lsb" expression => "disable_inventory";
       "disable_inventory_lsb" not => fileexists($(lsb_exec));
 
+      # If we have /proc/device-tree we should likely disable dmi completely
+      # as of 2022 systems with dmi dont have device-tree and vice versa.
+      "have_proc_device_tree" expression => fileexists($(proc_device_tree));
+
       # by default disable the dmidecode inventory if the general
       # inventory is disabled or the binary does not exist.  Note that
       # typically this is a very fast binary.
       "disable_inventory_dmidecode" expression => "disable_inventory";
+      "disable_inventory_dmidecode" expression => "have_proc_device_tree";
       "disable_inventory_dmidecode" not => fileexists($(dmidecoder));
 
       # by default disable the LLDP inventory if the general inventory
