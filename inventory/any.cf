@@ -455,6 +455,8 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
       # Ref: redmine#7088 https://dev.cfengine.com/issues/7088
       "have_cpuinfo_cpu_cores" expression => strcmp("cpu cores", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
       "have_cpuinfo_model_name" expression => strcmp("model name", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
+      "have_cpuinfo_hardware" expression => strcmp("Hardware", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
+      "have_cpuinfo_revision" expression => strcmp("Revision", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
 
   vars:
     _have_cpuinfo::
@@ -465,6 +467,14 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
       "cpuinfo_cpu_model_name"
         string => "$(default:cfe_autorun_inventory_proc.cpuinfo[model name])",
         if => "have_cpuinfo_model_name";
+
+      "cpuinfo_hardware"
+        string => "$(default:cfe_autorun_inventory_proc.cpuinfo[Hardware])",
+        if => "have_cpuinfo_hardware";
+
+      "cpuinfo_revision"
+        string => "$(default:cfe_autorun_inventory_proc.cpuinfo[Revision])",
+        if => "have_cpuinfo_revision";
 
     # We need to be able to count the number of unique physical id lines in
     # /proc/cpu in order to get a physical processor count.
@@ -521,6 +531,8 @@ bundle agent cfe_autorun_inventory_cpuinfo
 {
   classes:
     "_have_proc_cpu_model_name" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_cpu_model_name");
+    "_have_proc_hardware" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_hardware");
+    "_have_proc_revision" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_revision");
     "_have_proc_cpu_physical_cores" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_physical_cores");
 
     # We only accept dmidecode values that don't look like cfengine variables,
@@ -539,6 +551,15 @@ bundle agent cfe_autorun_inventory_cpuinfo
       "cpu_model"
         string => "$(default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_cpu_model_name)",
         meta => { "inventory", "attribute_name=CPU model", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
+
+    _have_proc_hardware::
+      "cpu_model"
+        string => "$(default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_hardware)",
+        meta => { "inventory", "attribute_name=CPU model", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
+    _have_proc_revision::
+      "system_product_name"
+        string => "$(default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_revision)",
+        meta => { "inventory", "attribute_name=System product name", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
 
     _have_dmidecode_cpu_model_name.!_have_proc_cpu_model_name::
       "cpu_model"
@@ -920,7 +941,7 @@ bundle agent cfe_autorun_inventory_dmidecode
 
     # Redhat 4 can support the -s option to dmidecode if
     # kernel-utils-2.4-15.el4 or greater is installed.
-    have_dmidecode.!(redhat_4|redhat_3)::
+    have_dmidecode.!(redhat_4|redhat_3).!have_proc_device_tree::
       "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
                                              "useshell"),
       unless => isvariable("dmi[$(dmivars)]"), # If already defined from sysfs, don't run dmidecode
