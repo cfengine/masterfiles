@@ -28,8 +28,13 @@ bundle agent test
       "description" -> { "ENT-5866" }
         string => "Test that set_line_based works when a file exists and edit_defaults.empty_file_before_editing is true.";
 
+      "test_skip_unsupported"
+        string => "cfengine_3_15|cfengine_3_12|cfengine_3_10",
+        comment => "The fix for this ticket was only back ported as far back as 3.18.x",
+        meta => { "ENT-5866" };
+
       "test_soft_fail"
-        string => "cfengine_3_18|cfengine_3_15|cfengine_3_12|cfengine_3_10",
+        string => "cfengine_3_18",
         meta => { "ENT-5866" };
 
   vars:
