@@ -19,17 +19,24 @@ matrix:
       script:
         - sudo ./travis-scripts/valgrind.sh
 
+    # NOTE: In stable branches aka LTS series (e.g. 3.18.x, 3.15.x) we do not test against binaries that are /newer/.
+    #       - General advice is that you should run MPF version at or newer than your binary version.
+    #       - When upgrading, MPF should be upgraded /before/ binaries.
+    #       - Fixes come to a stable branch /after/ having gone through master.
+    #       - master is expected to be tested against all currently supported series.
+    #       - A stable branch should be tested against all versions that were supported at the time when the stable branch was born.
+    #         - e.g. When 3.18.0 was released 3.12.x was supported, so the 3.18.x branch should be tested against 3.12.x binaries in perpetuity.
+
     # JOB 2
-    - env: CF_VERSION=master
-      install:
-        - sudo apt update
-        - sudo apt -y install python3
-        - sudo apt -y install python3-pip
-        - sudo pip3 install cf-remote
-        - BRANCH=$CF_VERSION
-        - PKG_URL=`cf-remote --version $BRANCH list ubuntu20 agent | tail -n 1`
-        - wget $PKG_URL
-        - sudo dpkg -i ./$(basename ${PKG_URL})
+    - env: CF_VERSION=3.18.x
+      addons:
+        apt:
+          sources:
+            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+              key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+          packages:
+            - cfengine-community=3.18.*
+
 
     # JOB 3
     - env: CF_VERSION=3.15.x
