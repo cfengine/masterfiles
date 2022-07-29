@@ -19,17 +19,28 @@ matrix:
       script:
         - sudo ./travis-scripts/valgrind.sh
 
+    # JOB
+    # - env: CF_VERSION=master
+    #   install:
+    #     - sudo apt update
+    #     - sudo apt -y install python3
+    #     - sudo apt -y install python3-pip
+    #     - sudo pip3 install cf-remote
+    #     - BRANCH=$CF_VERSION
+    #     - PKG_URL=`cf-remote --version $BRANCH list ubuntu20 agent | tail -n 1`
+    #     - wget $PKG_URL
+    #     - sudo dpkg -i ./$(basename ${PKG_URL})
+
     # JOB 2
-    - env: CF_VERSION=master
-      install:
-        - sudo apt update
-        - sudo apt -y install python3
-        - sudo apt -y install python3-pip
-        - sudo pip3 install cf-remote
-        - BRANCH=$CF_VERSION
-        - PKG_URL=`cf-remote --version $BRANCH list ubuntu20 agent | tail -n 1`
-        - wget $PKG_URL
-        - sudo dpkg -i ./$(basename ${PKG_URL})
+    - env: CF_VERSION=3.18.x
+      addons:
+        apt:
+          sources:
+            - sourceline: "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main"
+              key_url: https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+          packages:
+            - cfengine-community=3.18.*
+
 
     # JOB 3
     - env: CF_VERSION=3.15.x
