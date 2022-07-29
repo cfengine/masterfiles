@@ -29,7 +29,7 @@ bundle agent test
         string => "Test that set_line_based works when a file exists and edit_defaults.empty_file_before_editing is true.";
 
       "test_soft_fail"
-        string => "cfengine_3_18|cfengine_3_15|cfengine_3_12|cfengine_3_10",
+        string => "cfengine_3_15|cfengine_3_18_0|cfengine_3_18_1|cfengine_3_18_2",
         meta => { "ENT-5866" };
 
   vars:
