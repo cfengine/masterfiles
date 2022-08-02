@@ -1,6 +1,6 @@
 body file control
 {
-    services_autorun::
+    services_autorun|services_autorun_inputs::
       inputs => { @(services_autorun.found_inputs) };
 }
 
