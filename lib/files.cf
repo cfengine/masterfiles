@@ -779,7 +779,7 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
 @endif
 
 @if minimum_version(3.18)
-    !(cfengien_3_18_0|cfengine_3_18_1|cfengine_3_18_2)::
+    !(cfengine_3_18_0|cfengine_3_18_1|cfengine_3_18_2)::
       "exists_$(ci[$(i)])"
         expression => regline("^\s*($(i)$(bp).*|$(i))$",
                               $(edit.filename)),
