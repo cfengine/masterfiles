@@ -336,7 +336,16 @@ bundle common services_autorun
         ifvarclass => "!services_autorun";
 
       "DEBUG $(this.bundle): Services Autorun Enabled"
-        ifvarclass => "services_autorun";
+        if => "services_autorun";
+
+      "DEBUG $(this.bundle): Services Autorun Bundles Enabled"
+        if => "services_autorun_bundles";
+
+      "DEBUG $(this.bundle): Services Autorun Inputs Enabled"
+        if => "services_autorun_inputs";
+
+      "DEBUG $(this.bundle): Services Autorun (Bundles & Inputs) Enabled"
+        if => "services_autorun_inputs.services_autorun_bundles";
 
       "DEBUG $(this.bundle): adding input='$(inputs)'"
         ifvarclass => isvariable("inputs");
