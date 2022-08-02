@@ -778,7 +778,15 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
       unless => strcmp( "true", $(edit.empty_before_use) );
 @endif
 
-    (cfengine_3_15|cfengine_3_16|cfengine_3_17|cfengine_3_18|cfengine_3_19|cfengine_3_20)::
+@if minimum_version(3.18)
+    !(cfengine_3_18_0|cfengine_3_18_1|cfengine_3_18_2)::
+      "exists_$(ci[$(i)])"
+        expression => regline("^\s*($(i)$(bp).*|$(i))$",
+                              $(edit.filename)),
+        unless => strcmp( "true", $(edit.empty_before_use) );
+@endif
+
+    (cfengine_3_15|cfengine_3_16|cfengine_3_17|cfengine_3_18_0|cfengine_3_18_1|cfengine_3_18_2|cfengine_3_19|cfengine_3_20)::
       # Version 3.15.0 does not know about the before_version macro, so we keep the same behavior
       # TODO Remove after 3.21 is no longer supported. (3.15.0 was supported when 3.21 was released)
       # Check to see if this line exists
