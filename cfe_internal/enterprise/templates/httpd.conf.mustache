@@ -13,7 +13,6 @@ PidFile "{{{vars.sys.workdir}}}/httpd/httpd.pid"
 # Find built modules in {{{vars.sys.workdir}}}/httpd/modules
 
 LoadModule authn_file_module modules/mod_authn_file.so
-LoadModule authz_dbm_module modules/mod_authz_dbm.so
 
 # Our default log format uses features provided by these modules
 LoadModule log_config_module modules/mod_log_config.so
