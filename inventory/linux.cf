@@ -8,7 +8,7 @@ bundle common inventory_linux
 {
   vars:
     have_proc_device_tree::
-      "_model_path" strig => "/proc/device-tree/model";
+      "_model_path" string => "/proc/device-tree/model";
       "proc_device_tree_model" string => readfile("$(_model_path)"),
         if => fileexists("$(_model_path)"),
         comment => "Read model from $(_model_path) because it's not available from DMI",
