@@ -19,12 +19,17 @@ bundle common inventory_linux
       "os_release_version" string => canonify("$(version_array[1])");
 
     have_proc_device_tree::
-      "proc_device_tree_model" string => readfile("/proc/device-tree/model"),
-      comment => "Read model from /proc/device-tree",
-      meta => { "inventory", "attribute_name=System version" };
+      "_model_path" string => "/proc/device-tree/model";
+      "proc_device_tree_model" string => readfile("$(_model_path)"),
+        if => fileexists("$(_model_path)"),
+        comment => "Read model from $(_model_path) because it's not available from DMI",
+        meta => { "inventory", "attribute_name=System version" };
 
-      "proc_device_tree_serial_number" string => readfile("/proc/device-tree/serial-number"),
-      meta => { "inventory", "attribute_name=System serial number" };
+      "_serial_number_path" string => "/proc/device-tree/serial-number";
+      "proc_device_tree_serial_number" string => readfile("$(_serial_number_path)"),
+        if => fileexists("$(_serial_number_path)"),
+        comment => "Read serial number from $(_serial_number_path) because it's not available from DMI",
+        meta => { "inventory", "attribute_name=System serial number" };
 
 
     has_proc_1_cmdline::
