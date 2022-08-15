@@ -9,12 +9,17 @@
 body server control
 # @brief Control attributes for cf-serverd
 {
-      # List of ciphers the server accepts. For Syntax help see man page
-      # for "openssl ciphers". Default is "AES256-GCM-SHA384:AES256-SHA"
-      #allowciphers          => "AES256-GCM-SHA384:AES256-SHA";
+      # List of ciphers the server accepts. For Syntax help see man page for
+      # "openssl-ciphers" (man:openssl-ciphers(1ssl)). The 'TLS_'-prefixed
+      # ciphers are for TLS 1.3 and later.
+      #
+      # Default:
+      #allowciphers          => "AES256-GCM-SHA384:AES256-SHA:TLS_AES_256_GCM_SHA384";
 
       # Minimum required version of TLS. Set to "1.0" if you need clients
       # running CFEngine in a version lower than 3.7.0 to connect.
+      #
+      # Default:
       #allowtlsversion => "1.1";
 
       # List of hosts that may connect (change the ACL in def.cf)
