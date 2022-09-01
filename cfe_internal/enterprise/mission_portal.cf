@@ -172,6 +172,15 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
       "validate_config"
         string => "$(sys.workdir)/httpd/bin/httpd -t -f $(staged_config)";
 
+      # The location of the apache pid file moved from httpd/logs/httpd.pid to
+      # httpd/httpd.pid in 3.15.5, 3.18.1 and, 3.19.0
+
+      "httpd_pid_file" -> { "ENT-7966" }
+        string => ifelse( classmatch( "cfengine_3_1[0-4]" ), "httpd/logs/httpd.pid",
+                          classmatch( "cfengine_3_15_[0-4]" ), "httpd/logs/httpd.pid",
+                          "cfengine_3_18_0", "httpd/logs/httpd.pid",
+                          "httpd/httpd.pid" );
+
   files:
 
     "$(config)"
@@ -181,7 +190,8 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
     "$(config)"
       copy_from => local_dcp( $(staged_config) ),
-      if => and( "apache_stop_after_new_staged_config_repaired",
+      if => and( or( "apache_stop_after_new_staged_config_repaired",
+                     not( fileexists( "$(httpd_pid_file)" ) )),
                  returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell")),
       classes => results("bundle", "mission_portal_apache_config"),
       comment => "We make sure that the deployed config is a copy of the staged
@@ -195,7 +205,8 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
         args => "stop",
         if => and( returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
-                   isnewerthan( $(staged_config), $(config) ) ),
+                   isnewerthan( $(staged_config), $(config) ),
+                   fileexists( "$(httpd_pid_file)" ) ),
         contain => in_shell,
         classes => results( "bundle", "apache_stop_after_new_staged_config" ),
         comment => concat( "We have to stop apache before trying to start with a",
