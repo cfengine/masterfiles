@@ -9,7 +9,7 @@ body common control
 bundle agent init
 {
   meta:
-    "test_skip_needs_work" string => "solaris|suse";
+    "test_skip_needs_work" string => "(solaris|suse)|(!x86_64)";
 
   files:
     test_pass_1::
