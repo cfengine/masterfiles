@@ -96,6 +96,13 @@ bundle agent config
                        strcmp( "push_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
 
     am_feeder::
+      # List of superhub hostkeys for use with dump process
+      "superhubs[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][hostkey])",
+          if => and( strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" ),
+                     strcmp( "superhub", "$(data[remote_hubs][$(remotes)][role])" ),
+                     strcmp( "pull_over_rsync", "$(data[remote_hubs][$(remotes)][transport][mode])"));
+      "superhub_hostkeys" string => join(" ", getvalues(superhubs));
+
       # Public key(s) of enabled pulling superhub(s) need(s) to be trusted (on a feeder)
       "pubkey[$(remotes)]" string => "$(data[remote_hubs][$(remotes)][transport][ssh_pubkey])",
             if => and( strcmp( "on", "$(data[remote_hubs][$(remotes)][target_state])" ),
@@ -442,6 +449,10 @@ bundle agent federation_manage_files
       string => "$(cfengine_enterprise_federation:config.transport_user)";
     "login" data => parsejson('{"login":"$(cfengine_enterprise_federation:config.login)"}');
     "feeder_username" data => parsejson('{"feeder_username":"$(cfengine_enterprise_federation:config.transport_user)"}');
+    "superhub_hostkeys" string => ifelse( isvariable("cfengine_enterprise_federation:config.superhub_hostkeys"),
+                                        "$(cfengine_enterprise_federation:config.superhub_hostkeys)",
+                                        "" );
+    "this_hostkey" data => parsejson('{"this_hostkey":"$(default:sys.key_digest)"}');
     "feeder" data => parsejson('{"feeder": "$(sys.key_digest)"}');
     "cf_version" data => parsejson('{"cf_version":"$(sys.cf_version)"}');
     "workdir" data => parsejson('{"workdir":"$(sys.workdir)"}');
@@ -509,6 +520,8 @@ bundle agent federation_manage_files
         template_data => mergedata(@(login),
                                    @(feeder_username),
                                    @(feeder),
+                                   parsejson('{"superhub_hostkeys": "$(superhub_hostkeys)"}'),
+                                   @(this_hostkey),
                                    @(cf_version),
                                    @(handle_duplicates),
                                    parsejson('{"inventory_refresh_cmd": ""}')),

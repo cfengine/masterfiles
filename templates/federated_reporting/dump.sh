@@ -20,6 +20,7 @@ true "${CFE_FR_COMPRESSOR_EXT?undefined}"
 true "${CFE_FR_FEEDER?undefined}"
 true "${CFE_FR_TABLES?undefined}"
 true "${CFE_FR_FEEDER_USERNAME?undefined}"
+true "${CFE_FR_SUPERHUB_HOSTKEYS?undefined}"
 
 mkdir -p "$CFE_FR_DUMP_DIR"
 mkdir -p "$CFE_FR_TRANSPORT_DIR"
@@ -76,3 +77,11 @@ else
   mv "$in_progress_file" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
   chown "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
 fi
+
+log "Linking for superhub(s): $CFE_FR_SUPERHUB_HOSTKEYS"
+for superhub_hostkey in $CFE_FR_SUPERHUB_HOSTKEYS; do
+  mkdir -p "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey"
+  ln "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT" "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey/"
+  chown -R "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey"
+done
+log "Linking for superhub(s): DONE"
