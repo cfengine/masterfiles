@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-bundle agent mpf_main
+bundle agent mpf_main         
 # User Defined Service Catalogue
 {
   methods:
