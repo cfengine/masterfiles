@@ -33,21 +33,27 @@ feeder="$1"
 
 mkdir -p "$feeder"
 
-"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "test -e $CFE_FR_TRANSPORT_DIR/$CFE_FR_THIS_HOSTKEY/*.sql.$CFE_FR_COMPRESSOR_EXT" ||
+REMOTE_DIR="$CFE_FR_TRANSPORT_DIR/$CFE_FR_THIS_HOSTKEY"
+"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "test -d $REMOTE_DIR" ||
+  {
+    REMOTE_DIR="$CFE_FR_TRANSPORT_DIR"
+    log "Trying fallback dump directory $REMOTE_DIR. Upgrade masterfiles on feeder to enable multiple superhubs pulling from one feeder."
+  }
+"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "test -e $REMOTE_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT" ||
   {
     log "No files to transport."
     exit 0
   }
 
 # move the files so that they don't get overwritten/deleted during the transport
-"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "mkdir $CFE_FR_TRANSPORT_DIR/$CFE_FR_THIS_HOSTKEY/$$.transporting"
-"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "mv $CFE_FR_TRANSPORT_DIR/$CFE_FR_THIS_HOSTKEY/*.sql.$CFE_FR_COMPRESSOR_EXT $CFE_FR_TRANSPORT_DIR/$CFE_FR_THIS_HOSTKEY/$$.transporting/"
+"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "mkdir $REMOTE_DIR/$$.transporting"
+"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "mv $REMOTE_DIR/*.sql.$CFE_FR_COMPRESSOR_EXT $REMOTE_DIR/$$.transporting/"
 
 failed=0
-"$CFE_FR_TRANSPORTER" $CFE_FR_TRANSPORTER_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}:/$CFE_FR_TRANSPORT_DIR/$CFE_FR_THIS_HOSTKEY/$$.transporting/*.sql.$CFE_FR_COMPRESSOR_EXT" "$feeder/" ||
+"$CFE_FR_TRANSPORTER" $CFE_FR_TRANSPORTER_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}:/$REMOTE_DIR/$$.transporting/*.sql.$CFE_FR_COMPRESSOR_EXT" "$feeder/" ||
   failed=1
 
-"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "rm -rf $CFE_FR_TRANSPORT_DIR/$CFE_FR_THIS_HOSTKEY/$$.transporting"
+"$CFE_FR_SSH" $CFE_FR_SSH_ARGS "$CFE_FR_FEEDER_USERNAME@${feeder}" "rm -rf $REMOTE_DIR/$$.transporting"
 
 if [ "$failed" != "0" ]; then
   touch "$feeder.failed"
