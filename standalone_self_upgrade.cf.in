@@ -498,6 +498,7 @@ bundle common cfengine_package_names
       "pkg[ubuntu_14_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu14_amd64.deb";
       "pkg[ubuntu_16_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu16_amd64.deb";
       "pkg[ubuntu_18_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu18_amd64.deb";
+      "pkg[ubuntu_20_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu20_amd64.deb";
 
       # 32bit DEBs
 
@@ -574,6 +575,7 @@ bundle agent cfengine_master_software_content
       "dir[ubuntu_14_x86_64]" string => "agent_ubuntu14_x86_64";
       "dir[ubuntu_16_x86_64]" string => "agent_ubuntu16_x86_64";
       "dir[ubuntu_18_x86_64]" string => "agent_ubuntu18_x86_64";
+      "dir[ubuntu_20_x86_64]" string => "agent_ubuntu20_x86_64";
 
       # All 32bit debs use the same package
       "_deb_dists" slist => { "debian_4", "debian_5", "debian_6",
