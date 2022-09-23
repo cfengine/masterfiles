@@ -1,0 +1,42 @@
+on:
+  workflow_call
+
+jobs:
+  acceptance_tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: masterfiles
+      - name: Checkout Core
+        uses: actions/checkout@v3
+        with:
+          repository: cfengine/core
+          path: core
+          ref: ${{ github.base_ref }}
+      - name: Install CFEngine with cf-remote
+        run: |
+          pip3 install cf-remote
+          cf-remote --version master install --clients localhost
+      - name: Run autotools / configure
+        run: |
+          INSTDIR=$HOME/cf_install
+          export INSTDIR
+          cd masterfiles
+          ./autogen.sh --enable-debug --prefix=$INSTDIR
+          cd ..
+      - name: Install Masterfiles
+        run: make -C masterfiles install
+      - name: Validate policy with cf-promises
+        run: |
+          INSTDIR=$HOME/cf_install
+          export INSTDIR
+          /var/cfengine/bin/cf-promises --version
+          /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/update.cf
+          /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/promises.cf
+          /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/standalone_self_upgrade.cf
+      - name: Run tests
+        run: |
+          export BINDIR=/var/cfengine/bin # which testall will pickup and use
+          make -C masterfiles -j1 check
