@@ -15,7 +15,7 @@ on:
 
 jobs:
   style_check:
-    uses: cfengine/masterfiles/.github/workflows/style_check.yml
+    uses: ./github/workflows/style_check.yml
   tests:
     needs: style_check
-    uses: cfengine/masterfiles/.github/workflows/tests.yml
+    uses: ./github/workflows/tests.yml
