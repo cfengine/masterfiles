@@ -493,6 +493,7 @@ bundle common cfengine_package_names
       "pkg[debian_8_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian8_amd64.deb";
       "pkg[debian_9_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian9_amd64.deb";
       "pkg[debian_10_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian10_amd64.deb";
+      "pkg[debian_11_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian11_amd64.deb";
 
       # 64bit Ubuntu
       "pkg[ubuntu_14_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu14_amd64.deb";
@@ -570,6 +571,7 @@ bundle agent cfengine_master_software_content
       "dir[debian_8_x86_64]" string => "agent_debian8_x86_64";
       "dir[debian_9_x86_64]" string => "agent_debian9_x86_64";
       "dir[debian_10_x86_64]" string => "agent_debian10_x86_64";
+      "dir[debian_11_x86_64]" string => "agent_debian11_x86_64";
 
       # Ubuntu
       "dir[ubuntu_14_x86_64]" string => "agent_ubuntu14_x86_64";
