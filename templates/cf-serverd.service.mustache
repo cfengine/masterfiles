@@ -1,7 +1,7 @@
 [Unit]
 Description=CFEngine Enterprise file server
 After=syslog.target
-After=network.target
+After=network-online.target
 ConditionPathExists={{{vars.sys.bindir}}}/cf-serverd
 ConditionPathExists={{{vars.sys.workdir}}}/policy_server.dat
 ConditionPathExists={{{vars.sys.default_policy_path}}}
@@ -14,5 +14,5 @@ Restart=always
 RestartSec=10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=network-online.target
 WantedBy=cfengine3.service
