@@ -361,7 +361,21 @@ bundle agent cfe_autorun_inventory_proc
 # `ifconfig`.
 {
   vars:
-      "basefiles" slist => { "consoles", "cpuinfo", "modules", "partitions", "version" };
+      # To override this set of base files, define default:cfe_autorun_inventory_proc.basefiles via augments.
+      # {
+      #   "variables": {
+      #                  "default:cfe_autorun_inventory_proc.basefiles" : {
+      #                          "value": [ "consoles", "cpuinfo", "version" ],
+      #                          "comment": "We do not need the extra variables this produces since we get the info differently",
+      #                          "tags": [ "inventory", "attribute_name=My Inventory" ]
+      #                  }
+      #   }
+      # }
+
+      "basefiles" -> { "CFE-4056" }
+        slist => { "consoles", "cpuinfo", "modules", "partitions", "version" },
+        unless => isvariable( "$(this.namespace):$(this.bundle).basefiles" );
+
       "files[$(basefiles)]" string => "$(inventory_control.proc)/$(basefiles)";
 
     _have_proc_consoles::
