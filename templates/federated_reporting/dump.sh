@@ -78,10 +78,12 @@ else
   chown "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
 fi
 
-log "Linking for superhub(s): $CFE_FR_SUPERHUB_HOSTKEYS"
-for superhub_hostkey in $CFE_FR_SUPERHUB_HOSTKEYS; do
-  mkdir -p "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey"
-  ln "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT" "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey/"
-  chown -R "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey"
-done
-log "Linking for superhub(s): DONE"
+if [ -n "$CFE_FR_SUPERHUB_HOSTKEYS" ]; then
+  log "Linking for superhub(s): $CFE_FR_SUPERHUB_HOSTKEYS"
+  for superhub_hostkey in $CFE_FR_SUPERHUB_HOSTKEYS; do
+    mkdir -p "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey"
+    ln "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT" "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey/"
+    chown -R "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$superhub_hostkey"
+  done
+  log "Linking for superhub(s): DONE"
+fi
