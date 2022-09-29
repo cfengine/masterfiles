@@ -554,6 +554,35 @@ For example:
 **History:**
 - Introduced 3.13.0, 3.12.1, 3.10.5
 
+### Configure proc inventory
+
+By default the MPF inventories `consoles`, `cpuinfo`, `modules`, `partitions`, and `version` from `/proc`.
+This can be adjusted by defining `default:cfe_autorun_inventory_proc.basefiles`.
+
+For example:
+
+```json
+{
+  "variables": {
+    "default:cfe_autorun_inventory_proc.basefiles": {
+      "value": [
+        "consoles",
+        "cpuinfo",
+        "version"
+      ],
+      "comment": "We do not need the extra variables this produces since we get the info differently",
+      "tags": [
+        "Custom override MPF default"
+      ]
+    }
+  }
+}
+```
+
+**History:**
+
+* Added 3.21.0
+
 ### mailto
 
 The address that `cf-execd` should email agent output to.
