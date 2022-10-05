@@ -41,7 +41,6 @@ body executor control
       schedule => { @(def.control_executor_schedule_value) };
 
       # The full path and command to the executable run by default (overriding builtin).
-      # cf-twin needs its own safe environment because of the update mechanism
 
     windows::
       exec_command => "$(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated";
