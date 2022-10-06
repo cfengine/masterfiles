@@ -138,6 +138,7 @@ bundle common paths
       "path[timedatectl]"    string => "/usr/bin/timedatectl";
 
     linux::
+      "path[date]"          string => "/usr/bin/date";
       "path[lsattr]"        string => "/usr/bin/lsattr";
       "path[lsmod]"         string => "/sbin/lsmod";
       "path[tar]"           string => "/bin/tar";
