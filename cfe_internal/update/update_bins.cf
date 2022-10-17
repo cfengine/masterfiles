@@ -87,14 +87,14 @@ bundle agent cfe_internal_update_bins
 
     (solarisx86|solaris).enterprise::
 
-      "novapkg"                 string => "CFEcfengine-nova",
+      "novapkg"                 string => "cfengine-nova",
       comment => "Name convention of Nova package on Solaris",
       handle => "cfe_internal_update_bins_vars_novapkg_solaris",
       if => "nova_edition";
 
     aix.enterprise::
 
-      "novapkg"                 string => "cfengine.cfengine-nova",
+      "novapkg"                 string => "cfengine-nova",
       comment => "Name convention of Nova package on AIX",
       handle => "cfe_internal_update_bins_vars_novapkg_aix",
       if => "nova_edition";
@@ -602,12 +602,9 @@ body package_method u_generic(repo)
       package_name_convention    => "$(name)-$(version).bff";
       package_delete_convention  => "$(name)";
 
-      package_add_command        => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IqacgXNY -d $(repo) cfengine.cfengine-nova$";
-      package_update_command     => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IqacgXNY -d $(repo) cfengine.cfengine-nova$";
+      package_add_command        => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IqacgXNY -d $(repo) cfengine-nova$";
+      package_update_command     => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IqacgXNY -d $(repo) cfengine-nova$";
 
-      # package_add_command        => "/bin/sh -c /usr/sbin/inutoc $(repo) && /usr/sbin/installp -qacgXNYd $(repo) cfengine.cfengine-nova$";
-      # package_update_command     => "/bin/sh -c /usr/sbin/inutoc $(repo) && /usr/sbin/installp -qacgXNYd $(repo) cfengine.cfengine-nova$";
-
-      package_delete_command     => "/usr/sbin/installp -ug cfengine.cfengine-nova$";
+      package_delete_command     => "/usr/sbin/installp -ug cfengine-nova$";
 
 }
