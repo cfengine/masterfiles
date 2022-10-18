@@ -1,0 +1,35 @@
+##############################################################################
+#
+#  Test that expireafter works with custom promise types.
+#
+##############################################################################
+
+body common control
+{
+  inputs => { "../default.cf.sub" };
+  bundlesequence  => { "test" };
+  version => "1.0";
+}
+
+promise agent slow_append
+{
+  interpreter => "/usr/bin/python3";
+  path => "$(this.promise_dirname)/slow_append_promises.py";
+}
+
+##############################################################################
+
+body action timeout
+{
+  expireafter => "1";
+  ifelapsed => "0";
+}
+
+bundle agent test
+{
+  slow_append:
+      "$(G.testfile)"
+        seconds => "120",
+        content => "Hello CFEngine!",
+        action => timeout;
+}
