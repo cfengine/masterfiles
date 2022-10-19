@@ -93,12 +93,11 @@ bundle agent cfengine_software
       "pkg_edition_path" string => "community_binaries/Community-$(pkg_version)";
 
     aix::
-      "pkg_name" string => "cfengine.cfengine-nova";
+      "pkg_name" string => "cfengine-nova";
       "pkg_arch" string => "default";
 
-      # TODO ENT-3187
     solaris|solarisx86::
-      "pkg_name" string => "CFE.cfengine-nova";
+      "pkg_name" string => "cfengine-nova";
 
     (debian|ubuntu).64_bit::
 
@@ -975,9 +974,9 @@ body package_method u_generic(repo)
       # Redirecting the output to '/dev/null' below makes sure 'geninstall' has
       # its stdout open even if the 'cf-agent' process that started it
       # terminates (e.g. gets killed).
-        package_add_command        => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine.cfengine-nova > /dev/null$";
-        package_update_command     => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine.cfengine-nova > /dev/null$";
-        package_delete_command     => "/usr/sbin/installp -ug cfengine.cfengine-nova$";
+        package_add_command        => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine-nova > /dev/null$";
+        package_update_command     => "/usr/bin/rm -f $(repo)/.toc && /usr/sbin/geninstall -IacgXNY -d $(repo) cfengine-nova > /dev/null$";
+        package_delete_command     => "/usr/sbin/installp -ug cfengine-nova$";
 
       # Internal version comparison model doesn't work for W.X.Y.Z
         package_version_less_command => "$(sys.bindir)/rpmvercmp '$(v1)' lt '$(v2)'";

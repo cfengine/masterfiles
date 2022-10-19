@@ -232,7 +232,7 @@ bos.txt:bos.txt.tfs.data:7.1.0.0: : :C: :Text Formatting Services Data: : : : : 
 bos.wpars:bos.wpars:7.1.3.30: : :C: :AIX Workload Partitions : : : : : : :1:0:/:1441
 cdrtools.base:cdrtools.base:1.9.0.9: : :C: :CD/DVD recorder: : : : : : :1:0:/:
 cdrtools.man.en_US:cdrtools.man.en_US:1.9.0.9: : :C: :CD/DVD recorder man page documentation: : : : : : :1:0:/:
-cfengine.cfengine-nova:cfengine.cfengine-nova:3.7.0.0: : :C: :Cfengine Nova, Data Center Automation: : : : : : :0:0:/:
+cfengine-nova:cfengine-nova:3.7.0.0: : :C: :Cfengine Nova, Data Center Automation: : : : : : :0:0:/:
 clic.rte:clic.rte.kernext:4.10.0.1: : :C: :CryptoLite for C Kernel: : : : : : :1:0:/:
 clic.rte:clic.rte.lib:4.10.0.1: : :C: :CryptoLite for C Library: : : : : : :1:0:/:
 devices.artic960:devices.artic960.diag:7.1.0.0: : :C: :IBM ARTIC960 Adapter Diagnostics : : : : : : :1:0:/:1140
