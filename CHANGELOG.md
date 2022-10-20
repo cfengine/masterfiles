@@ -1,6 +1,41 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.18.3:
+	- Added inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
+	- Added date to known paths for linux (CFE-4069)
+	- Added fallback to top-level feeder dump directory (ENT-8936)
+	- Added self upgrade knowledge for Suse 12, 15 and opensuse leap 15
+	  (ENT-9209)
+	- Added self upgrade knowledge for debian 11 (ENT-9210)
+	- Added ssh in paths.cf so that policy writers can use $(paths.ssh)
+	  (CFE-4037)
+	- Added support for multiple superhubs per feeder (ENT-8936)
+	- Amazon Linux now uses --setopt-exit_on_lock=True in redhat_no_locking_knowledge
+	  (ENT-9057)
+	- Avoided error stopping apache when no pid file exists (ENT-9108)
+	- Fixed apt_get package module version comparison (CFE-3976)
+	- Fixed deleting multiple hosts with distributed cleanup utility
+	  (ENT-8979)
+	- Fixed directory in which windows agents source packages for upgrade
+	  (ENT-9010)
+	- Fixed services_autorun_inputs working independently from services_autorun
+	  (CFE-4017)
+	- Fixed set_line_based() for case when edit_defaults.empty_before_use is true
+	  (ENT-5866)
+	- Improves distributed_cleanup script for testing (ENT-8611)
+	- Made device-tree inventory quieter in containers (#2468) (ENT-9063)
+	- Renamed body depth_search u_infinate_client_policy to u_infinite_client_policy
+	  (ENT-9056)
+	- Stopped loading Apache modules on Enterprise Hubs by default:
+	- mod_auth_basic (ENT-8607)
+	- mod_authz_host (ENT-8602)
+	- mod_authz_owner (ENT-8706)
+	- mod_dbd (ENT-8609)
+	- on (ENT-9072)
+	- on (ENT-8605)
+	- Updated filename conventions for AIX and Solaris packages (ENT-9095)
+
 3.18.2:
 	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
 	  (ENT-8618)
