@@ -1,6 +1,21 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.15.7:
+	- Added date to known paths for linux (CFE-4069)
+	- Added ssh in paths.cf so that policy writers can use $(paths.ssh)
+	  (CFE-4037)
+	- Amazon Linux now uses --setopt-exit_on_lock=True in redhat_no_locking_knowledge
+	  (ENT-9057)
+	- Fix apt_get package module version comparison (CFE-3976)
+	- Stopped loading Apache modules on Enterprise Hubs by default:
+	- mod_auth_basic (ENT-8607)
+	- mod_authz_host (ENT-8602)
+	- mod_authz_owner (ENT-8706)
+	- mod_dbd (ENT-8609)
+	- mod_authn_file (ENT-9072)
+	- mod_authz_dbm (ENT-8605)
+
 3.15.6:
 	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
 	  (ENT-8618)
