@@ -23,7 +23,7 @@ Notable changes to the framework should be documented here
 	  (CFE-4017)
 	- Fixed set_line_based() for case when edit_defaults.empty_before_use is true
 	  (ENT-5866)
-	- Improves distributed_cleanup script for testing (ENT-8611)
+	- Improved distributed_cleanup script for testing (ENT-8611)
 	- Made device-tree inventory quieter in containers (#2468) (ENT-9063)
 	- Renamed body depth_search u_infinate_client_policy to u_infinite_client_policy
 	  (ENT-9056)
