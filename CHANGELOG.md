@@ -9,7 +9,7 @@ Notable changes to the framework should be documented here
 	  (ENT-9057)
 	- Fixed apt-get package module version comparison (CFE-3976)
 	- Stopped loading Apache modules on Enterprise Hubs by default:
-	  mod_auth_basic, mod_authz_host, mod_authz_owner, mod_dbd, 
+	  mod_auth_basic, mod_authz_host, mod_authz_owner, mod_dbd,
 	  mod_authn_file, mod_authz_dbm (ENT-8554)
 
 3.15.6:
