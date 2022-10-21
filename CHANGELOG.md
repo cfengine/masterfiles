@@ -7,14 +7,10 @@ Notable changes to the framework should be documented here
 	  (CFE-4037)
 	- Amazon Linux now uses --setopt-exit_on_lock=True in redhat_no_locking_knowledge
 	  (ENT-9057)
-	- Fix apt_get package module version comparison (CFE-3976)
+	- Fixed apt-get package module version comparison (CFE-3976)
 	- Stopped loading Apache modules on Enterprise Hubs by default:
-	- mod_auth_basic (ENT-8607)
-	- mod_authz_host (ENT-8602)
-	- mod_authz_owner (ENT-8706)
-	- mod_dbd (ENT-8609)
-	- mod_authn_file (ENT-9072)
-	- mod_authz_dbm (ENT-8605)
+	  mod_auth_basic, mod_authz_host, mod_authz_owner, mod_dbd, 
+	  mod_authn_file, mod_authz_dbm (ENT-8554)
 
 3.15.6:
 	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
