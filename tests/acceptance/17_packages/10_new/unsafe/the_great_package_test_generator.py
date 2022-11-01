@@ -116,10 +116,13 @@ body common control
 bundle agent init
 {
   meta:
+      # RHEL 9 may have similar issues as RHEL 8 and also issues where rpm -U --force
+      # has different behavior than previous releases: erases other architecture
+      # packages where earlier releases did not, so fails many tests.
       # RHEL 8 has broken DNF (upgrading a 32bit package also installs a 64bit
       # package)
-      "test_soft_fail" string => "rhel_8",
-        meta  => {"CFE-rhbz"};
+      "test_soft_fail" string => "rhel_8|rhel_9",
+        meta  => {"CFE-rhbz", "CFE-4096"};
 
   # For setting up the cfengine-selected-python symlink we want to
   # target $(sys.bindir) as that will be in the test WORKDIR.
