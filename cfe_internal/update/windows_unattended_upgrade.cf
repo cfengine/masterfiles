@@ -65,6 +65,28 @@ Taskkill /IM cf-serverd.exe /F
 Taskkill /IM cf-agent.exe /F
 set bat="$(sys.workdir)$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)msiexec.bat"
 echo File=$(cfengine_software.local_software_dir)$(const.dirsep)$(cfengine_package_names.my_pkg) | call %bat% file-install
+@echo off
+REM A failed install at this point can leave cf-execd not running leaving the host unable to try and self heal
+REM We at least want to try and start cf-execd if it is not running
+set TARGET_SERVICE=CfengineNovaExec
+set SERVICE_STATE=
+REM Surgically target third line, as some locales (such as Spanish) translate the output
+for /F "skip=3 tokens=3" %%i in ('""%windir%\system32\sc.exe" query "%TARGET_SERVICE%" 2>nul"') do (
+  if not defined SERVICE_STATE set SERVICE_STATE=%%i
+)
+rem Process result
+if not defined SERVICE_STATE (
+  echo ERROR: could not obtain service state!
+) else (
+  REM NOTE: values correspond to "SERVICE_STATUS.dwCurrentState"
+  REM https://msdn.microsoft.com/en-us/library/windows/desktop/ms685996(v=vs.85).aspx
+  if not %SERVICE_STATE%==4 (
+    echo WARNING: service is not running, attempting to start
+    net start "%TARGET_SERVICE%"
+  ) else (
+    echo INFORMATION: service is running
+  )
+)
 REM exit 0 so that scheduled task will not keep trying a failing situation
 REM looking at package module logs of one failure should help in debugging
 exit 0
