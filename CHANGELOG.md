@@ -29,6 +29,7 @@ Notable changes to the framework should be documented here
 	- Stopped loading Apache modules on Enterprise Hubs by default:
 	  mod_auth_basic, mod_authz_host, mod_authz_owner, mod_dbd (ENT-8554)
 	- Updated filename conventions for AIX and Solaris packages (ENT-9095)
+	- Added check to make sure cf-execd is running after attempting self upgrade on Windows (ENT-9573)
 
 3.18.2:
 	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
