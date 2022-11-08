@@ -11,6 +11,7 @@ Notable changes to the framework should be documented here
 	- Stopped loading Apache modules on Enterprise Hubs by default:
 	  mod_auth_basic, mod_authz_host, mod_authz_owner, mod_dbd,
 	  mod_authn_file, mod_authz_dbm (ENT-8554)
+	- Added check to make sure cf-execd is running after attempting self upgrade on Windows (ENT-9573)
 
 3.15.6:
 	- Added Enterprise Hub postgresql.conf to files monitored for diffs by default
