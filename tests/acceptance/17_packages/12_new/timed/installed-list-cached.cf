@@ -48,10 +48,10 @@ bundle agent check
                                         $(G.testfile), $(this.promise_filename));
   reports:
       "test_module.time.log: "
-        printfile => cat( "$(sys.workdir)/modules/packages/test_module.time.log" );
+        printfile => catty( "$(sys.workdir)/modules/packages/test_module.time.log" );
 }
 
-body printfile cat(file)
+body printfile catty(file)
 {
         file_to_print => "$(file)";
         number_of_lines => "inf";
