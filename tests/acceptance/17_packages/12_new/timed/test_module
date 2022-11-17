@@ -13,8 +13,10 @@ fi
 
 _dir=`dirname "$0"`
 module_dir=`cd "$_dir" && pwd -P`
+timelog="$module_dir/test_module.time.log"
 log="$module_dir/test_module.log"
 
+date >> "$timelog"
 echo "$1" >> "$log"
 
 

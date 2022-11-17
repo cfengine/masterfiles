@@ -30,6 +30,8 @@ bundle agent test
   commands:
       "$(sys.cf_agent) -D AUTO -f $(this.promise_filename).sub";
 
+      "$(G.date) >> $(sys.workdir)/modules/packages/test_module.time.log"
+        contain => in_shell;
       "$(G.echo) END-OF-AGENT-RUN--- >> $(sys.workdir)/modules/packages/test_module.log"
         contain => in_shell;
 }
@@ -44,4 +46,13 @@ bundle agent check
     test_pass_3::
       "any" usebundle => dcs_check_diff("$(sys.workdir)/modules/packages/test_module.log",
                                         $(G.testfile), $(this.promise_filename));
+  reports:
+      "test_module.time.log: "
+        printfile => cat( "$(sys.workdir)/modules/packages/test_module.time.log" );
+}
+
+body printfile cat(file)
+{
+        file_to_print => "$(file)";
+        number_of_lines => "inf";
 }
