@@ -595,6 +595,16 @@ The address that output mailed from `cf-execd` should come from.
 
 The SMTP server that `cf-execd` should use to send emails.
 
+### mailmaxlines
+
+The maximumm number of lines of output that `cf-execd` will email.
+
+**History:**
+
+* Added in CFEngine 3.22.0, 3.21.1, 3.18.4
+
+**See also:** [`maxmaillines`][cf-execd#maxmaillines]
+
 ### acl
 
 `def.acl` is a list of of network ranges that should be allowed to connect to cf-serverd. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed.
