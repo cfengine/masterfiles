@@ -47,6 +47,8 @@ bundle agent check
       "any" usebundle => dcs_check_diff("$(sys.workdir)/modules/packages/test_module.log",
                                         $(G.testfile), $(this.promise_filename));
   reports:
+      "test_module.log: "
+        printfile => catty( "$(sys.workdir)/modules/packages/test_module.log" );
       "test_module.time.log: "
         printfile => catty( "$(sys.workdir)/modules/packages/test_module.time.log" );
 }
