@@ -165,6 +165,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
   classes:
       "systemd_supervised"
         expression => returnszero("$(paths.systemctl) -q is-enabled cf-apache > /dev/null 2>&1", "useshell"),
+        action => default:immediate,
         if => fileexists( $(paths.systemctl) );
 
   vars:
@@ -174,6 +175,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
       # The location of the apache pid file moved from httpd/logs/httpd.pid to
       # httpd/httpd.pid in 3.15.5, 3.18.1 and, 3.19.0
+      # TODO Remove when 3.21 is EOL
 
       "httpd_pid_file" -> { "ENT-7966" }
         string => ifelse( classmatch( "cfengine_3_1[0-4]" ), "httpd/logs/httpd.pid",
@@ -190,6 +192,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
     "$(config)"
       copy_from => local_dcp( $(staged_config) ),
+      action => default:immediate,
       if => and( or( "apache_stop_after_new_staged_config_repaired",
                      not( fileexists( "$(httpd_pid_file)" ) )),
                  returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell")),
@@ -204,6 +207,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
     !systemd_supervised::
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
         args => "stop",
+        action => default:immediate,
         if => and( returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
                    isnewerthan( $(staged_config), $(config) ),
                    fileexists( "$(httpd_pid_file)" ) ),
@@ -223,6 +227,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
     systemd_supervised::
       "cf-apache"
         service_policy => "stop",
+        action => default:immediate,
         if => and( returnszero("$(validate_config) > /dev/null 2>&1 ", "useshell"),
                    isnewerthan( $(staged_config), $(config) ) ),
         classes => results( "bundle", "apache_stop_after_new_staged_config" ),
