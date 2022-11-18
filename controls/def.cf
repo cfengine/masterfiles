@@ -37,6 +37,10 @@ bundle common def
         string => "localhost",
         if => not(isvariable("smtpserver"));
 
+      "control_executor_mailmaxlines" -> { "ENT-9614" }
+        int => "30",
+        if => not( isvariable( "control_executor_mailmaxlines" ));
+
       # List here the IP masks that we grant access to on the server
 
       "acl"
