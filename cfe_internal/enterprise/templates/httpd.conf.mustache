@@ -147,7 +147,11 @@ LogLevel warn
 
   # TLS Compression should be disabled to avoid CRIME
   # https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-4929
-  SSLCompression off
+  # SSLCompression off
+  # As part of security hardening we minimize the features provided by OpenSSL.
+  # Case in point, we build openssl 3 without support for compression. As such,
+  # we do not explicitly disable SSL Compression beginning with CFEngine
+  # Enteprprise 3.21.0 as apache is unable to then validate the configuration.
 
   # This is not explicitly enabled to allow the requesting client the first
   # choice of support ciphers
