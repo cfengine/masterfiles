@@ -75,6 +75,7 @@ receive_request() {
 write_response() {
     echo "operation=$request_operation"
     echo "result=$response_result"
+    echo "result_classes=$response_classes"
     echo ""
 }
 
@@ -137,6 +138,7 @@ perform_operation() {
 }
 
 handle_request() {
+    response_classes=""
     reset_state         # 1. Reset global variables
     receive_request     # 2. Receive / parse an operation from agent
     perform_operation   # 3. Perform operation (validate, evaluate, terminate)
