@@ -27,7 +27,7 @@ do_evaluate() {
     else
         response_result="not_kept"
     fi
-    echo "result_classes=cp_$response_result"
+    response_classes="cp_$response_result"
 }
 
 . "$(dirname "$0")/cfengine.sh"
