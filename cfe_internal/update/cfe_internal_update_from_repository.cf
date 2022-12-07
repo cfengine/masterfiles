@@ -19,7 +19,9 @@ bundle agent cfe_internal_update_from_repository
       "Update staged masterfiles from VCS"
         usebundle => cfe_internal_masterfiles_stage,
         handle => "cfe_internal_update_from_repository_methods_masterfiles_fetch",
+        action => u_immediate,
         comment => "Grab the latest updates from upstream VCS repo before deploying masterfiles";
+
 }
 
 bundle agent cfe_internal_masterfiles_stage
@@ -29,7 +31,8 @@ bundle agent cfe_internal_masterfiles_stage
   commands:
       "$(update_def.dc_scripts)/masterfiles-stage.sh"
         classes => u_kept_successful_command_results("bundle", "masterfiles_deploy"),
-        handle => "masterfiles_update_stage";
+        handle => "masterfiles_update_stage",
+        action => u_immediate;
 
   reports:
     masterfiles_deploy_not_kept::

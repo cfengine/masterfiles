@@ -6,6 +6,7 @@ bundle agent cfe_internal_dc_workflow
       "Masterfiles from VCS"
         usebundle => cfe_internal_update_from_repository,
         handle => "cfe_internal_dc_workflow_methods_masterfiles_from_vcs",
+        action => u_immediate,
         comment => "Update masterfiles from upstream VCS automatically
                     for best OOTB Enterprise experience";
 }
