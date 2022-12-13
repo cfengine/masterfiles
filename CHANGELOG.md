@@ -1,6 +1,51 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.21.0:
+	- Add inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
+	- Added check to make sure cf-execd is running after attempting self upgrade on Windows
+	  (ENT-9573)
+	- Added date to known paths for linux (CFE-4069)
+	- Added fallback to top-level feeder dump directory (ENT-8936)
+	- Added self upgrade knowledge for Suse 12, 15 and opensuse leap 15
+	  (ENT-9209)
+	- Added self upgrade knowledge for debian 11 (ENT-9210)
+	- Added ssh in paths.cf so that policy writers can use $(paths.ssh)
+	  (CFE-4037)
+	- Added support for multiple superhubs per feeder (ENT-8936)
+	- Amazon Linux now uses --setopt-exit_on_lock=True in redhat_no_locking_knowledge
+	  (ENT-9057)
+	- Avoided error stopping apache when no pid file exists (ENT-9108)
+	- Disabled explicit setting for SSLCompression for Mission Portal Apache
+	  (ENT-8933)
+	- Fix deleting multiple hosts with distributed cleanup utility
+	  (ENT-8979)
+	- Fixed directory in which windows agents source packages for upgrade
+	  (ENT-9010)
+	- Fixed services_autorun_inputs working independently from services_autorun
+	  (CFE-4017)
+	- Fixed set_line_based() for case when edit_defaults.empty_before_use is true
+	  (ENT-5866)
+	- Improve distributed_cleanup script for testing (ENT-8611)
+	- Made it possible to cfbs add the masterfiles repository directly
+	  (ENT-8915)
+	- Made proc inventory configurable via Augments (CFE-4056)
+	- Make device-tree inventory quieter in containers (#2468) (ENT-9063)
+	- Stopped applying locks to masterfiles-stage (ENT-9625)
+	- Stopped loading Apache mod_auth_basic on Enterprise Hubs by default
+	  (ENT-8607)
+	- Stopped loading Apache mod_authz_host on Enterprise Hubs by default
+	  (ENT-8602)
+	- Stopped loading Apache mod_authz_owner on Enterprise Hubs by default
+	  (ENT-8706)
+	- Stopped loading Apache mod_dbd on Enterprise Hubs by default
+	  (ENT-8609)
+	- Stopped loading mod_authn_file on Enterprise Hubs by default
+	  (ENT-9072)
+	- Stoppped loading mod_authz_dbm on Enterprise Hubs by default
+	  (ENT-8605)
+	- Updated filename conventions for AIX and Solaris packages (ENT-9095)
+
 3.20.0:
 	- Renamed bundle agent main to bundle agent mpf_main (CFE-3947)
 	- Added prelink to paths.cf
