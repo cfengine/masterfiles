@@ -200,6 +200,20 @@ bundle agent cfe_internal_setup_knowledge
                     well take care of it separately",
         perms => mog("0550", "root", $(def.cf_apache_group) );
 
+      "$(cfe_internal_hub_vars.docroot)/ldap/." -> { "ENT-9693" }
+        comment => "The ldap directory and it's subdirectories need to be
+                    executable by cfapache",
+        perms => mog("0550", "root", $(def.cf_apache_group) );
+
+
+      "$(cfe_internal_hub_vars.docroot)/ldap/." -> { "ENT-9693" }
+        depth_search => recurse_ignore( "inf", "static" ),
+        file_select => dirs,
+        comment => "The ldap subdirectories need to be executable by cfapache,
+                    but ignore static here, it needs to be writeable as well,
+                    well take care of it separately",
+        perms => mog("0550", "root", $(def.cf_apache_group) );
+
       "$(cfe_internal_hub_vars.docroot)/api/." -> { "CFE-951" }
       depth_search => recurse_basedir("inf"),
       handle => "cfe_internal_setup_knowledge_files_doc_root_api",
