@@ -176,10 +176,10 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
       # httpd/httpd.pid in 3.15.5, 3.18.1 and, 3.19.0
 
       "httpd_pid_file" -> { "ENT-7966" }
-        string => ifelse( classmatch( "cfengine_3_1[0-4]" ), "httpd/logs/httpd.pid",
-                          classmatch( "cfengine_3_15_[0-4]" ), "httpd/logs/httpd.pid",
-                          "cfengine_3_18_0", "httpd/logs/httpd.pid",
-                          "httpd/httpd.pid" );
+        string => ifelse( classmatch( "cfengine_3_1[0-4]" ), "$(sys.workdir)/httpd/logs/httpd.pid",
+                          classmatch( "cfengine_3_15_[0-4]" ), "$(sys.workdir)/httpd/logs/httpd.pid",
+                          "cfengine_3_18_0", "$(sys.workdir)/httpd/logs/httpd.pid",
+                          "$(sys.workdir)/httpd/httpd.pid" );
 
   files:
 

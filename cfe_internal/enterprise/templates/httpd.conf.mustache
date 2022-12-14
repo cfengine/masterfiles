@@ -6,7 +6,7 @@ ServerTokens ProductOnly
 ServerName {{{vars.sys.fqhost}}}
 ServerRoot "{{{vars.sys.workdir}}}/httpd"
 Listen 80
-PidFile "{{{vars.sys.workdir}}}/httpd/httpd.pid"
+PidFile "{{{vars.mission_portal_apache_from_stage.httpd_pid_file}}}"
 
 # Modules
 # Note: Not all modules that are built are loaded.
