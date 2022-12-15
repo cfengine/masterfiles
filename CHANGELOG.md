@@ -19,7 +19,7 @@ Notable changes to the framework should be documented here
 	  (ENT-9057)
 	- Avoided error stopping apache when no pid file exists (ENT-9108)
 	- Disabled explicit setting for SSLCompression for Mission Portal Apache.
-	  OpenSSL3 does not provide compression capability, when enabled 
+	  OpenSSL3 does not provide compression capability, when enabled
 	  Apache will not start.
 	  (ENT-8933)
 	- Fixed deleting multiple hosts with distributed cleanup utility
@@ -35,7 +35,7 @@ Notable changes to the framework should be documented here
 	- Stopped applying locks to masterfiles-stage (ENT-9625)
 	- Stopped loading several Apache modules on Enterprise Hubs by default:
 	  mod_auth_basic, mod_authz_host, mod_authz_owner, mod_dbd,
-	  mod_authn_file, mod_authz_dbm (ENT-8607, ENT-8602, ENT-8706, 
+	  mod_authn_file, mod_authz_dbm (ENT-8607, ENT-8602, ENT-8706,
 	  ENT-8609, ENT-9072, ENT-8605)
 	- Updated filename conventions for AIX and Solaris packages (ENT-9095)
 	- Fixed detection of location for httpd.pid (ENT-9603)
