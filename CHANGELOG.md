@@ -5,6 +5,7 @@ Notable changes to the framework should be documented here
 	- Added inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
         - Added policy to enforce proper permissions on Mission Portal ldap directory (ENT-9693)
 	- Added check to make sure cf-execd is running after attempting self upgrade on Windows
+	- Added exception for ldap directory perms for settings.ldap.php (ENT-9697)
 	  (ENT-9573)
 	- Added date to known paths for linux (CFE-4069)
 	- Added fallback to top-level feeder dump directory (ENT-8936)
