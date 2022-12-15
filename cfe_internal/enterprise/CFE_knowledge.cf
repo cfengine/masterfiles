@@ -204,6 +204,7 @@ bundle agent cfe_internal_setup_knowledge
         comment => concat( "The ldap directory and it's subdirectories need to be",
                     "executable by cfapache" ),
         depth_search => recurse( "inf" ),
+        file_select => cfe_internal_docroot_perms,
         perms => mog("0550", "root", $(def.cf_apache_group) );
 
 
