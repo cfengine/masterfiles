@@ -2,7 +2,8 @@
 Notable changes to the framework should be documented here
 
 3.21.0:
-	- Add inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
+	- Added inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
+        - Added policy to enforce proper permissions on Mission Portal ldap directory (ENT-9693)
 	- Added check to make sure cf-execd is running after attempting self upgrade on Windows
 	  (ENT-9573)
 	- Added date to known paths for linux (CFE-4069)
@@ -16,9 +17,11 @@ Notable changes to the framework should be documented here
 	- Amazon Linux now uses --setopt-exit_on_lock=True in redhat_no_locking_knowledge
 	  (ENT-9057)
 	- Avoided error stopping apache when no pid file exists (ENT-9108)
-	- Disabled explicit setting for SSLCompression for Mission Portal Apache
+	- Disabled explicit setting for SSLCompression for Mission Portal Apache.
+	  OpenSSL3 does not provide compression capability, when enabled 
+	  Apache will not start.
 	  (ENT-8933)
-	- Fix deleting multiple hosts with distributed cleanup utility
+	- Fixed deleting multiple hosts with distributed cleanup utility
 	  (ENT-8979)
 	- Fixed directory in which windows agents source packages for upgrade
 	  (ENT-9010)
@@ -26,25 +29,15 @@ Notable changes to the framework should be documented here
 	  (CFE-4017)
 	- Fixed set_line_based() for case when edit_defaults.empty_before_use is true
 	  (ENT-5866)
-	- Improve distributed_cleanup script for testing (ENT-8611)
-	- Made it possible to cfbs add the masterfiles repository directly
-	  (ENT-8915)
 	- Made proc inventory configurable via Augments (CFE-4056)
-	- Make device-tree inventory quieter in containers (#2468) (ENT-9063)
+	- Make device-tree inventory quieter in containers (ENT-9063)
 	- Stopped applying locks to masterfiles-stage (ENT-9625)
-	- Stopped loading Apache mod_auth_basic on Enterprise Hubs by default
-	  (ENT-8607)
-	- Stopped loading Apache mod_authz_host on Enterprise Hubs by default
-	  (ENT-8602)
-	- Stopped loading Apache mod_authz_owner on Enterprise Hubs by default
-	  (ENT-8706)
-	- Stopped loading Apache mod_dbd on Enterprise Hubs by default
-	  (ENT-8609)
-	- Stopped loading mod_authn_file on Enterprise Hubs by default
-	  (ENT-9072)
-	- Stoppped loading mod_authz_dbm on Enterprise Hubs by default
-	  (ENT-8605)
+	- Stopped loading several Apache modules on Enterprise Hubs by default:
+	  mod_auth_basic, mod_authz_host, mod_authz_owner, mod_dbd,
+	  mod_authn_file, mod_authz_dbm (ENT-8607, ENT-8602, ENT-8706, 
+	  ENT-8609, ENT-9072, ENT-8605)
 	- Updated filename conventions for AIX and Solaris packages (ENT-9095)
+	- Fixed detection of location for httpd.pid (ENT-9603)
 
 3.20.0:
 	- Renamed bundle agent main to bundle agent mpf_main (CFE-3947)
