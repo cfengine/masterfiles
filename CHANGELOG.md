@@ -3,7 +3,7 @@ Notable changes to the framework should be documented here
 
 3.21.0:
 	- Added inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
-        - Added policy to enforce proper permissions on Mission Portal ldap directory (ENT-9693)
+ 	- Added policy to enforce proper permissions on Mission Portal ldap directory (ENT-9693)
 	- Added check to make sure cf-execd is running after attempting self upgrade on Windows
 	- Added exception for ldap directory perms for settings.ldap.php (ENT-9697)
 	  (ENT-9573)
@@ -39,6 +39,7 @@ Notable changes to the framework should be documented here
 	  ENT-8609, ENT-9072, ENT-8605)
 	- Updated filename conventions for AIX and Solaris packages (ENT-9095)
 	- Fixed detection of location for httpd.pid (ENT-9603)
+	- Added policy to manage permissions for php/runalerts-stamp (ENT-9703)
 
 3.20.0:
 	- Renamed bundle agent main to bundle agent mpf_main (CFE-3947)
