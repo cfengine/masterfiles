@@ -56,6 +56,16 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_dir_doc_root",
       perms => mog("0550", "root", $(def.cf_apache_group) );
 
+      "$(sys.workdir)/httpd/php" -> { "ENT-9703", "cfe_internal_setup_knowledge_dir_doc_root_runalerts_stamp" }
+        comment => "php directory needs to be accessible (execute) to cfapache",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_php",
+        perms => mog("0550", "root", $(def.cf_apache_group) );
+
+      "$(sys.workdir)/httpd/php/runalerts-stamp" -> { "ENT-9703" }
+        comment => "runalerts-stamp directory needs to be accessible (execute) to cfapache",
+        handle => "cfe_internal_setup_knowledge_dir_doc_root_runalerts_stamp",
+        perms => mog("0550", "root", $(def.cf_apache_group) );
+
       "$(cfe_internal_hub_vars.docroot)/vendor/." -> { "CFE-951" }
         comment => "The vendor directory and sub-directories contains dependencies from the code ignitor framework and the directories need to be searchable by the web server.",
         handle => "cfe_internal_setup_knowledge_dir_doc_root_vendor_dirs",
