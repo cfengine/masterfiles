@@ -40,6 +40,7 @@ Notable changes to the framework should be documented here
 	- Updated filename conventions for AIX and Solaris packages (ENT-9095)
 	- Fixed detection of location for httpd.pid (ENT-9603)
 	- Added policy to manage permissions for php/runalerts-stamp (ENT-9703)
+	- Ensured manual edits to httpd.conf are reverted (ENT-9686)
 
 3.20.0:
 	- Renamed bundle agent main to bundle agent mpf_main (CFE-3947)
