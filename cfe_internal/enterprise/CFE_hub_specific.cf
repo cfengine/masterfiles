@@ -744,7 +744,8 @@ bundle agent cfe_internal_enterprise_policy_analyzer
     enterprise_edition.policy_server::
 
       "analyzer_flagfile" string => "$(cfe_internal_hub_vars.docroot)/analyzer/pa.enabled";
-      "analyzer_dir" string => "/opt/cfengine/analyzer/policy/masterfiles";
+      "analyzer_base" string => "/opt/cfengine/analyzer";
+      "analyzer_dir" string => "$(analyzer_base)/policy/masterfiles";
       "analyzer_source" string => "$(sys.masterdir)";
 
       "exclude_files" -> { "ENT-7684" }
@@ -789,7 +790,7 @@ bundle agent cfe_internal_enterprise_policy_analyzer
          depth_search => recurse_with_base( inf ),
          file_select => default:ex_list( @(exclude_files) );
 
-      "$(analyzer_dir)/." -> { "CFE-951" }
+      "$(analyzer_base)/." -> { "CFE-951" }
         file_select => default:dirs,
         depth_search => recurse_with_base( inf ),
         perms => mog( "0450", "root", $(def.cf_apache_group) );
