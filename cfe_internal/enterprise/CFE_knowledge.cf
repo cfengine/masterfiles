@@ -360,22 +360,6 @@ bundle agent cfe_internal_setup_knowledge
                     web-server, then Mission Portal users will be unable to
                     upload custom action scripts.";
 
-      "/opt/cfengine/build/." -> { "ENT-9665" }
-        perms => mog("770", "root", $(def.cf_apache_group) ),
-        depth_search => recurse_with_base("inf"),
-        file_select => dirs,
-        comment => concat("Directories for build projects need to be owned by root",
-                   "so that cf-reactor can run git commands there, but also",
-                   "available to cfapache for access");
-
-      "/opt/cfengine/build/." -> { "ENT-9665" }
-        perms => mog("550", "root", $(def.cf_apache_group) ),
-        depth_search => recurse_with_base("inf"),
-        file_select => not_dir,
-        comment => concat("Files for build projects need to be owned by root",
-                   "so that cf-reactor can run git commands there, but also",
-                   "available to cfapache for access");
-
 }
 
 bundle agent cfe_internal_permissions
