@@ -1738,7 +1738,6 @@ body perms system_owned(mode)
 # ```
 {
       mode   => "$(mode)";
-      owners => { "root" };
 
 #+begin_ENT-951
 # Remove after 3.20 is not supported
@@ -1747,6 +1746,19 @@ body perms system_owned(mode)
         rxdirs => "false";
 @endif
 #+end
+
+    !windows::
+        owners => { "root" };
+
+    windows::
+
+      # NOTE: Setting owners will generate an error if the policy is not being
+      # executed as the user who's ownership is being targeted. While it seems
+      # that should typically be Administrator or SYSTEM, both are reported to
+      # result in errors by users, thus owners is currently omitted for Windows.
+
+      # ENT-9778
+      groups => { "Administrators" };
 
     freebsd|openbsd|netbsd|darwin::
       groups => { "wheel" };
