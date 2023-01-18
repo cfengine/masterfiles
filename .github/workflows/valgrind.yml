@@ -45,4 +45,4 @@ jobs:
           /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/promises.cf
           /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/standalone_self_upgrade.cf
       - name: Run valgrind.sh
-        run: sudo bash -x masterfiles/travis-scripts/valgrind.sh
+        run: sudo bash -x masterfiles/.github/workflows/valgrind.sh
