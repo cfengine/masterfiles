@@ -19,3 +19,6 @@ jobs:
   tests:
     needs: style_check
     uses: ./.github/workflows/tests.yml
+  valgrind:
+    needs: style_check
+    uses: ./.github/workflows/valgrind.yml
