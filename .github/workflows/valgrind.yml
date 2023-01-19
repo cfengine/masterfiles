@@ -1,0 +1,48 @@
+on:
+  workflow_call
+
+jobs:
+  valgring_tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: masterfiles
+      - name: Checkout Core
+        uses: actions/checkout@v3
+        with:
+          repository: cfengine/core
+          path: core
+          ref: ${{ github.base_ref }}
+          submodules: recursive
+      - name: Install dependencies
+        run: sudo apt-get update -y && sudo apt-get install -y libssl-dev libpam0g-dev liblmdb-dev byacc curl libyaml-dev valgrind
+      # - name: Install CFEngine with cf-remote
+      #   run: |
+      #     pip3 install cf-remote
+      #     cf-remote --version master install --clients localhost
+      - name: build and install CFEngine core
+        run: |
+          ./autogen.sh --enable-debug --with-systemd-service
+          make -j8 CFLAGS="-Werror -Wall"
+          sudo make install
+        working-directory: core
+
+      - name: Run autotools / configure
+        run: |
+          cd masterfiles
+          ./autogen.sh --enable-debug
+          cd ..
+      - name: Install Masterfiles
+        run: sudo make -C masterfiles install
+      - name: Validate policy with cf-promises
+        run: |
+          INSTDIR=/var/cfengine
+          export INSTDIR
+          /var/cfengine/bin/cf-promises --version
+          /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/update.cf
+          /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/promises.cf
+          /var/cfengine/bin/cf-promises -c -I -f $INSTDIR/masterfiles/standalone_self_upgrade.cf
+      - name: Run valgrind.sh
+        run: sudo bash -x masterfiles/.github/workflows/valgrind.sh
