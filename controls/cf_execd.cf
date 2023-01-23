@@ -7,7 +7,8 @@
 ###############################################################################
 
 body executor control
-
+# @brief Settings that determine the behavior of `cf-execd`
+# @variable `default:def.control_executor_maxmaillines` - The maximumm number of lines of output that `cf-execd` will email.
 {
 
     any::
@@ -22,9 +23,10 @@ body executor control
 @endif
 
     cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
-      mailto     => "$(def.mailto)";
-      mailfrom   => "$(def.mailfrom)";
-      smtpserver => "$(def.smtpserver)";
+      mailto       => "$(def.mailto)";
+      mailfrom     => "$(def.mailfrom)";
+      smtpserver   => "$(def.smtpserver)";
+      mailmaxlines => "$(default:def.control_executor_mailmaxlines)";
 
       # Filter log entries in emails based on regular expressions.
       # mailfilter_include => { ".*include pattern.*" };
