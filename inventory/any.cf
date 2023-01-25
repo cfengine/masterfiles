@@ -16,6 +16,10 @@ bundle common inventory_any
         string => "$(data[releaseId])",
         meta => { "inventory", "attribute_name=Policy Release Id" };
 
+      "policy_version" -> { "ENT-9804" }
+        string => "$(default:control_common.version)",
+        meta => { "inventory", "attribute_name=CFEngine policy version" };
+
   reports:
       "DEBUG|DEBUG_$(this.bundle)"::
         "DEBUG $(this.bundle): Inventory Policy Release Id=$(id)";
