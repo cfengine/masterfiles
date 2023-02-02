@@ -134,8 +134,6 @@ bundle common inventory
 #
 # Inventory bundles are simply common bundles loaded before anything
 # else in promises.cf
-#
-# Tested to work properly against 3.5.x
 {
   classes:
       "other_unix_os" expression => "!(windows|macos|linux|freebsd|aix)";
