@@ -30,13 +30,13 @@ class MultilineInsertPromiseTypeModule(PromiseModule):
     def __init__(self):
         super().__init__("multiline_insert_promise_module", "0.0.1")
 
-    def validate_promise(self, promiser, attributes):
+    def validate_promise(self, promiser, attributes, meta):
         if ("lines" not in attributes or
             type(attributes["lines"]) not in (list, tuple) or
             any(type(item) != str for item in attributes["lines"])):
             raise ValidationError("'lines' attribute of type slist required")
 
-    def evaluate_promise(self, promiser, attributes):
+    def evaluate_promise(self, promiser, attributes, meta):
         dst = promiser
         lines = attributes["lines"]
         lines_str = "\n".join(lines)

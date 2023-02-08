@@ -31,12 +31,12 @@ class JsonInsertPromiseTypeModule(PromiseModule):
     def __init__(self):
         super().__init__("json_insert_promise_module", "0.0.1")
 
-    def validate_promise(self, promiser, attributes):
+    def validate_promise(self, promiser, attributes, meta):
         if ("json_data" not in attributes or
             type(attributes["json_data"]) != dict):
             raise ValidationError("'json_data' attribute of type data required")
 
-    def evaluate_promise(self, promiser, attributes):
+    def evaluate_promise(self, promiser, attributes, meta):
         dst = promiser
         data = attributes["json_data"]
         data_str = json.dumps(data)

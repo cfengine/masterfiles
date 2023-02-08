@@ -26,14 +26,14 @@ class NoopPromiseTypeModule(PromiseModule):
     def __init__(self):
         super().__init__("noop_promise_module", "0.0.1")
 
-    def validate_promise(self, promiser, attributes):
+    def validate_promise(self, promiser, attributes, meta):
         if "outcome" in attributes and type(attributes["outcome"]) != str:
             raise ValidationError(
                 "Attribute 'outcome' for promiser '%d' must be of type string"
                 % promiser
             )
 
-    def evaluate_promise(self, promiser, attributes):
+    def evaluate_promise(self, promiser, attributes, meta):
         assert type(promiser) == str
 
         if "outcome" in attributes:
