@@ -28,10 +28,10 @@ class CopyPromiseTypeModule(PromiseModule):
     def __init__(self):
         super().__init__("copy_promise_module", "0.0.1")
 
-    def validate_promise(self, promiser, attributes):
+    def validate_promise(self, promiser, attributes, meta):
         pass
 
-    def evaluate_promise(self, promiser, attributes):
+    def evaluate_promise(self, promiser, attributes, meta):
         dst = promiser
         src = attributes["from"]
         if os.path.exists(dst) and filecmp.cmp(src, dst):

@@ -29,10 +29,10 @@ class BodiesPromiseTypeModule(PromiseModule):
     def __init__(self):
         super().__init__("bodies_promise_module", "0.0.1")
 
-    def validate_promise(self, promiser, attributes):
+    def validate_promise(self, promiser, attributes, meta):
         pass
 
-    def evaluate_promise(self, promiser, attributes):
+    def evaluate_promise(self, promiser, attributes, meta):
         try:
             with open(promiser, "rw") as f:
                 if (json.dumps(attributes) == f.read()):

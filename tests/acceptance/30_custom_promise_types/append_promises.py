@@ -23,7 +23,7 @@ class AppendPromiseTypeModule(PromiseModule):
     def __init__(self):
         super().__init__("append_promise_module", "0.0.1")
 
-    def validate_promise(self, promiser, attributes):
+    def validate_promise(self, promiser, attributes, meta):
         if type(promiser) != str:
             raise ValidationError("Promiser must be of type string")
         if not "string" in attributes:
@@ -34,7 +34,7 @@ class AppendPromiseTypeModule(PromiseModule):
         if "always" in attributes and attributes["always"] not in ("true", "false"):
             raise ValidationError("Attribute 'always' must be either 'true' or 'false'")
 
-    def evaluate_promise(self, promiser, attributes):
+    def evaluate_promise(self, promiser, attributes, meta):
         assert "string" in attributes
 
         always = attributes.get("always", "false") == "true"
