@@ -1107,7 +1107,7 @@ While the agent itsef will reload its config upon notice of policy change this
 bundle specifically handles changes to variables used in the MPF which may come
 from external data sources which are unknown to the components themselves.
 
-Currently only `cf-serverd` and `cf-monitord` are handled. `cf-execd` is
+Currently only `cf-serverd`, `cf-monitord`, and `cf-hub` are handled. `cf-execd` is
 **NOT** automatically restarted.
 
 To enable this functionality define the class **`mpf_augments_control_enabled`**
