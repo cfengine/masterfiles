@@ -635,7 +635,8 @@ bundle agent postgres_config
                                      "\s*=\s*",
                                      ".*",
                                      ""),
-        classes => default:results( "bundle", "postgresql_conf" );
+        classes => default:results( "bundle", "postgresql_conf" ),
+        if => fileexists( "$(sys.statedir)/pg/data/postgresql.conf" );
 
   commands:
     am_superhub.postgresql_conf_repaired.!systemd::
