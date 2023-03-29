@@ -334,6 +334,11 @@ bundle agent cfe_internal_update_cmdb
 bundle agent cfe_internal_update_cmdb_data_distribution
 # @brief Ensure data is ready for agents to download
 {
+  classes:
+
+      "_have_cmdb_next_request_state_file" -> { "ENT-9933" }
+        expression => fileexists( "$(_cmdb_next_request_state_file)" );
+
   vars:
     !bootstrap_mode.(policy_server.enterprise_edition)::
 
@@ -342,6 +347,7 @@ bundle agent cfe_internal_update_cmdb_data_distribution
       "_cmdb_next_request_state_file"
         string => "$(sys.statedir)/cmdb_next_request_from.dat";
 
+    !bootstrap_mode.(policy_server.enterprise_edition._have_cmdb_next_request_state_file)::
       # If we have the timestamp from a previous response we use it, else we start from 0
       "_cmdb_previous_next_request_from"
         string => readfile( $(_cmdb_next_request_state_file), inf ),
@@ -351,6 +357,7 @@ bundle agent cfe_internal_update_cmdb_data_distribution
         string => "0",
         unless => regline( "^\d+$", $(_cmdb_next_request_state_file) );
 
+    !bootstrap_mode.(policy_server.enterprise_edition)::
       # We need a script to call that should return the API response
       "_get_cmdb_data_bin" string => "$(sys.workdir)/httpd/htdocs/scripts/get_cmdb.php";
       "_get_cmdb_data_cmd" string => "/var/cfengine/httpd/php/bin/php $(_get_cmdb_data_bin) $(_cmdb_previous_next_request_from)";
