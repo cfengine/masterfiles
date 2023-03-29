@@ -60,7 +60,8 @@ bundle agent cronjob(commands,user,hours,mins)
       # entering duplicate entries.
 
       "present_with_potentially_different_spacing"
-        expression => regline( "^$(e_mins)\s+$(e_hours)\s+\*\s+\*\s+\*\s+$(e_commands)", "$(crontab)/$(user)");
+        expression => regline( "^$(e_mins)\s+$(e_hours)\s+\*\s+\*\s+\*\s+$(e_commands)", "$(crontab)/$(user)"),
+        if => fileexists( "$(crontab)/$(user)" );
 
   files:
 
