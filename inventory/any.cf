@@ -62,8 +62,10 @@ bundle agent inventory_autorun
       handle => "cfe_internal_autorun_inventory_fstab";
 
     !disable_inventory_mtab::
-      "mtab" usebundle => cfe_autorun_inventory_mtab(),
-      handle => "cfe_internal_autorun_inventory_mtab";
+      "mtab" -> { "ENT-8338" }
+        usebundle => cfe_autorun_inventory_mtab(),
+        handle => "cfe_internal_autorun_inventory_mtab",
+        action => default:immediate;
 
     !disable_inventory_dmidecode::
       "dmidecode" usebundle => cfe_autorun_inventory_dmidecode(),
@@ -723,6 +725,10 @@ bundle agent cfe_aws_ec2_metadata_from_cache
 
 bundle agent cfe_autorun_inventory_mtab
 # @brief Do mtab inventory
+# @inventory `File system` - File system in use by active mounts
+# @inventory `Mount point` - Mount points that have active mounts
+# @class `have_mount_FSTYPE_MOUNTPOINT` - Namespace scoped class for each file system mount point. For example: `have_mount_ext4__var` for a `ext4` file system mounted at `/var`
+# @class `have_mount_FSTYPE` - if there is any mounted file system formatted with `ext4`
 #
 # The mtab format is simple: each line looks like this format:
 # `/dev/sda1 / ext4 rw,noatime,data=ordered 0 0` (in order: `DEV
@@ -733,14 +739,33 @@ bundle agent cfe_autorun_inventory_mtab
 {
   vars:
     have_mtab::
-      "mount_count" int =>  readstringarrayidx("mounts",
-                                               $(inventory_control.mtab),
-                                               "\s*#[^\n]*",
-                                               "\s+",
-                                               500,
-                                               50000);
+      "mounts"
+        meta => { "noreport" },
+        data => data_readstringarrayidx( $(inventory_control.mtab),
+                                         "\s*#[^\n]*",
+                                         "\s+",
+                                         inf,
+                                         inf);
+
+      "mount_count"
+        int => length( mounts );
 
       "idx" slist => getindices("mounts");
+
+      "inventory_mount_point[$(idx)]" -> { "ENT-8338" }
+        string => "$(mounts[$(idx)][1])",
+        meta => { "inventory", "attribute_name=Mount point" };
+
+      "inventory_mounted_fs[$(idx)]"
+        string => "$(mounts[$(idx)][2])",
+        meta => { "noreport" };
+
+      "slist_unique_fs_types"
+        slist => unique( sort( getvalues( inventory_mounted_fs ), lex ) );
+
+      "inventory_fs[$(slist_unique_fs_types)]" -> { "ENT-8338" }
+        string => "$(slist_unique_fs_types)",
+        meta => { "inventory", "attribute_name=File system" };
 
   classes:
       "have_mtab" expression => fileexists($(inventory_control.mtab));
