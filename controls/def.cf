@@ -258,6 +258,12 @@ bundle common def
 @endif
                  };
 
+      "control_server_allowciphers_defined" -> { "ENT-10182" }
+        expression => isvariable( "default:def.control_server_allowciphers"),
+        comment => concat( "If default:def.control_server_allowciphers is defined then",
+                           " it's value will be used for allowciphers in body server",
+                           " control. Else the binary default will be used.");
+
   vars:
 
     debian::
