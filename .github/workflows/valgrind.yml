@@ -10,7 +10,7 @@ jobs:
         with:
           path: masterfiles
       - name: Get Togethers
-        uses: cfengine/together-javascript-action@v1.4
+        uses: cfengine/together-javascript-action@v1.7
         id: together
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
