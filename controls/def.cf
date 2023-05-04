@@ -264,6 +264,12 @@ bundle common def
                            " it's value will be used for allowciphers in body server",
                            " control. Else the binary default will be used.");
 
+      "control_server_allowtlsversion_defined" -> { "ENT-10182" }
+        expression => isvariable( "default:def.control_server_allowtlsversion"),
+        comment => concat( "If default:def.control_server_allowtlsversion is defined then",
+                           " it's value will be used for allowtlsversion in body server",
+                           " control. Else the binary default will be used.");
+
   vars:
 
     debian::
