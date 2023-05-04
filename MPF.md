@@ -843,6 +843,31 @@ Be careful changing this setting. A setting that is not well aligned between all
 
 * Added in 3.22.0
 
+### Configure the minimum TLS version which is allowed to be used by cf-serverd
+
+When `default:def.control_server_allowtlsversion` is defined `cf-serverd` will use the minimum TLS version specified instead of the binary defaults.
+
+Example definition in augments file:
+
+```json
+{
+  "variables": {
+    "default:def.control_server_allowtlsversion": {
+     "value": "1.0",
+     "comment": "We want to allow old (<3.7.0) clients to connect."
+    }
+  }
+}
+```
+
+**Notes:**
+
+Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
+
+**History:**
+
+* Added in 3.22.0
+
 ### Configure users allowed to initate execution via cf-runagent
 
 cf-serverd only allows specified users to request unscheduled execution remotely via cf-runagent.
