@@ -19,7 +19,7 @@ jobs:
         with:
           repository: cfengine/core
           path: core
-          ref: ${{steps.together.outputs.core}}
+          ref: ${{steps.together.outputs.core || github.base_ref || github.ref}}
       - name: Install CFEngine with cf-remote
         run: |
           pip3 install cf-remote
