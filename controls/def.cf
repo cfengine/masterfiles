@@ -375,9 +375,10 @@ bundle common def
 
       "hub_log_files" slist =>
       {
-        "$(sys.workdir)/httpd/logs/access_log", # Mission Portal
-        "$(sys.workdir)/httpd/logs/error_log", # Mission Portal
-        "/var/log/postgresql.log",
+        "$(cfe_internal_hub_vars.access_log)",      # Mission Portal
+        "$(cfe_internal_hub_vars.error_log)",       # Mission Portal
+        "$(cfe_internal_hub_vars.ssl_request_log)", # Mission Portal
+        "/var/log/postgresql.log",                  # PostgreSQL
       };
 
       "max_client_history_size" -> { "cf-hub", "CFEngine Enterprise" }
