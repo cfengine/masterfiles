@@ -818,9 +818,9 @@ Example definition in augments file:
 }
 ```
 
-### Configure the ciphers which are allowed to be used for incoming connections
+### Configure the ciphers which are allowed to be used by cf-serverd
 
-When `default:def.control_server_allowciphers` is defined `cf-serverd` will use the ciphers specified instead of the binary defaults for incoming connections.
+When `default:def.control_server_allowciphers` is defined `cf-serverd` will use the ciphers specified instead of the binary defaults.
 
 Example definition in augments file:
 
@@ -837,15 +837,15 @@ Example definition in augments file:
 
 **Notes:**
 
-Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
+* Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
 
 **History:**
 
 * Added in 3.22.0
 
-### Configure the ciphers which are allowed to be used for outgoing connections
+### Configure the ciphers which are allowed to be used by cf-agent
 
-When `default:def.control_common_tls_ciphers` is defined agents will use the ciphers specified instead of the binary defaults for outgoing connections.
+When `default:def.control_common_tls_ciphers` is defined `cf-agent` will use the ciphers specified instead of the binary defaults for outgoing connections.
 
 Example definition in augments file:
 
@@ -862,16 +862,17 @@ Example definition in augments file:
 
 **Notes:**
 
-Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
+* Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
+* This setting is instrumented in all of the default entry points (`promises.cf`, `update.cf`, `standalone_self_upgrade.cf`).
 
 **History:**
 
 * Added in 3.22.0
 
 
-### Configure the minimum TLS version which is allowed to be used for incoming connections
+### Configure the minimum TLS version which is allowed to be used by cf-serverd
 
-When `default:def.control_server_allowtlsversion` is defined `cf-serverd` will use the minimum TLS version specified instead of the binary defaults for incoming connections.
+When `default:def.control_server_allowtlsversion` is defined `cf-serverd` will use the minimum TLS version specified instead of the binary defaults.
 
 Example definition in augments file:
 
@@ -888,16 +889,16 @@ Example definition in augments file:
 
 **Notes:**
 
-Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
+* Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
 
 **History:**
 
 * Added in 3.22.0
 
 
-### Configure the minimum TLS version which is allowed to be used for outgoing connections
+### Configure the minimum TLS version which is allowed to be used by cf-agent
 
-When `default:def.control_common_tls_min_version` is defined agents will use the minimum TLS version specified instead of the binary defaults for outgoing connections.
+When `default:def.control_common_tls_min_version` is defined `cf-agent` will use the minimum TLS version specified instead of the binary defaults for outgoing connections.
 
 Example definition in augments file:
 
@@ -914,7 +915,8 @@ Example definition in augments file:
 
 **Notes:**
 
-Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
+* Be careful changing this setting. A setting that is not well aligned between all clients and the server could result in clients not being able to communicate with the hub preventing further policy updates.
+* This setting is instrumented in all of the default entry points (`promises.cf`, `update.cf`, `standalone_self_upgrade.cf`).
 
 **History:**
 
