@@ -812,7 +812,7 @@ Example definition in augments file:
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### Configure the ciphers which are allowed to be used by cf-agent
 
@@ -838,7 +838,7 @@ Example definition in augments file:
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 
 ### Configure the minimum TLS version which is allowed to be used by cf-serverd
