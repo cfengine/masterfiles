@@ -28,9 +28,14 @@ body executor control
       smtpserver   => "$(def.smtpserver)";
       mailmaxlines => "$(default:def.control_executor_mailmaxlines)";
 
-      # Filter log entries in emails based on regular expressions.
-      # mailfilter_include => { ".*include pattern.*" };
-      # mailfilter_exclude => { ".*exclude pattern.*" };
+    control_executor_mailsubject_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
+      mailsubject => "$(default:def.control_executor_mailsubject)";
+
+    control_executor_mailfilter_exclude_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
+      mailfilter_exclude => { "@(default:def.control_executor_mailfilter_exclude)" };
+
+    control_executor_mailfilter_include_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
+      mailfilter_include => { "@(default:def.control_executor_mailfilter_include)" };
 
     any::
 

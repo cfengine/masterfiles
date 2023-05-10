@@ -41,6 +41,18 @@ bundle common def
         int => "30",
         if => not( isvariable( "control_executor_mailmaxlines" ));
 
+      "control_executor_mailsubject" -> { "ENT-10210" }
+        string => "",
+        if => not( isvariable( "control_executor_mailsubject" ) );
+
+      "control_executor_mailfilter_exclude" -> { "ENT-10210" }
+        slist => {},
+        if => not( isvariable( "control_executor_mailfilter_exclude" ) );
+
+      "control_executor_mailfilter_include" -> { "ENT-10210" }
+        slist => {},
+        if => not( isvariable( "control_executor_mailfilter_include" ) );
+
       # List here the IP masks that we grant access to on the server
 
       "acl"
@@ -257,6 +269,25 @@ bundle common def
                  regcmp( "(policy slist|data array)", type( "default:def.control_agent_environment_vars", "true" ) ),
 @endif
                  };
+
+      "control_executor_mailsubject_configured" -> { "ENT-10210" }
+        expression => regcmp( ".+", "$(control_executor_mailsubject)"),
+        comment => concat( "If default:def.control_executor_mailsubject is not",
+                           " an empty string, we want to use it's value for",
+                           " emails sent by cf-execd.");
+
+      "control_executor_mailfilter_exclude_configured" -> { "ENT-10210" }
+        expression => isgreaterthan( 0, length( "control_executor_mailfilter_exclude" ) ),
+        comment => concat( "If default:def.control_executor_mailfilter_exclude is not",
+                           " an empty list, we want to use it's value for",
+                           " stripping lines from emails sent by cf-execd.");
+
+      "control_executor_mailfilter_include_configured" -> { "ENT-10210" }
+        expression => isgreaterthan( 0, length( "control_executor_mailfilter_include" ) ),
+        comment => concat( "If default:def.control_executor_mailfilter_include is not",
+                           " an empty list, we want to use it's value for",
+                           " including lines from emails sent by cf-execd.");
+
 
       "control_server_allowciphers_defined" -> { "ENT-10182" }
         expression => isvariable( "default:def.control_server_allowciphers"),
