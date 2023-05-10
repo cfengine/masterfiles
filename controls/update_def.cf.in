@@ -141,6 +141,18 @@ bundle common update_def
 
   classes:
 
+      "control_common_tls_min_version_defined" -> { "ENT-10198" }
+        expression => isvariable( "default:def.control_common_tls_min_version"),
+        comment => concat( "If default:def.control_common_tls_min_version is defined then",
+                           " it's value will be used for the minimum version in outbound",
+                           " connections. Else the binary default will be used.");
+
+      "control_common_tls_ciphers_defined" -> { "ENT-10198" }
+        expression => isvariable( "default:def.control_common_tls_ciphers"),
+        comment => concat( "If default:def.control_common_tls_ciphers is defined then",
+                           " it's value will be used for the set of tls ciphers allowed",
+                           " for outbound connections. Else the binary default will be used.");
+
       # Trigger binary upgrade from policy hub
       # Disable by default
       "trigger_upgrade" or => {

@@ -14,6 +14,22 @@ body file control
 {
   inputs => { @(standalone_self_upgrade_file_control.inputs) };
 }
+bundle common def_standalone_self_upgrade
+{
+  classes:
+
+      "control_common_tls_min_version_defined" -> { "ENT-10198" }
+        expression => isvariable( "default:def.control_common_tls_min_version"),
+        comment => concat( "If default:def.control_common_tls_min_version is defined then",
+                           " it's value will be used for the minimum version in outbound",
+                           " connections. Else the binary default will be used.");
+
+      "control_common_tls_ciphers_defined" -> { "ENT-10198" }
+        expression => isvariable( "default:def.control_common_tls_ciphers"),
+        comment => concat( "If default:def.control_common_tls_ciphers is defined then",
+                           " it's value will be used for the set of tls ciphers allowed",
+                           " for outbound connections. Else the binary default will be used.");
+}
 bundle agent main
 # @brief This bundle drives the self upgrade. It actuates the appropriate
 # bundles to download binaries to the hub for serving to clients, caching the
@@ -763,6 +779,13 @@ body common control
 # @brief Common control for standalone self upgrade
 {
       version => "CFEngine Standalone Self Upgrade @VERSION@";
+
+
+    control_common_tls_min_version_defined::
+        tls_min_version => "$(default:def.control_common_tls_min_version)"; # See also: allowtlsversion in body server control
+
+    control_common_tls_ciphers_defined::
+        tls_ciphers => "$(default:def.control_common_tls_ciphers)"; # See also: allowciphers in body server control
 
     (debian|ubuntu)::
       package_inventory => { $(package_module_knowledge.platform_default) };
