@@ -179,6 +179,10 @@ bundle common def
         comment => "The control body has a variable, so a valid list must be defined or the agent will error",
         if => not( isvariable( $(this.promiser) ));
 
+      "control_agent_agentfacility" -> { "ENT-10209" }
+        string => "",
+        if => not( isvariable ( $(this.promiser) ));
+
       "control_agent_abortbundleclasses" -> { "ENT-4823" }
         slist => { "abortbundle" },
         comment => "The control body has a variable, so a valid list must be defined or the agent will error",
@@ -243,6 +247,13 @@ bundle common def
       # typically the last promise wins.
 
   classes:
+
+      "control_agent_agentfacility_configured" -> { "ENT-10209" }
+        expression => regcmp( "LOG_(USER|DAEMON|LOCAL[0-7])",
+                              $(control_agent_agentfacility) ),
+        comment => concat( "If default:def.control_agent_agentfacility is a",
+                           " valid setting, we want to use it in body agent",
+                           " control for setting agentfacility" );
 
       "_control_agent_environment_vars_validated" -> { "CFE-3927" }
         and => {
