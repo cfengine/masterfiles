@@ -782,10 +782,10 @@ body common control
 
 
     control_common_tls_min_version_defined::
-        tls_min_version => "$(default:def.control_common_tls_min_version)";
+        tls_min_version => "$(default:def.control_common_tls_min_version)"; # See also: allowtlsversion in body server control
 
     control_common_tls_ciphers_defined::
-        tls_ciphers => "$(default:def.control_common_tls_ciphers)";
+        tls_ciphers => "$(default:def.control_common_tls_ciphers)"; # See also: allowciphers in body server control
 
     (debian|ubuntu)::
       package_inventory => { $(package_module_knowledge.platform_default) };
