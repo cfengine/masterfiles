@@ -554,6 +554,28 @@ For example:
 **History:**
 - Introduced 3.13.0, 3.12.1, 3.10.5
 
+### Configure cf-agent syslog facility
+
+To configure the syslog facility used by `cf-agent` configure `agentfacility` by
+setting `default:def.control_agent_agentfacility` via augments to one of the
+allowed values (`LOG_USER`, `LOG_DAEMON`, `LOG_LOCAL0`, `LOG_LOCAL1`,
+`LOG_LOCAL2`, `LOG_LOCAL3`, `LOG_LOCAL4`, `LOG_LOCAL5`, `LOG_LOCAL6`,
+`LOG_LOCAL7`)
+
+```json
+{
+  "variables": {
+    "default:def.control_agent_agentfacility": {
+      "value": "LOG_USER"
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in 3.22.0
+
 ### mailto
 
 The address that `cf-execd` should email agent output to.

@@ -139,7 +139,20 @@ bundle common update_def
                           "true",
                           "false");
 
+      "control_agent_agentfacility" -> { "ENT-10209" }
+        string => "",
+        if => not( isvariable ( "default:def.control_agent_agentfacility" ));
+
+
   classes:
+
+      "control_agent_agentfacility_configured" -> { "ENT-10209" }
+        expression => regcmp( "LOG_(USER|DAEMON|LOCAL[0-7])",
+                              $(control_agent_agentfacility) ),
+        comment => concat( "If default:def.control_agent_agentfacility is a",
+                           " valid setting, we want to use it in body agent",
+                           " control for setting agentfacility" );
+
 
       "control_common_tls_min_version_defined" -> { "ENT-10198" }
         expression => isvariable( "default:def.control_common_tls_min_version"),
