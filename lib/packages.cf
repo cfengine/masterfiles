@@ -205,7 +205,15 @@ bundle common common_knowledge
 # This common bundle defines general things about platforms.
 {
   vars:
-      "list_update_ifelapsed" string => "240";
+
+      # This variable can be customized via augments:
+      # { "variables": { "default:common_knowledge.list_update_ifelapsed": { "value": "0" } } }
+      "list_update_ifelapsed"
+        string => "240",
+        if => not( isvariable( "list_update_ifelapsed" )),
+        comment => concat( "The number of minutes to wait before updating the",
+                           " package cache. Note this controls both the software",
+                           " installed and the software updates available.");
 }
 
 bundle common debian_knowledge
