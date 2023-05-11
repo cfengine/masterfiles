@@ -153,6 +153,11 @@ body agent control
 {
       ifelapsed => "1";
       skipidentify => "true";
+
+    control_agent_agentfacility_configured::
+
+        agentfacility => "$(default:update_def.control_agent_agentfacility)";
+
 }
 
 #############################################################################
