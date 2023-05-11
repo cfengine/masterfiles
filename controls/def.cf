@@ -67,6 +67,21 @@ bundle common def
         if => and(not(isvariable("override_data_acl")), not(isvariable("acl"))),
         meta => { "defvar" };
 
+
+      "control_server_allowconnects" -> { "ENT-10212" }
+        slist => { "127.0.0.1" , "::1", @(def.acl) },
+        if => not( isvariable( "control_server_allowconnects" ) ),
+        comment => concat( "We want to define the default setting for",
+                           " allowconnects in body server control if not",
+                           " already specified" );
+
+      "control_server_allowallconnects" -> { "ENT-10212" }
+        slist => { "127.0.0.1" , "::1", @(def.acl) },
+        if => not( isvariable( "control_server_allowallconnects" ) ),
+        comment => concat( "We want to define the default setting for",
+                           " allowallconnects in body server control if not",
+                           " already specified" );
+
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  This is open by default for bootstrapping.
 
