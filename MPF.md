@@ -1444,6 +1444,11 @@ For example:
 
 ### Configure periodic package inventory refresh interval
 
+Note that there are currently two implementations of packages promises, package
+modules and package methods. Each maintain their own cache of packages installed
+and updates available.
+
+#### For package modules
 CFEngine refreshes software inventory when it makes changes via packages
 promises. Additionally, by default, CFEngine refreshes it's
 internal cache of packages installed (during each agent run) and package updates that
@@ -1468,6 +1473,49 @@ especially with public repositories or you may be banned for abuse.
 
 * Added in 3.15.0, 3.12.3
 * 3.17.0 decreased `package_module_query_installed_ifelapsed` from `60` to `0`
+
+#### For package methods
+
+CFEngine refreshes it's cache of information about packages installed and
+updates available when it evaluates packages promises if the cache has not been
+updated in the number of minutes stored in `package_list_update_ifelapsed` of
+the package method in use. Many package methods in the standard library use the
+value of `default:common_knowledge.list_updates_ifelapsed` for this value which
+can be customized via Augments.
+
+```json
+{
+  "variables": {
+    "default:common_knowledge.list_update_ifelapsed": {
+      "value": "0"
+    }
+  }
+}
+```
+
+**Notes:**
+
+* Unlike *many* variables that can be customized via Augments this variable is
+  **not** in the `default:def` bundle scope. Customizing it requires CFEngine
+  3.18.0 or newer which support targeting any namespace or variable.
+
+**See also:**
+
+* [package methods][lib/packages.cf]: ```pip```,
+  ```npm```, ```npm_g```, ```brew```, ```apt```, ```apt_get```,
+  ```apt_get_permissive```, ```apt_get_release```, ```dpkg_version```,
+  ```rpm_version``` , ```yum```, ```yum_rpm```, ```yum_rpm_permissive```,
+  ```yum_rpm_enable_repo``` , ```yum_group```, ```rpm_filebased```, ```ips```,
+  ```smartos```, ```opencsw```, ```emerge```, ```pacman```, ```zypper```,
+  ```generic```
+
+* [package bundles][lib/packages.cf]: ```package_latest```,
+  ```package_specific_present```, ```package_specific_absent```,
+  ```package_specific_latest```, ```package_specific```
+
+**History:**
+
+* Added in 3.22.0, 3.21.2, 3.18.5
 
 ### Enable logging of Enterprise License utilization
 
