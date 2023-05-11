@@ -1515,7 +1515,7 @@ can be customized via Augments.
 
 **History:**
 
-* Added in 3.22.0, 3.21.2
+* Added in 3.22.0, 3.21.2, 3.18.5
 
 ### Enable logging of Enterprise License utilization
 
