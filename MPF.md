@@ -603,7 +603,7 @@ allowed values (`LOG_USER`, `LOG_DAEMON`, `LOG_LOCAL0`, `LOG_LOCAL1`,
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### mailto
 
