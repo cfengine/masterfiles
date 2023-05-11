@@ -60,4 +60,8 @@ body agent control
 
       # Environment variables based on Distro
 
+    control_agent_agentfacility_configured::
+
+      agentfacility => "$(default:def.control_agent_agentfacility)";
+
 }

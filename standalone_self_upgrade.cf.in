@@ -16,7 +16,20 @@ body file control
 }
 bundle common def_standalone_self_upgrade
 {
+  vars:
+
+      "control_agent_agentfacility" -> { "ENT-10209" }
+        string => "",
+        if => not( isvariable ( "default:def.control_agent_agentfacility" ));
+
   classes:
+
+      "control_agent_agentfacility_configured" -> { "ENT-10209" }
+        expression => regcmp( "LOG_(USER|DAEMON|LOCAL[0-7])",
+                              $(control_agent_agentfacility) ),
+        comment => concat( "If default:def.control_agent_agentfacility is a",
+                           " valid setting, we want to use it in body agent",
+                           " control for setting agentfacility" );
 
       "control_common_tls_min_version_defined" -> { "ENT-10198" }
         expression => isvariable( "default:def.control_common_tls_min_version"),
@@ -29,6 +42,13 @@ bundle common def_standalone_self_upgrade
         comment => concat( "If default:def.control_common_tls_ciphers is defined then",
                            " it's value will be used for the set of tls ciphers allowed",
                            " for outbound connections. Else the binary default will be used.");
+}
+body agent control
+# @brief Agent controls for standalone self upgrade
+{
+    control_agent_agentfacility_configured::
+
+        agentfacility => "$(default:update_def.control_agent_agentfacility)";
 }
 bundle agent main
 # @brief This bundle drives the self upgrade. It actuates the appropriate
