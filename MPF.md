@@ -598,6 +598,65 @@ The maximumm number of lines of output that `cf-execd` will email.
 
 **See also:** [`maxmaillines`][cf-execd#maxmaillines]
 
+### Configure subject for emails sent by cf-execd
+
+When enabled `cf-execd` emails output that differs from previous executions. The subject of the email can be configured by setting `mailsubject` in `body executor control`. This will use the value of `default:def.control_executor_mailsubject` if it is a non-empty string.
+
+```json
+{
+  "variables": {
+    "default:def.control_executor_mailsubject": {
+        "value": "CFEngine output from $(sys.fqhost)"
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in 3.22.0, 3.21.2, 3.18.5
+### Configure lines that should be excluded from emails sent by cf-execd
+
+When enabled `cf-execd` emails output that differs from previous executions.
+Lines matching regular expressions in `mailfilter_exclude` in `body executor
+control` are stripped before sending. The MPF will use the value of
+`default:def.control_executor_mailfilter_exclude` if it is a non-empty list.
+
+```json
+{
+  "variables": {
+    "default:def.control_executor_mailfilter_exclude": {
+        "value": [ ".*ps output line.*", ".*regline.*" ]
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in 3.22.0, 3.21.2, 3.18.5
+
+### Configure lines that should be included from emails sent by cf-execd
+
+When enabled `cf-execd` emails output that differs from previous executions.
+Lines matching regular expressions in `mailfilter_include` in `body executor
+control` are stripped before sending. The MPF will use the value of
+`default:def.control_executor_mailfilter_include` if it is a non-empty list.
+
+```json
+{
+  "variables": {
+    "default:def.control_executor_mailfilter_include": {
+        "value": [ ".*EMAIL.*" ]
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in 3.22.0, 3.21.2, 3.18.5
+
 ### acl
 
 `def.acl` is a list of of network ranges that should be allowed to connect to cf-serverd. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed.
