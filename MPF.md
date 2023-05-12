@@ -643,7 +643,7 @@ When enabled `cf-execd` emails output that differs from previous executions. The
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 ### Configure lines that should be excluded from emails sent by cf-execd
 
 When enabled `cf-execd` emails output that differs from previous executions.
@@ -663,7 +663,7 @@ control` are stripped before sending. The MPF will use the value of
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### Configure lines that should be included from emails sent by cf-execd
 
@@ -684,7 +684,7 @@ control` are stripped before sending. The MPF will use the value of
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### acl
 
