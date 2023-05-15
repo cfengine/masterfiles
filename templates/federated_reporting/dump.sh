@@ -53,6 +53,7 @@ failed=0
 ts="$(date -Iseconds)"  # ISO 8601 format that doesn't have spaces in it
 in_progress_file="$CFE_FR_DUMP_DIR/$CFE_FR_FEEDER_$ts.sql.$CFE_FR_COMPRESSOR_EXT.dumping"
 
+"$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "PERFORM public.obtain_exclusive_schema_lock();"
 log "Dumping tables: $CFE_FR_TABLES"
 {
   "$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb
@@ -77,6 +78,7 @@ else
   mv "$in_progress_file" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
   chown "$CFE_FR_FEEDER_USERNAME" "$CFE_FR_TRANSPORT_DIR/$CFE_FR_FEEDER.sql.$CFE_FR_COMPRESSOR_EXT"
 fi
+"$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb -c "PERFORM public.release_exclusive_schema_lock('dump.sh');"
 
 if [ -n "$CFE_FR_SUPERHUB_HOSTKEYS" ]; then
   log "Linking for superhub(s): $CFE_FR_SUPERHUB_HOSTKEYS"
