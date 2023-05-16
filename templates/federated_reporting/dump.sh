@@ -55,7 +55,7 @@ in_progress_file="$CFE_FR_DUMP_DIR/$CFE_FR_FEEDER_$ts.sql.$CFE_FR_COMPRESSOR_EXT
 
 log "Dumping tables: $CFE_FR_TABLES"
 {
-  "$CFE_BIN_DIR"/pg_dump --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb
+  "$CFE_BIN_DIR"/pg_dump --serializable-deferrable --column-inserts --data-only $(printf ' -t %s' $CFE_FR_TABLES) cfdb
 
   # in case of 3.12 must copy m_inventory as if it was __inventory
   if [[ "$CFE_VERSION" =~ "3.12." ]]; then
