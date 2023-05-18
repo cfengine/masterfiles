@@ -15,12 +15,4 @@ bundle common inventory_redhat
       meta => { "inventory", "attribute_name=none" };
 
       "inventory_redhat_have_python_symlink" expression => fileexists("$(sys.bindir)/cfengine-selected-python");
-
-    inventory_redhat_have_python_symlink::
-      "cfe_yum_package_module_supported" -> { "CFE-2602", "CFE-3512" }
-        comment => "Here we see if the version of python found is acceptable for
-                    the yum package module. We use this guard to prevent errors
-                    related to missing python modules.",
-        expression => returnszero("$(sys.bindir)/cfengine-selected-python -V 2>&1 | grep ^Python | cut -d' ' -f 2 | ( IFS=. read v1 v2 v3 ; [ $v1 -ge 3 ] || [ $v1 -eq 2 -a $v2 -ge 4 ] )",
-                                  useshell);
 }
