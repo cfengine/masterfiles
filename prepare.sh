@@ -47,7 +47,7 @@ version=$(cat CFVERSION | awk -F"-" '{print $1}')
 # The code above should already have parsed tags / env var and put the correct
 # thing or default in CFRELEASE, no need to do more awk here:
 release=$(cat CFRELEASE)
-prefix="/var/cfengine/"
+prefix="/var/cfengine"
 
 templates=$(find . -name .git -prune -o -name '*.in' -print)
 for template in $templates; do
