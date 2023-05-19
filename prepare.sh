@@ -19,12 +19,13 @@ rm -f CFVERSION
 misc/determine-version.sh .CFVERSION > CFVERSION \
     || echo "Unable to auto-detect CFEngine version, continuing"
 
+export RELEASE="1"
 echo "Running determine-release.sh ..."
 rm -f CFRELEASE
 misc/determine-release.sh CFRELEASE \
     || { echo "Unable to auto-detect CFEngine release, continuing"; echo 1 >CFRELEASE; }
 
-version=$(cat CFVERSION)
+version=$(cat CFVERSION | awk -F"-" '{print $1}')
 release=$(cat CFRELEASE)
 prefix="/var/cfengine/"
 
