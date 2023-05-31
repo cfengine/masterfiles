@@ -65,9 +65,20 @@ bundle common inventory_linux
       "has_proc_1_cmdline" expression => fileexists("/proc/1/cmdline"),
       comment => "Check if we can read /proc/1/cmdline";
 
+      "inventory_have_python_symlink" expression => fileexists("$(sys.bindir)/cfengine-selected-python");
+
     has_proc_1_cmdline::
       "systemd" expression => strcmp(lastnode($(proc_1_process), "/"), "systemd"),
       comment => "Check if (the link target of) /proc/1/cmdline is systemd";
+
+    inventory_have_python_symlink::
+      "cfe_python_for_package_modules_supported" -> { "CFE-2602", "CFE-3512", "ENT-10248" }
+        comment => concat( "Here we see if the version of python found is",
+                           " acceptable ( 3.x or 2.4 or greater ) for package",
+                           " modules. We use this guard to prevent errors",
+                           " related to missing python modules."),
+        expression => returnszero("$(sys.bindir)/cfengine-selected-python -V 2>&1 | grep ^Python | cut -d' ' -f 2 | ( IFS=. read v1 v2 v3 ; [ $v1 -ge 3 ] || [ $v1 -eq 2 -a $v2 -ge 4 ] )",
+                                  useshell);
 }
 
 bundle monitor measure_entropy_available

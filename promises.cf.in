@@ -93,13 +93,8 @@ body common control
       # modules in which you MUST provide package modules used to generate
       # software inventory reports. You can also provide global default package module
       # instead of specifying it in all package promises.
-    (debian).!disable_inventory_package_refresh::
+    (debian|redhat|centos|suse|sles|opensuse|amazon_linux).cfe_python_for_package_modules_supported.!disable_inventory_package_refresh::
           package_inventory => { $(package_module_knowledge.platform_default) };
-
-      # We only define pacakge_invetory on redhat like systems that have a
-      # python version that works with the package module.
-    (redhat|centos|suse|sles|opensuse|amazon_linux).cfe_yum_package_module_supported.!disable_inventory_package_refresh::
-        package_inventory => { $(package_module_knowledge.platform_default) };
 
     (debian|redhat|suse|sles|opensuse|amazon_linux)::
           package_module => $(package_module_knowledge.platform_default);
