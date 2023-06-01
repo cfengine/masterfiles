@@ -1,6 +1,80 @@
 # Changelog
 Notable changes to the framework should be documented here
 
+3.21.2:
+	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
+	- Fixed suse package_inventory defaults (ENT-10248)
+	- Added inventory for policy version (ENT-9806)
+	- Added condition to runalerts service to require stamp directory
+	  (ENT-9711)
+	- Added guards against using regline() in cases where a file may not exist
+	  (ENT-9933)
+	- Added ssl_request_log to list of hub log files (ENT-10192)
+	- Fixed body perms system_owned to account for Windows (ENT-9778)
+	- Improved federated reporting dump concurrency with database
+	  (ENT-10214)
+	- Made TLS settings for components other than cf-serverd configurable via
+	  augments (ENT-10198)
+	- Made agentfacility in body agent control configurable via Augments
+	  (ENT-10209)
+	- Made allowciphers in body server control configurable via Augments
+	  (ENT-10182)
+	- Made allowtlsversion in body server control configurable via Augments
+	  (ENT-10182)
+	- Made body maxmaillines in body executor control configurable via Augments
+	  (ENT-9614)
+	- Made mailsubject, mailfilter_include, and mailfilter_exclude configurable
+	  via Augments (ENT-10210)
+	- Made package cache refresh for common_knowledge.list_update_ifelapsed
+	  configurable. This change makes the number of minutes to wait between
+	  package cache updates for some package_method bodies configurable via
+	  augments. The package_method bodies affected by this include:
+	  - body package_method pip(flags)
+	  - body package_method npm(dir)
+	  - body package_method npm_g
+	  - body package_method brew(user)
+	  - body package_method apt
+	  - body package_method apt_get
+	  - body package_method apt_get_permissive
+	  - body package_method apt_get_release(release)
+	  - body package_method dpkg_version(repo)
+	  - body package_method rpm_version(repo)
+	  - body package_method yum
+	  - body package_method yum_rpm
+	  - body package_method yum_rpm_permissive
+	  - body package_method yum_rpm_enable_repo(repoid)
+	  - body package_method yum_group
+	  - body package_method rpm_filebased(path)
+	  - body package_method ips
+	  - body package_method smartos
+	  - body package_method opencsw
+	  - body package_method emerge
+	  - body package_method pacman
+	  - body package_method zypper
+	  - body package_method generic
+	  Additionally note that the package related bundles use the package_method bodies
+	  mentioned above and are similarly influenced.
+	  - bundle agent package_present(package)
+	  - bundle agent package_latest(package)
+	  - bundle agent package_specific_present(packageorfile, package_version, package_arch)
+	  - bundle agent package_specific_absent(packageorfile, package_version, package_arch)
+	  - bundle agent package_specific_latest(packageorfile, package_version, package_arch)
+	  - bundle agent package_specific(package_name, desired, package_version, package_arch)
+	  (CFE-4178)
+	- Prevented management of runagent socket users when no users are listed
+	  (ENT-9535)
+	- Removed specific old CFEngine version package module handling for windows
+	  (ENT-9948)
+	- Currently mounted file system types and mount points are now reported as inventory
+	  (ENT-8338)
+
+3.21.1:
+	- This release contains fixes to CVE-2023-26560, a security vulnerability in the
+	  CFEngine Enterprise Hub / Mission Portal. Beyond this, there were no other changes.
+	  For more information about the vulnerability and release see our blog;
+	  https://cfengine.com/blog/2023/cve-2023-26560/
+	  https://cfengine.com/blog/2023/cfengine-3-18-4-and-3-21-1-released/
+
 3.21.0:
 	- Added inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
  	- Added policy to enforce proper permissions on Mission Portal ldap directory (ENT-9693)
