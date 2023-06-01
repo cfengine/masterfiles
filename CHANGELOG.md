@@ -2,7 +2,7 @@
 Notable changes to the framework should be documented here
 
 3.21.2:
-	- Added Inventory for Policy Version (ENT-9806)
+	- Added inventory for policy version (ENT-9806)
 	- Added condition to runalerts service to require stamp directory
 	  (ENT-9711)
 	- Added guards against using regline() in cases where a file may not exist
@@ -63,7 +63,7 @@ Notable changes to the framework should be documented here
 	  (ENT-9535)
 	- Removed specific old CFEngine version package module handling for windows
 	  (ENT-9948)
-	- Started inventorying currently mounted file system types and mount points
+	- Currently mounted file system types and mount points are now reported as inventory
 	  (ENT-8338)
 
 3.21.1:
