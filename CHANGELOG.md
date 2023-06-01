@@ -2,6 +2,8 @@
 Notable changes to the framework should be documented here
 
 3.21.2:
+	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
+	- Fixed suse package_inventory defaults (ENT-10248)
 	- Added inventory for policy version (ENT-9806)
 	- Added condition to runalerts service to require stamp directory
 	  (ENT-9711)
