@@ -66,6 +66,13 @@ Notable changes to the framework should be documented here
 	- Started inventorying currently mounted file system types and mount points
 	  (ENT-8338)
 
+3.21.1:
+	- This release contains fixes to CVE-2023-26560, a security vulnerability in the
+	  CFEngine Enterprise Hub / Mission Portal. Beyond this, there were no other changes.
+	  For more information about the vulnerability and release see our blog;
+	  https://cfengine.com/blog/2023/cve-2023-26560/
+	  https://cfengine.com/blog/2023/cfengine-3-18-4-and-3-21-1-released/
+
 3.21.0:
 	- Added inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
  	- Added policy to enforce proper permissions on Mission Portal ldap directory (ENT-9693)
