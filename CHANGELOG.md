@@ -2,7 +2,7 @@
 Notable changes to the framework should be documented here
 
 3.18.5:
-	- Added Inventory for Policy Version (ENT-9806)
+	- Added inventory for policy version (ENT-9806)
 	- Added condition to runalerts service to require stamp directory
 	  (ENT-9711)
 	- Added exception for ldap directory perms for settings.ldap.php
@@ -62,9 +62,7 @@ Notable changes to the framework should be documented here
 	  (CFE-4178)
 	- Prevented management of runagent socket users when no users are listed
 	  (ENT-9535)
-	- Prevented management of runagent socket users when no users are listed
-	  (ENT-9535)
-	- Started inventorying currently mounted file system types and mount points
+	- Currently mounted file system types and mount points are now reported as inventory
 	  (ENT-8338)
 3.18.4:
 	- This release contains fixes to CVE-2023-26560, a security vulnerability in the
