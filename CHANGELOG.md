@@ -3,6 +3,7 @@ Notable changes to the framework should be documented here
 
 3.21.2:
 	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
+	- Added self upgrade support for Ubuntu 22.04, Debian 11, and EL9 (ENT-10290)
 	- Fixed suse package_inventory defaults (ENT-10248)
 	- Added inventory for policy version (ENT-9806)
 	- Added condition to runalerts service to require stamp directory
