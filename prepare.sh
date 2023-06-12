@@ -90,6 +90,16 @@ test-driver
 tests
 travis-scripts
 .travis.yml
+cfe_internal/core/watchdog/README.md
+cfe_internal/enterprise/ha/ha_info.json
+.github
+inventory/README.md
+lib/README.md
+LICENSE
+modules/promises
+.no-distrib
+services/autorun/README.md
+templates/README.md
 
 $templates
 $(basename $0)
