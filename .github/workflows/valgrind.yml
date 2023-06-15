@@ -2,7 +2,7 @@ on:
   workflow_call
 
 jobs:
-  valgring_tests:
+  valgrind_tests:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
