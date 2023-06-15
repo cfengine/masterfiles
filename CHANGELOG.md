@@ -147,7 +147,7 @@
 	  (CFE-3568)
 	- Made body classes u_kept_successful_command_results inherit_from u_results
 	  (CFE-3917)
-	- Made cmdb update ignore locks (ENT-8847)
+	- Made CMDB update ignore locks (ENT-8847)
 	- Updating host-specific CMDB data files now happens asynchronously
 	  (ENT-7357)
 	- Fixed issue with apt_get package module on Ubuntu 22 (CFE-3976)
@@ -365,7 +365,7 @@
 	  (CFE-3259)
 	- Added inventory of license owner on enterprise hubs (ENT-5337)
 	- Added paths support for opensuse (CFE-3283)
-	- Added use of services promise for FR postgresql reconfig in case of
+	- Added use of services promise for FR PostgreSQL reconfig in case of
 	  systemd (ENT-5420)
 	- Added zypper as default package manager for opensuse (CFE-3284)
 	- Admitted ::1 as a query source on Enterprise hubs (ENT-5531)
@@ -461,7 +461,7 @@
 
 3.15.0b1:
 	- Added continual checking for policy_server state (CFE-3073)
-	- Added monitoring for postgresql lock acquisition times (ENT-4753)
+	- Added monitoring for PostgreSQL lock acquisition times (ENT-4753)
 	- Added support for 'awk' filters in the FR dump-import process (ENT-4839)
 	- Added support for configuring abortclasses and abortbundleclasses via
 	  augments (ENT-4823)
@@ -536,7 +536,7 @@
 	- redhat_pure is no longer defined on Fedora hosts (CFE-3022)
 
 3.13.0:
-	- Add debian 9 to the self upgrade package map (ENT-4255)
+	- Add Debian 9 to the self upgrade package map (ENT-4255)
 	- Add 'system-uuid' to default dmidecode inventory (CFE-2925)
 	- Add inventory of AWS EC2 linux instances (CFE-2924)
 	- Add ubuntu 18 to package map for self upgrade (ENT-4118)
@@ -676,7 +676,7 @@
 	- Add AIX OOTB oslevel inventory (ENT-3117)
 	- Disable package inventory via modules on redhat like systems with unsupported python versions
 	  (CFE-2602)
-	- Make stock policy update more resiliant (CFE-2587)
+	- Make stock policy update more resilient (CFE-2587)
 	- Configure networks allowed to initiate report collection (client initiated reporting) via augments (#910)
 	  (CFE-2624)
 	- apt_get package module: Fix bug which prevented updates
@@ -693,14 +693,14 @@
 	- Add default report collection exclusion based on promise handle
 	  (ENT-3061)
 	- Fix ability to select INI region with metachars (CFE-2519)
-	- Change: Verify transfered files during policy update
+	- Change: Verify transferred files during policy update
 	- Change select_region INI_section to match end of section or end of file
 	  (CFE-2519)
-	- Add class to enable post transfer verrification during policy updates
+	- Add class to enable post transfer verification during policy updates
 	- Add: prunetree bundle to stdlib
-	  The prunetree bundle allws you to delete files and directories up to a
-	  sepcified depth older than a specified number of days
-	- Do not symlink agents to /usr/local/bin on coreos (ENT-3047)
+	  The prunetree bundle allows you to delete files and directories up to a
+	  specified depth older than a specified number of days
+	- Do not symlink agents to /usr/local/bin on CoreOS (ENT-3047)
 	- Add: Ability to set default_repository via augments
 	- Enable settig def.max_client_history_size via augments (CFE-2560)
 	- Change self upgrade now uses standalone policy (ENT-3155)
@@ -721,8 +721,8 @@
 
 3.10.0:
 	- Add: Classes body tailored for use with diff
-	- Change: Session Cookies use HTTPOnly and secure attribtues (ENT-2781)
-	- Change: Verify transfered files during policy update
+	- Change: Session Cookies use HTTPOnly and secure attributes (ENT-2781)
+	- Change: Verify transferred files during policy update
 	- Add: Inventory for system product name (model) (ENT-2780)
 	- Add: Ensure appropriate permissions for SSL files (ENT-760)
 	- Fix rare bug that would sometimes prevent redis-server from launching.
@@ -737,7 +737,7 @@
 	- Change: Enable agent component management policy on systemd hosts
 	  (CFE-2429)
 	- Add: Enterprise appliaction log dir to rotation
-	- Change: re-enable hub process maintainance
+	- Change: re-enable hub process maintenance
 	- Add: edit_line contains_literal_string to stdlib
 	- Fix: Services starting or stopping unnecessarily (CFE-2421)
 	- Allow specifying agent maxconnections via def.json (CFE-2461)
@@ -757,10 +757,10 @@
 	  (CFE-2466)
 
 3.7.0:
-	- Support for user specified overring of framework defaults without modifying
+	- Support for user specified overriding of framework defaults without modifying
 	  policy supplied by the framework itself (see example_def.json)
 	- Support for def.json class augmentation in update policy
-	- Run vacuum operation on postgresql every night as a part of maintenance.
+	- Run vacuum operation on PostgreSQL every night as a part of maintenance.
 	- Add measure_promise_time action body to lib (3.5, 3.6, 3.7, 3.8)
 	- New negative class guard `cfengine_internal_disable_agent_email` so that
 	  agent email can be easily disabled by augmenting def.json
@@ -781,7 +781,7 @@
 	- Relocate services/file_change.cf to cfe_internal/enterprise. This policy is
 	  most useful for a good OOTB experience with CFEngine Enterprise Mission
 	  Portal.
-	- Relocate service_catalogue from promsies.cf to services/main.cf. It is
+	- Relocate service_catalogue from promises.cf to services/main.cf. It is
 	  intended to be a user entry. This name change correlates with the main
 	  bundle being activated by default if there is no bundlesequence specified.
 	- Reduce benchmarks sample history to 1 day.
@@ -796,7 +796,7 @@
 	  processes after upgrade. (Redmine #7185)
 	- Remove Diff reporting on /etc/shadow (Enterprise)
 	- Update policy from promise.cf inputs. There is no reason to include the
-	  update policy into promsies.cf, update.cf is the entry for the update policy
+	  update policy into promises.cf, update.cf is the entry for the update policy
 	- _not_repaired outcome from classes_generic and scoped_classes generic (Redmine: # 7022)
 	- standard_services now restarts the service if it was not already running
 	  when using service_policy => restart with chkconfig (Redmine #7258)
