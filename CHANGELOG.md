@@ -2,7 +2,7 @@
 Notable changes to the framework should be documented here
 
 3.22.0:
-	- Added Inventory for Policy Version (ENT-9806)
+	- Added inventory for policy version (ENT-9806)
 	- Added condition to runalerts service to require stamp directory
 	  (ENT-9711)
 	- Added guards against using regline() in cases where a file may not exist
@@ -10,12 +10,12 @@ Notable changes to the framework should be documented here
 	- Added self upgrade support for Ubuntu 22.04, Debian 11, and EL9
 	  (ENT-10290)
 	- Added ssl_request_log to list of hub log files (ENT-10192)
-	- Added support for RockyLinux in self upgrade (ENT-10335)
+	- Added support for Rocky Linux in self upgrade policy (ENT-10335)
 	- Adjusted dump.sh for multiple runs in between superhub imports
 	  (ENT-10274)
 	- Aligned module build result with release artifact (ENT-10345)
 	- Fixed body perms system_owned to account for Windows (ENT-9778)
-	- Fixed suse package_inventory defaults (ENT-10248)
+	- Fixed SUSE package_inventory defaults (ENT-10248)
 	- Improved federated reporting dump concurrency with database
 	  (ENT-10214)
 	- Made TLS settings for components other than cf-serverd configurable via augments
