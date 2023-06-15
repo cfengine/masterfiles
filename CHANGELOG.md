@@ -1,6 +1,3 @@
-# Changelog
-Notable changes to the framework should be documented here
-
 3.18.5:
 	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
 	- Added self upgrade support for Ubuntu 22.04, Debian 11, and EL9 (ENT-10290)
