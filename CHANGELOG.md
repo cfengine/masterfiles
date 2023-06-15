@@ -1,6 +1,3 @@
-# Changelog
-Notable changes to the framework should be documented here
-
 3.22.0:
 	- Added inventory for policy version (ENT-9806)
 	- Added condition to runalerts service to require stamp directory
