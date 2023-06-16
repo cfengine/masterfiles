@@ -41,7 +41,7 @@ body common control
 {
 
       bundlesequence => {
-                        # Common bundle first (Best Practice)
+                          # Common bundle first (Best Practice)
                           inventory_control,
                           @(inventory.bundles),
                           def,
@@ -54,7 +54,7 @@ body common control
                           services_autorun,
                           @(services_autorun.bundles),
 
-                         # Agent bundle
+                          # Agent bundle
                           cfe_internal_management,   # See cfe_internal/CFE_cfengine.cf
                           main,
                           @(cfengine_enterprise_hub_ha.management_bundles),
@@ -66,19 +66,19 @@ body common control
                   # User policy init, for example for defining custom promise types:
                   "services/init.cf",
 
-                 # File definition for global variables and classes
+                  # File definition for global variables and classes
                   @(cfengine_controls.def_inputs),
 
-                # Inventory policy
+                  # Inventory policy
                   @(inventory.inputs),
 
-                 # CFEngine internal policy for the management of CFEngine itself
+                  # CFEngine internal policy for the management of CFEngine itself
                   @(cfe_internal_inputs.inputs),
 
-                 # Control body for all CFEngine robot agents
+                  # Control body for all CFEngine robot agents
                   @(cfengine_controls.inputs),
 
-                 # COPBL/Custom libraries.  Eventually this should use wildcards.
+                  # COPBL/Custom libraries.  Eventually this should use wildcards.
                   @(cfengine_stdlib.inputs),
 
                   # autorun system
