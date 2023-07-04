@@ -5,7 +5,7 @@ bundle agent MPF_class_recommendations
       "tags" slist => { "cfengine_recommends" };
 
   reports:
-      "`cfengine_internal_purge_polices` no longer has any effect. Please use `cfengine_internal_purge_policies_disabled` instead, to choose where you want to disable purging or remove the class completely if you want purging enabled everywhere (the new default in 3.18+)." -> { "CFE-3662" }
+      "`cfengine_internal_purge_policies` no longer has any effect. Please use `cfengine_internal_purge_policies_disabled` instead, to choose where you want to disable purging or remove the class completely if you want purging enabled everywhere (the new default in 3.18+)." -> { "CFE-3662" }
         if => "cfengine_internal_purge_policies";
 }
 
