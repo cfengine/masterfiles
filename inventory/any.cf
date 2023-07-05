@@ -684,23 +684,12 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
   files:
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
 
-    cfengine_3_10::
-      "$(cache)"
-        create => "true",
-        edit_line => lines_present( "$(response[content])" ),
-        edit_defaults => empty,
-        if => regcmp( ".*", "$(content[version])" );
-
-@if minimum_version(3.11)
-      # template_method inline_mustache introduced in 3.11
-    !cfengine_3_10::
       "$(cache)"
         template_method => "inline_mustache",
         edit_template_string => "{{{content}}}",
         template_data => @(response),
         create =>   "true",
         if => regcmp( ".*", "$(content[version])" );
-@endif
 }
 
 bundle agent cfe_aws_ec2_metadata_from_cache
