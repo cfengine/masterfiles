@@ -660,6 +660,8 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
         # depends on a dummy command which does nothing but fires only once a day
         depends_on => { "daily_dummy_job_$(v)" };
 
+      "content" data => parsejson("$(response[content])");
+
   commands:
     _stdlib_path_exists_true::
 
@@ -687,7 +689,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
         create => "true",
         edit_line => lines_present( "$(response[content])" ),
         edit_defaults => empty,
-        if => regcmp( ".*", "$(response[content][version])" );
+        if => regcmp( ".*", "$(content[version])" );
 
 @if minimum_version(3.11)
       # template_method inline_mustache introduced in 3.11
@@ -697,7 +699,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
         edit_template_string => "{{{content}}}",
         template_data => @(response),
         create =>   "true",
-        if => regcmp( ".*", "$(response[content][version])" );
+        if => regcmp( ".*", "$(content[version])" );
 @endif
 }
 
