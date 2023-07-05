@@ -702,6 +702,59 @@ Here is an example setting the acl from augments:
 
 **See Also:** [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
 
+### Configure hosts that may connect to cf-serverd
+
+`allowconnects` is a list of IP addresses or subnets in `body server control` which restricts hosts that are allowed to connect to `cf-serverd`. This is the first layer of access control in `cf-serverd`, a client coming from a host not covered by this list will not be able to connect to `cf-serverd` at all.
+
+In the MPF this defaults to include localhost and the value defined for `default:def.acl`.
+
+`allowconnects` can be customized by configuring `default:def.control_server_allowconnects` via Augments. Note, this will *overwrite* the default value which includes `127.0.0.1` , `::1`, and `@(def.acl)` that you may want to include.
+
+For example, this configuration allows any IPv4 client to connect to `cf-serverd`.
+
+```json
+{
+  "variables": {
+    "default:def.allowconnects": {
+      "value": [
+        "0.0.0.0/0"
+      ]
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in 3.22.0
+
+### Configure hosts that may make multiple concurrent connections to cf-serverd
+
+`allowallconnects` is a list of IP addresses or subnets in `body server control` specifying hosts that are allowed to have more than one connection to `cf-serverd`.
+
+In the MPF this defaults to include localhost and the value defined for `default:def.acl`.
+
+`allowallconnects` can be customized by configuring `default:def.control_server_allowallconnects` via Augments.
+
+For example, this configuration allows any IPv4 client from the `192.168.56.0/24` subnet to have multiple concurrent connections to `cf-serverd`.
+
+
+```json
+{
+  "variables": {
+    "default:def.allowallconnects": {
+      "value": [
+        "192.168.56.0/24"
+      ]
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in 3.22.0
+
 ### ignore_missing_bundles
 
 This option allows you to ignore errors when a bundle specified in body common control bundlesequence is not found.
