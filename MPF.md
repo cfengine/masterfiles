@@ -259,6 +259,26 @@ By default Mission Portal listens for HTTP requests on port 80, redirecting to H
 
 - Added in CFEngine 3.23.0
 
+### Disable plain http redirect to https for CFEngine Enterprise Mission Portal
+
+By default Mission Portal listens for HTTP requests on port 80, redirecting to HTTPS on port 443. To prevent redirection of requests on HTTP to HTTPS define `default:cfe_cfengine_enterprise_enable_plain_http`.
+
+**For example:**
+
+```json
+{
+  "classes": {
+    "default:cfe_enterprise_enable_plain_http": {
+      "class_expressions": [ "(am_policy_hub|policy_server).test_server::" ]
+    }
+  }
+}
+```
+
+**History:**
+
+- Added in CFEngine 3.6.0
+
 ### Disable cf\_promises\_validated check
 
 For non policy hubs the default update policy only performs a full scan of
