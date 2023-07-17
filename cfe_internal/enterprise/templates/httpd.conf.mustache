@@ -234,11 +234,11 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
   <IfModule rewrite_module>
     RewriteEngine On
 
-    {{^classes.cfe_enterprise_enable_plain_http}}
+    {{^classes.cfe_enterprise_disable_http_redirect_to_https}}
     # Force https with redirection
     RewriteCond %{HTTPS} off
     RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-    {{/classes.cfe_enterprise_enable_plain_http}}
+    {{/classes.cfe_enterprise_disable_http_redirect_to_https}}
 
     {{#classes.mission_portal_index_php_redirect_enabled}}
     # redirect from `index.php/path` to `/path`
