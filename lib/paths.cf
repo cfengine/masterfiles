@@ -149,6 +149,7 @@ bundle common paths
       "path[mailx]"         string => "/usr/bin/mailx";
       "path[prelink]"       string => "/usr/sbin/prelink";
       "path[ssh]"           string => "/usr/bin/ssh";
+      "path[ss]"            string => "/usr/bin/ss";
 
     aix::
 
