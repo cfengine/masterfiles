@@ -148,6 +148,7 @@ bundle common paths
       "path[getent]"        string => "/usr/bin/getent";
       "path[mailx]"         string => "/usr/bin/mailx";
       "path[ssh]"           string => "/usr/bin/ssh";
+      "path[ss]"            string => "/usr/bin/ss";
 
     aix::
 
