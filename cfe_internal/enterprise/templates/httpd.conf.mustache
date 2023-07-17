@@ -5,7 +5,11 @@ ServerSignature Off
 ServerTokens ProductOnly
 ServerName {{{vars.sys.fqhost}}}
 ServerRoot "{{{vars.sys.workdir}}}/httpd"
+{{#classes.cfe_enterprise_disable_plain_http}}
+# ENT-10411
 Listen 80
+{{/classes.cfe_enterprise_disable_plain_http}}
+
 PidFile "{{{vars.mission_portal_apache_from_stage.httpd_pid_file}}}"
 
 # Modules
