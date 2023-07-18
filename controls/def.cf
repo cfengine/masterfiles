@@ -413,6 +413,15 @@ bundle common def
         via the master_software_updates shortcut.",
         if => not( isvariable( "def.dir_master_software_updates" ));
 
+    enterprise_edition.(policy_server|am_policy_hub)::
+      # Only enterprise hubs have Mission Portal
+
+      "cfe_enterprise_mission_portal_apache_sslprotocol" -> { "ENT-10412" }
+        string => "all -SSLv2 -SSLv3 -TLSv1", # We disable some versions of SSL
+                                              # as they are known to be insecure
+        if => not( isvariable( "default:def.cfe_enterprise_mission_portal_apache_sslprotocol" ) ),
+        comment => "The SSL protocol versions that are allowed by Apache for Mission Portal";
+
     solaris::
       "cf_runagent_shell"
         string  => "/usr/bin/sh",
