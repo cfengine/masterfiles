@@ -785,7 +785,7 @@ default of 1 week (`10080` minutes).
 
 **History:**
 
-- Introduced in 3.23.0
+- Introduced in 3.23.0, 3.21.3, 3.18.6
 
 ### trustkeysfrom
 
