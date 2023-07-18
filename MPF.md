@@ -1428,6 +1428,24 @@ Primarily for developer conveniance, this setting allows you to easily disable t
 }
 ```
 
+### Configure Enterprise Mission Portal Apache SSLProtocol
+
+This directive can be used to control which versions of the SSL/TLS protocol will be accepted in new connections.
+
+```json
+{
+  "variables": {
+    "default:def.cfe_enterprise_mission_portal_apache_sslprotocol": {
+      "value": "-SSLv3 -TLSv1 -TLSv1.1 -TLSv1.2 +TLSv1.3"
+    }
+  }
+}
+```
+
+**History:**
+
+- Added in CFEngine 3.23.0, 3.22.3, 3.18.6
+
 ### Bundlesequence
 
 #### Classification bundles before autorun
