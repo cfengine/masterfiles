@@ -234,6 +234,12 @@ bundle common def
                           "true",
                           "false");
 
+      "control_common_lastseenexpireafter" -> { "ENT-10414" }
+        string => "10080", # 10080 minutes is 1 week
+        if => not( isvariable( "default:def.control_common_lastseenexpireafter") ),
+        comment => concat( "Since lastseenexpireafter is not defined, we default to",
+                           " the binary default of 10080 minutes (1 week)" );
+
       # Agent controls
 @if minimum_version(3.18.0)
       # TODO When 3.18 is the oldest supported LTS, redact this macro and associated protections
