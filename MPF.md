@@ -795,6 +795,27 @@ This example illustrates enabling the option via augments.
 
 - Introduced in 3.12.0
 
+### lastseenexpireafter
+
+This option configures the number of minutes after which last-seen entries in
+`cf_lastseen.lmdb` are purged. If not specified, the MPF defaults to the binary
+default of 1 week (`10080` minutes).
+
+```json
+{
+  "variables": {
+    "default:def.control_common_ignore_missing_inputs": {
+      "value": "30240",
+      "comment": "We want to retain history of hosts in the last-seen database for 21 days"
+    }
+  }
+}
+```
+
+**History:**
+
+- Introduced in 3.23.0
+
 ### trustkeysfrom
 
 The list of network ranges that `cf-serverd` should trust keys from. This is
