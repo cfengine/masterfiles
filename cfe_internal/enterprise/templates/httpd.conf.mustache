@@ -132,7 +132,7 @@ LogLevel warn
   # This content used to be included from an external file
   # /var/cfengine/httpd/conf/extra/httpd-ssl.conf
 
-  Listen 443
+  Listen 8443
 
   AddType application/x-x509-ca-cert .crt
   AddType application/x-pkcs7-crl    .crl
@@ -178,12 +178,12 @@ LogLevel warn
   SSLRandomSeed startup builtin
   SSLRandomSeed connect builtin
 
-  <VirtualHost _default_:443>
+  <VirtualHost _default_:8443>
     DocumentRoot "{{{vars.cfe_internal_hub_vars.public_docroot}}}"
     Alias "/api" "{{{vars.cfe_internal_hub_vars.docroot}}}/api"
     Alias "/api/static" "{{{vars.cfe_internal_hub_vars.docroot}}}/api/static"
     Alias "/ldap" "{{{vars.cfe_internal_hub_vars.docroot}}}/ldap"
-    ServerName {{{vars.sys.fqhost}}}:443
+    ServerName {{{vars.sys.fqhost}}}:8443
     # ServerAdmin root@localhost
     ErrorLog "{{{vars.cfe_internal_hub_vars.error_log}}}"
     LogFormat "%h %l %{username}n %t \"%r\" %>s %b"
