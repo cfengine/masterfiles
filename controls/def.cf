@@ -691,6 +691,21 @@ bundle common def
       # Enable paths to POSIX tools instead of native tools when possible.
       "mpf_stdlib_use_posix_utils" expression => "any";
 
+    enterprise_edition.(policy_server|am_policy_hub)::
+      "cfe_enterprise_disable_http_redirect_to_https"
+        scope => "namespace",
+        expression => "cfe_cfengine_enterprise_enable_plain_http";
+
+      "cfe_enterprise_disable_http_redirect_to_https"
+        expression => "cfe_enterprise_disable_plain_http",
+        comment => "If plain http is disabled, it makes no sense to redirect to it, so we disable that as well.";
+
+  reports:
+      "Warning: the 'cfe_cfengine_enterprise_enable_plain_http' class has been deprecated in favor of 'cfe_enterprise_disable_http_redirect_to_https', please adjust accordingly. The  'cfe_enterprise_disable_http_redirect_to_https' class has been set automatically."
+        if => "cfe_enterprise_disable_http_redirect_to_https.cfe_cfengine_enterprise_enable_plain_http";
+      "Warning: the 'cfe_cfengine_enterprise_enable_plain_http' class has been deprecated in favor of 'cfe_enterprise_disable_http_redirect_to_https', please adjust accordingly."
+        if => "cfe_cfengine_enterprise_enable_plain_http.!cfe_enterprise_disable_http_redirect_to_https";
+
 }
 
 bundle common inventory_control
