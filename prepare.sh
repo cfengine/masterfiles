@@ -88,8 +88,6 @@ MPF.md
 README.md
 test-driver
 tests
-travis-scripts
-.travis.yml
 cfe_internal/core/watchdog/README.md
 cfe_internal/enterprise/ha/ha_info.json
 .github
