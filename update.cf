@@ -158,6 +158,12 @@ body agent control
 
         agentfacility => "$(default:update_def.control_agent_agentfacility)";
 
+    mpf_update_control_agent_default_repository::
+
+      # Location to backup files before they are edited by cfengine
+
+        default_repository => "$(update_def.control_agent_default_repository)";
+
 }
 
 #############################################################################
