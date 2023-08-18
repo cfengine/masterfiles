@@ -526,7 +526,8 @@ body file_select u_cf3_files
 body file_select u_input_files
 # @brief Select files by extension that we should include when updating inputs
 {
-      leaf_name => { @(update_def.input_name_patterns) };
+      leaf_name => { @(update_def.input_name_patterns),
+                     @(update_def.input_name_patterns_extra) };
       file_result => "leaf_name";
 }
 
