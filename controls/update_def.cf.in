@@ -66,6 +66,11 @@ bundle common update_def
                            not(isvariable("input_name_patterns"))),
         meta => { "defvar" };
 
+      "input_name_patterns_extra" -> { "ENT-10480" }
+        slist => {},
+        comment => "Additional filename patterns to copy during policy update.",
+        if => not( isvariable( "input_name_patterns_extra" ) );
+
       # the permissions for your masterfiles files (not dirs), which will propagate to inputs
       "masterfiles_perms_mode_not_dir" -> { "CFE-951" }
         string => "0600",

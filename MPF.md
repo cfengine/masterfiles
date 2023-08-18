@@ -456,7 +456,7 @@ For example:
 
 - Introduced 3.19.0, 3.18.1
 
-### Files considered for copy during policy updates
+### Override files considered for copy during policy updates
 
 The default update policy only copies files that match regular expressions
 listed in ```def.input_name_patterns```.
@@ -481,6 +481,35 @@ bootstrap the
 embedded
 [failsafe policy](https://github.com/cfengine/core/blob/master/libpromises/failsafe.cf) is
 used and it decides which files should be copied.
+
+### Extend files considered for copy during policy updates
+
+The default update policy only copies files that match regular expressions
+listed in `default:def.input_name_patterns`. The variable
+`default:update_def.input_name_patterns` allows the definition of additional
+filename patterns without having to maintain the full set of defaults.
+
+This [augments file][Augments] additionally ensures that files ending in
+`.tpl`, `.md`, and `.org` are also copied.
+
+```json
+{
+    "variables": {
+        "default:update_def.input_name_patterns_extra": {
+          "value": [ ".*\\.tpl", ".*\\.md", ".*\\.org" ],
+          "comment": "We use classic CFEngine templates suffixed with .tpl so they should be copied along with documentation."
+        }
+    }
+}
+```
+
+**Note:** This filter does **not** apply to bootstrap operations. During
+bootstrap the embedded
+[failsafe policy](https://github.com/cfengine/core/blob/master/libpromises/failsafe.cf)
+is used and it decides which files should be copied.
+
+**History:**
+  - Introduced in CFEngine 3.23.0
 
 ### Configuring component management
 
