@@ -120,6 +120,15 @@ bundle common update_def
     # enable_cfengine_enterprise_hub_ha is defined below
     # Disabled by default
 
+      # If we want to use the backup repository for update (because the class is
+      # defined) and if the location is not already configured (via Augments),
+      # set a default.
+
+      "control_agent_default_repository" -> { "ENT-10481" }
+        string => "$(sys.workdir)/backups",
+        if => and( "mpf_update_control_agent_default_repository",
+                   not( isvariable( "control_agent_default_repository" ) ) );
+
     enable_cfengine_enterprise_hub_ha::
       "standby_servers" slist => filter("$(sys.policy_hub)", "ha_def.ips", false, true, 10);
       "policy_servers" slist => { "$(sys.policy_hub)", "@(standby_servers)" };
