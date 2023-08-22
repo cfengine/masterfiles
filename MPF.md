@@ -1733,7 +1733,7 @@ For example:
 
 **History:**
 
-- Introduced in CFEngine 3.23.0
+- Introduced in CFEngine 3.23.0, 3.21.3
 
 ### Configure periodic package inventory refresh interval
 
