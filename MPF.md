@@ -1720,7 +1720,49 @@ For example:
 }
 ```
 
-**History**: Added in 3.10.1
+**Notes:**
+
+- This applies to `promises.cf`.
+
+
+**History:**
+
+- Introduced in CFEngine 3.10.1
+
+### Configure default repository for file backups during policy update
+
+By default the agent creates a backup of a file before it is edited in the same
+directory as the edited file. This happens during policy update but the backup
+files are culled by default as part of the default sync behavior.
+
+Defining the `default:mpf_update_control_agent_default_repository` class will
+cause these backups to be placed in `$(sys.workdir)/backups`. Customize the
+backup directory by setting `default:update_def.control_agent_default_backup`.
+
+For example:
+
+```
+{
+  "classes": {
+    "default:mpf_update_control_agent_default_repository": {
+      "class_expressions": [ "any::" ]
+    }
+  },
+  "variables": {
+    "default:update_def.control_agent_default_repository": {
+      "value": "/var/cfengine/policy-update-backups"
+    }
+  }
+}
+```
+
+**Notes:**
+
+- This applies to `update.cf`.
+
+**History:**
+
+- Introduced in CFEngine 3.23.0
 
 ### Configure periodic package inventory refresh interval
 
