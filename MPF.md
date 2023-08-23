@@ -509,7 +509,7 @@ bootstrap the embedded
 is used and it decides which files should be copied.
 
 **History:**
-  - Introduced in CFEngine 3.23.0
+  - Introduced in CFEngine 3.23.0, 3.23.3, 3.18.6
 
 ### Configuring component management
 
