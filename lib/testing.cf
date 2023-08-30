@@ -198,7 +198,18 @@ bundle agent testing_generic_report(format, outfile)
     tap::
       "tap_tests" data => mergedata(tests_passed, tests_failed, tests_skipped, tests_todo);
 
-      "tap_results" data => mapdata("json_pipe", "$(def.jq) 'sort_by(.test_offset) | .[] | [(.test_offset|tostring), .tap_message ] | join(\" \") '", tap_tests);
+      "tap_results" data => parsejson(string_mustache(
+        concat(
+          '[',
+          '{{#-top-}}',
+          '{{#fail_message?}}not ok{{/fail_message?}}',
+          '"',
+          '{{^fail_message?}}ok {{/fail_message?}}',
+          '{{test_offset}} {{test_message}}',
+          '",',
+          '{{/-top-}}',
+          ']'),
+        tap_tests));
 
     tap.inform_mode::
       "tap_tests_info" string => format("%S", tap_tests);
