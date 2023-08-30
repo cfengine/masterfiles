@@ -233,6 +233,10 @@ bundle agent testing_generic_report(format, outfile)
         edit_template => "$(this.promise_dirname)/templates/tap.mustache";
 
   reports:
+    any::
+      "CRAIG tap_json: ${tap_json}";
+      "CRAIG tap_results: ${with}" with => storejson(tap_results);
+      "CRAIG tap_tests: ${with}" with => storejson(tap_tests);
     junit.stdout::
       "$(const.n)$(junit_out)";
 
