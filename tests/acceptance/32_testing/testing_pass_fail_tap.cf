@@ -1,0 +1,48 @@
+######################################################
+#
+#   lib/testing.cf basic tests
+#
+#####################################################
+body common control
+{
+      inputs => { "../../default.cf.sub",
+                  "$(sys.libdir)/testing.cf" };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent test
+{
+  methods:
+"fail" usebundle => testing_ok_if("lipstick_kleenex",
+"test that trout mask replica is in effect",
+"error: captain beefheart was here",
+"trace: something went wrong",
+"delayed-tap");
+
+"pass" usebundle => testing_ok_if("cfengine",
+"test that cfengine class is defined, yes it should always be",
+"error: no errors",
+"trace: no trace logs",
+"delayed-tap");
+
+  "tap report"
+    usebundle => testing_tap_report( "$(this.promise_dirname)/test-result.tap" );
+}
+
+#######################################################
+
+bundle agent check
+{
+  classes:
+      "ok" expression => fileexists("$(this.promise_dirname)/test-result.tap");
+
+  reports:
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+}
+
