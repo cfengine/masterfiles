@@ -154,7 +154,7 @@ bundle agent testing_generic_report(format, outfile)
       "tests_passed" data => '[]';
       "tests_passed"
         data => mergedata(tests_passed,
-                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "tap_message": "ok %s" }]',
+                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s" }]',
                                 regex_replace($(passed), "^testing_", "", "T"),
                                 "$(testing_ok_if.next_$(passed))",
                                 regex_replace(join(",", grep("^message=.*", getclassmetatags($(passed)))), "^message=", "", "T"),
@@ -163,7 +163,7 @@ bundle agent testing_generic_report(format, outfile)
       "tests_failed" data => '[]';
       "tests_failed"
         data => mergedata(tests_failed,
-                         format('[{ "testcase": "%s", "fail_message": "%s", "trace_message": "%s", "test_offset": %d, "test_message": "%s", "tap_message": "not ok %s" }]',
+                         format('[{ "testcase": "%s", "failure": true, "fail_message": "%s", "trace_message": "%s", "test_offset": %d, "test_message": "%s" }]',
                                 regex_replace($(failed), "^testing_", "", "T"),
                                 regex_replace(join(",", grep("^error=.*", getclassmetatags($(failed)))), "^error=", "", "T"),
                                 regex_replace(join(",", grep("^trace=.*", getclassmetatags($(failed)))), "^trace=", "", "T"),
@@ -174,7 +174,7 @@ bundle agent testing_generic_report(format, outfile)
       "tests_skipped" data => '[]';
       "tests_skipped"
         data => mergedata(tests_skipped,
-                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "tap_message": "ok # SKIP %s" }]',
+                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "skip": true }]',
                                 regex_replace($(skipped), "^testing_", "", "T"),
                                 "$(testing_skip.next_$(skipped))",
                                 regex_replace(join(",", grep("^message=.*", getclassmetatags($(skipped)))), "^message=", "", "T"),
@@ -183,7 +183,7 @@ bundle agent testing_generic_report(format, outfile)
       "tests_todo" data => '[]';
       "tests_todo"
         data => mergedata(tests_todo,
-                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "tap_message": "ok # TODO %s" }]',
+                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "todo": true }]',
                                 regex_replace($(todo), "^testing_", "", "T"),
                                 "$(testing_todo.next_$(todo))",
                                 regex_replace(join(",", grep("^message=.*", getclassmetatags($(todo)))), "^message=", "", "T"),
@@ -198,7 +198,22 @@ bundle agent testing_generic_report(format, outfile)
     tap::
       "tap_tests" data => mergedata(tests_passed, tests_failed, tests_skipped, tests_todo);
 
-      "tap_results" data => mapdata("json_pipe", "$(def.jq) 'sort_by(.test_offset) | .[] | [(.test_offset|tostring), .tap_message ] | join(\" \") '", tap_tests);
+      "tap_json" string => string_mustache(
+        concat(
+          '[ ',
+          '{{#-top-}}',
+          '"',
+          '{{#failure}}not ok {{/failure}}',
+          '{{^failure}}ok {{/failure}}',
+          '{{test_offset}} {{test_message}}',
+          '{{#skip}} # SKIP {{/skip}}',
+          '{{#todo}} # TODO {{/todo}}',
+          '", ',
+          '{{/-top-}}',
+          ' ]'),
+        tap_tests);
+    "tap_results" data => parsejson("${tap_json}");
+
 
     tap.inform_mode::
       "tap_tests_info" string => format("%S", tap_tests);
