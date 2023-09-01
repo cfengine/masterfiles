@@ -1,3 +1,29 @@
+3.21.3:
+	- Fixed 'regline' error messages which appear on systems (ex. CentOS 6)
+	  where /sys/hypervisor/uuid is not readable (ENT-9931)
+	- Removed jq dependency in lib/testing.cf and fixed tap output (CFE-4242,
+	  CFE-4245)
+	- Added ability to enable backup archives during policy update (ENT-10481)
+	- Added ability to extend without overriding filename patterns to copy
+	  during policy update (ENT-10480)
+	- Added ability to disable plain http for CFEngine Enterprise Mission Portal
+	  (ENT-10411)
+	- Made lastseenexpireafter in body common control configurable via Augments
+	  (ENT-10414)
+	- Made Mission Portal Apache SSLProtocol configurable via augments
+	  (ENT-10412)
+	- Added ss to paths for linux (ENT-10413)
+	- Made allowconnects and allowallconnects configurable via Augments
+	  (ENT-10212)
+	- Stopped filtering $(sys.bindir) from dynamically determined python path
+	  (CFE-4223)
+	- Removed considerations for old versions from bundle agent
+	  cfe_autorun_inventory_aws_ec2_metadata_cache (CFE-4222)
+	- Fixed cfe_autorun_inventory_aws_ec2_metadata_cache file creation
+	  (CFE-4221)
+	- Aligned module build result with release artifact (ENT-10345)
+	- Added support for RockyLinux in self upgrade (ENT-10335)
+
 3.21.2:
 	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
 	- Added self upgrade support for Ubuntu 22.04, Debian 11, and EL9 (ENT-10290)
