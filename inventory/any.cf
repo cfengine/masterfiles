@@ -617,6 +617,15 @@ bundle common cfe_autorun_inventory_aws
         scope => "namespace",
         if => isvariable("cfe_autorun_inventory_dmidecode.dmi[bios-vendor]");
 
+@if minimum_version(3.22.0)
+      "sys_hypervisor_uuid_readable" -> { "ENT-9931" }
+        expression => isreadable("/sys/hypervisor/uuid", 1);
+@else
+      "sys_hypervisor_uuid_readable" -> { "ENT-9931" }
+        expression => returnszero("${paths.cat} /sys/hypervisor/uuid 2>/dev/null", "useshell");
+@endif
+
+    !disable_inventory_aws.sys_hypervisor_uuid_readable::
       "ec2_instance" -> { "CFE-2924" }
         expression => regline( "^ec2.*", "/sys/hypervisor/uuid" ),
         scope => "namespace",
