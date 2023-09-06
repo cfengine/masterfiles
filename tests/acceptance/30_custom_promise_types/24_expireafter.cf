@@ -51,6 +51,9 @@ bundle agent test
       "description" -> { "CFE-3435" }
         string => "Test that expireafter works with custom promise types";
 
+      "test_flakey_fail"
+        string => "aarch64.debian_11",
+        meta => { "ENT-10623" };
       "test_skip_unsupported"
         string => "!supports_expireafter|!compatible_python_version";
 
