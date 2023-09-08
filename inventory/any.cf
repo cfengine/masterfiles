@@ -606,7 +606,10 @@ bundle common cfe_autorun_inventory_aws
 @if minimum_version(3.22.0)
       "sys_hypervisor_uuid_readable" -> { "ENT-9931" }
         expression => isreadable("/sys/hypervisor/uuid", 1);
-@else
+@endif
+
+@if minimum_version(3.12.0)
+    cfengine_3_12|cfengine_3_13|cfengine_3_14|cfengine_3_15|cfengine_3_18|cfengine_3_19|cfengine_3_20|cfengine_3_21::
       "sys_hypervisor_uuid_readable" -> { "ENT-9931" }
         expression => returnszero("${paths.cat} /sys/hypervisor/uuid 2>&1 >/dev/null", "useshell");
 @endif
