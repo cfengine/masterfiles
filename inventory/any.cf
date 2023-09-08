@@ -622,7 +622,7 @@ bundle common cfe_autorun_inventory_aws
         expression => isreadable("/sys/hypervisor/uuid", 1);
 @else
       "sys_hypervisor_uuid_readable" -> { "ENT-9931" }
-        expression => returnszero("${paths.cat} /sys/hypervisor/uuid 2>&1 >/dev/null", "useshell");
+        expression => returnszero("${paths.cat} /sys/hypervisor/uuid >/dev/null 2>&1", "useshell");
 @endif
 
     !disable_inventory_aws.sys_hypervisor_uuid_readable::
