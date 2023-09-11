@@ -10,6 +10,10 @@ bundle agent init
 {
   meta:
     "test_skip_needs_work" string => "solaris|suse";
+    "test_flakey_fail"
+      string => "aarch64.debian_11",
+      meta => { "ENT-9601" };
+
   files:
     test_pass_1::
       "$(sys.workdir)/modules/packages/test_module"
