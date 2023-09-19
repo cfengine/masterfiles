@@ -1,3 +1,29 @@
+3.21.3:
+	- Fixed 'regline' error messages which appear on systems (ex. CentOS 6)
+	  where /sys/hypervisor/uuid is not readable (ENT-9931)
+	- Removed jq dependency in lib/testing.cf and fixed tap output (CFE-4242,
+	  CFE-4245)
+	- Added ability to enable backup archives during policy update (ENT-10481)
+	- Added ability to extend without overriding filename patterns to copy
+	  during policy update (ENT-10480)
+	- Added ability to disable plain http for CFEngine Enterprise Mission Portal
+	  (ENT-10411)
+	- Made lastseenexpireafter in body common control configurable via Augments
+	  (ENT-10414)
+	- Made Mission Portal Apache SSLProtocol configurable via augments
+	  (ENT-10412)
+	- Added ss to paths for linux (ENT-10413)
+	- Made allowconnects and allowallconnects configurable via Augments
+	  (ENT-10212)
+	- Stopped filtering $(sys.bindir) from dynamically determined python path
+	  (CFE-4223)
+	- Removed considerations for old versions from bundle agent
+	  cfe_autorun_inventory_aws_ec2_metadata_cache (CFE-4222)
+	- Fixed cfe_autorun_inventory_aws_ec2_metadata_cache file creation
+	  (CFE-4221)
+	- Aligned module build result with release artifact (ENT-10345)
+	- Added support for RockyLinux in self upgrade (ENT-10335)
+
 3.21.2:
 	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
 	- Added self upgrade support for Ubuntu 22.04, Debian 11, and EL9 (ENT-10290)
@@ -304,8 +330,8 @@
 	- Prevent setgid files from causing continual repair related to setuid file inventory
 	  (ENT-6782)
 	- Removed stale unused copy of u_kept_successful_command body. If you
-      receive an error about undefined body, alter your policy to use
-      kept_successful_command instead (CFE-3617)
+	  receive an error about undefined body, alter your policy to use
+	  kept_successful_command instead (CFE-3617)
 	- Removed unused plugins directory (CFE-3618)
 	- Renamed python symlink to cfengine-selected-python (CFE-3512)
 	- Shortened Inventory OS attribute to be more readable (ENT-6536)
@@ -318,7 +344,7 @@
 	- Use VBScript to enumerate installed packages (ENT-4669)
 	- add /usr/bin/yum to paths.cf for aix (CFE-3615)
 	- service status on FreeBSD now uses onestatus (CFE-3515)
-    - Guard again enforcing root ownership for CFEngine files on Windows (ENT-4628)
+	- Guard again enforcing root ownership for CFEngine files on Windows (ENT-4628)
 
 3.17.0:
 	- Added .csv to the list of file extensions considered by default during
@@ -457,7 +483,7 @@
 	- Fixed re-spawning of cf-execd or cf-monitord after remediating duplicate concurrent processes
 	  (CFE-3150)
 	- Replaced /var/cfengine with proper $(sys.*) vars (ENT-4800)
-    - Fixed selection of standard_services when used from non-default namespace (ENT-5406)
+	- Fixed selection of standard_services when used from non-default namespace (ENT-5406)
 
 3.15.0b1:
 	- Added continual checking for policy_server state (CFE-3073)
