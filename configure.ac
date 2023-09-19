@@ -239,13 +239,12 @@ dnl Now make the Makefiles
 dnl ######################################################################
 
 AC_CONFIG_FILES([Makefile
-                controls/update_def.cf
-                promises.cf
-                standalone_self_upgrade.cf
                 tests/Makefile
                 tests/acceptance/Makefile
                 tests/unit/Makefile
 ])
+
+AC_CONFIG_COMMANDS([render_templates],[./render-templates.sh])
 
 AC_OUTPUT
 

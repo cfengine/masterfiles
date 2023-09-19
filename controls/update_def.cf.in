@@ -7,7 +7,7 @@ bundle common update_def
   vars:
     any::
 
-      "current_version" string => "@VERSION@";
+      "current_version" string => "@DEFAULT_SELF_UPGRADE_BINARY_VERSION@";
       "current_release" string => "@RELEASE@";
 
       # MPF Controls
