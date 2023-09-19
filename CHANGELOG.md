@@ -330,8 +330,8 @@
 	- Prevent setgid files from causing continual repair related to setuid file inventory
 	  (ENT-6782)
 	- Removed stale unused copy of u_kept_successful_command body. If you
-      receive an error about undefined body, alter your policy to use
-      kept_successful_command instead (CFE-3617)
+	  receive an error about undefined body, alter your policy to use
+	  kept_successful_command instead (CFE-3617)
 	- Removed unused plugins directory (CFE-3618)
 	- Renamed python symlink to cfengine-selected-python (CFE-3512)
 	- Shortened Inventory OS attribute to be more readable (ENT-6536)
@@ -344,7 +344,7 @@
 	- Use VBScript to enumerate installed packages (ENT-4669)
 	- add /usr/bin/yum to paths.cf for aix (CFE-3615)
 	- service status on FreeBSD now uses onestatus (CFE-3515)
-    - Guard again enforcing root ownership for CFEngine files on Windows (ENT-4628)
+	- Guard again enforcing root ownership for CFEngine files on Windows (ENT-4628)
 
 3.17.0:
 	- Added .csv to the list of file extensions considered by default during
@@ -483,7 +483,7 @@
 	- Fixed re-spawning of cf-execd or cf-monitord after remediating duplicate concurrent processes
 	  (CFE-3150)
 	- Replaced /var/cfengine with proper $(sys.*) vars (ENT-4800)
-    - Fixed selection of standard_services when used from non-default namespace (ENT-5406)
+	- Fixed selection of standard_services when used from non-default namespace (ENT-5406)
 
 3.15.0b1:
 	- Added continual checking for policy_server state (CFE-3073)
