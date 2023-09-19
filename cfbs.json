@@ -8,7 +8,18 @@
       "tags": ["supported", "base"],
       "repo": "https://github.com/cfengine/masterfiles",
       "by": "https://github.com/cfengine",
-      "steps": ["run ./prepare.sh -y", "copy ./ ./"]
+      "steps": ["run ./prepare.sh -y",
+                "delete cfe_internal/core/watchdog/README.md",
+                "delete cfe_internal/enterprise/ha/ha_info.json",
+                "delete .github",
+                "delete inventory/README.md",
+                "delete lib/README.md",
+                "delete LICENSE",
+                "delete modules/promises",
+                "delete .no-distrib",
+                "delete services/autorun/README.md",
+                "delete templates/README.md",
+                "copy ./ ./"]
     }
   }
 }
