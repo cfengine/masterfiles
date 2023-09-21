@@ -23,7 +23,7 @@ jobs:
       - name: Install CFEngine with cf-remote
         run: |
           pip3 install cf-remote
-          cf-remote --version master install --clients localhost
+          cf-remote --version $GITHUB_BASE_REF install --clients localhost
       - name: Run autotools / configure
         run: |
           INSTDIR=$HOME/cf_install
