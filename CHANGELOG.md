@@ -23,6 +23,7 @@
 	   (CFE-4242, CFE-4245, CFE-4246)
 	- Stopped filtering $(sys.bindir) from dynamically determined python path
 	  (CFE-4223)
+	- Ensured manual edits to httpd.conf are reverted (ENT-9698)
 
 3.18.5:
 	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
