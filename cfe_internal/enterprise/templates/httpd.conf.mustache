@@ -5,7 +5,7 @@ ServerSignature Off
 ServerTokens ProductOnly
 ServerName {{{vars.sys.fqhost}}}
 ServerRoot "{{{vars.sys.workdir}}}/httpd"
-{{#classes.cfe_enterprise_disable_plain_http}}
+{{^classes.cfe_enterprise_disable_plain_http}}
 # ENT-10411
 Listen 80
 {{/classes.cfe_enterprise_disable_plain_http}}
