@@ -23,6 +23,7 @@
 	  (CFE-4221)
 	- Aligned module build result with release artifact (ENT-10345)
 	- Added support for RockyLinux in self upgrade (ENT-10335)
+	- Fixed apache listening on port 80 by default (ENT-10672)
 
 3.21.2:
 	- Adjusted dump.sh for multiple runs in between superhub imports (ENT-10274)
