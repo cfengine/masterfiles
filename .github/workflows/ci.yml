@@ -9,9 +9,12 @@ on:
 jobs:
   style_check:
     uses: ./.github/workflows/style_check.yml
-  tests:
+  bootstrap_policy_run_check:
     needs: style_check
+    uses: ./.github/workflows/bootstrap_policy_run_check.yml
+  tests:
+    needs: bootstrap_policy_run_check
     uses: ./.github/workflows/tests.yml
   valgrind:
-    needs: style_check
+    needs: bootstrap_policy_run_check
     uses: ./.github/workflows/valgrind.yml

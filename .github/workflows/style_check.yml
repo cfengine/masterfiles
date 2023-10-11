@@ -7,6 +7,6 @@ jobs:
   style_check:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Style Check
       run: sh tests/style_check.sh

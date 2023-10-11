@@ -152,6 +152,15 @@ bundle server mpf_default_access_rules()
         if => isdir( "$(sys.workdir)/master_software_updates" ),
         admit => { @(def.acl) };
 
+      "$(sys.statedir)/cf_version.txt" -> { "ENT-10664" }
+        handle => "server_access_grant_access_state_cf_version",
+        shortcut => "hub-cf_version",
+        comment => concat( "We want remote hosts to default their target binary",
+                           " version to that of the hubs binary version, so we",
+                           " need to share this state with remote clients." ),
+        admit => { @(def.acl) };
+
+
     enterprise_edition.policy_server::
       "collect_calls"
         resource_type => "query",

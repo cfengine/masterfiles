@@ -4,11 +4,19 @@ bundle common update_def
   classes:
     any::
       "sys_policy_hub_port_exists" expression => isvariable("sys.policy_hub_port");
-  vars:
-    any::
 
-      "current_version" string => "@VERSION@";
-      "current_release" string => "@RELEASE@";
+  vars:
+      "hub_binary_version" -> { "ENT-10664" }
+        data => data_regextract(
+                                 "^(?<major_minor_patch>\d+\.\d+\.\d+)-(?<release>\d+)",
+                                 readfile("$(sys.statedir)$(const.dirsep)hub_cf_version.txt" ) ),
+        if => fileexists( "$(sys.statedir)$(const.dirsep)hub_cf_version.txt" );
+
+      "current_version" -> { "ENT-10664" }
+        string => "$(hub_binary_version[major_minor_patch])";
+
+      "current_release"
+        string => "$(hub_binary_version[release])";
 
       # MPF Controls
 

@@ -115,11 +115,38 @@ bundle agent cfengine_software
 # @brief Variables to control the specifics in desired package selection
 {
   vars:
+    any::
+
+      # Extract the hub binary version info if it's available. Only expected to
+      # be available on a client.
+      "hub_binary_version" -> { "ENT-10664" }
+        data => data_regextract(
+                                 "^(?<major_minor_patch>\d+\.\d+\.\d+)-(?<release>\d+)",
+                                 readfile("$(sys.statedir)$(const.dirsep)hub_cf_version.txt" ) ),
+        if => fileexists( "$(sys.statedir)$(const.dirsep)hub_cf_version.txt" );
 
       # Default desired CFEngine software
       "pkg_name" string => ifelse( isvariable( "def.cfengine_software_pkg_name" ), $(def.cfengine_software_pkg_name), "cfengine-nova");
-      "pkg_version" string => ifelse( isvariable( "def.cfengine_software_pkg_version" ), $(def.cfengine_software_pkg_version), "@VERSION@");
-      "pkg_release" string => ifelse( isvariable( "def.cfengine_software_pkg_release" ), $(def.cfengine_software_pkg_release), "@RELEASE@");
+
+
+      "pkg_version" -> { "ENT-10664" }
+        string => "$(sys.cf_version_major).$(sys.cf_version_minor).$(sys.cf_version_patch)",
+        if => "am_policy_hub|policy_server",
+        comment => "The hub will use it's own version to seed client packages.";
+      "pkg_version" -> { "ENT-10664" }
+        string => "$(hub_binary_version[major_minor_patch])",
+        if => isvariable("hub_binary_version[major_minor_patch]"),
+        comment => "Use the hub binary version if available.";
+      "pkg_version"
+        string => "$(def.cfengine_software_pkg_version)",
+        if => isvariable( "def.cfengine_software_pkg_version" ),
+        comment => "If the target version is explicitly set, we want to use that.";
+
+
+      "pkg_release" string => "$(sys.cf_version_release)", if => "am_policy_hub|policy_server";
+      "pkg_release" string => "$(hub_binary_version[release])", if => isvariable("hub_binary_version[release]");
+      "pkg_release" string => "$(def.cfengine_software_pkg_release)", if => isvariable("def.cfengine_software_pkg_release");
+
       "pkg_arch" string => ifelse( isvariable( "def.cfengine_software_pkg_arch" ), $(def.cfengine_software_pkg_arch), "x86_64");
       "package_dir" string => ifelse( isvariable( "def.cfengine_software_pkg_dir" ), $(def.cfengine_software_pkg_dir), "$(sys.flavour)_$(sys.arch)");
       "pkg_edition_path" string => ifelse( isvariable( "def.cfengine_software_pkg_edition_path" ), $(def.cfengine_software_pkg_edition_path), "enterprise/Enterprise-$(pkg_version)/agent");
@@ -197,15 +224,6 @@ bundle agent cfengine_software
 
 
   files:
-      "$(sys.statedir)/MPF/."
-        create => "true";
-
-      "$(sys.statedir)/MPF/desired-cfengine-package-version.json"
-        create => "true";
-
-      "$(sys.statedir)/MPF/desired-cfengine-package-version.json" -> { "ENT-3592", "ENT-3937" }
-        edit_line => cfengine_software_version_data;
-
     windows::
       "$(sys.bindir)$(const.dirsep)vercmp.ps1"
         create => "true",
@@ -216,20 +234,6 @@ bundle agent cfengine_software
 
 }
 
-bundle edit_line cfengine_software_version_data
-# @brief Populate data file with the package information
-# The data this bundle writes is used by the update policy to determine if the
-# standalone self upgrade policy should be run or not.
-# TODO Consider replacing with inline_mustache after 3.10.x is EOL
-{
-      delete_lines: ".*";
-      insert_lines: '{
-"name": "$(cfengine_software.pkg_name)",
-"version": "$(cfengine_software.pkg_version)",
-"release": "$(cfengine_software.pkg_release)",
-"arch": "$(cfengine_software.pkg_arch)"
-}';
-}
 
 bundle agent cfengine_software_cached_locally
 # @brief Ensure that the internal local software mirror is up to date
@@ -682,11 +686,20 @@ bundle agent cfengine_master_software_content
        create => "true",
        comment => "We need a place to download each packge we build";
 
+      "$(download_dir)/$(cfengine_software.pkg_version)-downloaded.txt"
+        content => join( "\n", classesmatching( "binary_downloaded_.*" ) ),
+        if => isgreaterthan( length(classesmatching( "binary_downloaded_.*" )),
+                             0 ),
+        comment => concat( "We place a marker of the files downloaded so that",
+                           " the hub can skip the self upgrade policy after",
+                           " download.");
+
   commands:
       # Fetch each package that we don't already have
        "/usr/bin/curl"
         args => "-s $(base_url)/$(dir[$(platform_dir)])/$(cfengine_package_names.pkg[$(platform_dir)]) --output /var/cfengine/master_software_updates/$(platform_dir)/$(cfengine_package_names.pkg[$(platform_dir)])",
-        if => not( fileexists( "$(download_dir)/$(platform_dir)/$(cfengine_package_names.pkg[$(platform_dir)])" ) );
+        if => not( fileexists( "$(download_dir)/$(platform_dir)/$(cfengine_package_names.pkg[$(platform_dir)])" ) ),
+        classes => u_if_else("binary_downloaded_$(platform_dir)","binary_not_downloaded");
 
   reports:
     DEBUG|DEBUG_cfengine_master_software_content::
