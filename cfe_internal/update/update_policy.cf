@@ -797,7 +797,9 @@ bundle agent modules_presence
   vars:
     "_vendored_dir" string => "$(this.promise_dirname)/../../modules/packages/vendored/";
     "_override_dir" string => "$(this.promise_dirname)/../../modules/packages/";
+    "_custom_template_dir" string => "$(this.promise_dirname)/../../modules/mustache/";
     "_vendored_paths" slist => findfiles("$(_vendored_dir)*.mustache");
+    "_custom_template_paths" slist => findfiles("$(_custom_template_dir)*.mustache"), if => isdir( "$(_custom_template_dir)" );
     "_package_paths" slist => filter("$(_override_dir)vendored", _package_paths_tmp, "false", "true", 999);
     windows::
       "_package_paths_tmp" slist => findfiles("\Q$(_override_dir)\E*");
@@ -811,7 +813,8 @@ bundle agent modules_presence
       "_package_paths_tmp" slist => findfiles("$(_override_dir)*");
       "_vendored_modules" slist => maplist(regex_replace("$(this)", "$(_vendored_dir)(.*).mustache", "$1", "g"), @(_vendored_paths));
       "_override_modules" slist => maplist(regex_replace("$(this)", "$(_override_dir)(.*)", "$1", "g"), @(_package_paths));
-      "_not_vendored_modules_pathname_regex" string => "$(sys.inputdir)/modules/(?!packages/vendored).*";
+      "_custom_template_modules" slist => maplist(regex_replace("$(this)", "$(_custom_template_dir)(.*).mustache", "$1", "g"), @(_custom_template_paths));
+      "_not_vendored_modules_pathname_regex" string => "$(sys.inputdir)/modules/(?!(packages/vendored|mustache/)).*";
 
   classes:
     "override_vendored_module_$(_vendored_modules)" expression => fileexists("$(_override_dir)$(_vendored_modules)");
@@ -835,6 +838,14 @@ bundle agent modules_presence
       if => or (
         canonify("override_vendored_module_$(_override_modules)"),
         canonify("override_module_$(_override_modules)"));
+
+    "$(sys.workdir)/modules/$(_custom_template_modules)" -> { "ENT-10793" }
+        comment => "We want to render mustache templated modules",
+        handle => "cfe_internal_update_policy_files_custom_template_modules",
+        template_method => "mustache",
+        edit_template => "$(_custom_template_dir)$(_custom_template_modules).mustache",
+        perms => u_mo("500", "root"),
+        if => fileexists("$(_custom_template_dir)$(_custom_template_modules).mustache");
 
     "$(sys.workdir)/modules"
       comment => "Copy any non-packages modules",
