@@ -124,5 +124,11 @@ rocky::
    "description" -> { "ENT-8292" }
      string => "Rocky $(sys.os_version_major)",
      meta => { "inventory", "attribute_name=OS" };
+
+amzn_2::
+   "description" -> { "ENT-10817" }
+     string => "Amazon 2",
+     meta => { "inventory", "attribute_name=OS" };
+
 @endif
 }
