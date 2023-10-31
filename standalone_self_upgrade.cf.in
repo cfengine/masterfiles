@@ -149,6 +149,8 @@ bundle agent cfengine_software
         comment => concat( "On debian hosts it's the CFEngine standard to use 'arm64' in",
                            "the package filename." );
 
+      "package_dir"
+        string => "$(sys.flavor)_arm_64";
 
     (redhat|centos|suse|sles).32_bit::
       "pkg_arch"
