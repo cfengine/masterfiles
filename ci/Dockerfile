@@ -10,5 +10,3 @@ RUN cf-agent -KIf update.cf | tee update.log
 RUN cf-agent -KI | tee promise.log
 RUN cf-agent -KI | tee -a promise.log
 RUN cf-agent -KI | tee -a promise.log
-#RUN grep -qc error: *.log && exit 42
-#CMD sh -c "sleep infinity"

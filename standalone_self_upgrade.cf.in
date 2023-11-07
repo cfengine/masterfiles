@@ -34,13 +34,13 @@ bundle common def_standalone_self_upgrade
       "control_common_tls_min_version_defined" -> { "ENT-10198" }
         expression => isvariable( "default:def.control_common_tls_min_version"),
         comment => concat( "If default:def.control_common_tls_min_version is defined then",
-                           " it's value will be used for the minimum version in outbound",
+                           " its value will be used for the minimum version in outbound",
                            " connections. Else the binary default will be used.");
 
       "control_common_tls_ciphers_defined" -> { "ENT-10198" }
         expression => isvariable( "default:def.control_common_tls_ciphers"),
         comment => concat( "If default:def.control_common_tls_ciphers is defined then",
-                           " it's value will be used for the set of tls ciphers allowed",
+                           " its value will be used for the set of tls ciphers allowed",
                            " for outbound connections. Else the binary default will be used.");
 }
 body agent control
@@ -132,7 +132,7 @@ bundle agent cfengine_software
       "pkg_version" -> { "ENT-10664" }
         string => "$(sys.cf_version_major).$(sys.cf_version_minor).$(sys.cf_version_patch)",
         if => "am_policy_hub|policy_server",
-        comment => "The hub will use it's own version to seed client packages.";
+        comment => "The hub will use its own version to seed client packages.";
       "pkg_version" -> { "ENT-10664" }
         string => "$(hub_binary_version[major_minor_patch])",
         if => isvariable("hub_binary_version[major_minor_patch]"),

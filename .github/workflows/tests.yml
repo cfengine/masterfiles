@@ -29,7 +29,7 @@ jobs:
           INSTDIR=$HOME/cf_install
           export INSTDIR
           cd masterfiles
-          sh -x ./autogen.sh --prefix=$INSTDIR > autogen.log 2>&1
+          ./autogen.sh --prefix=$INSTDIR > autogen.log 2>&1
           cd ..
       - name: Prepare Artifacts for Uploading
         run: tar -zcvf /tmp/workspace.tgz ./ && mv /tmp/workspace.tgz ./
