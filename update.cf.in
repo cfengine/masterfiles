@@ -18,7 +18,7 @@ body common control
                           @(update_def.bundlesequence_end), # Define control_common_update_bundlesequnce_end via augments
       };
 
-      version => "update.cf $(update_def.current_version)";
+      version => "update.cf @VERSION@";
 
       inputs => {
                   "cfe_internal/update/lib.cf",
@@ -99,30 +99,59 @@ bundle agent cfengine_internal_standalone_self_upgrade_execution
                           isexecutable( "/usr/bin/systemd-run" ), "/usr/bin/systemd-run --unit=cfengine-upgrade --scope ",
                           "");
 
-      "desired_pkg_data_path" -> { "ENT-3592" }
-        string => "$(sys.statedir)/MPF/desired-cfengine-package-version.json";
-
-      "desired_pkg_data" -> { "ENT-3592" }
-        data => readjson( $(desired_pkg_data_path), inf ),
-        if => fileexists( $(desired_pkg_data_path) );
-
       "local_update_log_dir"
         string => translatepath("$(sys.workdir)/software_updates/update_log"),
         comment => "This directory is used for logging the current version of cfengine running.";
 
-  classes:
-      # If we are running the version desired by the self upgrade policy
-      "at_desired_version_by_policy_specification" -> { "ENT-3592" }
-        expression => strcmp( "$(desired_pkg_data[version])", "$(sys.cf_version)"  );
+      "hub_binary_version" -> { "ENT-10664" }
+        data => data_regextract(
+                                 "^(?<major_minor_patch>\d+\.\d+\.\d+)-(?<release>\d+)",
+                                 readfile("$(sys.statedir)$(const.dirsep)hub_cf_version.txt" ) ),
+        if => fileexists( "$(sys.statedir)$(const.dirsep)hub_cf_version.txt" );
 
+  classes:
       # If we are running the version explicitly defined by the user
       "at_desired_version_by_user_specification" -> { "ENT-3592" }
         expression => strcmp( "$(def.cfengine_software_pkg_version)", "$(sys.cf_version)" );
 
+      "at_desired_version_by_hub_binary_version" -> { "ENT-10664" }
+        expression => strcmp( "$(hub_binary_version[major_minor_patch])", "$(sys.cf_version)" );
+
       "at_desired_version"
-        or => { "at_desired_version_by_user_specification", "at_desired_version_by_policy_specification" };
+        or => { "at_desired_version_by_user_specification",
+                "at_desired_version_by_hub_binary_version" };
+
+    policy_server|am_policy_hub::
+
+      "downloaded_target_binaries"
+        expression => fileexists( "$(sys.workdir)/master_software_updates/$(def.cfengine_software_pkg_version)-downloaded.txt"),
+        if => isvariable( "def.cfengine_software_pkg_version");
+
+      "downloaded_target_binaries"
+        expression => fileexists( "$(sys.workdir)/master_software_updates/$(sys.cf_version_major).$(sys.cf_version_minor).$(sys.cf_version_patch)-downloaded.txt"),
+        if => not( isvariable( "def.cfengine_software_pkg_version") );
 
   files:
+
+    !(policy_server|am_policy_hub)::
+
+      "$(sys.statedir)/hub_cf_version.txt" -> { "ENT-10664", "handle:server_access_grant_access_state_cf_version" }
+        comment => concat( "We copy the hub binary version state locally",
+                           " so that we can target the hubs binary",
+                           " version as the default target version for",
+                           " self upgrade." ),
+        handle => "cfe_internal_update_hub_cf_version",
+        copy_from => u_remote_dcp_missing_ok( "hub-cf_version", $(sys.policy_hub) );
+
+    policy_server|am_policy_hub::
+
+      "$(sys.statedir)/cf_version.txt" -> { "ENT-10664", "handle:server_access_grant_access_state_cf_version" }
+        comment => concat( "We record the hubs binary version in state and this",
+                           " is shared with clients so that clients can target",
+                           " the hubs binary version as the default target",
+                           " version for self upgrade." ),
+        handle => "cfe_internal_update_state_cf_version",
+        content => "$(sys.cf_version_major).$(sys.cf_version_minor).$(sys.cf_version_patch)-$(sys.cf_version_release)";
 
     enterprise_edition::
 
@@ -134,7 +163,7 @@ bundle agent cfengine_internal_standalone_self_upgrade_execution
 
   commands:
 
-    trigger_upgrade.!at_desired_version::
+    trigger_upgrade.!(at_desired_version|mpf_disable_hub_masterfiles_software_update_seed|downloaded_target_binaries)::
 
       '$(exec_prefix)$(sys.cf_agent) --inform --timestamp --file "$(this.promise_dirname)$(const.dirsep)standalone_self_upgrade.cf" --define trigger_upgrade,update_cf_initiated >"$(sys.workdir)$(const.dirsep)outputs/standalone_self_upgrade_$(sys.cdate).log"'
       handle => "standalone_self_upgrade",

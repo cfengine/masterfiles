@@ -24,7 +24,8 @@ cd -               # back to original directory
 
 if [ -z "$NO_CONFIGURE" ]
 then
-    $srcdir/configure --enable-maintainer-mode "$@"  ||  exit $?
+    # prepend 'sh -x' if you want to debug
+    "$srcdir"/configure --enable-maintainer-mode "$@" || exit $?
 fi
 
 exit 0

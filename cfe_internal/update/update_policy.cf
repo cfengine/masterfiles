@@ -591,6 +591,19 @@ body copy_from u_cp_missing_ok(from)
       missing_ok => "true";
 }
 
+body copy_from u_remote_dcp_missing_ok(from,server)
+# @brief Download a file from a remote server if available and if differs from the local copy.
+#
+# @param from The location of the file on the remote server
+# @param server The hostname or IP of the server from which to download
+#
+# **See Also:** `remote_dcp()`
+{
+        servers     => { "$(server)" };
+        source      => "$(from)";
+        compare     => "digest";
+        missing_ok => "true";
+}
 #########################################################
 
 body action u_immediate

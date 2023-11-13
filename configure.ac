@@ -191,7 +191,8 @@ done
 AC_SUBST(MASTERFILES_TESTS)
 
 MASTERFILES_INSTALL_TARGETS=
-for j in `echo $srcdir/*.cf`
+find $srcdir -maxdepth 1 -name '*.cf' > tmp
+while IFS= read -r j
 do
     # Only add those that don't have a corresponding .in file.
     # They will be added later.
@@ -199,7 +200,8 @@ do
     then
         MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $j"
     fi
-done
+done < tmp
+rm tmp
 for j in `echo $srcdir/*.cf.in`
 do
     # Add .in files, but without the .in suffix.
@@ -240,6 +242,7 @@ dnl ######################################################################
 
 AC_CONFIG_FILES([Makefile
                 controls/update_def.cf
+                update.cf
                 promises.cf
                 standalone_self_upgrade.cf
                 tests/Makefile

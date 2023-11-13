@@ -29,8 +29,15 @@ jobs:
           INSTDIR=$HOME/cf_install
           export INSTDIR
           cd masterfiles
-          ./autogen.sh --enable-debug --prefix=$INSTDIR
+          ./autogen.sh --prefix=$INSTDIR > autogen.log 2>&1
           cd ..
+      - name: Prepare Artifacts for Uploading
+        run: tar -zcvf /tmp/workspace.tgz ./ && mv /tmp/workspace.tgz ./
+      - name: Upload The Workspace as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: workspace
+          path: workspace.tgz
       - name: Install Masterfiles
         run: make -C masterfiles install
       - name: Validate policy with cf-promises
