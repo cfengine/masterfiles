@@ -60,7 +60,7 @@ log "Dumping tables: $CFE_FR_TABLES"
   # in case of 3.12 must copy m_inventory as if it was __inventory
   if [[ "$CFE_VERSION" =~ "3.12." ]]; then
     # pg_dump will not dump the contents of views so we must run the following SQL:
-    "$CFE_BIN_DIR"/psql cfdb -c "COPY (SELECT * FROM m_inventory WHERE values IS NOT NULL) TO STDOUT CSV QUOTE '''' FORCE QUOTE *" |
+    "$CFE_BIN_DIR"/psql cfdb --quiet -c "COPY (SELECT * FROM m_inventory WHERE values IS NOT NULL) TO STDOUT CSV QUOTE '''' FORCE QUOTE *" |
       sed -e 's.^.INSERT INTO __inventory (hostkey, values) VALUES (.' \
           -e 's.$.);.'
   fi
