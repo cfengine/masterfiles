@@ -392,26 +392,37 @@ the appropriate platform directory. Clients will automatically download and
 install packages when the ```trigger_upgrade``` class is defined during a run of
 `update.cf`.
 
+By default self upgrade targets the binary version running on the hub. Specify a specific version by defining `default:def.cfengine_software_pkg_version`.
 
-This [augments file][Augments] will defines `trigger_upgrade` on hosts with IPv4 addresses in 192.0.2.0/24 or 203.0.113.0/24 or hosts that have a cfengine 3.10 class not for cfengine 3.10.2.
+This [augments file][Augments] will defines `trigger_upgrade` on hosts that are not policy servers that are also not running CFEngine version 3.21.3.
 
 ```json
 {
-   "classes": {
-    "trigger_upgrade": [
-      "ipv4_10_10_1",
-      "ipv4_10_10_2",
-      "cfengine_3_10_(?!2$)\\d+"
-    ]
-   }
+  "classes": {
+    "default:trigger_upgrade": {
+      "class_expressions": [
+        "!(am_policy_hub|policy_server).!cfengine_3_21_3::"
+      ],
+      "comment": "We want clients to self upgrade their binary version if they aren't running the desired version."
+    }
+  },
+  "variables": {
+    "default:def.cfengine_software_pkg_version": {
+      "value": "3.21.3",
+      "comment": "When self upgrading, this is the binary version we want to be installed."
+    }
+  }
 }
 ```
 
 **Notes:**
 
 - This policy is specific to CFEngine Enterprise.
-- The negative look ahead regular expression is useful because it automatically
-  turns off on hosts after they reach the target version.
+- If using a regular expression based on CFEngine version, use a negative look ahead to disable self upgrade when the host reaches the desired version. e.g. `cfengine_3_18_(?!2$)\\d+` matches hosts running CFEngine 3.18 but not 3.18.2 specifically.
+
+**History:**
+
+* Changed default binary version from policy version to hub binary version in 3.23.0
 
 #### Configure path that software is served from for autonomous agent upgrades
 
