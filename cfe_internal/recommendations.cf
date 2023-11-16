@@ -21,7 +21,6 @@ bundle agent postgresql_conf_recommendations
 
   vars:
     "pgsql_conf" string => "$(sys.statedir)/pg/data/postgresql.conf";
-    "pgsql_conf" string => "/tmp/postgresql.conf";
     "mem_info_source" string => "/proc/meminfo";
       "mem_info_data"
         data => data_readstringarray( $(mem_info_source), "", "(:|\s+)", inf, inf),
@@ -68,13 +67,17 @@ bundle agent postgresql_conf_recommendations
   files:
       "$(pgsql_conf)"
         edit_line => set_line_based("$(this.bundle).conf", "=", "\s*=\s*", ".*", "\s*#\s*"),
-        action => warn_only;
+        classes => results( "bundle", "psql_conf_recommendations" ),
+        action => warn_only,
+        if => fileexists( $(pgsql_conf) );
 
   reports:
+    psql_conf_recommendations_not_kept::
       "CFEngine Recommended Settings:";
-      "shared_buffers = $(conf[shared_buffers])";
-      "effective_cache_size = $(conf[effective_cache_size])";
-      "maintenance_work_mem = $(conf[maintenance_work_mem])";
-      "$(pgsql_conf) contains:"
-        printfile => cat( $(pgsql_conf) );
+      "shared_buffers = $(conf[shared_buffers])"
+        if => isvariable( "conf[shared_buffers]" );
+      "effective_cache_size = $(conf[effective_cache_size])"
+        if => isvariable( "conf[effective_cache_size]" );
+      "maintenance_work_mem = $(conf[maintenance_work_mem])"
+        if => isvariable( "conf[maintenance_work_mem]" );
 }
