@@ -59,7 +59,7 @@ bundle agent cfe_internal_management
       "bundles" slist => getindices(policy);
 
       "recommendation_bundles"
-        slist => sort( bundlesmatching( "cfengine_recommendations" ), lex);
+        slist => sort( bundlesmatching( ".*", "cfengine_recommends" ), lex);
 
   methods:
 
