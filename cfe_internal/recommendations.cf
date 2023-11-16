@@ -9,6 +9,72 @@ bundle agent MPF_class_recommendations
         if => "cfengine_internal_purge_policies";
 }
 
+@if minimum_version(3.21.4)
+# The preferred location for ignore_interfaces.rx changed from
+# $(sys.inputdir)/ignore_interfaces.rx to $(sys.workdir)/ignore_interfaces.rx in
+# 3.23.0 and 3.21.4. Versions lower than 3.23.0 and 3.21.4 only look for the file in inputdir.
+bundle agent ignore_interfaces_rx_reccomendations
+# @brief Recommend completing migration of ignore_interfaces.rx from inputdir to workdir
+#
+# @description This bundle identifies the presence of ignore_interfaces.rx in
+# inputdir and emits messages about its presence. Additionally, the file is
+# automatically copied if the file is present in inputdir and the class
+# default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir is defined (not
+# defined by default).
+{
+  meta:
+      "tags" slist => { "cfengine_recommends" };
+
+  classes:
+      "ignore_interfaces_in_workdir_supported"
+        and => { cf_version_minimum( "3.21.4" ),
+                 not( cf_version_at( "3.22" ) ) },
+        comment => concat( "CFEngine doesn't look for ignore_interfaces.rx in",
+                           " workdir except for versions greater than or equal",
+                           "to 3.21.4." );
+
+      "ignore_interfaces_in_workdir" -> { "ENT-9402" }
+        if => fileexists( "$(sys.workdir)/ignore_interfaces.rx" );
+
+      "ignore_interfaces_in_inputdir" -> { "ENT-9402" }
+        if => fileexists( "$(sys.inputdir)/ignore_interfaces.rx" );
+
+  files:
+    ignore_interfaces_in_workdir_supported.default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir.ignore_interfaces_in_inputdir::
+      "$(sys.workdir)/ignore_interfaces.rx" -> { "ENT-9402" }
+        copy_from => local_dcp( "$(sys.inputdir)/ignore_interfaces.rx"),
+        comment => concat( "Excluding interfaces should be done outside of the",
+                           " policy input directory so that it's easier to",
+                           " ignore different interfaces on different hosts.");
+
+    ignore_interfaces_in_workdir_supported::
+
+      "$(sys.inputdir)/ignore_interfaces.rx" -> { "ENT-9402" }
+        delete => tidy,
+        action => policy( "warn" ),
+        comment => concat( "Excluding interfaces should be done outside of the",
+                           " policy input directory so that it's easier to",
+                           " ignore different interfaces on different hosts.",
+                           " This file should be deleted once it's been migrated",
+                           " to sys.workdir");
+
+  reports:
+
+    ignore_interfaces_in_workdir_supported.(ignore_interfaces_in_inputdir.!default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled)::
+      "NOTICE: 'ignore_interfaces.rx' is present in '$(const.dollar)(sys.inputdir)' ('$(sys.inputdir)/ignore_interfaces.rx'). We recommend that it be removed and migrated to '$(const.dollar)(sys.workdir)' ('$(sys.workdir)/ignore_interfaces.rx')"
+        if => not( fileexists( "$(sys.workdir)/ignore_interfaces.rx" ) );
+
+    ignore_interfaces_in_workdir_supported.(ignore_interfaces_in_workdir.ignore_interfaces_in_inputdir).!default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled::
+      "NOTICE: 'ignore_interfaces.rx' identical in '$(const.dollar)(sys.workdir)' and '$(const.dollar)(sys.inputdir)'. We recommend removing '$(const.dollar)(sys.inputdir)/ignore_interfaces.rx'"
+        if => strcmp( readfile( "$(sys.workdir)/ignore_interfaces.rx"),
+                      readfile( "$(sys.inputdir)/ignore_interfaces.rx") );
+
+      "NOTICE: 'ignore_interfaces.rx' in '$(const.dollar)(sys.workdir)' and '$(const.dollar)(sys.inputdir)' but not identical. We recommend verifying the desired content of '$(const.dollar)(sys.workdir)/ignore_interfaces.rx', correcting it if necessary and removing '$(const.dollar)(sys.inputdir)/ignore_interfaces.rx'"
+        if => not( strcmp( readfile( "$(sys.workdir)/ignore_interfaces.rx"),
+                           readfile( "$(sys.inputdir)/ignore_interfaces.rx") ) );
+
+}
+@endif
 
 bundle agent postgresql_conf_recommendations
 # @brief Recommendations about the configuration of postgresql.conf for CFEngine Enterprise Hubs
