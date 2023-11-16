@@ -1617,7 +1617,7 @@ This directive can be used to control which versions of the SSL/TLS protocol wil
 
 **History:**
 
-- Added in CFEngine 3.23.0
+* Added in CFEngine 3.23.0, 3.21.3, 3.18.6
 
 ### Bundlesequence
 
