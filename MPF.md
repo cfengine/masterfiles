@@ -614,18 +614,18 @@ The following settings are defined in `controls/def.cf` can be set from an
 
 Prior to `3.23.0` this file was expected to be found in
 `$(sys.inputdir)/ignore_interfaces.rx`. Beginning with `3.23.0` preference is
-given to `$(sys.workdir)/ignore_interfaces.rx` if it is found and `WARNING` is
+given to `$(sys.workdir)/ignore_interfaces.rx` if it is found. A `WARNING` is
 emitted by cfengine if the file is found only in `$(sys.inputdir)`.
 
 When the class `default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir` is
-defined `$(sys.workdir)/ignore_interfaces.rx` is maintained as a copy of
-`$(sys.inputdir)/ignore_interfaces.rx`.
+defined (not defined by default) `$(sys.workdir)/ignore_interfaces.rx` is
+maintained as a copy of `$(sys.inputdir)/ignore_interfaces.rx`.
 
 ```json
 {
   "classes": {
     "default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir": {
-      "class_expressions": "cfengine_3_23|cfengine_3_24",
+      "class_expressions": [ "cfengine_3_23|cfengine_3_24::" ],
       "comment": "Automatically migrate ignore_interfaces.rx to workdir."
     }
   }
@@ -642,12 +642,16 @@ presence and state in relation to `$(sys.workdir)/ignore_interfaces.rx`.
 {
   "classes": {
     "default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled": {
-      "class_expressions": "cfengine_3_23|cfengine_3_24",
+      "class_expressions": [ "cfengine_3_23|cfengine_3_24::" ],
       "comment": "We don't want reports about legacy ignore_interfaces.rx to be emitted."
     }
   }
 }
 ```
+
+**History:**
+
+- Introduced `default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir` and `default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled` in 3.23.0, 3.21.4
 
 ### dmidecode inventory
 
