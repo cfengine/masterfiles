@@ -127,18 +127,25 @@ for file in $dump_files; do
   if [ ! -f "${file}.failed" ]; then
     hostkey=$(basename "$file" | cut -d. -f1)
     logfile="$WORKDIR"/outputs/"$hostkey"-schema-attach-$(date +%F-%T)-failure.log
-    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
-                        -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-      > "$logfile" 2>&1 || one_failed=1
-      if [ "$one_failed" = "0" ]; then
-        rm -f "$logfile"
-      else
-        any_failed=1
-        log "Attaching schemas: FAILED for $hostkey, check $logfile for details"
-        log "last 10 lines of $logfile"
-        tail -n 10 "$logfile"
-      fi
-      one_failed=0
+    if [ "${CFE_FR_DEBUG_IMPORT}" = "yes" ]; then
+      "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" "$debug_import_arg" \
+                          -c "SET client_min_messages TO DEBUG5" \
+                          -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+        > "$logfile" 2>&1 || one_failed=1
+    else
+      "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" "$debug_import_arg" \
+                          -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+        > "$logfile" 2>&1 || one_failed=1
+    fi
+    if [ "$one_failed" = "0" ]; then
+      rm -f "$logfile"
+    else
+      any_failed=1
+      log "Attaching schemas: FAILED for $hostkey, check $logfile for details"
+      log "last 10 lines of $logfile"
+      tail -n 10 "$logfile"
+    fi
+    one_failed=0
   else
     rm -f "${file}.failed"
   fi

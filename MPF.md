@@ -1930,6 +1930,24 @@ config when it notices a change in *policy*.
 **History**: Added in 3.11.
 
 ### Federated Reporting
+#### Debug import process
+
+In order to get detailed logs about import failures define the class `default:cfengine_mp_fr_debug_import` on the _superhub_.
+
+For example, to define this class via Augments:
+
+```json
+{
+  "classes": {
+    "cfengine_mp_fr_debug_import": [ "any::" ]
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.23.0
+
 #### Enable Federated Reporting Distributed Cleanup
 
 Hosts that report to multiple feeders result in duplicate entries and other issues. Distributed cleanup helps to deal with this condition.
