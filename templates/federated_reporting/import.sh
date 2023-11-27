@@ -52,7 +52,7 @@ declare -a hostkeys
 for file in $dump_files; do
   hostkey=$(basename "$file" | cut -d. -f1)
   hostkeys+=($hostkey)
-  if [ -z $("$CFE_BIN_DIR"/psql --csv --tuples-only -U cfapache -d cfdb -c "SELECT hub_id FROM __hubs WHERE hostkey = '$hostkey';") ]; then
+  if [ -z $("$CFE_BIN_DIR"/psql --quiet --csv --tuples-only -U cfapache -d cfdb -c "SELECT hub_id FROM __hubs WHERE hostkey = '$hostkey';") ]; then
     log "No feeder with hostkey $hostkey found in cfdb.__hubs, skipping the dump file $file, consider deleting this file or re-adding the feeder to superhub"
     dump_files=$(echo "$dump_files" | sed "s,\s\?$file,," | xargs)
   else
