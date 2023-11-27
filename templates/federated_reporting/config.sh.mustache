@@ -83,6 +83,8 @@ CFE_FR_DB_USER="{{db_user}}"
 CFE_FR_DB_USER="${CFE_FR_DB_USER:-cfpostgres}"
 CFE_FR_HANDLE_DUPLICATES="{{handle_duplicates}}"   # default is no (don't handle duplicates as it adds to time to import)
 CFE_FR_HANDLE_DUPLICATES="${CFE_FR_HANDLE_DUPLICATES:-no}"
+CFE_FR_DEBUG_IMPORT="{{debug_import}}" # default is no (don't run imports with debug level logging)
+CFE_FR_DEBUG_IMPORT="${CFE_FR_DEBUG_IMPORT:-no}"
 
 # distributed_cleanup dir
 CFE_FR_DISTRIBUTED_CLEANUP_DIR="{{distributed_cleanup_dir}}"
