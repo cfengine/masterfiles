@@ -79,6 +79,22 @@ bundle common def
         if => and(not(isvariable("override_data_acl")), not(isvariable("acl"))),
         meta => { "defvar" };
 
+    !disable_always_accept_policy_server_acl::
+      "acl_derived" -> { "ENT-10951" }
+        slist => {
+                   @(def.acl),
+                   "$(sys.policy_hub)"
+        },
+        comment => "Define an acl for the machines to be granted accesses";
+
+    disable_always_accept_policy_server_acl::
+      "acl_derived" -> { "ENT-10951" }
+        slist => {
+                   @(def.acl)
+        },
+        comment => "Define an acl for the machines to be granted accesses";
+
+    any::
 
       "control_server_allowconnects" -> { "ENT-10212" }
         slist => { "127.0.0.1" , "::1", @(def.acl) },
@@ -87,12 +103,46 @@ bundle common def
                            " allowconnects in body server control if not",
                            " already specified" );
 
+    !disable_always_accept_policy_server_allowconnects::
+      "control_server_allowconnects_derived" -> { "ENT-10951" }
+        slist => { "$(sys.policy_hub)", @(def.control_server_allowconnects) },
+        comment => concat( "We want to define the default setting for",
+                           " allowconnects in body server control if not",
+                           " already specified. Since not explicitly excluded",
+                           " we want the policy server itself to be allowed." );
+
+    disable_always_accept_policy_server_allowconnects::
+      "control_server_allowconnects_derived" -> { "ENT-10951" }
+        slist => { @(def.control_server_allowconnects) },
+        comment => concat( "We want to define the default setting for",
+                           " allowconnects in body server control if not",
+                           " already specified. Since explicitly excluded",
+                           " we don't automatically include the policy server itself." );
+
+    any::
+
       "control_server_allowallconnects" -> { "ENT-10212" }
         slist => { "127.0.0.1" , "::1", @(def.acl) },
         if => not( isvariable( "control_server_allowallconnects" ) ),
         comment => concat( "We want to define the default setting for",
                            " allowallconnects in body server control if not",
                            " already specified" );
+
+    !disable_always_accept_policy_server_allowallconnects::
+      "control_server_allowallconnects_derived" -> { "ENT-10951" }
+        slist => { @(def.control_server_allowallconnects), "$(sys.policy_hub)" },
+        comment => concat( "We want to define the default setting for",
+                           " allowallconnects in body server control if not",
+                           " already specified" );
+
+    disable_always_accept_policy_server_allowallconnects::
+      "control_server_allowallconnects_derived" -> { "ENT-10951" }
+        slist => { @(def.control_server_allowallconnects) },
+        comment => concat( "We want to define the default setting for",
+                           " allowallconnects in body server control if not",
+                           " already specified" );
+
+    any::
 
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  This is open by default for bootstrapping.
@@ -280,6 +330,15 @@ bundle common def
       # typically the last promise wins.
 
   classes:
+
+      "disable_always_accept_policy_server_acl"  -> { "ENT-10951" }
+        expression => "disable_always_accept_policy_server";
+
+      "disable_always_accept_policy_server_allowconnects" -> { "ENT-10951" }
+        expression => "disable_always_accept_policy_server";
+
+      "disable_always_accept_policy_server_allowallconnects" -> { "ENT-10951" }
+        expression => "disable_always_accept_policy_server";
 
       "control_agent_agentfacility_configured" -> { "ENT-10209" }
         expression => regcmp( "LOG_(USER|DAEMON|LOCAL[0-7])",
@@ -572,7 +631,7 @@ bundle common def
 
 
       "mpf_access_rules_collect_calls_admit_ips"
-        slist => { @(def.acl) },
+        slist => { @(def.acl_derived) },
         unless => isvariable(mpf_access_rules_collect_calls_admit_ips);
 
     enterprise_edition.client_initiated_reporting_enabled::
