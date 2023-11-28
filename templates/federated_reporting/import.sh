@@ -10,6 +10,7 @@ source "$(dirname "$0")/log.sh"
 source "$(dirname "$0")/parallel.sh"
 
 # check that we have all the variables we need
+true "${WORKDIR?undefined}"
 true "${CFE_BIN_DIR?undefined}"
 true "${CFE_FR_SUPERHUB_DROP_DIR?undefined}"
 true "${CFE_FR_SUPERHUB_IMPORT_DIR?undefined}"
@@ -119,26 +120,42 @@ if [ "$CFE_FR_HANDLE_DUPLICATES" = "yes" ]; then
   fi
 fi
 
-failed=0
+one_failed=0
+any_failed=0
 log "Attaching schemas"
 for file in $dump_files; do
   if [ ! -f "${file}.failed" ]; then
     hostkey=$(basename "$file" | cut -d. -f1)
-    "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" \
-                        -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
-      > schema_attach.log 2>&1 || failed=1
+    logfile="$WORKDIR"/outputs/"$hostkey"-schema-attach-$(date +%F-%T)-failure.log
+    if [ "${CFE_FR_DEBUG_IMPORT}" = "yes" ]; then
+      "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" "$debug_import_arg" \
+                          -c "SET client_min_messages TO DEBUG5" \
+                          -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+        > "$logfile" 2>&1 || one_failed=1
+    else
+      "$CFE_BIN_DIR"/psql -U $CFE_FR_DB_USER -d cfdb --set "ON_ERROR_STOP=1" "$debug_import_arg" \
+                          -c "SET SCHEMA 'public'; SELECT attach_feeder_schema('$hostkey', ARRAY[$table_whitelist]);" \
+        > "$logfile" 2>&1 || one_failed=1
+    fi
+    if [ "$one_failed" = "0" ]; then
+      rm -f "$logfile"
+    else
+      any_failed=1
+      log "Attaching schemas: FAILED for $hostkey, check $logfile for details"
+      log "last 10 lines of $logfile"
+      tail -n 10 "$logfile"
+    fi
+    one_failed=0
   else
     rm -f "${file}.failed"
   fi
 done
-if [ "$failed" = "0" ]; then
+if [ "$any_failed" = "0" ]; then
   log "Attaching schemas: DONE"
 else
   # attach_feeder_schema() makes sure the feeder's import schema is removed in
   # case of failure
   log "Attaching schemas: FAILED"
-  log "last 10 lines of schema_attach.log"
-  tail -n 10 schema_attach.log
   exit 1
 fi
 
