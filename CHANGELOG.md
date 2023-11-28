@@ -1,3 +1,48 @@
+3.23.0:
+	- Added ability to disable plain http for CFEngine Enterprise Mission Portal
+	  (ENT-10411)
+	- Added ability to enable backup archives during policy update
+	  (ENT-10481)
+	- Added ability to extend without overriding filename patterns to copy during policy update
+	  (ENT-10480)
+	- Added bundle to facilitate migration of ignore_interfaces.rx from inputdir to workdir
+	  (ENT-9402)
+	- Added self upgrade support for Amazon Linux 2 (ENT-10820)
+	- Added ss to paths for linux (ENT-10413)
+	- Aligned systemd service templates with core
+	  WantedBy=cfengine3.service was removed from systemd service templates
+	  for individual components. It was un-necessary as cfengine3.service already
+	  wants the individual services.
+	  https://github.com/cfengine/core/pull/5362
+	  Ticket: (CFE-3982)
+	- Avoided deleting python symlink when sys.bindir is not /var/cfengine/bin
+	  (CFE-4146)
+	- Changed default self upgrade target version to be that of Hubs binary version
+	  (ENT-10664)
+	- Fixed OS inventory for Amazon Linux 2 (ENT-10817)
+	- Fixed apache listening on port 80 by default (ENT-10672)
+	- Fixed cfe_autorun_inventory_aws_ec2_metadata_cache file creation
+	  Ticket: (CFE-4221)
+	- Removed jq dependency and fixed lib/testing.cf tap output (CFE-4245, CFE-4246, CFE-4223)
+	- Fixed self-upgrade for Debian and Ubuntu aarch64 clients (ENT-10816)
+	- Guard against /sys/hypervisor/uuid not being readable (ENT-9931)
+	- Made Mission Portal Apache SSLProtocol configurable via augments
+	  (ENT-10412)
+	- Made allowconnects and allowallconnects configurable via Augments
+	  (ENT-10212)
+	- Made lastseenexpireafter in body common control configurable via Augments
+	  (ENT-10414)
+	- Removed considerations for old versions from bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
+	  (CFE-4222)
+	- Stopped filtering $(sys.bindir) from dynamically determined python path
+	  (CFE-4223)
+	- Fixed recommendation policy execution (ENT-10915)
+	- Fixed postgresql.conf recommendations (ENT-10916)
+	- Added rendering of custom mustache templates to $(sys.workdir)/modules (ENT-10793)
+	- Fixed support for automatically installing semanage on el9 for federated reporting (ENT-10918)
+	- Improved failure logging during federated reporting schema import (ENT-10789)
+	- Added default:cfengine_mp_fr_debug_import class for federated reporting import debugging (ENT-10896)
+
 3.22.0:
 	- Added inventory for policy version (ENT-9806)
 	- Added condition to runalerts service to require stamp directory
