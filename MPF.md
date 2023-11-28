@@ -2020,7 +2020,7 @@ For example, to define this class via Augments:
 
 **History:**
 
-* Added in CFEngine 3.23.0
+* Added in CFEngine 3.23.0, 3.21.4, 3.18.7
 
 #### Enable Federated Reporting Distributed Cleanup
 
