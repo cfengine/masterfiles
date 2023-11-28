@@ -456,6 +456,8 @@ bundle agent federation_manage_files
     "workdir" data => parsejson('{"workdir":"$(sys.workdir)"}');
     "handle_duplicates_value" string => ifelse("default:cfengine_mp_fr_handle_duplicate_hostkeys", "yes", "no");
     "handle_duplicates" data => parsejson('{"handle_duplicates":"$(handle_duplicates_value)"}');
+    "debug_import_value" string => ifelse("default:cfengine_mp_fr_debug_import", "yes", "no");
+    "debug_import" data => parsejson('{"debug_import":"$(debug_import_value)"}');
 
   files:
     enterprise_edition.(policy_server|am_policy_hub)::
@@ -519,6 +521,7 @@ bundle agent federation_manage_files
                                    @(feeder_username),
                                    @(feeder),
                                    parsejson('{"superhub_hostkeys": "$(superhub_hostkeys)"}'),
+                                   @(debug_import),
                                    @(this_hostkey),
                                    @(cf_version),
                                    @(handle_duplicates),
