@@ -42,6 +42,8 @@
 	- Fixed support for automatically installing semanage on el9 for federated reporting (ENT-10918)
 	- Improved failure logging during federated reporting schema import (ENT-10789)
 	- Added default:cfengine_mp_fr_debug_import class for federated reporting import debugging (ENT-10896)
+	- Made $(sys.policy_hub) always be included in default:def.acl, allowconnects, and allowallconnects unless explicitly disabled
+	  (ENT-10951)
 
 3.22.0:
 	- Added inventory for policy version (ENT-9806)
