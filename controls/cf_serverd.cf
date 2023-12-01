@@ -10,11 +10,11 @@ body server control
 # @brief Control attributes for cf-serverd
 {
       # List of hosts that may connect (change the ACL in def.cf)
-      allowconnects         => { @(default:def.control_server_allowconnects) };
+      allowconnects         => { @(default:def.control_server_allowconnects_derived) };
 
       # Out of them, which ones should be allowed to have more than one
       # connection established at the same time?
-      allowallconnects      => { @(default:def.control_server_allowallconnects) };
+      allowallconnects      => { @(default:def.control_server_allowallconnects_derived) };
 
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  SEE COMMENTS IN def.cf
@@ -103,7 +103,7 @@ bundle server mpf_default_access_rules()
       shortcut => "masterfiles",
       comment => "Grant access to the policy updates",
       if => isdir( "$(def.dir_masterfiles)/" ),
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
       "$(def.dir_masterfiles)/.no-distrib" -> { "ENT-8079" }
       handle => "prevent_distribution_of_top_level_dot_no_distrib",
@@ -113,35 +113,35 @@ bundle server mpf_default_access_rules()
       handle => "server_access_grant_access_binary",
       comment => "Grant access to binary for cf-runagent",
       if => isdir( "$(def.dir_bin)/" ),
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
       "$(def.dir_data)/"
       handle => "server_access_grant_access_data",
       shortcut => "data",
       comment => "Grant access to data directory",
       if => isdir( "$(def.dir_data)/" ),
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
       "$(def.dir_modules)/"
       handle => "server_access_grant_access_modules",
       shortcut => "modules",
       comment => "Grant access to modules directory",
       if => isdir( "$(def.dir_modules)/" ),
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
       # TODO: Remove after 3.15 is no longer supported (December 18th 2022)
       "$(def.dir_plugins)/" -> { "CFE-3618" }
       handle => "server_access_grant_access_plugins",
       comment => "Grant access to plugins directory",
       if => isdir( "$(def.dir_plugins)/" ),
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
       "$(def.dir_templates)/"
       handle => "server_access_grant_access_templates",
       shortcut => "templates",
       comment => "Grant access to templates directory",
       if => isdir( "$(def.dir_templates)/" ),
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
     policy_server|am_policy_hub::
 
@@ -150,7 +150,7 @@ bundle server mpf_default_access_rules()
         shortcut => "master_software_updates",
         comment => "Grant access for hosts to download cfengine packages for self upgrade",
         if => isdir( "$(sys.workdir)/master_software_updates" ),
-        admit => { @(def.acl) };
+        admit => { @(def.acl_derived) };
 
       "$(sys.statedir)/cf_version.txt" -> { "ENT-10664" }
         handle => "server_access_grant_access_state_cf_version",
@@ -158,7 +158,7 @@ bundle server mpf_default_access_rules()
         comment => concat( "We want remote hosts to default their target binary",
                            " version to that of the hubs binary version, so we",
                            " need to share this state with remote clients." ),
-        admit => { @(def.acl) };
+        admit => { @(def.acl_derived) };
 
 
     enterprise_edition.policy_server::
@@ -230,7 +230,7 @@ bundle server mpf_default_access_rules()
       "$(ha_def.master_hub_location)"
       handle => "server_access_grant_access_policy_server_dat",
       comment => "Grant access to policy_server.dat",
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
       # Hubs keys working in HA configuration are stored in ppkeys_hubs directory.
       # In order to perform failover while active hub is down clients needs to
@@ -240,7 +240,7 @@ bundle server mpf_default_access_rules()
       handle => "server_access_grant_access_to_clients",
       comment => "Grant access to hubs' keys to clients",
       if => isdir("$(ha_def.hubs_keys_location)/"),
-      admit => { @(def.acl) };
+      admit => { @(def.acl_derived) };
 
     windows::
       "c:\program files\cfengine\bin\cf-agent.exe"

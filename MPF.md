@@ -822,19 +822,29 @@ control` are stripped before sending. The MPF will use the value of
 
 ### acl
 
-`def.acl` is a list of of network ranges that should be allowed to connect to cf-serverd. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed.
+`def.acl` is a list of of network ranges that should be allowed to connect to `cf-serverd`. It is also used in the default access promises to allow hosts access to policy and modules that should be distributed.
 
 Here is an example setting the acl from augments:
 
-```
+```json
 {
-  "vars": {
-    "acl": [ "24.124.0.0/16", "192.168.33.0/24" ]
+  "variables": {
+    "default:def.acl": {
+      "value": [ "24.124.0.0/16", "192.168.33.0/24" ]
+    }
   }
 }
 ```
 
+**Notes:**
+
+* Unless the class `default:disable_always_accept_policy_server_acl` is defined the value of `$(sys.policy)` server is automatically added to this producing `def.acl_derived` which is used by the default access promises.
+
 **See Also:** [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
+
+**History:**
+
+* Automatic inclusion of `$(sys.policy_hub)` added in 3.23.0
 
 ### Configure hosts that may connect to cf-serverd
 
@@ -849,7 +859,7 @@ For example, this configuration allows any IPv4 client to connect to `cf-serverd
 ```json
 {
   "variables": {
-    "default:def.allowconnects": {
+    "default:def.control_server_allowconnects": {
       "value": [
         "0.0.0.0/0"
       ]
@@ -858,9 +868,15 @@ For example, this configuration allows any IPv4 client to connect to `cf-serverd
 }
 ```
 
+**Notes:**
+
+* The value of `$(sys.policy)` server is automatically included in the value used by `allowconnects` in `body server control` unless the class `default:disable_always_accept_policy_server_allowconnects` is defined.
+* Alternatively define `default:disable_always_accept_policy_server`  to disable this behavior for `allowconnects`, `allowallconnects` and `def.acl` concurrently.
+
 **History:**
 
 * Added in 3.22.0
+* Automatic inclusion of `$(sys.policy_hub)` added in 3.23.0
 
 ### Configure hosts that may make multiple concurrent connections to cf-serverd
 
@@ -876,7 +892,7 @@ For example, this configuration allows any IPv4 client from the `192.168.56.0/24
 ```json
 {
   "variables": {
-    "default:def.allowallconnects": {
+    "default:def.control_server_allowallconnects": {
       "value": [
         "192.168.56.0/24"
       ]
@@ -885,9 +901,15 @@ For example, this configuration allows any IPv4 client from the `192.168.56.0/24
 }
 ```
 
+**Notes:**
+
+* The value of `$(sys.policy_hub)` is automatically included in the value used by `allowallconnects` in `body server control` unless the class `default:disable_always_accept_policy_server_allowallconnects` is defined.
+* Alternatively define `default:disable_always_accept_policy_server` to disable this behavior for `allowconnects`, `allowallconnects` and `def.acl` concurrently.
+
 **History:**
 
 * Added in 3.22.0
+* Automatic inclusion of `$(sys.policy_hub)` added in 3.23.0
 
 ### ignore_missing_bundles
 
