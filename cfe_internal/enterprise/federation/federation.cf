@@ -181,6 +181,8 @@ bundle agent config
 bundle agent distributed_cleanup_dependencies
 # @brief warn if python3 and urllib3 required dependencies are not installed
 # if cfengine_mp_fr_enable_distributed_cleanup class is defined
+# Note: these requirements are only needed on superhub to run the distributed cleanup python script.
+#       on feeders only the shell script is run so no python dependencies needed there.
 {
   vars:
     debian|ubuntu|redhat_8|centos_8|redhat_9|rocky_9::
@@ -849,6 +851,7 @@ bundle agent entry
     am_policy_hub.default:cfengine_mp_fr_enable_distributed_cleanup::
       "Distributed Cleanup Dependencies"
         handle => "distributed_cleanup_dependencies",
+        if => "enabled.am_on.am_superhub.!am_paused",
         usebundle => "distributed_cleanup_dependencies";
       "Distributed Cleanup Setup"
         handle => "distributed_cleanup_setup",
