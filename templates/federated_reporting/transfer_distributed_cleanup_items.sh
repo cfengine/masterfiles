@@ -6,6 +6,7 @@
 #
 
 set -e
+set -x
 
 # make sure a failure in any part of a pipe sequence is a failure
 set -o pipefail
