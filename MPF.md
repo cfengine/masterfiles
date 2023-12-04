@@ -838,7 +838,7 @@ Here is an example setting the acl from augments:
 
 **Notes:**
 
-* Unless the class `default:disable_always_accept_policy_server_acl` is defined the value of `$(sys.policy)` server is automatically added to this producing `def.acl_derived` which is used by the default access promises.
+* Unless the class `default:disable_always_accept_policy_server_acl` is defined the value of `$(sys.policy_hub)` server is automatically added to this producing `def.acl_derived` which is used by the default access promises.
 
 **See Also:** [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
 
@@ -870,7 +870,7 @@ For example, this configuration allows any IPv4 client to connect to `cf-serverd
 
 **Notes:**
 
-* The value of `$(sys.policy)` server is automatically included in the value used by `allowconnects` in `body server control` unless the class `default:disable_always_accept_policy_server_allowconnects` is defined.
+* The value of `$(sys.policy_hub)` server is automatically included in the value used by `allowconnects` in `body server control` unless the class `default:disable_always_accept_policy_server_allowconnects` is defined.
 * Alternatively define `default:disable_always_accept_policy_server`  to disable this behavior for `allowconnects`, `allowallconnects` and `def.acl` concurrently.
 
 **History:**
