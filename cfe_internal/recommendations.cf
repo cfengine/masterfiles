@@ -9,6 +9,17 @@ bundle agent MPF_class_recommendations
         if => "cfengine_internal_purge_policies";
 }
 
+bundle agent federated_reporting_superhub_recommendations
+{
+  meta:
+      "tags" slist => { "cfengine_recommends" };
+
+  reports:
+    cfengine_enterprise_federation:am_superhub::
+      "CFEngine recommends installing gnu parallel on federated reporting superhubs."
+        if => not(isgreaterthan(length(packagesmatching( "parallel", ".*", ".*", ".*")), 0 ));
+
+}
 @if minimum_version(3.21.4)
 # The preferred location for ignore_interfaces.rx changed from
 # $(sys.inputdir)/ignore_interfaces.rx to $(sys.workdir)/ignore_interfaces.rx in
