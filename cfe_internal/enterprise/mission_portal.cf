@@ -201,6 +201,11 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
                   the output to keep policy runs clean and not generate lots of
                   unnecessary email.";
 
+      # Note: RPM package spec must align or the file will come up in rpm verification
+      "$(config)"  -> { "ENT-11096" }
+        handle => "cfengine_mp_apache_config_ownership_perms",
+        perms => mog( "400", "root", "root");
+
   commands:
 
     !systemd_supervised::
