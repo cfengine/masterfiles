@@ -1581,6 +1581,19 @@ body copy_from no_backup_cp(from)
 
 ##
 
+body copy_from no_backup_cp_compare(from, comparison)
+# @brief Copy a local file (`from`) based on comparison (`comparison`) and don't make any backup of the previous version
+#
+# @param from The path to the source file.
+# @param comparison The comparison to use. (mtime|ctime|atime|exists|binary|hash|digest)
+{
+        source      => "$(from)";
+        copy_backup => "false";
+        compare => "$(comparison)";
+}
+
+##
+
 body copy_from no_backup_dcp(from)
 # @brief Copy a local file if contents have changed, and don't make any backup
 # of the previous version
