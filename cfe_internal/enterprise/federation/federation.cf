@@ -185,12 +185,10 @@ bundle agent distributed_cleanup_dependencies
 #       on feeders only the shell script is run so no python dependencies needed there.
 {
   vars:
-    debian|ubuntu|redhat_9|rocky_9::
+    debian|ubuntu|redhat_8|centos_8|redhat_9|rocky_9::
       "packages" slist => { "python3", "python3-urllib3" };
-    redhat_8|centos_8::
-        "packages" slist => { "python36", "python3-urllib3" };
 
-    redhat_7|centos_7::
+    centos_7::
       "packages" slist => { "python3" };
 
   classes:
@@ -220,6 +218,7 @@ bundle agent distributed_cleanup_dependencies
       "$(packages)"
         policy => "present",
         classes => default:results("bundle", "cfengine_mp_fr_distributed_cleanup_packages"),
+        action => default:policy ( "warn" ),
         package_module => default:yum;
 
   reports:
@@ -856,12 +855,12 @@ bundle agent entry
         usebundle => "distributed_cleanup_dependencies";
       "Distributed Cleanup Setup"
         handle => "distributed_cleanup_setup",
-        depends_on => { "transport_user", "data_transport" },
+        depends_on => { "transport_user", "data_transport", "distributed_cleanup_dependencies" },
         usebundle => "distributed_cleanup_setup";
       "Distributed Federated Host Cleanup"
         handle => "distributed_cleanup",
         if => "enabled.am_on.am_superhub.!am_paused",
-        depends_on => { "imported_data", "distributed_cleanup_setup", "distributed_cleanup_dependencies" },
+        depends_on => { "imported_data", "distributed_cleanup_setup" },
         usebundle => distributed_cleanup_run;
 
   reports:
