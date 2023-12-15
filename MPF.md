@@ -2004,6 +2004,27 @@ config when it notices a change in *policy*.
 **History**: Added in 3.11.
 
 ### Federated Reporting
+#### Configure dump interval
+
+By default feeder hubs dump data every `20` minutes. To configure the interval on which feeder hubs dump data define `cfengine_enterprise_federation:config.dump_interval`.
+
+For example:
+
+```json
+{
+  "variables": {
+    "cfengine_enterprise_federation:config.dump_interval": {
+      "value": "60",
+      "comment": "Dump data on feeders every 60 minutes"
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.24.0
+
 #### Debug import process
 
 In order to get detailed logs about import failures define the class `default:cfengine_mp_fr_debug_import` on the _superhub_.
