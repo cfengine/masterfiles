@@ -10,4 +10,4 @@ jobs:
         with:
           path: masterfiles
       - name: Install, bootstrap, policy run
-        run: masterfiles/ci/run.sh
+        run: masterfiles/ci/bootstrap-policy-run-check.sh

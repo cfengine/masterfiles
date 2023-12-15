@@ -13,4 +13,9 @@ if docker ps -a | grep mpf; then
   docker rm mpf
 fi
 docker build -t mpf -f "${NTECH_ROOT}"/masterfiles/ci/Dockerfile  "${NTECH_ROOT}"/masterfiles
-docker run --name mpf mpf sh -c "grep error: *.log" || exit 0 # finding nothing is what we want
+if docker run --name mpf mpf sh -c "grep error: *.log"; then
+  echo "fail"
+  exit 1
+else
+  echo "success"
+fi
