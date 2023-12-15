@@ -312,7 +312,7 @@ def main():
         feeder_hubid = response["rows"][0][0]
 
         sql = """
-SELECT DISTINCT hosts.hostkey
+SELECT DISTINCT ON (hosts.hostkey), hosts.ipaddress
 FROM hosts
 WHERE hub_id = '{0}'
 AND EXISTS(
@@ -355,27 +355,28 @@ AND EXISTS(
         post_sql = "set schema 'hub_{}';\n".format(feeder_hubid)
         post_sql += "\\set ON_ERROR STOP on\n"
         delete_sql = ""
-        post_hostkeys = []
+        post_hosts = []
         for row in hosts_to_delete:
             # The query API returns rows which are lists of column values.
             # We only selected hostkey so will take the first value.
-            host_to_delete = row[0]
+            host_to_delete_key = row[0]
+            host_to_delete_ip = row[1]
 
-            response = feeder_api.delete("host", host_to_delete)
+            response = feeder_api.delete("host", host_to_delete_key)
             # both 202 Accepted and 404 Not Found are acceptable responses
             if response["status"] not in [202, 404]:
                 logger.warning(
                     "Delete %s on feeder %s got %s status code",
-                    host_to_delete,
+                    host_to_delete_key,
                     feeder_hostname,
                     response["status"],
                 )
                 continue
 
             # only add the host_to_delete if it was successfully deleted on the feeder
-            post_hostkeys.append(host_to_delete)
+            post_hosts.append((host_to_delete_key, host_to_delete_ip))
 
-        if len(post_hostkeys) == 0:
+        if len(post_hosts) == 0:
             logger.info(
                 "No hosts on feeder %s need processing on superhub so skipping post processing",
                 feeder_hostname,
@@ -384,10 +385,10 @@ AND EXISTS(
 
         # simulate the host api delete process by setting current_timestamp in deleted column
         # and delete from all federated tables similar to the clear_hosts_references() pgplsql function.
-        post_sql += "INSERT INTO __hosts (hostkey,deleted) VALUES"
+        post_sql += "INSERT INTO __hosts (hostkey,ipaddress,deleted) VALUES"
         deletes = []
-        for hostkey in post_hostkeys:
-            deletes.append("('{}', CURRENT_TIMESTAMP)".format(hostkey))
+        for hostkey, ip in post_hosts:
+            deletes.append("('{}', '{}', CURRENT_TIMESTAMP)".format(hostkey, ip))
 
         delete_sql = ", ".join(deletes)
         delete_sql += (
@@ -402,7 +403,7 @@ AND EXISTS(
                 "DELETE FROM {} WHERE hub_id = {} AND hostkey IN ({});\n".format(
                     table,
                     feeder_hubid,
-                    ",".join(["'{}'".format(hk) for hk in post_hostkeys]),
+                    ",".join(["'{}'".format(hk) for hk in post_hosts[0]]),
                 )
             )
         post_sql += delete_sql + clear_sql
