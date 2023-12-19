@@ -645,60 +645,57 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata
 {
   methods:
     !(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+      "cfe_autorun_inventory_aws_ec2_metadata_data";
       "cfe_autorun_inventory_aws_ec2_metadata_cache";
       "cfe_aws_ec2_metadata_from_cache";
 }
+
+bundle agent cfe_autorun_inventory_aws_ec2_metadata_data
+# @brief Retrieve metadata from AWS API, preferring IMDSV2
+{
+  vars:
+    ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+      "base_url" string => "http://169.254.169.254/latest";
+
+      "imdsv2_token_cmd"  string => '$(paths.curl) -s -X PUT "$(base_url)/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"';
+
+      # Store the token for imdsv2 query, and it's result just once.
+      "imdsv2_token"
+        string => execresult("$(imdsv2_token_cmd)", noshell, stdout),
+        if => not( isvariable( imdsv2_token ) );
+      "imdsv2_cmd" string => '$(paths.curl) -s -H "X-aws-ec2-metadata-token: $(imdsv2_token)" $(base_url)/dynamic/instance-identity/document';
+      "imdsv2_cmd_result"
+        string => execresult( "$(imdsv2_cmd)", noshell ),
+        if => not( isvariable( imdsv2_cmd_result ) );
+
+      # Store the result of the imdsv1 query, just once (if it's not alredy been defined) only if imdsv2 result is not valid
+      "imdsv1_cmd" string => "$(paths.curl) -s $(base_url)/dynamic/instance-identity/document";
+      "imdsv1_cmd_result"
+        string => execresult( "$(imdsv1_cmd)", noshell ),
+        if => and( not( isvariable( imdsv1_cmd_result ) ),
+                   not( validjson( "$(imdsv2_cmd_result)" ) ) );
+}
+
 bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
 # @brief Cache ec2 metadata from http request
 #
 # Provides cache of ec2 instance metadata for inventory
 {
-
   vars:
-    ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
-      "URL"       string => "http://169.254.169.254/latest/dynamic/instance-identity/document";
       "cache"     string => "$(sys.statedir)/aws_ec2_metadata";
 
-      "v" -> { "ENT-5233" }
-        string => ifelse( isgreaterthan( $(sys.cf_version_minor), 14), "suppress_inform_capable",
-                          "suppress_inform_incapable");
-
-      "response" -> { "ENT-4900" }
-        data => url_get($(URL), '{"url.max_content": 512000, "url.timeout": 1}'),
-        # To prevent `url_get` from firing on every agent run, this variable
-        # depends on a dummy command which does nothing but fires only once a day
-        depends_on => { "daily_dummy_job_$(v)" };
-
-      "content" data => parsejson("$(response[content])");
-
-  commands:
-    _stdlib_path_exists_true::
-
-      "$(paths.true)"
-        comment => "This promise is used for delaying execution of url_get, since locking does not work directly on vars type promises",
-        classes => kept_successful_command,
-        handle => "daily_dummy_job_suppress_inform_incapable",
-        action => if_elapsed_day,
-        if => strcmp( "daily_dummy_job_$(v)", "daily_dummy_job_suppress_inform_incapable" );
-
-@if minimum_version(3.15.0)
-      "$(paths.true)"
-        comment => "This promise is used for delaying execution of url_get, since locking does not work directly on vars type promises",
-        classes => kept_successful_command,
-        handle => "daily_dummy_job_suppress_inform_capable",
-        inform => "false",
-        action => if_elapsed_day;
-@endif
+  classes:
+      "imdsv1_result_valid" expression => validjson( "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv1_cmd_result)" );
+      "imdsv2_result_valid" expression => validjson( "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv2_cmd_result)" );
 
   files:
-    ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
-
+    imdsv1_result_valid.!imdsv2_result_valid::
       "$(cache)"
-        template_method => "inline_mustache",
-        edit_template_string => "{{{content}}}",
-        template_data => @(response),
-        create =>   "true",
-        if => regcmp( ".*", "$(content[version])" );
+        content => "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv1_cmd_result)";
+
+    imdsv2_result_valid::
+      "$(cache)"
+        content => "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv2_cmd_result)";
 }
 
 bundle agent cfe_aws_ec2_metadata_from_cache
