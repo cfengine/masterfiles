@@ -1949,7 +1949,7 @@ For example:
 
 **History:**
 
-* Added in CFEngine 3.24.0
+* Added in CFEngine 3.24.0, 3.18.7, 3.21.4
 
 #### Debug import process
 
