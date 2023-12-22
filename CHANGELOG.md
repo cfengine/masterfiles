@@ -1,3 +1,29 @@
+3.18.7:
+	- Federated reporting policy now properly fixes SELinux context of the
+	  ~cftransport/.ssh directory and its contents. (ENT-11136)
+	- Added --quiet to psql commands where needed in federated reporting scripts
+	  (ENT-10904)
+	- Added debug_import class for federated reporting import debugging
+	  (ENT-10896)
+	- Added self upgrade support for Amazon Linux 2 (ENT-10820)
+	- Aligned systemd service templates with core WantedBy=cfengine3.service was
+	  removed from systemd service templates for individual components. It was
+	  unnecessary as cfengine3.service already wants the individual services.
+	  (CFE-3982)
+	- Fixed OS inventory for Amazon Linux 2 (ENT-10817)
+	- Fixed distributed_cleanup policy for feeders and rhel-8 superhubs
+	  (ENT-10960)
+	- Fixed execution of recommendation policy (ENT-10915)
+	- Fixed recommendation policy for postgresql.conf in CFEngine Enterprise
+	  (ENT-10916)
+	- Fixed self-upgrade for Debian and Ubuntu aarch64 clients (ENT-10816)
+	- Improved failure logging during federated reporting schema import
+	  (ENT-10789)
+	- Improved federation policy handling of cftransport selinux configuration
+	  (ENT-10959)
+	- Made enterprise federated reporting dump interval configurable via
+	  augments (ENT-10900)
+
 3.18.6:
 	- Added ability to disable plain http for CFEngine Enterprise Mission
 	  Portal (ENT-10411)
