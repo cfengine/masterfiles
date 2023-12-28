@@ -164,7 +164,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 
   classes:
       "systemd_supervised"
-        expression => returnszero("$(paths.systemctl) -q is-enabled cf-apache > /dev/null 2>&1", "useshell"),
+        expression => returnszero("$(paths.systemctl) -q is-active cf-apache > /dev/null 2>&1", "useshell"),
         if => fileexists( $(paths.systemctl) );
 
   vars:
