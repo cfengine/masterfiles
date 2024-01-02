@@ -269,6 +269,66 @@ bundle agent semanage_installed
       "semanage command is not available at $(default:paths.semanage). Will only install needed package if cfengine_mp_fr_dependencies_auto_install class is defined in augments(def.json) or with --define cf-agent option.";
 }
 
+bundle agent ssh_keygen(key_path)
+{
+  commands:
+      "/usr/bin/ssh-keygen"
+        handle => "ssh_keys_configured",
+        args => "-N '' -f $(key_path)",
+        if => not( fileexists( "$(key_path)" ));
+}
+
+bundle agent ssh_selinux_context(home, ssh_paths)
+{
+  classes:
+    default:_stdlib_path_exists_semanage::
+      "cftransport_fcontext_missing"
+        expression => not(returnszero("$(default:paths.semanage) fcontext -l | grep '$(home)/.ssh(/.*)?'", "useshell")),
+        if => fileexists("$(home)");
+
+    any::
+      # For all the files below it must be true that if they exist they need
+      # to have the right context.
+      # IOW, the following implication: if fileexists() then correct_context.
+      # IOW, the following OR: not(filexists()) or correct_context.
+      # not( and()) means that if for one of the files the implication is false, we get a true.
+      "incorrect_ssh_context"
+        expression => not( and(
+                                or(
+                                    not(fileexists("$(home)")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("$(default:paths.ls) -dZ $(home)/.ssh", noshell))),
+                                or(
+                                    not(fileexists("$(ssh_paths[auth_keys])")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("$(default:paths.ls) -Z $(ssh_paths[auth_keys])", noshell))),
+                                or(
+                                    not(fileexists("$(ssh_paths[priv_key])")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("$(default:paths.ls) -Z $(ssh_paths[priv_key])", noshell))),
+                                or(
+                                    not(fileexists("$(ssh_paths[pub_key])")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("$(default:paths.ls) -Z $(ssh_paths[pub_key])", noshell))),
+                                or(
+                                    not(fileexists("$(ssh_paths[config])")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("$(default:paths.ls) -Z $(ssh_paths[config])", noshell)))
+        ));
+  commands:
+    # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
+    cftransport_fcontext_missing.default:_stdlib_path_exists_semanage::
+      "$(default:paths.semanage) fcontext -a -t ssh_home_t '$(home)/.ssh(/.*)?'";
+    incorrect_ssh_context.default:_stdlib_path_exists_restorecon::
+      "$(default:paths.restorecon) -R -F $(home)/.ssh/";
+
+  reports:
+    incorrect_ssh_context.!default:_stdlib_path_exists_semanage::
+      "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf $(default:paths.semanage) does not resolve";
+    incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
+      "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf $(default:paths.restorecon) does not resolve";
+}
+
 bundle agent transport_user
 # @brief Manage transport user and permissions for remote SSH access
 {
@@ -294,40 +354,15 @@ bundle agent transport_user
           "$(ssh_config)"
         };
 
-  classes:
-    enabled.selinux_enabled.default:_stdlib_path_exists_semanage::
-        "cftransport_fcontext_missing"
-          expression => not(returnszero("$(default:paths.semanage) fcontext -l | grep '$(home)/.ssh(/.*)?'", "useshell")),
-          if => fileexists("$(home)");
-    enabled.selinux_enabled::
-        # For all the files below it must be true that if they exist they need
-        # to have the right context.
-        # IOW, the following implication: if fileexists() then correct_context.
-        # IOW, the following OR: not(filexists()) or correct_context.
-        # not( and()) means that if for one of the files the implication is false, we get a true.
-        "incorrect_ssh_context"
-          expression => not( and(
-                                 or(
-                                    not(fileexists("$(home)/.ssh")),
-                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("$(default:paths.ls) -dZ $(home)/.ssh", noshell))),
-                                 or(
-                                    not(fileexists("$(ssh_auth_keys)")),
-                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("$(default:paths.ls) -Z $(ssh_auth_keys)", noshell))),
-                                 or(
-                                    not(fileexists("$(ssh_priv_key)")),
-                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("$(default:paths.ls) -Z $(ssh_priv_key)", noshell))),
-                                 or(
-                                    not(fileexists("$(ssh_pub_key)")),
-                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("$(default:paths.ls) -Z $(ssh_pub_key)", noshell))),
-                                 or(
-                                    not(fileexists("$(ssh_config)")),
-                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("$(default:paths.ls) -Z $(ssh_config)", noshell)))
-                             ));
+      "ssh_paths" data => parsejson('{
+        "key_name": "id_FR",
+        "priv_key": "$(home)/.ssh/$(ssh_key_name)",
+        "pub_key": "$(ssh_priv_key).pub",
+        "auth_keys": "$(home)/.ssh/authorized_keys",
+        "known_hosts": "$(home)/.ssh/known_hosts",
+        "config": "$(home)/.ssh/config"
+      }');
+
   users:
     "$(user)"
       policy => "present",
@@ -369,27 +404,12 @@ bundle agent transport_user
   methods:
     selinux_enabled::
       "semanage_installed" usebundle => semanage_installed;
-
-  commands:
-    # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
-    selinux_enabled.cftransport_fcontext_missing.default:_stdlib_path_exists_semanage::
-      "$(default:paths.semanage) fcontext -a -t ssh_home_t '$(home)/.ssh(/.*)?'";
-    selinux_enabled.incorrect_ssh_context.default:_stdlib_path_exists_restorecon::
-      "$(default:paths.restorecon) -R -F $(home)/.ssh/";
-
-    any::
+    enabled.selinux_enabled::
+      # Ensure correct SElinux context
+      "ssh_selinux_context" usebundle => ssh_selinux_context("$(home)", @(ssh_paths));
+    enabled::
       # Generate ssh keypair
-      "/usr/bin/ssh-keygen"
-        handle => "ssh_keys_configured",
-        args => "-N '' -f $(ssh_priv_key)",
-        if => and( isdir( "$(home)/.ssh" ),
-                   not( fileexists( "$(ssh_priv_key)" )));
-
-  reports:
-    selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_semanage::
-      "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf $(default:paths.semanage) does not resolve";
-    selinux_enabled.incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
-      "need to fix incorrect ssh context for transport user but restorecon path in $(sys.libdir)/paths.cf $(default:paths.restorecon) does not resolve";
+      "ssh_keygen" usebundle => ssh_keygen("$(ssh_priv_key)");
 }
 
 bundle agent clean_when_off
