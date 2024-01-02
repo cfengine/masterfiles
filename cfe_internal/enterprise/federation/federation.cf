@@ -308,9 +308,9 @@ bundle agent transport_user
         "incorrect_ssh_context"
           expression => not( and(
                                  or(
-                                    not(fileexists("$(home)")),
+                                    not(fileexists("$(home)/.ssh")),
                                     regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("ls -Z $(home) | grep .ssh",
+                                           execresult("ls -dZ $(home)/.ssh",
                                                       useshell))),
                                  or(
                                     not(fileexists("$(ssh_auth_keys)")),
