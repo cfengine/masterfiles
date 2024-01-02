@@ -310,28 +310,24 @@ bundle agent transport_user
                                  or(
                                     not(fileexists("$(home)/.ssh")),
                                     regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("ls -dZ $(home)/.ssh",
-                                                      useshell))),
+                                           execresult("$(default:paths.ls) -dZ $(home)/.ssh", noshell))),
                                  or(
                                     not(fileexists("$(ssh_auth_keys)")),
                                     regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("ls -Z $(ssh_auth_keys)",
-                                                      useshell))),
+                                           execresult("$(default:paths.ls) -Z $(ssh_auth_keys)", noshell))),
                                  or(
                                     not(fileexists("$(ssh_priv_key)")),
                                     regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("ls -Z $(ssh_priv_key)",
-                                                      useshell))),
+                                           execresult("$(default:paths.ls) -Z $(ssh_priv_key)", noshell))),
                                  or(
                                     not(fileexists("$(ssh_pub_key)")),
                                     regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("ls -Z $(ssh_pub_key)",
-                                                      useshell))),
+                                           execresult("$(default:paths.ls) -Z $(ssh_pub_key)", noshell))),
                                  or(
                                     not(fileexists("$(ssh_config)")),
                                     regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                           execresult("ls -Z $(ssh_config)",
-                                                      useshell)))));
+                                           execresult("$(default:paths.ls) -Z $(ssh_config)", noshell)))
+                             ));
   users:
     "$(user)"
       policy => "present",
