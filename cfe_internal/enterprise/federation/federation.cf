@@ -378,7 +378,7 @@ bundle agent transport_user
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
     selinux_enabled.cftransport_fcontext_missing.default:_stdlib_path_exists_semanage::
       "$(default:paths.semanage) fcontext -a -t ssh_home_t '$(home)/.ssh(/.*)?'";
-    selinux_enabled.incorrect_ssh_context.default:_stdlib_exists_restorecon::
+    selinux_enabled.incorrect_ssh_context.default:_stdlib_path_exists_restorecon::
       "$(default:paths.restorecon) -R -F $(home)/.ssh/";
 
     any::
