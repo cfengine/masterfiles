@@ -300,29 +300,38 @@ bundle agent transport_user
           expression => not(returnszero("$(default:paths.semanage) fcontext -l | grep '$(home)/.ssh(/.*)?'", "useshell")),
           if => fileexists("$(home)");
     enabled.selinux_enabled::
+        # For all the files below it must be true that if they exist they need
+        # to have the right context.
+        # IOW, the following implication: if fileexists() then correct_context.
+        # IOW, the following OR: not(filexists()) or correct_context.
+        # not( and()) means that if for one of the files the implication is false, we get a true.
         "incorrect_ssh_context"
-          expression => and( and(
-                               fileexists("$(home)"),
-                               fileexists("$(ssh_auth_keys)"),
-                               fileexists("$(ssh_priv_key)"),
-                               fileexists("$(ssh_pub_key)"),
-                               fileexists("$(ssh_config)")),
-                             or(
-                               regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(home) | grep .ssh",
-                                                 useshell)),
-                               regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(ssh_auth_keys)",
-                                                 useshell)),
-                               regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(ssh_priv_key)",
-                                                 useshell)),
-                               regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(ssh_pub_key)",
-                                                 useshell)),
-                               regcmp(".*[\s:]ssh_home_t[\s:].*",
-                                      execresult("ls -Z $(ssh_config)",
-                                                 useshell))));
+          expression => not( and(
+                                 or(
+                                    not(fileexists("$(home)")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("ls -Z $(home) | grep .ssh",
+                                                      useshell))),
+                                 or(
+                                    not(fileexists("$(ssh_auth_keys)")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("ls -Z $(ssh_auth_keys)",
+                                                      useshell))),
+                                 or(
+                                    not(fileexists("$(ssh_priv_key)")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("ls -Z $(ssh_priv_key)",
+                                                      useshell))),
+                                 or(
+                                    not(fileexists("$(ssh_pub_key)")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("ls -Z $(ssh_pub_key)",
+                                                      useshell))),
+                                 or(
+                                    not(fileexists("$(ssh_config)")),
+                                    regcmp(".*[\s:]ssh_home_t[\s:].*",
+                                           execresult("ls -Z $(ssh_config)",
+                                                      useshell)))));
   users:
     "$(user)"
       policy => "present",
