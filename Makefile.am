@@ -32,3 +32,10 @@ tar-package:
 
 clean-local:
 	rm -rf build
+
+non-priv-install:
+	mkdir -p "$$HOME/.cfagent/bin"
+	ln -sf $$(command -v cf-promises) "$$HOME/.cfagent/bin"
+	mkdir -p "$$HOME/.cfagent/inputs/lib"
+	rsync -avz ./lib/  "$$HOME/.cfagent/inputs/lib/"
+	[ ! -s "$$HOME/.cfagent/inputs/promises.cf" ] && echo "bundle agent main { reports: 'Hello, CFEngine!'; }" > "$$HOME/.cfagent/inputs/promises.cf"
