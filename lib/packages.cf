@@ -1003,7 +1003,7 @@ body package_method yum
       package_list_arch_regex    => "$(rpm_knowledge.rpm3_arch_regex)";
 
       package_installed_regex => ".*";
-      package_name_convention => "$(name)-$(version).$(arch)";
+      package_name_convention => "$(name)";
 
       # just give the package name to rpm to delete, otherwise it gets "name.*" (from package_name_convention above)
       package_delete_convention => "$(name)";
@@ -1835,7 +1835,7 @@ body package_method generic
       package_list_arch_regex    => "$(rpm_knowledge.rpm3_arch_regex)";
 
       package_installed_regex => ".*";
-      package_name_convention => "$(name)-$(version).$(arch)";
+      package_name_convention => "$(name)";
 
       # just give the package name to rpm to delete, otherwise it gets "name.*" (from package_name_convention above)
       package_delete_convention => "$(name)";
