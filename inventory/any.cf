@@ -642,6 +642,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata
 bundle agent cfe_autorun_inventory_aws_ec2_metadata_data
 # @brief Retrieve metadata from AWS API, preferring IMDSV2
 {
+@if minimum_version(3.18.0)
   vars:
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
       "base_url" string => "http://169.254.169.254/latest";
@@ -663,6 +664,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_data
         string => execresult( "$(imdsv1_cmd)", noshell ),
         if => and( not( isvariable( imdsv1_cmd_result ) ),
                    not( validjson( "$(imdsv2_cmd_result)" ) ) );
+@endif
 }
 
 bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
@@ -670,6 +672,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
 #
 # Provides cache of ec2 instance metadata for inventory
 {
+@if minimum_version(3.18.0)
   vars:
       "cache"     string => "$(sys.statedir)/aws_ec2_metadata";
 
@@ -685,6 +688,7 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
     imdsv2_result_valid::
       "$(cache)"
         content => "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv2_cmd_result)";
+@endif
 }
 
 bundle agent cfe_aws_ec2_metadata_from_cache
