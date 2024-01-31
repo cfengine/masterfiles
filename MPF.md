@@ -1735,6 +1735,53 @@ For example:
 
 - Introduced in CFEngine 3.23.0, 3.21.3, 3.18.6
 
+### Configure default package manager
+
+The MPF specifies the package module to use for managing packages and collecting software inventory based on the detected platform. Define `default:def.default_package_module` as a data structure keyed with values matching the value of `sys.flavor` for the platforms you wish to target.
+
+**Example:**
+
+```json
+{
+  "variables": {
+    "default:def.default_package_module": {
+      "value": {
+        "ubuntu_20": "snap",
+        "aix_7": "yum"
+      },
+        "comment": "This variable provides the ability to override the default package manager to use for a platform. Keys are based on the value of $(sys.flavor) for the targeted platform."
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.24.0, 3.21.5, 3.18.8
+
+### Configure additional package managers to inventory by default
+
+The MPF inventories software for the default package module in use. Define `default:def.additional_package_inventory_modules` as a data structure keyed with values matching the value of `sys.flavor` for any additional package modules you wish to inventory by default.
+
+
+```json
+{
+  "variables": {
+    "default:def.additional_package_inventory_modules": {
+        "value": {
+            "ubuntu_20": [ "snap", "flatpak" ],
+            "aix": [ "yum" ]
+        },
+        "comment": "This variable provides the ability to extend the default package managers to inventory for a platform. Keys are based on the value of $(sys.flavor) for the targeted platform."
+      }
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.24.0, 3.21.5, 3.18.8
+
 ### Configure periodic package inventory refresh interval
 
 Note that there are currently two implementations of packages promises, package
