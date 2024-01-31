@@ -189,22 +189,4 @@ bundle agent mpf_augments_control
        #    if => "(execd_controls_repaired|runagent_controls_repaired)";
 
 @endif
-
-    server_controls_repaired|runagent_controls_repaired::
-      "Should restart cf-serverd because something in its data changed.";
-
-    executor_controls_repaired|runagent_controls_repaired::
-      "Should restart cf-execd because something in its data changed.";
-
-    monitor_controls_repaired::
-      "Should restart cf-monitord because something in its data changed.";
-
-    hub_controls_repaired::
-      "Should restart cf-hub because something in its data changed.";
-
-    DEBUG|DEBUG_mpf_augments_control::
-      "DEBUG $(this.bundle): Common control $(common_controls_state)";
-      "DEBUG $(this.bundle): Agent control $(agent_controls_state)";
-      "DEBUG $(this.bundle): Executor control $(executor_controls_state)";
-      "DEBUG $(this.bundle): Server control $(server_controls_state)";
 }
