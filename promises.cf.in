@@ -93,14 +93,26 @@ body common control
       # modules in which you MUST provide package modules used to generate
       # software inventory reports. You can also provide global default package module
       # instead of specifying it in all package promises.
-    (debian|redhat|centos|suse|sles|opensuse|amazon_linux).cfe_python_for_package_modules_supported.!disable_inventory_package_refresh::
-          package_inventory => { $(package_module_knowledge.platform_default) };
+    (debian).!disable_inventory_package_refresh::
+          package_inventory => { $(package_module_knowledge.platform_default), @(default:package_module_knowledge.additional_inventory) };
+
+      # We only define package_inventory on redhat like systems that have a
+      # python version that works with the package module.
+    (redhat|centos|suse|sles|opensuse|amazon_linux).cfe_yum_package_module_supported.!disable_inventory_package_refresh::
+        package_inventory => { $(package_module_knowledge.platform_default), @(default:package_module_knowledge.additional_inventory)};
+
+    aix.!disable_inventory_package_refresh::
+      package_inventory => { $(package_module_knowledge.platform_default), @(default:package_module_knowledge.additional_inventory) };
+
+    aix::
+      package_module => $(package_module_knowledge.platform_default);
+
 
     (debian|redhat|suse|sles|opensuse|amazon_linux)::
           package_module => $(package_module_knowledge.platform_default);
 
     windows::
-          package_inventory => { $(package_module_knowledge.platform_default) };
+          package_inventory => { $(package_module_knowledge.platform_default), @(default:package_module_knowledge.additional_inventory) };
           package_module => $(package_module_knowledge.platform_default);
 
     termux::
