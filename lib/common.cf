@@ -180,7 +180,7 @@ body classes if_notkept(x)
 ##
 
 body classes if_ok(x)
-# @brief Define the class `x` if the promise is kept or could be repaired
+# @brief Define the class `x` if the promise is kept or repaired
 # @param x The name of the class that should be defined
 {
       promise_repaired => { "$(x)" };
