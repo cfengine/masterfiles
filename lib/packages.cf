@@ -8,16 +8,8 @@ bundle common package_module_knowledge
 {
   vars:
 
-      # Package inventory refresh
-      "query_installed_ifelapsed" -> { "CFE-2771", "CFE-3504" }
-        string => ifelse( isvariable( "def.package_module_query_installed_ifelapsed" ),
-                          "$(def.package_module_query_installed_ifelapsed)",
-                          "0"); # Always refresh local package inventory
-
-      "query_updates_ifelapsed" -> { "CFE-2771", "CFE-3504" }
-        string => ifelse( isvariable( "def.package_module_query_updates_ifelapsed" ),
-                          "$(def.package_module_query_updates_ifelapsed)",
-                          "1440"); # Refresh software updates available once a day
+    # First we set the default package manager based on the platform:
+    # TODO Refactor to use ifelse()?
 
     debian::
       "platform_default" string => "apt_get";
@@ -45,6 +37,48 @@ bundle common package_module_knowledge
 
     termux::
       "platform_default" string => "apt_get";
+
+    any::
+
+      # By default, we don't want additional package managers inventoried, but
+      # we need the variable to be defined, so we initialize it to an empty
+      # list.
+
+      "additional_inventory" slist => {};
+
+      # We look to see if additional package inventory modules should be used.
+      # `default:def.additional_package_inventory_modules` is expected to be a data
+      # structure keyed with values expected to match the value of `sys.flavor`.
+
+      # For example: { "aix_7": [ "yum"], "ubuntu_20: [ "snap" ] }
+
+      # If there is additional inventory defined for the platform we want to use them
+      "additional_inventory" -> { "CFE-3612" }
+        slist => getvalues( "default:def.additional_package_inventory_modules[$(sys.flavor)]" ),
+        if => isvariable( "default:def.additional_package_inventory_modules[$(sys.flavor)]" );
+
+      # Package inventory refresh
+      "query_installed_ifelapsed" -> { "CFE-2771", "CFE-3504" }
+        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
+                          "$(def.package_module_$(this.promiser))",
+                          "0"); # Always refresh local package inventory
+
+      "query_updates_ifelapsed" -> { "CFE-2771", "CFE-3504" }
+        string => ifelse( isvariable( "def.package_module_$(this.promiser)" ),
+                          "$(def.package_module_$(this.promiser))",
+                          "1440"); # Refresh software updates available once a day
+
+      # It's possible that a user wants to use a different default package
+      # manager. To support that we look at
+      # `default:def.default_package_module`, a data structure keyed
+      # with values expected to match the value of `sys.flavor`
+
+      "platform_default" -> { "CFE-3612" }
+        string => "$(default:def.default_package_module[$(sys.flavor)])",
+        if => isvariable( "default:def.default_package_module[$(sys.flavor)]"),
+        comment => concat( "default:def.default_package_module[$(sys.flavor)] has been defined.",
+                           "This overrides the default package manager.");
+
 }
 
 body package_module apk
