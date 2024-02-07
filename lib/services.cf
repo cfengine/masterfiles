@@ -139,6 +139,9 @@ bundle agent standard_services(service,state)
 # methods:
 #     "SSHD should be running" usebundle => standard_services("sshd", "start");
 # ```
+#
+# **Notes:**
+# FreeBSD uses "one" prefixed commands, e.g. onestatus, onestart, onestop so that services that are not enabled can still be managed
 {
   vars:
       "c_service" string => canonify("$(service)");
@@ -171,15 +174,17 @@ bundle agent standard_services(service,state)
 
       "have_init" expression => fileexists($(init));
 
-    chkconfig.have_init.freebsd::
-      "running" -> { "CFE-3513" }
-        expression => returnszero("$(init) onestatus > /dev/null", "useshell");
-
-    chkconfig.have_init.!freebsd::
+    chkconfig.have_init::
       "running" expression => returnszero("$(init) status > /dev/null", "useshell");
 
     sysvservice.have_init::
-      "running" expression => returnszero("$(paths.service) $(service) status > /dev/null", "useshell");
+      # We use one prefixed service commands on freebsd so that service
+      # management works even when the service is not enabled in /etc/rc.conf.
+
+      "running" -> { "CFE-4323" }
+        with => ifelse( "freebsd", "one", ""),
+        expression => returnszero("$(paths.service) $(service) $(with)status > /dev/null",
+                                  "useshell");
 
     chkconfig.SuSE::
       "onboot"
@@ -219,41 +224,44 @@ bundle agent standard_services(service,state)
       contain => silent;
 
     sysvservice.start.!running::
-      "$(paths.service) $(service) start"
-      handle => "standard_services_sysvservice_not_running_start",
-      classes => kept_successful_command,
-      comment => "If the service should be running and it is not
-                  currently running then we should issue the standard service
-                  command to start the service.";
+      # We use one prefixed service commands on freebsd so that service
+      # management works even when the service is not enabled in /etc/rc.conf.
+
+      "$(paths.service) $(service) $(with)start" -> { "CFE-4323" }
+        handle => "standard_services_sysvservice_not_running_start",
+        classes => kept_successful_command,
+        with => ifelse( "freebsd", "one", "");
 
     sysvservice.restart::
-      "$(paths.service) $(service) restart"
-      handle => "standard_services_sysvservice_restart",
-      classes => kept_successful_command,
-      comment => "If the service should be restarted we issue the
-                  standard service command to restart or reload the service.
-                  There is no restriction based on the services current state as
-                  restart can start a service that was not already
-                  running.";
+      # We use one prefixed service commands on freebsd so that service
+      # management works even when the service is not enabled in /etc/rc.conf.
+
+      "$(paths.service) $(service) $(with)restart" -> { "CFE-4323" }
+        handle => "standard_services_sysvservice_restart",
+        classes => kept_successful_command,
+        with => ifelse( "freebsd", "one", "");
 
     sysvservice.reload.running::
-      "$(paths.service) $(service) reload"
-      handle => "standard_services_sysvservice_reload",
-      classes => kept_successful_command,
-      comment => "If the service should be reloaded we issue the
-                  standard service command to reload the service.
-                  It is restricted to when the service is running as a reload
-                  should not start services that are not already running. This
-                  may not be triggered as service state parameters are limited
-                  and translated to the closest meaning.";
+      # If the service should be reloaded we issue the standard service command
+      # to reload the service, but only if it's currently running as to not
+      # start a service that was not already running. This may not be triggered
+      # as service state parameters are limited and translated to the closest
+      # meaning.
+
+      "$(paths.service) $(service) $(with)reload" -> { "CFE-4323" }
+        handle => "standard_services_sysvservice_reload",
+        classes => kept_successful_command,
+        with => ifelse( "freebsd", "one", "");
+
 
     sysvservice.((stop|disable).running)::
-      "$(paths.service) $(service) stop"
-      handle => "standard_services_sysvservice_stop",
-      classes => kept_successful_command,
-      comment => "If the service should be stopped or disabled and it is
-                  currently running then we should issue the standard service
-                  command to stop the service.";
+      # If the service should be stopped or disabled and it is currently running
+      # then we should issue the standard service command to stop the service
+
+      "$(paths.service) $(service) $(with)stop" -> { "CFE-4323" }
+        handle => "standard_services_sysvservice_not_freebsd stop",
+        classes => kept_successful_command,
+        with => ifelse( "freebsd", "one", "");
 
     smf::
       "$(paths.svcadm) $(svcadm_mode) $(service)"
