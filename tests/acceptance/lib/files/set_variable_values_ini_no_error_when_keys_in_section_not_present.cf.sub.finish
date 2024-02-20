@@ -1,0 +1,5 @@
+[section 1]
+present_at_start=1
+absent_at_start=1
+[section 2]
+present_at_start=two
