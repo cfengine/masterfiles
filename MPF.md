@@ -551,7 +551,7 @@ When enabled, the policy will render systemd unit files in `/etc/systemd/system`
 
 When enabled, the policy will make sure that all units are enabled, unless they have been disabled by a persistent class or are explicitly listed as an agent to be disabled.
 
-#### Class: persistent\_disable\_*DAEMON*
+#### Class: default:persistent\_disable\_*DAEMON*
 
 **Description:** Disable a CFEngine Enterprise daemon component persistently.
 
