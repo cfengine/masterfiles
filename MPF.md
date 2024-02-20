@@ -936,7 +936,7 @@ default of 1 week (`10080` minutes).
 ```json
 {
   "variables": {
-    "default:def.control_common_ignore_missing_inputs": {
+    "default:def.control_common_lastseenexpireafter": {
       "value": "30240",
       "comment": "We want to retain history of hosts in the last-seen database for 21 days"
     }
