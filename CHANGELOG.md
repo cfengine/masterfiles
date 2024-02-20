@@ -648,7 +648,7 @@
 	  (ENT-3624)
 	- Configure ignore_missing_inputs and ignore_missing_bundles via augments
 	  (CFE-2773)
-	- Change class identifying runagent initiated executions from cfruncommand to cf_runagent_initated
+	- Change class identifying runagent initiated executions from cfruncommand to cf_runagent_initiated
 	- Support enablerepo and disablerepo options in yum package_module
 	  (CFE-2806)
 	- Fix cf-runagent during 3.7.x -> 3.10.x migration
