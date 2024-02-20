@@ -33,7 +33,9 @@ request to expose the tunable into the ```def``` bundle.
 **Note:** `controls/def.cf` contains the defaults and settings for `promises.cf`
 and `controls/update_def.cf` contains the defaults and settings for `update.cf`.
 
-Since 3.7.8, 3.10.4, and 3.12.0 The class `cf_runagent_initiated` is defined by
+**History:**
+
+* In 3.7.8, 3.10.4, and 3.12.0 the class `cf_runagent_initiated` is defined by
 default in the MPF for agent executions initiated by `cf-runagent` through
 `cf-serverd`. Previously the class `cfruncommand` was defined. See `body server
 control cfruncommand` in `controls/cf_serverd.cf`.
@@ -586,7 +588,7 @@ hosts.
 }
 ```
 
-#### Augments variable: agents_to_be_disabled
+#### Variable: default:def.agents_to_be_disabled
 
 **Description:** list of agents to disable.
 
