@@ -262,7 +262,7 @@ By default Mission Portal listens for HTTP requests on port 80, redirecting to H
 
 **History:**
 
-* Added in CFEngine 3.23.0
+* Added in CFEngine 3.23.0, 3.21.3
 
 ### Disable plain HTTP redirect to HTTPS for CFEngine Enterprise Mission Portal
 
@@ -287,7 +287,7 @@ By default Mission Portal listens for HTTP requests on port 80, redirecting to H
 **History:**
 
 * Added in CFEngine 3.6.0
-* Class renamed from `cfe_cfengine_enterprise_enable_plain_http` to `cfe_enterprise_disable_http_redirect_to_https` in CFEngine 3.23.0
+* Class renamed from `cfe_cfengine_enterprise_enable_plain_http` to `cfe_enterprise_disable_http_redirect_to_https` in CFEngine 3.23.0, 3.21.3
 
 ### Disable cf\_promises\_validated check
 
@@ -327,7 +327,7 @@ This [augments file][Augments] will enable this behavior for all clients.
 
 **History:**
 
-* Introduced in 3.18.0, previously, the default behavior was opposite and the class `cfengine_internal_purge_policies`  had to be enabled to keep inputs in sync with masterfiles.
+* Introduced in 3.18.0, previously, the default behavior was opposite and the class `cfengine_internal_purge_policies` had to be enabled to keep inputs in sync with masterfiles.
 
 ### Disable limiting robot agents
 
@@ -445,6 +445,7 @@ For example:
 ```
 
 **History:**
+
 * Introduced 3.15.0, 3.12.3, 3.10.8
 
 #### Disable seeding binaries on hub
@@ -523,7 +524,8 @@ bootstrap the embedded
 is used and it decides which files should be copied.
 
 **History:**
-  - Introduced in CFEngine 3.23.0
+
+* Introduced in CFEngine 3.23.0, 3.21.3
 
 ### Configuring component management
 
@@ -737,7 +739,7 @@ allowed values (`LOG_USER`, `LOG_DAEMON`, `LOG_LOCAL0`, `LOG_LOCAL1`,
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### mailto
 
@@ -777,7 +779,7 @@ When enabled `cf-execd` emails output that differs from previous executions. The
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.3
 
 ### Configure lines that should be excluded from emails sent by cf-execd
 
@@ -798,7 +800,7 @@ control` are stripped before sending. The MPF will use the value of
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### Configure lines that should be included from emails sent by cf-execd
 
@@ -819,7 +821,7 @@ control` are stripped before sending. The MPF will use the value of
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### acl
 
@@ -970,7 +972,7 @@ default of 1 week (`10080` minutes).
 
 **History:**
 
-* Introduced in 3.23.0
+* Introduced in 3.23.0, 3.21.3
 
 ### Automatic bootstrap - Trusting keys from new hosts with trustkeysfrom
 
@@ -1152,7 +1154,7 @@ Example definition in augments file:
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### Configure the ciphers used by cf-agent
 
@@ -1951,7 +1953,7 @@ can be customized via Augments.
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### Enable logging of Enterprise License utilization
 
@@ -1973,7 +1975,7 @@ Example enabling the class from an [augments file][Augments]:
 
 ### Enable external watchdog
 
-**Note**: This feature is not enabled by default.
+**Note:** This feature is not enabled by default.
 
 If the class `cfe_internal_core_watchdog_enabled` is defined, the feature is
 enabled and the watchdog will be active. If the class
