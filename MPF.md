@@ -1,10 +1,10 @@
-The Masterfiles Policy Framework is the default policy
+The Masterfiles Policy Framework (MPF) is the default policy
 that ships with both the CFEngine Enterprise and
 Community editions. The MPF includes policy to manage
-cfengine itself, the stdlib, and policy to inventory
-various aspects of the system.
+CFEngine itself, the standard library (`stdlib`), and policy
+to inventory various aspects of the system.
 
-# Overview
+## Overview
 
 * `update.cf` - The update policy entry.
 * `promises.cf` - The main policy entry.
@@ -19,7 +19,7 @@ various aspects of the system.
 The MPF is continually updated. You can track its development
 on [github](https://github.com/cfengine/masterfiles/).
 
-# Configuration
+## Configuration
 
 The most common controls reference variables in the ```def``` bundle in order to
 keep the modifications to the distributed policy contained within a single
@@ -27,18 +27,20 @@ place. The recommended way to set classes and define variables in the ```def```
 bundle is using an [augments file][Augments]. Keeping the modifications to the
 distributed policy set makes policy framework upgrades significantly easier.
 
-Note: If you need to make modification to a shipped file consider opening a pull
+**Note:** If you need to make modification to a shipped file consider opening a pull
 request to expose the tunable into the ```def``` bundle.
 
 **Note:** `controls/def.cf` contains the defaults and settings for `promises.cf`
 and `controls/update_def.cf` contains the defaults and settings for `update.cf`.
 
-Since 3.7.8, 3.10.4, and 3.12.0 The class `cf_runagent_initated` is defined by
+**History:**
+
+* In 3.7.8, 3.10.4, and 3.12.0 the class `cf_runagent_initiated` is defined by
 default in the MPF for agent executions initiated by `cf-runagent` through
 `cf-serverd`. Previously the class `cfruncommand` was defined. See `body server
 control cfruncommand` in `controls/cf_serverd.cf`.
 
-## Update Policy (update.cf)
+## Update policy (update.cf)
 
 Synchronizing clients with the policy server happens here, in
 `update.cf`. Its main job is to copy all the files on the policy
@@ -84,12 +86,12 @@ Want to get your policy from a place other than `/var/cfengine/masterfiles` on
 
 With an augments like this:
 
-```
+```json
 {
   "vars": {
-            "house": "Gryffindor",
-            "mpf_update_policy_master_location": "/srv/cfengine/$(sys.flavor)/$(def.house)"
-          }
+    "house": "Gryffindor",
+    "mpf_update_policy_master_location": "/srv/cfengine/$(sys.flavor)/$(def.house)"
+  }
 }
 ```
 
@@ -98,24 +100,23 @@ A CentOS 7 host would copy policy from `/srv/cfengine/centos_6/Gryffindor` to
 
 **History:**
 
-- Introduced in 3.12.0.
+* Introduced in 3.12.0.
 
-### Append to inputs used by update policy
+### Add additional policy files for update (inputs)
 
 You can append to the inputs used by the update policy via augments by defining
 ```vars.update_inputs```. The following example will add the policy file
 ```my_updatebundle1.cf``` to the list of policy file inputs during the update policy.
 
-
 ```json
 {
-  "vars":{
+  "vars": {
     "update_inputs": [ "my_updatebundle1.cf" ]
   }
 }
 ```
 
-### Append to the update bundlesequence
+### Evaluate additional bundles during update (bundlesequence)
 
 You can specify bundles which should be run at the end of the default update
 policy bundlesequence by defining ```control_common_update_bundlesequence_end```
@@ -125,7 +126,7 @@ For example:
 
 ```json
 {
-  "vars":{
+  "vars": {
     "control_common_update_bundlesequence_end": [ "my_updatebundle1", "mybundle2" ]
   }
 }
@@ -146,25 +147,25 @@ all files each time the update policy is triggered.
 
 Override this bundle by setting `def.mpf_update_policy_bundle` via augments:
 
-```
+```json
 {
-    "vars": {
-        "mpf_update_policy_bundle": "MyCustomPolicyUpdateBundle"
-    }
+  "vars": {
+    "mpf_update_policy_bundle": "MyCustomPolicyUpdateBundle"
+  }
 }
 ```
 
 **History:**
 
-- Introduced in 3.12.0
+* Introduced in 3.12.0
 
-#### ignore_missing_bundles
+### Ignore missing bundles
 
 This option allows you to ignore errors when a bundle specified in body common control bundlesequence is not found.
 
 This example illustrates enabling the option via augments.
 
-```
+```json
 {
   "vars": {
     "control_common_ignore_missing_bundles": "true"
@@ -176,15 +177,15 @@ This example illustrates enabling the option via augments.
 
 **History:**
 
-- Introduced in 3.12.0
+* Introduced in 3.12.0
 
-#### ignore_missing_inputs
+#### Ignore missing inputs
 
 This option allows you to ignore errors when a file specified in body common control inputs is not found.
 
 This example illustrates enabling the option via augments.
 
-```
+```json
 {
   "vars": {
     "control_common_ignore_missing_inputs": "true"
@@ -196,7 +197,7 @@ This example illustrates enabling the option via augments.
 
 **History:**
 
-- Introduced in 3.12.0
+* Introduced in 3.12.0
 
 ### Verify update transfers
 
@@ -207,7 +208,7 @@ against the hash given by the server
 
 This [augments file][Augments] will enable this behavior for all clients.
 
-```
+```json
 {
   "classes": {
     "cfengine_internal_verify_update_transfers": [ "any" ]
@@ -239,7 +240,7 @@ manage High Availability of Enterprise Hubs is enabled.
 
 **Note:** This class is **not** defined by default.
 
-### Disable plain http for CFEngine Enterprise Mission Portal
+### Disable plain HTTP for CFEngine Enterprise Mission Portal
 
 By default Mission Portal listens for HTTP requests on port 80, redirecting to HTTPS on port 443. To prevent the web server from listening on port 80 at all define `default:cfe_cfengine_enterprise_disable_plain_http`.
 
@@ -257,13 +258,13 @@ By default Mission Portal listens for HTTP requests on port 80, redirecting to H
 
 **Notes:**
 
-- If this class (`default:cfe_enterprise_disable_http_redirect_to_https`) is defined the class `default:cfe_enterprise_disable_plain_http` is defined is automatically defined.
+* If this class (`default:cfe_enterprise_disable_http_redirect_to_https`) is defined the class `default:cfe_enterprise_disable_plain_http` is defined is automatically defined.
 
 **History:**
 
-- Added in CFEngine 3.23.0, 3.21.3
+* Added in CFEngine 3.23.0, 3.21.3
 
-### Disable plain http redirect to https for CFEngine Enterprise Mission Portal
+### Disable plain HTTP redirect to HTTPS for CFEngine Enterprise Mission Portal
 
 By default Mission Portal listens for HTTP requests on port 80, redirecting to HTTPS on port 443. To prevent redirection of requests on HTTP to HTTPS define `default:cfe_enterprise_disable_http_redirect_to_https`.
 
@@ -281,12 +282,12 @@ By default Mission Portal listens for HTTP requests on port 80, redirecting to H
 
 **Notes:**
 
-- If `default:cfe_enterprise_disable_plain_http` is defined, this class (`default:cfe_enterprise_disable_http_redirect_to_https`) is automatically defined.
+* If `default:cfe_enterprise_disable_plain_http` is defined, this class (`default:cfe_enterprise_disable_http_redirect_to_https`) is automatically defined.
 
 **History:**
 
-- Added in CFEngine 3.6.0
-- Class renamed from `cfe_cfengine_enterprise_enable_plain_http` to `cfe_enterprise_disable_http_redirect_to_https` in CFEngine 3.23.0, 3.21.3
+* Added in CFEngine 3.6.0
+* Class renamed from `cfe_cfengine_enterprise_enable_plain_http` to `cfe_enterprise_disable_http_redirect_to_https` in CFEngine 3.23.0, 3.21.3
 
 ### Disable cf\_promises\_validated check
 
@@ -316,7 +317,7 @@ is renamed, duplicate definition errors may occur, preventing policy execution.
 
 This [augments file][Augments] will enable this behavior for all clients.
 
-```
+```json
 {
   "classes": {
     "cfengine_internal_purge_policies_disabled": [ "any" ]
@@ -326,7 +327,7 @@ This [augments file][Augments] will enable this behavior for all clients.
 
 **History:**
 
-- Introduced in 3.18.0, previously, the default behavior was opposite and the class `cfengine_internal_purge_policies`  had to be enabled to keep inputs in sync with masterfiles.
+* Introduced in 3.18.0, previously, the default behavior was opposite and the class `cfengine_internal_purge_policies` had to be enabled to keep inputs in sync with masterfiles.
 
 ### Disable limiting robot agents
 
@@ -344,9 +345,9 @@ Define the class ```mpf_disable_cfe_internal_limit_robot_agents``` to disable th
 
 **History:**
 
-- Introduced in 3.15.0, 3.12.3, 3.10.7
+* Introduced in 3.15.0, 3.12.3, 3.10.7
 
-### Automatically deploy masterfiles from Version Control
+### Automatically deploy policy from version control
 
 On a CFEngine Enterprise Hub during the update policy if the class
 ```cfengine_internal_masterfiles_update``` is defined masterfiles will be
@@ -355,11 +356,11 @@ the
 [settings defined via Mission Portal][Best Practices#Version Control and Configuration Policy] or
 directly in ```/opt/cfengine/dc-scripts```.
 
-**Note:** Any policy in the distribution location (/var/cfengine/masterfiles)
+**Note:** Any policy in the distribution location (`/var/cfengine/masterfiles`)
 will be deleted the first time this tooling runs. Be wary of local modifications
 before enabling.
 
-### Policy Analyzer Exclude Files
+### Exclude files in policy analyzer
 
 When the policy analyzer is enabled, a copy of the policy is made available for viewing from Mission Portal. To exclude files from this view you can define ```def.cfengine_enterprise_policy_analyzer_exclude_files``` as a list of regular expressions matching files that you do not want to be viewable from Policy Analyzer.
 
@@ -369,7 +370,7 @@ This [augments file][Augments] will prevent any files named `please-no-copy` and
 {
   "vars": {
     "cfengine_enterprise_policy_analyzer_exclude_files": [ "please-no-copy", ".*no-copy-me.*" ]
-  },
+  }
 }
 ```
 
@@ -377,7 +378,7 @@ This [augments file][Augments] will prevent any files named `please-no-copy` and
 
 * Added in 3.19.0, 3.18.1
 
-### Policy Permissions
+### Policy permissions
 
 By default the policy enforces permissions of ```0600``` meaning that inputs are
 only readable by their owner. If you are distributing scripts with your
@@ -426,14 +427,15 @@ For example:
 
 ```json
 {
-   "vars": {
-     "dir_master_software_updates": "/srv/cfengine-software-updates/"
-   }
+  "vars": {
+    "dir_master_software_updates": "/srv/cfengine-software-updates/"
+  }
 }
 ```
 
 **History:**
-- Introduced 3.15.0, 3.12.3, 3.10.8
+
+* Introduced 3.15.0, 3.12.3, 3.10.8
 
 #### Disable seeding binaries on hub
 
@@ -446,15 +448,15 @@ For example:
 
 ```json
 {
-   "classes": {
-     "mpf_disable_hub_masterfiles_software_update_seed": [ "policy_server::" ]
-   }
+  "classes": {
+    "mpf_disable_hub_masterfiles_software_update_seed": [ "policy_server::" ]
+  }
 }
 ```
 
 **History:**
 
-- Introduced 3.19.0, 3.18.1
+* Introduced 3.19.0, 3.18.1
 
 ### Override files considered for copy during policy updates
 
@@ -465,14 +467,16 @@ This [augments file][Augments] ensures that only files ending in ```.cf```, ```.
 ```.mustache```, ```.json```, ```.yaml``` and the file
 ```cf_promises_release_id``` will be considered by the default update policy.
 
-```
+```json
 {
-    "vars": {
-        "input_name_patterns": [ ".*\\.cf", ".*\\.dat", ".*\\.txt", ".*\\.conf",
-            ".*\\.mustache", ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
-            ".*\\.sed", ".*\\.awk", "cf_promises_release_id", ".*\\.json",
-            ".*\\.yaml", ".*\\.csv" ]
-    }
+  "vars": {
+    "input_name_patterns": [
+      ".*\\.cf", ".*\\.dat", ".*\\.txt", ".*\\.conf",
+      ".*\\.mustache", ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
+      ".*\\.sed", ".*\\.awk", "cf_promises_release_id", ".*\\.json",
+      ".*\\.yaml", ".*\\.csv"
+    ]
+  }
 }
 ```
 
@@ -494,12 +498,12 @@ This [augments file][Augments] additionally ensures that files ending in
 
 ```json
 {
-    "variables": {
-        "default:update_def.input_name_patterns_extra": {
-          "value": [ ".*\\.tpl", ".*\\.md", ".*\\.org" ],
-          "comment": "We use classic CFEngine templates suffixed with .tpl so they should be copied along with documentation."
-        }
+  "variables": {
+    "default:update_def.input_name_patterns_extra": {
+      "value": [ ".*\\.tpl", ".*\\.md", ".*\\.org" ],
+      "comment": "We use classic CFEngine templates suffixed with .tpl so they should be copied along with documentation."
     }
+  }
 }
 ```
 
@@ -509,7 +513,8 @@ bootstrap the embedded
 is used and it decides which files should be copied.
 
 **History:**
-  - Introduced in CFEngine 3.23.0, 3.21.3
+
+* Introduced in CFEngine 3.23.0, 3.21.3
 
 ### Configuring component management
 
@@ -537,10 +542,7 @@ When enabled, the policy will render systemd unit files in `/etc/systemd/system`
 
 When enabled, the policy will make sure that all units are enabled, unless they have been disabled by a persistent class or are explicitly listed as an agent to be disabled.
 
-#### Enable or disable CFEngine components
-
-##### Using persistent classes
-###### persistent\_disable\_*DAEMON*
+#### Class: default:persistent\_disable\_*DAEMON*
 
 **Description:** Disable a CFEngine Enterprise daemon component persistently.
 
@@ -551,7 +553,7 @@ This will stop the AGENT from starting automatically.
 This [augments file][Augments] will ensure that `cf-monitord` is disabled on hosts that have
 `server1` or the `redhat` class defined.
 
-```
+```json
 {
   "classes": {
     "persistent_disable_cf_monitord": [ "server1", "redhat" ]
@@ -559,7 +561,7 @@ This [augments file][Augments] will ensure that `cf-monitord` is disabled on hos
 }
 ```
 
-###### clear_persistent\_disable\_*DAEMON*
+#### Class: clear_persistent\_disable\_*DAEMON*
 
 **Description:** Re-enable a previously disabled CFEngine Enterprise daemon
 component.
@@ -569,7 +571,7 @@ component.
 This [augments file][Augments] will ensure that `cf-monitord` is not disabled on `redhat`
 hosts.
 
-```
+```json
 {
   "classes": {
     "clear_persistent_disable_cf_monitord": [ "redhat" ]
@@ -577,14 +579,13 @@ hosts.
 }
 ```
 
-##### Using augments
-##### agents_to_be_disabled
+#### Variable: default:def.agents_to_be_disabled
 
 **Description:** list of agents to disable.
 
 This [augments file][Augments] is a way to specify that `cf-monitord` should be disabled on all hosts.
 
-```
+```json
 {
   "vars": {
     "agents_to_be_disabled": [ "cf-monitord" ]
@@ -592,7 +593,7 @@ This [augments file][Augments] is a way to specify that `cf-monitord` should be 
 }
 ```
 
-## Main Policy (promises.cf)
+## Main policy (promises.cf)
 
 The following settings are defined in `controls/def.cf` can be set from an
 [augments file][Augments].
@@ -640,7 +641,7 @@ presence and state in relation to `$(sys.workdir)/ignore_interfaces.rx`.
 
 **History:**
 
-- Introduced `default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir` and `default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled` in 3.23.0, 3.21.4
+* Introduced `default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir` and `default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled` in 3.23.0, 3.21.4
 
 ### dmidecode inventory
 
@@ -675,7 +676,8 @@ For example:
 ```
 
 **History:**
-- Introduced 3.13.0, 3.12.1, 3.10.5
+
+* Introduced 3.13.0, 3.12.1, 3.10.5
 
 ### Configure proc inventory
 
@@ -766,7 +768,8 @@ When enabled `cf-execd` emails output that differs from previous executions. The
 
 **History:**
 
-* Added in 3.22.0, 3.21.2
+* Added in 3.22.0, 3.21.3
+
 ### Configure lines that should be excluded from emails sent by cf-execd
 
 When enabled `cf-execd` emails output that differs from previous executions.
@@ -778,7 +781,7 @@ control` are stripped before sending. The MPF will use the value of
 {
   "variables": {
     "default:def.control_executor_mailfilter_exclude": {
-        "value": [ ".*ps output line.*", ".*regline.*" ]
+      "value": [ ".*ps output line.*", ".*regline.*" ]
     }
   }
 }
@@ -815,7 +818,7 @@ control` are stripped before sending. The MPF will use the value of
 
 Here is an example setting the acl from augments:
 
-```
+```json
 {
   "vars": {
     "acl": [ "24.124.0.0/16", "192.168.33.0/24" ]
@@ -823,7 +826,7 @@ Here is an example setting the acl from augments:
 }
 ```
 
-**See Also:** [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
+**See also:** [Configure networks allowed to make collect calls (client initiated reporting)](#configure-networks-allowed-to-make-collect_calls-client-initiated-reporting)
 
 ### Configure hosts that may connect to cf-serverd
 
@@ -874,17 +877,23 @@ For example, this configuration allows any IPv4 client from the `192.168.56.0/24
 }
 ```
 
+**Notes:**
+
+* The value of `$(sys.policy_hub)` is automatically included in the value used by `allowallconnects` in `body server control` unless the class `default:disable_always_accept_policy_server_allowallconnects` is defined.
+* Alternatively define `default:disable_always_accept_policy_server` to disable this behavior for `allowconnects`, `allowallconnects` and `def.acl` concurrently.
+
 **History:**
 
 * Added in 3.22.0
+* Automatic inclusion of `$(sys.policy_hub)` added in 3.23.0
 
-### ignore_missing_bundles
+### Ignore missing bundles
 
 This option allows you to ignore errors when a bundle specified in body common control bundlesequence is not found.
 
 This example illustrates enabling the option via augments.
 
-```
+```json
 {
   "vars": {
     "control_common_ignore_missing_bundles": "true"
@@ -896,15 +905,15 @@ This example illustrates enabling the option via augments.
 
 **History:**
 
-- Introduced in 3.12.0
+* Introduced in 3.12.0
 
-### ignore_missing_inputs
+### Ignore missing inputs
 
 This option allows you to ignore errors when a file specified in body common control inputs is not found.
 
 This example illustrates enabling the option via augments.
 
-```
+```json
 {
   "vars": {
     "control_common_ignore_missing_inputs": "true"
@@ -916,7 +925,7 @@ This example illustrates enabling the option via augments.
 
 **History:**
 
-- Introduced in 3.12.0
+* Introduced in 3.12.0
 
 ### lastseenexpireafter
 
@@ -927,7 +936,7 @@ default of 1 week (`10080` minutes).
 ```json
 {
   "variables": {
-    "default:def.control_common_ignore_missing_inputs": {
+    "default:def.control_common_lastseenexpireafter": {
       "value": "30240",
       "comment": "We want to retain history of hosts in the last-seen database for 21 days"
     }
@@ -937,9 +946,9 @@ default of 1 week (`10080` minutes).
 
 **History:**
 
-- Introduced in 3.23.0, 3.21.3
+* Introduced in 3.23.0, 3.21.3
 
-### trustkeysfrom
+### Automatic bootstrap - Trusting keys from new hosts with trustkeysfrom
 
 The list of network ranges that `cf-serverd` should trust keys from. This is
 should only be open on policy servers while new hosts are expected to be
@@ -955,34 +964,34 @@ The [augments][Augments] file (```def.json```) can be used to override the
 default setting. For example it can be restricted to ```127.0.0.1``` to prevent
 keys from any foreign host from being automatically accepted.
 
-```
+```json
 {
   "vars": {
     "trustkeysfrom": [ "127.0.0.1" ]
-    }
+  }
 }
 ```
 
 Prevent automatic trust for any host by specifying an empty value:
 
-```
+```json
 {
   "vars": {
     "trustkeysfrom": [ "" ]
-    }
+  }
 }
 ```
 ### Append to inputs used by main policy
 
 The `inputs` key in augments can be used to add additional custom policy files.
 
-**See Also:** [Append to inputs used by update policy][Append to inputs used by update policy]
+**See also:** [Append to inputs used by update policy][Append to inputs used by update policy]
 
 **History:**
 
 * Introduced in CFEngine 3.7.3, 3.12.0
 
-### services\_autorun
+### Enabling autorun: services\_autorun
 
 See the documentation in [services/autorun][mpf-services-autorun].
 
@@ -1006,9 +1015,9 @@ Set this class when you want to enable the CFEngine Enterprise HA policies.
 
 This class can be defined by an [augments file][Augments]. For example:
 
-```
+```json
 {
-  "classes" {
+  "classes": {
     "enable_cfengine_enterprise_hub_ha": [ "hub001" ]
   }
 }
@@ -1024,11 +1033,11 @@ Enterprise agent is detected.
 
 `splaytime` is the maximum number of minutes `exec_commad` should wait before executing.
 
-Note: `splaytime` should be less than the scheduled interval plus agent run time. So for example if your agent run time is over 1 minute and you are running the default execution schedule of 5 mintues your splay time should be set to 3.
+**Note:** `splaytime` should be less than the scheduled interval plus agent run time. So for example if your agent run time is over 1 minute and you are running the default execution schedule of 5 minutes your splay time should be set to 3.
 
 Configure it via augments by defining ```control_executor_splaytime```:
 
-```
+```json
 {
   "vars": {
     "control_executor_splaytime": "3"
@@ -1042,7 +1051,7 @@ cf-agents spawned by cf-execd are killed after this number of minutes of not ret
 
 Example configuration via augments:
 
-```
+```json
 {
   "vars": {
     "control_executor_agent_expireafter": "15"
@@ -1056,7 +1065,7 @@ The execution scheduled is expressesd as a list of classes. If any of the classe
 
 Example configuration via augments:
 
-```
+```json
 {
   "vars": {
     "control_executor_schedule": [ "Min00", "Min30" ]
@@ -1070,7 +1079,7 @@ The above configuration would result in exec_command being triggered at the top 
 
 On Enterprise hubs, access to cf-execd sockets can be configured as a list of users who should be allowed by defining `vars.control_executor_runagent_socket_allow_users`. By default on Enterprise Hubs, `cfapache` is allowed to access runagent sockets.
 
-```
+```json
 {
   "vars": {
     "control_executor_runagent_socket_allow_users": [ "cfapache", "vpodzime" ]
@@ -1088,7 +1097,7 @@ By default since 3.9.0 `cf-serverd` disallows connections from the classic proto
 
 Example definition in augments file:
 
-```
+```json
 {
   "vars": {
     "control_server_allowlegacyconnects": [ "0.0.0.0/0" ]
@@ -1096,7 +1105,7 @@ Example definition in augments file:
 }
 ```
 
-### Configure the ciphers which are allowed to be used by cf-serverd
+### Configure the ciphers used by cf-serverd
 
 When `default:def.control_server_allowciphers` is defined `cf-serverd` will use the ciphers specified instead of the binary defaults.
 
@@ -1121,7 +1130,7 @@ Example definition in augments file:
 
 * Added in 3.22.0, 3.21.2
 
-### Configure the ciphers which are allowed to be used by cf-agent
+### Configure the ciphers used by cf-agent
 
 When `default:def.control_common_tls_ciphers` is defined `cf-agent` will use the ciphers specified instead of the binary defaults for outgoing connections.
 
@@ -1145,10 +1154,9 @@ Example definition in augments file:
 
 **History:**
 
-* Added in 3.22.0, 3.21.2
+* Added in 3.22.0
 
-
-### Configure the minimum TLS version which is allowed to be used by cf-serverd
+### Configure the minimum TLS version used by cf-serverd
 
 When `default:def.control_server_allowtlsversion` is defined `cf-serverd` will use the minimum TLS version specified instead of the binary defaults.
 
@@ -1173,8 +1181,7 @@ Example definition in augments file:
 
 * Added in 3.22.0
 
-
-### Configure the minimum TLS version which is allowed to be used by cf-agent
+### Configure the minimum TLS version used by cf-agent
 
 When `default:def.control_common_tls_min_version` is defined `cf-agent` will use the minimum TLS version specified instead of the binary defaults for outgoing connections.
 
@@ -1184,8 +1191,8 @@ Example definition in augments file:
 {
   "variables": {
     "default:def.control_common_tls_min_version": {
-     "value": "1.0",
-     "comment": "We want to connect to old (<3.7.0) servers."
+      "value": "1.0",
+      "comment": "We want to connect to old (<3.7.0) servers."
     }
   }
 }
@@ -1200,8 +1207,7 @@ Example definition in augments file:
 
 * Added in 3.22.0
 
-
-### Configure users allowed to initate execution via cf-runagent
+### Configure users allowed to initiate execution via cf-runagent
 
 cf-serverd only allows specified users to request unscheduled execution remotely via cf-runagent.
 
@@ -1209,10 +1215,10 @@ By default the MPF allows `root` to request unscheduled execution of non policy 
 
 To configure the list of users allowed to request unscheduled execution define `vars.control_server_allowusers`.
 
-```
+```json
 {
   "vars": {
-    "control_server_allowusers": [ "root", "nickanderson", "cfapache" ],
+    "control_server_allowusers": [ "root", "nickanderson", "cfapache" ]
   }
 }
 ```
@@ -1221,7 +1227,7 @@ It's possible to configure different users that are allowed for policy servers v
 
 This example allows the users `hubmanager` and  `cfoperator` to request unscheduled execution from policy servers and no users are allowed to request unscheduled runs from non policy servers.
 
-```
+```json
 {
   "vars": {
     "control_server_allowusers_non_policy_server": [ ],
@@ -1232,37 +1238,37 @@ This example allows the users `hubmanager` and  `cfoperator` to request unschedu
 
 **History:**
 
-- Added in 3.13.0, 3.12.1
-- Added `vars.control_server_allowusers` in 3.18.0
+* Added in 3.13.0, 3.12.1
+* Added `vars.control_server_allowusers` in 3.18.0
 
-**See Also:** [Configure hosts allowed to initate execution via cf-runagent][Configure hosts allowed to initate execution via cf-runagent]
+**See also:** [Configure hosts allowed to initiate execution via cf-runagent][Configure hosts allowed to initiate execution via cf-runagent]
 
-### Configure hosts allowed to initate execution via cf-runagent
+### Configure hosts allowed to initiate execution via cf-runagent
 
 cf-serverd only allows specified hosts to request unscheduled execution remotely via `cf-runagent`.
 
 By default the MPF allows policy servers (as defined by `def.policy-servers`) to initiate agent runs via `cf-runagent`.
 
-
 To configure the list of hosts allowed to request unscheduled execution define `vars.mpf_admit_cf_runagnet_shell`. This example allows the IPv4 address `192.168.42.10`, the host `bastion.example.com`, and the host with identity `SHA=43c979e264924d0b4a2d3b568d71ab8c768ef63487670f2c51cd85e8cec63834` and policy servers the ability to initiate agent runs via `cf-runagent`.
 
 ```json
 {
-    "vars": {
-        "mpf_admit_cf_runagent_shell": [ "192.168.42.10",
-                                         "bastion.example.com",
-                                         "SHA=43c979e264924d0b4a2d3b568d71ab8c768ef63487670f2c51cd85e8cec63834",
-                                         "@(def.policy_servers)"
-                                       ]
-    }
+  "vars": {
+    "mpf_admit_cf_runagent_shell": [
+      "192.168.42.10",
+      "bastion.example.com",
+      "SHA=43c979e264924d0b4a2d3b568d71ab8c768ef63487670f2c51cd85e8cec63834",
+      "@(def.policy_servers)"
+    ]
+  }
 }
 ```
 
-**See Also:** [Configure users allowed to initate execution via cf-runagent][Configure users allowed to initate execution via cf-runagent]
+**See also:** [Configure users allowed to initiate execution via cf-runagent][Configure users allowed to initiate execution via cf-runagent]
 
 **History:**
 
-- Added in CFEngine 3.18.0
+* Added in CFEngine 3.18.0
 
 ### Configure retention for files in log directories
 
@@ -1270,7 +1276,7 @@ By default the MPF rotates managed log files when they reach 1M in size. To conf
 
 For example:
 
-```
+```json
 {
   "vars": {
     "mpf_log_file_max_size": "10M"
@@ -1282,7 +1288,7 @@ By default the MPF keeps up to 10 rotated log files. To configure this limit via
 
 For example:
 
-```
+```json
 {
   "vars": {
     "mpf_log_file_retention": "5"
@@ -1294,7 +1300,7 @@ By default the MPF retains log files in log directories (`outputs`, `reports` an
 
 For example:
 
-```
+```json
 {
   "vars": {
     "mpf_log_dir_retention": "7"
@@ -1323,7 +1329,7 @@ to keep report collection from timing out.
 
 The default 50M threshold can be configured using an [augments file][Augments], for example:
 
-```
+```json
 {
   "vars": {
     "max_client_history_size": "5M"
@@ -1347,7 +1353,7 @@ Here we set the schedule to initiate pull collection once every 30 minutes via a
 
 **History:**
 
-- MPF override introduced in 3.13.0, 3.12.2
+* MPF override introduced in 3.13.0, 3.12.2
 
 ### Configure maximum age in hours of old reports for cf-hub to collect
 
@@ -1356,7 +1362,6 @@ By default cf-hub instructs clients to expire reports older than 6 hours in orde
 You can adjust this time by setting `vars.control_hub_client_history_timeout`
 
 For example:
-
 
 ```json
 {
@@ -1368,7 +1373,7 @@ For example:
 
 **History:**
 
-- MPF override introduced in 3.13.0, 3.12.2
+* MPF override introduced in 3.13.0, 3.12.2
 
 ### Exclude hosts from hub initiated report collection
 
@@ -1389,7 +1394,7 @@ For example to completely disable hub initiated report collection:
 
 **History:**
 
-- MPF override introduced in 3.13.0, 3.12.2
+* MPF override introduced in 3.13.0, 3.12.2
 
 ### Change port used for enterprise report collection
 
@@ -1407,7 +1412,7 @@ For example:
 
 **History:**
 
-- Added in 3.13.0, 3.12.2
+* Added in 3.13.0, 3.12.2
 
 ### Change hub to client connection timeout
 
@@ -1426,11 +1431,11 @@ For example:
 
 **Note:**
 
-- A value of `"0"` will cause the default to be used.
+* A value of `"0"` will cause the default to be used.
 
 **History:**
 
-- Added in 3.15.0
+* Added in 3.15.0
 
 ### Enable client initiated reporting
 
@@ -1446,31 +1451,32 @@ be defined in an [augments file][Augments].
 
 For example:
 
-```
+```json
 {
-  "classes" {
+  "classes": {
     "client_initiated_reporting_enabled": [ "any" ]
   },
   "vars": {
-    "control_server_call_collect_interval": "1",
+    "control_server_call_collect_interval": "1"
   }
 }
 ```
 
 ### Configure client initiated reporting timeout
 
-By default cf-serverd holds an open connection for client initiated for 30
+By default `cf-serverd` holds an open connection for client initiated for 30
 seconds. In some environments this value may need to be increased in order for
 report collection to finish. Once the connection has been open for longer than
 the specified seconds it is closed.
 
 The window of time can be controled by setting `def.control_server_collect_window`.
 
-For example, enable client initated reporting for all hosts with a 10 minute interval and hold the connection open for 90 seconds.
+For example, enable client initiated reporting for all hosts with a 10 minute
+interval and hold the connection open for 90 seconds.
 
-```
+```json
 {
-  "classes" {
+  "classes": {
     "client_initiated_reporting_enabled": [ "any" ]
   },
   "vars": {
@@ -1482,11 +1488,11 @@ For example, enable client initated reporting for all hosts with a 10 minute int
 
 **History:**
 
-- Added in 3.10.6, 3.12.2, 3.13.1
+* Added in 3.10.6, 3.12.2, 3.13.1
 
 ### Configure MPF to automatically restart components on relevant data change
 
-While the agent itsef will reload its config upon notice of policy change this
+While the agent itself will reload its config upon notice of policy change this
 bundle specifically handles changes to variables used in the MPF which may come
 from external data sources which are unknown to the components themselves.
 
@@ -1497,8 +1503,8 @@ To enable this functionality define the class **`mpf_augments_control_enabled`**
 
 ```json
 {
-  "classes":{
-      "mpf_augments_control_enabled": [ "any" ]
+  "classes": {
+    "mpf_augments_control_enabled": [ "any" ]
   }
 }
 ```
@@ -1510,11 +1516,10 @@ For example changes to ```vars.control_server_my_access_rules```
 when ```mpf_augments_control_enabled``` is defined will result
 in `cf-serverd` restarting.
 
-
 ```json
 {
   "classes": {
-      "mpf_augments_control_enabled": [ "any" ]
+    "mpf_augments_control_enabled": [ "any" ]
   },
   "vars": {
     "control_server_my_access_rules" : {
@@ -1531,15 +1536,15 @@ in `cf-serverd` restarting.
 ### Configure maxconnections for cf-serverd
 
 `maxconnections` in `body server control` configures the maximum number of
-connections allowed by cf-serverd. Recommended to be set greater than the number
+connections allowed by `cf-serverd`. Recommended to be set greater than the number
 of hosts bootstrapped.
 
 This can be configured via [augments][Augments]:
 
-```
+```json
 {
-  "vars":{
-      "control_server_maxconnections": "1000"
+  "vars": {
+    "control_server_maxconnections": "1000"
   }
 }
 ```
@@ -1556,7 +1561,7 @@ initiate report collection define
 For example to allow client initiated reporting for hosts coming from
 `24.124.0.0/16`:
 
-```
+```json
 {
   "vars": {
     "mpf_access_rules_collect_calls_admit_ips": [ "24.124.0.0/16" ]
@@ -1564,9 +1569,9 @@ For example to allow client initiated reporting for hosts coming from
 }
 ```
 
-**See Also:** [Generic acl](#acl)
+**See also:** [Generic acl](#acl)
 
-### Configure Enterprise Measurement/Monitoring Collection
+### Configure Enterprise measurement/monitoring collection
 
 Metrics recorded by measurement promises in `cf-monitord` are only collected by
 default for policy servers. In order to collect metrics for non policy servers
@@ -1575,7 +1580,7 @@ simply define `default_data_select_host_monitoring_include` via in an [augments 
 For example to collect all measurements for remote agents and only cpu and
 memory related probes on policy servers:
 
-```
+```json
 {
   "vars": {
     "default_data_select_host_monitoring_include": [ ".*" ],
@@ -1590,10 +1595,9 @@ memory related probes on policy servers:
 
 ### Configure Enterprise Mission Portal Docroot
 
-Primarily for developer conveniance, this setting allows you to easily disable the enforcement that the webapp consists of the packaged files in the docroot used for Mission Portal.
+Primarily for developer convenience, this setting allows you to easily disable the enforcement that the webapp consists of the packaged files in the docroot used for Mission Portal.
 
-
-```
+```json
 {
   "classes": {
     "mpf_disable_mission_portal_docroot_sync_from_share_gui": [ "any" ]
@@ -1627,10 +1631,9 @@ You can specify a list of bundles which should be run before autorun policies (i
 
 ```json
 {
-  "vars":{
+  "vars": {
     "control_common_bundlesequence_classification": [ "classification_one", "classification_two" ]
   },
-
   "inputs": [ "services/my_classificaton.cf" ]
 }
 ```
@@ -1643,16 +1646,15 @@ You can specify a list of bundles which should be run before autorun policies (i
 
 You can specify bundles which should be run at the end of the default
 bundlesequence by defining ```control_common_bundlesequence_end``` in the vars
-of an  [augments file][Augments].
+of an [augments file][Augments].
 
 For example:
 
 ```json
 {
-  "vars":{
+  "vars": {
     "control_common_bundlesequence_end": [ "mybundle1", "mybundle2" ]
   },
-
   "inputs": [ "services/mybundles.cf" ]
 }
 ```
@@ -1662,7 +1664,7 @@ For example:
 * The order in which bundles are actuates is not guaranteed.
 * The agent will error if a named bundle is not part of inputs.
 
-**History**: Added in 3.10.0
+**History:** Added in 3.10.0
 
 ### Configure `abortclasses` via augments
 
@@ -1671,15 +1673,15 @@ itself upon definition of a matching class.
 
 For example, abort execution if any class starting with ```error_``` or ```abort_``` is defined:
 
-```
+```json
 {
-  "vars":{
+  "vars": {
     "control_agent_abortclasses": [ "error.*", "abort.**" ]
   }
 }
 ```
 
-**History**: Added in 3.15.0, 3.12.3
+**History:** Added in 3.15.0, 3.12.3
 
 ### Configure `abortbundleclasses` via augments
 
@@ -1690,15 +1692,15 @@ If no list is defined, then a default of ```abortbundle``` is used.
 
 For example, abort execution if any class starting with ```bundle_error_``` or ```bundle_abort_``` is defined:
 
-```
+```json
 {
-  "vars":{
+  "vars": {
     "control_agent_abortbundleclasses": [ "bundle_error.*", "bundle_abort.**" ]
   }
 }
 ```
 
-**History**: Added in 3.15.0, 3.12.3
+**History:** Added in 3.15.0, 3.12.3
 
 ### Configure `files_single_copy` via augments
 
@@ -1707,16 +1709,15 @@ from performing subsequent copy operations on the same promiser.
 
 For example, to only allow any file to be copied a single time:
 
-```
+```json
 {
-  "vars":{
+  "vars": {
     "control_agent_files_single_copy": [ ".*" ]
   }
-
 }
 ```
 
-**History**: Added in 3.11.0, 3.10.2
+**History:** Added in 3.11.0, 3.10.2
 
 ### Disable automatic policy hub detection
 
@@ -1732,16 +1733,15 @@ To disable this check, define `mpf_auto_am_policy_hub_state_disabled`.
 
 For example, to define this class via augments, place the following in your def.json.
 
-```
+```json
 {
-  "classes":{
+  "classes": {
     "mpf_auto_am_policy_hub_state_disabled": [ "any" ]
   }
-
 }
 ```
 
-**History**: Added in 3.15.0, 3.12.3, 3.10.7
+**History:** Added in 3.15.0, 3.12.3, 3.10.7
 
 ### Configure default repository for file backups
 
@@ -1753,12 +1753,11 @@ placed in `$(sys.workdir)/backups`. Customize the backup directory by setting
 
 For example:
 
-```
+```json
 {
   "classes": {
     "mpf_control_agent_default_repository": [ "any" ]
   },
-
   "vars": {
     "control_agent_default_repository": "/var/cfengine/edit_backups"
   }
@@ -1767,12 +1766,11 @@ For example:
 
 **Notes:**
 
-- This applies to `promises.cf`.
-
+* This applies to `promises.cf`.
 
 **History:**
 
-- Introduced in CFEngine 3.10.1
+* Introduced in CFEngine 3.10.1
 
 ### Configure default repository for file backups during policy update
 
@@ -1786,7 +1784,7 @@ backup directory by setting `default:update_def.control_agent_default_backup`.
 
 For example:
 
-```
+```json
 {
   "classes": {
     "default:mpf_update_control_agent_default_repository": {
@@ -1816,6 +1814,7 @@ modules and package methods. Each maintain their own cache of packages installed
 and updates available.
 
 #### For package modules
+
 CFEngine refreshes software inventory when it makes changes via packages
 promises. Additionally, by default, CFEngine refreshes it's
 internal cache of packages installed (during each agent run) and package updates that
@@ -1831,12 +1830,12 @@ pick up changes made outside packages promises.
 }
 ```
 
-WARNING: Be ware of setting `package_module_query_update_ifelapsed` too low,
+**Warning:** Beware of setting `package_module_query_update_ifelapsed` too low,
 especially with public repositories or you may be banned for abuse.
 
 **See also:** `packagesmatching()`, `packageupdatesmatching()`
 
-**History**:
+**History:**
 
 * Added in 3.15.0, 3.12.3
 * 3.17.0 decreased `package_module_query_installed_ifelapsed` from `60` to `0`
@@ -1875,7 +1874,6 @@ can be customized via Augments.
   ```yum_rpm_enable_repo``` , ```yum_group```, ```rpm_filebased```, ```ips```,
   ```smartos```, ```opencsw```, ```emerge```, ```pacman```, ```zypper```,
   ```generic```
-
 * [package bundles][lib/packages.cf]: ```package_latest```,
   ```package_specific_present```, ```package_specific_absent```,
   ```package_specific_latest```, ```package_specific```
@@ -1892,7 +1890,7 @@ an enterprise hub license utilization will be logged by the hub in
 
 Example enabling the class from an [augments file][Augments]:
 
-```
+```json
 {
   "classes": {
     "enable_log_cfengine_enterprise_license_utilization": [ "enterprise_edition" ]
@@ -1900,11 +1898,11 @@ Example enabling the class from an [augments file][Augments]:
 }
 ```
 
-**History**: Added in 3.11, 3.10.2
+**History:** Added in 3.11, 3.10.2
 
 ### Enable external watchdog
 
-**Note**: This feature is not enabled by default.
+**Note:** This feature is not enabled by default.
 
 If the class `cfe_internal_core_watchdog_enabled` is defined, the feature is
 enabled and the watchdog will be active. If the class
@@ -1913,16 +1911,18 @@ the watchdog will not be active.
 
 ```json
 {
-    "classes": {
-        "cfe_internal_core_watchdog_enabled": [ "aix::" ],
-        "cfe_internal_core_watchdog_disabled": [ "!cfe_internal_core_watchdog_enabled::" ]
-        }
+  "classes": {
+    "cfe_internal_core_watchdog_enabled":
+      [ "aix::" ],
+    "cfe_internal_core_watchdog_disabled":
+      [ "!cfe_internal_core_watchdog_enabled::" ]
+  }
 }
 ```
 
-**See Also:** [Watchdog documentation][cfe_internal/core/watchdog]
+**See also:** [Watchdog documentation][cfe_internal/core/watchdog]
 
-### Environment Variables
+### Environment variables
 
 Environment variables that should be inherited by child commands can be set using `def.control_agent_environment_vars_default`. The policy defaults are overridden if this is defined. This can be useful if you want to modify the default environment variables that are set.
 
@@ -1931,9 +1931,10 @@ For example:
 ```json
 {
   "vars": {
-    "control_agent_environment_vars_default":
-      [ "DEBIAN_FRONTEND=noninteractive",
-        "XPG_SUS_ENV=ON" ]
+    "control_agent_environment_vars_default": [
+      "DEBIAN_FRONTEND=noninteractive",
+      "XPG_SUS_ENV=ON"
+    ]
   }
 }
 ```
@@ -1979,7 +1980,6 @@ Copy a template from the templates directory:
 
 ```cf3
   files:
-
     "$(def.dir_templates)/mytemplate.mustache" -> { "myservice" }
       copy_from => remote_dcp("templates/mytemplate.mustache", $(sys.policy_server) ),
       comment => "mytemplate is necessary in order to render myservice configuration file.";
@@ -1990,9 +1990,9 @@ the  [augments file][Augments] (`def.json`):
 
 ```json
 {
-    "vars": {
-        "dir_templates": "/var/cfengine/mytemplates"
-        }
+  "vars": {
+    "dir_templates": "/var/cfengine/mytemplates"
+  }
 }
 ```
 
@@ -2001,7 +2001,7 @@ will not cause `cf-serverd` to reload its configuration and update the access
 control lists as necessary. `cf-serverd` will only automatically reload its
 config when it notices a change in *policy*.
 
-**History**: Added in 3.11.
+**History:** Added in 3.11.
 
 ### Federated Reporting
 #### Configure dump interval
@@ -2079,7 +2079,7 @@ When custom certificates are in use distributed cleanup needs to know where to f
 
 * Added in CFEngine 3.20.0, 3.18.2
 
-#### PostgreSQL Configuration
+#### PostgreSQL configuration
 
 It's not uncommon to need to configure some PostgreSQL settings differently for Federated Reporting. The settings that are exposed as tunables which can be set via augments are listed here. These do not comprise all settings that may need adjusted, only those that are most commonly adjusted.
 
@@ -2089,7 +2089,7 @@ file various units can be used. Valid memory units are B (bytes), kB
 for memory units is 1024, not 1000. Valid time units are us (microseconds), ms
 (milliseconds), s (seconds), min (minutes), h (hours), and d (days).
 
-##### shared_buffers
+#### shared_buffers
 
 Shared buffers are the amount of memory the database server uses for shared memory buffers. Settings significantly higher than the minimum are usually needed for good performance.
 
@@ -2111,7 +2111,7 @@ For example:
 
 * Added in 3.20.0, 3.18.2
 
-##### max_locks_per_transaction
+#### max_locks_per_transaction
 
 The ```max_locks_per_transaction``` value indicates the number of database objects that can be locked simultaneously. When Federated Reporting is enabled, the MPF default is `4000`.
 
@@ -2127,7 +2127,7 @@ The ```max_locks_per_transaction``` value indicates the number of database objec
 
 * Added in 3.20.0, 3.18.2
 
-##### log_lock_waits
+#### log_lock_waits
 
 Controls whether a log message is produced when a session waits longer than `deadlock_timeout` to acquire a lock. This is useful in determining if lock waits are causing poor performance. When Federated Reporting is enabled, the MPF default is `on`.
 
@@ -2143,7 +2143,7 @@ Controls whether a log message is produced when a session waits longer than `dea
 
 * Added in 3.20.0, 3.18.2
 
-##### max_wal_size
+#### max_wal_size
 
 Sets the WAL size that triggers a checkpoint.
 
@@ -2161,7 +2161,7 @@ Maximum size to let the WAL grow during automatic checkpoints. This is a soft li
 
 * Added in 3.20.0, 3.18.2
 
-##### checkpoint_timeout
+#### checkpoint_timeout
 
 Sets the maximum time between automatic WAL checkpoints.
 
@@ -2191,11 +2191,11 @@ To disable cfengine recommendations define `cfengine_recommendations_disabled`.
 
 This snippet disables recommendations via augments.
 
-```
+```json
 {
-    "classes": [
-        "cfengine_recommendations_disabled"
-    ]
+  "classes": [
+    "cfengine_recommendations_disabled"
+  ]
 }
 ```
 
