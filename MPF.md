@@ -750,7 +750,7 @@ The maximumm number of lines of output that `cf-execd` will email.
 
 * Added in CFEngine 3.22.0, 3.21.1, 3.18.4
 
-**See also:** [`maxmaillines`][cf-execd#maxmaillines]
+**See also:** [`mailmaxlines`][cf-execd#mailmaxlines]
 
 ### Configure subject for emails sent by cf-execd
 
@@ -1241,7 +1241,7 @@ This example allows the users `hubmanager` and  `cfoperator` to request unschedu
 * Added in 3.13.0, 3.12.1
 * Added `vars.control_server_allowusers` in 3.18.0
 
-**See also:** [Configure hosts allowed to initiate execution via cf-runagent][Configure hosts allowed to initiate execution via cf-runagent]
+**See also:** [Configure hosts allowed to initiate execution via cf-runagent][Masterfiles Policy Framework#Configure hosts allowed to initiate execution via cf-runagent]
 
 ### Configure hosts allowed to initiate execution via cf-runagent
 
@@ -1264,7 +1264,7 @@ To configure the list of hosts allowed to request unscheduled execution define `
 }
 ```
 
-**See also:** [Configure users allowed to initiate execution via cf-runagent][Configure users allowed to initiate execution via cf-runagent]
+**See also:** [Configure users allowed to initiate execution via cf-runagent][Masterfiles Policy Framework#Configure users allowed to initiate execution via cf-runagent]
 
 **History:**
 
