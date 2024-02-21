@@ -841,7 +841,7 @@ For example, this configuration allows any IPv4 client to connect to `cf-serverd
 ```json
 {
   "variables": {
-    "default:def.allowconnects": {
+    "default:def.control_server_allowconnects": {
       "value": [
         "0.0.0.0/0"
       ]
@@ -868,7 +868,7 @@ For example, this configuration allows any IPv4 client from the `192.168.56.0/24
 ```json
 {
   "variables": {
-    "default:def.allowallconnects": {
+    "default:def.control_server_allowallconnects": {
       "value": [
         "192.168.56.0/24"
       ]
