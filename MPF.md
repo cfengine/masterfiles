@@ -88,9 +88,13 @@ With an augments like this:
 
 ```json
 {
-  "vars": {
-    "house": "Gryffindor",
-    "mpf_update_policy_master_location": "/srv/cfengine/$(sys.flavor)/$(def.house)"
+  "variables": {
+    "default:def.house": {
+      "value": "Gryffindor"
+    },
+    "default:def.mpf_update_policy_master_location": {
+      "value": "/srv/cfengine/$(default:sys.flavor)/$(default:def.house)"
+    }
   }
 }
 ```
@@ -110,8 +114,12 @@ You can append to the inputs used by the update policy via augments by defining
 
 ```json
 {
-  "vars": {
-    "update_inputs": [ "my_updatebundle1.cf" ]
+  "variables": {
+    "default:def.update_inputs": {
+      "value": [
+        "my_updatebundle1.cf"
+      ]
+    }
   }
 }
 ```
@@ -126,8 +134,13 @@ For example:
 
 ```json
 {
-  "vars": {
-    "control_common_update_bundlesequence_end": [ "my_updatebundle1", "mybundle2" ]
+  "variables": {
+    "default:def.control_common_update_bundlesequence_end": {
+      "value": [
+        "my_updatebundle1",
+        "mybundle2"
+      ]
+    }
   }
 }
 ```
@@ -149,8 +162,10 @@ Override this bundle by setting `def.mpf_update_policy_bundle` via augments:
 
 ```json
 {
-  "vars": {
-    "mpf_update_policy_bundle": "MyCustomPolicyUpdateBundle"
+  "variables": {
+    "default:def.mpf_update_policy_bundle": {
+      "value": "MyCustomPolicyUpdateBundle"
+    }
   }
 }
 ```
@@ -167,8 +182,10 @@ This example illustrates enabling the option via augments.
 
 ```json
 {
-  "vars": {
-    "control_common_ignore_missing_bundles": "true"
+  "variables": {
+    "default:def.control_common_ignore_missing_bundles": {
+      "value": "true"
+    }
   }
 }
 ```
@@ -187,8 +204,10 @@ This example illustrates enabling the option via augments.
 
 ```json
 {
-  "vars": {
-    "control_common_ignore_missing_inputs": "true"
+  "variables": {
+    "default:def.control_common_ignore_missing_inputs": {
+      "value": "true"
+    }
   }
 }
 ```
@@ -211,7 +230,11 @@ This [augments file][Augments] will enable this behavior for all clients.
 ```json
 {
   "classes": {
-    "cfengine_internal_verify_update_transfers": [ "any" ]
+    "default:cfengine_internal_verify_update_transfers": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   }
 }
 ```
@@ -320,7 +343,11 @@ This [augments file][Augments] will enable this behavior for all clients.
 ```json
 {
   "classes": {
-    "cfengine_internal_purge_policies_disabled": [ "any" ]
+    "default:cfengine_internal_purge_policies_disabled": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   }
 }
 ```
@@ -338,7 +365,11 @@ Define the class ```mpf_disable_cfe_internal_limit_robot_agents``` to disable th
 ```json
 {
   "classes": {
-    "mpf_disable_cfe_internal_limit_robot_agents": [ "any" ]
+    "default:mpf_disable_cfe_internal_limit_robot_agents": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   }
 }
 ```
@@ -368,8 +399,10 @@ This [augments file][Augments] will prevent any files named `please-no-copy` and
 
 ```json
 {
-  "vars": {
-    "cfengine_enterprise_policy_analyzer_exclude_files": [ "please-no-copy", ".*no-copy-me.*" ]
+  "variables": {
+    "default:def.cfengine_enterprise_policy_analyzer_exclude_files": {
+        "value": [ "please-no-copy", ".*no-copy-me.*" ]
+    }
   }
 }
 ```
@@ -438,8 +471,10 @@ For example:
 
 ```json
 {
-  "vars": {
-    "dir_master_software_updates": "/srv/cfengine-software-updates/"
+  "variables": {
+    "default:def.dir_master_software_updates": {
+        "value": "/srv/cfengine-software-updates/"
+    }
   }
 }
 ```
@@ -460,7 +495,9 @@ For example:
 ```json
 {
   "classes": {
-    "mpf_disable_hub_masterfiles_software_update_seed": [ "policy_server::" ]
+    "default:mpf_disable_hub_masterfiles_software_update_seed": {
+       "class_expressions": [ "policy_server::" ]
+    }
   }
 }
 ```
@@ -480,13 +517,15 @@ This [augments file][Augments] ensures that only files ending in ```.cf```, ```.
 
 ```json
 {
-  "vars": {
-    "input_name_patterns": [
-      ".*\\.cf", ".*\\.dat", ".*\\.txt", ".*\\.conf",
-      ".*\\.mustache", ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
-      ".*\\.sed", ".*\\.awk", "cf_promises_release_id", ".*\\.json",
-      ".*\\.yaml", ".*\\.csv"
-    ]
+  "variables": {
+    "default:def.input_name_patterns": {
+        "value": [
+          ".*\\.cf", ".*\\.dat", ".*\\.txt", ".*\\.conf",
+          ".*\\.mustache", ".*\\.sh", ".*\\.pl", ".*\\.py", ".*\\.rb",
+          ".*\\.sed", ".*\\.awk", "cf_promises_release_id", ".*\\.json",
+          ".*\\.yaml", ".*\\.csv"
+        ]
+    }
   }
 }
 ```
@@ -544,7 +583,9 @@ This example illustrates enabling management of components on systemd hosts havi
 ```json
 {
   "classes": {
-    "mpf_enable_cfengine_systemd_component_management": [ "redhat_8" ]
+    "default:mpf_enable_cfengine_systemd_component_management": {
+        "regular_expressions": [ "redhat_8" ]
+    }
   }
 }
 ```
@@ -567,7 +608,9 @@ This [augments file][Augments] will ensure that `cf-monitord` is disabled on hos
 ```json
 {
   "classes": {
-    "persistent_disable_cf_monitord": [ "server1", "redhat" ]
+    "default:persistent_disable_cf_monitord": {
+      "regular_expressions": [ "server1", "redhat" ]
+    }
   }
 }
 ```
@@ -585,7 +628,9 @@ hosts.
 ```json
 {
   "classes": {
-    "clear_persistent_disable_cf_monitord": [ "redhat" ]
+    "default:clear_persistent_disable_cf_monitord": {
+        "regular_expressions": [ "redhat" ]
+    }
   }
 }
 ```
@@ -598,8 +643,10 @@ This [augments file][Augments] is a way to specify that `cf-monitord` should be 
 
 ```json
 {
-  "vars": {
-    "agents_to_be_disabled": [ "cf-monitord" ]
+  "variables": {
+    "default:def.agents_to_be_disabled": {
+      "value": [ "cf-monitord" ]
+    }
   }
 }
 ```
@@ -667,19 +714,21 @@ For example:
 
 ```json
 {
-  "vars": {
-    "cfe_autorun_inventory_dmidecode": {
-      "dmidefs": {
-        "bios-vendor": "BIOS vendor",
-        "bios-version": "BIOS version",
-        "system-serial-number": "System serial number",
-        "system-manufacturer": "System manufacturer",
-        "system-version": "System version",
-        "system-product-name": "System product name",
-        "bios-release-date": "BIOS release date",
-        "chassis-serial-number": "Chassis serial number",
-        "chassis-asset-tag": "Chassis asset tag",
-        "baseboard-asset-tag": "Baseboard asset tag"
+  "variables": {
+    "default:def.cfe_autorun_inventory_dmidecode": {
+      "value": {
+        "dmidefs": {
+          "bios-vendor": "BIOS vendor",
+          "bios-version": "BIOS version",
+          "system-serial-number": "System serial number",
+          "system-manufacturer": "System manufacturer",
+          "system-version": "System version",
+          "system-product-name": "System product name",
+          "bios-release-date": "BIOS release date",
+          "chassis-serial-number": "Chassis serial number",
+          "chassis-asset-tag": "Chassis asset tag",
+          "baseboard-asset-tag": "Baseboard asset tag"
+        }
       }
     }
   }
@@ -921,8 +970,10 @@ This example illustrates enabling the option via augments.
 
 ```json
 {
-  "vars": {
-    "control_common_ignore_missing_bundles": "true"
+  "variables": {
+    "default:def.control_common_ignore_missing_bundles": {
+      "value": "true"
+    }
   }
 }
 ```
@@ -941,8 +992,10 @@ This example illustrates enabling the option via augments.
 
 ```json
 {
-  "vars": {
-    "control_common_ignore_missing_inputs": "true"
+  "variables": {
+    "default:def.control_common_ignore_missing_inputs": {
+      "value": "true"
+    }
   }
 }
 ```
@@ -992,8 +1045,12 @@ keys from any foreign host from being automatically accepted.
 
 ```json
 {
-  "vars": {
-    "trustkeysfrom": [ "127.0.0.1" ]
+  "variables": {
+    "default:def.trustkeysfrom": {
+      "value": [
+        "127.0.0.1"
+      ]
+    }
   }
 }
 ```
@@ -1002,8 +1059,12 @@ Prevent automatic trust for any host by specifying an empty value:
 
 ```json
 {
-  "vars": {
-    "trustkeysfrom": [ "" ]
+  "variables": {
+    "default:def.trustkeysfrom": {
+      "value": [
+        ""
+      ]
+    }
   }
 }
 ```
@@ -1044,7 +1105,11 @@ This class can be defined by an [augments file][Augments]. For example:
 ```json
 {
   "classes": {
-    "enable_cfengine_enterprise_hub_ha": [ "hub001" ]
+    "default:enable_cfengine_enterprise_hub_ha": {
+      "regular_expressions": [
+        "hub001"
+      ]
+    }
   }
 }
 ```
@@ -1065,8 +1130,10 @@ Configure it via augments by defining ```control_executor_splaytime```:
 
 ```json
 {
-  "vars": {
-    "control_executor_splaytime": "3"
+  "variables": {
+    "default:def.control_executor_splaytime": {
+      "value": "3"
+    }
   }
 }
 ```
@@ -1079,8 +1146,10 @@ Example configuration via augments:
 
 ```json
 {
-  "vars": {
-    "control_executor_agent_expireafter": "15"
+  "variables": {
+    "default:def.control_executor_agent_expireafter": {
+      "value": "15"
+    }
   }
 }
 ```
@@ -1093,8 +1162,13 @@ Example configuration via augments:
 
 ```json
 {
-  "vars": {
-    "control_executor_schedule": [ "Min00", "Min30" ]
+  "variables": {
+    "default:def.control_executor_schedule": {
+      "value": [
+        "Min00",
+        "Min30"
+      ]
+    }
   }
 }
 ```
@@ -1107,8 +1181,13 @@ On Enterprise hubs, access to cf-execd sockets can be configured as a list of us
 
 ```json
 {
-  "vars": {
-    "control_executor_runagent_socket_allow_users": [ "cfapache", "vpodzime" ]
+  "variables": {
+    "default:def.control_executor_runagent_socket_allow_users": {
+      "value": [
+        "cfapache",
+        "vpodzime"
+      ]
+    }
   }
 }
 ```
@@ -1125,8 +1204,12 @@ Example definition in augments file:
 
 ```json
 {
-  "vars": {
-    "control_server_allowlegacyconnects": [ "0.0.0.0/0" ]
+  "variables": {
+    "default:def.control_server_allowlegacyconnects": {
+      "value": [
+        "0.0.0.0/0"
+      ]
+    }
   }
 }
 ```
@@ -1243,8 +1326,14 @@ To configure the list of users allowed to request unscheduled execution define `
 
 ```json
 {
-  "vars": {
-    "control_server_allowusers": [ "root", "nickanderson", "cfapache" ]
+  "variables": {
+    "default:def.control_server_allowusers": {
+      "value": [
+        "root",
+        "nickanderson",
+        "cfapache"
+      ]
+    }
   }
 }
 ```
@@ -1255,9 +1344,16 @@ This example allows the users `hubmanager` and  `cfoperator` to request unschedu
 
 ```json
 {
-  "vars": {
-    "control_server_allowusers_non_policy_server": [ ],
-    "control_server_allowusers_policy_server": [ "hubmanager", "cfoperator" ]
+  "variables": {
+    "default:def.control_server_allowusers_non_policy_server": {
+      "value": []
+    },
+    "default:def.control_server_allowusers_policy_server": {
+      "value": [
+        "hubmanager",
+        "cfoperator"
+      ]
+    }
   }
 }
 ```
@@ -1279,13 +1375,15 @@ To configure the list of hosts allowed to request unscheduled execution define `
 
 ```json
 {
-  "vars": {
-    "mpf_admit_cf_runagent_shell": [
-      "192.168.42.10",
-      "bastion.example.com",
-      "SHA=43c979e264924d0b4a2d3b568d71ab8c768ef63487670f2c51cd85e8cec63834",
-      "@(def.policy_servers)"
-    ]
+  "variables": {
+    "default:def.mpf_admit_cf_runagent_shell": {
+      "value": [
+        "192.168.42.10",
+        "bastion.example.com",
+        "SHA=43c979e264924d0b4a2d3b568d71ab8c768ef63487670f2c51cd85e8cec63834",
+        "@(def.policy_servers)"
+      ]
+    }
   }
 }
 ```
@@ -1304,8 +1402,10 @@ For example:
 
 ```json
 {
-  "vars": {
-    "mpf_log_file_max_size": "10M"
+  "variables": {
+    "default:def.mpf_log_file_max_size": {
+      "value": "10M"
+    }
   }
 }
 ```
@@ -1316,8 +1416,10 @@ For example:
 
 ```json
 {
-  "vars": {
-    "mpf_log_file_retention": "5"
+  "variables": {
+    "default:def.mpf_log_file_retention": {
+      "value": "5"
+    }
   }
 }
 ```
@@ -1328,8 +1430,10 @@ For example:
 
 ```json
 {
-  "vars": {
-    "mpf_log_dir_retention": "7"
+  "variables": {
+    "default:def.mpf_log_dir_retention": {
+      "value": "7"
+    }
   }
 }
 ```
@@ -1340,8 +1444,10 @@ By default the MPF is configured to retain reports generated by the asynchronous
 
 ```json
 {
-  "vars": {
-    "purge_scheduled_reports_older_than_days": "30"
+  "variables": {
+    "default:def.purge_scheduled_reports_older_than_days": {
+      "value": "30"
+    }
   }
 }
 ```
@@ -1357,8 +1463,10 @@ The default 50M threshold can be configured using an [augments file][Augments], 
 
 ```json
 {
-  "vars": {
-    "max_client_history_size": "5M"
+  "variables": {
+    "default:def.max_client_history_size": {
+      "value": "5M"
+    }
   }
 }
 ```
@@ -1371,8 +1479,13 @@ Here we set the schedule to initiate pull collection once every 30 minutes via a
 
 ```json
 {
-  "vars": {
-    "control_hub_hub_schedule": [ "Min00", "Min30" ]
+  "variables": {
+    "default:def.control_hub_hub_schedule": {
+      "value": [
+        "Min00",
+        "Min30"
+      ]
+    }
   }
 }
 ```
@@ -1391,8 +1504,10 @@ For example:
 
 ```json
 {
-  "vars": {
-    "control_hub_client_history_timeout": "72"
+  "variables": {
+    "default:def.control_hub_client_history_timeout": {
+      "value": "72"
+    }
   }
 }
 ```
@@ -1412,8 +1527,12 @@ For example to completely disable hub initiated report collection:
 
 ```json
 {
-  "vars": {
-    "control_hub_exclude_hosts": [ "0.0.0.0/0" ]
+  "variables": {
+    "default:def.control_hub_exclude_hosts": {
+      "value": [
+        "0.0.0.0/0"
+      ]
+    }
   }
 }
 ```
@@ -1430,8 +1549,10 @@ For example:
 
 ```json
 {
-  "vars": {
-    "control_hub_port": "8035"
+  "variables": {
+    "default:def.control_hub_port": {
+      "value": "8035"
+    }
   }
 }
 ```
@@ -1449,8 +1570,10 @@ For example:
 
 ```json
 {
-  "vars": {
-    "control_hub_query_timeout": "10"
+  "variables": {
+    "default:def.control_hub_query_timeout": {
+      "value": "10"
+    }
   }
 }
 ```
@@ -1480,10 +1603,16 @@ For example:
 ```json
 {
   "classes": {
-    "client_initiated_reporting_enabled": [ "any" ]
+    "default:client_initiated_reporting_enabled": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   },
-  "vars": {
-    "control_server_call_collect_interval": "1"
+  "variables": {
+    "default:def.control_server_call_collect_interval": {
+      "value": "1"
+    }
   }
 }
 ```
@@ -1503,11 +1632,19 @@ interval and hold the connection open for 90 seconds.
 ```json
 {
   "classes": {
-    "client_initiated_reporting_enabled": [ "any" ]
+    "default:client_initiated_reporting_enabled": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   },
-  "vars": {
-    "control_server_collect_window": "90",
-    "control_server_call_collect_interval": "10"
+  "variables": {
+    "default:def.control_server_collect_window": {
+      "value": "90"
+    },
+    "default:def.control_server_call_collect_interval": {
+      "value": "10"
+    }
   }
 }
 ```
@@ -1530,7 +1667,11 @@ To enable this functionality define the class **`mpf_augments_control_enabled`**
 ```json
 {
   "classes": {
-    "mpf_augments_control_enabled": [ "any" ]
+    "default:mpf_augments_control_enabled": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   }
 }
 ```
@@ -1545,12 +1686,18 @@ in `cf-serverd` restarting.
 ```json
 {
   "classes": {
-    "mpf_augments_control_enabled": [ "any" ]
+    "default:mpf_augments_control_enabled": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   },
-  "vars": {
-    "control_server_my_access_rules" : {
-      "/var/repo/": {
-        "admit": "def.acl"
+  "variables": {
+    "default:def.control_server_my_access_rules": {
+      "value": {
+        "/var/repo/": {
+          "admit": "def.acl"
+        }
       }
     }
   }
@@ -1569,8 +1716,10 @@ This can be configured via [augments][Augments]:
 
 ```json
 {
-  "vars": {
-    "control_server_maxconnections": "1000"
+  "variables": {
+    "default:def.control_server_maxconnections": {
+      "value": "1000"
+    }
   }
 }
 ```
@@ -1589,8 +1738,12 @@ For example to allow client initiated reporting for hosts coming from
 
 ```json
 {
-  "vars": {
-    "mpf_access_rules_collect_calls_admit_ips": [ "24.124.0.0/16" ]
+  "variables": {
+    "default:def.mpf_access_rules_collect_calls_admit_ips": {
+      "value": [
+        "24.124.0.0/16"
+      ]
+    }
   }
 }
 ```
@@ -1608,9 +1761,18 @@ memory related probes on policy servers:
 
 ```json
 {
-  "vars": {
-    "default_data_select_host_monitoring_include": [ ".*" ],
-    "default_data_select_policy_hub_monitoring_include": [ "mem_.*", "cpu.*" ]
+  "variables": {
+    "default:def.default_data_select_host_monitoring_include": {
+      "value": [
+        ".*"
+      ]
+    },
+    "default:def.default_data_select_policy_hub_monitoring_include": {
+      "value": [
+        "mem_.*",
+        "cpu.*"
+      ]
+    }
   }
 }
 ```
@@ -1626,7 +1788,11 @@ Primarily for developer convenience, this setting allows you to easily disable t
 ```json
 {
   "classes": {
-    "mpf_disable_mission_portal_docroot_sync_from_share_gui": [ "any" ]
+    "default:mpf_disable_mission_portal_docroot_sync_from_share_gui": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   }
 }
 ```
@@ -1657,10 +1823,17 @@ You can specify a list of bundles which should be run before autorun policies (i
 
 ```json
 {
-  "vars": {
-    "control_common_bundlesequence_classification": [ "classification_one", "classification_two" ]
+  "variables": {
+    "default:def.control_common_bundlesequence_classification": {
+      "value": [
+        "classification_one",
+        "classification_two"
+      ]
+    }
   },
-  "inputs": [ "services/my_classificaton.cf" ]
+  "inputs": [
+    "services/my_classificaton.cf"
+  ]
 }
 ```
 
@@ -1678,10 +1851,17 @@ For example:
 
 ```json
 {
-  "vars": {
-    "control_common_bundlesequence_end": [ "mybundle1", "mybundle2" ]
+  "variables": {
+    "default:def.control_common_bundlesequence_end": {
+      "value": [
+        "mybundle1",
+        "mybundle2"
+      ]
+    }
   },
-  "inputs": [ "services/mybundles.cf" ]
+  "inputs": [
+    "services/mybundles.cf"
+  ]
 }
 ```
 
@@ -1701,8 +1881,13 @@ For example, abort execution if any class starting with ```error_``` or ```abort
 
 ```json
 {
-  "vars": {
-    "control_agent_abortclasses": [ "error.*", "abort.**" ]
+  "variables": {
+    "default:def.control_agent_abortclasses": {
+      "value": [
+        "error_.*",
+        "abort_.*"
+      ]
+    }
   }
 }
 ```
@@ -1720,8 +1905,13 @@ For example, abort execution if any class starting with ```bundle_error_``` or `
 
 ```json
 {
-  "vars": {
-    "control_agent_abortbundleclasses": [ "bundle_error.*", "bundle_abort.**" ]
+  "variables": {
+    "default:def.control_agent_abortbundleclasses": {
+      "value": [
+        "bundle_error_.*",
+        "bundle_abort_.*"
+      ]
+    }
   }
 }
 ```
@@ -1737,8 +1927,12 @@ For example, to only allow any file to be copied a single time:
 
 ```json
 {
-  "vars": {
-    "control_agent_files_single_copy": [ ".*" ]
+  "variables": {
+    "default:def.control_agent_files_single_copy": {
+      "value": [
+        ".*"
+      ]
+    }
   }
 }
 ```
@@ -1762,7 +1956,11 @@ For example, to define this class via augments, place the following in your def.
 ```json
 {
   "classes": {
-    "mpf_auto_am_policy_hub_state_disabled": [ "any" ]
+    "default:mpf_auto_am_policy_hub_state_disabled": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   }
 }
 ```
@@ -1782,10 +1980,16 @@ For example:
 ```json
 {
   "classes": {
-    "mpf_control_agent_default_repository": [ "any" ]
+    "default:mpf_control_agent_default_repository": {
+      "regular_expressions": [
+        "any"
+      ]
+    }
   },
-  "vars": {
-    "control_agent_default_repository": "/var/cfengine/edit_backups"
+  "variables": {
+    "default:def.control_agent_default_repository": {
+      "value": "/var/cfengine/edit_backups"
+    }
   }
 }
 ```
@@ -1896,9 +2100,13 @@ pick up changes made outside packages promises.
 
 ```json
 {
-  "vars": {
-    "package_module_query_installed_ifelapsed": "5",
-    "package_module_query_updates_ifelapsed": "60"
+  "variables": {
+    "default:def.package_module_query_installed_ifelapsed": {
+      "value": "5"
+    },
+    "default:def.package_module_query_updates_ifelapsed": {
+      "value": "60"
+    }
   }
 }
 ```
@@ -1966,7 +2174,11 @@ Example enabling the class from an [augments file][Augments]:
 ```json
 {
   "classes": {
-    "enable_log_cfengine_enterprise_license_utilization": [ "enterprise_edition" ]
+    "default:enable_log_cfengine_enterprise_license_utilization": {
+      "regular_expressions": [
+        "enterprise_edition"
+      ]
+    }
   }
 }
 ```
@@ -1985,10 +2197,16 @@ the watchdog will not be active.
 ```json
 {
   "classes": {
-    "cfe_internal_core_watchdog_enabled":
-      [ "aix::" ],
-    "cfe_internal_core_watchdog_disabled":
-      [ "!cfe_internal_core_watchdog_enabled::" ]
+    "default:cfe_internal_core_watchdog_enabled": {
+      "class_expressions": [
+        "aix::"
+      ]
+    },
+    "default:cfe_internal_core_watchdog_disabled": {
+      "class_expressions": [
+        "!cfe_internal_core_watchdog_enabled::"
+      ]
+    }
   }
 }
 ```
@@ -2003,11 +2221,13 @@ For example:
 
 ```json
 {
-  "vars": {
-    "control_agent_environment_vars_default": [
-      "DEBIAN_FRONTEND=noninteractive",
-      "XPG_SUS_ENV=ON"
-    ]
+  "variables": {
+    "default:def.control_agent_environment_vars_default": {
+      "value": [
+        "DEBIAN_FRONTEND=noninteractive",
+        "XPG_SUS_ENV=ON"
+      ]
+    }
   }
 }
 ```
@@ -2016,8 +2236,12 @@ The environment variables can also be extended by defining `def.control_agent_en
 
 ```json
 {
-  "vars": {
-    "control_agent_environment_vars_extra": [ "XPG_SUS_ENV=ON" ]
+  "variables": {
+    "default:def.control_agent_environment_vars_extra": {
+      "value": [
+        "XPG_SUS_ENV=ON"
+      ]
+    }
   }
 }
 ```
@@ -2063,8 +2287,10 @@ the  [augments file][Augments] (`def.json`):
 
 ```json
 {
-  "vars": {
-    "dir_templates": "/var/cfengine/mytemplates"
+  "variables": {
+    "default:def.dir_templates": {
+      "value": "/var/cfengine/mytemplates"
+    }
   }
 }
 ```
@@ -2107,7 +2333,11 @@ For example, to define this class via Augments:
 ```json
 {
   "classes": {
-    "cfengine_mp_fr_debug_import": [ "any::" ]
+    "default:cfengine_mp_fr_debug_import": {
+      "class_expressions": [
+        "any::"
+      ]
+    }
   }
 }
 ```
@@ -2127,7 +2357,11 @@ For example, to define this class via Augments:
 ```json
 {
   "classes": {
-    "cfengine_mp_fr_enable_distributed_cleanup": [ "any::" ]
+    "default:cfengine_mp_fr_enable_distributed_cleanup": {
+      "class_expressions": [
+        "any::"
+      ]
+    }
   }
 }
 ```
@@ -2142,8 +2376,10 @@ When custom certificates are in use distributed cleanup needs to know where to f
 
 ```json
 {
-  "vars": {
-    "DISTRIBUTED_CLEANUP_SSL_CERT_DIR": "/path/to/my/cert/dir"
+  "variables": {
+    "default:def.DISTRIBUTED_CLEANUP_SSL_CERT_DIR": {
+      "value": "/path/to/my/cert/dir"
+    }
   }
 }
 ```
@@ -2175,7 +2411,9 @@ For example:
 ```json
 {
   "variables": {
-    "cfengine_enterprise_federation:postgres_config.shared_buffers": "2560MB"
+    "cfengine_enterprise_federation:postgres_config.shared_buffers": {
+      "value": "2560MB"
+    }
   }
 }
 ```
@@ -2191,7 +2429,9 @@ The ```max_locks_per_transaction``` value indicates the number of database objec
 ```json
 {
   "variables": {
-    "cfengine_enterprise_federation:postgres_config.max_locks_per_transaction": "4100"
+    "cfengine_enterprise_federation:postgres_config.max_locks_per_transaction": {
+      "value": "4100"
+    }
   }
 }
 ```
@@ -2207,7 +2447,9 @@ Controls whether a log message is produced when a session waits longer than `dea
 ```json
 {
   "variables": {
-    "cfengine_enterprise_federation:postgres_config.log_lock_waits": "off"
+    "cfengine_enterprise_federation:postgres_config.log_lock_waits": {
+      "value": "off"
+    }
   }
 }
 ```
@@ -2225,7 +2467,9 @@ Maximum size to let the WAL grow during automatic checkpoints. This is a soft li
 ```json
 {
   "variables": {
-    "cfengine_enterprise_federation:postgres_config.max_wal_size": "20G"
+    "cfengine_enterprise_federation:postgres_config.max_wal_size": {
+      "value": "20G"
+    }
   }
 }
 ```
@@ -2243,7 +2487,9 @@ Maximum time between automatic WAL checkpoints. If this value is specified witho
 ```json
 {
   "variables": {
-    "cfengine_enterprise_federation:postgres_config.checkpoint_timeout": "30min"
+    "cfengine_enterprise_federation:postgres_config.checkpoint_timeout": {
+      "value": "30min"
+    }
   }
 }
 ```
@@ -2266,9 +2512,13 @@ This snippet disables recommendations via augments.
 
 ```json
 {
-  "classes": [
-    "cfengine_recommendations_disabled"
-  ]
+  "classes": {
+    "default:cfengine_recommendations_disabled": {
+      "class_expressions": [
+        "policy_server|am_policy_hub::"
+      ]
+    }
+  }
 }
 ```
 
