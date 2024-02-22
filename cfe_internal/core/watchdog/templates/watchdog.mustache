@@ -50,16 +50,32 @@ LOGFILE="/var/cfengine/watchdog.log"
 echo "$(date) Initiating watchdog $$" >> ${LOGFILE}
 
 if [ -s $PIDFILE ]; then
-    ps -p $(cat $PIDFILE) > /dev/null 2>&1
-    _ret=$?
-    if [ "${_ret}" -eq 0 ] ; then
-        echo "$(date) Aborting execution of watchdog $$, existing watchdog process $(cat $PIDFILE) running" >> ${LOGFILE}
-        exit 1
+    # We have a pidfile
+    if ps -p $(cat $PIDFILE) > /dev/null 2>&1 ; then
+        # There is a process with the PID in the file, but is it stale?
+        if [ -d /proc ]; then
+            # We can know for sure if it's stale
+            actual_process="/proc/$(cat "$PIDFILE")"
+            newer="$(ls -1dt "$PIDFILE" "$actual_process" | head -n 1)"
+            if [ "$actual_process" = "$newer" ]; then
+                # Pidfile is stale, ignore it
+                echo $$ > $PIDFILE
+            else
+                # Pidfile is definitely correct
+                echo "$(date) Aborting execution of watchdog $$, existing watchdog process $(cat $PIDFILE) running" >> ${LOGFILE}
+                exit 1
+            fi
+        else
+            # No /proc, pidfile shows a running process, we'll assume it's valid
+            echo "$(date) Aborting execution of watchdog $$, existing watchdog process $(cat $PIDFILE) running" >> ${LOGFILE}
+            exit 1
+        fi
     else
         # No current process matching pid in file
         echo $$ > $PIDFILE
     fi
 else
+    # No pidfile at all
     echo $$ > $PIDFILE
 fi
 
