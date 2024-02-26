@@ -1179,7 +1179,7 @@ Example definition in augments file:
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### Configure the minimum TLS version used by cf-agent
 
