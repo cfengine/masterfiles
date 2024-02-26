@@ -167,10 +167,12 @@ LogLevel warn
   # browser compatibility and security. Use ~{{vars.sys.workdir}}/openssl ciphers
   # -v HIGH~ to see what ciphers are considered HIGH security.
 
-  SSLCipherSuite HIGH
+  # SSLCipherSuite HIGH
 
   # A more secure setting might be:
   # SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+
+  SSLCipherSuite {{{vars.def.cfe_enterprise_mission_portal_apache_sslciphersuite}}}
 
   # The SSL protocol versions allowed
   SSLProtocol {{{vars.def.cfe_enterprise_mission_portal_apache_sslprotocol}}}
