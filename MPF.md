@@ -1231,7 +1231,7 @@ Example definition in augments file:
 
 **History:**
 
-* Added in 3.22.0
+* Added in 3.22.0, 3.21.2
 
 ### Configure users allowed to initiate execution via cf-runagent
 
