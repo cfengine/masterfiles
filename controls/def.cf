@@ -487,6 +487,11 @@ bundle common def
         if => not( isvariable( "default:def.cfe_enterprise_mission_portal_apache_sslprotocol" ) ),
         comment => "The SSL protocol versions that are allowed by Apache for Mission Portal";
 
+      "cfe_enterprise_mission_portal_apache_sslciphersuite" -> { "ENT-11393" }
+        string => "HIGH",
+        if => not( isvariable( "default:def.cfe_enterprise_mission_portal_apache_sslciphersuite" ) ),
+        comment => "The SSL cipher suites that are allowed by Apache for Mission Portal";
+
     solaris::
       "cf_runagent_shell"
         string  => "/usr/bin/sh",

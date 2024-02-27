@@ -1815,6 +1815,24 @@ This directive can be used to control which versions of the SSL/TLS protocol wil
 
 * Added in CFEngine 3.23.0, 3.21.3, 3.18.6
 
+### Configure Enterprise Mission Portal Apache SSLCipherSuite
+
+This directive can be used to control which SSL Ciphers will be accepted. The value defaults to `HIGH` but can be overridden as shown in the example below.
+
+```json
+{
+  "variables": {
+    "default:def.cfe_enterprise_mission_portal_apache_sslciphersuite": {
+      "value": "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH"
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.24.0
+
 ### Bundlesequence
 
 #### Classification bundles before autorun
