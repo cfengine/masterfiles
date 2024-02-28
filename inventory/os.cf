@@ -130,5 +130,14 @@ amzn_2::
      string => "Amazon 2",
      meta => { "inventory", "attribute_name=OS" };
 
+any::
+  "description"
+    string => "$(sys.os_release[PRETTY_NAME])",
+    if => and(
+      strcmp("$(sys.os_name_human)", "Unknown"),
+      isvariable("sys.os_release[PRETTY_NAME])"),
+    ),
+    meta => { "inventory", "attribute_name=OS", "derived-from=sys.os_release" };
+
 @endif
 }
