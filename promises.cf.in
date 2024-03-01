@@ -104,11 +104,14 @@ body common control
     aix.!disable_inventory_package_refresh::
       package_inventory => { $(package_module_knowledge.platform_default), @(default:package_module_knowledge.additional_inventory) };
 
+    freebsd.!disable_inventory_package_refresh::
+          package_inventory => { $(package_module_knowledge.platform_default), @(default:package_module_knowledge.additional_inventory) };
+
     aix::
       package_module => $(package_module_knowledge.platform_default);
 
 
-    (debian|redhat|suse|sles|opensuse|amazon_linux)::
+    (debian|redhat|suse|sles|opensuse|amazon_linux|freebsd)::
           package_module => $(package_module_knowledge.platform_default);
 
       # CFEngine 3.12.2+ and 3.14+ have new package module on Windows
