@@ -1815,6 +1815,26 @@ This directive can be used to control which versions of the SSL/TLS protocol wil
 
 * Added in CFEngine 3.23.0, 3.21.3, 3.18.6
 
+### Configure Enterprise Mission Portal Apache SSLCACertificateFile
+
+The `SSLCACertificateFile` for Mission Portal Apache is not configured by default. Define `default:cfe_internal_hub_vars.SSLCACertificateFile` directed to the path where the file can be found to configure it.
+
+For example:
+
+```json
+{
+  "variables": {
+    "default:cfe_internal_hub_vars.SSLCACertificateFile": {
+      "value": "/var/cfengine/httpd/ssl/certs/ca-bundle-client.crt"
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in CFEngine 3.24.0
+
 ### Configure Enterprise Mission Portal Apache SSLCipherSuite
 
 This directive can be used to control which SSL Ciphers will be accepted. The value defaults to `HIGH` but can be overridden as shown in the example below.
