@@ -30,6 +30,12 @@ body file control
 bundle common cfe_internal_hub_vars
 # @brief Set hub specific variables
 {
+  classes:
+
+      "cfe_enterprise_have_SSLCACertificateFile_defined" -> { "ENT-11421" }
+        scope => "namespace",
+        expression => isvariable( "SSLCACertificateFile" );
+
   vars:
 
     policy_server::
