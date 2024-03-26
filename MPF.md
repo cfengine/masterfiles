@@ -2097,7 +2097,7 @@ The MPF specifies the package module to use for managing packages and collecting
 
 **History:**
 
-* Added in CFEngine 3.24.0
+* Added in CFEngine 3.24.0, 3.21.5, 3.18.8
 
 ### Configure additional package managers to inventory by default
 
@@ -2120,7 +2120,7 @@ The MPF inventories software for the default package module in use. Define `defa
 
 **History:**
 
-* Added in CFEngine 3.24.0
+* Added in CFEngine 3.24.0, 3.21.5, 3.18.8
 
 ### Configure periodic package inventory refresh interval
 
