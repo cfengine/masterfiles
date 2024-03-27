@@ -145,7 +145,7 @@ bundle agent postgresql_conf_recommendations
       "$(pgsql_conf)"
         edit_line => set_line_based("$(this.bundle).conf", "=", "\s*=\s*", ".*", "\s*#\s*"),
         classes => results( "bundle", "psql_conf_recommendations" ),
-        action => warn_only,
+        action => policy( "warn" ),
         if => fileexists( $(pgsql_conf) );
 
   reports:
