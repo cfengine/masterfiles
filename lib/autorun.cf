@@ -8,10 +8,8 @@ bundle agent autorun
 {
   vars:
     services_autorun|services_autorun_bundles::
-      "bundles" slist => bundlesmatching(".*", "autorun");
-
       "sorted_bundles"
-        slist => sort("bundles", "lex"),
+        slist => sort( bundlesmatching(".*", "autorun"), "lex"),
         comment => "Lexicographically sorted bundles for predictable order";
 
   methods:
