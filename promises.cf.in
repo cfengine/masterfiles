@@ -355,14 +355,14 @@ bundle common services_autorun
       "_default_autorun_input_dir"
         string => "$(this.promise_dirname)/services/autorun";
       "_default_autorun_inputs"
-        slist => lsdir( "$(_default_autorun_input_dir)", ".*\.cf", "true");
+        slist => sort( lsdir( "$(_default_autorun_input_dir)", ".*\.cf", "true"), lex);
 
       "_extra_autorun_input_dirs"
         slist => { @(def.mpf_extra_autorun_inputs) },
         if => isvariable( "def.mpf_extra_autorun_inputs" );
 
       "_extra_autorun_inputs[$(_extra_autorun_input_dirs)]"
-        slist => lsdir("$(_extra_autorun_input_dirs)/.", ".*\.cf", "true"),
+        slist => sort( lsdir("$(_extra_autorun_input_dirs)/.", ".*\.cf", "true"), lex),
         if => isdir( $(_extra_autorun_input_dirs) );
 
       "found_inputs" slist => { @(_default_autorun_inputs),
