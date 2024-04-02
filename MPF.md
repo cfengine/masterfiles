@@ -2539,12 +2539,12 @@ Maximum time between automatic WAL checkpoints. If this value is specified witho
 ## Recommendations
 
 The MPF includes policy that inspects the system and makes recommendations about
-the configuration of the system. When `cfengine_recommendations_enabled` is
-defined bundles tagged `cfengine_recommendation` are executed in lexical order.
-`cfengine_recommendations_enabled` is defined by default when
-`cfengine_recommendations_disabled` is **not** defined.
+the configuration of the system. When `default:cfengine_recommendations_enabled` is
+defined bundles tagged `cfengine_recommends` are executed in lexical order.
+`default:cfengine_recommendations_enabled` is defined by default when
+`default:cfengine_recommendations_disabled` is **not** defined.
 
-To disable cfengine recommendations define `cfengine_recommendations_disabled`.
+To disable cfengine recommendations define `default:cfengine_recommendations_disabled`.
 
 This snippet disables recommendations via augments.
 

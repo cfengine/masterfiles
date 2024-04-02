@@ -4,9 +4,15 @@ bundle agent MPF_class_recommendations
     (policy_server|am_policy_hub).enterprise_edition::
       "tags" slist => { "cfengine_recommends" };
 
+  classes:
+      "cfengine_recommendation_instruct_disablement"
+        expression => "cfengine_recommendation_emitted",
+        scope => "namespace";
+
   reports:
       "`cfengine_internal_purge_policies` no longer has any effect. Please use `cfengine_internal_purge_policies_disabled` instead, to choose where you want to disable purging or remove the class completely if you want purging enabled everywhere (the new default in 3.18+)." -> { "CFE-3662" }
-        if => "cfengine_internal_purge_policies";
+        if => "cfengine_internal_purge_policies",
+        classes => results( "bundle", "cfengine_recommendation_emitted");
 }
 
 bundle agent federated_reporting_superhub_recommendations
@@ -14,10 +20,16 @@ bundle agent federated_reporting_superhub_recommendations
   meta:
       "tags" slist => { "cfengine_recommends" };
 
+  classes:
+      "cfengine_recommendation_instruct_disablement"
+        expression => "cfengine_recommendation_emitted_reached",
+        scope => "namespace";
+
   reports:
     cfengine_enterprise_federation:am_superhub::
       "CFEngine recommends installing gnu parallel on federated reporting superhubs."
-        if => not(isgreaterthan(length(packagesmatching( "parallel", ".*", ".*", ".*")), 0 ));
+        if => not(isgreaterthan(length(packagesmatching( "parallel", ".*", ".*", ".*")), 0 )),
+        classes => results( "bundle", "cfengine_recommendation_emitted");
 
 }
 @if minimum_version(3.21.4)
@@ -50,6 +62,10 @@ bundle agent ignore_interfaces_rx_reccomendations
       "ignore_interfaces_in_inputdir" -> { "ENT-9402" }
         if => fileexists( "$(sys.inputdir)/ignore_interfaces.rx" );
 
+      "cfengine_recommendation_instruct_disablement"
+        expression => "cfengine_recommendation_emitted_reached",
+        scope => "namespace";
+
   files:
     ignore_interfaces_in_workdir_supported.default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir.ignore_interfaces_in_inputdir::
       "$(sys.workdir)/ignore_interfaces.rx" -> { "ENT-9402" }
@@ -73,16 +89,20 @@ bundle agent ignore_interfaces_rx_reccomendations
 
     ignore_interfaces_in_workdir_supported.(ignore_interfaces_in_inputdir.!default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled)::
       "NOTICE: 'ignore_interfaces.rx' is present in '$(const.dollar)(sys.inputdir)' ('$(sys.inputdir)/ignore_interfaces.rx'). We recommend that it be removed and migrated to '$(const.dollar)(sys.workdir)' ('$(sys.workdir)/ignore_interfaces.rx')"
-        if => not( fileexists( "$(sys.workdir)/ignore_interfaces.rx" ) );
+        if => not( fileexists( "$(sys.workdir)/ignore_interfaces.rx" ) ),
+        classes => results( "bundle", "cfengine_recommendation_emitted");
 
     ignore_interfaces_in_workdir_supported.(ignore_interfaces_in_workdir.ignore_interfaces_in_inputdir).!default:mpf_auto_migrate_ignore_interfaces_rx_to_workdir_reports_disabled::
       "NOTICE: 'ignore_interfaces.rx' identical in '$(const.dollar)(sys.workdir)' and '$(const.dollar)(sys.inputdir)'. We recommend removing '$(const.dollar)(sys.inputdir)/ignore_interfaces.rx'"
         if => strcmp( readfile( "$(sys.workdir)/ignore_interfaces.rx"),
-                      readfile( "$(sys.inputdir)/ignore_interfaces.rx") );
+                      readfile( "$(sys.inputdir)/ignore_interfaces.rx") ),
+
+        classes => results( "bundle", "cfengine_recommendation_emitted");
 
       "NOTICE: 'ignore_interfaces.rx' in '$(const.dollar)(sys.workdir)' and '$(const.dollar)(sys.inputdir)' but not identical. We recommend verifying the desired content of '$(const.dollar)(sys.workdir)/ignore_interfaces.rx', correcting it if necessary and removing '$(const.dollar)(sys.inputdir)/ignore_interfaces.rx'"
         if => not( strcmp( readfile( "$(sys.workdir)/ignore_interfaces.rx"),
-                           readfile( "$(sys.inputdir)/ignore_interfaces.rx") ) );
+                           readfile( "$(sys.inputdir)/ignore_interfaces.rx") ) ),
+        classes => results( "bundle", "cfengine_recommendation_emitted");
 
 }
 @endif
@@ -141,6 +161,11 @@ bundle agent postgresql_conf_recommendations
                    not( isvariable( "conf[maintenance_work_mem]" ) ),
                    not( isvariable( "conf[effective_cache_size]" )));
 
+  classes:
+      "cfengine_recommendation_instruct_disablement"
+        expression => "cfengine_recommendation_emitted_reached",
+        scope => "namespace";
+
   files:
       "$(pgsql_conf)"
         edit_line => set_line_based("$(this.bundle).conf", "=", "\s*=\s*", ".*", "\s*#\s*"),
@@ -152,9 +177,12 @@ bundle agent postgresql_conf_recommendations
     psql_conf_recommendations_not_kept::
       "CFEngine Recommended Settings:";
       "shared_buffers = $(conf[shared_buffers])"
-        if => isvariable( "conf[shared_buffers]" );
+        if => isvariable( "conf[shared_buffers]" ),
+        classes => results( "bundle", "cfengine_recommendation_emitted");
       "effective_cache_size = $(conf[effective_cache_size])"
-        if => isvariable( "conf[effective_cache_size]" );
+        if => isvariable( "conf[effective_cache_size]" ),
+        classes => results( "bundle", "cfengine_recommendation_emitted");
       "maintenance_work_mem = $(conf[maintenance_work_mem])"
-        if => isvariable( "conf[maintenance_work_mem]" );
+        if => isvariable( "conf[maintenance_work_mem]" ),
+        classes => results( "bundle", "cfengine_recommendation_emitted");
 }
