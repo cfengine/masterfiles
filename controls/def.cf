@@ -667,7 +667,7 @@ bundle common def
         expression => some( ".+", "def.control_executor_runagent_socket_allow_users" );
 
       "cfengine_recommendations_enabled"
-        expression => "!cfengine_recommendations_disabled";
+        expression => "!cfengine_recommendations_disabled.!data:cfengine_recommendations_disabled";
 
       ### Enable special features policies. Set to "any" to enable.
 
