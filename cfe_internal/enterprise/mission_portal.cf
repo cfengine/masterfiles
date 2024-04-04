@@ -228,7 +228,7 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
                            "place only if we have stopped apache already.");
 
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl" -> { "ENT-9686" }
-        args => "restart",
+        args => "graceful",
         if => and( "mission_portal_apache_config_repaired",
                    not( "apache_stop_after_new_staged_config_repaired" ) ),
         contain => in_shell,
