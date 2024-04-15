@@ -368,13 +368,13 @@ bundle common def
                            " emails sent by cf-execd.");
 
       "control_executor_mailfilter_exclude_configured" -> { "ENT-10210" }
-        expression => isgreaterthan( 0, length( "control_executor_mailfilter_exclude" ) ),
+        expression => isgreaterthan( length( "control_executor_mailfilter_exclude" ), 0 ),
         comment => concat( "If default:def.control_executor_mailfilter_exclude is not",
                            " an empty list, we want to use it's value for",
                            " stripping lines from emails sent by cf-execd.");
 
       "control_executor_mailfilter_include_configured" -> { "ENT-10210" }
-        expression => isgreaterthan( 0, length( "control_executor_mailfilter_include" ) ),
+        expression => isgreaterthan( length( "control_executor_mailfilter_include" ), 0 ),
         comment => concat( "If default:def.control_executor_mailfilter_include is not",
                            " an empty list, we want to use it's value for",
                            " including lines from emails sent by cf-execd.");
