@@ -212,8 +212,10 @@ bundle edit_line prepend_if_no_line(string)
 # @brief Prepend `string` if it doesn't exist in the file
 # @param string The string to be prepended
 #
-# **See also:** [`insert_lines`][insert_lines] in
-# [`edit_line`][bundle edit_line]
+# **See also:**
+#
+# * [`insert_lines` promise type][insert_lines]
+# * [`edit_line` bundles][edit_line]
 {
   insert_lines:
       "$(string)"
