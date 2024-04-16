@@ -1001,21 +1001,54 @@ bundle edit_line set_colon_field(key,field,val)
 bundle edit_line set_user_field(user,field,val)
 # @brief Set the value of field number "field" in a `:-field`
 # formatted file like `/etc/passwd`
+# @param user A regular expression matching the user(s) to be modified
+# @param field The field that should be modified
+# @param val The value for `field`
+#
+# **Note:** To manage local users with CFEngine 3.6 and later,
+# consider making `users` promises instead of modifying system files.
+#
+# **See also:**
+#
+# * [bundle edit_line set_escaped_user_field][lib/files.cf#set_escaped_user_field]
+# * [edit_line field_edits][field_edits]
+{
+  field_edits:
+
+      "$(user):.*"
+
+        comment => "Edit a user attribute in the password file",
+        edit_field => col(":","$(field)","$(val)","set");
+}
+
+##
+
+bundle edit_line set_escaped_user_field(user,field,val)
+# @brief Set the value of field number "field" in a `:-field`
+# formatted file like `/etc/passwd`
 # @param user The user to be modified
 # @param field The field that should be modified
 # @param val The value for `field`
 #
 # **Note:** To manage local users with CFEngine 3.6 and later,
 # consider making `users` promises instead of modifying system files.
+#
+# **See also:**
+#
+# * [bundle edit_line set_user_field][lib/files.cf#set_user_field]
+# * [edit_line field_edits][field_edits]
 {
+  vars:
+      "escaped_user"
+        string => escape( "$(user)" );
+
   field_edits:
 
-      "$(user):.*"
+      "$(escaped_user):.*"
 
-      comment => "Edit a user attribute in the password file",
-      edit_field => col(":","$(field)","$(val)","set");
+        comment => "Edit a user attribute in the password file",
+        edit_field => col(":","$(field)","$(val)","set");
 }
-
 ##
 
 bundle edit_line append_user_field(group,field,allusers)
