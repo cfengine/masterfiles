@@ -290,14 +290,10 @@ bundle agent git(repo_path, subcmd, args)
       comment => "So that we don't mess up permissions, we will just execute
                     all commands as the current group of .git";
 
-      # We get the passwd entry from the user that owns the repo so
-      # that we can extract the home directory for later use.
-      "repo_uid_passwd_ent"
-        string => execresult("$(paths.getent) passwd $(repo_uid)", noshell),
-        comment => "We need to extract the home directory of the repo
-                    owner so that it can be used to avoid errors from
-                    unprivledged execution trying to access the root
-                    users git config.";
+      # Data container with user info
+      # {"description":"Luke Skywalker","gid":1000,"home_dir":"/home/luke","shell":"/bin/bash","uid":1000,"username":"luke"}
+      "repo_userinfo"
+        data => getuserinfo( "$(repo_uid)" );
 
   classes:
       "am_root" expression => strcmp($(this.promiser_uid), "0");
@@ -311,24 +307,14 @@ bundle agent git(repo_path, subcmd, args)
         not => strcmp($(this.promiser_uid), $(repo_uid)),
         if => isvariable( repo_uid );
 
-    am_root.need_to_drop::
-      # This regular expression could be tightened up
-      # Extract the home directory from the owner of the repository
-      # into $(repo_uid_passwd[1])
-      "extracted_repo_uid_home"
-        expression => regextract( ".*:.*:\d+:\d+:.*:(.*):.*",
-                                  $(repo_uid_passwd_ent),
-                                  "repo_uid_passwd" ),
-        if => isvariable("repo_uid_passwd_ent");
-
-  commands:
+ commands:
     am_root.need_to_drop::
       # Because cfengine does not inherit the shell environment when
       # executing commands, git will look for the root users git
       # config and error when the executing user does not have
       # access. So we need to set the home directory of the executing
       # user.
-      "$(paths.env) HOME=$(repo_uid_passwd[1]) $(oneliner)"
+      "$(paths.env) HOME=$(repo_userinfo[home_dir]) $(oneliner)"
         args => "$(subcmd) $(args)",
         classes => kept_successful_command,
         contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) );
@@ -341,8 +327,8 @@ bundle agent git(repo_path, subcmd, args)
 
   reports:
     "DEBUG|DEBUG_$(this.bundle).am_root.need_to_drop"::
-      "DEBUG $(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(paths.env) HOME=\"$(repo_uid_passwd[1])\" $(oneliner) $(subcmd) $(args)'"
-        if => isvariable("repo_uid_passwd[1]");
+      "DEBUG $(this.bundle): with dropped privileges to uid '$(repo_uid)' and gid '$(repo_gid)', in directory '$(repo_path)', running Git command '$(paths.env) HOME=\"$(repo_userinfo[home_dir])\" $(oneliner) $(subcmd) $(args)'"
+        if => isvariable("repo_userinfo[home_dir]");
 
     "DEBUG|DEBUG_$(this.bundle).(!am_root|!need_to_drop)"::
       "DEBUG $(this.bundle): with current privileges, in directory '$(repo_path)', running Git command '$(oneliner) $(subcmd) $(args)'";
