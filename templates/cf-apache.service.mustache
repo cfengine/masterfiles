@@ -10,6 +10,7 @@ PartOf=cfengine3.service
 Type=forking
 ExecStart={{{vars.sys.workdir}}}/httpd/bin/apachectl start
 ExecStop={{{vars.sys.workdir}}}/httpd/bin/apachectl stop
+ExecReload={{{vars.sys.workdir}}}/httpd/bin/apachectl graceful
 PIDFile={{{vars.sys.workdir}}}/httpd/httpd.pid
 Restart=always
 RestartSec=10
