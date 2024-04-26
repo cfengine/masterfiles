@@ -44,10 +44,7 @@ bundle agent cfe_internal_update_processes
   classes:
       "systemd_supervised"
         scope => "bundle",
-        expression => "systemd",
-        comment => "As of 3.10 the runalerts service is supervised by systemd
-                    when available. Prior to 3.10 the service is supervised
-                    directly by CFEngine policy.";
+        expression => "systemd";
 
   reports:
       inform.systemd_supervised.!mpf_enable_cfengine_systemd_component_management::
@@ -101,7 +98,6 @@ bundle agent cfe_internal_update_processes
       # definitions for each component.
 
       "agent[cf_postgres]" string => "cf-postgres";
-      "agent[cf_runalerts]" string => "cf-runalerts";
       "agent[cf_apache]"   string => "cf-apache";
 
     any::
@@ -134,10 +130,9 @@ bundle agent cfe_internal_update_processes
 
     systemd_supervised.policy_server.enterprise.hub_passive|(ha_replication_only_node.!failover_to_repliacation_node_enabled)::
 
-      # We want the enterprise components cf-runalerts, and cf-hub to be
-      # disabled if running on a passive hub or replication only hub.
+      # We want the enterprise component cf-hub to be disabled if running on a
+      # passive hub or replication only hub.
 
-      "disabled[cf_runalerts]" string => "cf-runalerts";
       "disabled[cf_hub]" string => "cf-hub";
 
     any::
