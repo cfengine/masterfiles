@@ -30,9 +30,11 @@ bundle agent cfe_internal_enterprise_main
 
       "hub" usebundle => cfe_internal_php_runalerts,
       handle => "cfe_internal_management_php_runalerts",
-      comment => "To run PHP runalerts to check bundle status on SQL and Sketch.
-                 ENT-5432: must run after cfe_internal_enterprise_maintenance bundle
-                 so that active_hub class is determined";
+      comment => concat("To run PHP runalerts to check bundle status on SQL and Sketch.",
+                        " ENT-5432: must run after cfe_internal_enterprise_maintenance bundle",
+                        " so that active_hub class is determined. Since version 3.24.0 running",
+                        " alerts is part of cf-reactor"),
+      if => cf_version_before("3.24");
 
       "Inventory Enterprise License Utilization" -> { "ENT-5089" }
         usebundle => inventory_cfengine_enterprise_license_utilization;
