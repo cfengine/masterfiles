@@ -656,19 +656,71 @@ allowed values (`LOG_USER`, `LOG_DAEMON`, `LOG_LOCAL0`, `LOG_LOCAL1`,
 
 ### mailto
 
-The address that `cf-execd` should email agent output to.
+The address that `cf-execd` should email agent output to. Defaults to `root@$(default:def.domain)`.
+
+This setting can be customized via Augments, for example:
+
+```json
+{
+  "variables": {
+    "default:def.mailto": {
+        "value": "cfengine-maintainers@example.com",
+        "comment": "When output differs from the prior execution cf-execd will deliver the output to this Email address for review."
+    }
+  }
+}
+```
 
 ### mailfrom
 
-The address that output mailed from `cf-execd` should come from.
+The address that output mailed from `cf-execd` should come from. Defaults to `root@$(sys.uqhost).$(def.domain)`.
+
+This setting can be customized via Augments, for example:
+
+```json
+{
+  "variables": {
+    "default:def.mailfrom": {
+        "value": "cfengine@example.com",
+        "comment": "Email sent from cf-execd should come from this address."
+    }
+  }
+}
+```
 
 ### smtpserver
 
-The SMTP server that `cf-execd` should use to send emails.
+The SMTP server that `cf-execd` should use to send emails. Defaults to `localhost`.
+
+This setting can be customized via Augments, for example:
+
+```json
+{
+  "variables": {
+    "default:def.smtpserver": {
+        "value": "smtp.example.com",
+        "comment": "The smtp server that should be used when sending email from cf-execd."
+    }
+  }
+}
+```
 
 ### mailmaxlines
 
-The maximumm number of lines of output that `cf-execd` will email.
+The maximum number of lines of output that `cf-execd` will email. Defaults to `30`.
+
+This setting can be customized via Augments, for example:
+
+```json
+{
+  "variables": {
+    "default:def.mailmaxlines": {
+        "value": "50",
+        "comment": "The maximum number of lines cf-execd should email."
+    }
+  }
+}
+```
 
 **History:**
 
