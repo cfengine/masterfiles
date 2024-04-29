@@ -722,6 +722,23 @@ This setting can be customized via Augments, for example:
 }
 ```
 
+### domain
+
+The domain the host is configured for. Defaults to domain configured on system, e.g. the output from ```hostname -d```. This setting influences `sys.domain` and `mailfrom` if not customized.
+
+This setting can be customized via Augments, for example:
+
+```json
+{
+    "variables": {
+        "default:def.domain": {
+            "comment": "Override domain as configured on the host.",
+            "value": "exmaple.net"
+        }
+    }
+}
+```
+
 **History:**
 
 * Added in CFEngine 3.22.0, 3.21.1, 3.18.4
