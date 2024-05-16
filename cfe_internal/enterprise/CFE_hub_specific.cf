@@ -599,7 +599,9 @@ bundle agent cfe_internal_exported_report_location
 
 bundle agent cfe_internal_refresh_inventory_view
 # @brief Refresh list of inventory variables every 5 minutes
+# @note Beginning with 3.24.0 the inventory view refresh is handled by cf-reactor.
 {
+@if before_version(3.24.0)
   meta:
 
     (policy_server|am_policy_hub).enterprise_edition::
@@ -613,12 +615,11 @@ bundle agent cfe_internal_refresh_inventory_view
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks inventory_refresh",
         contain => silent,
-@if minimum_version(3.15.0)
         inform => "false",
-@endif
         comment => "This refreshes the variables shown in the Mission Portal Inventory.",
         handle  => "mpf_fresh_inventory_view",
         if => isdir( "$(cfe_internal_hub_vars.docroot)/api/modules/inventory" );
+@endif
 }
 
 bundle agent cfe_internal_refresh_hosts_view
