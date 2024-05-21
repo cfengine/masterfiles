@@ -8,7 +8,7 @@
 
 body executor control
 # @brief Settings that determine the behavior of `cf-execd`
-# @variable `default:def.control_executor_maxmaillines` - The maximumm number of lines of output that `cf-execd` will email.
+# @variable `default:def.control_executor_mailmaxlines` - The maximum number of lines of output that `cf-execd` will email.
 {
 
     any::
