@@ -858,6 +858,8 @@ This setting can be customized via Augments, for example:
 }
 ```
 
+**See also:** [`mailmaxlines`][cf-execd#mailmaxlines]
+
 ### domain
 
 The domain the host is configured for. Defaults to domain configured on system, e.g. the output from ```hostname -d```. This setting influences `sys.domain` and `mailfrom` if not customized.
@@ -878,8 +880,6 @@ This setting can be customized via Augments, for example:
 **History:**
 
 * Added in CFEngine 3.22.0, 3.21.1, 3.18.4
-
-**See also:** [`mailmaxlines`][cf-execd#mailmaxlines]
 
 ### Configure subject for emails sent by cf-execd
 
@@ -940,6 +940,27 @@ control` are stripped before sending. The MPF will use the value of
 **History:**
 
 * Added in 3.22.0, 3.21.2
+
+### Configure maximum number of lines of output in emails sent by cf-execd
+
+When enabled `cf-execd` emails output that differs from previous executions.
+The number of lines from the output sent via email can be configured by setting
+`mailmaxlines` in `body executor control`. Setting it to `0` disables sending emails.
+The MPF will use the value of `default:def.control_executor_mailmaxlines`.
+
+```json
+{
+  "variables": {
+    "default:def.control_executor_mailmaxlines": {
+        "value": 0
+    }
+  }
+}
+```
+
+**History:**
+
+* Added in 3.22.0, 3.21.2, 3.18.5
 
 ### acl
 
