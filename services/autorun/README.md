@@ -29,9 +29,9 @@ allow policy files to be dynamically loaded or tagged bundles to be run
 independently of each-other. If you have an automatically loaded policy file in
 `services/autorun` which loads additional policy dynamically, `cf-promises` may
 not be able to resolve syntax errors. Use
-[`mpf_extra_autorun_inputs`][mpf_extra_autorun_inputs]
+[`mpf_extra_autorun_inputs`][Masterfiles Policy Framework#Add additional policy files for update (inputs)]
 and or
-[`control_common_bundlesequence_classification`][mpf-classification-bundles]
+[`control_common_bundlesequence_classification`][Masterfiles Policy Framework#Classification bundles before autorun]
 to work around this limitation.
 
 **History:**
