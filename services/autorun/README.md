@@ -29,9 +29,9 @@ allow policy files to be dynamically loaded or tagged bundles to be run
 independently of each-other. If you have an automatically loaded policy file in
 `services/autorun` which loads additional policy dynamically, `cf-promises` may
 not be able to resolve syntax errors. Use
-[`mpf_extra_autorun_inputs`][mpf_extra_autorun_inputs]
+[`mpf_extra_autorun_inputs`][Masterfiles Policy Framework#Add additional policy files for update (inputs)]
 and or
-[`control_common_bundlesequence_classification`][mpf-classification-bundles]
+[`control_common_bundlesequence_classification`][Masterfiles Policy Framework#Classification bundles before autorun]
 to work around this limitation.
 
 **History:**
@@ -77,7 +77,7 @@ Example definition of ```services_autorun_bundles``` using [Augments (def.json)]
 
 #### Additional automatically loaded inputs
 
-When `def.mpf_extra_autorun_inputs` is defined (and services_autorun is defined), the policy files (`*.cf`) in those directories will be added to inputs. If a directory is specified but is not a directory, it will be skipped.
+When `def.mpf_extra_autorun_inputs` is defined (and `services_autorun` is defined), the policy files (`*.cf`) in those directories will be added to inputs. If a directory is specified but is not a directory, it will be skipped.
 
 ```json
 {
