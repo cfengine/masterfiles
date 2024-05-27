@@ -3,10 +3,10 @@ on:
 
 jobs:
   valgrind_tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: masterfiles
       - name: Get Togethers
@@ -15,7 +15,7 @@ jobs:
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout Core
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: cfengine/core
           path: core
