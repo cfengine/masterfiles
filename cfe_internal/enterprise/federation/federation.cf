@@ -706,20 +706,28 @@ body contain cfpostgres_user
 
 bundle agent exported_data
 # @brief Run script to dump pg data on feeder hub
+# @note Since version 3.24.0, the inventory view is automatically refreshed by
+# cf-reactor whenever inventory is updated. Hence, you can assume that the
+# inventory is refreshed. However, there is one exception; if the previous
+# refresh happened too recently, the following one will be delayed.
 {
+@if before_version(3.24.0)
   methods:
     am_feeder.!am_paused::
       "Refresh Inventory"
         usebundle => "default:cfe_internal_refresh_inventory_view",
         handle => "fr_inventory_refresh",
         comment => "Use standard inventory refresh so that we don't run it twice";
+@endif
 
   commands:
     am_feeder.!am_paused::
       "/bin/bash"
         arglist => {"$(cfengine_enterprise_federation:config.bin_dir)/dump.sh"},
         contain => default:in_shell,
+@if before_version(3.24.0)
         depends_on => { "fr_inventory_refresh" },
+@endif
         comment => "Refresh Inventory must be completed before dumping data";
 }
 
