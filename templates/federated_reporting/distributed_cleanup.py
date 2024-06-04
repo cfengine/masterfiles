@@ -97,7 +97,7 @@ def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password, force_
     )
     if response["status"] != 201:
         print(
-            "Problem creating fr_distributed_cleanup role on superhub. {}".format(
+            "Problem creating fr_distributed_cleanup role on feeder. {}".format(
                 response
             )
         )
@@ -228,6 +228,7 @@ def main():
     group.add_argument("--inform", action="store_true")
 
     parser.add_argument("--force-interactive", action="store_true", help="force interactive mode even when no tty, good for automation")
+    parser.add_argument("--setup-feeder", help="Setup a single feeder by hostname")
     args = parser.parse_args()
 
     global logger
@@ -253,6 +254,12 @@ def main():
             sys.exit(1)
 
     fr_distributed_cleanup_password = read_secret(DISTRIBUTED_CLEANUP_SECRET_PATH)
+    if args.setup_feeder:
+        email = input("Enter email for fr_distributed_cleanup accounts: ")
+        print() # newline for easier reading
+        feeder = { "ui_name": args.setup_feeder }
+        interactive_setup_feeder(feeder, email, fr_distributed_cleanup_password, force_interactive=args.force_interactive)
+
     api = NovaApi(
         api_user="fr_distributed_cleanup", api_password=fr_distributed_cleanup_password
     )  # defaults to localhost
@@ -286,7 +293,11 @@ def main():
             cert_path=CERT_PATH,
             hostname=feeder_hostname,
         )
-        response = feeder_api.status()
+        try:
+            response = feeder_api.status()
+        except Exception as e:
+            print("Could not connect to {}, error: {}".format(feeder_hostname, e));
+            sys.exit(1);
         if response["status"] == 401 and sys.stdout.isatty():
             # auth error when running interactively
             # assume it's a new feeder and offer to set it up interactively
