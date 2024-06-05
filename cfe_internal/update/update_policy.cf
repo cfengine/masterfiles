@@ -321,6 +321,14 @@ bundle agent cfe_internal_update_cmdb
 @endif
 }
 
+body acl u_acl_cmdb_host_specific_json
+# @brief Allow read access for user cfapache
+# Mission Portal needs read access to these files (See ticket ENT-11809)
+{
+  acl_method => "append";
+  aces => { "user:cfapache:r" };
+}
+
 bundle agent cfe_internal_update_cmdb_data_distribution
 # @brief Ensure data is ready for agents to download
 {
@@ -390,6 +398,7 @@ bundle agent cfe_internal_update_cmdb_data_distribution
       # Write out the data for each host that had a data change
       "$(sys.workdir)/cmdb/$(_i)/host_specific.json"
         create => "true", # CFE-2329, ENT-4792
+        acl => u_acl_cmdb_host_specific_json, # ENT-11809
         template_data => mergedata("_get_cmdb_data_response_d[data][$(_i)]" ), # mergedata() is necessary in order to pick out a substructure, parsejson() is insufficient because expanding a key results in iteration of /values/ under that key
         template_method => "inline_mustache",
         edit_template_string => string_mustache( "{{$-top-}}", "_get_cmdb_data_response_d[data][$(_i)]" ),
