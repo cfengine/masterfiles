@@ -1,3 +1,21 @@
+3.18.8:
+	- Added ability to influence default package manager and inventory via Augments
+	  (CFE-3612)
+	- Added freebsd package_module and package_inventory since we have pkg packages module available
+	  (CFE-4345)
+	- Added no_backup_cp_compare copy_from body to stdlib
+	  Like the existing no_backup_cp this copy_from body is used to copy files locally
+	  without making backups but with the additional ability to specify the comparison
+	  used. (ENT-10962)
+	- Changed mission-portal apache restart to graceful to minimize service interruptions
+	  (ENT-11526)
+	- Fixed policy compatibility with 3.15.x, disabled aws ec2 inventory for versions less than 3.18.0
+	  (ENT-11178)
+	- Fixed restoration of Mission Portal application to packaged content when modified
+	  (ENT-10962)
+	- Removed hour delay between CFEngine Enterprise PostgreSQL recommendation checks
+	  (ENT-11480)
+
 3.18.7:
 	- Federated reporting policy now properly fixes SELinux context of the
 	  ~cftransport/.ssh directory and its contents. (ENT-11136)
