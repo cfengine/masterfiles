@@ -1,6 +1,6 @@
 3.21.5:
 	- AIX watchdog now handles stale pids (CFE-4335)
-	- Added ability to influence default package manager and inventory via Augments
+	- Added ability to influence default package manager and inventory via augments files (def.json)
 	  (CFE-3612)
 	- Added freebsd package_module and package_inventory since we have pkg packages module available
 	  (CFE-4345)
@@ -22,6 +22,7 @@
 	  (ENT-11480)
 	- When failing to detect platform, inventory attribute "OS" now defaults to PRETTY_NAME from
 	  os-release as a fallback (CFE-4342)
+	- Prevented common error logged by Apache related to IPv6 (ENT-10646)
 
 3.21.4:
 	- Federated reporting policy now properly fixes SELinux context of the
