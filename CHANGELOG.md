@@ -1,5 +1,5 @@
 3.18.8:
-	- Added ability to influence default package manager and inventory via Augments
+	- Added ability to influence default package manager and inventory via augments files (def.json)
 	  (CFE-3612)
 	- Added freebsd package_module and package_inventory since we have pkg packages module available
 	  (CFE-4345)
@@ -15,6 +15,7 @@
 	  (ENT-10962)
 	- Removed hour delay between CFEngine Enterprise PostgreSQL recommendation checks
 	  (ENT-11480)
+	- Prevented common error logged by Apache related to IPv6 (ENT-10646)
 
 3.18.7:
 	- Federated reporting policy now properly fixes SELinux context of the
