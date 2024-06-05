@@ -1,3 +1,28 @@
+3.21.5:
+	- AIX watchdog now handles stale pids (CFE-4335)
+	- Added ability to influence default package manager and inventory via Augments
+	  (CFE-3612)
+	- Added freebsd package_module and package_inventory since we have pkg packages module available
+	  (CFE-4345)
+	- Added no_backup_cp_compare copy_from body to stdlib
+	  Like the existing no_backup_cp this copy_from body is used to copy files locally
+	  without making backups but with the additional ability to specify the comparison
+	  used. (ENT-10962)
+	- Added set_escaped_user_field complementing set_user_field (CFE-4377)
+	- Added setup-feeder option to distributed cleanup script (ENT-11844)
+	- Changed mission-portal apache restart to graceful to minimize service interruptions
+	  (ENT-11526)
+	- Federated reporting policy fixes SELinux context of the ~cftransport/.ssh directory
+	  and its contents in a single agent run. (ENT-11136)
+	- Fixed comparison that caused control_executor_mailfilter_*_configured to never be set
+	  (CFE-4374)
+	- Fixed restoration of Mission Portal application to packaged content when modified
+	  (ENT-10962)
+	- Removed hour delay between CFEngine Enterprise PostgreSQL recommendation checks
+	  (ENT-11480)
+	- When failing to detect platform, inventory attribute "OS" now defaults to PRETTY_NAME from
+	  os-release as a fallback (CFE-4342)
+
 3.21.4:
 	- Federated reporting policy now properly fixes SELinux context of the
 	  ~cftransport/.ssh directory and its contents. (ENT-11136)
