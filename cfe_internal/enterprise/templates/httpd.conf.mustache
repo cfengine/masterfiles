@@ -7,7 +7,10 @@ ServerName {{{vars.sys.fqhost}}}
 ServerRoot "{{{vars.sys.workdir}}}/httpd"
 {{^classes.cfe_enterprise_disable_plain_http}}
 # ENT-10411
-Listen 80
+# ENT-10646 - Listen 80 often causes IPv6 related errors, specifying ipv4 squashes them.
+#   Unclear why the same is not an issue for 443
+#   To enable listening on ipv6 add Listen [::]:80
+Listen 0.0.0.0:80
 {{/classes.cfe_enterprise_disable_plain_http}}
 
 PidFile "{{{vars.mission_portal_apache_from_stage.httpd_pid_file}}}"
