@@ -176,13 +176,19 @@ bundle agent postgresql_conf_recommendations
   reports:
     psql_conf_recommendations_not_kept::
       "CFEngine Recommended Settings:";
+      "You have less than $(lower)KB of total memory, please consider adding more memory."
+        if => islessthan( "$(mem_info_data[MemTotal][1])", $(lower) );
       "shared_buffers = $(conf[shared_buffers])"
         if => isvariable( "conf[shared_buffers]" ),
         classes => results( "bundle", "cfengine_recommendation_emitted");
       "effective_cache_size = $(conf[effective_cache_size])"
         if => isvariable( "conf[effective_cache_size]" ),
         classes => results( "bundle", "cfengine_recommendation_emitted");
-      "maintenance_work_mem = $(conf[maintenance_work_mem])"
+      "$(with)"
+        with => concat( "maintenance_work_mem = $(conf[maintenance_work_mem]);",
+                        " If we have more than 2GB of memory available then",
+                        " we set the maintenance_work_memory to 2G to improve",
+                        " index creation, and vacuuming. Else we leave the default value." ),
         if => isvariable( "conf[maintenance_work_mem]" ),
         classes => results( "bundle", "cfengine_recommendation_emitted");
 }
