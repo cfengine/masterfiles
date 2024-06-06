@@ -98,7 +98,7 @@ body common control
 
       # We only define package_inventory on redhat like systems that have a
       # python version that works with the package module.
-    (redhat|centos|suse|sles|opensuse|amazon_linux).cfe_yum_package_module_supported.!disable_inventory_package_refresh::
+    (redhat|centos|suse|sles|opensuse|amazon_linux).cfe_python_for_package_modules_supported.!disable_inventory_package_refresh::
         package_inventory => { $(package_module_knowledge.platform_default), @(default:package_module_knowledge.additional_inventory)};
 
     aix.!disable_inventory_package_refresh::
