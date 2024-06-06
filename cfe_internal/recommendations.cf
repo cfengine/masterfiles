@@ -178,7 +178,6 @@ bundle agent postgresql_conf_recommendations
       "CFEngine Recommended Settings:";
       "You have less than $(lower)KB of total memory, please consider adding more memory."
         if => islessthan( "$(mem_info_data[MemTotal][1])", $(lower) );
-      "We suggest dynamically calculated values for hosts that have between $(lower) and $(upper)KB of memory.";
       "shared_buffers = $(conf[shared_buffers])"
         if => isvariable( "conf[shared_buffers]" ),
         classes => results( "bundle", "cfengine_recommendation_emitted");
