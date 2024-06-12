@@ -69,13 +69,15 @@ class NovaApi:
             basic_auth="{}:{}".format(self._api_user, self._api_password)
         )
         self._headers["Content-Type"] = "application/json"
-        # In order to avoid SubjectAltNameWarning with our self-signed certs, silence it
-        if not sys.warnoptions:
-            import warnings
+        # urllib3 v2.0 removed SubjectAltNameWarning and instead throws an error if no SubjectAltName is present in a certificate
+        if hasattr(urllib3.exceptions, "SubjectAltNameWarning"):
+            # if urllib3 is < v2.0 then SubjectAltNameWarning will exist and should be silenced
+            if not sys.warnoptions:
+                import warnings
 
-            warnings.simplefilter(
-                "ignore", category=urllib3.exceptions.SubjectAltNameWarning
-            )
+                warnings.simplefilter(
+                    "ignore", category=urllib3.exceptions.SubjectAltNameWarning
+                )
 
     def __str__(self):
         return str(self.__class__) + ":" + str(self.__dict__)
