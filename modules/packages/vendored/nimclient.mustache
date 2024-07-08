@@ -146,7 +146,7 @@ done
 # This is not well developed as I don't have continuous access to aix and nim
 # nor am I an expert
 CFENGINE_TEST_NIMCLIENT_MOCK=false
-if [ -n "$CFENGINE_TEST_NIMCLIENT_MOCK"  = "true" ]; then
+if [ "$CFENGINE_TEST_NIMCLIENT_MOCK" = "true" ]; then
     list_installed_packages() {
         cat ../../tests/unit/mock_lslpp_Lc
      }
