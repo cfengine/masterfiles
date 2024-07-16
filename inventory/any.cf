@@ -33,6 +33,11 @@ bundle agent inventory_autorun
 # earlier are no longer supported.
 {
   methods:
+    !disable_inventory_cfengine_roles::
+      "cfengine_roles" usebundle => cfe_autorun_inventory_cfengine_roles(),
+        handle => "cfe_internal_autorun_inventory_cfengine_roles";
+
+
     !disable_inventory_LLDP::
       "LLDP" usebundle => cfe_autorun_inventory_LLDP(),
       handle => "cfe_internal_autorun_inventory_LLDP";
@@ -100,6 +105,28 @@ bundle agent inventory_autorun
       "IP addresses" -> { "ENT-2552", "ENT-4987" }
         usebundle => cfe_autorun_inventory_ip_addresses,
         handle => "cfe_internal_autorun_ip_addresses";
+}
+
+bundle agent cfe_autorun_inventory_cfengine_roles
+# @brief Inventory the CFEngine roles detected on a host
+{
+  vars:
+      "role_policy_server"
+        string => "Policy server",
+        meta => { "inventory", "attribute_name=CFEngine roles" },
+        if => not( strcmp( nth( getclassmetatags( "policy_server", "attribute_name" ), 0 ),
+                           "CFEngine roles" ) );
+
+      "role_reporting_hub"
+        string => "Reporting hub",
+        meta => { "inventory", "attribute_name=CFEngine roles" },
+        if => isexecutable( "$(sys.bindir)/cf-hub" );
+
+      "role_client"
+        string => "Client",
+        meta => { "inventory", "attribute_name=CFEngine roles" },
+        if => not( or ( isvariable( "role_reporting_hub" ),
+                        isvariable( "role_policy_server" ) ) );
 }
 
 bundle agent cfe_autorun_inventory_listening_ports
