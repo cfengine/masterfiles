@@ -1,3 +1,55 @@
+3.24.0:
+	- AIX watchdog now handles stale pids (CFE-4335)
+	- Added ability to configure Mission Portal Apache SSLCACertificateFile via Augments
+	  (ENT-11421)
+	- Added ability to configure SSLCipherSuite via Augments (ENT-11393)
+	- Added ability to influence default package manager and inventory via Augments
+	  (CFE-3612)
+	- Added freebsd package_module and package_inventory since we have pkg packages module available
+	  (CFE-4345)
+	- Added no_backup_cp_compare copy_from body to stdlib
+	  Like the existing no_backup_cp this copy_from body is used to copy files locally
+	  without making backups but with the additional ability to specify the comparison
+	  used. (ENT-10962)
+	- Added recommendation for installing gnu parallel on federated reporting superhubs
+	  (ENT-8785)
+	- Added set_escaped_user_field complementing set_user_field (CFE-4377)
+	- Added setup-feeder option to distributed cleanup script (ENT-11844)
+	- Aligned ownership and permission expectations between Mission Portal and MPF
+	  (ENT-11941)
+	- Changed mission-portal apache restart to graceful to minimize service interruptions
+	  (ENT-11526)
+	- Federated reporting policy now properly fixes SELinux context of the
+	  ~cftransport/.ssh directory and its contents in a single agent
+	  run. (ENT-11136)
+	- Fixed comparison that caused control_executor_mailfilter_*_configured to never be set
+	  (CFE-4374)
+	- Fixed distributed_cleanup policy for feeders and rhel-8 superhubs
+	  (ENT-10960)
+	- Fixed restoration of Mission Portal application to packaged content when modified
+	  (ENT-10962)
+	- Freebsd service management now uses one prefixed service commands
+	  (CFE-4323)
+	- Improved federation policy handling of cftransport selinux configuration
+	  (ENT-10959)
+	- Improved instructions and added report to instruct users how to disable recommendations
+	  (ENT-11523)
+	- Inventory view is now refreshed in cf-reactor instead of through policy
+	  (ENT-11763)
+	- Made enterprise federated reporting dump interval configurable via Augments
+	  (ENT-10900)
+	- Policy now manages Mission Portals httpd.conf ownership and permissions
+	  (ENT-11096)
+	- Refactored AWS IMDS retrieval to support both IMDSv1 and IMDSv2
+	  (ENT-10988)
+	- Refactored extraction of home directory from parsing getent output to getuserinfo()
+	  (CFE-4375)
+	- Removed hour delay between CFEngine Enterprise PostgreSQL recommendation checks
+	  (ENT-11480)
+	- Squashed common error logged by Apache related to IPv6 (ENT-10646)
+	- When failing to detect platform, inventory attribute "OS" now
+	  defaults to PRETTY_NAME from os-release as a fallback (CFE-4342)
+
 3.23.0:
 	- Added ability to disable plain http for CFEngine Enterprise Mission Portal
 	  (ENT-10411)
