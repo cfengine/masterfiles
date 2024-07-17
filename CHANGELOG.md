@@ -10,8 +10,7 @@
 	- Added no_backup_cp_compare copy_from body to stdlib
 	  Like the existing no_backup_cp this copy_from body is used to copy files locally
 	  without making backups but with the additional ability to specify the comparison
-	  used.
-	  Ticket: (ENT-10962)
+	  used. (ENT-10962)
 	- Added recommendation for installing gnu parallel on federated reporting superhubs
 	  (ENT-8785)
 	- Added set_escaped_user_field complementing set_user_field (CFE-4377)
@@ -20,11 +19,9 @@
 	  (ENT-11941)
 	- Changed mission-portal apache restart to graceful to minimize service interruptions
 	  (ENT-11526)
-	- Federated reporting policy fixes SELinux context of the
+	- Federated reporting policy now properly fixes SELinux context of the
 	  ~cftransport/.ssh directory and its contents in a single agent
 	  run. (ENT-11136)
-	- Federated reporting policy now properly fixes SELinux context of
-	  the ~cftransport/.ssh directory and its contents. (ENT-11136)
 	- Fixed comparison that caused control_executor_mailfilter_*_configured to never be set
 	  (CFE-4374)
 	- Fixed distributed_cleanup policy for feeders and rhel-8 superhubs
@@ -47,8 +44,6 @@
 	  (ENT-10988)
 	- Refactored extraction of home directory from parsing getent output to getuserinfo()
 	  (CFE-4375)
-	- Reformatted Augments snippets in MPF docs to consistently use Augments v2 syntax
-	  (ENT-11388)
 	- Removed hour delay between CFEngine Enterprise PostgreSQL recommendation checks
 	  (ENT-11480)
 	- Squashed common error logged by Apache related to IPv6 (ENT-10646)
