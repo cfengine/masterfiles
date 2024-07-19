@@ -194,7 +194,7 @@ LogLevel warn
     SSLEngine on
     SSLCertificateFile "{{{vars.cfe_internal_hub_vars.SSLCertificateFile}}}"
     SSLCertificateKeyFile "{{{vars.cfe_internal_hub_vars.SSLCertificateKeyFile}}}"
-{{^classes.cfe_enterprise_have_SSLCACertificateFile_defined}}
+{{#classes.cfe_enterprise_have_SSLCACertificateFile_defined}}
     SSLCACertificateFile "{{{vars.cfe_internal_hub_vars.SSLCACertificateFile}}}"
 {{/classes.cfe_enterprise_have_SSLCACertificateFile_defined}}
 
