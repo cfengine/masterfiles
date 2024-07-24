@@ -1243,7 +1243,8 @@ body edit_field fstab_options(newval, method)
 body edit_field quoted_var(newval,method)
 # @brief Edit the quoted value of the matching line
 # @param newval The new value
-# @param method The method by which to edit the field
+# @param method The method by which to edit the field (append|prepend|alphanum|set|delete)
+# Ref https://docs.cfengine.com/latest/reference-promise-types-files-edit_line-field_edits.html#field_operation
 {
       field_separator => "\"";
       select_field    => "2";
