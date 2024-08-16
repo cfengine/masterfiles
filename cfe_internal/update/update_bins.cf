@@ -262,7 +262,7 @@ bundle agent cfe_internal_update_bins
         comment => "Ensure the local software directory exists for new binaries
                     to be downloaded to";
 
-      "$(local_software_dir)"
+      "$(local_software_dir)/."
       comment => "Copy binary updates from master source on policy server",
       handle => "cfe_internal_update_bins_files_pkg_copy",
       copy_from => u_pcp("$(master_software_location)/$(package_dir)", @(update_def.policy_servers)),
