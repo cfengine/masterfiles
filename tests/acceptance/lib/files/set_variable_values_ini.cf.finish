@@ -15,3 +15,6 @@ variablename4=desired value4
 keytwo = valuetwo
 [something]
 keyone=something1
+[CFE-413]
+keytwo=value=one
+keyone=one
