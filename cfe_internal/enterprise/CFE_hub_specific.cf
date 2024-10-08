@@ -40,6 +40,14 @@ bundle common cfe_internal_hub_vars
 
     policy_server::
 
+      "http_port" -> { "ENT-12151" }
+        string => ifelse( isvariable("cfe_internal_hub_vars.http_port"), "$(cfe_internal_hub_vars.http_port)", "80" ),
+        comment => "Mission portal's webserver HTTP port. Default 80";
+
+      "https_port" -> { "ENT-12151" }
+        string => ifelse( isvariable("cfe_internal_hub_vars.https_port"), "$(cfe_internal_hub_vars.https_port)", "443" ),
+        comment => "Mission portal's webserver HTTPS port. Default 443";
+
       "docroot" string => "$(sys.workdir)/httpd/htdocs",
         comment => "Root directory of Enterprise Web interface",
         handle => "cfe_internal_hub_vars_docroot";
@@ -89,6 +97,44 @@ bundle common cfe_internal_hub_vars
       "ERROR: $(this.bundle): Unable to determine correct PHP version."
         if => strcmp( $(php_version), "UNKNOWN" );
 
+}
+
+##################################################################
+#
+# update_cli_rest_server_url_config
+#  - updates REST server URL port of Mission Portal WebGUI when
+#    cfe_internal_hub_vars.https_port is changed
+#
+##################################################################
+bundle agent update_cli_rest_server_url_config
+{
+  vars:
+    "mp_config_file" string => "$(cfe_internal_hub_vars.docroot)/application/config/config.php";
+    "mp_share_config_file" string => "$(sys.workdir)/share/GUI/application/config/config.php";
+    "regex_test_pattern" string => ".*localhost:$(cfe_internal_hub_vars.https_port).*";
+
+  files:
+   "$(mp_share_config_file)"
+      edit_line => change_cli_rest_server_url_port,
+      if => and(
+        fileexists("$(mp_share_config_file)"),
+        islessthan(countlinesmatching("$(regex_test_pattern)", "$(mp_share_config_file)"), 1)
+        );
+
+    "$(mp_config_file)"
+      edit_line => change_cli_rest_server_url_port,
+      if => and(
+        fileexists("$(mp_config_file)"),
+        islessthan(countlinesmatching("$(regex_test_pattern)", "$(mp_config_file)"), 1)
+        );
+}
+
+bundle edit_line change_cli_rest_server_url_port
+{
+  replace_patterns:
+  "^\s*\$config\['cli_rest_server_url'\]\s*=\s*\"https://localhost(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?/api/\";\s*$"
+      replace_with => value("    $config['cli_rest_server_url'] = \"https://localhost:$(cfe_internal_hub_vars.https_port)/api/\";"),
+      comment => "Change port CLI REST server URL port";
 }
 
 ##################################################################

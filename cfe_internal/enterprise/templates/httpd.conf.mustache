@@ -10,7 +10,7 @@ ServerRoot "{{{vars.sys.workdir}}}/httpd"
 # ENT-10646 - Listen 80 often causes IPv6 related errors, specifying ipv4 squashes them.
 #   Unclear why the same is not an issue for 443
 #   To enable listening on ipv6 add Listen [::]:80
-Listen 0.0.0.0:80
+Listen 0.0.0.0:{{{vars.cfe_internal_hub_vars.http_port}}}
 {{/classes.cfe_enterprise_disable_plain_http}}
 
 PidFile "{{{vars.mission_portal_apache_from_stage.httpd_pid_file}}}"
@@ -135,7 +135,7 @@ LogLevel warn
   # This content used to be included from an external file
   # /var/cfengine/httpd/conf/extra/httpd-ssl.conf
 
-  Listen 443
+  Listen {{{vars.cfe_internal_hub_vars.https_port}}}
 
   AddType application/x-x509-ca-cert .crt
   AddType application/x-pkcs7-crl    .crl
@@ -183,12 +183,12 @@ LogLevel warn
   SSLRandomSeed startup builtin
   SSLRandomSeed connect builtin
 
-  <VirtualHost _default_:443>
+  <VirtualHost _default_:{{{vars.cfe_internal_hub_vars.https_port}}}>
     DocumentRoot "{{{vars.cfe_internal_hub_vars.public_docroot}}}"
     Alias "/api" "{{{vars.cfe_internal_hub_vars.docroot}}}/api"
     Alias "/api/static" "{{{vars.cfe_internal_hub_vars.docroot}}}/api/static"
     Alias "/ldap" "{{{vars.cfe_internal_hub_vars.docroot}}}/ldap"
-    ServerName {{{vars.sys.fqhost}}}:443
+    ServerName {{{vars.sys.fqhost}}}:{{{vars.cfe_internal_hub_vars.https_port}}}
     # ServerAdmin root@localhost
     ErrorLog "{{{vars.cfe_internal_hub_vars.error_log}}}"
     LogFormat "%h %l %{username}n %t \"%r\" %>s %b"
