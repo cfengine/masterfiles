@@ -164,11 +164,13 @@ Override this bundle by setting `def.mpf_update_policy_bundle` via augments:
 {
   "variables": {
     "default:def.mpf_update_policy_bundle": {
-      "value": "MyCustomPolicyUpdateBundle"
+      "value": "default:MyCustomPolicyUpdateBundle"
     }
   }
 }
 ```
+
+**NOTE:** Be sure to specify the namespace the bundle is in, for example, `default`.
 
 **History:**
 
