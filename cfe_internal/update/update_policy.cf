@@ -42,7 +42,7 @@ bundle agent cfe_internal_update_policy
 
       # Look for a bundle that matches what the user wants
       "found_matching_user_specified_bundle"
-        slist => bundlesmatching( "$(def.mpf_update_policy_bundle)" );
+        slist => bundlesmatching( "^$(def.mpf_update_policy_bundle)$" );
 
   methods:
 
@@ -71,18 +71,16 @@ bundle agent cfe_internal_update_policy
     inform_mode|verbose_mode|DEBUG|DEBUG_cfe_internal_update_policy::
       # Report a human readable way to understand the policy behavior
 
-      "Found user specified update bundle."
-        if => "have_user_specified_update_bundle";
-
       "User specified update bundle: $(def.mpf_update_policy_bundle)"
         if => "have_user_specified_update_bundle";
 
       "User specified update bundle MISSING! Falling back to $(default_policy_update_bundle)."
         if => and( "have_user_specified_update_bundle",
-                   "missing_user_specified_update_bundle"
-                  );
-
-
+                   "missing_user_specified_update_bundle" );
+    any::
+      "WARNING User specified update bundle '$(def.mpf_update_policy_bundle)' does not specify a namespace. Please specify a namespace, e.g. 'default:$(def.mpf_update_policy_bundle)'."
+        if => and( not(regcmp( ".*:.*", $(def.mpf_update_policy_bundle) ) ),
+                   "have_user_specified_update_bundle" );
 }
 
 bundle agent cfe_internal_setup_python_symlink(symlink_path)
