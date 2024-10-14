@@ -1,0 +1,67 @@
+# todo, maybe chmod, user, group for config_final_path
+# check pid file for service stop/start?
+bundle agent service_config(service_name,config_template_path,config_final_path,validate_config_command,template_data)
+{
+  vars:
+
+    "staged_config" string => "$(config_final_path).staged";
+
+
+  methods:
+
+    "staged config rendered"   usebundle => file_make_mustache($(staged_config), $(config_template_path), @(template_data));
+    "final config and restart" usebundle => validate_config_and_restart_service($(staged_config), $(validate_config_command), $(config_final_path), $(service_name));
+
+
+  reports:
+
+    DEBUG::
+      "template_data is ${with}" with => storejson(template_data);
+}
+
+bundle agent validate_config_and_restart_service(staged_config,validate_config_command,config_final_path,service_name)
+{
+  vars:
+    "validation_output" string => "$(staged_config)-validation.log";
+
+  classes:
+
+    "config_validated"    expression => returnszero("$(validate_config_command) $(staged_config) >$(validation_output) 2>&1", "useshell");
+    "config_final_exists" expression => fileexists("$(config_final_path)");
+    "staged_config_newer" expression => isnewerthan("$(staged_config)", "$(config_final_path)");
+
+
+  files:
+
+    "$(config_final_path)"
+      copy_from => local_dcp($(staged_config)),
+      if        => and("config_validated", or(not("config_final_exists"), "staged_config_newer")),
+      classes   => results("bundle", "$(service_name)_config");
+
+
+  services:
+
+    "$(service_name)"
+      service_policy => "stop",
+      if             => "$(service_name)_config_repaierd",
+      classes        => results("bundle", "$(service_name)_stopped_after_validated_config");
+
+    "$(service_name)"
+      service_policy => "start",
+      if             => and("$(service_name)_config_repaired", "$(service_name)_stopped_after_validated_config_repaired");
+
+    "$(service_name)"
+      service_policy => "restart",
+      if             => and("$(service_name)_config_repaired", not("$(service_name)_stopped_after_validated_config_repaired"));
+
+
+  reports:
+
+    DEBUG::
+      "$(staged_config) validates"                          if => "config_validated";
+      "$(config_final_path) exists"                         if => "config_final_exists";
+      "$(staged_config) is newer than $(config_final_path)" if => "staged_config_newer";
+
+    !config_validated::
+      "validation output ${with}" with => readfile("${validation_output}");
+}
