@@ -110,7 +110,12 @@ DocumentRoot "{{{vars.cfe_internal_hub_vars.public_docroot}}}"
 </FilesMatch>
 
 ErrorLog "logs/error_log"
+{{#data:cfengine_enterprise_mission_portal_debug_php_fpm}}
+LogLevel warn rewrite:trace6 proxy:debug proxy_fcgi:debug dir:debug
+{{/data:cfengine_enterprise_mission_portal_debug_php_fpm}}
+{{^data:cfengine_enterprise_mission_portal_debug_php_fpm}}
 LogLevel warn
+{{/data:cfengine_enterprise_mission_portal_debug_php_fpm}}
 
 <IfModule log_config_module>
     LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
@@ -244,10 +249,26 @@ LogLevel warn
 </IfModule>
 
 
+{{#classes.mission_portal_http2_enabled}}
+# Use mod_http2
+LoadModule http2_module modules/mod_http2.so
+# Prefer http2 protocol
+Protocols h2 h2c http/1.1
+
+# Setup php to be handled by php-fpm. Required for use of mod_http2 due to threading issues in php.
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
+# Need to pass auth headers to fpm
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+<FilesMatch \.php$>
+SetHandler "proxy:fcgi://127.0.0.1:9000"
+</FilesMatch>
+{{/classes.mission_portal_http2_enabled}}
+{{^classes.mission_portal_http2_enabled}}
 LoadModule php{{{vars.cfe_internal_hub_vars.php_version}}}_module       modules/libphp{{{vars.cfe_internal_hub_vars.php_version}}}.so
 AddHandler php{{{vars.cfe_internal_hub_vars.php_version}}}-script       .php
 AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_version}}}
-
+{{/classes.mission_portal_http2_enabled}}
 
 <Directory "{{{vars.cfe_internal_hub_vars.public_docroot}}}">
 

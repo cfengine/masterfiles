@@ -98,6 +98,7 @@ bundle agent cfe_internal_update_processes
       # definitions for each component.
 
       "agent[cf_postgres]" string => "cf-postgres";
+      "agent[cf_php_fpm]"  string => "cf-php-fpm";
       "agent[cf_apache]"   string => "cf-apache";
 
     any::
