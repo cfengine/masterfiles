@@ -44,14 +44,14 @@ bundle agent cfe_internal_systemd_unit_files
     systemd::
 
       "$(systemctl)"
-        args => "daemon-reload",
+        args => "daemon-reload --no-ask-password",
         handle => "cfe_internal_systemd_unit_files_reload_when_changed",
         if => classmatch("cfe_systemd_service_unit_.*_repaired"),
         comment => "We need to reload the systemd configuration after any unit
                     is changed in order for systemd to recognize the change.";
 
       "$(systemctl)"
-        args => "restart $(service_units).service",
+        args => "restart $(service_units).service --no-ask-password",
         handle => "cfe_internal_systemd_unit_restart_when_changed",
         if => and(classify("cfe_systemd_service_unit_$(service_units)_repaired"),
                   returnszero("$(systemctl) --quiet is-active $(service_units)", noshell)),
