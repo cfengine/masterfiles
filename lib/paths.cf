@@ -168,6 +168,7 @@ bundle common paths
       "path[find]"     string => "/usr/bin/find";
       "path[grep]"     string => "/usr/bin/grep";
       "path[ls]"       string => "/usr/bin/ls";
+      "path[lssrc]"    string => "/usr/bin/lssrc";
       "path[netstat]"  string => "/usr/bin/netstat";
       "path[oslevel]"  string => "/usr/bin/oslevel";
       "path[ping]"     string => "/usr/bin/ping";
@@ -175,6 +176,8 @@ bundle common paths
       "path[printf]"   string => "/usr/bin/printf";
       "path[sed]"      string => "/usr/bin/sed";
       "path[sort]"     string => "/usr/bin/sort";
+      "path[startsrc]" string => "/usr/bin/startsrc";
+      "path[stopsrc]"  string => "/usr/bin/stopsrc";
       "path[tr]"       string => "/usr/bin/tr";
       "path[yum]"      string => "/usr/bin/yum";
 
