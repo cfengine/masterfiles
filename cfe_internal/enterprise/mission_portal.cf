@@ -15,6 +15,11 @@ bundle agent cfe_internal_enterprise_mission_portal
         handle => "cfe_internal_management_web_server",
         comment => "Manage Apache Web server (on/off)";
 
+      "Port Configuration" -> { "CFEngine Enterprise", "Mission Portal" }
+        usebundle => update_cli_rest_server_url_config,
+        handle => "cfe_internal_management_update_cli_rest_server_url_config",
+        comment => "Update the REST server URL port in the Mission Portal when cfe_internal_hub_vars.https_port is changed";
+
 }
 bundle agent apachectl_patched_for_upgrade
 # @brief Ensure that apacehctl is patched so that it is able to re-start services
