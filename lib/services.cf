@@ -111,10 +111,12 @@ bundle agent standard_services(service,state)
 #
 # Else, if chkconfig is present, it will be used.
 #
-# Else, if the service command is available, if will be used.
+# Else, if the service command is available, it will be used.
 #
-# Else, if the svcadm command is available, if will be used. Note you
+# Else, if the svcadm command is available, it will be used. Note you
 # have to supply the full SMF service identifier.
+#
+# Else, if lssrc command is available (AIX), it will be used.
 #
 # Else, control is passed to `classic_services`.
 #
@@ -170,7 +172,9 @@ bundle agent standard_services(service,state)
       "chkconfig" expression => "!systemd._stdlib_path_exists_chkconfig";
       "sysvservice" expression => "!systemd.!chkconfig._stdlib_path_exists_service";
       "smf" expression => "!systemd.!chkconfig.!sysvservice._stdlib_path_exists_svcadm";
-      "fallback" expression => "!systemd.!chkconfig.!sysvservice.!smf";
+      # AIX System Resource Controller https://www.ibm.com/docs/en/aix/7.2?topic=concepts-system-resource-controller
+      "aix_src" expression => "_stdlib_path_exists_lssrc";
+      "fallback" expression => "!systemd.!chkconfig.!sysvservice.!smf.!aix_src";
 
       "have_init" expression => fileexists($(init));
 
@@ -268,6 +272,8 @@ bundle agent standard_services(service,state)
       classes => kept_successful_command;
 
   methods:
+    aix_src::
+      "aix_service" usebundle => aix_services($(service), $(state));
     fallback::
       "classic" usebundle => classic_services($(service), $(state));
 
@@ -1097,4 +1103,75 @@ bundle agent classic_services(service,state)
 
       "DEBUG $(this.bundle): The baseinit is NOT provided, using default"
       if => not(isvariable("baseinit[$(service)]"));
+}
+
+body service_method aix_service_method
+{
+  service_bundle => aix_services("$(this.promiser)","$(this.service_policy)");
+}
+
+# example of querying state of a service on AIX
+#
+# bash-5.1# /usr/bin/lssrc -s sendmail
+# Subsystem         Group            PID          Status
+#  sendmail         mail             5308762      active
+#
+# according to https://docs.cfengine.com/docs/3.24/reference-promise-types-services.html#service_policy
+# state can be one of start, stop, enable, disable, restart and reload.
+# disable/enable might be available for services in /etc/inetd.conf
+# e.g. https://www.ibm.com/support/pages/ibm-aix-how-disable-rsh-and-rlogin-services
+# /usr/bin/lssrc -t login, comment out lines in /etc/inetd.conf
+#
+# Note: This service method bundle does NOT handle inetd services like rsh/rlogin
+# only subsystems aka those services listed with /usr/bin/lssrc -a
+# https://www.ibm.com/docs/en/aix/7.3?topic=daemons-subsystems-subservers
+#
+# Also note this from the lssrc man page:
+#        The lssrc command output can sometimes show two entries for a particular daemon. One instance will be active and another instance will be
+#       inoperative. This can happen if the subsystem is modified (using the mkssys command or chssys command) without stopping the subsystem. The
+#       original subsystem will remain active and the modified instance will be inoperative until the subsystem is stopped and started again.
+#
+# Additional output may appear prefixed with Q: for example if it takes some time to change the service state:
+#
+#   notice: Q: "...in/stopsrc -s s": 0513-056 Timeout waiting for command response. If you specified a foreign host,
+# Q: "...in/stopsrc -s s": see the /etc/inittab file on the foreign host to verify that the SRC daemon
+# Q: "...in/stopsrc -s s": (srcmstr) was started with the -r flag to accept remote requests.
+# Q: "...in/stopsrc -s s": 0513-059 The sendmail Subsystem has been started. Subsystem PID is 13042068.
+#
+# Another failure case. Likely on next agent run (default of 5 minutes) the service will have stopped or we will try again.
+#    error: Finished command related to promiser '/usr/bin/stopsrc -s sendmail' -- an error occurred, returned 1
+#   notice: Q: "...in/stopsrc -s s": 0513-056 Timeout waiting for command response. If you specified a foreign host,
+# Q: "...in/stopsrc -s s": see the /etc/inittab file on the foreign host to verify that the SRC daemon
+# Q: "...in/stopsrc -s s": (srcmstr) was started with the -r flag to accept remote requests.
+bundle agent aix_services(service, desired_state)
+{
+  vars:
+    # current state can be: active, inoperative, stopping
+    "current_state" string => execresult("$(paths.lssrc) -s $(service) | tail -1 | awk '{print $NF}'", useshell);
+
+  classes:
+    "needs_start" expression => and(
+      strcmp("$(current_state)", "inoperative"),
+      strcmp("$(desired_state)", "start")
+    );
+    "needs_restart" expression => and(
+      strcmp("$(desired_state)", "restart")
+    );
+    "needs_stop" expression => and(
+      strcmp("$(current_state)", "active"),
+      strcmp("$(desired_state)", "stop")
+    );
+
+  commands:
+    needs_start::
+      "$(paths.startsrc) -s $(service)";
+    needs_restart::
+      "$(paths.stopsrc) -s $(service); $(paths.startsrc) -s $(service)"
+      contain => in_shell;
+    needs_stop::
+      "$(paths.stopsrc) -s $(service)";
+
+  reports:
+    DEBUG::
+      "Current state of service $(service) is $(current_state). Desired state is $(desired_state).";
 }
