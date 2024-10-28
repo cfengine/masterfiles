@@ -109,6 +109,7 @@ bundle common cfe_internal_hub_vars
 bundle agent update_cli_rest_server_url_config
 {
   vars:
+    # Both share and live versions must be changed at once since httpd will be restarted later in the same agent run.
     "mp_config_file" string => "$(cfe_internal_hub_vars.docroot)/application/config/config.php";
     "mp_share_config_file" string => "$(sys.workdir)/share/GUI/application/config/config.php";
     "regex_test_pattern" string => ".*localhost:$(cfe_internal_hub_vars.https_port).*";
