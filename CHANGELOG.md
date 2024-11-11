@@ -1,3 +1,14 @@
+3.21.6:
+	- Added inline docs showing valid values for method (field_operation) in body edit_field quoted_var
+	  (CFE-4426)
+	- Added trailing /. to files promises targeting local_software_dir
+	  (ENT-12116)
+	- Adjusted CSP in httpd.conf to suit ACE javascript editor (ENT-12010)
+	- Aligned ownership and permission expectations between Mission Portal and MPF
+	  (ENT-11941)
+	- Fixed failed to open /dev/tty errors when using systemd unit management
+	  (CFE-4445)
+
 3.21.5:
 	- AIX watchdog now handles stale pids (CFE-4335)
 	- Added ability to influence default package manager and inventory via augments files (def.json)
