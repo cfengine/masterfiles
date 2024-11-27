@@ -42,6 +42,13 @@ bundle common def_standalone_self_upgrade
         comment => concat( "If default:def.control_common_tls_ciphers is defined then",
                            " its value will be used for the set of tls ciphers allowed",
                            " for outbound connections. Else the binary default will be used.");
+
+      "control_common_system_log_level_defined" -> { "CFE-4452" }
+        expression => isvariable( "default:def.control_common_system_log_level" ),
+        comment => concat( "The minimum log level required for log messages to go to the",
+                           " system log (e.g. syslog or Windows Event Log).",
+                           " (critical|error|warning|notice|info)" );
+
 }
 body agent control
 # @brief Agent controls for standalone self upgrade
@@ -874,6 +881,9 @@ body common control
 
     (debian|redhat)::
       package_module => $(package_module_knowledge.platform_default);
+
+    control_common_system_log_level_defined::
+        system_log_level => "$(default:def.control_common_system_log_level)";
 }
 
 body depth_search u_recurse_basedir(d)
