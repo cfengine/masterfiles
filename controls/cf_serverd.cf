@@ -105,7 +105,7 @@ bundle server mpf_default_access_rules()
       if => isdir( "$(def.dir_masterfiles)/" ),
       admit => { @(def.acl_derived) };
 
-      "$(def.dir_masterfiles)/.no-distrib" -> { "ENT-8079" }
+      "$(def.dir_masterfiles)/.no-distrib/" -> { "ENT-8079" }
       handle => "prevent_distribution_of_top_level_dot_no_distrib",
       deny => { "0.0.0.0/0" };
 
