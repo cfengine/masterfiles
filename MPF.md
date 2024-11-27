@@ -1408,6 +1408,26 @@ Example definition in augments file:
 
 * Added in 3.22.0, 3.21.2
 
+### Configure the minimum log level for system log
+
+When `default:def.control_common_system_log_level` is defined the value controls the minimum log level required for log messages to go to the system log (e.g. syslog, Windows Event Log).
+
+Example definition in augments file:
+
+```json
+{
+  "variables": {
+    "default:def.control_common_system_log_level": {
+      "value": "info",
+      "comment": "We want syslog to recieve messages tha are level info and above."
+    }
+  }
+}
+```
+**History:**
+
+* Added in 3.25.0
+
 ### Configure users allowed to initiate execution via cf-runagent
 
 cf-serverd only allows specified users to request unscheduled execution remotely via cf-runagent.

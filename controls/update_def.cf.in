@@ -5,6 +5,12 @@ bundle common update_def
     any::
       "sys_policy_hub_port_exists" expression => isvariable("sys.policy_hub_port");
 
+      "control_common_system_log_level_defined" -> { "CFE-4452" }
+        expression => isvariable( "default:def.control_common_system_log_level" ),
+        comment => concat( "The minimum log level required for log messages to go to the",
+                           " system log (e.g. syslog or Windows Event Log).",
+                           " (critical|error|warning|notice|info)" );
+
   vars:
       "hub_binary_version" -> { "ENT-10664" }
         data => data_regextract(

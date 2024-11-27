@@ -40,6 +40,9 @@ body common control
 
     control_common_tls_ciphers_defined::
         tls_ciphers => "$(default:def.control_common_tls_ciphers)"; # See also: allowciphers in body server control
+
+    control_common_system_log_level_defined::
+        system_log_level => "$(default:def.control_common_system_log_level)";
 }
 
 #############################################################################
