@@ -1,5 +1,6 @@
 Looking for help?
-[![Gitter chat](https://badges.gitter.im/cfengine/core.png)](https://gitter.im/cfengine/core) | [![IRC channel](https://kiwiirc.com/buttons/irc.cfengine.com/cfengine.png)](https://web.libera.chat?channel=#cfengine)
+* [Chat with us in #CFEngine:matrix.org](https://matrix.to/#/#CFEngine:matrix.org).
+* Ask questions on [Github Discussions](https://github.com/cfengine/core/discussions/) or the mailing list [help-cfengine@googlegroups.com](https://groups.google.com/g/help-cfengine).
 
 # CFEngine 3 masterfiles
 
