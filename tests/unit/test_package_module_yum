@@ -151,11 +151,11 @@ assert check("list-updates-local", [], 18,
 assert check("list-installed", [], 6,
              ["Name=firefox\nVersion=24.5.0-1.el5.centos\nArchitecture=i386",
               "Name=yum\nVersion=3.2.29-43.el6_5\nArchitecture=noarch"],
-             4, ["rpm -qa --qf Name=%{name}\nVersion=%{version}-%{release}\nArchitecture=%{arch}\n"])
+             4, ["rpm -qa --qf Name=%{name}\nVersion=%{epoch}:%{version}-%{release}\nArchitecture=%{arch}\n"])
 
 assert check("get-package-data", ["File=/path/to/pkg"], 4,
              ["PackageType=file\nName=file_pkg\nVersion=10.0\nArchitecture=x86_64"],
-             4, ["rpm --qf Name=%{name}\nVersion=%{version}-%{release}\nArchitecture=%{arch}\n -qp /path/to/pkg"])
+             4, ["rpm --qf Name=%{name}\nVersion=%{epoch}:%{version}-%{release}\nArchitecture=%{arch}\n -qp /path/to/pkg"])
 assert check("get-package-data", ["File=repo_pkg"], 2,
              ["PackageType=repo\nName=repo_pkg"],
              0, [])

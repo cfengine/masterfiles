@@ -22,7 +22,7 @@ jobs:
           ref: ${{steps.together.outputs.core || github.base_ref || github.ref}}
           submodules: recursive
       - name: Install dependencies
-        run: sudo apt-get update -y && sudo apt-get install -y libssl-dev libpam0g-dev liblmdb-dev byacc curl libyaml-dev valgrind
+        run: sudo apt-get update -y && sudo apt-get install -y libssl-dev libpam0g-dev liblmdb-dev byacc curl libyaml-dev valgrind librsync-dev
       # - name: Install CFEngine with cf-remote
       #   run: |
       #     pip3 install cf-remote

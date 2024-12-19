@@ -9,17 +9,20 @@ import subprocess
 import re
 
 
-rpm_cmd = os.environ.get('CFENGINE_TEST_RPM_CMD', "/bin/rpm")
+rpm_cmd = os.environ.get("CFENGINE_TEST_RPM_CMD", "/bin/rpm")
 rpm_quiet_option = ["--quiet"]
-rpm_output_format = "Name=%{name}\nVersion=%{version}-%{release}\nArchitecture=%{arch}\n"
+rpm_output_format = (
+    "Name=%{name}\nVersion=%{epoch}:%{version}-%{release}\nArchitecture=%{arch}\n"
+)
 
-yum_cmd = os.environ.get('CFENGINE_TEST_YUM_CMD', "/usr/bin/yum")
+yum_cmd = os.environ.get("CFENGINE_TEST_YUM_CMD", "/usr/bin/yum")
 yum_options = ["--quiet", "-y"]
 
-NULLFILE = open(os.devnull, 'w')
+NULLFILE = open(os.devnull, "w")
 
 
 redirection_is_broken_cached = -1
+
 
 def redirection_is_broken():
     # Older versions of Python have a bug where it is impossible to redirect
@@ -41,7 +44,12 @@ def redirection_is_broken():
 
 
 def subprocess_Popen(cmd, stdout=None, stderr=None):
-    if not redirection_is_broken() or (stdout is None and stderr is None) or stdout == subprocess.PIPE or stderr == subprocess.PIPE:
+    if (
+        not redirection_is_broken()
+        or (stdout is None and stderr is None)
+        or stdout == subprocess.PIPE
+        or stderr == subprocess.PIPE
+    ):
         return subprocess.Popen(cmd, stdout=stdout, stderr=stderr)
 
     old_stdout_fd = -1
@@ -87,7 +95,19 @@ def get_package_data():
         # Absolute file.
         sys.stdout.write("PackageType=file\n")
         sys.stdout.flush()
-        return subprocess_call([rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string])
+        process = subprocess_Popen(
+            [rpm_cmd, "--qf", rpm_output_format, "-qp", pkg_string],
+            stdout=subprocess.PIPE,
+        )
+        (stdoutdata, _) = process.communicate()
+
+        if process.returncode != 0:
+            return process.returncode
+
+        for line in stdoutdata.decode("utf-8").splitlines():
+            sys.stdout.write(line.replace("(none):", "") + "\n")
+
+        return 0
     elif re.search("[:,]", pkg_string):
         # Contains an illegal symbol.
         sys.stdout.write(line + "ErrorMessage: Package string with illegal format\n")
@@ -102,7 +122,18 @@ def list_installed():
     # Ignore everything.
     sys.stdin.readlines()
 
-    return subprocess_call([rpm_cmd, "-qa", "--qf", rpm_output_format])
+    process = subprocess_Popen(
+        [rpm_cmd, "-qa", "--qf", rpm_output_format], stdout=subprocess.PIPE
+    )
+    (stdoutdata, _) = process.communicate()
+
+    if process.returncode != 0:
+        return process.returncode
+
+    for line in stdoutdata.decode("utf-8").splitlines():
+        sys.stdout.write(line.replace("(none):", "") + "\n")
+
+    return 0
 
 
 def list_updates(online):
@@ -110,7 +141,7 @@ def list_updates(online):
     for line in sys.stdin:
         line = line.strip()
         if line.startswith("options="):
-            option = line[len("options="):]
+            option = line[len("options=") :]
             if option.startswith("-"):
                 yum_options.append(option)
             elif option.startswith("enablerepo=") or option.startswith("disablerepo="):
@@ -120,7 +151,9 @@ def list_updates(online):
     if not online:
         online_flag = ["-C"]
 
-    process = subprocess_Popen([yum_cmd] + yum_options + online_flag + ["check-update"], stdout=subprocess.PIPE)
+    process = subprocess_Popen(
+        [yum_cmd] + yum_options + online_flag + ["check-update"], stdout=subprocess.PIPE
+    )
     (stdoutdata, _) = process.communicate()
     # analyze return code from `yum check-update`:
     # 0 means no updates
@@ -129,7 +162,9 @@ def list_updates(online):
     if process.returncode == 1 and not online:
         # If we get an error when listing local updates, try again using the
         # online method, so that the cache is generated
-        process = subprocess_Popen([yum_cmd] + yum_options + ["check-update"], stdout=subprocess.PIPE)
+        process = subprocess_Popen(
+            [yum_cmd] + yum_options + ["check-update"], stdout=subprocess.PIPE
+        )
         (stdoutdata, _) = process.communicate()
     if process.returncode != 100:
         # either there were no updates or error happened
@@ -152,7 +187,9 @@ def list_updates(online):
             continue
 
         lastline = ""
-        match = re.match(r"^(?P<name>\S+)\.(?P<arch>[^.\s]+)\s+(?P<version>\S+)\s+\S+\s*$", line)
+        match = re.match(
+            r"^(?P<name>\S+)\.(?P<arch>[^.\s]+)\s+(?P<version>\S+)\s+\S+\s*$", line
+        )
         if match is not None:
             sys.stdout.write("Name=" + match.group("name") + "\n")
             sys.stdout.write("Version=" + match.group("version") + "\n")
@@ -174,8 +211,9 @@ def one_package_argument(name, arch, version, is_yum_install):
         archs.append(arch)
 
     if is_yum_install:
-        process = subprocess_Popen([rpm_cmd, "--qf", "%{arch}\n",
-                                    "-q", name], stdout=subprocess.PIPE)
+        process = subprocess_Popen(
+            [rpm_cmd, "--qf", "%{arch}\n", "-q", name], stdout=subprocess.PIPE
+        )
         existing_archs = [line.decode("utf-8").rstrip() for line in process.stdout]
         process.wait()
         if process.returncode == 0 and existing_archs:
@@ -218,13 +256,13 @@ def package_arguments_builder(is_yum_install):
     name = ""
     version = ""
     arch = ""
-    single_cmd_args = []    # List of arguments
-    multi_cmd_args = []     # List of lists of arguments
+    single_cmd_args = []  # List of arguments
+    multi_cmd_args = []  # List of lists of arguments
     old_name = ""
     for line in sys.stdin:
         line = line.strip()
         if line.startswith("options="):
-            option = line[len("options="):]
+            option = line[len("options=") :]
             if option.startswith("-"):
                 yum_options.append(option)
             elif option.startswith("enablerepo=") or option.startswith("disablerepo="):
@@ -232,7 +270,9 @@ def package_arguments_builder(is_yum_install):
         if line.startswith("Name="):
             if name:
                 # Each new "Name=" triggers a new entry.
-                single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
+                single_list, multi_list = one_package_argument(
+                    name, arch, version, is_yum_install
+                )
                 single_cmd_args += single_list
                 if name == old_name:
                     # Packages that differ only by architecture should be
@@ -255,7 +295,9 @@ def package_arguments_builder(is_yum_install):
             arch = line.split("=", 1)[1].rstrip()
 
     if name:
-        single_list, multi_list = one_package_argument(name, arch, version, is_yum_install)
+        single_list, multi_list = one_package_argument(
+            name, arch, version, is_yum_install
+        )
         single_cmd_args += single_list
         if name == old_name:
             # Packages that differ only by architecture should be
@@ -435,5 +477,6 @@ def main():
     else:
         sys.stderr.write("Invalid operation\n")
         return 2
+
 
 sys.exit(main())
