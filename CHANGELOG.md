@@ -1,3 +1,20 @@
+3.25.0:
+	- Added inline docs showing valid values for method (field_operation) in body edit_field quoted_var
+	  (CFE-4426)
+	- Added support for AIX System Resource Controller services promises
+	  (CFE-4447)
+	- Added trailing /. to files promises targeting local_software_dir
+	  (ENT-12116)
+	- Adjusted CSP in httpd.conf to suit ACE javascript editor (ENT-12010)
+	- Allowed images from raw.github.com (ENT-12531)
+	- Data dumping on Federated Reporting feeders no longer uses an AWK filter to merge INSERT
+	  lines in the dumps
+	- Fixed failed to open /dev/tty errors when using systemd unit management
+	  (CFE-4445)
+	- Fixed issue with yum package module regarding packages with epoch not validating
+	  (ENT-12538)
+	- Made system_log_level configurable via Augments (CFE-4452)
+
 3.24.0:
 	- AIX watchdog now handles stale pids (CFE-4335)
 	- Added ability to configure Mission Portal Apache SSLCACertificateFile via Augments
