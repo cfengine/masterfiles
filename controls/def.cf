@@ -565,7 +565,8 @@ bundle common def
       "log_dir[package_logs]" string => "$(const.dirsep)cfengine_package_logs";
 
     enterprise.am_policy_hub::
-      "log_dir[application]" string => "$(sys.workdir)/httpd/htdocs/application/logs";
+      "log_dir[mission_portal]" string => "$(sys.workdir)/httpd/logs";
+      "log_dir[application]" string => "$(sys.workdir)/httpd/logs/application";
 
     any::
       "cfe_log_dirs" slist => getvalues( log_dir );
