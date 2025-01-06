@@ -370,10 +370,12 @@ bundle common paths
       "path[df]"            string => "/bin/df";
       "path[diff]"          string => "/usr/bin/diff";
       "path[dig]"           string => "/usr/bin/dig";
+      "path[dmsetup]"       string => "/usr/sbin/dmsetup";
       "path[domainname]"    string => "/bin/domainname";
       "path[echo]"          string => "/bin/echo";
       "path[egrep]"         string => "/bin/egrep";
       "path[ethtool]"       string => "/usr/sbin/ethtool";
+      "path[fdisk]"         string => "/usr/sbin/fdisk";
       "path[find]"          string => "/usr/bin/find";
       "path[free]"          string => "/usr/bin/free";
       "path[getenforce]"    string => "/usr/sbin/getenforce";
@@ -383,6 +385,7 @@ bundle common paths
       "path[iptables]"      string => "/sbin/iptables";
       "path[iptables_save]" string => "/sbin/iptables-save";
       "path[ls]"            string => "/bin/ls";
+      "path[lshw]"          string => "/usr/sbin/lshw";
       "path[lsof]"          string => "/usr/sbin/lsof";
       "path[netstat]"       string => "/bin/netstat";
       "path[nologin]"       string => "/sbin/nologin";
@@ -465,10 +468,12 @@ bundle common paths
       "path[diff]"          string => "/usr/bin/diff";
       "path[dig]"           string => "/usr/bin/dig";
       "path[dmidecode]"     string => "/usr/sbin/dmidecode";
+      "path[dmsetup]"       string => "/usr/sbin/dmsetup";
       "path[domainname]"    string => "/bin/domainname";
       "path[echo]"          string => "/bin/echo";
       "path[egrep]"         string => "/bin/egrep";
       "path[ethtool]"       string => "/sbin/ethtool";
+      "path[fdisk]"         string => "/usr/sbin/fdisk";
       "path[find]"          string => "/usr/bin/find";
       "path[free]"          string => "/usr/bin/free";
       "path[getenforce]"    string => "/usr/sbin/getenforce";
@@ -478,6 +483,7 @@ bundle common paths
       "path[iptables]"      string => "/sbin/iptables";
       "path[iptables_save]" string => "/sbin/iptables-save";
       "path[ls]"            string => "/bin/ls";
+      "path[lshw]"          string => "/usr/bin/lshw";
       "path[lsof]"          string => "/usr/bin/lsof";
       "path[netstat]"       string => "/bin/netstat";
       "path[nologin]"       string => "/usr/sbin/nologin";
