@@ -2015,6 +2015,7 @@ can be customized via Augments.
   ```yum_rpm_enable_repo``` , ```yum_group```, ```rpm_filebased```, ```ips```,
   ```smartos```, ```opencsw```, ```emerge```, ```pacman```, ```zypper```,
   ```generic```
+
 * [package bundles][lib/packages.cf]: ```package_latest```,
   ```package_specific_present```, ```package_specific_absent```,
   ```package_specific_latest```, ```package_specific```
