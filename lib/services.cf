@@ -340,7 +340,7 @@ bundle agent systemd_services(service,state)
 # * restart - Service should be restarted, no promise about state on boot made.
 # * reload - Service should be reloaded, no promise about state on boot made.
 # * enabled - Service should be enabled, no promise about state on boot made.
-# * disabled - Service should be reloaded, no promise about state on boot made.
+# * disabled - Service should be disabled, no promise about state on boot made.
 # * start - Service should be running, service should be started on boot (active + enabled).
 # * stop - Service should not be running, service should not be started on boot (inactive + disabled).
 #

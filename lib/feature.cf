@@ -80,6 +80,7 @@ bundle agent feature_test
 
 body classes feature_cancel(x)
 # @brief Undefine class `x` when promise is kept or repaired
+#
 # Used internally by bundle `feature`
 {
       cancel_kept => { "$(x)" };
