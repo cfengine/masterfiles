@@ -1,8 +1,55 @@
 bundle agent cfe_internal_enterprise_mission_portal
 {
   meta:
-
       "description" string => "Manage mission portal configuration";
+
+classes:
+      "mission_portal_http2_enabled"
+        expression => and(
+                          fileexists("$(sys.workdir)/httpd/php/sbin/php-fpm"),
+                          fileexists("$(sys.workdir)/httpd/modules/mod_http2.so")
+                      ),
+        scope => "namespace", # so it is visible in datastate() used in httpd.conf template rendering in bundle cfe_internal_enterprise_mission_portal_apache
+        comment => "If php-fpm and mod_http2.so are present then http2 is enabled
+                    and we use this class in httpd.conf to configure accordingly.";
+  vars:
+    policy_server.enterprise_edition.mission_portal_http2_enabled::
+      "php_fpm_pid_file" string => "$(sys.workdir)/httpd/php-fpm.pid";
+      "php_fpm_www_pool_max_children" string => ifelse(
+        isvariable("default:def.php_fpm_www_pool_max_children"),
+        "$(default:def.php_fpm_www_pool_max_children)",
+        "60");
+      "php_fpm_www_pool_start_servers" string => ifelse(
+        isvariable("default:def.php_fpm_www_pool_start_servers"),
+        "$(default:def.php_fpm_www_pool_start_servers)",
+        "50");
+      "php_fpm_www_pool_min_spare_servers" string => ifelse(
+        isvariable("default:def.php_fpm_www_pool_min_spare_servers"),
+        "$(default:def.php_fpm_www_pool_min_spare_servers)",
+        "40");
+      "php_fpm_www_pool_max_spare_servers" string => ifelse(
+        isvariable("default:def.php_fpm_www_pool_max_spare_servers"),
+        "$(default:def.php_fpm_www_pool_max_spare_servers)",
+        "50");
+      "php_fpm_state" data => mergedata(
+        '{"vars": { "sys": { "workdir": "${default:sys.workdir}" } } }',
+        '{
+          "max_children":"${php_fpm_www_pool_max_children}",
+          "start_servers":"${php_fpm_www_pool_start_servers}",
+          "min_spare_servers":"${php_fpm_www_pool_min_spare_servers}",
+          "max_spare_servers":"${php_fpm_www_pool_max_spare_servers}"
+         }');
+
+  reports:
+    DEBUG::
+      "Using variable default:def.php_fpm_www_pool_max_children: ${default:def.php_fpm_www_pool_max_children} instead of built-in default"
+        if => isvariable("default:def.php_fpm_www_pool_max_children");
+      "Using variable default:def.php_fpm_www_pool_start_servers: ${default:def.php_fpm_www_pool_start_servers} instead of built-in default"
+        if => isvariable("default:def.php_fpm_www_pool_start_servers");
+      "Using variable default:def.php_fpm_www_pool_min_spare_servers: ${default:def.php_fpm_www_pool_min_spare_servers} instead of built-in default"
+        if => isvariable("default:def.php_fpm_www_pool_min_spare_servers");
+      "Using variable default:def.php_fpm_www_pool_max_spare_servers: ${default:def.php_fpm_www_pool_max_spare_servers} instead of built-in default"
+        if => isvariable("default:def.php_fpm_www_pool_max_spare_servers");
 
   methods:
 
@@ -20,7 +67,23 @@ bundle agent cfe_internal_enterprise_mission_portal
         handle => "cfe_internal_management_update_cli_rest_server_url_config",
         comment => "Update the REST server URL port in the Mission Portal when cfe_internal_hub_vars.https_port is changed";
 
+    policy_server.mission_portal_http2_enabled::
+      "PHP FastCGI process manager"
+        usebundle => service_config(
+          "cf-php-fpm",
+          "$(this.promise_dirname)/templates/php-fpm.conf.mustache",
+          "$(sys.workdir)/httpd/php/etc/php-fpm.conf",
+          "$(sys.workdir)/httpd/php/sbin/php-fpm -t --fpm-config ",
+          @(php_fpm_state),
+          "$(php_fpm_pid_file)"
+        );
+
+  services:
+    policy_server.mission_portal_http2_enabled::
+      "cf-php-fpm"
+        service_policy => "start";
 }
+
 bundle agent apachectl_patched_for_upgrade
 # @brief Ensure that apacehctl is patched so that it is able to re-start services
 #
