@@ -1,8 +1,14 @@
 [Unit]
 Description=CFEngine Enterprise Webserver
 After=syslog.target
+{{#classes.mission_portal_http2_enabled}}
+Wants=cf-php-fpm.service
+After=cf-php-fpm.service
+{{/classes.mission_portal_http2_enabled}}
+{{^classes.mission_portal_http2_enabled}}
 Wants=cf-postgres.service
 After=cf-postgres.service
+{{/classes.mission_portal_http2_enabled}}
 ConditionPathExists={{{vars.sys.workdir}}}/httpd/bin/apachectl
 PartOf=cfengine3.service
 

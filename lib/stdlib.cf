@@ -39,6 +39,7 @@ bundle common stdlib_common
       "input[files]"                      string => "$(this.promise_dirname)/files.cf";
       "input[edit_xml]"                   string => "$(this.promise_dirname)/edit_xml.cf";
       "input[services]"                   string => "$(this.promise_dirname)/services.cf";
+      "input[service_config]"             string => "$(this.promise_dirname)/service_config.cf";
       "input[processes]"                  string => "$(this.promise_dirname)/processes.cf";
       "input[storage]"                    string => "$(this.promise_dirname)/storage.cf";
       "input[databases]"                  string => "$(this.promise_dirname)/databases.cf";
