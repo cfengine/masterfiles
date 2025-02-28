@@ -9,7 +9,7 @@ function is to provide automated configuration and maintenance of large-scale
 computer systems.
 
 The MPF or Masterfiles Policy Framework is intended to provide a stable base
-policy installations and upgrades, and is used by both CFEngine Enterprise and
+policy for installations and upgrades, and is used by both CFEngine Enterprise and
 CFEngine community in versions 3.6 and newer.
 The
 [documentation for the MPF](https://docs.cfengine.com/docs/master/reference-masterfiles-policy-framework.html) is
