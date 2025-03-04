@@ -82,9 +82,12 @@ bundle common cfe_internal_hub_vars
 
       # Determine the version of PHP that is used
       # TODO Drop this after 3.18 is no longer supported. It's used for Mission Portals httpd configuration.
+      # ENT-11440 enabled http/2 which switched from libphp.so apache module to php-fpm.
+      # httpd.conf doesn't use php_version when http/2 is enabled.
 
       "php_version" -> { "ENT-7039" }
         string => ifelse(
+                          fileexists( "$(sys.workdir)/httpd/php/sbin/php-fpm" ), "", # ENT-11440, http/2 in httpd.conf doesn't need php_version
                           fileexists( "$(sys.workdir)/httpd/modules/libphp.so" ), "", # ENT-7039 php 8+
                           fileexists( "$(sys.workdir)/httpd/modules/libphp7.so" ), "7",
                           fileexists( "$(sys.workdir)/httpd/modules/libphp5.so" ), "5",
