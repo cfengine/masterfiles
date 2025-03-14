@@ -15,7 +15,7 @@ body action if_elapsed(x)
 ##
 
 body action if_elapsed_day
-# @brief Evalute the promise once every 24 hours
+# @brief Evaluate the promise once every 24 hours
 {
       ifelapsed => "1440";    # 60 x 24
       expireafter => "1400";
@@ -58,7 +58,7 @@ body action warn_only
 
 ##
 
-body action bg(elapsed,expire)
+body action bg(elapsed, expire)
 # @brief Evaluate the promise in the background every `elapsed` minutes, for at most `expire` minutes
 # @param elapsed The time in minutes between promise evaluations
 # @param expire The time in minutes after which a repair-attempt gets cancelled
@@ -96,7 +96,7 @@ body action policy(p)
 
 ##
 
-body action log_repaired(log,message)
+body action log_repaired(log, message)
 # @brief Log `message` to a file `log`=[/file|stdout]
 # @param log The log file for repaired messages
 # @param message The log message
@@ -116,8 +116,10 @@ body action log_verbose
 ##
 
 body action sample_rate(x)
-# @brief Evaluate the promise every `x` minutes,
-# A repair-attempt is cancelled after 10 minutes
+# @brief Evaluate the promise every `x` minutes
+#
+# A repair-attempt is cancelled after 10 minutes.
+#
 # @param x The time in minutes between promise evaluation
 {
       ifelapsed => "$(x)";
@@ -137,7 +139,7 @@ body classes if_repaired(x)
 
 ##
 
-body classes if_else(yes,no)
+body classes if_else(yes, no)
 # @brief Define the classes `yes` or `no` depending on promise outcome
 # @param yes The name of the class that should be defined if the promise is kept or repaired
 # @param no The name of the class that should be defined if the promise could not be repaired
@@ -151,7 +153,7 @@ body classes if_else(yes,no)
 
 ##
 
-body classes cf2_if_else(yes,no)
+body classes cf2_if_else(yes, no)
 # @brief Define the classes `yes` or `no`, depending on promise outcome
 #
 # A version of `if_else` that matches CFEngine2 semantics. Neither class is set if the promise
@@ -199,7 +201,7 @@ body classes if_ok_cancel(x)
 
 ##
 
-body classes cmd_repair(code,cl)
+body classes cmd_repair(code, cl)
 # @brief Define the class `cl` if an external command in a `commands`, `file` or `packages`
 # promise is executed with return code `code`
 # @param code The return codes that indicate a successful repair
@@ -224,8 +226,8 @@ body classes classes_generic(x)
 
 body classes results(scope, class_prefix)
 # @brief Define classes prefixed with `class_prefix` and suffixed with
-# appropriate outcomes: _kept, _repaired, _not_kept, _error, _failed,
-# _denied, _timeout, _reached
+# appropriate outcomes: `_kept`, `_repaired`, `_not_kept`, `_error`, `_failed`,
+# `_denied`, `_timeout`, `_reached`
 #
 # @param scope The scope in which the class should be defined (`bundle` or `namespace`)
 # @param class_prefix The prefix for the classes defined
@@ -245,7 +247,7 @@ body classes results(scope, class_prefix)
 # This body is a simpler, more consistent version of the body
 # `scoped_classes_generic`, which see. The key difference is that
 # fewer classes are defined, and only for outcomes that we can know.
-# For example this body does not define "OK/not OK" outcome classes,
+# For example this body does not define "OK"/"not OK" outcome classes,
 # since a promise can be both kept and failed at the same time.
 #
 # It's important to understand that promises may do multiple things,
@@ -321,7 +323,7 @@ body classes results(scope, class_prefix)
 @if minimum_version(3.8)
 body classes diff_results(scope, x)
 # @brief Define `x` prefixed/suffixed with promise outcome with command return codes adjusted to align with `diff`.
-# @param scope The scope the class should be defined with [bundle|namespace].
+# @param scope The scope the class should be defined with (`bundle` or `namespace`).
 # @param x The unique part of the classes to be defined.
 #
 # From man diff:
@@ -352,7 +354,7 @@ body classes diff_results(scope, x)
 {
       inherit_from => results( $(scope), $(x) );
       kept_returncodes => { "0" };
-      failed_returncodes => { "1","2" };
+      failed_returncodes => { "1", "2" };
 }
 @endif
 
