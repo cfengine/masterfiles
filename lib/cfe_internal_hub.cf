@@ -110,6 +110,108 @@ bundle agent cfe_internal_hub_maintain
       action => if_elapsed_day;
 }
 
+bundle agent cfe_internal_hub_maintain_notice_retention_settings_change
+# @brief Emits reports to inform users that configuration settings have been
+# modified and need to be migrated to new location.
+#
+# Database maintenance process of purging of old data is now the responsibility
+# of cf-remote. This bundle looks for user modifications of default retention
+# and informs they should migrate their configuration.
+{
+  classes:
+    "running_binary_with_new_db_retention_settings"
+      expression => "cfengine_3_22_0|feature_cf_reactor_report_retention";
+
+  vars:
+
+      # These variables were duplicated from cfe_internal_hub_maintain so that
+      # departure from defaults can be determined.
+
+      "default_report_settings"
+        data => parsejson('[
+  {
+    "report": "contexts",
+    "table": "__ContextsLog",
+    "history_length_days": 7,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "variables",
+    "table": "__VariablesLog",
+    "history_length_days": 7,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "software",
+    "table": "__SoftwareLog",
+    "history_length_days": 28,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "software_updates",
+    "table": "__SoftwareUpdatesLog",
+    "history_length_days": 28,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "filechanges",
+    "table": "__FileChangesLog",
+    "history_length_days": 365,
+    "time_key": "ChangeTimeStamp"
+  },
+  {
+    "report": "benchmarks",
+    "table": "__BenchmarksLog",
+    "history_length_days": 1,
+    "time_key": "CheckTimeStamp"
+  }
+]');
+
+
+      "default_diagnostics_settings"
+        data => parsejson('[
+  {
+    "report": "hub_connection_errors",
+    "table": "__HubConnectionErrors",
+    "history_length_days": 1,
+    "time_key": "CheckTimeStamp"
+  },
+  {
+    "report": "diagnostics",
+    "table": "Diagnostics",
+    "history_length_days": 1,
+    "time_key": "TimeStamp"
+  }
+]');
+
+      "report_settings_i"
+        slist => getindices( "default_report_settings" );
+      "diagnostics_settings_i"
+        slist => getindices( "default_report_settings" );
+
+  reports:
+
+    # Emite a report so that users notice that they need to configure settings in a new place
+      "NOTICE: 'default:cfe_internal_hub_maintain.report_settings' has been customized. These settings have moved to Mission Portal as cf-reactor has taken over responsibility for maintaining this data."
+        unless => strcmp( storejson("default:cfe_internal_hub_maintain.report_settings"),
+                          storejson("default_report_settings"));
+
+    # Emite a report so that users notice the specific settings that they need to configure settings in a new place
+      "NOTICE: $(default:cfe_internal_hub_maintain.report_settings[$(report_settings_i)][report]) history_length_days has been customized. Default: $(default_report_settings[$(report_settings_i)][history_length_days]) Set: $(default:cfe_internal_hub_maintain.report_settings[$(report_settings_i)][history_length_days])"
+        unless => strcmp("$(default:cfe_internal_hub_maintain.report_settings[$(report_settings_i)][history_length_days])",
+                         "$(default_report_settings[$(report_settings_i)][history_length_days])");
+
+    # Emite a report so that users notice that they need to configure settings in a new place
+      "NOTICE: 'default:cfe_internal_hub_maintain.diagnostics_settings' has been customized. These settings have moved to Mission Portal as cf-reactor has taken over responsibility for maintaining this data."
+        unless => strcmp( storejson("default:cfe_internal_hub_maintain.diagnostics_settings"),
+                          storejson("default_diagnostics_settings"));
+
+
+    # Emite a report so that users notice the specific settings that they need to configure settings in a new place
+      "NOTICE: $(default:cfe_internal_hub_maintain.diagnostics_settings[$(diagnostics_settings_i)][report]) history_length_days has been customized. Default: $(default_diagnostics_settings[$(diagnostics_settings_i)][history_length_days]) Set: $(default:cfe_internal_hub_maintain.diagnostics_settings[$(diagnostics_settings_i)][history_length_days])"
+        unless => strcmp("$(default:cfe_internal_hub_maintain.diagnostics_settings[$(diagnostics_settings_i)][history_length_days])",
+                         "$(default_diagnostics_settings[$(diagnostics_settings_i)][history_length_days])");
+}
 bundle agent cfe_internal_database_cleanup_reports (settings)
 # @brief clean up the reporting tables
 {
