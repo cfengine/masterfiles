@@ -31,13 +31,6 @@ jobs:
           cd masterfiles
           ./autogen.sh --prefix=$INSTDIR > autogen.log 2>&1
           cd ..
-      - name: Prepare Artifacts for Uploading
-        run: tar -zcvf /tmp/workspace.tgz ./ && mv /tmp/workspace.tgz ./
-      - name: Upload The Workspace as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: workspace
-          path: workspace.tgz
       - name: Install Masterfiles
         run: make -C masterfiles install
       - name: Validate policy with cf-promises
