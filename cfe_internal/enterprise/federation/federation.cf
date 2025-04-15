@@ -950,6 +950,8 @@ bundle agent distributed_cleanup_setup
 {
   vars:
     "distributed_cleanup_dir" string => "/opt/cfengine/federation/cftransport/distributed_cleanup";
+    # TODO: Remove this once sys.keydir is always available (3.26+ only)
+    "keydir" string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
 
   files:
     am_superhub|am_feeder::
@@ -958,7 +960,7 @@ bundle agent distributed_cleanup_setup
         create => "true";
       "${distributed_cleanup_dir}/${sys.fqhost}.pub"
         perms => default:mog( "600", "$(cfengine_enterprise_federation:config.transport_user)", "root" ),
-        copy_from => default:local_cp("${sys.workdir}/ppkeys/localhost.pub");
+        copy_from => default:local_cp("${keydir}/localhost.pub");
       "${distributed_cleanup_dir}/${sys.fqhost}.cert"
         perms => default:mog( "600", "$(cfengine_enterprise_federation:config.transport_user)", "root" ),
         copy_from => default:local_cp("${sys.workdir}/httpd/ssl/certs/${sys.fqhost}.cert");

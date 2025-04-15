@@ -94,6 +94,11 @@ body server control
 bundle server mpf_default_access_rules()
 # @brief Defines access to common resources
 {
+  vars:
+    # TODO: Remove this once sys.keydir is always available (3.26+ only)
+    "keydir" -> { "CFE-2822" }
+      string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
+
   access:
 
     any::
@@ -179,10 +184,10 @@ bundle server mpf_default_access_rules()
       admit => { @(def.mpf_admit_cf_runagent_shell_selected) };
 
     policy_server.enable_cfengine_enterprise_hub_ha::
-      "$(sys.workdir)/ppkeys/"
+      "$(keydir)/"
       handle => "server_access_grant_access_ppkeys_hubs",
       comment => "Grant access to ppkeys for HA hubs",
-      if => isdir( "$(sys.workdir)/ppkeys/" ),
+      if => isdir( "$(keydir)/" ),
       admit => { @(def.policy_servers) };
 
       # Allow slave hub to synchronize cf_robot and appsettings, application

@@ -158,6 +158,10 @@ bundle agent cfe_internal_update_policy_cpv
 #   scanned for update.
 {
   vars:
+      # TODO: Remove this once sys.keydir is always available (3.26+ only)
+      "keydir" -> { "CFE-2822" }
+        string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
+
       "inputs_dir"         string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
@@ -185,7 +189,7 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "Path to a policy file",
       handle => "cfe_internal_update_vars_file_check";
 
-      "ppkeys_file"        string => translatepath("$(sys.workdir)/ppkeys/localhost.pub"),
+      "ppkeys_file"        string => translatepath("$(keydir)/localhost.pub"),
       comment => "Path to public key file",
       handle => "cfe_internal_update_policy_vars_ppkeys_file";
 

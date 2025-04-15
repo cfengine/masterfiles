@@ -45,6 +45,10 @@ bundle agent ha_hubs_have_am_policy_hub_marker
 
 bundle agent ha_agent_sync
 {
+ vars:
+  # TODO: Remove this once sys.keydir is always available (3.26+ only)
+  "keydir" -> { "CFE-2822" }
+      string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
  files:
   "$(sys.workdir)/policy_server.dat"
       copy_from => ha_update_ha_no_backup_scp("$(ha_def.master_hub_location)", @(update_def.policy_servers)),
@@ -52,7 +56,7 @@ bundle agent ha_agent_sync
       comment => "Update master hub IP on CFEngine node. This is causing that clients will try
                   to contact active/master hub first.";
 
-  "$(sys.workdir)/ppkeys"
+  "$(keydir)"
       copy_from => ha_update_ha_no_backup_scp("$(ha_def.hubs_keys_location)", @(update_def.policy_servers)),
       file_select => hub_all_keys,
       depth_search => ha_update_ha_recurse("inf"),
@@ -64,9 +68,13 @@ bundle agent ha_agent_sync
 
 bundle agent ha_share_hub_keys
 {
+ vars:
+  # TODO: Remove this once sys.keydir is always available (3.26+ only)
+  "keydir" -> { "CFE-2822" }
+      string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
  files:
    "$(ha_def.hubs_keys_location)"
-      copy_from => ha_update_no_backup_cp("$(sys.workdir)/ppkeys"),
+      copy_from => ha_update_no_backup_cp("$(keydir)"),
       file_select => hubs_keys_select,
       handle => "ha_copy_hubs_keys",
       depth_search => ha_update_recurse("1"),
@@ -80,10 +88,13 @@ bundle agent ha_share_hub_keys
 bundle agent ha_hub_sync
 {
  vars:
+  # TODO: Remove this once sys.keydir is always available (3.26+ only)
+  "keydir" -> { "CFE-2822" }
+      string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
   "exclude_files" slist => {"localhost.priv", "localhost.pub", @(ha_def.hub_shas)};
  files:
   "$(ha_def.ppkeys_staging)"
-      copy_from => ha_update_ha_no_backup_scp("$(sys.workdir)/ppkeys", @(update_def.standby_servers)),
+      copy_from => ha_update_ha_no_backup_scp("$(keydir)", @(update_def.standby_servers)),
       file_select => ha_update_ex_list(@(exclude_files)),
       handle => "ha_copy_client_keys_between_replica_set_servers",
       depth_search => ha_update_recurse("1"),
@@ -100,6 +111,10 @@ bundle agent manage_hub_synced_data
 # Ensures keys collected from other hubs are present in ppkeys so that the
 # agents bootstrapped to other hubs are trusted.
 {
+ vars:
+  # TODO: Remove this once sys.keydir is always available (3.26+ only)
+  "keydir" -> { "CFE-2822" }
+      string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
  files:
 
    # Ensure that localhost.pub and localhost.priv are not in the directory of
@@ -116,7 +131,7 @@ bundle agent manage_hub_synced_data
    # ppkeys directory so that agents bootstrapped to standby hubs will be
    # trusted.
 
-   "$(sys.workdir)/ppkeys"
+   "$(keydir)"
       copy_from => ha_update_no_backup_cp("$(ha_def.ppkeys_staging)"),
       file_select => ha_update_plain,
       depth_search => ha_update_recurse("1"),
