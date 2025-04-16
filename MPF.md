@@ -2412,8 +2412,14 @@ The environment variables can also be extended by defining `def.control_agent_en
 ### Modules
 
 Modules executed by the `usemodule()` function are expected to be found in
-`$(sys.workdir)/modules` the modules are distributed to all remote agents by in
-the default policy.
+`$(sys.moduledir)` (typically `/var/cfengine/modules`) the modules are
+distributed to all remote agents by in the default policy.
+
+**History:**
+
+* `$(sys.moduledir)` was introduced in 3.26.0.
+  Previously, `$(sys.workdir)/modules` was used.
+  They both result in the same default - `/var/cfengine/modules`.
 
 ### Templates
 

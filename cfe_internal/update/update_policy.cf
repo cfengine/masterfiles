@@ -158,6 +158,10 @@ bundle agent cfe_internal_update_policy_cpv
 #   scanned for update.
 {
   vars:
+      # TODO: Remove this once sys.keydir is always available (3.26+ only)
+      "keydir" -> { "CFE-2822" }
+        string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
+
       "inputs_dir"         string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
@@ -185,7 +189,7 @@ bundle agent cfe_internal_update_policy_cpv
       comment => "Path to a policy file",
       handle => "cfe_internal_update_vars_file_check";
 
-      "ppkeys_file"        string => translatepath("$(sys.workdir)/ppkeys/localhost.pub"),
+      "ppkeys_file"        string => translatepath("$(keydir)/localhost.pub"),
       comment => "Path to public key file",
       handle => "cfe_internal_update_policy_vars_ppkeys_file";
 
@@ -780,7 +784,7 @@ body delete u_tidy
 bundle agent modules_presence
 # @brief Render vendored and user provided modules from $(sys.inputdir) to $(sys.workdir)
 #
-# @description This bundle manages the contents of $(sys.workdir)/modules by
+# @description This bundle manages the contents of moduledir (/var/cfengine/modules) by
 #              first dealing with package module scripts.
 #              Preference is given to user provided package module scripts in
 #              modules/packages directory. If a module there matches a mustache
@@ -790,9 +794,12 @@ bundle agent modules_presence
 #              e.g. modules/packages/apt_get takes precedence over modules/packages/apt_get.mustache
 #
 #              Any other files in the modules directory will be promised to
-#              be updated in $(sys.workdir)/modules, including any sub-directories.
+#              be updated in moduledir (/var/cfengine/modules), including any sub-directories.
 {
+
   vars:
+    # TODO: Remove this once sys.moduledir is always available (3.26+ only)
+    "moduledir" string => ifelse(isvariable("sys.moduledir"), "$(sys.moduledir)", "$(sys.workdir)/modules");
     "_vendored_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)vendored$(const.dirsep)";
     "_override_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)";
     "_custom_template_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)mustache$(const.dirsep)";
@@ -824,21 +831,21 @@ bundle agent modules_presence
 # update (see controls/update_def.cf input_name_patterns var.
 
   files:
-    "$(sys.workdir)/modules/packages/$(_vendored_modules)"
+    "$(moduledir)/packages/$(_vendored_modules)"
       create => "true",
       perms => u_mo("755", "root"),
       unless => canonify("override_vendored_module_$(_vendored_modules)"),
       edit_template => "$(_vendored_dir)$(_vendored_modules).mustache",
       template_method => "mustache";
 
-    "$(sys.workdir)/modules/packages/$(_override_modules)"
+    "$(moduledir)/packages/$(_override_modules)"
       copy_from => u_cp_missing_ok("$(_override_dir)$(_override_modules)"),
       perms => u_mo("755", "root"),
       if => or (
         canonify("override_vendored_module_$(_override_modules)"),
         canonify("override_module_$(_override_modules)"));
 
-    "$(sys.workdir)/modules/$(_custom_template_modules)" -> { "ENT-10793" }
+    "$(moduledir)/$(_custom_template_modules)" -> { "ENT-10793" }
         comment => "We want to render mustache templated modules",
         handle => "cfe_internal_update_policy_files_custom_template_modules",
         template_method => "mustache",
@@ -846,7 +853,7 @@ bundle agent modules_presence
         perms => u_mo("500", "root"),
         if => fileexists("$(_custom_template_dir)$(_custom_template_modules).mustache");
 
-    "$(sys.workdir)/modules"
+    "$(moduledir)"
       comment => "Copy any non-packages modules",
       handle => "cfe_internal_update_policy_files_nonpackages_modules",
       copy_from => u_cp("$(sys.inputdir)$(const.dirsep)modules"),
