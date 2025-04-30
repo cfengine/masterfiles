@@ -1,3 +1,11 @@
+3.24.2:
+	- Added paths for the dmsetup, fdisk, and lshw commands (ENT-12560)
+	- Allowed images from raw.github.com (ENT-12531)
+	- Fixed issue with yum package module regarding packages with epoch not
+	  validating (ENT-12538)
+	- Fixed location of Mission Portal application logs for log_dir cleanup
+	  (ENT-12556)
+
 3.24.1:
 	- Added inline docs showing valid values for method (field_operation) in body edit_field quoted_var
 	  (CFE-4426)
