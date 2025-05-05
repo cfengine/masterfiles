@@ -15,7 +15,7 @@
 ##################################################################
 
 @if minimum_version(3.12.0)
-bundle common cfe_hub_specific_file_control
+bundle agent cfe_hub_specific_file_control
 {
   vars:
     "inputs" slist => { "$(this.promise_dirname)/federation/federation.cf" };
@@ -27,7 +27,7 @@ body file control
 }
 @endif
 
-bundle common cfe_internal_hub_vars
+bundle agent cfe_internal_hub_vars
 # @brief Set hub specific variables
 {
   classes:

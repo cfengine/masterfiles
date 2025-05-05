@@ -1,4 +1,4 @@
-bundle common inventory_any
+bundle agent inventory_any
 # @brief Do inventory for any OS
 #
 # This common bundle is for any OS work not handled by specific
@@ -593,7 +593,7 @@ bundle agent cfe_autorun_inventory_cpuinfo
       "$(const.t) CPU physical cores: $(cpuinfo_physical_cores)";
 }
 
-bundle common cfe_autorun_inventory_aws
+bundle agent cfe_autorun_inventory_aws
 # @brief inventory AWS EC2 instances
 #
 # Provides:

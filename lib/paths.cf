@@ -1,6 +1,6 @@
 # Paths bundle (used by other bodies)
 
-bundle common paths
+bundle agent paths
 # @brief Defines an array `path` with common paths to standard binaries and
 # directories as well as classes for defined and existing paths.
 #
