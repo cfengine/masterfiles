@@ -14,23 +14,57 @@ classes:
                     and we use this class in httpd.conf to configure accordingly.";
   vars:
     policy_server.enterprise_edition.mission_portal_http2_enabled::
+      "cpu_info_source" string => "/proc/cpuinfo";
+      "cpu_cores_number"
+        int =>
+          int( execresult("grep -c ^processor $(cpu_info_source) 2>/dev/null", "useshell")),
+          if => fileexists( $(cpu_info_source) );
+      "mem_info_source" string => "/proc/meminfo";
+      "mem_total_kb"
+        int => int( execresult("grep ^MemTotal $(mem_info_source) | awk '{print $2}' 2>/dev/null", "useshell") ),
+        if => fileexists( $(mem_info_source) );
+      "php_fpm_www_pool_min_spare_servers_calculated" int => int(
+         ifelse(
+           isvariable("cpu_cores_number"),
+           eval("$(cpu_cores_number) * 2"), # min spare servers are cpu cores number * 2
+           "8" # fallback
+        ));
+      "php_fpm_www_pool_max_spare_servers_calculated" int => int(
+        ifelse(
+          isvariable("cpu_cores_number"),
+          eval("$(cpu_cores_number) * 4"), # max spare servers are cpu cores number * 4
+          "16" # fallback
+        ));
+      #start servers between min & max spare
+      "php_fpm_www_pool_start_servers_calculated" int => int(
+        eval(
+          "($(php_fpm_www_pool_min_spare_servers_calculated) + $(php_fpm_www_pool_max_spare_servers_calculated)) / 2")
+        );
+      "fpm_children_average_memory_kb" int => "25600"; # average memory taken by one fpm process 25MB * 1024
+      "php_fpm_www_pool_max_children_calculated" int => int(
+        ifelse(
+          isvariable("mem_total_kb"),
+          eval("$(mem_total_kb) * 0.6 / $(fpm_children_average_memory_kb)"), # get only 60% of total memory and devide by avarage memory taken by one fpm process
+          "60" # fallback
+        ));
+
       "php_fpm_pid_file" string => "$(sys.workdir)/httpd/php-fpm.pid";
       "php_fpm_www_pool_max_children" string => ifelse(
         isvariable("default:def.php_fpm_www_pool_max_children"),
         "$(default:def.php_fpm_www_pool_max_children)",
-        "60");
+        "${php_fpm_www_pool_max_children_calculated}");
       "php_fpm_www_pool_start_servers" string => ifelse(
         isvariable("default:def.php_fpm_www_pool_start_servers"),
         "$(default:def.php_fpm_www_pool_start_servers)",
-        "50");
+        "$(php_fpm_www_pool_start_servers_calculated)");
       "php_fpm_www_pool_min_spare_servers" string => ifelse(
         isvariable("default:def.php_fpm_www_pool_min_spare_servers"),
         "$(default:def.php_fpm_www_pool_min_spare_servers)",
-        "40");
+        "$(php_fpm_www_pool_min_spare_servers_calculated)");
       "php_fpm_www_pool_max_spare_servers" string => ifelse(
         isvariable("default:def.php_fpm_www_pool_max_spare_servers"),
         "$(default:def.php_fpm_www_pool_max_spare_servers)",
-        "50");
+        "$(php_fpm_www_pool_max_spare_servers_calculated)");
       "php_fpm_state" data => mergedata(
         '{"vars": { "sys": { "workdir": "${default:sys.workdir}" } } }',
         '{
