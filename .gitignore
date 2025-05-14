@@ -50,3 +50,6 @@ build
 # Emacs
 .*\.~undo-tree~
 flycheck_*
+
+#VScode
+.vscode
