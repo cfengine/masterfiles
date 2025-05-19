@@ -533,8 +533,6 @@ bundle common paths
       "path[logger]"        string => "/usr/bin/logger";
 
     opensuse::
-      "path[ls]"        string => "/usr/bin/ls";
-      "path[lsof]"      string => "/usr/bin/lsof";
       "path[awk]"       string => "/usr/bin/awk";
       "path[cat]"       string => "/usr/bin/cat";
       "path[cksum]"     string => "/usr/bin/cksum";
