@@ -32,9 +32,9 @@ bundle common inventory_linux
       "proc_1_process" string => filestat($(proc_1_cmdline), "linktarget");
 
     any::
-      "proc_routes" data => data_readstringarrayidx("/proc/net/route",
+      "proc_routes" data => data_readstringarrayidx("/proc/$(this.promiser_pid)/net/route",
                                                     "#[^\n]*","\s+",40,4k),
-        if => fileexists("/proc/net/route");
+        if => fileexists("/proc/$(this.promiser_pid)/net/route");
       "routeidx" slist => getindices("proc_routes");
       "dgw_ipv4_iface" string => "$(proc_routes[$(routeidx)][0])",
         comment => "Name of the interface where default gateway is routed",
@@ -48,10 +48,10 @@ bundle common inventory_linux
                           # e.g., nfs.example.com:/vol/homedir/user1 /home/user1 ...
                           #       ^^^^^^^^^^^^^^^
                           grep( ".* nfs .*",
-                                readstringlist("/proc/mounts", "", "\n", inf, inf)
+                                readstringlist("/proc/$(this.promiser_pid)/mounts", "", "\n", inf, inf)
                               )
                         ),
-        if => fileexists( "/proc/mounts" );
+        if => fileexists( "/proc/$(this.promiser_pid)/mounts" );
 
 
         "nfs_server[$(nfs_servers)]"
