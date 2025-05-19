@@ -386,7 +386,9 @@ bundle common paths
       "path[iptables_save]" string => "/sbin/iptables-save";
       "path[ls]"            string => "/bin/ls";
       "path[lshw]"          string => "/usr/sbin/lshw";
-      "path[lsof]"          string => "/usr/sbin/lsof";
+      "path[lsof]"          string => ifelse( "redhat_7|redhat_6", "/usr/sbin/lsof",
+                                              "/usr/bin/lsof"
+                                               );
       "path[netstat]"       string => "/bin/netstat";
       "path[nologin]"       string => "/sbin/nologin";
       "path[ping]"          string => "/usr/bin/ping";
