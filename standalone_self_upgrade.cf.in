@@ -42,6 +42,14 @@ bundle common def_standalone_self_upgrade
         comment => concat( "If default:def.control_common_tls_ciphers is defined then",
                            " its value will be used for the set of tls ciphers allowed",
                            " for outbound connections. Else the binary default will be used.");
+
+      "control_common_protocol_version_defined" -> { "CFE-4543" }
+        expression => isvariable( "default:def.control_common_protocol_version" ),
+        comment => concat( "Defines the protocol version to use for all outgoing",
+                           " connections.",
+                           # It's challenging to keep this aligned with the core agent code
+                           # cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
+                           " (1|classic|2|tls|3|cookie|4|filestream|latest)" );
 }
 body agent control
 # @brief Agent controls for standalone self upgrade
@@ -874,6 +882,9 @@ body common control
 
     (debian|redhat)::
       package_module => $(package_module_knowledge.platform_default);
+
+    control_common_protocol_version_defined::
+        protocol_version => "$(default:def.control_common_protocol_version)";
 }
 
 body depth_search u_recurse_basedir(d)
