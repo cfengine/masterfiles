@@ -1306,6 +1306,24 @@ Example definition in augments file:
 }
 ```
 
+### Specify the CFEngine protocol version to use
+
+By default CFEngine will negotiate the newest protocol version available. Configuring `protocol_version` will restrict the protocol too the specified version.
+
+```json
+{
+  "variables": {
+    "default:def.control_common_protocol_version": {
+      "value": "filestream"
+      }
+  }
+}
+```
+
+**History:**
+
+- Added in CFEngine 3.27.0
+
 ### Configure the ciphers used by cf-serverd
 
 When `default:def.control_server_allowciphers` is defined `cf-serverd` will use the ciphers specified instead of the binary defaults.
