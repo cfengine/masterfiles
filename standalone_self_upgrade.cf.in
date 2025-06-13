@@ -49,6 +49,11 @@ bundle common def_standalone_self_upgrade
                            " system log (e.g. syslog or Windows Event Log).",
                            " (critical|error|warning|notice|info)" );
 
+      "control_common_protocol_version_defined" -> { "CFE-4543" }
+        expression => isvariable( "default:def.control_common_protocol_version" ),
+        comment => concat( "Defines the protocol version to use for all outgoing",
+                           " connections.",
+                           " (1|classic|2|tls|3|cookie|4|filestream|latest)" );
 }
 body agent control
 # @brief Agent controls for standalone self upgrade
@@ -884,6 +889,9 @@ body common control
 
     control_common_system_log_level_defined::
         system_log_level => "$(default:def.control_common_system_log_level)";
+
+    control_common_protocol_version_defined::
+        protocol_version => "$(default:def.control_common_protocol_version)";
 }
 
 body depth_search u_recurse_basedir(d)
