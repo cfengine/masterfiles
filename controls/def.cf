@@ -399,6 +399,14 @@ bundle common def
         comment => concat( "The minimum log level required for log messages to go to the",
                            " system log (e.g. syslog or Windows Event Log).",
                            " (critical|error|warning|notice|info)" );
+
+      "control_common_protocol_version_defined" -> { "CFE-4543" }
+        expression => isvariable( "default:def.control_common_protocol_version" ),
+        comment => concat( "Defines the protocol version to use for all outgoing",
+                           " connections.",
+                           # It's challenging to keep this aligned with the core agent code
+                           # cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
+                           " (1|classic|2|tls|3|cookie|4|filestream|latest)" );
   vars:
 
     debian::

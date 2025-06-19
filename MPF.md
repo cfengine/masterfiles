@@ -1306,6 +1306,38 @@ Example definition in augments file:
 }
 ```
 
+### Specify the CFEngine protocol version to use
+
+By default CFEngine will negotiate the newest protocol version available. Configuring `protocol_version` will restrict the protocol to the specified version.
+
+```json
+{
+  "variables": {
+    "default:def.control_common_protocol_version": {
+      "value": "filestream"
+      }
+  }
+}
+```
+
+**Notes:**
+
+- Valid values for `protocol_version` can be extracted from the syntax-description output of `cf-promises`.
+
+  For example:
+
+  ```command
+  cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
+  ```
+
+  ```output
+  (1|classic|2|tls|3|cookie|4|filestream|latest)
+  ```
+
+**History:**
+
+- Added in CFEngine 3.27.0
+
 ### Configure the ciphers used by cf-serverd
 
 When `default:def.control_server_allowciphers` is defined `cf-serverd` will use the ciphers specified instead of the binary defaults.

@@ -43,6 +43,9 @@ body common control
 
     control_common_system_log_level_defined::
         system_log_level => "$(default:def.control_common_system_log_level)";
+
+    control_common_protocol_version_defined::
+        protocol_version => "$(default:def.control_common_protocol_version)";
 }
 
 #############################################################################
