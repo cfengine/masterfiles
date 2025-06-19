@@ -5,6 +5,14 @@ bundle common update_def
     any::
       "sys_policy_hub_port_exists" expression => isvariable("sys.policy_hub_port");
 
+      "control_common_protocol_version_defined" -> { "CFE-4543" }
+        expression => isvariable( "default:def.control_common_protocol_version" ),
+        comment => concat( "Defines the protocol version to use for all outgoing",
+                           " connections.",
+                           # It's challenging to keep this aligned with the core agent code
+                           # cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
+                           " (1|classic|2|tls|3|cookie|4|filestream|latest)" );
+
   vars:
       "hub_binary_version" -> { "ENT-10664" }
         data => data_regextract(
