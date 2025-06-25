@@ -153,7 +153,6 @@ bundle agent apt_config
         comment => "key in 17_packages/resources/gpg use rsa1024 which is not supported on Ubuntu-24.",
         create => "true",
         content => 'APT::Key::Assert-Pubkey-Algo ">=rsa1024";',
-        edit_defaults => empty,
         classes => if_successful("apt_config_ok");
 
     ubuntu_10|debian_6::
@@ -163,7 +162,6 @@ bundle agent apt_config
       "/etc/apt/apt.conf.d/nocache"
         create => "true",
         content => 'Dir::Cache::pkgcache "";',
-        edit_defaults => empty,
         classes => if_successful("apt_config_ok");
 }
 
