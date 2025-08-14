@@ -1941,6 +1941,10 @@ Primarily for developer convenience, this setting allows you to easily disable t
 }
 ```
 
+**History:**
+
+* Added in CFEngine 3.12.0
+
 ### Configure Enterprise Mission Portal Apache SSLProtocol
 
 This directive can be used to control which versions of the SSL/TLS protocol will be accepted in new connections.
