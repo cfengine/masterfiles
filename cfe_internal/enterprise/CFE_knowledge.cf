@@ -129,10 +129,11 @@ bundle agent cfe_internal_setup_knowledge
       handle => "cfe_internal_setup_knowledge_dir_httpd",
       perms => mog("755", "root", "root");
 
-      "$(cfe_internal_hub_vars.docroot)/.htaccess"
-      comment => "Correct up htaccess file in doc root",
-      handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
-      copy_from => no_backup_cp("$(sys.workdir)/share/GUI/Apache-htaccess");
+      "$(cfe_internal_hub_vars.docroot)/.htaccess" -> { "ENT-13173" }
+        comment => "Correct up htaccess file in doc root",
+        handle => "cfe_internal_setup_knowledge_files_doc_root_htaccess",
+        copy_from => no_backup_cp("$(sys.workdir)/share/GUI/Apache-htaccess"),
+        if => "mpf_enable_mission_portal_docroot_sync_from_share_gui";
 
       "$(cfe_internal_hub_vars.public_docroot)/scripts/." -> { "CFE-951" }
       comment => "Ensure permissions for $(cfe_internal_hub_vars.public_docroot)/scripts",
