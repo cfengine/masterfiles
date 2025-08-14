@@ -1954,6 +1954,26 @@ application docroot consists of only packaged files.
 * Added `default:mpf_enable_mission_portal_docroot_sync_from_share_gui` in
   CFEngine 3.27.0
 
+### Enable permission enforcement for files under WORKDIR/share/GUI
+
+The MPF used to actively enforce permissions of files and directories under `$(sys.workdir)/share/GUI`, to re-enable this active permission enforcement define the class `default:mpf_enforce_workdir_share_gui_perms`.
+
+For example, to define it via Augments for CFEngine Enterprise Hubs:
+
+```json
+{
+  "classes": {
+    "default:mpf_enforce_workdir_share_gui_perms": {
+      "class_expressions": [
+        "enterprise_edition.am_policy_hub::"
+      ]
+    }
+  }
+}
+```
+
+* Added in CFEngine 3.27.0
+
 ### Configure Enterprise Mission Portal Apache SSLProtocol
 
 This directive can be used to control which versions of the SSL/TLS protocol will be accepted in new connections.

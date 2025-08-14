@@ -346,12 +346,13 @@ bundle agent cfe_internal_setup_knowledge
                     $(def.cf_apache_user) then users will not be able to change
                     ldap settings.";
 
-
       "$(sys.workdir)/share/GUI/."
+        handle => "cfe_internal_setup_knowledge_files_workdir_share_gui_perms",
         perms => mog("0400", "root", "root" ),
         depth_search => recurse_basedir("inf"),
-        comment => "No Mission Portal code in share needs to be accessed by
-                    anyone";
+        comment => concat( "No Mission Portal code in share needs to be accessed",
+                           " by anyone" ),
+        if => "mpf_enforce_workdir_share_gui_perms";
 
       "$(sys.workdir)/." -> { "ENT-3299" }
         perms => mog("755", "root", "root"),
