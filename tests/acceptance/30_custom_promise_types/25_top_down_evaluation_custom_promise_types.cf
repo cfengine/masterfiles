@@ -1,0 +1,52 @@
+body common control
+{
+  inputs => { "../default.cf.sub" };
+  bundlesequence => { "test", "cleanup" };
+  evaluation_order => "top_down";
+}
+
+promise agent dummy
+{
+  path => "$(this.promise_dirname)/dummy_promise_type.py";
+  interpreter => "/usr/bin/python3";
+}
+
+bundle agent test
+{
+
+  dummy:
+    "/tmp/dummyfile"
+      smth => "hello";
+
+  vars:
+    "content"
+      string => readfile("/tmp/dummyfile");
+
+  files:
+    "/tmp/dummyfile"
+      content => "ok";
+
+  vars:
+    "content"
+      string => readfile("/tmp/dummyfile");
+
+  classes:
+    "ok"
+      expression => strcmp("$(content)", "ok");
+
+  reports:
+    ok::
+      "$(this.promise_filename) Pass";
+    !ok::
+      "$(this.promise_filename) FAIL";
+
+    DEBUG::
+      "$(content)";
+}
+
+bundle agent cleanup
+{
+  files:
+    "/tmp/dummyfile"
+      delete => tidy;
+}
