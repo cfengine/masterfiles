@@ -42,12 +42,12 @@ bundle agent cfe_internal_setup_knowledge
 
   files:
 
-    !mpf_disable_mission_portal_docroot_sync_from_share_gui::
-      "$(cfe_internal_hub_vars.docroot)"
-      comment => "Copy the basic knowledge base configuration from the installation to doc root",
-      handle => "cfe_internal_setup_knowledge_files_doc_root_1",
-      copy_from => no_backup_cp_compare("$(sys.workdir)/share/GUI", "binary"),
-      depth_search => recurse("inf");
+    mpf_enable_mission_portal_docroot_sync_from_share_gui::
+      "$(cfe_internal_hub_vars.docroot)" -> { "ENT-13172" }
+        comment => "Copy the basic knowledge base configuration from the installation to doc root",
+        handle => "cfe_internal_setup_knowledge_files_doc_root_1",
+        copy_from => no_backup_cp_compare("$(sys.workdir)/share/GUI", "binary"),
+        depth_search => recurse("inf");
 
     any::
 
@@ -370,6 +370,14 @@ bundle agent cfe_internal_setup_knowledge
                     web-server, then Mission Portal users will be unable to
                     upload custom action scripts.";
 
+  reports:
+
+    mpf_disable_mission_portal_docroot_sync_from_share_gui::
+      "$(with)" -> { "ENT-13172" }
+        with => concat( "The class 'default:mpf_disable_mission_portal_docroot_sync_from_share_gui'",
+                        " is no longer necessary. Synchronizing files from share/GUI to Mission",
+                        " Portal is now done only if explicitly requested by defining the class",
+                        " 'default:mpf_enable_mission_portal_docroot_sync_from_share_gui'" );
 }
 
 bundle agent cfe_internal_permissions

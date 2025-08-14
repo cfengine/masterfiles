@@ -1925,16 +1925,17 @@ memory related probes on policy servers:
 
 * Added in 3.10.2, 3.11.0
 
-### Configure Enterprise Mission Portal Docroot
+### Configure Enterprise Mission Portal Docroot sync
 
-Primarily for developer convenience, this setting allows you to easily disable the enforcement that the webapp consists of the packaged files in the docroot used for Mission Portal.
+This setting allows you to enable the enforcement that the Mission Portal web
+application docroot consists of only packaged files.
 
 ```json
 {
   "classes": {
-    "default:mpf_disable_mission_portal_docroot_sync_from_share_gui": {
-      "regular_expressions": [
-        "any"
+    "default:mpf_enable_mission_portal_docroot_sync_from_share_gui": {
+      "class_expressions": [
+        "enterprise_edition.am_policy_hub::"
       ]
     }
   }
@@ -1943,7 +1944,15 @@ Primarily for developer convenience, this setting allows you to easily disable t
 
 **History:**
 
-* Added in CFEngine 3.12.0
+* Added `default:mpf_disable_mission_portal_docroot_sync_from_share_gui` to
+  explicitly disable synchronization of the active docroot from share/GUI in
+  CFEngine 3.12.0
+
+* Removed `default:mpf_enable_mission_portal_docroot_sync_from_share_gui` in
+  CFEngine 3.27.0
+
+* Added `default:mpf_enable_mission_portal_docroot_sync_from_share_gui` in
+  CFEngine 3.27.0
 
 ### Configure Enterprise Mission Portal Apache SSLProtocol
 
