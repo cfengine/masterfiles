@@ -1936,6 +1936,75 @@ body delete tidy
       rmdirs   => "true";
 }
 
+@if minimum_version(3.27)
+##-------------------------------------------------------
+## fsattrs
+##-------------------------------------------------------
+
+body fsattrs immutable(state)
+# @brief Ensure promised file is immutable or is not immutable
+# @param state A string representing a boolean choice in the range `(true|yes|on)` for true and `(false|no|off)` for false.. When true file immutability is enforced, when false file immutability is removed.
+#
+# **Example:**
+#
+# ```cf3
+# files:
+#   "/etc/motd"
+#     content => "There are, in fact, rules. You have been notified.",
+#     fsattrs => immutable("true"),
+#     perms => mog( "644", "root", "root" );
+# ````
+{
+      # When true the end state of the file is immutable. If the promise
+      # necessitates a change in the file, the agent will handle immutability
+      # transparently with the bit being removed just before modification
+      # and restored immediately after the atomic change is made.
+
+        immutable => "$(state)"; # The i attribute supported by chattr
+}
+
+body fsattrs is_immutable
+# @brief Ensure promised file is immutable
+#
+# **Example:**
+#
+# ```cf3
+# files:
+#   "/etc/motd"
+#     content => "There are, in fact, rules. You have been notified.",
+#     fsattrs => is_immutable,
+#     perms => mog( "644", "root", "root" );
+# ````
+{
+      # The end state of the file should be immutable. If the promise
+      # necessitates a change in the file, the agent will handle immutability
+      # transparently with the bit being removed just before modification and
+      # restored immediately after the atomic change is made.
+
+        immutable => "true"; # The i attribute supported by chattr
+}
+
+body fsattrs is_not_immutable
+# @brief Ensure promised file is immutable
+#
+# **Example:**
+#
+# ```cf3
+# files:
+#   "/etc/motd"
+#     content => "There are, in fact, rules. You have been notified.",
+#     fsattrs => is_not_immutable,
+#     perms => mog( "644", "root", "root" );
+# ````
+{
+      # The end state of the file should be mutable. If the immutable bit is set
+      # it will be removed.
+
+        immutable => "false"; # The i attribute supported by chattr
+}
+
+@endif
+
 ##-------------------------------------------------------
 ## rename
 ##-------------------------------------------------------
