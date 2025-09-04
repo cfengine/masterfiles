@@ -76,6 +76,46 @@ bundle agent ignore_interfaces_rx_reccomendations
 }
 @endif
 
+bundle agent nfs_mount_recommendations
+# @brief Recommendations about configured NFS servers
+{
+  meta:
+
+      "tags" slist => { "cfengine_recommends" };
+
+  vars:
+      "nfs_server_list"
+        slist => getvalues( "default:inventory_linux.nfs_server"),
+        depends_on => { "cfe_internal_inventory_mounted_nfs_server" };
+
+  classes:
+
+      # If we end up emitting the recommendation, then we define a class so that
+      # instructions about disabling these reports are also emitted.
+
+      "cfengine_recommendation_instruct_disablement"
+        expression => "cfengine_recommendation_emitted_kept",
+        scope => "namespace";
+
+  reports:
+
+      "$(with)"
+        with => concat(
+                        "NOTICE: At least one of your NFS servers is specified",
+                        " in-consistently. Consider aligning your definitions to",
+                        " consistently use or avoid a trailing dot when specifying",
+                        " the NFS server."
+        ),
+        if => and(
+                   # Check if there exists inventory of mounted nfs servers
+                   isvariable( "nfs_server_list" ),
+                   # Check if any other NFS server looks identical when adding a trailing dot
+                   some( concat( escape("$(nfs_server_list)"), "\.$" ),
+                         "nfs_server_list" )
+        ),
+        classes => results( "bundle", "cfengine_recommendation_emitted");
+}
+
 bundle agent postgresql_conf_recommendations
 # @brief Recommendations about the configuration of postgresql.conf for CFEngine Enterprise Hubs
 {
