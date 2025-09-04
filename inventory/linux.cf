@@ -51,6 +51,7 @@ bundle common inventory_linux
 
       "nfs_server[$(with)]" -> { "CFE-3259", "ENT-13210", "ENT-13223" }
         with => regex_replace( "$(nfs_mounts)", ":.*", "", "g" ),
+        handle => "cfe_internal_inventory_mounted_nfs_server",
         string => "$(with)",
         meta => { "inventory", "attribute_name=NFS Server" },
         if => not( isvariable( "$(this.promiser)" ) );
