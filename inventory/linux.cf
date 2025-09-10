@@ -32,16 +32,16 @@ bundle common inventory_linux
       "proc_1_process" string => filestat($(proc_1_cmdline), "linktarget");
 
     any::
-      "proc_routes" data => data_readstringarrayidx("/proc/net/route",
+      "proc_routes" data => data_readstringarrayidx("/proc/$(this.promiser_pid)/net/route",
                                                     "#[^\n]*","\s+",40,4k),
-        if => fileexists("/proc/net/route");
+        if => fileexists("/proc/$(this.promiser_pid)/net/route");
       "routeidx" slist => getindices("proc_routes");
       "dgw_ipv4_iface" string => "$(proc_routes[$(routeidx)][0])",
         comment => "Name of the interface where default gateway is routed",
         if => strcmp("$(proc_routes[$(routeidx)][1])", "00000000");
 
     linux::
-      "mounts" string => "/proc/mounts";
+      "mounts" string => "/proc/$(this.promiser_pid)/mounts";
 
       "nfs_mounts"
         slist => grep( ".* nfs .*",
