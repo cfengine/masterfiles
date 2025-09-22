@@ -1954,6 +1954,28 @@ application docroot consists of only packaged files.
 * Added `default:mpf_enable_mission_portal_docroot_sync_from_share_gui` in
   CFEngine 3.27.0
 
+### Enable permission enforcement for files under `WORKDIR/httpd/htdocs/public/scripts`
+
+If the class `default:mpf_enable_mission_portal_public_docroot_scripts_not_dir_perms` is defined then permissions of non-directories will be enforced from policy.
+
+```json
+{
+  "classes": {
+    "default:mpf_enable_mission_portal_public_docroot_scripts_not_dir_perms": {
+      "class_expressions": [
+        "enterprise_edition.am_policy_hub::"
+      ]
+    }
+  }
+}
+```
+
+**History:**
+
+* Stopped enforcing permissions for `WORKDIR/httpd/htdocs/public/scripts` by default in CFEngine 3.27.0.
+
+* Added class `default:mpf_enable_mission_portal_public_docroot_scripts_not_dir_perms` to enable enforcement of permissions for this directory in CFEngine 3.27.0.
+
 ### Enable permission enforcement for files under WORKDIR/share/GUI
 
 The MPF used to actively enforce permissions of files and directories under `$(sys.workdir)/share/GUI`, to re-enable this active permission enforcement define the class `default:mpf_enforce_workdir_share_gui_perms`.
