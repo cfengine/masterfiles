@@ -98,6 +98,8 @@ modules/promises
 .no-distrib
 services/autorun/README.md
 templates/README.md
+ci
+modules/mustache
 
 $templates
 $(basename $0)
