@@ -74,6 +74,21 @@ classes:
           "max_spare_servers":"${php_fpm_www_pool_max_spare_servers}"
          }');
 
+  files:
+      # http -> https redirection moved from Apache to PHP
+      # Here the flag files are managed so that PHP will know what to do
+    cfe_enterprise_disable_http_redirect_to_https::
+      "/opt/cfengine/flags/."
+        perms => mog("750", "root", "cfapache"),
+        create => "true";
+      "/opt/cfengine/flags/http_redirect_to_https.disabled" -> { "ENT-11481" }
+        perms => mog("660", "root", "cfapache"),
+        create => "true";
+
+    !cfe_enterprise_disable_http_redirect_to_https::
+      "/opt/cfengine/flags/http_redirect_to_https.disabled" -> { "ENT-11481" }
+        delete => tidy;
+
   reports:
     DEBUG::
       "Using variable default:def.php_fpm_www_pool_max_children: ${default:def.php_fpm_www_pool_max_children} instead of built-in default"
