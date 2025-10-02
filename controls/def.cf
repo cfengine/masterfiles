@@ -889,6 +889,8 @@ bundle common inventory_control
       "disable_inventory_proc" expression => "disable_inventory|freebsd";
       "disable_inventory_proc" not => isdir($(proc));
 
+      "disable_mpf_policy_version" expression => isvariable("$(sys.policy_version)");
+
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
