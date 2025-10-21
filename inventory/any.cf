@@ -18,7 +18,10 @@ bundle common inventory_any
 
       "policy_version" -> { "ENT-9806" }
         string => "$(default:control_common.version)",
-        meta => { "inventory", "attribute_name=CFEngine policy version" };
+        meta => { "inventory", "attribute_name=CFEngine policy version" },
+        if => not(isvariable("sys.policy_version")),
+        comment => concat( "Don't inventory the policy version from policy when it's available",
+                    " as a sys var to avoid duplicate values being inventoried.");
 
   reports:
       "DEBUG|DEBUG_$(this.bundle)"::
