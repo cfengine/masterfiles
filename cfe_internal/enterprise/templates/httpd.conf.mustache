@@ -249,6 +249,9 @@ LogLevel warn
 </IfModule>
 
 
+# Timeout defaults to 60 but that is too short for some operations on slower hub hardware
+Timeout 120
+
 {{#classes.mission_portal_http2_enabled}}
 # Use mod_http2
 LoadModule http2_module modules/mod_http2.so
