@@ -49,6 +49,13 @@ bundle common def_standalone_self_upgrade
                            " system log (e.g. syslog or Windows Event Log).",
                            " (critical|error|warning|notice|info)" );
 
+      "control_common_protocol_version_defined" -> { "CFE-4543" }
+        expression => isvariable( "default:def.control_common_protocol_version" ),
+        comment => concat( "Defines the protocol version to use for all outgoing",
+                           " connections.",
+                           # It's challenging to keep this aligned with the core agent code
+                           # cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
+                           " (1|classic|2|tls|3|cookie|4|filestream|latest)" );
 }
 body agent control
 # @brief Agent controls for standalone self upgrade
@@ -566,6 +573,7 @@ bundle common cfengine_package_names
       "pkg[debian_9_x86_64]"  string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian9_amd64.deb";
       "pkg[debian_10_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian10_amd64.deb";
       "pkg[debian_11_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian11_amd64.deb";
+      "pkg[debian_12_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian12_amd64.deb";
 
       # 64bit Ubuntu
       "pkg[ubuntu_14_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu14_amd64.deb";
@@ -573,12 +581,15 @@ bundle common cfengine_package_names
       "pkg[ubuntu_18_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu18_amd64.deb";
       "pkg[ubuntu_20_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu20_amd64.deb";
       "pkg[ubuntu_22_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu22_amd64.deb";
+      "pkg[ubuntu_24_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu24_amd64.deb";
 
       # aarch64 Ubuntu
       "pkg[ubuntu_22_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu22_arm64.deb";
+      "pkg[ubuntu_22_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu24_arm64.deb";
 
       # aarch64 Debian
       "pkg[debian_11_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian11_arm64.deb";
+      "pkg[debian_12_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian12_arm64.deb";
 
       # 32bit DEBs
       "pkg[$(cfengine_master_software_content._deb_dists)_$(cfengine_master_software_content._32bit_arches)]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian7_i386.deb";
@@ -664,6 +675,8 @@ bundle agent cfengine_master_software_content
       "dir[debian_10_x86_64]" string => "agent_debian10_x86_64";
       "dir[debian_11_x86_64]" string => "agent_debian11_x86_64";
       "dir[debian_11_arm_64]" string => "agent_debian11_arm_64";
+      "dir[debian_12_x86_64]" string => "agent_debian12_x86_64";
+      "dir[debian_12_arm_64]" string => "agent_debian12_arm_64";
 
       # Ubuntu
       "dir[ubuntu_14_x86_64]" string => "agent_ubuntu14_x86_64";
@@ -672,6 +685,8 @@ bundle agent cfengine_master_software_content
       "dir[ubuntu_20_x86_64]" string => "agent_ubuntu20_x86_64";
       "dir[ubuntu_22_x86_64]" string => "agent_ubuntu22_x86_64";
       "dir[ubuntu_22_arm_64]" string => "agent_ubuntu22_arm_64";
+      "dir[ubuntu_24_x86_64]" string => "agent_ubuntu24_x86_64";
+      "dir[ubuntu_24_arm_64]" string => "agent_ubuntu24_arm_64";
 
       # All 32bit debs use the same package
       "_deb_dists" slist => { "debian_4", "debian_5", "debian_6",
@@ -884,6 +899,9 @@ body common control
 
     control_common_system_log_level_defined::
         system_log_level => "$(default:def.control_common_system_log_level)";
+
+    control_common_protocol_version_defined::
+        protocol_version => "$(default:def.control_common_protocol_version)";
 }
 
 body depth_search u_recurse_basedir(d)

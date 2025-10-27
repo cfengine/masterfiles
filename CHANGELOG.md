@@ -1,3 +1,14 @@
+3.26.0:
+	- Added http2 support in Mission Portal with apache and php-fpm
+	  (ENT-11440)
+	- Added paths for the dmsetup, fdisk, and lshw commands (ENT-12560)
+	- Added service_config bundle to aid in service config check/replace/service restart
+	  (ENT-11440)
+	- Inhibit management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
+	  (ENT-12658)
+	- Use current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
+	  (CFE-3429)
+
 3.25.0:
 	- Added inline docs showing valid values for method (field_operation) in body edit_field quoted_var
 	  (CFE-4426)

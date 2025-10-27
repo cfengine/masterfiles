@@ -118,16 +118,18 @@ bundle agent update_cli_rest_server_url_config
     "regex_test_pattern" string => ".*localhost:$(cfe_internal_hub_vars.https_port).*";
 
   files:
-    !mpf_disable_mission_portal_docroot_sync_from_share_gui::
+    mpf_enable_mission_portal_docroot_sync_from_share_gui::
       "$(mp_share_config_file)"
-         edit_line => change_cli_rest_server_url_port,
-         if => and(
-           fileexists("$(mp_share_config_file)"),
-           islessthan(countlinesmatching("$(regex_test_pattern)", "$(mp_share_config_file)"), 1)
-           );
+        handle => "cfe_internal_edit_share_gui_mp_config",
+        edit_line => change_cli_rest_server_url_port,
+        if => and(
+                   fileexists("$(mp_share_config_file)"),
+                   islessthan(countlinesmatching("$(regex_test_pattern)", "$(mp_share_config_file)"), 1)
+        );
 
     any::
       "$(mp_config_file)"
+        handle => "cfe_internal_edit_mp_config",
         edit_line => change_cli_rest_server_url_port,
         if => and(
           fileexists("$(mp_config_file)"),

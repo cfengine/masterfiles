@@ -313,6 +313,7 @@ By default Mission Portal listens for HTTP requests on port 80, redirecting to H
 
 * Added in CFEngine 3.6.0
 * Class renamed from `cfe_cfengine_enterprise_enable_plain_http` to `cfe_enterprise_disable_http_redirect_to_https` in CFEngine 3.23.0, 3.21.3
+* Redirection responsibility moved from Apache to PHP in CFEngine 3.27.0
 
 ### Disable cf\_promises\_validated check
 
@@ -1306,6 +1307,38 @@ Example definition in augments file:
 }
 ```
 
+### Specify the CFEngine protocol version to use
+
+By default CFEngine will negotiate the newest protocol version available. Configuring `protocol_version` will restrict the protocol to the specified version.
+
+```json
+{
+  "variables": {
+    "default:def.control_common_protocol_version": {
+      "value": "filestream"
+      }
+  }
+}
+```
+
+**Notes:**
+
+- Valid values for `protocol_version` can be extracted from the syntax-description output of `cf-promises`.
+
+  For example:
+
+  ```command
+  cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
+  ```
+
+  ```output
+  (1|classic|2|tls|3|cookie|4|filestream|latest)
+  ```
+
+**History:**
+
+- Added in CFEngine 3.27.0
+
 ### Configure the ciphers used by cf-serverd
 
 When `default:def.control_server_allowciphers` is defined `cf-serverd` will use the ciphers specified instead of the binary defaults.
@@ -1893,21 +1926,76 @@ memory related probes on policy servers:
 
 * Added in 3.10.2, 3.11.0
 
-### Configure Enterprise Mission Portal Docroot
+### Configure Enterprise Mission Portal Docroot sync
 
-Primarily for developer convenience, this setting allows you to easily disable the enforcement that the webapp consists of the packaged files in the docroot used for Mission Portal.
+This setting allows you to enable the enforcement that the Mission Portal web
+application docroot consists of only packaged files.
 
 ```json
 {
   "classes": {
-    "default:mpf_disable_mission_portal_docroot_sync_from_share_gui": {
-      "regular_expressions": [
-        "any"
+    "default:mpf_enable_mission_portal_docroot_sync_from_share_gui": {
+      "class_expressions": [
+        "enterprise_edition.am_policy_hub::"
       ]
     }
   }
 }
 ```
+
+**History:**
+
+* Added `default:mpf_disable_mission_portal_docroot_sync_from_share_gui` to
+  explicitly disable synchronization of the active docroot from share/GUI in
+  CFEngine 3.12.0
+
+* Removed `default:mpf_enable_mission_portal_docroot_sync_from_share_gui` in
+  CFEngine 3.27.0
+
+* Added `default:mpf_enable_mission_portal_docroot_sync_from_share_gui` in
+  CFEngine 3.27.0
+
+### Enable permission enforcement for files under `WORKDIR/httpd/htdocs/public/scripts`
+
+If the class `default:mpf_enable_mission_portal_public_docroot_scripts_not_dir_perms` is defined then permissions of non-directories will be enforced from policy.
+
+```json
+{
+  "classes": {
+    "default:mpf_enable_mission_portal_public_docroot_scripts_not_dir_perms": {
+      "class_expressions": [
+        "enterprise_edition.am_policy_hub::"
+      ]
+    }
+  }
+}
+```
+
+**History:**
+
+* Stopped enforcing permissions for `WORKDIR/httpd/htdocs/public/scripts` by default in CFEngine 3.27.0.
+
+* Added class `default:mpf_enable_mission_portal_public_docroot_scripts_not_dir_perms` to enable enforcement of permissions for this directory in CFEngine 3.27.0.
+
+### Enable permission enforcement for files under WORKDIR/share/GUI
+
+The MPF used to actively enforce permissions of files and directories under `$(sys.workdir)/share/GUI`, to re-enable this active permission enforcement define the class `default:mpf_enforce_workdir_share_gui_perms`.
+
+For example, to define it via Augments for CFEngine Enterprise Hubs:
+
+```json
+{
+  "classes": {
+    "default:mpf_enforce_workdir_share_gui_perms": {
+      "class_expressions": [
+        "enterprise_edition.am_policy_hub::"
+      ]
+    }
+  }
+}
+```
+
+* Added in CFEngine 3.27.0
 
 ### Configure Enterprise Mission Portal Apache SSLProtocol
 

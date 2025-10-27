@@ -375,6 +375,7 @@ bundle common paths
       "path[df]"            string => "/bin/df";
       "path[diff]"          string => "/usr/bin/diff";
       "path[dig]"           string => "/usr/bin/dig";
+      "path[dmidecode]"     string => "/usr/sbin/dmidecode";
       "path[dmsetup]"       string => "/usr/sbin/dmsetup";
       "path[domainname]"    string => "/bin/domainname";
       "path[echo]"          string => "/bin/echo";
@@ -391,7 +392,9 @@ bundle common paths
       "path[iptables_save]" string => "/sbin/iptables-save";
       "path[ls]"            string => "/bin/ls";
       "path[lshw]"          string => "/usr/sbin/lshw";
-      "path[lsof]"          string => "/usr/sbin/lsof";
+      "path[lsof]"          string => ifelse( "redhat_7|redhat_6", "/usr/sbin/lsof",
+                                              "/usr/bin/lsof"
+                                               );
       "path[netstat]"       string => "/bin/netstat";
       "path[nologin]"       string => "/sbin/nologin";
       "path[ping]"          string => "/usr/bin/ping";
@@ -538,8 +541,6 @@ bundle common paths
       "path[logger]"        string => "/usr/bin/logger";
 
     opensuse::
-      "path[ls]"        string => "/usr/bin/ls";
-      "path[lsof]"      string => "/usr/bin/lsof";
       "path[awk]"       string => "/usr/bin/awk";
       "path[cat]"       string => "/usr/bin/cat";
       "path[cksum]"     string => "/usr/bin/cksum";
