@@ -567,7 +567,7 @@ bundle common cfengine_package_names
 
       # aarch64 Ubuntu
       "pkg[ubuntu_22_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu22_arm64.deb";
-      "pkg[ubuntu_22_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu24_arm64.deb";
+      "pkg[ubuntu_24_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu24_arm64.deb";
 
       # aarch64 Debian
       "pkg[debian_11_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian11_arm64.deb";
