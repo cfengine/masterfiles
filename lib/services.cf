@@ -340,8 +340,8 @@ bundle agent systemd_services(service,state)
 #
 #     # Explicitly use `systemd_services`
 #     "sshd"
-#       service_policy => "running",
-#       service_policy => "systemd_services";
+#       service_policy => "enabled",
+#       service_method => systemd_services;
 # ```
 #
 # Alternatively, since services promises are an abstraction around bundles, the service state can be promised via a methods type promise.
@@ -438,7 +438,7 @@ bundle agent systemd_services(service,state)
         if => "action_custom";
 
   reports:
-    systemd.service_notfound.(start|restart|reload).(inform_mode|verbose_mode)::
+    systemd.service_notfound.(action_start|action_restart|action_reload).(inform_mode|verbose_mode)::
       "$(this.bundle): Could not find service: $(service)";
 }
 
