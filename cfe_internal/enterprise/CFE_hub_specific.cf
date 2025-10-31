@@ -115,34 +115,50 @@ bundle agent update_cli_rest_server_url_config
     # Both share and live versions must be changed at once since httpd will be restarted later in the same agent run.
     "mp_config_file" string => "$(cfe_internal_hub_vars.docroot)/application/config/config.php";
     "mp_share_config_file" string => "$(sys.workdir)/share/GUI/application/config/config.php";
-    "regex_test_pattern" string => ".*localhost:$(cfe_internal_hub_vars.https_port).*";
+    "api_config_file" string => "$(cfe_internal_hub_vars.docroot)/api/modules/inventory/config/config.php";
+    "mp_test_pattern" string => ".*localhost:$(cfe_internal_hub_vars.https_port).*";
+    "api_test_pattern" string => ".*127\.0\.0\.1:$(cfe_internal_hub_vars.https_port).*";
 
   files:
     mpf_enable_mission_portal_docroot_sync_from_share_gui::
       "$(mp_share_config_file)"
         handle => "cfe_internal_edit_share_gui_mp_config",
-        edit_line => change_cli_rest_server_url_port,
+        edit_line => change_mp_server_url_port,
         if => and(
                    fileexists("$(mp_share_config_file)"),
-                   islessthan(countlinesmatching("$(regex_test_pattern)", "$(mp_share_config_file)"), 1)
+                   islessthan(countlinesmatching("$(mp_test_pattern)", "$(mp_share_config_file)"), 1)
         );
 
     any::
       "$(mp_config_file)"
         handle => "cfe_internal_edit_mp_config",
-        edit_line => change_cli_rest_server_url_port,
+        edit_line => change_mp_server_url_port,
         if => and(
           fileexists("$(mp_config_file)"),
-          islessthan(countlinesmatching("$(regex_test_pattern)", "$(mp_config_file)"), 1)
+          islessthan(countlinesmatching("$(mp_test_pattern)", "$(mp_config_file)"), 1)
           );
+
+      "$(api_config_file)"
+        edit_line => change_api_server_url_port,
+        if => and(
+          fileexists("$(api_config_file)"),
+          islessthan(countlinesmatching("$(api_test_pattern)", "$(api_config_file)"), 1)
+        );
 }
 
-bundle edit_line change_cli_rest_server_url_port
+bundle edit_line change_mp_server_url_port
 {
   replace_patterns:
-  "^\s*\$config\['cli_rest_server_url'\]\s*=\s*\"https://localhost(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?/api/\";\s*$"
+  "^\s*\$config\['cli_rest_server_url'\]\s*=\s*\"https:\/\/localhost(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?\/api\/\";\s*$"
       replace_with => value("    $config['cli_rest_server_url'] = \"https://localhost:$(cfe_internal_hub_vars.https_port)/api/\";"),
-      comment => "Change port CLI REST server URL port";
+      comment => "Change port MP REST server URL port";
+}
+bundle edit_line change_api_server_url_port
+{
+  replace_patterns:
+  "^\s*define\(\"API_URL\",\s*\"https:\/\/127\.0\.0\.1(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?\/api\"\);\s*$"
+      replace_with => value("define(\"API_URL\", \"https://127.0.0.1:$(cfe_internal_hub_vars.https_port)/api\");"),
+      comment => "Change port API REST server URL port";
 }
 
 ##################################################################
