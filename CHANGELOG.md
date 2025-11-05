@@ -1,48 +1,33 @@
 3.26.0:
+	- Inhibit management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
+	  (ENT-12658)
+	- Switched to using current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
+	  (CFE-3429)
 	- Added http2 support in Mission Portal with apache and php-fpm
 	  (ENT-11440)
 	- Added paths for the dmsetup, fdisk, and lshw commands (ENT-12560)
 	- Added service_config bundle to aid in service config check/replace/service restart
 	  (ENT-11440)
-	- Inhibit management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
-	  (ENT-12658)
-	- Use current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
-	  (CFE-3429)
 
 3.25.0:
+	- Data dumping on Federated Reporting feeders no longer uses an AWK filter to merge INSERT
+	  lines in the dumps
+	- Made system_log_level configurable via Augments (CFE-4452)
 	- Added inline docs showing valid values for method (field_operation) in body edit_field quoted_var
 	  (CFE-4426)
 	- Added support for AIX System Resource Controller services promises
 	  (CFE-4447)
 	- Added trailing /. to files promises targeting local_software_dir
 	  (ENT-12116)
-	- Adjusted CSP in httpd.conf to suit ACE javascript editor (ENT-12010)
-	- Allowed images from raw.github.com (ENT-12531)
-	- Data dumping on Federated Reporting feeders no longer uses an AWK filter to merge INSERT
-	  lines in the dumps
 	- Fixed failed to open /dev/tty errors when using systemd unit management
 	  (CFE-4445)
 	- Fixed issue with yum package module regarding packages with epoch not validating
 	  (ENT-12538)
-	- Made system_log_level configurable via Augments (CFE-4452)
+	- Fixed issues with ACE javascript editor due to CSP (Content Security Policy) (ENT-12010)
+	- Fixed issues with loading images from raw.github.com inside CFEngine Build application in Mission Portal (ENT-12531)
 
 3.24.0:
-	- AIX watchdog now handles stale pids (CFE-4335)
-	- Added ability to configure Mission Portal Apache SSLCACertificateFile via Augments
-	  (ENT-11421)
-	- Added ability to configure SSLCipherSuite via Augments (ENT-11393)
-	- Added ability to influence default package manager and inventory via Augments
-	  (CFE-3612)
-	- Added freebsd package_module and package_inventory since we have pkg packages module available
-	  (CFE-4345)
-	- Added no_backup_cp_compare copy_from body to stdlib
-	  Like the existing no_backup_cp this copy_from body is used to copy files locally
-	  without making backups but with the additional ability to specify the comparison
-	  used. (ENT-10962)
-	- Added recommendation for installing gnu parallel on federated reporting superhubs
-	  (ENT-8785)
-	- Added set_escaped_user_field complementing set_user_field (CFE-4377)
-	- Added setup-feeder option to distributed cleanup script (ENT-11844)
+	- AIX watchdog now handles stale PIDs (CFE-4335)
 	- Aligned ownership and permission expectations between Mission Portal and MPF
 	  (ENT-11941)
 	- Changed mission-portal apache restart to graceful to minimize service interruptions
@@ -50,12 +35,6 @@
 	- Federated reporting policy now properly fixes SELinux context of the
 	  ~cftransport/.ssh directory and its contents in a single agent
 	  run. (ENT-11136)
-	- Fixed comparison that caused control_executor_mailfilter_*_configured to never be set
-	  (CFE-4374)
-	- Fixed distributed_cleanup policy for feeders and rhel-8 superhubs
-	  (ENT-10960)
-	- Fixed restoration of Mission Portal application to packaged content when modified
-	  (ENT-10962)
 	- Freebsd service management now uses one prefixed service commands
 	  (CFE-4323)
 	- Improved federation policy handling of cftransport selinux configuration
@@ -77,6 +56,27 @@
 	- Squashed common error logged by Apache related to IPv6 (ENT-10646)
 	- When failing to detect platform, inventory attribute "OS" now
 	  defaults to PRETTY_NAME from os-release as a fallback (CFE-4342)
+	- Added ability to configure Mission Portal Apache SSLCACertificateFile via Augments
+	  (ENT-11421)
+	- Added ability to configure SSLCipherSuite via Augments (ENT-11393)
+	- Added ability to influence default package manager and inventory via Augments
+	  (CFE-3612)
+	- Added freebsd package_module and package_inventory since we have pkg packages module available
+	  (CFE-4345)
+	- Added no_backup_cp_compare copy_from body to stdlib
+	  Like the existing no_backup_cp this copy_from body is used to copy files locally
+	  without making backups but with the additional ability to specify the comparison
+	  used. (ENT-10962)
+	- Added recommendation for installing gnu parallel on federated reporting superhubs
+	  (ENT-8785)
+	- Added set_escaped_user_field complementing set_user_field (CFE-4377)
+	- Added setup-feeder option to distributed cleanup script (ENT-11844)
+	- Fixed comparison that caused control_executor_mailfilter_*_configured to never be set
+	  (CFE-4374)
+	- Fixed distributed_cleanup policy for feeders and rhel-8 superhubs
+	  (ENT-10960)
+	- Fixed restoration of Mission Portal application to packaged content when modified
+	  (ENT-10962)
 
 3.23.0:
 	- Added ability to disable plain http for CFEngine Enterprise Mission Portal
