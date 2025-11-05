@@ -14,12 +14,12 @@
 	  (ENT-13210)
 	- Removed duplicate well known paths for ls and lsof on opensuse
 	  (ENT-12990)
-	- Use current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
+	- Switched to using current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
 	  (CFE-3429)
 
 3.24.2:
 	- Added paths for the dmsetup, fdisk, and lshw commands (ENT-12560)
-	- Allowed images from raw.github.com (ENT-12531)
+	- Fixed issue loading images from raw.github.com in Mission Portal Build application(ENT-12531)
 	- Fixed issue with yum package module regarding packages with epoch not
 	  validating (ENT-12538)
 	- Fixed location of Mission Portal application logs for log_dir cleanup
