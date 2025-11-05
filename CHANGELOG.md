@@ -1,3 +1,22 @@
+3.24.3:
+	- Added dmidecode to well known paths for Red Hat (ENT-12988)
+	- Added recommendation about nfs server and consistent use of root dot
+	  (ENT-13223)
+	- Changed NFS Server inventory to report only unique servers
+	  (ENT-13223)
+	- Fixed duplicate bundlesequence_end when bundlesequence_classification not defined
+	  (CFE-4588)
+	- Fixed path to lsof on Red Hat 7 and greater (ENT-12987)
+	- Increased timeout for php processing to allow for longer running API requests
+	  (ENT-13291)
+	- Made protocol_version configurable via Augments (CFE-4543)
+	- Prevented nfs server inventory from doing unnecessary extra work
+	  (ENT-13210)
+	- Removed duplicate well known paths for ls and lsof on opensuse
+	  (ENT-12990)
+	- Use current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
+	  (CFE-3429)
+
 3.24.2:
 	- Added paths for the dmsetup, fdisk, and lshw commands (ENT-12560)
 	- Allowed images from raw.github.com (ENT-12531)
