@@ -79,6 +79,29 @@ As is typical for CFEngine, the policy and the configuration are mixed. In
 to `controls/update_def.cf` as you read this. We are skipping the nonessential
 ones.
 
+### Configure the evaluation order for cf-agent evaluated promises for update policy
+
+By default CFEngine processes promises in "Normal Order". Configure `default:def.control_agent_update_evaluation_order` to control the default promise evaluation order for `cf-agent` during the execution of the update policy. This variable is used to set `evaluation_order` in `body agent control` in `update.cf`
+
+Example Augments:
+
+```json
+{
+  "variables": {
+    "default:def.control_agent_update_evaluation_order": {
+      "value": "top_down",
+      "comment": "Our policy writers find it easier to understand policy that is evaluated in the order it is written."
+    }
+  }
+}
+```
+
+**History:**
+
+- Introduced in 3.27.0.
+
+**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure the evaluation order of cf-agent for main policy](#Configure the evaluation order of cf-agent for main policy), [`evaluation_order` in `body agent control`][cf-agent#evaluation_order], [Policy style guide on promise ordering][Policy style guide#Promise ordering]
+
 ### Configure upstream masterfiles location for policy update
 
 Want to get your policy from a place other than `/var/cfengine/masterfiles` on
@@ -658,6 +681,29 @@ This [augments file][Augments] is a way to specify that `cf-monitord` should be 
 
 The following settings are defined in `controls/def.cf` can be set from an
 [augments file][Augments].
+
+### Configure the evaluation order of cf-agent for main policy
+
+By default CFEngine processes promises in "Normal Order". Configure `default:def.control_agent_evaluation_order` to control the default promise evaluation order for `cf-agent`. This variable is used to set `evaluation_order` in `body agent control` in `promises.cf`
+
+Example Augments:
+
+```json
+{
+  "variables": {
+    "default:def.control_agent_evalution_order": {
+      "value": "top_down",
+      "comment": "Our policy writers find it easier to understand policy that is evaluated in the order it is written."
+    }
+  }
+}
+```
+
+**History:**
+
+- Introduced in 3.27.0.
+
+**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure cf-agent promise evaluation order for update policy](#Configure the evaluation order for cf-agent evaluated promises for update policy), [Policy style guide on promise ordering][Policy style guide#Promise ordering]
 
 ### Automatically migrate ignore_interfaces.rx to workdir
 

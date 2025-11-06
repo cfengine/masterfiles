@@ -186,8 +186,14 @@ bundle agent cfengine_internal_standalone_self_upgrade_execution
 body agent control
 # @brief Agent controls for update
 {
+
       ifelapsed => "1";
       skipidentify => "true";
+
+@if minimum_version(3.27.0)
+      # The order in which promises are evaluated (top_down|classic)
+        evaluation_order => "$(default:def.control_agent_update_evaluation_order)";
+@endif
 
     control_agent_agentfacility_configured::
 

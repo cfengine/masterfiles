@@ -15,6 +15,11 @@ body agent control
 
     any::
 
+@if minimum_version(3.27.0)
+      # The order in which promises are evaluated (top_down|classic)
+        evaluation_order => "$(default:def.control_agent_evaluation_order)";
+@endif
+
       # Minimum time (in minutes) which should have passed since the last time
       # the promise was verified before it is checked again.
 
@@ -23,10 +28,10 @@ body agent control
       # Do not send IP/name during server connection if address resolution is broken.
       # Comment it out if you do NOT have a problem with DNS
 
-      skipidentify => "true";
+        skipidentify => "true";
 
       # explicitly not supported (but they should break long before)
-      abortclasses => { "cfengine_3_3", "cfengine_3_4", @(def.control_agent_abortclasses) };
+        abortclasses => { "cfengine_3_3", "cfengine_3_4", @(def.control_agent_abortclasses) };
 
       # The abortbundleclasses slist contains regular expressions that match
       # classes which if defined lead to termination of current bundle.
