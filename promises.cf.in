@@ -40,6 +40,9 @@ body common control
 # @brief Control options common to all agents
 {
 
+      # The order in which promises are evaluated (top_down|classic)
+      evaluation_order => "$(default:def.control_common_evaluation_order)";
+
       bundlesequence => {
                           # Common bundle first (Best Practice)
                           inventory_control,
