@@ -251,6 +251,20 @@ bundle common def
 
       # Agent Controls
 
+      "control_agent_evaluation_order" -> { "ENT-13495" }
+        string => ifelse( isvariable( $(this.promiser) ),
+                          "$(default:def.control_agent_evaluation_order)",
+                          "classic"),
+        comment => concat( 'We default to the classic "Normal Order"',
+                           ' for cf-agent if not otherwise specified' );
+
+      "control_agent_update_evaluation_order" -> { "ENT-13495" }
+        string => ifelse( isvariable( $(this.promiser) ),
+                          "$(default:def.control_agent_update_evaluation_order)",
+                          "classic"),
+        comment => concat( 'We default to the classic "Normal Order"',
+                           ' for cf-agent when running update.cf if not otherwise specified' );
+
       "control_agent_abortclasses" -> { "ENT-4823" }
         slist => { },
         comment => "The control body has a variable, so a valid list must be defined or the agent will error",
@@ -281,6 +295,13 @@ bundle common def
       # control does not support iteration over data containers we must first
       # pick out the bundles into a shallow container that we can then get a
       # regular list from using getvalues().
+
+      "control_common_evaluation_order" -> { "ENT-13495" }
+        string => ifelse( isvariable( $(this.promiser) ),
+                          "$(default:def.control_common_evaluation_order)",
+                          "classic"),
+        comment => concat( 'We default to the classic "Normal Order"',
+                           ' for all components if not otherwise specified.' );
 
       "bundlesequence_end" -> { "CFE-4855" }
         slist => { },
