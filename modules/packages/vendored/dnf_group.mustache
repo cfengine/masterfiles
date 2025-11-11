@@ -1,0 +1,504 @@
+#!/usr/bin/python3
+
+"""DNF Group Package Module for CFEngine.
+
+Supported Operations:
+    - supports-api-version, get-package-data, list-installed
+    - list-updates, list-updates-local (checks for package updates in groups)
+    - repo-install, remove, file-install
+
+Configuration (--setopt style):
+    Group options:
+    - options=group_package_types=mandatory|default|optional
+
+    DNF/repo options:
+    - options=<repo>.enabled=1|0
+    - options=<config_key>=<value> (any base.conf attribute)
+
+Version Handling:
+    - version=latest: Upgrade group packages
+
+Dependencies: python3, python3-dnf
+"""
+
+from typing import Dict, List, Tuple, Union
+import sys
+import logging
+import os
+import dnf
+import dnf.exceptions
+
+# Exit codes
+EXIT_SUCCESS, EXIT_ERROR, EXIT_UNSUPPORTED = 0, 1, 2
+
+# Protocol
+PROTOCOL_VERSION = "1"
+MAX_INPUT_LINES = 10000
+KEY_OPTIONS, KEY_NAME, KEY_FILE, KEY_VERSION, KEY_ARCHITECTURE = (
+    "options",
+    "Name",
+    "File",
+    "Version",
+    "Architecture",
+)
+KEY_ERROR_MESSAGE, KEY_PACKAGE_TYPE = "ErrorMessage", "PackageType"
+PACKAGE_TYPE_FILE, PACKAGE_TYPE_REPO = "file", "repo"
+
+# Options
+OPT_GROUP_PACKAGE_TYPES = "group_package_types"
+VERSION_LATEST = "latest"
+
+
+def _convert_value(value: str) -> Union[bool, int, str]:
+    """Convert string value to appropriate Python type."""
+    if value.lower() in ("true", "1", "yes"):
+        return True
+    if value.lower() in ("false", "0", "no"):
+        return False
+    return int(value) if value.isdigit() else value
+
+
+def _parse_stdin() -> Tuple[List[Dict[str, str]], List[str]]:
+    """Parse stdin protocol input into (packages, options)."""
+    packages, options, curr = [], [], {}
+    for line_num, line in enumerate(sys.stdin):
+        if line_num >= MAX_INPUT_LINES:
+            raise Exception(f"Input exceeds {MAX_INPUT_LINES} lines")
+        k, _, v = line.strip().partition("=")
+        if k == KEY_OPTIONS:
+            options.append(v)
+        elif k in (KEY_NAME, KEY_FILE):
+            if curr:
+                packages.append(curr)
+            curr = {k.lower(): v}
+        elif k == KEY_VERSION:
+            curr["version"] = v
+        elif k == KEY_ARCHITECTURE:
+            curr["arch"] = v
+    if curr:
+        packages.append(curr)
+    return packages, options
+
+
+def _get_dnf_base(with_repos: bool = True, cache_only: bool = True) -> dnf.Base:
+    """Create configured DNF base object."""
+    base = dnf.Base()
+    base.conf.assumeyes = True
+    base.conf.cacheonly = cache_only
+    base.conf.comment = "CFEngine dnf_group package module"
+
+    if with_repos:
+        base.read_all_repos()
+        # Force metadata expiry to avoid stale cache FileNotFoundError
+        if not cache_only and base.repos:
+            for repo in base.repos.iter_enabled():
+                repo.metadata_expire = 0
+        base.fill_sack(load_system_repo=True)
+    else:
+        base.fill_sack(load_system_repo=True, load_available_repos=False)
+    return base
+
+
+def _apply_setopt_options(base: dnf.Base, options: List[str]) -> None:
+    """Apply DNF config options (--setopt style)."""
+    for option in options:
+        # Skip group-specific options
+        if option.startswith(f"{OPT_GROUP_PACKAGE_TYPES}="):
+            continue
+
+        if "=" not in option:
+            continue
+
+        key, value = [x.strip() for x in option.split("=", 1)]
+        conv_value = _convert_value(value)
+
+        # Repository option (e.g., epel.enabled=1)
+        if "." in key:
+            repo_id, repo_attr = key.split(".", 1)
+            if (
+                base.repos
+                and repo_id in base.repos
+                and hasattr(base.repos[repo_id], repo_attr)
+            ):
+                try:
+                    setattr(base.repos[repo_id], repo_attr, conv_value)
+                    logging.debug(f"Set repo: {key} = {conv_value}")
+                except (AttributeError, ValueError, TypeError) as e:
+                    logging.warning(f"Failed to set '{key}': {e}")
+
+        # Base config option (e.g., install_weak_deps=false)
+        elif hasattr(base.conf, key) and not callable(getattr(base.conf, key)):
+            try:
+                setattr(base.conf, key, conv_value)
+                logging.debug(f"Set config: {key} = {conv_value}")
+            except (AttributeError, ValueError, TypeError) as e:
+                logging.warning(f"Failed to set '{key}': {e}")
+
+
+def _parse_group_package_types(options: List[str]) -> List[str]:
+    """Determine package types to install from options."""
+    for option in options:
+        if "=" in option:
+            key, value = [x.strip() for x in option.split("=", 1)]
+            if key == OPT_GROUP_PACKAGE_TYPES:
+                if value.lower() == "mandatory":
+                    return ["mandatory"]
+                if value.lower() == "optional":
+                    return ["mandatory", "default", "optional"]
+                return ["mandatory", "default"]
+
+    return ["mandatory", "default"]  # default
+
+
+def _read_comps(base: dnf.Base) -> bool:
+    """Read comps safely. Returns True if successful, False otherwise."""
+    try:
+        base.read_comps()
+        return base.comps is not None
+    except dnf.exceptions.CompsError as e:
+        logging.debug(f"Could not read comps: {e}")
+        return False
+
+
+def _find_group(base: dnf.Base, group_id: str):
+    """Find group by ID in comps. Returns group object or None."""
+    if not base.comps:
+        return None
+    for group in base.comps.groups_iter():
+        if group.id == group_id:
+            return group
+    return None
+
+
+def _is_group_installed(base: dnf.Base, group_id: str) -> bool:
+    """Check if group is installed."""
+    return (
+        hasattr(base, "history")
+        and hasattr(base.history, "group")
+        and bool(base.history.group.get(group_id))
+    )
+
+
+def _execute_transaction(base: dnf.Base, operation: str) -> int:
+    """Resolve and execute DNF transaction."""
+    try:
+        logging.debug(f"Resolving {operation} transaction...")
+
+        if not base.resolve() or not base.transaction:
+            if not base.transaction:
+                logging.debug("No transaction needed")
+                return EXIT_SUCCESS
+            logging.error(f"Transaction resolution failed for {operation}")
+            return EXIT_ERROR
+
+        # Download packages to avoid stale path errors
+        install_set = list(base.transaction.install_set)
+        if install_set:
+            logging.debug(f"Downloading {len(install_set)} packages...")
+            base.download_packages(install_set)
+
+        logging.debug(f"Executing {operation}...")
+        base.do_transaction()
+        logging.debug("Transaction complete")
+        return EXIT_SUCCESS
+
+    except (
+        dnf.exceptions.DepsolveError,
+        dnf.exceptions.DownloadError,
+        dnf.exceptions.TransactionCheckError,
+    ) as e:
+        logging.error(f"Transaction error: {e}", exc_info=True)
+        return EXIT_ERROR
+
+
+def supports_api_version() -> int:
+    sys.stdout.write(f"{PROTOCOL_VERSION}\n")
+    sys.stdout.flush()
+    return EXIT_SUCCESS
+
+
+def get_package_data() -> int:
+    packages, _ = _parse_stdin()
+    if not packages:
+        return EXIT_ERROR
+
+    pkg = packages[0]
+    pkg_string = pkg.get("file") or pkg.get("name")
+    if not pkg_string:
+        return EXIT_ERROR
+
+    # Groups are repo type, files are file type
+    output = []
+    if "/" in pkg_string or pkg_string.endswith(".rpm"):
+        output.append(
+            f"{KEY_PACKAGE_TYPE}={PACKAGE_TYPE_FILE}\n{KEY_NAME}={pkg_string}\n"
+        )
+        if pkg.get("version"):
+            output.append(f"{KEY_VERSION}={pkg['version']}\n")
+        if pkg.get("arch"):
+            output.append(f"{KEY_ARCHITECTURE}={pkg['arch']}\n")
+    else:
+        output.append(
+            f"{KEY_PACKAGE_TYPE}={PACKAGE_TYPE_REPO}\n{KEY_NAME}={pkg_string}\n"
+        )
+
+    sys.stdout.write("".join(output))
+    sys.stdout.flush()
+    return EXIT_SUCCESS
+
+
+def list_installed() -> int:
+    _parse_stdin()  # Consume stdin even though we don't need the data
+    base = _get_dnf_base(with_repos=True, cache_only=True)
+    try:
+        if not _read_comps(base) or not base.comps:
+            return EXIT_SUCCESS
+
+        output = []
+        for group in base.comps.groups_iter():
+            if _is_group_installed(base, group.id):
+                output.append(
+                    f"{KEY_NAME}={group.id}\n{KEY_VERSION}={group.id}\n{KEY_ARCHITECTURE}=all\n"
+                )
+
+        if output:
+            sys.stdout.write("".join(output))
+            sys.stdout.flush()
+        return EXIT_SUCCESS
+    except dnf.exceptions.Error as e:
+        logging.debug(f"Error listing groups: {e}")
+        return EXIT_SUCCESS
+    finally:
+        base.close()
+
+
+def _check_group_updates(cache_only: bool) -> int:
+    """Check for group updates. Helper for list_updates and list_updates_local."""
+    base = _get_dnf_base(with_repos=True, cache_only=cache_only)
+    try:
+        if not _read_comps(base) or not base.comps:
+            return EXIT_SUCCESS
+
+        # Reuse single test base for efficiency
+        test_base = _get_dnf_base(with_repos=True, cache_only=cache_only)
+        test_base.read_comps()
+        test_base.init_plugins()
+        test_base.pre_configure_plugins()
+
+        try:
+            # Check each installed group for available updates
+            output = []
+            for group in base.comps.groups_iter():
+                if not _is_group_installed(base, group.id):
+                    continue
+
+                # Simulate upgrade to see if there are updates
+                try:
+                    # Mark group for upgrade
+                    test_base.group_upgrade(group.id)
+
+                    # Resolve to see if there are any packages to upgrade
+                    if test_base.resolve() and test_base.transaction:
+                        # There are updates available for this group
+                        output.append(
+                            f"{KEY_NAME}={group.id}\n{KEY_VERSION}=latest\n{KEY_ARCHITECTURE}=all\n"
+                        )
+
+                    # Reset for next group
+                    test_base.reset(goal=True, repos=False, sack=False)
+                except (dnf.exceptions.MarkingError, dnf.exceptions.CompsError):
+                    # Group can't be marked for upgrade or comps error
+                    test_base.reset(goal=True, repos=False, sack=False)
+                    continue
+
+            if output:
+                sys.stdout.write("".join(output))
+                sys.stdout.flush()
+            return EXIT_SUCCESS
+        finally:
+            test_base.close()
+    except dnf.exceptions.Error as e:
+        logging.debug(f"Error checking group updates: {e}")
+        return EXIT_SUCCESS
+    finally:
+        base.close()
+
+
+def list_updates() -> int:
+    """List groups that have package updates available.
+
+    Note: Groups themselves don't have versions, but the packages within
+    installed groups may have updates. This reports which groups contain
+    packages with available updates.
+    """
+    _parse_stdin()
+    return _check_group_updates(cache_only=False)
+
+
+def list_updates_local() -> int:
+    """List groups with updates using local cache only.
+
+    Same as list_updates but uses cached metadata.
+    """
+    _parse_stdin()
+    return _check_group_updates(cache_only=True)
+
+
+def repo_install() -> int:
+    packages, options = _parse_stdin()
+    if not packages:
+        return EXIT_SUCCESS
+
+    base = _get_dnf_base(with_repos=True, cache_only=False)
+    try:
+        _apply_setopt_options(base, options)
+        package_types = _parse_group_package_types(options)
+
+        # Initialize plugins for DNF history
+        base.init_plugins()
+        base.pre_configure_plugins()
+
+        _read_comps(base)  # Best effort, continue even if fails
+
+        # Process each group
+        for group_info in packages:
+            group_name = group_info.get("name", "").strip()
+            if not group_name:
+                continue
+
+            # Validate and check version parameter
+            version_str = group_info.get("version", "").strip().lower()
+            is_upgrade = version_str == VERSION_LATEST
+
+            if version_str and not is_upgrade:
+                logging.warning(
+                    f"Group '{group_name}': version='{version_str}' ignored. "
+                    f"DNF groups don't have versions. Use version='latest' to upgrade, or omit version."
+                )
+
+            # Find group
+            group = _find_group(base, group_name)
+            if not group:
+                sys.stdout.write(
+                    f"{KEY_ERROR_MESSAGE}=dnf package group {group_name} not found\n"
+                )
+                sys.stdout.flush()
+                return EXIT_SUCCESS
+
+            logging.debug(f"Found group '{group.id}'")
+
+            # Install, upgrade, or skip
+            if _is_group_installed(base, group.id):
+                if is_upgrade:
+                    logging.debug(f"Upgrading '{group.id}'")
+                    base.group_upgrade(group.id)
+                else:
+                    logging.debug(f"Already installed, skipping '{group.id}'")
+                    continue
+            else:
+                logging.debug(f"Installing '{group.id}' with types {package_types}")
+                base.group_install(group.id, package_types)
+
+        return _execute_transaction(base, "install")
+
+    except (dnf.exceptions.Error, dnf.exceptions.MarkingError) as e:
+        logging.error(f"Error during install: {e}", exc_info=True)
+        return EXIT_ERROR
+    finally:
+        base.close()
+
+
+def remove() -> int:
+    packages, options = _parse_stdin()
+    if not packages:
+        return EXIT_SUCCESS
+
+    base = _get_dnf_base(with_repos=True, cache_only=True)
+    try:
+        _apply_setopt_options(base, options)
+
+        # Initialize plugins
+        base.init_plugins()
+        base.pre_configure_plugins()
+
+        _read_comps(base)  # Best effort, continue even if fails
+
+        groups_removed = False
+        for pkg in packages:
+            group_name = pkg.get("name", "").strip()
+            if not group_name:
+                continue
+
+            # Find group
+            group = _find_group(base, group_name)
+            if not group or not _is_group_installed(base, group.id):
+                logging.debug(f"Group '{group_name}' not installed, skipping")
+                continue
+
+            logging.debug(f"Removing '{group.id}'")
+            try:
+                if hasattr(base, "env_group_remove"):
+                    base.env_group_remove([group.id])
+                else:
+                    base.group_remove(group.id)
+                groups_removed = True
+            except dnf.exceptions.MarkingError as e:
+                logging.error(f"Failed to mark '{group.id}' for removal: {e}")
+                return EXIT_ERROR
+
+        if not groups_removed:
+            logging.debug("No groups to remove")
+            return EXIT_SUCCESS
+
+        return _execute_transaction(base, "remove")
+
+    except dnf.exceptions.Error as e:
+        logging.error(f"Error during removal: {e}")
+        return EXIT_ERROR
+    finally:
+        base.close()
+
+
+def file_install() -> int:
+    logging.error("File installation not supported for package groups")
+    return EXIT_ERROR
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        return EXIT_UNSUPPORTED
+
+    commands = {
+        "supports-api-version": supports_api_version,
+        "get-package-data": get_package_data,
+        "list-installed": list_installed,
+        "list-updates": list_updates,
+        "list-updates-local": list_updates_local,
+        "repo-install": repo_install,
+        "remove": remove,
+        "file-install": file_install,
+    }
+
+    op = sys.argv[1]
+    if op not in commands:
+        return EXIT_UNSUPPORTED
+
+    try:
+        return commands[op]()
+    except Exception as e:
+        sys.stdout.write(f"{KEY_ERROR_MESSAGE}={e}\n")
+        sys.stdout.flush()
+        return EXIT_ERROR
+
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.WARNING,
+        format="%(levelname)s: %(message)s",
+        handlers=[logging.StreamHandler(sys.stderr)],
+    )
+    if os.environ.get("CFENGINE_DEBUG") or os.environ.get("DEBUG"):
+        logging.getLogger().setLevel(logging.DEBUG)
+        logging.debug(f"--- {' '.join(sys.argv)} ---")
+
+    sys.exit(main())
