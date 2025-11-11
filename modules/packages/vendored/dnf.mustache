@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+# Note: See lib/packages.cf `package_module dnf` use of the
+# `interpreter` attribute to use cfengine-selected-python.
+
+import sys
+import os
+import logging
+import dnf
+import rpm
+
+
+def _get_package_info_from_file(file_path):
+    """Extract package information from an RPM file using the python-rpm library."""
+    ts = rpm.TransactionSet()
+    try:
+        with open(file_path, 'rb') as f:
+            hdr = ts.hdrFromFdno(f.fileno())
+    except Exception as e:
+        raise Exception(f'Failed to read RPM header from {file_path}: {e}')
+
+    def _s(val):
+        return val.decode('utf-8') if isinstance(val, bytes) else str(val)
+
+    name = _s(hdr[rpm.RPMTAG_NAME])
+    version = _s(hdr[rpm.RPMTAG_VERSION])
+    release = _s(hdr[rpm.RPMTAG_RELEASE])
+    arch = _s(hdr[rpm.RPMTAG_ARCH])
+    epoch = hdr[rpm.RPMTAG_EPOCH]
+    epoch_str = '0' if epoch is None or _s(epoch) == '(none)' else _s(epoch)
+
+    return {
+        'name': name,
+        'version': version,
+        'release': release,
+        'arch': arch,
+        'epoch': epoch_str,
+        'full_version': f'{version}-{release}' if release else version,
+    }
+
+
+def _get_base(with_repos=True):
+    """Create and configure a DNF base object."""
+    base = dnf.Base()
+    base.conf.assumeyes = True
+    if with_repos:
+        base.read_all_repos()
+        base.fill_sack(load_system_repo='auto')
+    else:
+        base.fill_sack(load_system_repo=True, load_available_repos=False)
+    return base
+
+
+def _parse_stdin():
+    """Parses stdin protocol input into (packages, options)."""
+    packages, options, curr = [], [], {}
+    for line in sys.stdin:
+        k, _, v = line.strip().partition('=')
+        if k == 'options':
+            options.append(v)
+        elif k in ('Name', 'File'):
+            if curr:
+                packages.append(curr)
+            curr = {k.lower(): v}
+        elif k == 'Version':
+            curr['version'] = v
+        elif k == 'Architecture':
+            curr['arch'] = v
+    if curr:
+        packages.append(curr)
+    return packages, options
+
+
+def _apply_options(base, options):
+    """Apply repository options and generic DNF configuration from the policy."""
+    for option in options:
+        option = option.strip()
+        if '=' in option:
+            key, value = [x.strip() for x in option.split('=', 1)]
+            if key == 'enablerepo':
+                if value in base.repos:
+                    base.repos[value].enable()
+            elif key == 'disablerepo':
+                if value in base.repos:
+                    base.repos[value].disable()
+            elif hasattr(base.conf, key):
+                if value.lower() == 'true': value = True
+                elif value.lower() == 'false': value = False
+                elif value.isdigit(): value = int(value)
+                setattr(base.conf, key, value)
+        elif option.startswith('--'):
+            conf_key = option[2:].replace('-', '_')
+            if hasattr(base.conf, conf_key):
+                setattr(base.conf, conf_key, True)
+
+
+def _do_transaction(base):
+    """Resolves dependencies and executes the DNF transaction."""
+    if not base.resolve():
+        if not base.transaction: return 0
+    if not base.transaction:
+        return 0
+    base.download_packages(list(base.transaction.install_set))
+    base.do_transaction()
+    return 0
+
+
+def _resolve_spec(pkg):
+    """Resolve a package specification string from a package or file path."""
+    name = pkg.get('name')
+    file_path = pkg.get('file')
+
+    path = file_path or (name if name and name.startswith('/') else None)
+    if path:
+        if not os.path.exists(path):
+            raise Exception(f'Package file not found: {path}')
+        info = _get_package_info_from_file(path)
+        name = info['name']
+
+    if not name: return None
+    spec = name
+    if pkg.get('version'): spec += '-' + pkg.get('version')
+    if pkg.get('arch'): spec += '.' + pkg.get('arch')
+    return spec
+
+
+def get_package_data():
+    packages, _ = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid further processing if no package metadata is provided
+        return 1
+    pkg = packages[0]
+    pkg_string = pkg.get('file') or pkg.get('name')
+    if not pkg_string: return 1
+
+    if pkg_string.startswith('/'):
+        info = _get_package_info_from_file(pkg_string)
+        sys.stdout.write(f"PackageType=file\nName={info['name']}\nVersion={info['full_version']}\nArchitecture={info['arch']}\n")
+    else:
+        sys.stdout.write(f"PackageType=repo\nName={pkg_string}\n")
+    sys.stdout.flush()
+    return 0
+
+def list_installed():
+    _parse_stdin()
+    mi = rpm.TransactionSet().dbMatch()
+    for h in mi:
+        def _s(val):
+            return val.decode('utf-8') if isinstance(val, bytes) else str(val)
+        name = _s(h['name'])
+        ver = _s(h['version'])
+        rel = _s(h['release'])
+        arch = _s(h['arch'])
+        sys.stdout.write(f'Name={name}\nVersion={ver}-{rel}\nArchitecture={arch}\n')
+    return 0
+
+def list_updates(online):
+    packages, options = _parse_stdin()
+    base = _get_base(with_repos=True)
+    base.conf.cacheonly = not online
+    _apply_options(base, options)
+    try:
+        base.upgrade_all()
+        if base.resolve():
+            for tsi in base.transaction:
+                if tsi.action == dnf.transaction.PKG_UPGRADE:
+                    v_str = f'{tsi.pkg.version}-{tsi.pkg.release}'
+                    sys.stdout.write(f'Name={tsi.pkg.name}\nVersion={v_str}\nArchitecture={tsi.pkg.arch}\n')
+    finally: base.close()
+    return 0
+
+def repo_install():
+    packages, options = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid expensive DNF base initialization if no packages are provided
+        return 0
+    base = _get_base(with_repos=True)
+    _apply_options(base, options)
+    for pkg in packages:
+        spec = _resolve_spec(pkg)
+        if spec:
+            base.install(spec)
+    return _do_transaction(base)
+
+def remove():
+    packages, options = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid DNF base initialization if no packages are provided
+        return 0
+    base = _get_base(with_repos=False)
+    _apply_options(base, options)
+    for pkg in packages:
+        spec = _resolve_spec(pkg)
+        if spec:
+            base.remove(spec)
+    return _do_transaction(base)
+
+def file_install():
+    packages, options = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid DNF base initialization if no packages are provided
+        return 0
+    base = _get_base(with_repos=True)
+    _apply_options(base, options)
+    rpm_files = [p['file'] for p in packages if p.get('file')]
+    if not rpm_files:
+        # Optimization: Avoid further processing if no file paths were successfully parsed
+        return 0
+    for f in rpm_files:
+        if not os.path.exists(f):
+            raise Exception(f'Package file not found: {f}')
+    for pkg in base.add_remote_rpms(rpm_files):
+        base.package_install(pkg)
+    return _do_transaction(base)
+
+def supports_api_version():
+    """Report the supported package module API version."""
+    sys.stdout.write('1\n')
+    return 0
+
+def main():
+    if len(sys.argv) < 2:
+        return 2
+    op = sys.argv[1]
+
+    # Dispatch table for protocol commands
+    commands = {
+        'supports-api-version': supports_api_version,
+        'get-package-data': get_package_data,
+        'list-installed': list_installed,
+        'list-updates': lambda: list_updates(online=True),
+        'list-updates-local': lambda: list_updates(online=False),
+        'repo-install': repo_install,
+        'remove': remove,
+        'file-install': file_install,
+    }
+
+    if op not in commands:
+        return 2
+
+    try:
+        return commands[op]()
+    except Exception as e:
+        # Proper error output for CFEngine protocol
+        sys.stdout.write(f'ErrorMessage={str(e)}\n')
+        sys.stdout.flush()
+        return 1
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.WARNING, format='%(message)s', handlers=[logging.StreamHandler(sys.stderr)])
+    sys.exit(main())
