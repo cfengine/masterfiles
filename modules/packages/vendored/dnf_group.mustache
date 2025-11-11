@@ -1,0 +1,474 @@
+#!/usr/bin/python3
+#
+# DNF Group Package Module
+# Implements the CFEngine Package Module API for DNF package groups
+
+import sys
+import logging
+import os
+import dnf
+
+def supports_api_version():
+    """Return the API version supported by this module"""
+    sys.stdout.write("1\n")
+    return 0
+
+def get_package_data():
+    """Determine if the package is group-based or regular package"""
+    pkg_string = ""
+    version = ""
+    architecture = ""
+
+    for line in sys.stdin:
+        line = line.strip()
+        if line.startswith("File="):
+            pkg_string = line.split("=", 1)[1]
+        elif line.startswith("Version="):
+            version = line.split("=", 1)[1]
+        elif line.startswith("Architecture="):
+            architecture = line.split("=", 1)[1]
+        # Don't break, we need to exhaust stdin
+
+    if not pkg_string:
+        return 1
+
+    # For DNF groups, we consider them as "repo" type since they come from repositories
+    # Group names typically don't contain slashes or file extensions like regular packages
+    if "/" not in pkg_string and not pkg_string.endswith((".rpm")):
+        sys.stdout.write("PackageType=repo\n")
+        sys.stdout.write("Name=" + pkg_string + "\n")
+        # For groups, we don't return version/architecture as they're often ambiguous
+    else:
+        # This is likely a regular file-based package
+        sys.stdout.write("PackageType=file\n")
+        sys.stdout.write("Name=" + pkg_string + "\n")
+        if version:
+            sys.stdout.write("Version=" + version + "\n")
+        if architecture:
+            sys.stdout.write("Architecture=" + architecture + "\n")
+
+    return 0
+
+def _get_dnf_base():
+    """Create and configure a DNF base object"""
+    base = dnf.Base()
+    base.conf.assumeyes = True
+    # Default to cache only mode to avoid network unless specifically needed
+    base.conf.cacheonly = True
+    return base
+
+
+def _find_group_by_id(base, group_id):
+    """Find a group by ID only (not UI name)"""
+    for g in base.comps.groups_iter():
+        if g.id == group_id:
+            return g
+
+    # Group not found
+    return None
+
+
+def list_installed():
+    """List all installed package groups"""
+    try:
+        # Create a DNF base object
+        base = _get_dnf_base()
+
+        # Read configuration - disable network operations for performance
+        base.conf.cacheonly = True  # Don't try to refresh repos from network
+
+        # Read repository information (but use cache only)
+        try:
+            base.read_all_repos()
+        except:
+            # If repos can't be read, continue anyway
+            pass
+
+        # Fill the sack (package database) - use cache only
+        base.fill_sack(load_system_repo="auto")
+
+        # Load the comps data (groups/metadata) - this is where group definitions come from
+        try:
+            base.read_comps()
+        except Exception as e:
+            # If comps data isn't available, we can't list groups
+            logging.info(f"Comps data not available: {str(e)}")
+            return 0
+
+        # Get all available groups
+        all_groups = list(base.comps.groups_iter())
+
+        if not all_groups:
+            # If no groups are available, return empty result
+            logging.info("No group definitions available")
+            return 0
+
+        # Use the correct DNF API to check if groups are installed
+        # Based on DNF source code, groups are installed if base.history.group.get(group.id) returns a truthy value
+        for group in all_groups:
+            try:
+                # Check if the group is marked as installed in DNF history
+                if hasattr(base, "history") and hasattr(base.history, "group"):
+                    # This is how DNF itself determines if a group is installed
+                    group_found = base.history.group.get(group.id)
+                    if group_found:
+                        # Group is installed, output it
+                        sys.stdout.write(f"Name={group.id}\n")
+                        sys.stdout.write(f"Version={group.id}\n")
+                        sys.stdout.write(f"Architecture=all\n")
+                else:
+                    # If history API is not available, we can't properly determine installed status
+                    # This should ideally not happen in normal DNF usage
+                    logging.debug(f"History API not available for group '{group.id}', cannot determine install status")
+            except Exception as e:
+                logging.debug(f"Could not check status of group '{group.id}': {str(e)}")
+                continue
+
+        return 0
+    except Exception as e:
+        # It's OK if no groups are installed, so return 0
+        # Only log the error for debugging
+        logging.debug(
+            f"Error listing installed groups (may have no installed groups): {str(e)}"
+        )
+        return 0  # Return 0 because not having installed groups is not an error
+
+def list_updates():
+    """List available group updates (not typically applicable for groups)"""
+    # Groups don't typically have updates in the same way packages do
+    # This is a placeholder implementation
+    return 0
+
+def list_updates_local():
+    """List available group updates from local cache"""
+    # Groups don't typically have updates in the same way packages do
+    # This is a placeholder implementation
+    return 0
+
+def _get_groups_to_install(stdin):
+    """Parse stdin for groups to install and options"""
+    groups_to_install = []
+    optional_packages = False
+
+    for line in stdin:
+        line = line.strip()
+        if line.startswith("options="):
+            option = line[len("options=") :]
+            if option == "with-optional":
+                optional_packages = True
+        elif line.startswith("Name="):
+            group_name = line.split("=", 1)[1].strip()
+            group_name = group_name.replace("\\n", "").strip()
+            groups_to_install.append(group_name)
+
+    return groups_to_install, optional_packages
+
+def _install_groups(base, groups_to_install, optional_packages):
+    """Install a list of package groups"""
+    if not groups_to_install:
+        return 0
+
+    # Load comps data to access groups
+    try:
+        base.read_comps()
+    except Exception as e:
+        logging.debug(f"Could not read comps data: {str(e)}")
+        # Continue anyway as some systems might not have comps data in all repos
+
+    # Install the groups
+    for group_name in groups_to_install:
+        # Remove any trailing newline characters and whitespace
+        group_name = group_name.strip()
+        if not group_name:
+            continue
+
+        # Find group by ID only
+        group = _find_group_by_id(base, group_name)
+        if not group:
+            all_groups = list(base.comps.groups_iter())
+            if all_groups:
+                available_ids = [g.id for g in all_groups]
+                sys.stdout.write(f"ErrorMessage=dnf package group {group_name} not found in available groups: {', '.join(available_ids)}\n")
+            else:
+                sys.stdout.write(f"ErrorMessage=dnf package group {group_name} not found in available groups: No groups available.\n")
+            # Return 0 (success) to indicate protocol was processed, even though specific group failed
+            return 0
+
+        logging.debug(f"Found dnf package group '{group_name}' (ID: {group.id})")
+
+        # Install group with appropriate flags
+        # Use ['default', 'mandatory'] instead of just ['mandatory'] to match dnf group install behavior
+        if optional_packages:
+            types = ["mandatory", "default", "optional"]
+        else:
+            types = ["mandatory", "default"]
+
+        base.group_install(group.id, types)
+        logging.debug(f"dnf package group '{group.id}' marked for installation with types: {types}")
+
+    # Resolve and execute the transaction
+    try:
+        logging.debug("Attempting to resolve transaction...")
+        resolve_result = base.resolve()
+        logging.debug(f"Transaction resolved: {resolve_result}")
+
+        if resolve_result is False or not base.transaction:
+            # Changed condition to check if base.transaction is empty
+            logging.error(
+                f"Could not resolve transaction for dnf package group(s): {groups_to_install}"
+            )
+            if base.transaction and hasattr(base.transaction, "problems"):
+                problems = base.transaction.problems()
+                if problems:
+                    logging.error("dnf transaction problems:")
+                    for problem in problems:
+                        logging.error(f"  - {problem}")
+            logging.error("Transaction resolution failed.")
+            return 1
+
+        if base.transaction:
+            logging.debug("Transaction resolved successfully. Preparing to execute.")
+            transaction_items = list(base.transaction)
+            logging.debug(f"Transaction has {len(transaction_items)} items")
+
+            # List what packages will be installed
+            install_set = list(base.transaction.install_set)
+            if install_set:
+                logging.debug(
+                    f"dnf group packages to install: {[pkg.name for pkg in install_set[:10]]}"
+                )
+                if len(install_set) > 10:
+                    logging.debug(f"... and {len(install_set) - 10} more packages")
+            else:
+                logging.debug(
+                    "No packages in install set - may be updating existing group"
+                )
+
+            # Download packages first to ensure they're available
+            if install_set:
+                logging.debug("Downloading packages...")
+                base.download_packages(install_set)
+                logging.debug(f"Packages downloaded successfully")
+
+        # Execute the transaction
+        logging.debug("Executing transaction...")
+        base.do_transaction()
+        logging.debug(f"Transaction executed successfully")
+
+    except Exception as e:
+        logging.error(f"Error during transaction: {str(e)}", exc_info=True)
+        return 1
+
+    return 0
+
+def repo_install():
+    """Install package groups from repositories"""
+    try:
+        # Create a DNF base object
+        base = _get_dnf_base()
+
+        # Ensure network access is enabled for repository operations
+        base.conf.cacheonly = False
+        # Make sure we can access repositories
+        base.conf.assumeno = False
+
+        # Read repository information
+        base.read_all_repos()
+
+        # Fill the sack (package database) - refresh repository metadata
+        base.fill_sack(load_system_repo="auto")
+
+        # Parse groups to install from stdin
+        groups_to_install, optional_packages = _get_groups_to_install(sys.stdin)
+
+        # If we have groups to install, install them
+        return _install_groups(base, groups_to_install, optional_packages)
+
+    except Exception as e:
+        logging.error(f"Error during dnf package group install: {str(e)}", exc_info=True)
+        return 1
+
+
+def file_install():
+    """Install from file (not applicable for groups, but required by API)"""
+    # This is not applicable for groups, but we need to implement it for the API
+    logging.error("File installation is not supported for package groups")
+    return 1
+
+def _get_groups_to_remove(stdin):
+    """Parse stdin for groups to remove"""
+    groups_to_remove = []
+
+    for line in stdin:
+        line = line.strip()
+        if line.startswith("Name="):
+            group_name = line.split("=", 1)[1].strip()
+            group_name = group_name.replace("\\n", "").strip()
+            groups_to_remove.append(group_name)
+
+    return groups_to_remove
+
+def _remove_groups(base, groups_to_remove):
+    """Remove a list of package groups"""
+    if not groups_to_remove:
+        return 0
+
+    installed_groups_to_remove = []
+    # Process groups to determine which are installed and need removal
+    for group_name in groups_to_remove:
+        group_name = group_name.strip()
+        if not group_name:
+            continue
+
+        # Find group by ID only
+        group = _find_group_by_id(base, group_name)
+        if not group:
+            logging.debug(f"dnf package group '{group_name}' not found in available groups, considering it removed.")
+            continue
+
+        # Check if the group is actually installed
+        is_installed = hasattr(base, "history") and hasattr(base.history, "group") and base.history.group.get(group.id)
+
+        if not is_installed:
+            logging.debug(f"dnf package group '{group.id}' is not installed, considering it removed.")
+            continue
+
+        # If we get here, the group is installed and we must try to remove it
+        logging.debug(f"dnf package group '{group.id}' is installed and will be removed.")
+        installed_groups_to_remove.append(group)
+
+        try:
+            logging.debug(f"Attempting to mark dnf package group '{group.id}' for removal")
+            # Use the recommended method for group removal
+            if hasattr(base, "env_group_remove"):
+                base.env_group_remove([group.id])
+            else:
+                # Fallback for older DNF versions
+                logging.warning(f"env_group_remove not available, using fallback group_remove for dnf package group '{group.id}'")
+                base.group_remove(group.id)
+            logging.debug(f"Successfully marked dnf package group '{group.id}' for removal")
+        except Exception as e:
+            # If marking for removal fails for an installed group, it's a hard error
+            logging.error(f"Error marking installed dnf package group '{group.id}' for removal: {str(e)}")
+            return 1
+
+    # If no installed groups were found to remove, we're done
+    if not installed_groups_to_remove:
+        logging.debug("No installed dnf package groups to remove, promise kept.")
+        return 0
+
+    # Resolve and execute the transaction for the installed groups
+    try:
+        logging.debug(f"Attempting to resolve transaction for dnf package group removal(s): {[g.id for g in installed_groups_to_remove]}")
+        resolve_result = base.resolve()
+        logging.debug(f"Transaction resolve result: {resolve_result}")
+
+        if not base.transaction:
+            # This can happen if the group is empty or packages were removed manually
+            logging.debug("Transaction for dnf package group removal is empty, nothing to do.")
+            return 0
+
+        if resolve_result is False:
+            # If resolution fails, it's an error because we are trying to remove installed groups
+            logging.error(f"Could not resolve transaction for dnf package group removal(s): {[g.id for g in installed_groups_to_remove]}")
+            if hasattr(base.transaction, "problems"):
+                problems = base.transaction.problems()
+                if problems:
+                    logging.error("dnf transaction problems:")
+                    for problem in problems:
+                        logging.error(f"  - {problem}")
+            return 1
+
+        # Execute the transaction
+        logging.debug("Executing transaction...")
+        base.do_transaction()
+        logging.debug("Transaction executed successfully")
+        return 0
+    except Exception as e:
+        # If the transaction fails for an installed group, it's a hard error
+        logging.error(f"Transaction to remove dnf package groups {[g.id for g in installed_groups_to_remove]} failed: {str(e)}")
+        return 1
+
+def remove():
+    """Remove installed dnf package groups"""
+    try:
+        # Create a DNF base object
+        base = _get_dnf_base()
+
+        # Use cache only to avoid network connections
+        base.conf.cacheonly = True
+
+        # Read repository information (from cache only, the group metadata aka comps is there)
+        base.read_all_repos()
+
+        # Fill the sack (package database) - cache only
+        base.fill_sack(load_system_repo="auto")
+
+        # Load comps data to access groups
+        try:
+            base.read_comps()
+        except Exception as e:
+            logging.debug(f"Could not read dnf package group metadata (comps) removal: {str(e)}")
+            # Continue anyway as some systems might not have comps data in all repos
+
+        # Parse groups to remove from stdin
+        groups_to_remove = _get_groups_to_remove(sys.stdin)
+
+        # If we have groups to remove, remove them
+        return _remove_groups(base, groups_to_remove)
+
+    except Exception as e:
+        logging.error(f"Error during dnf package group removal: {str(e)}")
+        return 1
+
+def main():
+    """Main function"""
+    # Set up minimal logging to stderr for errors only, to not interfere with protocol
+    # The only output should be protocol responses to stdin commands
+    logging.basicConfig(
+        level=logging.WARNING,  # Only log warnings and errors to avoid protocol interference
+        format="%(levelname)s: %(message)s",
+        handlers=[logging.StreamHandler(sys.stderr)]
+    )
+    # Only log debug info when explicitly debugging
+    if os.environ.get('CFENGINE_DEBUG') or os.environ.get('DEBUG'):
+        logging.getLogger().setLevel(logging.DEBUG)
+        logging.debug(f"--- New execution with args: {' '.join(sys.argv)} ---")
+
+    if len(sys.argv) < 2:
+        # This error can go to stderr as it's before the protocol begins
+        logging.error("Need to provide argument")
+        return 2
+
+    arg = sys.argv[1]
+
+    if arg == "supports-api-version":
+        return supports_api_version()
+
+    elif arg == "get-package-data":
+        return get_package_data()
+
+    elif arg == "list-installed":
+        return list_installed()
+
+    elif arg == "list-updates":
+        return list_updates()
+
+    elif arg == "list-updates-local":
+        return list_updates_local()
+
+    elif arg == "repo-install":
+        return repo_install()
+
+    elif arg == "remove":
+        return remove()
+
+    elif arg == "file-install":
+        return file_install()
+
+    else:
+        logging.error("Invalid operation")
+        return 2
+
+if __name__ == "__main__":
+    sys.exit(main())
