@@ -1,0 +1,533 @@
+#!/usr/bin/env python3
+# Note: See lib/packages.cf `package_module dnf` use of the
+# `interpreter` attribute to use cfengine-selected-python.
+
+"""DNF Package Module for CFEngine.
+
+This module provides a Python-based interface between CFEngine and the DNF package
+manager, supporting package installation, removal, updates, and queries on RPM-based
+Linux distributions.
+
+The module implements the CFEngine package module protocol v1, communicating via
+stdin/stdout using a key=value format.
+
+Supported Operations:
+    - supports-api-version: Report API version compatibility
+    - get-package-data: Extract metadata from packages or RPM files
+    - list-installed: List all installed packages (uses RPM library for speed)
+    - list-updates: Check for available package updates (online/offline)
+    - list-updates-local: Check for updates using local cache only
+    - repo-install: Install packages from configured repositories
+    - file-install: Install packages from local RPM files
+    - remove: Uninstall packages from the system
+
+Configuration:
+    The module accepts options via stdin in the format:
+    - options=enablerepo=<repo_name>
+    - options=disablerepo=<repo_name>
+    - options=<dnf_config_key>=<value>
+
+Security Notes:
+    - File paths are validated for existence before processing
+    - DNF operations run with assumeyes=True to prevent interactive prompts
+    - All operations return proper exit codes (0=success, 1=error, 2=unsupported)
+
+Performance Optimizations:
+    - Uses RPM library directly for listing installed packages (faster than DNF)
+    - Supports offline mode using cached repository data
+    - Early returns when no packages are provided to avoid expensive initialization
+
+Error Handling:
+    - Exceptions are caught and reported via ErrorMessage=<message> format
+    - Resource cleanup is performed using try/finally blocks where appropriate
+
+Dependencies:
+    - python3
+    - python3-dnf
+    - python3-rpm
+
+Author: CFEngine AS
+License: MIT
+"""
+
+from typing import Dict, List, Tuple, Optional, Any, Union
+import sys
+import os
+import logging
+import dnf
+import rpm
+
+# Exit codes
+EXIT_SUCCESS = 0
+EXIT_ERROR = 1
+EXIT_UNSUPPORTED = 2
+
+# Protocol constants
+PROTOCOL_VERSION = "1"
+DEFAULT_EPOCH = "0"
+
+# Configuration constants
+MAX_INPUT_LINES = 10000  # Prevent DoS from excessive input
+DEFAULT_ASSUME_YES = True  # Non-interactive mode
+
+
+def _s(val: Union[bytes, str, Any]) -> str:
+    """Convert bytes to string, pass through other types as str().
+
+    Args:
+        val: Value to convert (bytes, str, or other)
+
+    Returns:
+        String representation of the value
+    """
+    return val.decode("utf-8") if isinstance(val, bytes) else str(val)
+
+
+# Protocol keys (input)
+KEY_OPTIONS = "options"
+KEY_NAME = "Name"
+KEY_FILE = "File"
+KEY_VERSION = "Version"
+KEY_ARCHITECTURE = "Architecture"
+
+# Protocol keys (output)
+KEY_ERROR_MESSAGE = "ErrorMessage"
+KEY_PACKAGE_TYPE = "PackageType"
+
+# Package type values
+PACKAGE_TYPE_FILE = "file"
+PACKAGE_TYPE_REPO = "repo"
+
+# Repository option keys
+OPT_ENABLE_REPO = "enablerepo"
+OPT_DISABLE_REPO = "disablerepo"
+OPT_ALLOW_DOWNGRADE = "allow_downgrade"
+
+# Boolean string values
+BOOL_TRUE = "true"
+BOOL_FALSE = "false"
+
+# Command line option prefix
+CLI_OPTION_PREFIX = "--"
+
+
+def _get_package_info_from_file(file_path: str) -> Dict[str, str]:
+    """Extract package information from an RPM file using the python-rpm library.
+
+    Args:
+        file_path: Path to the RPM file
+
+    Returns:
+        Dictionary containing package metadata (name, version, release, arch, epoch, full_version)
+
+    Raises:
+        Exception: If RPM header cannot be read
+    """
+    ts = rpm.TransactionSet()
+    try:
+        with open(file_path, "rb") as f:
+            hdr = ts.hdrFromFdno(f.fileno())
+    except Exception as e:
+        raise Exception(f"Failed to read RPM header from {file_path}: {e}")
+
+    name = _s(hdr[rpm.RPMTAG_NAME])  # type: ignore[attr-defined]
+    version = _s(hdr[rpm.RPMTAG_VERSION])  # type: ignore[attr-defined]
+    release = _s(hdr[rpm.RPMTAG_RELEASE])  # type: ignore[attr-defined]
+    arch = _s(hdr[rpm.RPMTAG_ARCH])  # type: ignore[attr-defined]
+    epoch = hdr[rpm.RPMTAG_EPOCH]  # type: ignore[attr-defined]
+    epoch_str = DEFAULT_EPOCH if epoch is None else _s(epoch)
+
+    return {
+        "name": name,
+        "version": version,
+        "release": release,
+        "arch": arch,
+        "epoch": epoch_str,
+        "full_version": f"{version}-{release}" if release else version,
+    }
+
+
+def _get_base(with_repos: bool = True) -> dnf.Base:
+    """Create and configure a DNF base object.
+
+    Args:
+        with_repos: Whether to load repository information
+
+    Returns:
+        Configured DNF Base instance
+    """
+    base = dnf.Base()
+    base.conf.assumeyes = DEFAULT_ASSUME_YES
+    if with_repos:
+        base.read_all_repos()
+        base.fill_sack(load_system_repo=True)
+    else:
+        base.fill_sack(load_system_repo=True, load_available_repos=False)
+    return base
+
+
+def _parse_stdin() -> Tuple[List[Dict[str, str]], List[str]]:
+    """Parses stdin protocol input into (packages, options).
+
+    Returns:
+        Tuple of (packages list, options list) where:
+        - packages: List of dicts with keys like 'name', 'file', 'version', 'arch'
+        - options: List of option strings
+
+    Raises:
+        Exception: If input exceeds MAX_INPUT_LINES
+    """
+    packages: List[Dict[str, str]] = []
+    options: List[str] = []
+    curr: Dict[str, str] = {}
+    for line_num, line in enumerate(sys.stdin):
+        if line_num >= MAX_INPUT_LINES:
+            raise Exception(f"Input exceeds maximum allowed lines ({MAX_INPUT_LINES})")
+        k, _, v = line.strip().partition("=")
+        if k == KEY_OPTIONS:
+            options.append(v)
+        elif k in (KEY_NAME, KEY_FILE):
+            if curr:
+                packages.append(curr)
+            curr = {k.lower(): v}
+        elif k == KEY_VERSION:
+            curr["version"] = v
+        elif k == KEY_ARCHITECTURE:
+            curr["arch"] = v
+    if curr:
+        packages.append(curr)
+    return packages, options
+
+
+def _is_downgrade_allowed(options: List[str]) -> bool:
+    """Check if package downgrade is explicitly allowed via options.
+
+    Args:
+        options: List of option strings
+
+    Returns:
+        True if 'allow_downgrade=true' is found, False otherwise.
+    """
+    for option in options:
+        option = option.strip()
+        if "=" in option:
+            key, value = [x.strip() for x in option.split("=", 1)]
+            if key == OPT_ALLOW_DOWNGRADE and value.lower() == BOOL_TRUE:
+                return True
+    return False
+
+
+def _apply_options(base: dnf.Base, options: List[str]) -> None:
+    """Apply repository options and generic DNF configuration from the policy.
+
+    Args:
+        base: DNF Base instance to configure
+        options: List of option strings in format "key=value" or "--flag"
+    """
+    for option in options:
+        option = option.strip()
+        if "=" in option:
+            key, value = [x.strip() for x in option.split("=", 1)]
+            if key == OPT_ENABLE_REPO:
+                if base.repos is not None and value in base.repos:
+                    base.repos[value].enable()
+            elif key == OPT_DISABLE_REPO:
+                if base.repos is not None and value in base.repos:
+                    base.repos[value].disable()
+            elif key == OPT_ALLOW_DOWNGRADE:
+                pass  # Handled separately
+            elif hasattr(base.conf, key):
+                attr = getattr(base.conf, key)
+                if not callable(attr):
+                    conf_value: Union[bool, int, str] = value
+                    if value.lower() == BOOL_TRUE:
+                        conf_value = True
+                    elif value.lower() == BOOL_FALSE:
+                        conf_value = False
+                    elif value.isdigit():
+                        conf_value = int(value)
+                    try:
+                        setattr(base.conf, key, conf_value)
+                    except Exception as e:
+                        logging.warning(
+                            f"Failed to set config '{key}' to '{conf_value}': {e}"
+                        )
+        elif option.startswith(CLI_OPTION_PREFIX):
+            conf_key = option[len(CLI_OPTION_PREFIX) :].replace("-", "_")
+            if hasattr(base.conf, conf_key):
+                attr = getattr(base.conf, conf_key)
+                if not callable(attr):
+                    try:
+                        setattr(base.conf, conf_key, True)
+                    except Exception as e:
+                        logging.warning(f"Failed to set flag '{conf_key}': {e}")
+
+
+def _do_transaction(base: dnf.Base) -> int:
+    """Resolves dependencies and executes the DNF transaction.
+
+    Args:
+        base: DNF Base instance with pending transaction
+
+    Returns:
+        0 on success, non-zero on failure
+    """
+    if not base.resolve():
+        if not base.transaction:
+            return 0
+    if not base.transaction:
+        return 0
+    base.download_packages(list(base.transaction.install_set))
+    base.do_transaction()
+    return 0
+
+
+def _resolve_spec(pkg: Dict[str, str]) -> Optional[str]:
+    """Resolve a package specification string from a package or file path.
+
+    Args:
+        pkg: Package dictionary with keys like 'name', 'file', 'version', 'arch'
+
+    Returns:
+        Package specification string or None if unable to resolve
+
+    Raises:
+        Exception: If specified file does not exist
+    """
+    name = pkg.get("name")
+    file_path = pkg.get("file")
+
+    path = file_path or (name if name and name.startswith("/") else None)
+    if path:
+        if not os.path.exists(path):
+            raise Exception(f"Package file not found: {path}")
+        info = _get_package_info_from_file(path)
+        name = info["name"]
+
+    if not name:
+        return None
+    spec = name
+    version = pkg.get("version")
+    if version:
+        spec += "-" + version
+    arch = pkg.get("arch")
+    if arch:
+        spec += "." + arch
+    return spec
+
+
+def get_package_data() -> int:
+    """Get package metadata from stdin and output it.
+
+    Returns:
+        0 on success, 1 on failure
+    """
+    packages, _ = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid further processing if no package metadata is provided
+        return 1
+    pkg = packages[0]
+    pkg_string = pkg.get("file") or pkg.get("name")
+    if not pkg_string:
+        return 1
+
+    if pkg_string.startswith("/"):
+        info = _get_package_info_from_file(pkg_string)
+        sys.stdout.write(
+            f"{KEY_PACKAGE_TYPE}={PACKAGE_TYPE_FILE}\n{KEY_NAME}={info['name']}\n{KEY_VERSION}={info['full_version']}\n{KEY_ARCHITECTURE}={info['arch']}\n"
+        )
+    else:
+        sys.stdout.write(
+            f"{KEY_PACKAGE_TYPE}={PACKAGE_TYPE_REPO}\n{KEY_NAME}={pkg_string}\n"
+        )
+    sys.stdout.flush()
+    return 0
+
+
+def list_installed() -> int:
+    """List all installed packages.
+
+    Returns:
+        0 on success, non-zero on failure
+    """
+    _parse_stdin()  # Protocol requires reading stdin even if unused
+    mi = rpm.TransactionSet().dbMatch()
+    for h in mi:
+        name = _s(h["name"])
+        ver = _s(h["version"])
+        rel = _s(h["release"])
+        arch = _s(h["arch"])
+        sys.stdout.write(
+            f"{KEY_NAME}={name}\n{KEY_VERSION}={ver}-{rel}\n{KEY_ARCHITECTURE}={arch}\n"
+        )
+    sys.stdout.flush()
+    return 0
+
+
+def list_updates(online: bool) -> int:
+    """List available package updates.
+
+    Args:
+        online: Whether to check online repositories or use cache only
+
+    Returns:
+        0 on success, non-zero on failure
+    """
+    packages, options = _parse_stdin()
+    base = _get_base(with_repos=True)
+    base.conf.cacheonly = not online
+    _apply_options(base, options)
+    try:
+        base.upgrade_all()
+        if base.resolve() and base.transaction:
+            for tsi in base.transaction:
+                if tsi.action == dnf.transaction.PKG_UPGRADE:  # type: ignore[attr-defined]
+                    v_str = f"{tsi.pkg.version}-{tsi.pkg.release}"
+                    sys.stdout.write(
+                        f"{KEY_NAME}={tsi.pkg.name}\n{KEY_VERSION}={v_str}\n{KEY_ARCHITECTURE}={tsi.pkg.arch}\n"
+                    )
+        sys.stdout.flush()
+    finally:
+        base.close()
+    return EXIT_SUCCESS
+
+
+def repo_install() -> int:
+    """Install packages from repositories.
+
+    Returns:
+        0 on success, non-zero on failure
+    """
+    packages, options = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid expensive DNF base initialization if no packages are provided
+        return 0
+    base = _get_base(with_repos=True)
+    try:
+        _apply_options(base, options)
+        allow_downgrade = _is_downgrade_allowed(options)
+        for pkg in packages:
+            spec = _resolve_spec(pkg)
+            if spec:
+                try:
+                    base.install(spec)
+                except Exception as install_err:
+                    if allow_downgrade:
+                        try:
+                            base.downgrade(spec)
+                        except Exception as downgrade_err:
+                            logging.warning(
+                                f"Failed to install or downgrade '{spec}': "
+                                f"install error: {install_err}, downgrade error: {downgrade_err}"
+                            )
+                    else:
+                        logging.warning(f"Failed to install '{spec}': {install_err}")
+        return _do_transaction(base)
+    finally:
+        base.close()
+
+
+def remove() -> int:
+    """Remove installed packages.
+
+    Returns:
+        0 on success, non-zero on failure
+    """
+    packages, options = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid DNF base initialization if no packages are provided
+        return 0
+    base = _get_base(with_repos=False)
+    try:
+        _apply_options(base, options)
+        for pkg in packages:
+            spec = _resolve_spec(pkg)
+            if spec:
+                base.remove(spec)
+        return _do_transaction(base)
+    finally:
+        base.close()
+
+
+def file_install() -> int:
+    """Install packages from local RPM files.
+
+    Returns:
+        0 on success, non-zero on failure
+
+    Raises:
+        Exception: If package files are not found
+    """
+    packages, options = _parse_stdin()
+    if not packages:
+        # Optimization: Avoid DNF base initialization if no packages are provided
+        return 0
+    rpm_files: List[str] = [p["file"] for p in packages if p.get("file")]
+    if not rpm_files:
+        # Optimization: Avoid further processing if no file paths were successfully parsed
+        return 0
+    for f in rpm_files:
+        if not os.path.exists(f):
+            raise Exception(f"Package file not found: {f}")
+    base = _get_base(with_repos=True)
+    try:
+        _apply_options(base, options)
+        for pkg in base.add_remote_rpms(rpm_files):
+            base.package_install(pkg)
+        return _do_transaction(base)
+    finally:
+        base.close()
+
+
+def supports_api_version() -> int:
+    """Report the supported package module API version.
+
+    Returns:
+        Always returns 0
+    """
+    sys.stdout.write(f"{PROTOCOL_VERSION}\n")
+    return 0
+
+
+def main() -> int:
+    """Main entry point for the DNF module.
+
+    Returns:
+        Exit code: 0 for success, 1 for error, 2 for unsupported command
+    """
+    if len(sys.argv) < 2:
+        return EXIT_UNSUPPORTED
+
+    op: str = sys.argv[1]
+
+    # Dispatch table for protocol commands
+    commands: Dict[str, Any] = {
+        "supports-api-version": supports_api_version,
+        "get-package-data": get_package_data,
+        "list-installed": list_installed,
+        "list-updates": lambda: list_updates(online=True),
+        "list-updates-local": lambda: list_updates(online=False),
+        "repo-install": repo_install,
+        "remove": remove,
+        "file-install": file_install,
+    }
+
+    if op not in commands:
+        return EXIT_UNSUPPORTED
+
+    try:
+        return commands[op]()
+    except Exception as e:
+        # Proper error output for CFEngine protocol
+        sys.stdout.write(f"{KEY_ERROR_MESSAGE}={str(e)}\n")
+        sys.stdout.flush()
+        return EXIT_ERROR
+
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.WARNING,
+        format="%(message)s",
+        handlers=[logging.StreamHandler(sys.stderr)],
+    )
+    sys.exit(main())
