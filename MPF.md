@@ -1871,6 +1871,30 @@ This can be configured via [augments][Augments]:
 
 **History:** Added 3.11.0
 
+### Configure maxconnections for cf-agent
+
+`maxconnections` in `body agent control` configures the maximum number of
+outbound connections allowed by `cf-agent`. By default the MPF configures this to `30` matching the binary default.
+
+**Notes:**
+
+- Generally this would need to be increased for hosts who are copying files from many other hosts (a-typical, especially in Enterprise environments).
+
+This can be configured via [augments][Augments]:
+
+```json
+{
+  "variables": {
+    "default:def.control_agent_maxconnections": {
+      "value": "1000",
+      "comment": "On the hub we collect a data file from each client recently seen, this requires cf-agent to be allowed to make many connections"
+    }
+  }
+}
+```
+
+**History:** Added in CFEngine 3.10.0
+
 ### Configure networks allowed to make collect_calls (client initiated reporting)
 
 By default the hub allows collect calls (client initiated reporting) from the
