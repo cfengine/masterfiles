@@ -121,8 +121,9 @@ bundle agent init
       # packages where earlier releases did not, so fails many tests.
       # RHEL 8 has broken DNF (upgrading a 32bit package also installs a 64bit
       # package)
+
       "test_soft_fail" string => "rhel_8|rhel_9",
-        meta  => {"CFE-rhbz", "CFE-4096"};
+        meta  => {"CFE-rhbz", "CFE-4096", "ENT-13499" };
 
   # For setting up the cfengine-selected-python symlink we want to
   # target $(sys.bindir) as that will be in the test WORKDIR.

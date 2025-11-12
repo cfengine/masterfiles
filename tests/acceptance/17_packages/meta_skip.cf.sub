@@ -1,9 +1,9 @@
 bundle common 17_packages_meta
 {
   meta:
-    "test_skip_needs_work" string => "(!redhat.!debian)|(!x86_64)",
-      comment => "Need to create test packages for platforms other than x86 redhat and debian based distributions.",
-      meta => { "CFE-3993", "CFE-3992"};
+    "test_skip_needs_work" string => "(!redhat.!debian)|(!x86_64)|(debian_13|redhat_10)",
+      comment => "Need to create test packages for platforms other than x86 redhat and debian based distributions. Also, debian-13 deprecates apt-key and requires a newer pubkey algorithm.",
+      meta => { "CFE-3993", "CFE-3992", "ENT-13499" };
 
     "test_skip_unsupported" string => "redhat_4|centos_4|debian_4|debian_etch",
       comment => "RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.",
