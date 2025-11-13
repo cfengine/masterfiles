@@ -13,21 +13,13 @@ body common control
                 "../../../../../$(sys.local_libdir)/packages.cf",
                 "../../../../../inventory/any.cf",
                 "../../packages-info.cf.sub",
+                "../../meta_skip.cf.sub",
               };
     bundlesequence => { default($(this.promise_files)) };
 }
 
 bundle agent init
 {
-  meta:
-      # need packages for platforms other than redhat and debian on x86_64 architecture
-      # see tests/acceptance/17_packages/meta_skip.cf.sub
-      "test_skip_needs_work" string => "(!redhat.!debian)|(!x86_64)",
-        meta => { "CFE-3992" };
-      # RedHat 4 RPM has a bug which corrupts the RPM DB during our tests, so it is untestable.
-      # And available patches is an Enterprise feature.
-      "test_skip_unsupported" string => "redhat_4|centos_4|!enterprise";
-
   methods:
       "any" usebundle => clear_packages("dummy");
       "any" usebundle => install_package("$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy");
