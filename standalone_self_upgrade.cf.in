@@ -553,11 +553,17 @@ bundle common cfengine_package_names
       "pkg[oracle_8_x86_64]" string => "$(pkg[redhat_8_x86_64])";
       "pkg[rocky_8_x86_64]" string => "$(pkg[redhat_8_x86_64])";
 
-      # Redhat/Centos/Oracle/Rocky 8 use the same package
+      # Redhat/Centos/Oracle/Rocky 9 use the same package
       "pkg[redhat_9_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el9.x86_64.rpm";
       "pkg[centos_9_x86_64]" string => "$(pkg[redhat_9_x86_64])";
       "pkg[oracle_9_x86_64]" string => "$(pkg[redhat_9_x86_64])";
       "pkg[rocky_9_x86_64]" string => "$(pkg[redhat_9_x86_64])";
+
+      # Redhat/Centos/Oracle/Rocky 10 use the same package
+      "pkg[redhat_10_x86_64]" string => "$(pkg_name)-$(pkg_version)-$(pkg_release).el10.x86_64.rpm";
+      "pkg[centos_10_x86_64]" string => "$(pkg[redhat_10_x86_64])";
+      "pkg[oracle_10_x86_64]" string => "$(pkg[redhat_10_x86_64])";
+      "pkg[rocky_10_x86_64]" string => "$(pkg[redhat_10_x86_64])";
 
 
       # 64bit Debian
@@ -568,6 +574,7 @@ bundle common cfengine_package_names
       "pkg[debian_10_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian10_amd64.deb";
       "pkg[debian_11_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian11_amd64.deb";
       "pkg[debian_12_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian12_amd64.deb";
+      "pkg[debian_13_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian13_amd64.deb";
 
       # 64bit Ubuntu
       "pkg[ubuntu_14_x86_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).ubuntu14_amd64.deb";
@@ -584,6 +591,7 @@ bundle common cfengine_package_names
       # aarch64 Debian
       "pkg[debian_11_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian11_arm64.deb";
       "pkg[debian_12_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian12_arm64.deb";
+      "pkg[debian_13_arm_64]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian13_arm64.deb";
 
       # 32bit DEBs
       "pkg[$(cfengine_master_software_content._deb_dists)_$(cfengine_master_software_content._32bit_arches)]" string => "$(pkg_name)_$(pkg_version)-$(pkg_release).debian7_i386.deb";
@@ -662,6 +670,12 @@ bundle agent cfengine_master_software_content
       "dir[oracle_9_x86_64]" string => "$(dir[redhat_9_x86_64])";
       "dir[rocky_9_x86_64]" string => "$(dir[redhat_9_x86_64])";
 
+      # Redhat/Centos/Oracle/Rocky 10 use the same package
+      "dir[redhat_10_x86_64]" string => "agent_rhel10_x86_64";
+      "dir[centos_10_x86_64]" string => "$(dir[redhat_10_x86_64])";
+      "dir[oracle_10_x86_64]" string => "$(dir[redhat_10_x86_64])";
+      "dir[rocky_10_x86_64]" string => "$(dir[redhat_10_x86_64])";
+
       # Debian
       "dir[debian_7_x86_64]" string => "agent_deb_x86_64";
       "dir[debian_8_x86_64]" string => "agent_debian8_x86_64";
@@ -670,7 +684,9 @@ bundle agent cfengine_master_software_content
       "dir[debian_11_x86_64]" string => "agent_debian11_x86_64";
       "dir[debian_11_arm_64]" string => "agent_debian11_arm_64";
       "dir[debian_12_x86_64]" string => "agent_debian12_x86_64";
+      "dir[debian_13_x86_64]" string => "agent_debian13_x86_64";
       "dir[debian_12_arm_64]" string => "agent_debian12_arm_64";
+      "dir[debian_13_arm_64]" string => "agent_debian13_arm_64";
 
       # Ubuntu
       "dir[ubuntu_14_x86_64]" string => "agent_ubuntu14_x86_64";
