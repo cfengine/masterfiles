@@ -1,3 +1,37 @@
+3.27.0
+	- Added dmidecode to well known paths for Red Hat (ENT-12988)
+	- Added fsattrs bodies to manage the immutable bit (CFE-4582)
+	- Added recommendation about nfs server and consistent use of root dot
+	  (ENT-13223)
+	- Adjust nova API rest URL for custom https port (ENT-12653)
+	- Adjusted mission portal httpd.conf validation to show errors when they occur
+	  (ENT-12653)
+	- Changed NFS Server inventory to report only unique servers
+	  (ENT-13223)
+	- Disabled policy version in masterfiles because it is now managed and inventoried by
+	  default by the core agent inside sys.policy_version (ENT-4043)
+	- Disabled sync of Mission Portal config from share/GUI unless explicitly enabled
+	  (ENT-13175, ENT-13172, ENT-13173)
+	- Fixed duplicate bundlesequence_end when bundlesequence_classification not defined
+	  (CFE-4588)
+	- Fixed path to lsof on Red Hat 7 and greater (ENT-12987)
+	- Increased timeout for php processing to allow for longer running requests
+	  (ENT-13291)
+	- Made protocol_version configurable via Augments (CFE-4543)
+	- Prevented nfs server inventory from doing unnecessary extra work
+	  (ENT-13210)
+	- Redirection from HTTP to HTTPS responsibility moved from Apache to PHP
+	  (ENT-11481)
+	- Removed duplicate well known paths for ls and lsof on opensuse
+	  (ENT-12990)
+	- Stopped automatic mirroring of WORKDIR/share/GUI to Mission Portal docroot
+	  (ENT-13172)
+	- Stopped enforcing permission management of $(sys.workdir)/share/GUI
+	  (ENT-13171)
+	- Stopped enforcing permissions of public docroot scripts (ENT-13243)
+	- Stopped mirroring .htaccess from share/GUI to Mission Portal docroot
+	  (ENT-13173)
+
 3.26.0:
 	- Inhibited management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
 	  (ENT-12658)
