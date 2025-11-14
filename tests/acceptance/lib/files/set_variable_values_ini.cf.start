@@ -14,3 +14,5 @@ variablename3 =desired value3
 #  keytwo = bar
 [something]
 keyone=something1
+[CFE-413]
+keytwo=value=two
