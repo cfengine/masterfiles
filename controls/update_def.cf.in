@@ -156,6 +156,11 @@ bundle common update_def
         if => and( "mpf_update_control_agent_default_repository",
                    not( isvariable( "control_agent_default_repository" ) ) );
 
+      "control_agent_default_directory_create_mode" -> { "CFE-4590" }
+        string => ifelse( isvariable("control_common_default_directory_create_mode"),
+                          "$(control_common_default_directory_create_mode)",
+                          "700");
+
     enable_cfengine_enterprise_hub_ha::
       "standby_servers" slist => filter("$(sys.policy_hub)", "ha_def.ips", false, true, 10);
       "policy_servers" slist => { "$(sys.policy_hub)", "@(standby_servers)" };
@@ -174,6 +179,11 @@ bundle common update_def
         string => ifelse( strcmp( $(control_common_ignore_missing_inputs), "true" ),
                           "true",
                           "false");
+
+      "control_common_default_directory_create_mode" -> { "CFE-4590" }
+        string => ifelse( isvariable("control_common_default_directory_create_mode"),
+                          "$(control_common_default_directory_create_mode)",
+                          "700");
 
       "control_agent_agentfacility" -> { "ENT-10209" }
         string => "",

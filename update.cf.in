@@ -35,6 +35,9 @@ body common control
         ignore_missing_bundles => "$(update_def.control_common_ignore_missing_bundles)";
         ignore_missing_inputs => "$(update_def.control_common_ignore_missing_inputs)";
 
+@if minimum_version(3.27.0)
+        default_directory_create_mode => "$(update_def.control_common_default_directory_create_mode)";
+@endif
     control_common_tls_min_version_defined::
         tls_min_version => "$(default:def.control_common_tls_min_version)"; # See also: allowtlsversion in body server control
 
@@ -188,6 +191,10 @@ body agent control
 {
       ifelapsed => "1";
       skipidentify => "true";
+
+@if minimum_version(3.27.0)
+        default_directory_create_mode => "$(default:update_def.control_agent_default_directory_create_mode)";
+@endif
 
     control_agent_agentfacility_configured::
 

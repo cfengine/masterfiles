@@ -654,6 +654,47 @@ This [augments file][Augments] is a way to specify that `cf-monitord` should be 
 }
 ```
 
+### Configure default directory creation permissions for update policy
+The `default_directory_create_mode` attribute in body agent control enables
+users to specify custom permissions (e.g., 0755) for automatically created
+directories, avoiding the need for explicit perms promises on each parent
+directory when deeper paths are required.
+
+The mode string may be symbolic or numerical, like `chmod`.
+
+The default permissions can be overridden via Augments, for example:
+
+To override the default for **all components** (a-typical) configure `default:update_def.control_common_default_directory_create_mode`, for example:
+
+```json
+{
+    "variables": {
+        "default:update_def.control_common_default_directory_create_mode": {
+            "value": "0755"
+        }
+    }
+}
+```
+
+To override the default for **cf-agent** configure `default:update_def.control_agent_default_directory_create_mode`, for example:
+
+```json
+{
+    "variables": {
+        "default:update_def.control_agent_default_directory_create_mode": {
+            "value": "a+rx"
+        }
+    }
+}
+```
+
+**See also:** [`default_directory_create_mode` in `body common control`][Components#default_directory_create_mode], [`default_directory_create_mode` in `body agent control`][cf-agent#default_directory_create_mode]
+
+**History:**
+
+- Added in CFEngine 3.27.0
+
+
 ## Main policy (promises.cf)
 
 The following settings are defined in `controls/def.cf` can be set from an
@@ -2766,6 +2807,47 @@ Maximum time between automatic WAL checkpoints. If this value is specified witho
 **History:**
 
 * Added in 3.20.0, 3.18.2
+
+### Configure default directory creation permissions for main policy
+
+The `default_directory_create_mode` attribute in body agent control enables
+users to specify custom permissions (e.g., 0755) for automatically created
+directories, avoiding the need for explicit perms promises on each parent
+directory when deeper paths are required.
+
+The mode string may be symbolic or numerical, like `chmod`.
+
+The default permissions can be overridden via Augments, for example:
+
+To override the default for **all components** (a-typical) configure `default:def.control_common_default_directory_create_mode`, for example:
+
+```json
+{
+    "variables": {
+        "default:def.control_common_default_directory_create_mode": {
+            "value": "0755"
+        }
+    }
+}
+```
+
+To override the default for **cf-agent** configure `default:def.control_agent_default_directory_create_mode`, for example:
+
+```json
+{
+    "variables": {
+        "default:def.control_agent_default_directory_create_mode": {
+            "value": "a+rx"
+        }
+    }
+}
+```
+
+**See also:** [`default_directory_create_mode` in `body common control`][Components#default_directory_create_mode], [`default_directory_create_mode` in `body agent control`][cf-agent#default_directory_create_mode]
+
+**History:**
+
+- Added in CFEngine 3.27.0
 
 ## Recommendations
 
