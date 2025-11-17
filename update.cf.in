@@ -193,6 +193,9 @@ body agent control
 @if minimum_version(3.27.0)
       # The order in which promises are evaluated (top_down|classic)
         evaluation_order => "$(default:def.control_agent_update_evaluation_order)";
+
+      # The permissions automatically created directories should have
+        default_directory_create_mode => "$(default:update_def.control_agent_default_directory_create_mode)";
 @endif
 
     control_agent_agentfacility_configured::

@@ -45,6 +45,10 @@ body agent control
       # EMPTY list is not valid for environment attribute Ref: CFE-3927. So, we
       # do some validation on it so we can apply it selectively.
 
+@if minimum_version(3.27.0)
+      default_directory_create_mode => "$(def.control_agent_default_directory_create_mode)";
+@endif
+
    _control_agent_environment_vars_validated::
 
       environment => { @(def.control_agent_environment_vars) };
