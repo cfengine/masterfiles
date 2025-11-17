@@ -344,6 +344,12 @@ bundle common def
                            " the binary default of 10080 minutes (1 week)" );
 
       # Agent controls
+
+      "control_agent_default_directory_create_mode" -> { "CFE-4590" }
+        string => ifelse( isvariable("control_agent_default_directory_create_mode"),
+                          "$(control_agent_default_directory_create_mode)",
+                          "700");
+
 @if minimum_version(3.18.0)
       # TODO When 3.18 is the oldest supported LTS, redact this macro and associated protections
       "control_agent_files_single_copy" -> { "CFE-3622" }
