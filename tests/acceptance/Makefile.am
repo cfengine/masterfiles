@@ -18,7 +18,7 @@ clean-local:
 
 
 check-local: create-env
-	MAKE=$(MAKE) ./testall
+	MAKE=$(MAKE) ./testall ./17_packages/11_old/unsafe/package-inventory.cf
 
 CLEANFILES  = testall.env summary.log test.log test.xml Makefile.testall
 #These are created by running the submakefile
