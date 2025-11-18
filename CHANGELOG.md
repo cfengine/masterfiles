@@ -1,5 +1,5 @@
 3.27.0
-	- Added dmidecode to well known paths for Red Hat (ENT-12988)
+	- Added $(paths.dmidecode) for Red Hat (ENT-12988)
 	- Added fsattrs bodies to manage the immutable bit (CFE-4582)
 	- Added recommendation about nfs server and consistent use of root dot
 	  (ENT-13223)
@@ -15,22 +15,18 @@
 	- Fixed duplicate bundlesequence_end when bundlesequence_classification not defined
 	  (CFE-4588)
 	- Fixed path to lsof on Red Hat 7 and greater (ENT-12987)
-	- Increased timeout for php processing to allow for longer running requests
+	- Fixed issue with the "Run Agent" functionality by increasing timeout for php processing
 	  (ENT-13291)
 	- Made protocol_version configurable via Augments (CFE-4543)
 	- Prevented nfs server inventory from doing unnecessary extra work
 	  (ENT-13210)
 	- Redirection from HTTP to HTTPS responsibility moved from Apache to PHP
 	  (ENT-11481)
-	- Removed duplicate well known paths for ls and lsof on opensuse
+	- Removed duplicate $(paths.ls) and $(paths.lsof) for opensuse
 	  (ENT-12990)
-	- Stopped automatic mirroring of WORKDIR/share/GUI to Mission Portal docroot
-	  (ENT-13172)
 	- Stopped enforcing permission management of $(sys.workdir)/share/GUI
 	  (ENT-13171)
 	- Stopped enforcing permissions of public docroot scripts (ENT-13243)
-	- Stopped mirroring .htaccess from share/GUI to Mission Portal docroot
-	  (ENT-13173)
 
 3.26.0:
 	- Inhibited management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
