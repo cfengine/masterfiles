@@ -20,6 +20,10 @@ body common control
 
 bundle agent init
 {
+  meta:
+      # Available patches is an Enterprise feature.
+      "test_skip_unsupported" string => "!enterprise";
+
   methods:
       "any" usebundle => clear_packages("dummy");
       "any" usebundle => install_package("$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy");
