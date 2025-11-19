@@ -31,18 +31,31 @@ body common control
 
 bundle agent init
 {
+  vars:
+
+      # if we have the patches, 7 days; otherwise keep trying
+      "refresh" string => ifelse("have_inventory", "10080",
+                                 "0");
+  classes:
+      "have_patches" or => { "community_edition", # not in Community
+                             fileexists("$(sys.workdir)/state/software_patches_avail.csv") };
+
+      "have_inventory" and => { "have_patches",
+                                fileexists("$(sys.workdir)/state/software_packages.csv"),
+      };
+
   packages:
     # Old way of forcing package updates, for the legacy packages promise.
     debian::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => inventory_apt_get($(cfe_autorun_inventory_packages.refresh)),
+      package_method => inventory_apt_get($(refresh)),
       action => if_elapsed_day;
 
     redhat::
       "cfe_internal_non_existing_package"
       package_policy => "add",
-      package_method => inventory_yum_rpm($(cfe_autorun_inventory_packages.refresh)),
+      package_method => inventory_yum_rpm($(refresh)),
       action => if_elapsed_day;
 
   vars:
