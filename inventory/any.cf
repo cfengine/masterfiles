@@ -1107,7 +1107,11 @@ bundle agent cfe_autorun_inventory_packages
                                 fileexists("$(sys.workdir)/state/software_packages.csv"),
       };
 
-      "use_package_module_for_inventory" or => { "redhat", "debian", "suse", "sles", "alpinelinux", "windows" };
+      "use_package_module_for_inventory" -> { "ENT-13525" }
+        expression => some (".*", "@(default:control_common.package_inventory)"),
+        comment => concat( "If body common control defines package_inventory then the system",
+                           " is using package modules for inventory");
+
       "use_package_method_for_inventory" or => { "gentoo", "aix" };
       "use_package_method_generic_for_inventory"
         not => "use_package_module_for_inventory|use_package_method_for_inventory";
@@ -1151,7 +1155,6 @@ bundle agent cfe_autorun_inventory_packages
       "DEBUG $(this.bundle): we don't have the inventory files."
         if => "!have_inventory";
 }
-
 bundle agent cfe_autorun_inventory_policy_servers
 # @brief Inventory policy servers
 {
