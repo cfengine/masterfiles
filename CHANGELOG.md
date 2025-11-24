@@ -1,4 +1,5 @@
 3.24.3:
+	- Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
 	- Added dmidecode to well known paths for Red Hat (ENT-12988)
 	- Added recommendation about nfs server and consistent use of root dot
 	  (ENT-13223)

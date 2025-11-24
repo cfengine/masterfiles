@@ -68,15 +68,18 @@ body server control
 
       allowusers => { @(def.control_server_allowusers) };
 
+    # In 3.10 the quotation is properly closed when EOF is reached. It is left
+    # open so that arguments (like -K and --remote-bundles) can be appended.
+    # 3.10.x does not automatically append -I -Dcfruncommand
+
     windows::
-      cfruncommand => "$(sys.cf_agent) -I -D cf_runagent_initiated -f \"$(sys.update_policy_path)\"  &
-                       $(sys.cf_agent) -I -D cf_runagent_initiated";
+
+        # /s removes the first and last quote characters and aids in specifying paths with surrounding quotes
+        cfruncommand => "$(def.cf_runagent_shell) /s /c \"
+                           $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  &
+                           $(sys.cf_agent) -I -D cf_runagent_initiated";
 
     !windows::
-
-      # In 3.10 the quotation is properly closed when EOF is reached. It is left
-      # open so that arguments (like -K and --remote-bundles) can be appended.
-      # 3.10.x does not automatically append -I -Dcfruncommand
 
         cfruncommand => "$(def.cf_runagent_shell) -c \'
                            $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
@@ -172,7 +175,7 @@ bundle server mpf_default_access_rules()
         shortcut => "hub_cmdb",
         admit_keys => { $(connection.key) };
 
-    !windows::
+    any::
       "$(def.cf_runagent_shell)" -> { "ENT-6673" }
       handle => "server_access_grant_access_shell_cmd",
       comment => "Grant access to shell for cfruncommand",
