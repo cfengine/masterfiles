@@ -452,6 +452,12 @@ bundle common def
         comment => "Define path to shell used by cf-runagent",
         handle  => "common_def_vars_solaris_cf_runagent_shell";
 
+    windows::
+      "cf_runagent_shell"
+        string  => "${sys.winsysdir}${const.dirsep}cmd.exe",
+        comment => "Define path to shell used by cf-runagent",
+        handle  => "common_def_vars_windows_cf_runagent_shell";
+
     !(windows|solaris)::
       "cf_runagent_shell"
         string  => "/bin/sh",
