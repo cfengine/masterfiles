@@ -2863,7 +2863,7 @@ To override the default for **cf-agent** configure `default:def.control_agent_de
 }
 ```
 
-**See also:** [`default_directory_create_mode` in `body common control`][Components#default_directory_create_mode], [`default_directory_create_mode` in `body agent control`][cf-agent#default_directory_create_mode]
+**See also:** [`default_directory_create_mode` in `body agent control`][cf-agent#default_directory_create_mode]
 
 **History:**
 
