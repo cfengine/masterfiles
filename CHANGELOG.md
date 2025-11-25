@@ -1,4 +1,5 @@
 3.27.0
+	- Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
 	- Added $(paths.dmidecode) for Red Hat (ENT-12988)
 	- Added fsattrs bodies to manage the immutable bit (CFE-4582)
 	- Added recommendation about nfs server and consistent use of root dot
