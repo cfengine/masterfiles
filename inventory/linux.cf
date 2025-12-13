@@ -75,8 +75,8 @@ bundle common inventory_linux
                            " acceptable ( 3.x or 2.4 or greater ) for package",
                            " modules. We use this guard to prevent errors",
                            " related to missing python modules."),
-        expression => returnszero("$(sys.bindir)/cfengine-selected-python -V 2>&1 | grep ^Python | cut -d' ' -f 2 | ( IFS=. read v1 v2 v3 ; [ $v1 -ge 3 ] || [ $v1 -eq 2 -a $v2 -ge 4 ] )",
-                                  useshell);
+        expression => returnszero("$(sys.bindir)/cfengine-selected-python -c 'import sys; vi = sys.version_info; exit(not (vi[0] > 2 or (vi[0] == 2 and vi[1] > 3)))'",
+                                  noshell);
 }
 
 bundle monitor measure_entropy_available
