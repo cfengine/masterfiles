@@ -11,6 +11,10 @@ bundle agent cfe_internal_enterprise_main
 
     enterprise_edition.(policy_server|am_policy_hub)::
 
+      "hub" usebundle => update_cli_rest_server_url_config,
+            handle => "update_cli_rest_server_url_config",
+            comment => "Update https port in php config files from cfe_internal_hub_vars.https_port";
+
       "hub" usebundle => cfe_internal_update_folders,
       handle => "cfe_internal_management_update_folders",
       comment => "Create empty directories for CFE self-upgrade";
