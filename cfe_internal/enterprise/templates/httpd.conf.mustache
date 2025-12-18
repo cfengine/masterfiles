@@ -249,6 +249,9 @@ AddHandler php{{{vars.cfe_internal_hub_vars.php_version}}}-script       .php
 AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_version}}}
 
 
+# Timeout defaults to 60 but that is too short for some operations on slower hub hardware
+Timeout 120
+
 <Directory "{{{vars.cfe_internal_hub_vars.public_docroot}}}">
 
     Options -Indexes +FollowSymLinks +MultiViews
@@ -281,7 +284,6 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
 </Directory>
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api">
-  Timeout 120 # Increase timeout for the API, especially agent_run. See ENT-13291
 
     Order deny,allow
     AllowOverride None
