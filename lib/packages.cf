@@ -414,9 +414,9 @@ bundle common pip_knowledge
   vars:
       "call_pip" string => "$(paths.path[pip])";
 
-      "pip_list_name_regex"    string => "^([[:alnum:]-_]+)\s\([\d.]+\)";
-      "pip_list_version_regex" string => "^[[:alnum:]-_]+\s\(([\d.]+)\)";
-      "pip_installed_regex"    string => "^([[:alnum:]-_]+\s\([\d.]+\))";
+      "pip_list_name_regex"    string => "^([[:alnum:]\-_]+)\s\([\d.]+\)";
+      "pip_list_version_regex" string => "^[[:alnum:]\-_]+\s\(([\d.]+)\)";
+      "pip_installed_regex"    string => "^([[:alnum:]\-_]+\s\([\d.]+\))";
 }
 
 bundle common solaris_knowledge
