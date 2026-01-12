@@ -245,10 +245,17 @@ bundle agent semanage_installed
                   warn or fix based.";
     debian_6|debian_7|debian_8|ubuntu_12|ubuntu_14|ubuntu_16|rhel_5::
       "semanage_package" string => "policycoreutils";
-    debian_9|debian_10|ubuntu_18|redhat_8|centos_8|redhat_9|rocky_9|redhat_10|rocky_10::
-      "semanage_package" string => "policycoreutils-python-utils";
     redhat_6|centos_6|redhat_7|centos_7::
       "semanage_package" string => "policycoreutils-python";
+    any::
+      "semanage_package"
+        string => "policycoreutils-python-utils",
+        if => or(
+          and("debian", isgreaterthan("$(sys.os_version_major)", "8")),
+          and("ubuntu", isgreaterthan("$(sys.os_version_major)", "16")),
+          and("redhat|centos", isgreaterthan("$(sys.os_version_major)", "7")),
+          and("redhat|rocky", isgreaterthan("$(sys.os_version_major)", "8"))
+        );
 
   packages:
     debian|ubuntu::
