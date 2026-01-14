@@ -28,6 +28,16 @@
 	- Stopped enforcing permission management of $(sys.workdir)/share/GUI
 	  (ENT-13171)
 	- Stopped enforcing permissions of public docroot scripts (ENT-13243)
+	- Added needed custom port to API in the API itself (LDAP related)
+	  (ENT-13612)
+	- Made default_directory_create_mode configurable via Augments
+	  (CFE-4590)
+	- Made evaluation_order in body agent control configurable via Augments
+	  (ENT-13495)
+	- Stopped automatic mirroring of WORKDIR/share/GUI to Mission Portal docroot
+	  (ENT-13172)
+	- Stopped mirroring .htaccess from share/GUI to Mission Portal docroot
+	  (ENT-13173)
 
 3.26.0:
 	- Inhibited management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
