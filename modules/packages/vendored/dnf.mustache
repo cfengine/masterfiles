@@ -1,0 +1,634 @@
+#!/usr/bin/python
+# Note that the shebang above is ignored when run in policy
+# See lib/packages.cf `package_module dnf` use of the
+# `interpreter` attribute to use cfengine-selected-python.
+
+import sys
+import os
+import dnf
+import re
+import logging
+
+
+def _get_dnf_base(assumeno=False, cacheonly=False):
+    """Create and configure a DNF base object."""
+    base = dnf.Base()
+    base.conf.assumeyes = True
+    base.conf.assumeno = assumeno
+    if cacheonly:
+        base.conf.cacheonly = True
+    return base
+
+
+def _get_package_info_from_file(file_path):
+    """Extract package information from an RPM file."""
+    try:
+        import rpm
+        ts = rpm.TransactionSet()
+        with open(file_path, 'rb') as f:
+            hdr = ts.hdrFromFdno(f.fileno())
+
+            name = str(hdr[rpm.RPMTAG_NAME])
+            version = str(hdr[rpm.RPMTAG_VERSION])
+            release = str(hdr[rpm.RPMTAG_RELEASE])
+            arch = str(hdr[rpm.RPMTAG_ARCH])
+            epoch = hdr[rpm.RPMTAG_EPOCH]
+
+        full_version = _format_package_version(version, release, epoch)
+
+        return {
+            "name": name,
+            "version": version,
+            "release": release,
+            "arch": arch,
+            "epoch": epoch,
+            "full_version": full_version
+        }
+    except Exception as e:
+        raise Exception(f"Error reading package file {file_path}: {str(e)}")
+
+
+def _is_package_installed(base, name, epoch, version, release, arch):
+    """Check if a specific package is installed."""
+    if epoch is not None:
+        installed_packages = base.sack.query().installed().filter(name=name, epoch=epoch, version=version, release=release, arch=arch)
+    else:
+        installed_packages = base.sack.query().installed().filter(name=name, version=version, release=release, arch=arch)
+    return installed_packages
+
+
+def _format_package_version(version, release, epoch):
+    """Format package version string including epoch if present."""
+    if epoch is not None:
+        epoch_str = str(epoch)
+        full_version = f"{epoch_str}:{version}-{release}"
+    else:
+        full_version = f"0:{version}-{release}"
+    return full_version
+
+
+def _create_and_setup_base(assumeno=False, cacheonly=False):
+    """Create and setup a DNF base with common configuration."""
+    base = _get_dnf_base(assumeno=assumeno, cacheonly=cacheonly)
+    base.read_all_repos()
+    base.fill_sack(load_system_repo='auto')
+    return base
+
+
+def _get_file_path_from_stdin():
+    """Extract file path from stdin input."""
+    file_path = ""
+    for line in sys.stdin:
+        line = line.strip()
+        if line.startswith("File="):
+            file_path = line.split("=", 1)[1].rstrip()
+        # Continue reading to exhaust stdin
+    return file_path
+
+
+def _parse_package_spec_from_stdin():
+    """Parses package specification and options from stdin."""
+    package_spec = {
+        "name": "",
+        "version": "",
+        "arch": "",
+        "options": {}
+    }
+    for line in sys.stdin:
+        line = line.strip()
+        if line.startswith("options="):
+            option_str = line[len("options="):]
+            # Handle options like enablerepo= or disablerepo=
+            if "=" in option_str:
+                key, value = option_str.split("=", 1)
+                package_spec["options"][key] = value
+            else:
+                package_spec["options"][option_str] = True # For boolean options
+        elif line.startswith("Name="):
+            package_spec["name"] = line.split("=", 1)[1].rstrip()
+        elif line.startswith("Version="):
+            package_spec["version"] = line.split("=", 1)[1].rstrip()
+        elif line.startswith("Architecture="):
+            package_spec["arch"] = line.split("=", 1)[1].rstrip()
+    return package_spec
+
+
+def _do_transaction(base):
+    """Resolves and executes a DNF transaction with error handling."""
+    try:
+        logging.debug(f"Resolving transaction...")
+        resolve_result = base.resolve()
+        logging.debug(f"Transaction resolved with result: {resolve_result}")
+
+        if base.transaction:
+            transaction_items = list(base.transaction)
+            logging.debug(f"Transaction has {len(transaction_items)} items")
+
+            # Log transaction details for debugging
+            for i, tsi in enumerate(transaction_items):
+                logging.debug(f"Transaction item {i}: action={getattr(tsi, 'action', 'unknown')}, pkg={getattr(tsi, 'pkg', 'unknown')}")
+
+            # Download packages first to ensure they're available
+            # Only download if there are packages to install (not for removals)
+            install_set = list(base.transaction.install_set)
+            if install_set:
+                logging.debug(f"Downloading {len(install_set)} packages...")
+                base.download_packages(install_set)
+                logging.debug(f"Packages downloaded successfully")
+
+        # Execute the transaction
+        try:
+            logging.debug(f"Executing transaction...")
+            base.do_transaction()
+            logging.debug(f"Transaction executed successfully")
+        except (OSError, IOError, dnf.exceptions.Error) as e:
+            logging.error(f"Error during DNF transaction: {str(e)}")
+            sys.stdout.write(f"ErrorMessage=Error during DNF transaction: {str(e)}\n")
+            return 1
+        except Exception as e:
+            logging.error(f"Unexpected error during DNF transaction: {str(e)}")
+            sys.stdout.write(f"ErrorMessage=Unexpected error during DNF transaction: {str(e)}\n")
+            return 1
+
+    except dnf.exceptions.Error as e:
+        logging.error(f"Error during transaction resolution: {str(e)}")
+        sys.stdout.write(f"ErrorMessage=Error during transaction resolution: {str(e)}\n")
+        return 1
+    except Exception as e:
+        logging.error(f"Unexpected error during transaction resolution: {str(e)}")
+        sys.stdout.write(f"ErrorMessage=Unexpected error during transaction resolution: {str(e)}\n")
+        return 1
+    return 0
+
+
+def get_package_data():
+    logging.debug(f"--- get_package_data() called with args: {' '.join(sys.argv)} ---")
+    pkg_string = ""
+    version = ""
+    architecture = ""
+    lines = []
+
+    for line in sys.stdin:
+        line = line.strip()
+        lines.append(line)
+        if line.startswith("File="):
+            pkg_string = line.split("=", 1)[1].rstrip()
+        elif line.startswith("Version="):
+            version = line.split("=", 1)[1].rstrip()
+        elif line.startswith("Architecture="):
+            architecture = line.split("=", 1)[1].rstrip()
+
+    logging.debug(f"get_package_data() pkg_string: '{pkg_string}', version: '{version}', architecture: '{architecture}'")
+    logging.debug(f"get_package_data() all lines: {lines}")
+
+    if not pkg_string:
+        sys.stdout.write("ErrorMessage=No package name or file path provided\n")
+        return 1
+
+    if pkg_string.startswith("/"):
+        # Absolute file - use rpm Python library to query the file directly, it's faster than rpm cli via subprocess
+        try:
+            import rpm
+            # Validate the file path is safe
+            if not os.path.exists(pkg_string) or not os.path.isfile(pkg_string):
+                sys.stdout.write(f"ErrorMessage=File does not exist or is not a regular file: {pkg_string}\n")
+                return 1
+
+            # Additional security: ensure path is absolute and doesn't contain dangerous patterns
+            if not os.path.isabs(pkg_string) or ".." in pkg_string:
+                sys.stdout.write(f"ErrorMessage=Invalid file path: {pkg_string}\n")
+                logging.error(f"Invalid file path: {pkg_string}")
+                return 1
+
+            # Extract package information from the file
+            package_info = _get_package_info_from_file(pkg_string)
+            name = package_info["name"]
+            file_version = package_info["version"]
+            release = package_info["release"]
+            arch = package_info["arch"]
+            epoch = package_info["epoch"]
+            full_version = package_info["full_version"]
+
+            # Check if the package is already installed
+            base = _create_and_setup_base()
+            installed_packages = _is_package_installed(base, name, epoch, file_version, release, arch)
+            base.close()
+
+            # Always return PackageType=file for file-based packages
+            # CFEngine will determine if it needs to be removed based on installed status
+            sys.stdout.write("PackageType=file\n")
+            sys.stdout.write(f"Name={name}\n")
+            sys.stdout.write(f"Version={full_version}\n")
+            sys.stdout.write(f"Architecture={arch}\n")
+            sys.stdout.flush()
+            return 0
+
+        except Exception as e:
+            logging.error(f"Error reading package file with rpm library: {str(e)}")
+            sys.stdout.write(f"ErrorMessage=Error reading package file {pkg_string}: {str(e)}\n")
+            return 1
+    elif re.search("[:,]", pkg_string):
+        # Contains an illegal symbol.
+        sys.stdout.write("ErrorMessage=Package string with illegal format\n")
+        sys.stdout.flush()
+        return 1
+    else:
+        sys.stdout.write("PackageType=repo\n")
+        sys.stdout.write("Name=" + pkg_string + "\n")
+        sys.stdout.flush()
+        return 0
+
+
+def list_installed():
+    # Process options from stdin (even though we don't use them for RPM query)
+    options = {}
+    for line in sys.stdin:
+        line = line.strip()
+        if line.startswith("options="):
+            option_str = line[len("options="):]
+            # Handle options like enablerepo= or disablerepo=
+            if "=" in option_str:
+                key, value = option_str.split("=", 1)
+                options[key] = value
+            else:
+                options[option_str] = True # For boolean options
+
+    # For maximum performance, use direct RPM query instead of DNF
+    # This bypasses DNF's initialization overhead
+    try:
+        import rpm
+        ts = rpm.TransactionSet()
+        mi = ts.dbMatch()  # get all packages
+
+        for h in mi:
+            name = h['name'].decode('utf-8') if isinstance(h['name'], bytes) else h['name']
+            version = h['version'].decode('utf-8') if isinstance(h['version'], bytes) else h['version']
+            release = h['release'].decode('utf-8') if isinstance(h['release'], bytes) else h['release']
+            arch = h['arch'].decode('utf-8') if isinstance(h['arch'], bytes) else h['arch']
+
+            # Format epoch if it exists
+            epoch = h['epoch']
+            epoch = epoch.decode('utf-8') if isinstance(epoch, bytes) and epoch is not None else epoch
+            full_version = _format_package_version(version, release, epoch)
+
+            sys.stdout.write(f"Name={name}\n")
+            sys.stdout.write(f"Version={full_version}\n")
+            sys.stdout.write(f"Architecture={arch}\n")
+
+    except Exception as e:
+        sys.stdout.write(f"ErrorMessage=Error listing installed packages: {str(e)}\n")
+        return 1
+    return 0
+
+
+def list_updates(online):
+    # Process options from stdin
+    options = {}
+    for line in sys.stdin:
+        line = line.strip()
+        if line.startswith("options="):
+            option_str = line[len("options="):]
+            # Handle options like enablerepo= or disablerepo=
+            if "=" in option_str:
+                key, value = option_str.split("=", 1)
+                options[key] = value
+            else:
+                options[option_str] = True # For boolean options
+
+    # Create a base DNF instance with appropriate settings based on online status
+    assumeno = True if online else False
+    cacheonly = not online
+    base = _create_and_setup_base(assumeno=assumeno, cacheonly=cacheonly)
+
+    try:
+        # Apply any repository options that were passed
+        for option_key, option_value in options.items():
+            if option_key == "enablerepo" and option_value in base.repos:
+                base.repos[option_value].enable()
+            elif option_key == "disablerepo" and option_value in base.repos:
+                base.repos[option_value].disable()
+
+        # The most efficient way is to use DNF's built-in upgrade resolution
+        # which is optimized for this exact purpose
+        base.upgrade_all()
+
+        # Resolve the transaction to see what would be updated
+        if base.resolve():
+            transaction = base.transaction
+            if transaction:
+                for tsi in transaction:
+                    if tsi.action == dnf.transaction.PKG_UPGRADE:
+                        # Format as expected by CFEngine
+                        sys.stdout.write(f"Name={tsi.pkg.name}\n")
+                        full_version = f"{tsi.pkg.epoch}:{tsi.pkg.version}-{tsi.pkg.release}"
+                        full_version = full_version.replace("(none):", "")
+                        sys.stdout.write(f"Version={full_version}\n")
+                        sys.stdout.write(f"Architecture={tsi.pkg.arch}\n")
+    except Exception as e:
+        sys.stdout.write(f"ErrorMessage=Error listing updates: {str(e)}\n")
+        return 1
+    finally:
+        # Clean up
+        base.close()
+
+    return 0
+
+
+def repo_install():
+    # Create a base DNF instance
+    base = _create_and_setup_base(assumeno=False)
+
+    try:
+        # Process options and package spec from stdin
+        options = {}
+        package_spec = {
+            "name": "",
+            "version": "",
+            "arch": ""
+        }
+
+        for line in sys.stdin:
+            line = line.strip()
+            if line.startswith("options="):
+                option_str = line[len("options="):]
+                # Handle options like enablerepo= or disablerepo=
+                if "=" in option_str:
+                    key, value = option_str.split("=", 1)
+                    options[key] = value
+                else:
+                    options[option_str] = True # For boolean options
+            elif line.startswith("Name="):
+                package_spec["name"] = line.split("=", 1)[1].rstrip()
+            elif line.startswith("Version="):
+                package_spec["version"] = line.split("=", 1)[1].rstrip()
+            elif line.startswith("Architecture="):
+                package_spec["arch"] = line.split("=", 1)[1].rstrip()
+
+        # Apply repository options
+        for option_key, option_value in options.items():
+            if option_key == "enablerepo":
+                if option_value in base.repos:
+                    base.repos[option_value].enable()
+            elif option_key == "disablerepo":
+                if option_value in base.repos:
+                    base.repos[option_value].disable()
+
+        # If we have a package name, install it
+        if package_spec["name"]:
+            # Construct package spec with version and architecture if provided
+            name = package_spec["name"]
+            version = package_spec["version"]
+            arch = package_spec["arch"]
+
+            package_spec_str = name
+            if version:
+                package_spec_str += "-" + version
+            if arch:
+                package_spec_str += "." + arch
+
+            # Debug: print what we're trying to install
+            logging.debug(f"Attempting to install: {package_spec_str}")
+
+            # Apply version and architecture filters when searching for packages
+            try:
+                # Install the package
+                base.install(package_spec_str)
+                logging.debug(f"Package {package_spec_str} marked for installation")
+            except dnf.exceptions.MarkingError as e:
+                # Package not found or other marking error
+                sys.stdout.write(f"ErrorMessage=Error during repo install: {str(e)}\n")
+                return 1
+            except Exception as e:
+                sys.stdout.write(f"ErrorMessage=Error during repo install: {str(e)}\n")
+                return 1
+
+            # Resolve and execute the transaction
+            return _do_transaction(base)
+
+    except Exception as e:
+        sys.stdout.write(f"ErrorMessage=Error during repo install: {str(e)}\n")
+        return 1
+    finally:
+        # Clean up
+        base.close()
+
+    return 0
+
+
+def remove():
+    # Log debug message so we know this function was called
+    logging.debug("--- remove() function called ---")
+
+    # Process options from stdin
+    options = {}
+    name = ""
+
+    for line in sys.stdin:
+        line = line.strip()
+        logging.debug(f"remove() stdin: {line}")
+        if line.startswith("options="):
+            option_str = line[len("options="):]
+            # Handle options like enablerepo= or disablerepo=
+            if "=" in option_str:
+                key, value = option_str.split("=", 1)
+                options[key] = value
+            else:
+                options[option_str] = True # For boolean options
+        elif line.startswith("Name="):
+            name = line.split("=", 1)[1].rstrip()
+
+    logging.debug(f"remove() name: '{name}', options: {options}")
+
+    # Create a base DNF instance
+    base = None
+    try:
+        # Read repository information (for system repo access)
+        base = _create_and_setup_base()
+
+        if name:
+            # This is the case for a simple package name promise (CFEngine core only passes Name, not File to remove)
+            logging.debug(f"Processing package name for removal: {name}")
+
+            # Apply any repository options
+            for option_key, option_value in options.items():
+                if option_key == "enablerepo":
+                    if option_value in base.repos:
+                        base.repos[option_value].enable()
+                elif option_key == "disablerepo":
+                    if option_value in base.repos:
+                        base.repos[option_value].disable()
+
+            try:
+                # Attempt to remove the package by name
+                result = base.remove(name)
+                logging.debug(f"Package {name} marked for removal, result: {result}")
+
+                # If the package was successfully marked for removal, execute the transaction
+                return _do_transaction(base)
+            except dnf.exceptions.MarkingError as e:
+                # Package not installed, which is fine for an absent promise
+                logging.debug(f"Package {name} not installed ({str(e)}), promise already satisfied.")
+                return 0
+        else:
+            sys.stdout.write("ErrorMessage=No package name provided for removal\n")
+            return 1
+
+    except Exception as e:
+        logging.error(f"Error during remove: {str(e)}")
+        sys.stdout.write(f"ErrorMessage=Error during remove: {str(e)}\n")
+        return 1
+    finally:
+        # Clean up
+        if base:
+            base.close()
+
+    return 0
+
+
+def file_install():
+    # Process options from stdin
+    options = {}
+    file_path = ""
+
+    for line in sys.stdin:
+        line = line.strip()
+        if line.startswith("options="):
+            option_str = line[len("options="):] # For boolean options
+            if "=" in option_str:
+                key, value = option_str.split("=", 1)
+                options[key] = value
+            else:
+                options[option_str] = True
+        elif line.startswith("File="):
+            file_path = line.split("=", 1)[1].rstrip()
+
+    # Create a base DNF instance
+    base = None
+    try:
+        # Read repository information
+        base = _create_and_setup_base()
+
+        if file_path:
+            # Security validation: ensure path is absolute and doesn't contain dangerous patterns
+            if not os.path.isabs(file_path) or ".." in file_path:
+                sys.stdout.write(f"ErrorMessage=Invalid file path: {file_path}\n")
+                return 1
+            if not os.path.exists(file_path):
+                sys.stdout.write("ErrorMessage=File path does not exist\n")
+                return 1
+            if not os.path.isfile(file_path):
+                sys.stdout.write(f"ErrorMessage=Path is not a regular file: {file_path}\n")
+                return 1
+
+            # Get package info from the file
+            try:
+                package_info = _get_package_info_from_file(file_path)
+                name = package_info["name"]
+                version = package_info["version"]
+                release = package_info["release"]
+                arch = package_info["arch"]
+                epoch = package_info["epoch"]
+                full_version = package_info["full_version"]
+            except Exception as e:
+                sys.stdout.write(f"ErrorMessage=Error reading package file {file_path}: {str(e)}\n")
+                return 1
+
+            # Check if the package is already installed
+            installed_packages = _is_package_installed(base, name, epoch, version, release, arch)
+            if len(installed_packages) > 0:
+                logging.debug(f"Package {name}-{full_version} is already installed. Promise kept.")
+                return 0
+
+            # Install from file using add_remote_rpms and package_install
+            try:
+                # Add the local RPM file to the sack - this returns package objects
+                pkgs = base.add_remote_rpms([file_path])
+                if not pkgs:
+                    sys.stdout.write(f"ErrorMessage=Could not find or process package at: {file_path}\n")
+                    return 1
+
+                logging.debug(f"Successfully added local package: {pkgs[0]}")
+
+                # Mark the package for installation
+                for pkg in pkgs:
+                    base.package_install(pkg)
+
+                logging.debug(f"Marked RPM file {file_path} for installation")
+            except Exception as e:
+                sys.stdout.write(f"ErrorMessage=Error adding or marking RPM for install: {str(e)}\n")
+                return 1
+
+            # Resolve and execute the transaction
+            return _do_transaction(base)
+        else:
+            sys.stdout.write("ErrorMessage=File path not provided\n")
+            return 1
+
+    except Exception as e:
+        sys.stdout.write(f"ErrorMessage=Error during file install: {str(e)}\n")
+        return 1
+    finally:
+        # Clean up
+        if base:
+            base.close()
+
+    return 0
+
+
+def main():
+    # Set up minimal logging to stderr for errors only, to not interfere with protocol
+    # The only output should be protocol responses to stdin commands
+    logging.basicConfig(
+        level=logging.WARNING,  # Only log warnings and errors to avoid protocol interference
+        format="%(levelname)s: %(message)s",
+        handlers=[logging.StreamHandler(sys.stderr)]
+    )
+    # Only log debug info when explicitly debugging
+    if os.environ.get('CFENGINE_DEBUG') or os.environ.get('DEBUG'):
+        logging.getLogger().setLevel(logging.DEBUG)
+        logging.debug(f"--- New execution with args: {' '.join(sys.argv)} ---")
+
+    if len(sys.argv) < 2:
+        logging.error("Need to provide argument")
+        return 2
+
+    if sys.argv[1] == "internal-test-stderr":
+        # This will cause an exception if stderr is closed.
+        try:
+            os.fstat(2)
+        except OSError:
+            return 1
+        return 0
+
+    elif sys.argv[1] == "supports-api-version":
+        sys.stdout.write("1\n")
+        return 0
+
+    elif sys.argv[1] == "get-package-data":
+        return get_package_data()
+
+    elif sys.argv[1] == "list-installed":
+        return list_installed()
+
+    elif sys.argv[1] == "list-updates":
+        return list_updates(True)
+
+    elif sys.argv[1] == "list-updates-local":
+        return list_updates(False)
+
+    elif sys.argv[1] == "repo-install":
+        return repo_install()
+
+    elif sys.argv[1] == "remove":
+        return remove()
+
+    elif sys.argv[1] == "file-install":
+        return file_install()
+
+    else:
+        logging.error("Invalid operation")
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
