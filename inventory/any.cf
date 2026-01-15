@@ -40,10 +40,6 @@ bundle agent inventory_autorun
       "LLDP" usebundle => cfe_autorun_inventory_LLDP(),
       handle => "cfe_internal_autorun_inventory_LLDP";
 
-    !disable_inventory_package_refresh::
-      "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
-      handle => "cfe_internal_autorun_inventory_packages";
-
     !disable_inventory_policy_servers::
       "Inventory Policy Servers"
         handle => "cfe_internal_autorun_inventory_policy_servers",
@@ -1091,65 +1087,6 @@ bundle agent cfe_autorun_inventory_LLDP
         if => isvariable("def.lldpctl_json"),
         comment => "For safety, we do not run lldpctl in a shell if the path to
         lldpctl is customized via augments";
-}
-
-bundle agent cfe_autorun_inventory_packages
-# @brief Package inventory auto-refresh
-#
-# This bundle is for refreshing the package inventory.  It runs on
-# startup, unless disabled.  Other package methods can be added below.
-{
-  classes:
-      "have_patches" or => { "community_edition", # not in Community
-                             fileexists("$(sys.workdir)/state/software_patches_avail.csv") };
-
-      "have_inventory" and => { "have_patches",
-                                fileexists("$(sys.workdir)/state/software_packages.csv"),
-      };
-
-      "use_package_module_for_inventory" or => { "redhat", "debian", "suse", "sles", "alpinelinux", "windows" };
-      "use_package_method_for_inventory" or => { "gentoo", "aix" };
-      "use_package_method_generic_for_inventory"
-        not => "use_package_module_for_inventory|use_package_method_for_inventory";
-
-  vars:
-      # if we have the patches, 7 days; otherwise keep trying
-      "refresh" string => ifelse("have_inventory", "10080",
-                                 "0");
-
-  packages:
-
-    # The legacy implementation (package_method) of the packages type promise
-    # requires a packages promise to be triggered in order to generate package
-    # inventory. The following promises ensure that package inventory data
-    # exists. As package modules become available the package_methods should be
-    # removed.
-
-    aix::
-      "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => inventory_lslpp($(refresh)),
-      action => if_elapsed_day;
-
-    gentoo::
-      "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => emerge,
-      action => if_elapsed_day;
-
-    use_package_method_generic_for_inventory::
-      "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => generic,
-      action => if_elapsed_day;
-
-  reports:
-    DEBUG|DEBUG_cfe_autorun_inventory_packages::
-      "DEBUG $(this.bundle): refresh interval is $(refresh)";
-      "DEBUG $(this.bundle): we have the inventory files."
-        if => "have_inventory";
-      "DEBUG $(this.bundle): we don't have the inventory files."
-        if => "!have_inventory";
 }
 
 bundle agent cfe_autorun_inventory_policy_servers
