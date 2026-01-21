@@ -307,7 +307,7 @@ bundle agent git(repo_path, subcmd, args)
         not => strcmp($(this.promiser_uid), $(repo_uid)),
         if => isvariable( repo_uid );
 
- commands:
+  commands:
     am_root.need_to_drop::
       # Because cfengine does not inherit the shell environment when
       # executing commands, git will look for the root users git
