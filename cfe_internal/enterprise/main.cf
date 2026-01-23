@@ -58,6 +58,9 @@ bundle agent cfe_internal_enterprise_main
       handle => "cfe_internal_management_hub_maintain",
       comment => "Start the hub maintenance process";
 
+      "Ensure users notice that report retention settings have changed" -> { "ENT-9531" }
+        usebundle => cfe_internal_hub_maintain_notice_retention_settings_change;
+
       "hub" usebundle => cfe_internal_truncate_events,
       handle => "cfe_internal_truncate_events",
       comment => "To run CFE truncate to pending";
