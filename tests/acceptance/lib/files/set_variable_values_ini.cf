@@ -31,7 +31,7 @@ bundle agent init
 bundle agent test
 {
   meta:
-      "description" -> { "CFE-3221", "CFE-3244" }
+      "description" -> { "CFE-3221", "CFE-3244", "CFE-413" }
         string => "Test expected behavior of set_variable_values_ini";
 
   vars:
@@ -50,6 +50,9 @@ bundle agent test
       "config[CFE-3244][keyone]" string => "1";
       "config[CFE-3244][keytwo]" string => "valuetwo";
 
+      "config[CFE-413][keyone]" string => "one";
+      "config[CFE-413][keytwo]" string => "value=one";
+
   files:
 
       "$(G.testfile).actual"
@@ -61,6 +64,8 @@ bundle agent test
       "$(G.testfile).actual" -> { "CFE-3244" }
         edit_line => set_variable_values_ini( "test.config", "CFE-3244" );
 
+      "$(G.testfile).actual" -> { "CFE-413" }
+        edit_line => set_variable_values_ini( "test.config", "CFE-413" );
 }
 
 #######################################################
