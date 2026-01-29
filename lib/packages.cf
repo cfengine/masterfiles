@@ -164,6 +164,17 @@ body package_module yum
 @endif
 }
 
+body package_module dnf
+# @brief Define details used when interfacing with dnf
+{
+    query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+    query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
+    #default_options => {};
+@if minimum_version(3.12.2)
+    interpreter => "$(sys.bindir)/cfengine-selected-python";
+@endif
+}
+
 body package_module slackpkg
 # @brief Define details used when interfacing with slackpkg
 {
