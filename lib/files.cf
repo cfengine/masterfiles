@@ -437,6 +437,8 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
       # Be careful if the index string contains funny chars
       "cindex[$(index)]" string => canonify("$(index)");
+      "_escaped_key[$(index)]" string => escape("$(index)");
+      "_escaped_section[$(sectionName)]" string => escape("$(sectionName)");
 
   classes:
       "edit_$(cindex[$(index)])"     not => strcmp("$($(tab)[$(sectionName)][$(index)])","dontchange"),
@@ -444,27 +446,45 @@ bundle edit_line set_variable_values_ini(tab, sectionName)
 
   field_edits:
 
+      # This is emitting an /error/ when no commented out managed key line is
+      # found within the selected region. The missing keys is completely
+      # expected in the case of promising a new file or section. How can this be
+      # guarded against executing? The only thought I have is ...
+      # if => regcmp( "some regex I dunno how to craft", readfile( $(edit.filename) )
+
+      # # If the line is there, but commented out, first uncomment it
+      # "#+\s*$(index)\s*=.*"
+      # select_region => INI_section(escape("$(sectionName)")),
+      # edit_field => col("\s*=\s*","1","$(index)","set"),
+      # if => and(canonify("_section_$(sectionName)_present_reached"),
+      #           "edit_$(cindex[$(index)])");
       # If the line is there, but commented out, first uncomment it
-      "#+\s*$(index)\s*=.*"
-      select_region => INI_section(escape("$(sectionName)")),
-      edit_field => col("\s*=\s*","1","$(index)","set"),
-      if => "edit_$(cindex[$(index)])";
+      "#+\s*$(_escaped_key[$(index)])\s*=.*"
+        if => and(
+                   #canonify("_section_$(sectionName)_present_reached"), # I don't think this helps because the class is based on the promise running on a buffer of the file, we are only checking the file as it exists before the promise finished
+                   #"edit_$(cindex[$(index)])", # is it useful? why would you do not change? this bundle only asserts keys provided in dataset, providing a key with value donotchange is tantemount to not providing the key
+                   # regcmp matches if the promised file contains [$(sectionName)] with a commented out $(index)
+                   regcmp( concat("\[$(_escaped_section[$(sectionName)])\]",
+                                  "[^#\[]*#\s*$(_escaped_key[$(index)])\s*=.*"),
+                           readfile( $(edit.filename) ))),
+        select_region => INI_section( "$(_escaped_section[$(sectionName)])" ),
+        edit_field => col("\s*=\s*","1","$(index)","set");
 
       # match a line starting like the key something
       "\s*$(index)\s*=.*"
       edit_field => col("\s*=\s*","2","$($(tab)[$(sectionName)][$(index)])","set"),
       select_region => INI_section(escape("$(sectionName)")),
-      classes => results("bundle", "set_variable_values_ini_not_$(cindex[$(index)])"),
-      if => "edit_$(cindex[$(index)])";
-
+      if => and(canonify("_section_$(sectionName)_present_reached"),
+                "edit_$(cindex[$(index)])");
   insert_lines:
       "[$(sectionName)]"
       location => start,
-      comment => "Insert lines";
+      comment => "Insert lines",
+      classes => results( "bundle", "_section_$(sectionName)_present" );
 
       "$(index)=$($(tab)[$(sectionName)][$(index)])"
       select_region => INI_section(escape("$(sectionName)")),
-        if => "!(set_variable_values_ini_not_$(cindex[$(index)])_kept|set_variable_values_ini_not_$(cindex[$(index)])_repaired).edit_$(cindex[$(index)])";
+        if => "edit_$(cindex[$(index)])";
 
 }
 
@@ -815,6 +835,7 @@ bundle edit_line set_line_based(v, sep, bp, kp, cp)
 
       # If the line is there with the wrong value, replace with
       # the correct value
+      # "^\s*(ucredit\s*=\s*(?!1$).*|ucredit)$"
       "^\s*($(i)$(bp)(?!$(ev[$(i)])$).*|$(i))$"
            comment => "Correct the value '$(i)'",
       replace_with => value("$(i)$(sep)$($(v)[$(i)])"),

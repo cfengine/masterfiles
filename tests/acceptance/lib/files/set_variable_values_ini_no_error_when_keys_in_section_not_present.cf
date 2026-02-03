@@ -1,0 +1,35 @@
+#######################################################
+#
+# Test bundle set_config_values_ini
+#
+#######################################################
+
+body common control
+{
+      inputs => { '../../default.cf.sub' };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+
+bundle agent test
+{
+  meta:
+      "description" -> { "CFE-3866" }
+        string => "Test that set_variable_values_ini does not error when promised key is not present";
+
+}
+
+#######################################################
+
+bundle agent check
+{
+
+  methods:
+
+      "Pass/FAIL"
+        usebundle => dcs_passif_output(".*$(this.promise_filename).sub Pass.*", ".*error.*", "$(sys.cf_agent) -Kf $(this.promise_filename).sub --define AUTO,DEBUG,EXTRA", $(this.promise_filename));
+
+}
