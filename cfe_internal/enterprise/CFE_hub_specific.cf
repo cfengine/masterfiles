@@ -607,7 +607,7 @@ bundle agent log_cfengine_enterprise_license_utilization
 
 }
 
-bundle agent cfe_internal_enterprise_HA_classes
+bundle agent cfe_internal_enterprise_ha_classes
 {
   classes:
       # NOTE The `hub_active` class is a hard class defined by the ha_plugin in
@@ -645,7 +645,7 @@ bundle agent cfe_internal_enterprise_maintenance
 
     enterprise_edition::
       "HA classes"
-        usebundle => "cfe_internal_enterprise_HA_classes",
+        usebundle => "cfe_internal_enterprise_ha_classes",
         comment => "Set the HA-related classes for the maintenance bundles";
 
       "Enterprise Maintenance"
