@@ -1,4 +1,4 @@
-bundle agent MPF_class_recommendations
+bundle agent mpf_class_recommendations
 {
   meta:
     (policy_server|am_policy_hub).enterprise_edition::

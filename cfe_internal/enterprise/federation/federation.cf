@@ -816,9 +816,9 @@ bundle agent ensure_feeders
         arglist => {
                      "cfdb",
 @if minimum_version(3.24)
-                     "select ensure_feeders($(feeders_arg));"
+                     "select ensure_feeders($(feeders_arg));",
 @else
-                     `"select ensure_feeders($(feeders_arg));"`
+                     `"select ensure_feeders($(feeders_arg));"`,
 @endif
                    },
         classes => psql_wrapper_exit_codes,
