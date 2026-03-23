@@ -37,7 +37,7 @@ bundle agent inventory_autorun
 {
   methods:
     !disable_inventory_LLDP::
-      "LLDP" usebundle => cfe_autorun_inventory_LLDP(),
+      "LLDP" usebundle => cfe_autorun_inventory_lldp(),
       handle => "cfe_internal_autorun_inventory_LLDP";
 
     !disable_inventory_package_refresh::
@@ -1066,7 +1066,7 @@ bundle agent cfe_autorun_inventory_dmidecode
       "DEBUG $(this.bundle): Obtained Physical memory (MB) = '$(total_physical_memory_MB)'";
 }
 
-bundle agent cfe_autorun_inventory_LLDP
+bundle agent cfe_autorun_inventory_lldp
 # @brief Do LLDP-based inventory
 #
 # This agent bundle runs lldpctl to discover information.  See

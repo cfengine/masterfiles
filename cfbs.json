@@ -1,5 +1,5 @@
 {
-  "name": "Masterfiles",
+  "name": "masterfiles",
   "description": "Official CFEngine Masterfiles Policy Framework (MPF)",
   "type": "module",
   "provides": {
