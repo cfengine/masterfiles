@@ -103,7 +103,7 @@ def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password, force_
         )
         sys.exit(1)
     response = feeder_api.put_role_permissions(
-        "fr_distributed_cleanup", ["host.delete"]
+        "fr_distributed_cleanup", ["host.delete", "hosts-delete-permanently.delete"]
     )
     if response["status"] != 201:
         print("Unable to set RBAC permissions on role fr_distributed_cleanup")
@@ -372,9 +372,11 @@ AND EXISTS(
             # We only selected hostkey so will take the first value.
             host_to_delete = row[0]
 
-            response = feeder_api.delete("host", host_to_delete)
-            # both 202 Accepted and 404 Not Found are acceptable responses
-            if response["status"] not in [202, 404]:
+
+            responseDelete = feeder_api.delete("host", host_to_delete)
+            responsePermanentlyDelete = feeder_api.delete("hosts/delete-permanently", host_to_delete)
+            # both 202 Accepted/204 No Content and 200 Ok/404 Not Found are acceptable responses
+            if responseDelete["status"] not in [202, 204] or responsePermanentlyDelete["status"] not in [200, 404]:
                 logger.warning(
                     "Delete %s on feeder %s got %s status code",
                     host_to_delete,
@@ -393,17 +395,11 @@ AND EXISTS(
             )
             continue
 
-        # simulate the host api delete process by setting current_timestamp in deleted column
-        # and delete from all federated tables similar to the clear_hosts_references() pgplsql function.
-        post_sql += "INSERT INTO __hosts (hostkey,deleted) VALUES"
-        deletes = []
+        # delete from __hosts and all federated tables similar to the clear_hosts_references() pgplsql function.
+        hostkeys_to_delete = []
         for hostkey in post_hostkeys:
-            deletes.append("('{}', CURRENT_TIMESTAMP)".format(hostkey))
-
-        delete_sql = ", ".join(deletes)
-        delete_sql += (
-            " ON CONFLICT (hostkey,hub_id) DO UPDATE SET deleted = excluded.deleted;\n"
-        )
+            hostkeys_to_delete.append("'{}'".format(hostkey))
+        delete_sql = "DELETE FROM __hosts WHERE hostkey IN ({});\n".format(",".join(hostkeys_to_delete))
         clear_sql = "set schema 'public';\n"
         for table in CFE_FR_TABLES:
             # special case of partitioning, operating on parent table will work
