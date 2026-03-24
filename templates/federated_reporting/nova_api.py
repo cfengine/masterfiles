@@ -114,7 +114,10 @@ class NovaApi:
             value["message"] = message
             value["status"] = response.status
         else:
-            data = json.loads(response.data.decode("utf-8"))
+            body = response.data.decode("utf-8").strip()
+            if not body:
+                return {"status": response.status}
+            data = json.loads(body)
             # some APIs like query API return a top-level data key which we want to skip for ease of use
             if "data" in data:
                 # data response e.g. query API returns top-level key 'data'
