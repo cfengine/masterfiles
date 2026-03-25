@@ -31,7 +31,7 @@ import random
 import subprocess
 import sys
 from getpass import getpass
-from nova_api import NovaApi
+from nova_api import NovaApi, Unauthenticated, Unauthenticated2FA
 from cfsecret import read_secret, write_secret
 
 WORKDIR = None
@@ -65,26 +65,37 @@ DISTRIBUTED_CLEANUP_SECRET_PATH = os.path.join(
 
 
 def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password, force_interactive=False):
+    feeder_hostname = hub["ui_name"]
+    feeder_admin_user = input("Enter admin username for {} [admin]: ".format(feeder_hostname)) or "admin"
     if force_interactive:
         feeder_credentials = input(
-            "admin credentials for {}: ".format(
-                hub["ui_name"]
-            )
+            "admin credentials for {}: ".format(feeder_hostname)
         )
         print() # output newline for easier reading
     else:
         feeder_credentials = getpass(
-            prompt="Enter admin credentials for {}: ".format(
-                hub["ui_name"]
-            )
+            prompt="Enter admin password for {}: ".format(feeder_hostname)
         )
-    feeder_hostname = hub["ui_name"]
     feeder_api = NovaApi(
-        api_user="admin",
+        api_user=feeder_admin_user,
         api_password=feeder_credentials,
         cert_path=CERT_PATH,
         hostname=feeder_hostname,
     )
+    try:
+        feeder_api.status()
+    except Unauthenticated2FA:
+        token = getpass(prompt="Enter 2FA code for {}: ".format(feeder_hostname))
+        feeder_api = NovaApi(
+            api_user=feeder_admin_user,
+            api_password=feeder_credentials,
+            cert_path=CERT_PATH,
+            hostname=feeder_hostname,
+            two_factor_token=token,
+        )
+    except Unauthenticated:
+        print("admin credentials for {} are incorrect, try again".format(feeder_hostname))
+        sys.exit(1)
 
     logger.info("Creating fr_distributed_cleanup role on %s", feeder_hostname)
     response = feeder_api.put(
@@ -130,6 +141,7 @@ def interactive_setup_feeder(hub, email, fr_distributed_cleanup_password, force_
 
 def interactive_setup(force_interactive=False):
     fr_distributed_cleanup_password = "".join(random.choices(string.digits + string.ascii_letters, k=20))
+    admin_user = input("Enter admin username for superhub {} [admin]: ".format(socket.getfqdn())) or "admin"
     if force_interactive:
         admin_pass = input("admin password for superhub {}: ".format(socket.getfqdn()))
         print() # newline for easier reading
@@ -138,27 +150,26 @@ def interactive_setup(force_interactive=False):
             prompt="Enter admin password for superhub {}: ".format(socket.getfqdn())
         )
 
-    api = NovaApi(api_user="admin", api_password=admin_pass)
+    api = NovaApi(api_user=admin_user, api_password=admin_pass)
 
     # first confirm that this host is a superhub
-    status = api.fr_hub_status()
-    if (
-        status["status"] == 200
-        and status["role"] == "superhub"
-        and status["configured"]
-    ):
-        logger.debug("This host is a superhub configured for Federated Reporting.")
-    else:
-        if status["status"] == 401:
-            print("admin credentials are incorrect, try again")
-            sys.exit(1)
-        else:
-            print(
-                "Check the status to ensure role is superhub and configured is True. {}".format(
-                    status
-                )
+    try:
+        status = api.fr_hub_status()
+    except Unauthenticated2FA:
+        token = getpass(prompt="Enter 2FA code for superhub {}: ".format(socket.getfqdn()))
+        api = NovaApi(api_user=admin_user, api_password=admin_pass, two_factor_token=token)
+        status = api.fr_hub_status()
+    except Unauthenticated:
+        print("admin credentials are incorrect, try again")
+        sys.exit(1)
+    if not (status["status"] == 200 and status["role"] == "superhub" and status["configured"]):
+        print(
+            "Check the status to ensure role is superhub and configured is True. {}".format(
+                status
             )
-            sys.exit(1)
+        )
+        sys.exit(1)
+    logger.debug("This host is a superhub configured for Federated Reporting.")
 
     feederResponse = api.fr_remote_hubs()
     if not feederResponse["hubs"]:
@@ -295,19 +306,26 @@ def main():
         )
         try:
             response = feeder_api.status()
-        except Exception as e:
-            print("Could not connect to {}, error: {}".format(feeder_hostname, e));
-            sys.exit(1);
-        if response["status"] == 401 and sys.stdout.isatty():
-            # auth error when running interactively
-            # assume it's a new feeder and offer to set it up interactively
-            hub_user = api.get( "user", "fr_distributed_cleanup")
-            if hub_user is None or 'email' not in hub_user:
-                email = 'fr_distributed_cleanup@{}'.format(hub['ui_name'])
+        except Unauthenticated2FA:
+            if sys.stdout.isatty():
+                hub_user = api.get("user", "fr_distributed_cleanup")
+                email = hub_user['email'] if hub_user and 'email' in hub_user else 'fr_distributed_cleanup@{}'.format(hub['ui_name'])
+                interactive_setup_feeder(hub, email, fr_distributed_cleanup_password)
             else:
-                email = hub_user['email']
-            interactive_setup_feeder(hub, email, fr_distributed_cleanup_password)
-        elif response["status"] != 200:
+                print("2FA required for feeder {}. Skipping".format(feeder_hostname))
+                continue
+        except Unauthenticated:
+            if sys.stdout.isatty():
+                hub_user = api.get("user", "fr_distributed_cleanup")
+                email = hub_user['email'] if hub_user and 'email' in hub_user else 'fr_distributed_cleanup@{}'.format(hub['ui_name'])
+                interactive_setup_feeder(hub, email, fr_distributed_cleanup_password)
+            else:
+                print("Unable to authenticate to feeder {}. Skipping".format(feeder_hostname))
+                continue
+        except Exception as e:
+            print("Could not connect to {}, error: {}".format(feeder_hostname, e))
+            sys.exit(1)
+        if response["status"] != 200:
             print(
                 "Unable to get status for feeder {}. Skipping".format(feeder_hostname)
             )
