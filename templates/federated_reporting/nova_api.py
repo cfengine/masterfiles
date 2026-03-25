@@ -34,6 +34,14 @@ _WORKDIR = os.environ.get("WORKDIR", "/var/cfengine")
 _DEFAULT_SECRETS_PATH = "{}/httpd/secrets.ini".format(_WORKDIR)
 
 
+class Unauthenticated(Exception):
+    pass
+
+
+class Unauthenticated2FA(Unauthenticated):
+    pass
+
+
 class NovaApi:
     def __init__(
         self,
@@ -42,6 +50,7 @@ class NovaApi:
         api_password=None,
         cert_path=None,
         ca_cert_dir=None,
+        two_factor_token=None,
     ):
         self._hostname = hostname or str(socket.getfqdn())
         self._api_user = api_user
@@ -69,6 +78,8 @@ class NovaApi:
             basic_auth="{}:{}".format(self._api_user, self._api_password)
         )
         self._headers["Content-Type"] = "application/json"
+        if two_factor_token:
+            self._headers["Cf-2fa-Token"] = two_factor_token
         # urllib3 v2.0 removed SubjectAltNameWarning and instead throws an error if no SubjectAltName is present in a certificate
         if hasattr(urllib3.exceptions, "SubjectAltNameWarning"):
             # if urllib3 is < v2.0 then SubjectAltNameWarning will exist and should be silenced
@@ -111,6 +122,10 @@ class NovaApi:
             if not message:
                 if response.status == 201:
                     message = "Created"
+            if response.status == 401:
+                if "Invalid two-factor" in message:
+                    raise Unauthenticated2FA(message)
+                raise Unauthenticated(message)
             value["message"] = message
             value["status"] = response.status
         else:
