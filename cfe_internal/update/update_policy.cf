@@ -805,7 +805,7 @@ bundle agent modules_presence
     "_custom_template_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)mustache$(const.dirsep)";
     "_vendored_paths" slist => findfiles("$(_vendored_dir)*.mustache");
     "_custom_template_paths" slist => findfiles("$(_custom_template_dir)*.mustache"), if => isdir( "$(_custom_template_dir)" );
-    "_package_paths" slist => filter("$(_override_dir)vendored", _package_paths_tmp, "false", "true", 999);
+    "_package_paths" slist => filter("$(_override_dir)vendored$(const.dirsep)", _package_paths_tmp, "false", "true", 999);
 
     windows::
       "_package_paths_tmp" slist => findfiles("$(_override_dir)*");
