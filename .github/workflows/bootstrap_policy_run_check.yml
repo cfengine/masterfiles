@@ -3,11 +3,29 @@ on:
 
 jobs:
   bootstrap_policy_run_check:
+    strategy:
+      fail-fast: false
+      matrix:
+        cfengine_version: [ "3.21.8", "3.24.3", "3.27.0", "master" ]
+
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: masterfiles
+      - name: Get Togethers
+        uses: cfengine/together-javascript-action@main
+        id: together
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout Core
+        if: ${{ steps.together.outputs.core != null }}
+        uses: actions/checkout@v4
+        with:
+          repository: cfengine/core
+          path: core
+          ref: ${{steps.together.outputs.core || github.base_ref || github.ref}}
+          submodules: recursive
       - name: Install, bootstrap, policy run
-        run: masterfiles/ci/docker-bootstrap-policy-run.sh
+        run: masterfiles/ci/docker-bootstrap-policy-run.sh ${{ matrix.cfengine_version }}
