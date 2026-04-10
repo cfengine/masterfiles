@@ -806,9 +806,11 @@ bundle agent modules_presence
     "_vendored_paths" slist => findfiles("$(_vendored_dir)*.mustache");
     "_custom_template_paths" slist => findfiles("$(_custom_template_dir)*.mustache"), if => isdir( "$(_custom_template_dir)" );
     "_package_paths" slist => filter("$(_override_dir)vendored$(const.dirsep)", _package_paths_tmp, "false", "true", 999);
+    "_package_paths_tmp" slist => filter("${_override_dir}[${const.dirsep}]?", "${_package_paths_tmp}", "true", "true", 1),
+      comment => "If the directory itself shows up, just remove it";
 
     windows::
-      "_package_paths_tmp" slist => findfiles("$(_override_dir)*");
+      "_package_paths_raw" slist => findfiles("$(_override_dir)*");
       "_vendored_modules" slist => maplist(regex_replace("$(this)", "\Q$(_vendored_dir)\E(.*).mustache", "$1", "g"), @(_vendored_paths));
       "_override_modules" slist => maplist(regex_replace("$(this)", "\Q$(_override_dir)\E(.*)", "$1", "g"), @(_package_paths));
       # replace single backslashes in a windows path with double-backslashes
@@ -816,7 +818,7 @@ bundle agent modules_presence
       # causing PCRE to try and interpret special escape sequences.
       "_not_vendored_modules_pathname_regex" string => regex_replace("$(sys.inputdir)$(const.dirsep)modules$(const.dirsep)(?!packages$(const.dirsep)vendored).*","\\\\","\\\\\\\\","g");
     !windows::
-      "_package_paths_tmp" slist => findfiles("$(_override_dir)*");
+      "_package_paths_raw" slist => findfiles("$(_override_dir)*");
       "_vendored_modules" slist => maplist(regex_replace("$(this)", "$(_vendored_dir)(.*).mustache", "$1", "g"), @(_vendored_paths));
       "_override_modules" slist => maplist(regex_replace("$(this)", "$(_override_dir)(.*)", "$1", "g"), @(_package_paths));
       "_custom_template_modules" slist => maplist(regex_replace("$(this)", "$(_custom_template_dir)(.*).mustache", "$1", "g"), @(_custom_template_paths));
