@@ -21,8 +21,9 @@ if docker images | grep mpf; then
 fi
 
 # run the test
-docker build -t mpf -f "${NTECH_ROOT}"/masterfiles/ci/bootstrap-policy-run.Dockerfile  "${NTECH_ROOT}"/masterfiles
-docker run --workdir /mpf --volume "${NTECH_ROOT}"/masterfiles:/mpf --tty mpf sh /mpf/ci/bootstrap-policy-run.sh
+ls "${NTECH_ROOT}"
+docker build -t mpf -f "${NTECH_ROOT}"/masterfiles/ci/bootstrap-policy-run.Dockerfile  "${NTECH_ROOT}"
+docker run --workdir /masterfiles --tty mpf sh /masterfiles/ci/bootstrap-policy-run.sh
 if grep error *.log; then
   echo "fail"
   exit 1
