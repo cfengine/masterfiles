@@ -801,14 +801,17 @@ bundle agent modules_presence
     # TODO: Remove this once sys.moduledir is always available (3.26+ only)
     "moduledir" string => ifelse(isvariable("sys.moduledir"), "$(sys.moduledir)", "$(sys.workdir)/modules");
     "_vendored_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)vendored$(const.dirsep)";
+    "_vendored_dir_filter" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)vendored";
     "_override_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)";
     "_custom_template_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)mustache$(const.dirsep)";
     "_vendored_paths" slist => findfiles("$(_vendored_dir)*.mustache");
     "_custom_template_paths" slist => findfiles("$(_custom_template_dir)*.mustache"), if => isdir( "$(_custom_template_dir)" );
-    "_package_paths" slist => filter("$(_override_dir)vendored", _package_paths_tmp, "false", "true", 999);
+    "_package_paths_tmp" slist => findfiles("${_override_dir}*"),
+      comment => "We get a temp list of files that we have to filter out the vendored sub directory.";
 
     windows::
-      "_package_paths_tmp" slist => findfiles("$(_override_dir)*");
+      "_package_paths" slist => filter("\Q${_vendored_dir_filter}\E.*", _package_paths_tmp, "true", "true", 999),
+        comment => "The list will include the vendored sub-directory that we don't want so remove it.";
       "_vendored_modules" slist => maplist(regex_replace("$(this)", "\Q$(_vendored_dir)\E(.*).mustache", "$1", "g"), @(_vendored_paths));
       "_override_modules" slist => maplist(regex_replace("$(this)", "\Q$(_override_dir)\E(.*)", "$1", "g"), @(_package_paths));
       # replace single backslashes in a windows path with double-backslashes
@@ -816,7 +819,8 @@ bundle agent modules_presence
       # causing PCRE to try and interpret special escape sequences.
       "_not_vendored_modules_pathname_regex" string => regex_replace("$(sys.inputdir)$(const.dirsep)modules$(const.dirsep)(?!packages$(const.dirsep)vendored).*","\\\\","\\\\\\\\","g");
     !windows::
-      "_package_paths_tmp" slist => findfiles("$(_override_dir)*");
+      "_package_paths" slist => filter("${_vendored_dir_filter}.*", _package_paths_tmp, "true", "true", 999),
+        comment => "The list will include the vendored sub-directory that we don't want so remove it.";
       "_vendored_modules" slist => maplist(regex_replace("$(this)", "$(_vendored_dir)(.*).mustache", "$1", "g"), @(_vendored_paths));
       "_override_modules" slist => maplist(regex_replace("$(this)", "$(_override_dir)(.*)", "$1", "g"), @(_package_paths));
       "_custom_template_modules" slist => maplist(regex_replace("$(this)", "$(_custom_template_dir)(.*).mustache", "$1", "g"), @(_custom_template_paths));
@@ -867,14 +871,13 @@ bundle agent modules_presence
   reports:
     DEBUG::
       "_override_dir: $(_override_dir)";
-      "_package_paths_tmp: $(with)" with => storejson(_package_paths_tmp);
+      "_package_paths: $(with)" with => storejson(_package_paths);
       "_not_vendored_modules_pathname_regex: $(_not_vendored_modules_pathname_regex)";
       "_vendored_modules: $(_vendored_modules)";
       "_override_modules: $(_override_modules)";
       "_vendored_dir: $(_vendored_dir)";
       "_vendored_paths: $(_vendored_paths)";
       "_override_dir: $(_override_dir)";
-      "_package_paths: $(_package_paths)";
       "override_vendored_module_$(_vendored_modules)"
         if => "override_vendored_module_$(_vendored_modules)";
       "override_module_$(_override_modules)"
