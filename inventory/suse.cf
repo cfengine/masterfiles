@@ -4,11 +4,13 @@ bundle common inventory_suse
 # This common bundle is for SUSE Linux inventory work.
 {
   classes:
-      "suse_pure" expression => "(sles|sled).!opensuse",
+    "suse_pure"
+      expression => "(sles|sled).!opensuse",
       comment => "pure SUSE",
       meta => { "inventory", "attribute_name=none" };
 
-      "suse_derived" expression => "opensuse.!suse_pure",
+    "suse_derived"
+      expression => "opensuse.!suse_pure",
       comment => "derived from SUSE",
       meta => { "inventory", "attribute_name=none" };
 }

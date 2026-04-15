@@ -18,22 +18,21 @@ bundle common cfe_internal_management_file_control
 # @brief Define policy input dependancies
 {
   vars:
-
-      "inputs" slist => { };
+    "inputs" slist => {  };
 
     cfengine_recommendations_enabled::
       "input[cfengine_recommendations]"
         string => "$(this.promise_dirname)/recommendations.cf";
 
     any::
-      "inputs" slist => getvalues( input );
+      "inputs" slist => getvalues(input);
 }
 
 body file control
 # @brief Include policy input dependancies
 {
-    cfengine_recommendations_enabled::
-      inputs => { @(cfe_internal_management_file_control.inputs) };
+  cfengine_recommendations_enabled::
+    inputs => { @(cfe_internal_management_file_control.inputs) };
 }
 
 bundle agent cfe_internal_management
@@ -59,20 +58,15 @@ bundle agent cfe_internal_management
       "bundles" slist => getindices(policy);
 
       "recommendation_bundles"
-        slist => sort( bundlesmatching( ".*", "cfengine_recommends" ), lex);
+        slist => sort(bundlesmatching(".*", "cfengine_recommends"), lex);
 
   methods:
+    # CFEngine internals
+    "CFEngine_Internals" usebundle => "$(bundles)";
 
-      #
-      # CFEngine internals
-      #
-
-      "CFEngine_Internals"
-        usebundle => "$(bundles)";
-
-      "CFEngine Recommendations"
-        usebundle => $(recommendation_bundles),
-        if => isvariable( recommendation_bundles );
+    "CFEngine Recommendations"
+      usebundle => $(recommendation_bundles),
+      if => isvariable(recommendation_bundles);
 
   reports:
     DEBUG|DEBUG_cfe_internal_management::
