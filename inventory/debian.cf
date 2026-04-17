@@ -27,9 +27,9 @@ bundle common inventory_debian
           100,
           # maxentries
           2048
+          # maxbytes
         );
 
-      # maxbytes
       "mint_release" string => "$(mint_info[RELEASE][1])";
       "mint_codename" string => "$(mint_info[CODENAME][1])";
 
