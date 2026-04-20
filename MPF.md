@@ -170,7 +170,7 @@ For example:
 
 **Notes:**
 
-* The order in which bundles are actuates is not guaranteed.
+* The order in which bundles are actuated is not guaranteed.
 * The agent will error if a named bundle is not part of inputs.
 
 ### Specify the agent bundle used for policy update
@@ -2202,7 +2202,7 @@ For example:
 
 **Notes:**
 
-* The order in which bundles are actuates is not guaranteed.
+* The order in which bundles are actuated is not guaranteed.
 * The agent will error if a named bundle is not part of inputs.
 
 **History:** Added in 3.10.0
