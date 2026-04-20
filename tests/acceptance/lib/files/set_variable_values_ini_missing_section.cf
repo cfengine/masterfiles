@@ -1,0 +1,67 @@
+#######################################################
+#
+# Test that set_variable_values_ini does not error when section doesn't exist
+#
+#######################################################
+
+body common control
+{
+      inputs => { "../../default.cf.sub" };
+      bundlesequence  => { default("$(this.promise_filename)") };
+      version => "1.0";
+}
+
+#######################################################
+
+bundle agent init
+{
+  files:
+      # The tested file "actual" is copied from our seeded starting position.
+      "$(G.testfile).actual"
+        copy_from => local_cp("$(this.promise_filename).actual");
+
+      # Next we place the file which we will compare the final result with.
+      "$(G.testfile).expected"
+        copy_from => local_cp("$(this.promise_filename).expected");
+}
+
+#######################################################
+
+bundle agent test
+{
+  meta:
+      "description" -> { "CFE-3866" }
+        string => "Test that set_variable_values_ini does not error when section doesn't exist";
+
+  vars:
+      "config[section1][key1]" string => "value1";
+      "config[section1][key2]" string => "value2";
+      "config[section2][key3]" string => "value3";
+      "config[section2][key4]" string => "value4";
+
+  files:
+      "$(G.testfile).actual"
+        create => "true",
+        edit_line => set_variable_values_ini("test.config", "section1");
+
+      "$(G.testfile).actual"
+        edit_line => set_variable_values_ini("test.config", "section2");
+}
+
+#######################################################
+
+bundle agent check
+{
+  methods:
+      "check"
+        usebundle => dcs_if_diff("$(G.testfile).actual", "$(G.testfile).expected",
+                                 "pass", "_fail");
+
+      "fail"
+        usebundle => dcs_fail($(this.promise_filename)),
+        if => "_fail";
+
+    pass::
+      "pass"
+        usebundle => dcs_pass($(this.promise_filename));
+}
