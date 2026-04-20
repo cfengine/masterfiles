@@ -37,6 +37,10 @@ bundle common def
         string => "localhost",
         if => not(isvariable("smtpserver"));
 
+      "smtpport"
+        string => "25",
+        if => not(isvariable("smtpport"));
+
       "control_executor_mailmaxlines" -> { "ENT-9614" }
         int => "30",
         if => not( isvariable( "control_executor_mailmaxlines" ));
