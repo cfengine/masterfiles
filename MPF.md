@@ -900,6 +900,27 @@ This setting can be customized via Augments, for example:
 }
 ```
 
+### smtpport
+
+The SMTP port that `cf-execd` should use when connecting to the SMTP server. Defaults to `25`.
+
+This setting can be customized via Augments, for example:
+
+```json
+{
+  "variables": {
+    "default:def.smtpport": {
+        "value": "26",
+        "comment": "The smtp port that should be used when sending email from cf-execd."
+    }
+  }
+}
+```
+
+**History:**
+
+- Added in CFEngine 3.28.0
+
 ### smtpserver
 
 The SMTP server that `cf-execd` should use to send emails. Defaults to `localhost`.

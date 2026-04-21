@@ -26,6 +26,9 @@ body executor control
       mailto       => "$(def.mailto)";
       mailfrom     => "$(def.mailfrom)";
       smtpserver   => "$(def.smtpserver)";
+@if minimum_version(3.28.0)
+      smtpport     => "$(def.smtpport)";
+@endif
       mailmaxlines => "$(default:def.control_executor_mailmaxlines)";
 
     control_executor_mailsubject_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
