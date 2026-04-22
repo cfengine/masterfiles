@@ -8,7 +8,6 @@
 # This is loaded very early, only use hard classes or classes from def.json here.
 #
 ###############################################################################
-
 # For example:
 # promise agent git
 # {

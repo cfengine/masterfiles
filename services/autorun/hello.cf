@@ -1,7 +1,7 @@
 bundle agent hello_world_autorun
 {
   meta:
-      "tags" slist => { "autorun" };
+    "tags" slist => { "autorun" };
 
   reports:
     verbose_mode::
