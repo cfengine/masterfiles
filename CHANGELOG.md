@@ -262,7 +262,7 @@
   (ENT-8823)
 - Added policy update exclusion for directories named .no-distrib
   (ENT-8079)
-- Added support for 'option' option in pkg module (CFE-3568)
+- Added support for `option` option in pkg module (CFE-3568)
 - Added support for Amazon Linux in standalone self upgrade (ENT-8274)
 - Added support for downloading windows packages as part of self upgrade
   (ENT-8283)
@@ -421,8 +421,8 @@
   files in masterfiles were up to date with the files in inputs. Files in inputs
   that did not exist in masterfiles were left undisturbed. To enable sync
   behavior (a common user expectation) you had to explicitly define
-  'cfengine_internal_purge_policies'. Now, if you wish to return to the previous
-  default behavior, define the class 'cfengine_internal_purge_policies_disabled'.
+  `cfengine_internal_purge_policies`. Now, if you wish to return to the previous
+  default behavior, define the class `cfengine_internal_purge_policies_disabled`.
   Ticket: (CFE-3662)
 - Changed msiexec package module install logs to be unique for each msi file
   (ENT-6824)
@@ -495,7 +495,7 @@
 
 ## 3.16.0
 - /var/cfengine/bin/python symlink creation on SLES was fixed
-- Added 'data' shortcut to cf-serverd, defaults to sys.workdir/data
+- Added `data` shortcut to cf-serverd, defaults to sys.workdir/data
 - Added inventory for CFEngine Enterprise License information
   (ENT-5089, ENT-5279)
 - Added inventory of NFS servers in use (from /proc/mounts, on linux)
@@ -536,7 +536,7 @@
 - Made python symlink fall back to platform-python (CFE-3291)
 - Made set_variable_values_ini prefer whitespace around = (CFE-3221)
 - Modified cftransport cleanup to avoid errors (ENT-5555)
-- Moved 'selinux_enabled' class to config bundle and namespace scope it
+- Moved `selinux_enabled` class to config bundle and namespace scope it
 - Prevented inventory of unresolved variables for diskfree and loadavg
   (ENT-5190)
 - Release number was added to MPF tarballs (ENT-5429)
@@ -599,7 +599,7 @@
 ## 3.15.0b1
 - Added continual checking for policy_server state (CFE-3073)
 - Added monitoring for PostgreSQL lock acquisition times (ENT-4753)
-- Added support for 'awk' filters in the FR dump-import process (ENT-4839)
+- Added support for `awk` filters in the FR dump-import process (ENT-4839)
 - Added support for configuring abortclasses and abortbundleclasses via
   augments (ENT-4823)
 - Added support for filtering in both dump and import phases of the FR
@@ -674,7 +674,7 @@
 
 ## 3.13.0
 - Added Debian 9 to the self upgrade package map (ENT-4255)
-- Added 'system-uuid' to default dmidecode inventory (CFE-2925)
+- Added `system-uuid` to default dmidecode inventory (CFE-2925)
 - Added inventory of AWS EC2 linux instances (CFE-2924)
 - Added ubuntu 18 to package map for self upgrade (ENT-4118)
 - Allowed dmidefs inventory to be overridden via augments (CFE-2927)
@@ -818,7 +818,7 @@
   (CFE-2624)
 - apt_get package module: Fix bug which prevented updates
   from being picked up if there was more than one source listed in the
-  'apt upgrade' output, without a comma in between (CFE-2605)
+  `apt upgrade` output, without a comma in between (CFE-2605)
 - Enabled specification of monitoring_include via augments (CFE-2505)
 - Configure call_collect_interval from augments (enable_client_initiated_reporting) (#905)
   (CFE-2623)
