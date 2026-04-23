@@ -100,6 +100,25 @@ body package_module apt_get
 @endif
 }
 
+body package_module dnf_group
+# @brief manage dnf package groups
+#
+# **Example:**
+#
+# ```cf3
+# "development"
+#   policy => "present",
+#   package_module => dnf_group,
+#   options => { "group_package_types=optional",
+#                "install_weak_deps=false" },
+#   version => "latest";  # Upgrade group packages
+# ```
+{
+        query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
+        query_updates_ifelapsed => "$(package_module_knowledge.query_updates_ifelapsed)";
+        interpreter => "$(sys.bindir)/cfengine-selected-python";
+}
+
 body package_module zypper
 {
       query_installed_ifelapsed => "$(package_module_knowledge.query_installed_ifelapsed)";
