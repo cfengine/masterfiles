@@ -1,3 +1,14 @@
+3.24.4:
+	- Added dnf package module (ENT-11784)
+	- Added workaround for set_variable_values_ini with missing sections
+	  (CFE-3866)
+	- Fixed bad regex in packages promise method for pip (ENT-13667)
+	- Fixed incorrect previous fix for timeout for php processing to allow for longer running API requests (3.24)
+	  (ENT-13291, ENT-13625)
+	- Inhibit management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
+	  (ENT-12658)
+	- Made system_log_level configurable via Augments (CFE-4452)
+
 3.24.3:
 	- Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
 	- Added dmidecode to well known paths for Red Hat (ENT-12988)
