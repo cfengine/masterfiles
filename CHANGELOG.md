@@ -1,3 +1,13 @@
+## 3.27.1
+- Added 2FA support and configurable admin username for distributed cleanup setup
+  (ENT-12129)
+- Added dnf package module (ENT-11784)
+- Added workaround for set_variable_values_ini with missing sections
+  (CFE-3866)
+- Changed distributed_cleanup.py to issue a real DELETE FROM __hosts instead of soft deletion via INSERT with a deleted timestamp
+  (ENT-12129)
+- Fixed bad regex in packages promise method for pip (ENT-13667)
+
 ## 3.27.0
 - Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
 - Added $(paths.dmidecode) for Red Hat (ENT-12988)
