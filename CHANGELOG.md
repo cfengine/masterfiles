@@ -15,7 +15,6 @@
 - `standard_services` bundle no longer invokes `systemctl` with `--global`
   which is mutually exclusive from `--system` (CFE-4639)
 
-
 ## 3.24.3
 
 - Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
