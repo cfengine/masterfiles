@@ -12,8 +12,6 @@
 - Fixed maximum recursion errors in modules_presence for CFEngine versions
   unaffected by CFE-4623 (CFE-2852)
 - Added dnf_group package module for managing DNF package groups (CFE-2852)
-- `standard_services` bundle no longer invokes `systemctl` with `--global`
-  which is mutually exclusive from `--system` (CFE-4639)
 
 ## 3.24.3
 
