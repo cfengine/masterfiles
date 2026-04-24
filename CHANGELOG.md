@@ -9,6 +9,9 @@
 - Inhibit management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
   (ENT-12658)
 - Made system_log_level configurable via Augments (CFE-4452)
+- Fixed maximum recursion errors in modules_presence for CFEngine versions
+  unaffected by CFE-4623 (CFE-2852)
+- Added dnf_group package module for managing DNF package groups (CFE-2852)
 
 ## 3.24.3
 
