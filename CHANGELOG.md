@@ -8,6 +8,9 @@
 - Changed distributed_cleanup.py to issue a real DELETE FROM `__hosts` instead of soft deletion via INSERT with a deleted timestamp
   (ENT-12129)
 - Fixed bad regex in packages promise method for pip (ENT-13667)
+- Fixed maximum recursion errors in modules_presence for CFEngine versions
+  unaffected by CFE-4623 (CFE-2852)
+- Added dnf_group package module for managing DNF package groups (CFE-2852)
 
 ## 3.27.0
 
