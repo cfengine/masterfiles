@@ -369,7 +369,7 @@ bundle agent systemd_services(service,state)
   vars:
     systemd::
       "call_systemctl"
-        string => "$(paths.systemctl) --no-ask-password --global --system";
+        string => "$(paths.systemctl) --no-ask-password --system";
 
       "systemd_properties"
         string => "-pLoadState,CanStop,UnitFileState,ActiveState,LoadState,CanStart,CanReload";
