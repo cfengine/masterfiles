@@ -7,7 +7,7 @@
 body common control
 {
     inputs => {
-               "../../../default.cf.sub",
+               "../../../default.sub.cf",
                "../../../../../lib/3.6/packages.cf",
                "../../packages-info.cf.sub",
               };
@@ -121,6 +121,3 @@ body classes succesfully_executed(class)
     kept_returncodes => { "0" };
     promise_kept => { "$(class)" };
 }
-
-
-

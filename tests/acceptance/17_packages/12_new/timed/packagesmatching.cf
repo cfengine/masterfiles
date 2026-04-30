@@ -2,7 +2,7 @@
 
 body common control
 {
-    inputs => { "../../../default.cf.sub" };
+    inputs => { "../../../default.sub.cf" };
     bundlesequence => { default($(this.promise_filename)) };
 
     package_inventory => { test_module };
@@ -84,4 +84,3 @@ bundle agent check
     test_pass_3.!ok_pass3::
       "$(this.promise_filename) FAIL";
 }
-

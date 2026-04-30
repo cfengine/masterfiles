@@ -12,7 +12,7 @@ stdlib directly, but does not include the rest of the test framework.
 
 ** Example test
 
-This is the main test. Note how it includes =default.cf.sub= and runs the
+This is the main test. Note how it includes =default.sub.cf= and runs the
 typical test bundlesequence. The test passes based on the *OUTPUT* of the
 subtest which runs from a policy file with the same name suffixed with =.sub=.
 
@@ -20,7 +20,7 @@ subtest which runs from a policy file with the same name suffixed with =.sub=.
 #+BEGIN_SRC cfengine3
 body common control
 {
-        inputs => { '../../default.cf.sub' };
+        inputs => { '../../default.sub.cf' };
         bundlesequence  => { default("$(this.promise_filename)") };
         version => "1.0";
 }
@@ -55,7 +55,7 @@ R: line 9";
 #+END_SRC
 
 This is the subtest itself. Note how it *does not include the test framework*
-(=default.cf.sub=) but instead includes the part of the standard library that it
+(=default.sub.cf=) but instead includes the part of the standard library that it
 needs for the test. In this case the subtest outputs information that the main
 test inspects for pass or failure. The main test could also inspect data in
 other files. Consider writing a data file containing the =datastate()= or

@@ -1,7 +1,6 @@
 ENV_FILE=testall.env
 
 copy:
-	cp $(core_dir)/tests/acceptance/*.cf.sub .
 	cp $(core_dir)/tests/acceptance/*.sub.cf .
 
 env:
@@ -23,7 +22,7 @@ check-local: create-env
 
 CLEANFILES  = testall.env summary.log test.log test.xml Makefile.testall
 #These are created by running the submakefile
-CLEANFILES += dcs.cf.sub default.cf.sub plucked.sub.cf
+CLEANFILES += dcs.sub.cf default.sub.cf plucked.sub.cf
 
 
 EXTRA_DIST  = README.md

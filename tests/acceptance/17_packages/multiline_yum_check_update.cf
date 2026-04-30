@@ -5,13 +5,13 @@ body common control
 {
     cfengine_3_7::
       inputs => {
-                  "../dcs.cf.sub",
+                  "../dcs.sub.cf",
                   "../../../lib/stdlib.cf",
                   "../../../lib/packages.cf",
                 };
 
     !cfengine_3_7::
-      inputs => { "../dcs.cf.sub",
+      inputs => { "../dcs.sub.cf",
                   "../../../$(sys.local_libdir)/stdlib.cf",
                   "../../../$(sys.local_libdir)/packages.cf",
       };
