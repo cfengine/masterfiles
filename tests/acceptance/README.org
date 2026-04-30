@@ -1,10 +1,10 @@
 * Writing tests against the stdlib
 
 The test framework for masterfiles piggy backs on the test framework from core.
-It's important to note =plucked.cf.sub= comes from the core repository and that
+It's important to note =plucked.sub.cf= comes from the core repository and that
 it includes bodies and bundles from the stdlib which are useful in writing tests
 in core. This presents a problem for writing tests in the masterfiles framework
-because =plucked.cf.sub= is included and simply including the stdlib could
+because =plucked.sub.cf= is included and simply including the stdlib could
 result in duplicate definition of bundle errors.
 
 To work around this complication you can create a subtest that includes the
