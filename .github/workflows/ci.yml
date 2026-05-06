@@ -9,8 +9,10 @@ on:
 jobs:
   style_check:
     uses: ./.github/workflows/style_check.yml
+  cfengine_lint:
+    uses: ./.github/workflows/cfengine_lint.yml
   bootstrap_policy_run_check:
-    needs: style_check
+    needs: [style_check, cfengine_lint]
     uses: ./.github/workflows/bootstrap_policy_run_check.yml
   tests:
     needs: bootstrap_policy_run_check
