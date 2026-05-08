@@ -9,7 +9,7 @@
  {
   "sha": "PLACE KEY HERE",
   "internal_ip": "192.168.100.11",
-  "is_in_cluster" : true
+  "is_in_cluster" : true,
  }
 }
 
