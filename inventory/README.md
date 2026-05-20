@@ -183,7 +183,7 @@ R: inventory_lsb: OS = Ubuntu, codename = trusty, release = 14.04, flavor = Ubun
 
 * lives in: `any.cf`
 * runs `inventory_control.lldpctl_exec` through a Perl filter
-* provides variables: `cfe_autorun_inventory_LLDP.K` for each `K` returned by the LLDB executable
+* provides variables: `cfe_autorun_inventory_lldp.K` for each `K` returned by the LLDB executable
 
 ## mtab
 

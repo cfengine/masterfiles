@@ -11,7 +11,7 @@ bundle common test_meta
 body common control
 {
       inputs => {
-                 "../../../dcs.cf.sub",
+                 "../../../dcs.sub.cf",
                   "../../../../../$(sys.local_libdir)/stdlib.cf",
                   "../../../../../$(sys.local_libdir)/packages.cf",
                   "../../packages-info.cf.sub",

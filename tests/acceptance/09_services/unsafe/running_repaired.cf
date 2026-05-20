@@ -10,7 +10,7 @@ vars:
 
 body common control
 {
-      inputs => { "../../dcs.cf.sub",
+      inputs => { "../../dcs.sub.cf",
                   "../../../../$(sys.local_libdir)/stdlib.cf",
                   "service_common.cf.sub"
                 };

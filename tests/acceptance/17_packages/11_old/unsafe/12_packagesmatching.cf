@@ -18,7 +18,7 @@ body common control
 {
       inputs => { "../../packages-info.cf.sub",
                   "../../meta_skip.cf.sub",
-                  "../../../dcs.cf.sub",
+                  "../../../dcs.sub.cf",
                   "../../../../../inventory/any.cf",
                   "../../../../../$(sys.local_libdir)/stdlib.cf",
                   "../../../../../$(sys.local_libdir)/packages.cf",

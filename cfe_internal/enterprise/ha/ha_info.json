@@ -1,15 +1,12 @@
 {
- "192.168.100.10":
- {
-  "sha": "PLACE KEY HERE",
-  "internal_ip": "192.168.100.10",
-  "is_in_cluster" : true,
- },
- "192.168.100.11":
- {
-  "sha": "PLACE KEY HERE",
-  "internal_ip": "192.168.100.11",
-  "is_in_cluster" : true,
- }
+  "192.168.100.10": {
+    "sha": "PLACE KEY HERE",
+    "internal_ip": "192.168.100.10",
+    "is_in_cluster": true
+  },
+  "192.168.100.11": {
+    "sha": "PLACE KEY HERE",
+    "internal_ip": "192.168.100.11",
+    "is_in_cluster": true
+  }
 }
-
