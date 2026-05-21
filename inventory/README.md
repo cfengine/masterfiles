@@ -1,5 +1,5 @@
 The CFEngine 3 inventory modules are pieces of CFEngine policy that are loaded
-and used by `promises.cf` in order to *inventory* the system.
+and used by `promises.cf` in order to _inventory_ the system.
 
 CFEngine Enterprise has specific functionality to show and use inventory data,
 but users of the Community Version can use them as well locally on each host.
@@ -36,7 +36,7 @@ inventory modules should be disabled. You can simply set
 
 Any inventory module works the same way, by doing some discovery work
 and then tagging its classes and variables with the `report` or
-`inventory` tags.  For example:
+`inventory` tags. For example:
 
 ```
 vars:
@@ -111,22 +111,23 @@ system). Here's the list of modules and what they provide. Note they
 are all enabled by code in `def.cf` as explained above.
 
 ## Package Inventory
-* lives in: `any.cf`
-* applies to: All systems
-* runs: package modules in order to report on packages installed and patches
+
+- lives in: `any.cf`
+- applies to: All systems
+- runs: package modules in order to report on packages installed and patches
   available
-* disable: define the class ```disable_inventory_package_refresh```. Note this
+- disable: define the class `disable_inventory_package_refresh`. Note this
   also disables the default package inventory used by the new packages promise
-  implementation. This will cause the ```packagesmatching()``` and
-  ```packageupdatesmatching()``` functions to rely on data supplied by the
+  implementation. This will cause the `packagesmatching()` and
+  `packageupdatesmatching()` functions to rely on data supplied by the
   legacy package promise implementation.
 
 ## LSB
 
-* lives in: `lsb.cf`
-* applies to: LSB systems (most Linux distributions, basically)
-* runs: `lsb_release -a`
-* sample data:
+- lives in: `lsb.cf`
+- applies to: LSB systems (most Linux distributions, basically)
+- runs: `lsb_release -a`
+- sample data:
 
 ```
 Distributor ID:	Ubuntu
@@ -135,11 +136,11 @@ Release:	14.04
 Codename:	trusty
 ```
 
-* provides:
-    * classes `lsb_$(os)`, `lsb_$(os)_$(release)`, `lsb_$(os)_$(codename)`
-    * variables: `inventory_lsb.os` (Distributor ID), `inventory_lsb.codename`, `inventory_lsb.release`, `inventory_lsb.flavor`, `inventory_lsb.description`
+- provides:
+  - classes `lsb_$(os)`, `lsb_$(os)_$(release)`, `lsb_$(os)_$(codename)`
+  - variables: `inventory_lsb.os` (Distributor ID), `inventory_lsb.codename`, `inventory_lsb.release`, `inventory_lsb.flavor`, `inventory_lsb.description`
 
-* sample output:
+- sample output:
 
 ```
 % cf-agent -KI -binventory_control,inventory_lsb
@@ -149,49 +150,49 @@ R: inventory_lsb: OS = Ubuntu, codename = trusty, release = 14.04, flavor = Ubun
 
 ## SUSE
 
-* lives in: `suse.cf`
-* applies to: SUSE Linux
-* provides classes: `suse_pure` and `suse_derived`
+- lives in: `suse.cf`
+- applies to: SUSE Linux
+- provides classes: `suse_pure` and `suse_derived`
 
 ## Debian
 
-* lives in: `debian.cf`
-* applies to: Debian and its derivatives
-* provides:
-    * variables: `inventory_debian.mint_release` and `inventory_debian.mint_codename`
-    * classes: `debian_pure`, `debian_derived`, `linuxmint`, `lmde`, `linuxmint_$(mint_release)`, `linuxmint_$(mint_codename)`, `$(mint_codename)`
+- lives in: `debian.cf`
+- applies to: Debian and its derivatives
+- provides:
+  - variables: `inventory_debian.mint_release` and `inventory_debian.mint_codename`
+  - classes: `debian_pure`, `debian_derived`, `linuxmint`, `lmde`, `linuxmint_$(mint_release)`, `linuxmint_$(mint_codename)`, `$(mint_codename)`
 
 ## Red Hat
 
-* lives in: `redhat.cf`
-* applies to: Red Hat and its derivatives
-* provides classes: `redhat_pure`, `redhat_derived`
+- lives in: `redhat.cf`
+- applies to: Red Hat and its derivatives
+- provides classes: `redhat_pure`, `redhat_derived`
 
 ## Windows
 
-* lives in: `windows.cf`
+- lives in: `windows.cf`
 
 ## Mac OS X
 
-* lives in: `macos.cf`
+- lives in: `macos.cf`
 
 ## Generic (unknown OS)
 
-* lives in: `generic.cf` (see `any.cf` for generally applicable inventory modules)
+- lives in: `generic.cf` (see `any.cf` for generally applicable inventory modules)
 
 ## LLDP
 
-* lives in: `any.cf`
-* runs `inventory_control.lldpctl_exec` through a Perl filter
-* provides variables: `cfe_autorun_inventory_lldp.K` for each `K` returned by the LLDB executable
+- lives in: `any.cf`
+- runs `inventory_control.lldpctl_exec` through a Perl filter
+- provides variables: `cfe_autorun_inventory_lldp.K` for each `K` returned by the LLDB executable
 
 ## mtab
 
-* lives in: `any.cf`
-* parses: `/etc/mtab`
-* provides classes: `have_mount_FSTYPE` and `have_mount_FSTYPE_MOUNTPOINT`
+- lives in: `any.cf`
+- parses: `/etc/mtab`
+- provides classes: `have_mount_FSTYPE` and `have_mount_FSTYPE_MOUNTPOINT`
 
-* sample output (note this is verbose mode with `-v` because there's a lot of output):
+- sample output (note this is verbose mode with `-v` because there's a lot of output):
 
 ```
 % cf-agent -Kv -binventory_control,cfe_autorun_inventory_mtab|grep 'cfe_autorun_inventory_mtab: we have'
@@ -204,11 +205,11 @@ R: cfe_autorun_inventory_mtab: we have a tmpfs mount under /run/shm
 
 ## fstab
 
-* lives in: `any.cf`
-* parses: `sys.fstab`
-* provides classes: `have_fs_FSTYPE` `have_fs_MOUNTPOINT` and `have_fs_FSTYPE_MOUNTPOINT`
+- lives in: `any.cf`
+- parses: `sys.fstab`
+- provides classes: `have_fs_FSTYPE` `have_fs_MOUNTPOINT` and `have_fs_FSTYPE_MOUNTPOINT`
 
-* sample output (note this is verbose mode with `-v` because there's a LOT of output):
+- sample output (note this is verbose mode with `-v` because there's a LOT of output):
 
 ```
 % cf-agent -Kv -binventory_control,cfe_autorun_inventory_fstab|grep 'cfe_autorun_inventory_fstab: we have'
@@ -220,11 +221,11 @@ R: cfe_autorun_inventory_fstab: we have a auto fstab entry under /mnt/cdrom
 
 ## DMI decoding
 
-* lives in: `any.cf`
-* runs: `dmidecode`
-* provides variables: `cfe_autorun_inventory_dmidecode.dmi[K]` for each key K in the `dmidecode` output
+- lives in: `any.cf`
+- runs: `dmidecode`
+- provides variables: `cfe_autorun_inventory_dmidecode.dmi[K]` for each key K in the `dmidecode` output
 
-* sample output (sudo is needed to access the DMI):
+- sample output (sudo is needed to access the DMI):
 
 ```
 % sudo /var/cfengine/bin/cf-agent -KI -binventory_control,cfe_autorun_inventory_dmidecode
@@ -239,32 +240,32 @@ R: cfe_autorun_inventory_dmidecode: Obtained CPU model = 'Intel(R) Core(TM) i7-2
 
 ## Listening ports
 
-* lives in: `any.cf`
-* provides variables: `cfe_autorun_inventory_listening_ports.ports` as a copy of `mon.listening_ports`
+- lives in: `any.cf`
+- provides variables: `cfe_autorun_inventory_listening_ports.ports` as a copy of `mon.listening_ports`
 
 ## Disk space
 
-* lives in: `any.cf`
-* provides variables: `cfe_autorun_inventory_disk.free` as a copy of `mon.value_diskfree`
+- lives in: `any.cf`
+- provides variables: `cfe_autorun_inventory_disk.free` as a copy of `mon.value_diskfree`
 
 ## Available memory
 
-* lives in: `any.cf`
-* provides variables: `cfe_autorun_inventory_memory.free` as a copy of `mon.value_mem_free` and `cfe_autorun_inventory_memory.total` as a copy of `mon.value_mem_total`
+- lives in: `any.cf`
+- provides variables: `cfe_autorun_inventory_memory.free` as a copy of `mon.value_mem_free` and `cfe_autorun_inventory_memory.total` as a copy of `mon.value_mem_total`
 
 ## Load average
 
-* lives in: `any.cf`
-* provides variables: `cfe_autorun_inventory_loadaverage.value` as a copy of `mon.value_loadavg`
+- lives in: `any.cf`
+- provides variables: `cfe_autorun_inventory_loadaverage.value` as a copy of `mon.value_loadavg`
 
 ## procfs
 
-* lives in: `any.cf`
-* parses: `consoles`, `cpuinfo`, `modules`, `partitions`, `version`
-* provides variables: `cfe_autorun_inventory_proc.console_count`, `cfe_autorun_inventory_proc.cpuinfo[K]` for each CPU info key, `cfe_autorun_inventory_proc.paritions[K]` for each partition key
-* provides classes: `_have_console_CONSOLENAME`, `have_module_MODULENAME`
+- lives in: `any.cf`
+- parses: `consoles`, `cpuinfo`, `modules`, `partitions`, `version`
+- provides variables: `cfe_autorun_inventory_proc.console_count`, `cfe_autorun_inventory_proc.cpuinfo[K]` for each CPU info key, `cfe_autorun_inventory_proc.paritions[K]` for each partition key
+- provides classes: `_have_console_CONSOLENAME`, `have_module_MODULENAME`
 
-* sample output (note this is verbose mode with `-v` because there's a LOT of output):
+- sample output (note this is verbose mode with `-v` because there's a LOT of output):
 
 ```
 % cf-agent -Kv -binventory_control,cfe_autorun_inventory_proc|grep 'cfe_autorun_inventory_proc: we have'
