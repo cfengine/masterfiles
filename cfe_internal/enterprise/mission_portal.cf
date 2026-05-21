@@ -368,6 +368,13 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
         contain => in_shell,
         comment => "We restart apache after the new valid config is in place";
 
+  methods:
+    systemd_supervised::
+      "Reset cf-apache failed state" -> { "ENT-11189" }
+        usebundle => cf_apache_reset_failed_state,
+        if => "mission_portal_apache_config_repaired",
+        comment => "Clear any latched failed state before restarting cf-apache";
+
   services:
     systemd_supervised::
       "cf-apache"
@@ -540,4 +547,16 @@ bundle agent cfe_enterprise_selfsigned_cert
 
       "DEBUG $(this.bundle): No Certificate Generation Requested"
         if => "!_cfe_enterprise_selfsigned_cert_regenerate_certificate";
+}
+
+bundle agent cf_apache_reset_failed_state
+# @brief Clear any latched 'failed' state on cf-apache.service so subsequent
+# service operations are not refused by systemd's start rate limiter
+# (StartLimitBurst). Safe no-op when the unit is not in a failed state.
+{
+  commands:
+      "$(paths.systemctl) reset-failed cf-apache" -> { "ENT-11189" }
+        contain => in_shell,
+        handle => "cf_apache_systemctl_reset_failed",
+        comment => "Reset latched failed state on cf-apache.service";
 }
