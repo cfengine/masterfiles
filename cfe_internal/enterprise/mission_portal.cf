@@ -288,9 +288,10 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
         string => "Configure apache based on successfully staged config";
 
   classes:
-      "systemd_supervised"
-        expression => returnszero("$(paths.systemctl) -q is-active cf-apache > /dev/null 2>&1", "useshell"),
-        if => fileexists( $(paths.systemctl) );
+      "systemd_supervised" -> { "ENT-11189" }
+        expression => returnszero("$(paths.systemctl) cat cf-apache > /dev/null 2>&1", "useshell"),
+        if => fileexists( $(paths.systemctl) ),
+        comment => "Set when cf-apache.service is a unit known to systemd";
 
       "httpd_config_validated"
         expression => strcmp("$(validate_result[exit_code])", "0");
