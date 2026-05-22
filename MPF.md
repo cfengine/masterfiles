@@ -486,7 +486,6 @@ This [augments file][Augments] will defines `trigger_upgrade` on hosts that are 
 
 #### Configure path that software is served from for autonomous agent upgrades
 
-{% comment %}ENT-4953{% endcomment %}
 `def.master_software_updates` defines the path that cfengine policy servers
 share software updates from. Remote agents access this path via the
 `master_software_updates` *shortcut*. By default this path is
