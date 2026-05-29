@@ -790,11 +790,15 @@ bundle agent cfe_internal_refresh_events_table
 bundle agent cfe_internal_update_health_failures
 # @brief Update table that contains health diagnostics failures hosts
 {
+@if before_version(3.28)
+  # The update_health_failures CLI task is moved to cf-reactor.
+  # Remove this bundle once CFEngine 3.28 is end-of-life.
   meta:
 
     (policy_server|am_policy_hub).enterprise_edition::
 
       "tags" slist => { "enterprise_maintenance" };
+@endif
 
   commands:
 
