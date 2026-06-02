@@ -14,8 +14,22 @@ fi
 
 TMP=$(mktemp)
 cd /tmp
-OUT=$(su - cfpostgres --command "{{{vars.sys.bindir}}}/psql --quiet --tuples-only --no-align --no-psqlrc \"$1\" --command=\"$2\"" 2> $TMP)
-RETURN_CODE=$?
+
+# psql returns 2 when the connection to the server went bad, which can happen
+# transiently while postgres is being restarted. Retry a few times so that the
+# wrapper doesn't fail the promise just because postgres is briefly unavailable.
+MAX_ATTEMPTS=10
+ATTEMPT=1
+while : ; do
+    OUT=$(su - cfpostgres --command "{{{vars.sys.bindir}}}/psql --quiet --tuples-only --no-align --no-psqlrc \"$1\" --command=\"$2\"" 2> $TMP)
+    RETURN_CODE=$?
+    if [ $RETURN_CODE -ne 2 ] || [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
+        break
+    fi
+    ATTEMPT=$((ATTEMPT + 1))
+    sleep 3
+done
+
 ERR=$(<$TMP)
 
 EXIT_CODE=$(echo $OUT | awk -F= '{ if ( /exit_code/ ) print $2}')
