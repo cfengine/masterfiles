@@ -39,7 +39,9 @@ m4_undefine([cfrelease])
 
 AC_CANONICAL_TARGET
 
-_AM_SET_OPTION([tar-ustar])
+dnl Selects the new pax interchange format. Recommended for making tar archives
+dnl more reproducible (see https://www.gnu.org/software/tar/manual/html_section/Reproducibility.html).
+_AM_SET_OPTION([tar-pax])
 AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE([enable])
 
