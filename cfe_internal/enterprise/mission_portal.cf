@@ -138,6 +138,12 @@ bundle agent cfe_internal_enterprise_mission_portal
       "/opt/cfengine/flags/http_redirect_to_https.disabled" -> { "ENT-11481" }
         delete => tidy;
 
+    policy_server.mission_portal_http2_enabled::
+      "$(sys.workdir)/httpd/php/sbin/php-fpm" -> { "ENT-14183" }
+        handle => "php_fpm_perms",
+        perms => mog("0755", "root", "root"),
+        comment => "The php-fpm binary must be executable for the cf-php-fpm service to start.";
+
   reports:
     DEBUG::
       "Using variable default:def.php_fpm_www_pool_max_children: ${default:def.php_fpm_www_pool_max_children} instead of built-in default"
