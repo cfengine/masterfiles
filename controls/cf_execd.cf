@@ -5,54 +5,52 @@
 # including scheduling times and output capture to
 # $(sys.workdir)/outputs and relay via email.
 ###############################################################################
-
 body executor control
 # @brief Settings that determine the behavior of `cf-execd`
 # @variable `default:def.control_executor_mailmaxlines` - The maximum number of lines of output that `cf-execd` will email.
 {
-
-    any::
-
-      splaytime  => "$(def.control_executor_splaytime)"; # activity will be spread over this many time slices
-
-      agent_expireafter  => "$(def.control_executor_agent_expireafter)";
-
+  any::
+    splaytime => "$(def.control_executor_splaytime)";
+    # activity will be spread over this many time slices
+    agent_expireafter => "$(def.control_executor_agent_expireafter)";
 @if minimum_version(3.18.0)
-    _have_control_executor_runagent_socket_allow_users::
-      runagent_socket_allow_users => { @(def.control_executor_runagent_socket_allow_users) };
+  _have_control_executor_runagent_socket_allow_users::
+    runagent_socket_allow_users => {
+      @(def.control_executor_runagent_socket_allow_users)
+    };
 @endif
 
-    cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
-      mailto       => "$(def.mailto)";
-      mailfrom     => "$(def.mailfrom)";
-      smtpserver   => "$(def.smtpserver)";
-      mailmaxlines => "$(default:def.control_executor_mailmaxlines)";
+  cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
+    mailto       => "$(def.mailto)";
+    mailfrom     => "$(def.mailfrom)";
+    smtpserver   => "$(def.smtpserver)";
+    mailmaxlines => "$(default:def.control_executor_mailmaxlines)";
 
-    control_executor_mailsubject_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
-      mailsubject => "$(default:def.control_executor_mailsubject)";
+  control_executor_mailsubject_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
+    mailsubject => "$(default:def.control_executor_mailsubject)";
 
-    control_executor_mailfilter_exclude_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
-      mailfilter_exclude => { "@(default:def.control_executor_mailfilter_exclude)" };
+  control_executor_mailfilter_exclude_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
+    mailfilter_exclude => {
+      "@(default:def.control_executor_mailfilter_exclude)"
+    };
 
-    control_executor_mailfilter_include_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
-      mailfilter_include => { "@(default:def.control_executor_mailfilter_include)" };
+  control_executor_mailfilter_include_configured.cfengine_internal_agent_email.!cfengine_internal_disable_agent_email::
+    mailfilter_include => {
+      "@(default:def.control_executor_mailfilter_include)"
+    };
 
-    any::
+  any::
+    # Default:
+    #
+    # schedule => { "Min00", "Min05", "Min10", "Min15", "Min20",
+    #               "Min25", "Min30", "Min35", "Min40", "Min45",
+    #               "Min50", "Min55" };
+    schedule => { @(def.control_executor_schedule_value) };
 
-      # Default:
-      #
-      # schedule => { "Min00", "Min05", "Min10", "Min15", "Min20",
-      #               "Min25", "Min30", "Min35", "Min40", "Min45",
-      #               "Min50", "Min55" };
+  # The full path and command to the executable run by default (overriding builtin).
+  windows::
+    exec_command => "$(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated";
 
-      schedule => { @(def.control_executor_schedule_value) };
-
-      # The full path and command to the executable run by default (overriding builtin).
-
-    windows::
-      exec_command => "$(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated -f \"$(sys.update_policy_path)\" & $(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated";
-
-    !windows::
-      exec_command => "$(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated";
-
+  !windows::
+    exec_command => "$(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated -f \"$(sys.update_policy_path)\" ; $(sys.cf_agent) -Dfrom_cfexecd,cf_execd_initiated";
 }

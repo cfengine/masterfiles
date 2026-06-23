@@ -1,44 +1,45 @@
 # Reporting bodies
-
 bundle server report_access_rules
 # @brief Access rules for Enterprise report collection
 {
   vars:
     enterprise::
-      "query_types" slist => {"delta", "rebase", "full"};
+      "query_types" slist => { "delta", "rebase", "full" };
 
   access:
     !policy_server.enterprise::
       "$(query_types)"
-      handle => "report_access_grant_$(query_types)_for_hosts",
-      comment => "Grant $(query_types) reporting query for the hub on the hosts",
-      resource_type => "query",
-      report_data_select => default_data_select_host,
-      admit => { @(def.policy_servers) };
+        handle => "report_access_grant_$(query_types)_for_hosts",
+        comment => "Grant $(query_types) reporting query for the hub on the hosts",
+        resource_type => "query",
+        report_data_select => default_data_select_host,
+        admit => { @(def.policy_servers) };
 
     policy_server.enterprise::
       "$(query_types)"
-      handle => "report_access_grant_$(query_types)_for_hub",
-      comment => "Grant $(query_types) reporting query for the hub on the policy server",
-      resource_type => "query",
-      report_data_select => default_data_select_policy_hub,
-      admit => { "127.0.0.1", "::1", @(def.policy_servers) };
+        handle => "report_access_grant_$(query_types)_for_hub",
+        comment => "Grant $(query_types) reporting query for the hub on the policy server",
+        resource_type => "query",
+        report_data_select => default_data_select_policy_hub,
+        admit => { "127.0.0.1", "::1", @(def.policy_servers) };
 }
 
 body report_data_select default_data_select_host
 # @brief Data authorized by non policy servers for collection by cf-hub
 {
-      metatags_include => { "inventory", "report" };
-      metatags_exclude => { "noreport" };
-      promise_handle_exclude => { "noreport_.*" };
-      monitoring_include => { @(def.default_data_select_host_monitoring_include) };
+  metatags_include => { "inventory", "report" };
+  metatags_exclude => { "noreport" };
+  promise_handle_exclude => { "noreport_.*" };
+  monitoring_include => { @(def.default_data_select_host_monitoring_include) };
 }
 
 body report_data_select default_data_select_policy_hub
 # @brief Data authorized by policy servers for collection by cf-hub
 {
-      metatags_include => { "inventory", "report" };
-      metatags_exclude => { "noreport" };
-      promise_handle_exclude => { "noreport_.*" };
-      monitoring_include => { @(def.default_data_select_policy_hub_monitoring_include) };
+  metatags_include => { "inventory", "report" };
+  metatags_exclude => { "noreport" };
+  promise_handle_exclude => { "noreport_.*" };
+  monitoring_include => {
+    @(def.default_data_select_policy_hub_monitoring_include)
+  };
 }
