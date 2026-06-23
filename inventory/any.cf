@@ -131,8 +131,7 @@ bundle agent cfe_autorun_inventory_listening_ports
       slist => sort("mon.listening_ports", "int"),
       meta => { "inventory", "attribute_name=Ports listening" },
       if => some("[0-9]+", "mon.listening_ports"),
-      comment => "We only want to inventory the listening ports if we have
-                    values that make sense.";
+      comment => "We only want to inventory the listening ports if we have values that make sense.";
 }
 
 bundle agent cfe_autorun_inventory_ip_addresses
@@ -145,13 +144,11 @@ bundle agent cfe_autorun_inventory_ip_addresses
 
     "ipv4_loopback_regex" -> { "ENT-2552" }
       string => "127\.0\.0\.1",
-      comment => "Addresses that match this regular expression will be filtered
-                    from the inventory for ipv4 addresses";
+      comment => "Addresses that match this regular expression will be filtered from the inventory for ipv4 addresses";
 
     "ipv6_loopback_regex" -> { "ENT-4987" }
       string => "::1",
-      comment => "Addresses that match this regular expression will be filtered
-                    from the inventory for ipv4 addresses";
+      comment => "Addresses that match this regular expression will be filtered from the inventory for ipv4 addresses";
 
     # Strings are displayed more beautifully in Mission Portal than lists, so
     # we first generate the list of addresses to be inventoried and then do
