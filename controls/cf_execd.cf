@@ -10,7 +10,8 @@ body executor control
 # @variable `default:def.control_executor_mailmaxlines` - The maximum number of lines of output that `cf-execd` will email.
 {
   any::
-    splaytime => "$(def.control_executor_splaytime)"; # activity will be spread over this many time slices
+    # activity will be spread over this many time slices:
+    splaytime => "$(def.control_executor_splaytime)";
     agent_expireafter => "$(def.control_executor_agent_expireafter)";
 @if minimum_version(3.18.0)
   _have_control_executor_runagent_socket_allow_users::

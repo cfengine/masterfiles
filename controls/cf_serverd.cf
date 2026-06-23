@@ -38,7 +38,9 @@ body server control
     #
     # Example:
     # allowtlsversion => "1.0";
-    allowtlsversion => "$(default:def.control_server_allowtlsversion)"; # See also: tls_min_version in body common control
+    # See also: tls_min_version in body common control
+    allowtlsversion => "$(default:def.control_server_allowtlsversion)";
+
   control_server_allowciphers_defined::
     # List of ciphers the server accepts. For Syntax help see man page for
     # "openssl-ciphers" (man:openssl-ciphers(1ssl)). The 'TLS_'-prefixed
@@ -46,7 +48,9 @@ body server control
     #
     # Example setting:
     # allowciphers          => "AES256-GCM-SHA384:AES256-SHA:TLS_AES_256_GCM_SHA384";
-    allowciphers => "$(default:def.control_server_allowciphers)"; # See also: tls_ciphers in body common control
+    # See also: tls_ciphers in body common control
+    allowciphers => "$(default:def.control_server_allowciphers)";
+
   enterprise_edition.client_initiated_reporting_enabled::
     # How often cf-serverd should try to establish a reverse tunnel for report
     # collection
