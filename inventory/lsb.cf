@@ -4,77 +4,84 @@ bundle agent inventory_lsb
 # This common bundle is for LSB inventory work.
 {
   classes:
-      "have_lsb" expression => fileexists($(lsb_exec));
+    "have_lsb" expression => fileexists($(lsb_exec));
 
-      "_inventory_lsb_found" expression => regcmp("^[1-9][0-9]*$", $(dim)),
-                                  scope => "namespace";
+    "_inventory_lsb_found"
+      expression => regcmp("^[1-9][0-9]*$", $(dim)),
+      scope => "namespace";
 
     _inventory_lsb_found::
-      "lsb_$(os)" expression => "any",
-      comment => "LSB Distributor ID",
-      depends_on => { "inventory_lsb_os" },
-      scope => "namespace",
-      meta => { "inventory", "attribute_name=none" };
+      "lsb_$(os)"
+        expression => "any",
+        comment => "LSB Distributor ID",
+        depends_on => { "inventory_lsb_os" },
+        scope => "namespace",
+        meta => { "inventory", "attribute_name=none" };
 
-      "lsb_$(os)_$(release)" expression => "any",
-      comment => "LSB Distributor ID and Release",
-      depends_on => { "inventory_lsb_os", "inventory_lsb_release" },
-      scope => "namespace",
-      meta => { "inventory", "attribute_name=none" };
+      "lsb_$(os)_$(release)"
+        expression => "any",
+        comment => "LSB Distributor ID and Release",
+        depends_on => { "inventory_lsb_os", "inventory_lsb_release" },
+        scope => "namespace",
+        meta => { "inventory", "attribute_name=none" };
 
-      "lsb_$(os)_$(codename)" expression => "any",
-      comment => "LSB Distributor ID and Codename",
-      depends_on => { "inventory_lsb_os", "inventory_lsb_codename" },
-      scope => "namespace",
-      meta => { "inventory", "attribute_name=none" };
+      "lsb_$(os)_$(codename)"
+        expression => "any",
+        comment => "LSB Distributor ID and Codename",
+        depends_on => { "inventory_lsb_os", "inventory_lsb_codename" },
+        scope => "namespace",
+        meta => { "inventory", "attribute_name=none" };
 
   vars:
-      "lsb_exec" string => "$(inventory_control.lsb_exec)";
+    "lsb_exec" string => "$(inventory_control.lsb_exec)";
 
     have_lsb::
       "data" string => execresult("$(lsb_exec) -a", "noshell");
-      "dim" int => parsestringarray(
-                                     "lsb",
-                                     $(data),
-                                     "\s*#[^\n]*",
-                                     "\s*:\s+",
-                                     "15",
-                                     "4095"
-      );
+
+      "dim"
+        int => parsestringarray(
+          "lsb", $(data), "\s*#[^\n]*", "\s*:\s+", "15", "4095"
+        );
 
     _inventory_lsb_found::
       "lsb_keys" slist => getindices("lsb");
 
-      "os" string => canonify("$(lsb[Distributor ID][1])"),
-      handle => "inventory_lsb_os",
-      comment => "LSB-provided OS name",
-      meta => { "inventory", "attribute_name=none" };
+      "os"
+        string => canonify("$(lsb[Distributor ID][1])"),
+        handle => "inventory_lsb_os",
+        comment => "LSB-provided OS name",
+        meta => { "inventory", "attribute_name=none" };
 
-      "codename" string => canonify("$(lsb[Codename][1])"),
-      handle => "inventory_lsb_codename",
-      comment => "LSB-provided OS code name",
-      meta => { "inventory", "attribute_name=none" };
+      "codename"
+        string => canonify("$(lsb[Codename][1])"),
+        handle => "inventory_lsb_codename",
+        comment => "LSB-provided OS code name",
+        meta => { "inventory", "attribute_name=none" };
 
-      "release" string => "$(lsb[Release][1])",
-      handle => "inventory_lsb_release",
-      comment => "LSB-provided OS release",
-      meta => { "inventory", "attribute_name=none" };
+      "release"
+        string => "$(lsb[Release][1])",
+        handle => "inventory_lsb_release",
+        comment => "LSB-provided OS release",
+        meta => { "inventory", "attribute_name=none" };
 
-      "flavor" string => canonify("$(lsb[Distributor ID][1])_$(lsb[Release][1])"),
-      handle => "inventory_lsb_flavor",
-      comment => "LSB-provided OS flavor",
-      meta => { "inventory", "attribute_name=none" };
+      "flavor"
+        string => canonify("$(lsb[Distributor ID][1])_$(lsb[Release][1])"),
+        handle => "inventory_lsb_flavor",
+        comment => "LSB-provided OS flavor",
+        meta => { "inventory", "attribute_name=none" };
 
-      "description" string => "$(lsb[Description][1])",
-      handle => "inventory_lsb_description",
-      comment => "LSB-provided OS description",
-      meta => { "inventory", "attribute_name=none" };
+      "description"
+        string => "$(lsb[Description][1])",
+        handle => "inventory_lsb_description",
+        comment => "LSB-provided OS description",
+        meta => { "inventory", "attribute_name=none" };
 
   reports:
     (DEBUG|DEBUG_inventory_lsb)._inventory_lsb_found::
       "DEBUG $(this.bundle): OS = $(os), codename = $(codename), release = $(release), flavor = $(flavor), description = $(description)";
       "DEBUG $(this.bundle): got $(dim) LSB keys";
       "DEBUG $(this.bundle): prepared LSB key $(lsb_keys) = '$(lsb[$(lsb_keys)][1])'";
+
     (DEBUG|DEBUG_inventory_lsb).!_inventory_lsb_found::
       "DEBUG $(this.bundle): LSB inventory not found";
 }
