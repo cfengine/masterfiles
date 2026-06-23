@@ -6,30 +6,24 @@
 # by cf-monitord. The system defaults will be sufficient for most users.
 #
 ###############################################################################
-
 body hub control
 # @brief Control attributes for `cf-hub`
 {
+  enterprise_edition.policy_server::
+    exclude_hosts => { @(def.control_hub_exclude_hosts) };
 
-    enterprise_edition.policy_server::
+    # exclude_hosts => { "192.168.12.21", "10.10", "10.12.*" };
+    # cf-hub initiates a pull collection round if one of the listed classes is defined.
+    hub_schedule => { @(def.control_hub_hub_schedule) };
 
-      exclude_hosts => { @(def.control_hub_exclude_hosts) };
-      # exclude_hosts => { "192.168.12.21", "10.10", "10.12.*" };
-
-      # cf-hub initiates a pull collection round if one of the listed classes is defined.
-      hub_schedule => { @(def.control_hub_hub_schedule) };
-
-      # port => "5308";
-
+    # port => "5308";
 @if minimum_version(3.15)
-      query_timeout => "$(def.control_hub_query_timeout)";
+    query_timeout => "$(def.control_hub_query_timeout)";
 @endif
-
-      # Hub will discard accumulated reports on the clients
-      # and download only information about current state of the client
-      # in case of not successfully downloading the reports for defined
-      # period of time. Default value is 6 hours.
-      # Was introduced in CFEngine 3.6.4
-      # client_history_timeout => 6; # [hours]
-
+    # Hub will discard accumulated reports on the clients
+    # and download only information about current state of the client
+    # in case of not successfully downloading the reports for defined
+    # period of time. Default value is 6 hours.
+    # Was introduced in CFEngine 3.6.4
+    # client_history_timeout => 6; # [hours]
 }
