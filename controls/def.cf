@@ -150,7 +150,7 @@ bundle common def
         slist => {
           # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
           "0.0.0.0/0",
-          # allow any IP
+          # (0.0.0.0/0 allows any IP
         },
         comment => "Define from which machines keys can be trusted",
         if => and(
@@ -418,8 +418,10 @@ bundle common def
 
   #+begin_src def.control_agent_environment_vars
   # This configures environment_vars in body agent control
+  #
   # It's configurable without having to modify policy, so the default values
   # are only applied if the variable is not already defined (via augments).
+  #
   # Platform defaults are set first, and the global default is set last so
   # that global default does not override a platform specific setting since
   # the promises are only applied if the variable is not already defined
@@ -676,14 +678,12 @@ bundle common def
 
       "hub_log_files"
         slist => {
+          # Mission Portal:
           "$(cfe_internal_hub_vars.access_log)",
-          # Mission Portal
           "$(cfe_internal_hub_vars.error_log)",
-          # Mission Portal
           "$(cfe_internal_hub_vars.ssl_request_log)",
-          # Mission Portal
+          # PostgreSQL:
           "/var/log/postgresql.log",
-          # PostgreSQL
         };
 
       "max_client_history_size" -> { "cf-hub", "CFEngine Enterprise" }
@@ -707,7 +707,7 @@ bundle common def
       # CFEngine's own log files
       "cfe_log_files" slist => { @(base_log_files) };
 
-    # Directories where logs are rotated and old files need to be purged.
+    # Directories where logs are rotated and old files need to be purged:
     any::
       "log_dir[outputs]" string => "$(sys.workdir)/outputs";
       "log_dir[reports]" string => "$(sys.workdir)/reports";
@@ -789,8 +789,8 @@ bundle common def
 
       "control_hub_query_timeout"
         comment => "Configurable timeout for cf-hub outgoing connections",
+        # 0 = default is set by cf-hub binary:
         string => "0",
-        # 0 = default is set by cf-hub binary
         unless => isvariable(control_hub_query_timeout);
 
       "control_hub_port"
@@ -980,6 +980,7 @@ bundle common inventory_control
     "disable_inventory" expression => "!any";
 
     # disable specific inventory modules below
+    #
     # by default disable the LSB inventory if the general inventory
     # is disabled or the binary is missing.  Note that the LSB
     # binary is typically not very fast.
