@@ -1,10 +1,9 @@
 # Test that the local updates list cache is called instead of the online
 # version when ifelapsed has not expired.
-
 body common control
 {
-    inputs => { "../../../default.sub.cf" };
-    bundlesequence => { default($(this.promise_filename)) };
+  inputs => { "../../../default.sub.cf" };
+  bundlesequence => { default($(this.promise_filename)) };
 }
 
 bundle agent init
@@ -20,7 +19,10 @@ bundle agent init
 
   methods:
     test_pass_1::
-      "any" usebundle => file_make($(G.testfile), "get-package-data
+      "any"
+        usebundle => file_make(
+          $(G.testfile),
+          "get-package-data
 list-installed
 list-updates
 repo-install
@@ -31,16 +33,17 @@ get-package-data
 repo-install
 list-installed
 list-updates-local
-END-OF-AGENT-RUN---");
+END-OF-AGENT-RUN---"
+        );
 }
 
 bundle agent test
 {
   commands:
-      "$(sys.cf_agent) -D AUTO -f $(this.promise_filename).sub";
+    "$(sys.cf_agent) -D AUTO -f $(this.promise_filename).sub";
 
-      "$(G.echo) END-OF-AGENT-RUN--- >> $(sys.workdir)/modules/packages/test_module.log"
-        contain => in_shell;
+    "$(G.echo) END-OF-AGENT-RUN--- >> $(sys.workdir)/modules/packages/test_module.log"
+      contain => in_shell;
 }
 
 bundle agent check
@@ -48,7 +51,12 @@ bundle agent check
   methods:
     test_pass_1::
       "any" usebundle => dcs_wait($(this.promise_filename), 65);
+
     test_pass_2::
-      "any" usebundle => dcs_check_diff("$(sys.workdir)/modules/packages/test_module.log",
-                                        $(G.testfile), $(this.promise_filename));
+      "any"
+        usebundle => dcs_check_diff(
+          "$(sys.workdir)/modules/packages/test_module.log",
+          $(G.testfile),
+          $(this.promise_filename)
+        );
 }

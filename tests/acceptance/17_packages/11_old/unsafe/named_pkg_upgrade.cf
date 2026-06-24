@@ -3,98 +3,94 @@
 # Test add named package
 #
 #######################################################
-
 body common control
 {
-      inputs => {
-                  "../../../dcs.sub.cf",
-                  "../../../../../$(sys.local_libdir)/stdlib.cf",
-                  "../../../../../$(sys.local_libdir)/packages.cf",
-                  "../../packages-info.cf.sub",
-                  "../../meta_skip.cf.sub",
-                };
-      bundlesequence  => { default("$(this.promise_filename)") };
-      version => "1.0";
-      cache_system_functions => "no";
+  inputs => {
+    "../../../dcs.sub.cf",
+    "../../../../../$(sys.local_libdir)/stdlib.cf",
+    "../../../../../$(sys.local_libdir)/packages.cf",
+    "../../packages-info.cf.sub",
+    "../../meta_skip.cf.sub",
+  };
+  bundlesequence => { default("$(this.promise_filename)") };
+  version => "1.0";
+  cache_system_functions => "no";
 }
 
-
-
 #######################################################
-
 bundle agent init
 {
   methods:
-    "install_package" usebundle => install_package("$(p.name[3])", "$(p.version[1])", "$(p.arch)", "dummy");
+    "install_package"
+      usebundle => install_package(
+        "$(p.name[3])", "$(p.version[1])", "$(p.arch)", "dummy"
+      );
 }
 
 #######################################################
-
 bundle agent test
 {
-    vars:
-        "package_name" string => "$(p.name[3])";
+  vars:
+    "package_name" string => "$(p.name[3])";
 
-    packages:
+  packages:
+    debian::
+      "$(package_name)"
+        package_policy => "addupdate",
+        package_select => "==",
+        package_version => "1.0-2",
+        package_method => apt_get,
+        classes => test_set_class("pass", "fail");
 
+    redhat::
+      "$(package_name)"
+        package_policy => "addupdate",
+        package_select => "==",
+        package_version => "1.0-2",
+        package_method => yum_rpm,
+        classes => test_set_class("pass", "fail");
 
-        debian::
-
-            "$(package_name)"
-            package_policy => "addupdate",
-            package_select => "==",
-            package_version => "1.0-2",
-            package_method => apt_get,
-            classes => test_set_class("pass","fail");
-
-        redhat::
-
-            "$(package_name)"
-            package_policy => "addupdate",
-            package_select => "==",
-            package_version => "1.0-2",
-            package_method => yum_rpm,
-            classes => test_set_class("pass","fail");
-
-        suse|sles::
-
-            "$(package_name)"
-            package_policy => "addupdate",
-            package_select => "==",
-            package_version => "1.0-2",
-            package_method => zypper,
-            classes => test_set_class("pass","fail");
+    suse|sles::
+      "$(package_name)"
+        package_policy => "addupdate",
+        package_select => "==",
+        package_version => "1.0-2",
+        package_method => zypper,
+        classes => test_set_class("pass", "fail");
 }
 
-
-
-body classes test_set_class(ok_class,notok_class)
+body classes test_set_class(ok_class, notok_class)
 {
-    promise_kept => { "$(ok_class)" };
-    promise_repaired => { "$(ok_class)" };
-    repair_failed => { "$(notok_class)" };
+  promise_kept => { "$(ok_class)" };
+  promise_repaired => { "$(ok_class)" };
+  repair_failed => { "$(notok_class)" };
 }
 
 #######################################################
-
 bundle agent check
 {
+  classes:
+    redhat|suse|sles::
+      "has_pkg"
+        expression => returnszero(
+          "/bin/rpm -q $(test.package_name) > /dev/null", "useshell"
+        );
 
-    classes:
+    debian::
+      "has_pkg"
+        expression => returnszero(
+          "dpkg -l | egrep ' $(test.package_name)(:$(p.arch))? ' > /dev/null",
+          "useshell"
+        );
 
-        redhat|suse|sles::
-            "has_pkg" expression => returnszero("/bin/rpm -q $(test.package_name) > /dev/null", "useshell");
+    any::
+      "has_file" expression => fileexists("$(p.file[3][$(p.latest_version)])");
+      "ok" expression => "pass.!fail.has_pkg.has_file";
 
-        debian::
-            "has_pkg" expression => returnszero("dpkg -l | egrep ' $(test.package_name)(:$(p.arch))? ' > /dev/null", "useshell");
+  reports:
+    ok::
+      "$(this.promise_filename) Pass";
 
-        any::
-            "has_file" expression => fileexists("$(p.file[3][$(p.latest_version)])");
-            "ok" expression => "pass.!fail.has_pkg.has_file";
-
-    reports:
-        ok::
-            "$(this.promise_filename) Pass";
-        !ok::
-            "$(this.promise_filename) FAIL";
+    !ok::
+      "$(this.promise_filename) FAIL";
 }
