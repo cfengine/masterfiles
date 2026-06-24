@@ -5,13 +5,12 @@
 #####################################################
 body common control
 {
-    inputs => { "../default.sub.cf" };
-    bundlesequence  => { default("$(this.promise_filename)") };
-    version => "1.0";
+  inputs => { "../default.sub.cf" };
+  bundlesequence => { default("$(this.promise_filename)") };
+  version => "1.0";
 }
 
 #######################################################
-
 bundle common version_check
 {
 @if minimum_version(3.17)
@@ -23,38 +22,36 @@ bundle common version_check
 bundle agent init
 {
   meta:
-      "test_skip_unsupported" string => "!cfengine_supports_custom_promises";
+    "test_skip_unsupported" string => "!cfengine_supports_custom_promises";
 
   vars:
-    "test_string"
-      string => "hello, modules";
+    "test_string" string => "hello, modules";
 
-   files:
+  files:
     "$(G.testfile).src"
       create => "true",
       edit_line => insert_lines("$(test_string)");
 
-    "$(G.testfile).dst"
-      delete => init_delete;
+    "$(G.testfile).dst" delete => init_delete;
 
     "$(this.promise_dirname)/cfengine.sh"
-      copy_from => local_cp("$(this.promise_dirname)/../../../modules/promises/cfengine.sh");
-
+      copy_from => local_cp(
+        "$(this.promise_dirname)/../../../modules/promises/cfengine.sh"
+      );
 }
 
 body delete init_delete
 {
-      dirlinks => "delete";
-      rmdirs   => "true";
+  dirlinks => "delete";
+  rmdirs => "true";
 }
 
 #######################################################
-
 @if minimum_version(3.17)
 promise agent cp
 {
-    interpreter => "/bin/bash";
-    path => "$(this.promise_dirname)/cp.sh";
+  interpreter => "/bin/bash";
+  path => "$(this.promise_dirname)/cp.sh";
 }
 
 bundle agent test
@@ -64,23 +61,23 @@ bundle agent test
       string => "Test a simple promise module which uses library";
 
   cp:
-    "$(G.testfile).dst"
-      from => "$(G.testfile).src";
+    "$(G.testfile).dst" from => "$(G.testfile).src";
 }
 @endif
-
 #######################################################
-
 bundle agent check
 {
   classes:
-      "ok"
-        expression => strcmp("$(init.test_string)", readfile("$(G.testfile).dst")),
-        if => fileexists("$(G.testfile).dst");
+    "ok"
+      expression => strcmp(
+        "$(init.test_string)", readfile("$(G.testfile).dst")
+      ),
+      if => fileexists("$(G.testfile).dst");
 
   reports:
     ok::
       "$(this.promise_filename) Pass";
+
     !ok::
       "$(this.promise_filename) FAIL";
 }
