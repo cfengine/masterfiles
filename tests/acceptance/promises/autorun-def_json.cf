@@ -31,6 +31,7 @@ bundle agent test
   meta:
     "description"
       string => "Test that def.json can enable autorun as expected.";
+
   # We need to lay down the def.json that will enable autorun.
   files:
     "$(init.def_json_path)"
@@ -43,6 +44,7 @@ bundle edit_line enable_autorun
   insert_lines:
     '{ "classes": { "services_autorun": ["any"] } }';
 }
+
 #######################################################
 bundle agent check
 {
