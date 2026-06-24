@@ -1,56 +1,50 @@
 body common control
 {
-      inputs => { '../../default.sub.cf' };
-      bundlesequence  => { default("$(this.promise_filename)") };
-      version => "1.0";
+  inputs => { '../../default.sub.cf' };
+  bundlesequence => { default("$(this.promise_filename)") };
+  version => "1.0";
 }
-#######################################################
 
+#######################################################
 bundle agent init
 {
   files:
+    # The tested file "actual" is copied from our seeded starting position.
+    "$(G.testfile)" copy_from => local_cp("$(this.promise_filename).start");
 
-      # The tested file "actual" is copied from our seeded starting position.
-      "$(G.testfile)"
-      copy_from => local_cp("$(this.promise_filename).start");
-
-     # Next we place the file which we will compare the final result with.
-     "$(G.testfile).expected"
+    # Next we place the file which we will compare the final result with.
+    "$(G.testfile).expected"
       copy_from => local_cp("$(this.promise_filename).finish");
 }
 
 #######################################################
-
 bundle agent test
 {
   meta:
-      "description" -> { "CFE-3776" }
-        string => "Test that append_user_field works as expected";
+    "description" -> { "CFE-3776" }
+      string => "Test that append_user_field works as expected";
 
   vars:
-      "users" slist => { "ZAP", "one", "ZOINK", "two", "three" };
+    "users" slist => { "ZAP", "one", "ZOINK", "two", "three" };
 
   files:
-
-      "$(G.testfile)"
-        edit_line => append_user_field("root","4", @(users) );
+    "$(G.testfile)" edit_line => append_user_field("root", "4", @(users));
 }
 
 #######################################################
-
 bundle agent check
 {
   methods:
-      "check"
-      usebundle => dcs_if_diff( "$(G.testfile)", "$(G.testfile).expected",
-                                "pass", "_fail");
-      # Fail the test if any of the files fail.
+    "check"
+      usebundle => dcs_if_diff(
+        "$(G.testfile)", "$(G.testfile).expected", "pass", "_fail"
+      );
 
-      "fail"
-        usebundle => dcs_fail( $(this.promise_filename) ),
-        if => "_fail";
+    # Fail the test if any of the files fail.
+    "fail"
+      usebundle => dcs_fail($(this.promise_filename)),
+      if => "_fail";
 
     pass::
-      "pass"
-        usebundle => dcs_pass( $(this.promise_filename) );
+      "pass" usebundle => dcs_pass($(this.promise_filename));
 }

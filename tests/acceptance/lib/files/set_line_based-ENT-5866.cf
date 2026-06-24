@@ -3,54 +3,52 @@
 # Test bundle set_line_based
 #
 #######################################################
-
 body common control
 {
-      inputs => { '../../default.sub.cf' };
-      bundlesequence  => { default("$(this.promise_filename)") };
-      version => "1.0";
+  inputs => { '../../default.sub.cf' };
+  bundlesequence => { default("$(this.promise_filename)") };
+  version => "1.0";
 }
 
 #######################################################
-
 bundle agent init
 {
   files:
-      "$(G.testfile)"
-        copy_from => local_cp("$(this.promise_filename).start");
+    "$(G.testfile)" copy_from => local_cp("$(this.promise_filename).start");
 }
 
 #######################################################
-
 bundle agent test
 {
   meta:
-      "description" -> { "ENT-5866" }
-        string => "Test that set_line_based works when a file exists and edit_defaults.empty_file_before_editing is true.";
+    "description" -> { "ENT-5866" }
+      string => "Test that set_line_based works when a file exists and edit_defaults.empty_file_before_editing is true.";
 
-      "test_soft_fail"
-        string => "cfengine_3_15|cfengine_3_18_0|cfengine_3_18_1|cfengine_3_18_2",
-        meta => { "ENT-5866" };
+    "test_soft_fail"
+      string => "cfengine_3_15|cfengine_3_18_0|cfengine_3_18_1|cfengine_3_18_2",
+      meta => { "ENT-5866" };
 
   vars:
-      "config[one]" string => "1";
-      "config[two]" string => "2";
-      "config[three]" string => "3";
+    "config[one]" string => "1";
+    "config[two]" string => "2";
+    "config[three]" string => "3";
 
   files:
-      "$(G.testfile)"
-        edit_defaults => empty,
-        edit_line => set_line_based("$(this.bundle).config", "=", "=", ".*", "\s*#\s*");
+    "$(G.testfile)"
+      edit_defaults => empty,
+      edit_line => set_line_based(
+        "$(this.bundle).config", "=", "=", ".*", "\s*#\s*"
+      );
 }
 
 #######################################################
-
 bundle agent check
 {
   methods:
-
-      "Pass/Fail"
-        usebundle => dcs_check_diff( "$(G.testfile)",
-                                     "$(this.promise_filename).expected-result",
-                                     "$(this.promise_filename)");
+    "Pass/Fail"
+      usebundle => dcs_check_diff(
+        "$(G.testfile)",
+        "$(this.promise_filename).expected-result",
+        "$(this.promise_filename)"
+      );
 }
