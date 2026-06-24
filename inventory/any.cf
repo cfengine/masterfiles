@@ -1404,8 +1404,10 @@ body package_method inventory_lslpp(update_interval)
   package_list_update_command => "/usr/bin/true";
   package_list_update_ifelapsed => $(update_interval);
   package_list_command => "/usr/bin/lslpp -Lqc";
+
   # list RPMs too
   package_list_version_regex => "[^:]+:[^:]+:([^:]+):.*";
+
   # Make sure version is not included in the name, that indicates RPM
   # packages, which we should ignore.
   package_list_name_regex => "[^:]+:(([^-:]|-[^0-9])+):.*";
@@ -1470,5 +1472,6 @@ body contain inventory_in_shell
 # Copy of `in_shell`, which see.
 {
   useshell => "true";
+
   # canonical "useshell" but this is backwards-compatible
 }
