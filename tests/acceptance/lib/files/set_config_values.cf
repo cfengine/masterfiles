@@ -3,88 +3,86 @@
 # Test bundle set_config_values
 #
 #######################################################
-
 body common control
 {
-      inputs => { '../../default.sub.cf' };
-      bundlesequence  => { default("$(this.promise_filename)") };
-      version => "1.0";
+  inputs => { '../../default.sub.cf' };
+  bundlesequence => { default("$(this.promise_filename)") };
+  version => "1.0";
 }
 
 #######################################################
-
 bundle agent init
 {
   files:
     # We want to test editing multiple similar files so that we know we do not
     # have a problem with namespace scoped classes colliding unintentionally.
-
-      "$(G.testfile)-1.expected"
+    "$(G.testfile)-1.expected"
       copy_from => local_cp("$(this.promise_filename).finish");
-      "$(G.testfile)-1.actual"
+
+    "$(G.testfile)-1.actual"
       copy_from => local_cp("$(this.promise_filename).start");
 
-      "$(G.testfile)-2.expected"
+    "$(G.testfile)-2.expected"
       copy_from => local_cp("$(this.promise_filename).finish");
-      "$(G.testfile)-2.actual"
-      copy_from => local_cp("$(this.promise_filename).start");
 
+    "$(G.testfile)-2.actual"
+      copy_from => local_cp("$(this.promise_filename).start");
 }
 
 #######################################################
-
 bundle agent test
 {
   meta:
     "description" string => "Test that set_config_values works as expected";
 
   vars:
-       # should create a new line right after existing commented-out Protocol lines
-      "config[Protocol]" string => "2";
-       # should uncomment the existing line
-      "config[Port]" string => "22";
-       # should insert a new line at the end, this is missing
-      "config[AddressFamily]" string => "any";
-      # should uncomment the line and edit the value
-      "config[AuthorizedKeysFile]" string => ".*ssh/authorized_keys";
-      # blanks should be OK
-      "config[BlankOption]" string => "";
+    # should create a new line right after existing commented-out Protocol lines
+    "config[Protocol]" string => "2";
+
+    # should uncomment the existing line
+    "config[Port]" string => "22";
+
+    # should insert a new line at the end, this is missing
+    "config[AddressFamily]" string => "any";
+
+    # should uncomment the line and edit the value
+    "config[AuthorizedKeysFile]" string => ".*ssh/authorized_keys";
+
+    # blanks should be OK
+    "config[BlankOption]" string => "";
 
   files:
-      "$(G.testfile)-1.actual"
-      edit_line => set_config_values("test.config");
-
-      "$(G.testfile)-2.actual"
-      edit_line => set_config_values("test.config");
+    "$(G.testfile)-1.actual" edit_line => set_config_values("test.config");
+    "$(G.testfile)-2.actual" edit_line => set_config_values("test.config");
 }
 
 #######################################################
-
 bundle agent check
 {
   vars:
-      "files" slist => { "1", "2" };
+    "files" slist => { "1", "2" };
 
   classes:
-      "pass" and => { "1_pass", "2_pass" };
+    "pass" and => { "1_pass", "2_pass" };
 
   methods:
+    "check"
+      usebundle => dcs_if_diff(
+        "$(G.testfile)-$(files).actual",
+        "$(G.testfile)-$(files).expected",
+        "$(files)_pass",
+        "$(files)_fail"
+      );
 
-      "check"
-        usebundle => dcs_if_diff( "$(G.testfile)-$(files).actual", "$(G.testfile)-$(files).expected",
-                                  "$(files)_pass", "$(files)_fail");
-
-      # Fail the test if any of the files fail.
-      "fail"
-        usebundle => dcs_fail( $(this.promise_filename) ),
-        if => "$(files)_fail";
+    # Fail the test if any of the files fail.
+    "fail"
+      usebundle => dcs_fail($(this.promise_filename)),
+      if => "$(files)_fail";
 
     pass::
-      "pass"
-        usebundle => dcs_pass( $(this.promise_filename) );
+      "pass" usebundle => dcs_pass($(this.promise_filename));
 
   reports:
-      DEBUG::
-        "$(files)_fail"
-          if => "$(files)_fail";
+    DEBUG::
+      "$(files)_fail" if => "$(files)_fail";
 }

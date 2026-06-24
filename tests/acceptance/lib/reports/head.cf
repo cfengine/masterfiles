@@ -1,21 +1,22 @@
 body common control
 {
-        inputs => { '../../default.sub.cf' };
-        bundlesequence  => { default("$(this.promise_filename)") };
-        version => "1.0";
+  inputs => { '../../default.sub.cf' };
+  bundlesequence => { default("$(this.promise_filename)") };
+  version => "1.0";
 }
 
 bundle agent test
 {
   meta:
-      "description" string => "
+    "description" string => "
 Test that body printfile head works as expected";
-
 }
+
 bundle agent check
 {
   vars:
-      "pass_reg" string => ".*R: My first line
+    "pass_reg"
+      string => ".*R: My first line
 R: line 0
 R: line 1
 R: line 2
@@ -27,8 +28,11 @@ R: line 7
 R: line 8
 R: line 9";
 
-      "command" string => "$(sys.cf_agent) -K -f $(this.promise_filename).sub";
+    "command" string => "$(sys.cf_agent) -K -f $(this.promise_filename).sub";
 
   methods:
-      "" usebundle => dcs_passif_output("$(pass_reg)", "", $(command), $(this.promise_filename));
+    ""
+      usebundle => dcs_passif_output(
+        "$(pass_reg)", "", $(command), $(this.promise_filename)
+      );
 }
