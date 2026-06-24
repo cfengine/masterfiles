@@ -1,7 +1,4 @@
 {
- "inputs": [ "$(sys.inputdir)/secondary.cf" ],
-
- "vars": {
-	 "control_common_bundlesequence_end": [ "x" ]
- }
+  "inputs": ["$(sys.inputdir)/secondary.cf"],
+  "vars": { "control_common_bundlesequence_end": ["x"] }
 }

@@ -23,6 +23,7 @@ bundle agent init
     "promises_cf_slist" slist => findfiles("$(G.testdir)/**/promises.cf");
     "promises_cf_path" string => nth(promises_cf_slist, 0);
 }
+
 #######################################################
 bundle agent check
 {
