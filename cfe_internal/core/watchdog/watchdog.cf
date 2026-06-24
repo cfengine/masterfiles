@@ -6,42 +6,38 @@ bundle agent cfe_internal_core_watchdog(state)
     "description"
       string => "Configure external watchdog processes (like cron, or monit) to
                  make sure that cf-execd is always running";
-  vars:
 
-      "_logfile" string => "$(sys.workdir)/watchdog.log";
+  vars:
+    "_logfile" string => "$(sys.workdir)/watchdog.log";
 
   classes:
-      "invalid_state"
-        not => regcmp("(enabled|disabled)", "$(state)");
+    "invalid_state" not => regcmp("(enabled|disabled)", "$(state)");
+    "have_cron_d" expression => isdir("/etc/cron.d");
 
-      "have_cron_d"
-        expression => isdir("/etc/cron.d");
+    "use_cfe_internal_core_watchdog_cron_d"
+      expression => "have_cron_d._stdlib_path_exists_pgrep";
 
-      "use_cfe_internal_core_watchdog_cron_d"
-        expression => "have_cron_d._stdlib_path_exists_pgrep";
+    # We use the aix specific watchdog implementation when it's aix and we are
+    # not using the cron.d implementation.
+    "use_cfe_internal_core_watchdog_aix"
+      expression => "!use_cfe_internal_core_watchdog_cron_d.aix";
 
-      # We use the aix specific watchdog implementation when it's aix and we are
-      # not using the cron.d implementation.
-
-      "use_cfe_internal_core_watchdog_aix"
-        expression => "!use_cfe_internal_core_watchdog_cron_d.aix";
-
-      "use_cfe_internal_core_watchdog_windows"
-        expression => "windows";
+    "use_cfe_internal_core_watchdog_windows" expression => "windows";
 
   methods:
     use_cfe_internal_core_watchdog_cron_d::
-      "any" usebundle => cfe_internal_core_watchdog_cron_d( $(state) );
+      "any" usebundle => cfe_internal_core_watchdog_cron_d($(state));
 
     use_cfe_internal_core_watchdog_aix::
-      "any" usebundle => cfe_internal_core_watchdog_aix( $(state) );
+      "any" usebundle => cfe_internal_core_watchdog_aix($(state));
 
     use_cfe_internal_core_watchdog_windows::
-      "any" usebundle => cfe_internal_core_watchdog_windows( $(state) );
+      "any" usebundle => cfe_internal_core_watchdog_windows($(state));
 
   reports:
     DEBUG|DEBUG_cfe_internal_core_watchdog::
       "DEBUG $(this.bundle): Watchdog '$(state)'";
+
       "DEBUG $(this.bundle): Invalid state '$(state)' only enabled|disabled allowed"
         if => "invalid_state";
 
@@ -55,18 +51,21 @@ bundle agent cfe_internal_core_watchdog_windows(state)
 # - When enabled a scheduled task "CFEngine-watchdog" will be present and enabled
 # - When disabled a scheduled task named "CFEngine-watchdog" will be absent.
 {
-
   vars:
     windows::
-      "_requested_state" string => ifelse( regcmp( "enabled|disabled", $(state) ), "$(state)", "invalid");
+      "_requested_state"
+        string => ifelse(
+          regcmp("enabled|disabled", $(state)), "$(state)", "invalid"
+        );
+
       "_taskname" string => "CFEngine-watchdog";
       "_taskfreq" string => "1";
       "_taskscript" string => "$(sys.bindir)$(const.dirsep)watchdog.ps1";
       "_taskrun" string => "PowerShell";
       "_taskrun_args" string => "-NoProfile -ExecutionPolicy bypass -File";
       "_logfile" string => "$(cfe_internal_core_watchdog._logfile)";
-      # -NonInteractive?
 
+      # -NonInteractive?
       "_cmd_task_schedule"
         string => `$(sys.winsysdir)$(const.dirsep)schtasks.exe /create /tn "$(_taskname)" /tr "$(_taskrun) $(_taskrun_args) '$(_taskscript)'" /ru "System" /sc minute /mo $(_taskfreq) /rl highest /f`;
 
@@ -75,47 +74,56 @@ bundle agent cfe_internal_core_watchdog_windows(state)
         string => `schtasks /QUERY /TN "$(_taskname)" /XML 2> $(const.dollar)null`;
 
       "_cmd_task_query_result"
-        string => execresult( $(_cmd_task_query), powershell);
+        string => execresult($(_cmd_task_query), powershell);
 
       # This regular expression is used to match against the XML output querying the task
       # We escape _taskscript with \Q \E since it contains backslashes which we don't want to be expanded
       "_scheduled_task_regex"
-        string => concat(".*Interval.PT$(_taskfreq)M..Interval",
-                         ".*Command.$(_taskrun)..Command",
-                         ".*Arguments.$(_taskrun_args) .\Q$(_taskscript)\E...Arguments",
-                         ".*");
+        string => concat(
+          ".*Interval.PT$(_taskfreq)M..Interval",
+          ".*Command.$(_taskrun)..Command",
+          ".*Arguments.$(_taskrun_args) .\Q$(_taskscript)\E...Arguments",
+          ".*"
+        );
+
   classes:
     windows::
       "_requested_state_$(_requested_state)";
 
     _requested_state_enabled::
       "_watchdog_present_correct"
-        expression => regcmp( $(_scheduled_task_regex), $(_cmd_task_query_result) );
+        expression => regcmp(
+          $(_scheduled_task_regex), $(_cmd_task_query_result)
+        );
 
     _requested_state_disabled::
       "_watchdog_absent_correct"
-        expression => not( returnszero( 'schtasks /QUERY /TN "$(_taskname)" 2> $(const.dollar)null', powershell ));
+        expression => not(
+          returnszero(
+            'schtasks /QUERY /TN "$(_taskname)" 2> $(const.dollar)null',
+            powershell
+          )
+        );
 
   files:
-      "$(_taskscript)"
-        create => "true",
-        template_method => "mustache",
-        edit_template => "$(this.promise_dirname)/templates/watchdog-windows.ps1.mustache",
-        template_data => parsejson( '{"logfile": "$(_logfile)" }' );
+    "$(_taskscript)"
+      create => "true",
+      template_method => "mustache",
+      edit_template => "$(this.promise_dirname)/templates/watchdog-windows.ps1.mustache",
+      template_data => parsejson('{"logfile": "$(_logfile)" }');
 
   commands:
-
     _requested_state_disabled.!_watchdog_absent_correct::
       `schtasks /DELETE /TN "$(_taskname)" /F`
         action => immediate,
         contain => powershell,
-        classes => results( "bundle", "win_watchdog_script");
+        classes => results("bundle", "win_watchdog_script");
 
     _requested_state_enabled.!_watchdog_present_correct::
       `$(_cmd_task_schedule)`
         action => immediate,
         contain => in_shell,
-        classes => results( "bundle", "win_watchdog_script");
+        classes => results("bundle", "win_watchdog_script");
 
   reports:
     verbose_mode::
@@ -140,69 +148,55 @@ bundle agent cfe_internal_core_watchdog_aix(state)
 {
   classes:
     any::
-
       # Define a class for whatever the desired state is
-
-      "$(state)"
-        expression => "any";
+      "$(state)" expression => "any";
 
   vars:
-      "my_statedir" string => "$(sys.statedir)/MPF/$(this.bundle)";
+    "my_statedir" string => "$(sys.statedir)/MPF/$(this.bundle)";
 
   commands:
-
-      # We need to know about the current crontab before making any changes
-
-      "/usr/bin/crontab -l > $(my_statedir)/root-crontab"
-        handle => "aix_crontab_get_state",
-        if => isdir( "$(my_statedir)" ),
-        contain => in_shell_and_silent;
+    # We need to know about the current crontab before making any changes
+    "/usr/bin/crontab -l > $(my_statedir)/root-crontab"
+      handle => "aix_crontab_get_state",
+      if => isdir("$(my_statedir)"),
+      contain => in_shell_and_silent;
 
   files:
-
     enabled::
-
       # We need a place to track state for processing changes to cron entries
       # with proper signaling.
-
-      "$(my_statedir)/."
-        create => "true";
+      "$(my_statedir)/." create => "true";
 
       # The watchdog script takes care of detecting conditions and launching
       # necessary components.
-
       "$(sys.bindir)/watchdog"
         create => "true",
         template_method => "mustache",
-        perms => mog( "700", "root", "system" ),
+        perms => mog("700", "root", "system"),
         edit_template => "$(this.promise_dirname)/templates/watchdog.mustache";
 
       # When enabled we make sure there is a cron entry to execute the watchdog
       # script.
-
       # NOTE The text `# CFEngine watchdog` is used to locate the specific entry in cron when disabling
       "$(my_statedir)/root-crontab"
         create => "true",
-        edit_line => lines_present( "* * * * * $(sys.bindir)/watchdog >/dev/null 2>&1 # CFEngine watchdog"),
-        classes => results( "bundle", "root_crontab" ),
+        edit_line => lines_present(
+          "* * * * * $(sys.bindir)/watchdog >/dev/null 2>&1 # CFEngine watchdog"
+        ),
+        classes => results("bundle", "root_crontab"),
         depends_on => { "aix_crontab_get_state" };
 
     disabled::
-
       "$(my_statedir)/root-crontab"
         edit_line => delete_lines_matching(".*# CFEngine watchdog"),
-        classes => results( "bundle", "root_crontab" ),
+        classes => results("bundle", "root_crontab"),
         depends_on => { "aix_crontab_get_state" };
 
   commands:
-
     root_crontab_repaired::
-
       # We use crontab to load the desired entries so that crond will be
       # signaled and the changes will be respected.
-
       "/usr/bin/crontab $(my_statedir)/root-crontab";
-
 }
 
 bundle agent cfe_internal_core_watchdog_cron_d(state)
@@ -213,26 +207,19 @@ bundle agent cfe_internal_core_watchdog_cron_d(state)
 {
   classes:
     any::
-
       # Define a class for whatever the desired state is
-
-      "$(state)"
-        expression => "any";
+      "$(state)" expression => "any";
 
   vars:
     any::
-
       "template"
         string => "$(this.promise_dirname)/../../../templates/cfengine_watchdog.mustache";
 
       "cron_d_watchdog" string => "/etc/cron.d/cfengine_watchdog";
 
   files:
-
     enabled::
-
-      "$(cron_d_watchdog)"
-        create => "true";
+      "$(cron_d_watchdog)" create => "true";
 
       "$(cron_d_watchdog)"
         edit_template => "$(template)",
@@ -240,7 +227,5 @@ bundle agent cfe_internal_core_watchdog_cron_d(state)
         template_method => "mustache";
 
     disabled::
-
-      "$(cron_d_watchdog)"
-        delete => tidy;
+      "$(cron_d_watchdog)" delete => tidy;
 }

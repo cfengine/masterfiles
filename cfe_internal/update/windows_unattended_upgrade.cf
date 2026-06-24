@@ -5,23 +5,26 @@ bundle agent windows_unattended_upgrade
 {
   classes:
     windows::
-      "_expected_version_installed" expression => and(
-        strcmp( $(sys.cf_version), $(cfengine_software.pkg_version) ),
-        strcmp( $(sys.cf_version_release), $(cfengine_software.pkg_release) )
-      );
+      "_expected_version_installed"
+        expression => and(
+          strcmp($(sys.cf_version), $(cfengine_software.pkg_version)),
+          strcmp($(sys.cf_version_release), $(cfengine_software.pkg_release))
+        );
 
   vars:
     windows::
       "_schedule_upgrade_script"
         string => "$(const.dirsep)schedule_unattended_upgrade.ps1",
-        comment => "sys.bindir has issues when used as execution path"; # TODO examine and fix/document specific issue(s)
+        comment => "sys.bindir has issues when used as execution path";
 
+      # TODO examine and fix/document specific issue(s)
       "_upgrade_script_name" string => "unattended-upgrade.bat";
 
       "_upgrade_script"
         string => "$(sys.bindir)$(const.dirsep)$(_upgrade_script_name)";
 
-      "_scripts" slist => { "$(_schedule_upgrade_script)", "$(_upgrade_script)" };
+      "_scripts"
+        slist => { "$(_schedule_upgrade_script)", "$(_upgrade_script)" };
 
       "_min_offset" string => "2";
 
@@ -94,7 +97,7 @@ exit 0
         template_method => "inline_mustache",
         template_data => '{}',
         create => "true",
-        if => not( "_expected_version_installed" );
+        if => not("_expected_version_installed");
 
       "$(_scripts)"
         delete => windows_unattended_upgrade_tidy,
@@ -103,22 +106,22 @@ exit 0
   commands:
     windows::
       'powershell -NoProfile -ExecutionPolicy bypass -F $(_schedule_upgrade_script)'
-         if => not( "_expected_version_installed" ),
-         contain => windows_unattended_upgrade:powershell;
+        if => not("_expected_version_installed"),
+        contain => windows_unattended_upgrade:powershell;
 }
 
 body delete windows_unattended_upgrade_tidy
 {
-        dirlinks => "delete";
-        rmdirs => "true";
+  dirlinks => "delete";
+  rmdirs => "true";
 }
 
 body file control
 {
-        namespace => "windows_unattended_upgrade";
+  namespace => "windows_unattended_upgrade";
 }
 
 body contain powershell
 {
-        useshell => "powershell";
+  useshell => "powershell";
 }
