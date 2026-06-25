@@ -882,7 +882,7 @@ body classes u_if_else(yes,no)
 # @param yes class to define if promise results in repair
 # @param no class to define if promise is not kept (failed, denied, timeout)
 {
-      #      promise_kept     => { "$(yes)" };
+      # promise_kept     => { "$(yes)" };
       promise_repaired => { "$(yes)" };
       repair_failed    => { "$(no)" };
       repair_denied    => { "$(no)" };
