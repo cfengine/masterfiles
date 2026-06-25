@@ -463,13 +463,13 @@ bundle agent transport_user
     "ssh_paths"
       data => parsejson(
         '{
-        "key_name": "id_FR",
-        "priv_key": "$(home)/.ssh/$(ssh_key_name)",
-        "pub_key": "$(ssh_priv_key).pub",
-        "auth_keys": "$(home)/.ssh/authorized_keys",
-        "known_hosts": "$(home)/.ssh/known_hosts",
-        "config": "$(home)/.ssh/config"
-      }'
+           "key_name": "id_FR",
+           "priv_key": "$(home)/.ssh/$(ssh_key_name)",
+           "pub_key": "$(ssh_priv_key).pub",
+           "auth_keys": "$(home)/.ssh/authorized_keys",
+           "known_hosts": "$(home)/.ssh/known_hosts",
+           "config": "$(home)/.ssh/config"
+         }'
       );
 
   users:
