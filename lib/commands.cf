@@ -79,9 +79,9 @@ body contain in_dir_shell(dir)
 # ```
 {
   chdir => "$(dir)";
-  useshell => "true";
 
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
 }
 
 ##
@@ -112,9 +112,8 @@ body contain in_shell
 #      contain => in_shell;
 # ```
 {
-  useshell => "true";
-
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
 }
 
 ##
@@ -124,9 +123,8 @@ body contain in_shell_bg
 # parser strictness enhancements. Backgrounding is handeled by the body action
 # background attribute.
 {
-  useshell => "true";
-
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
 }
 
 ##
@@ -142,9 +140,8 @@ body contain in_shell_and_silent
 #      comment => "Silently run command in shell";
 # ```
 {
-  useshell => "true";
-
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
   no_output => "true";
 }
 
@@ -162,9 +159,8 @@ body contain in_dir_shell_and_silent(dir)
 #      comment => "Silently run command in shell";
 # ```
 {
-  useshell => "true";
-
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
   no_output => "true";
   chdir => "$(dir)";
 }
@@ -203,9 +199,9 @@ body contain setuid_sh(owner)
 # ```
 {
   exec_owner => "$(owner)";
-  useshell => "true";
 
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
 }
 
 ##
@@ -228,9 +224,9 @@ body contain setuidgid_sh(owner, group)
 {
   exec_owner => "$(owner)";
   exec_group => "$(group)";
-  useshell => "true";
 
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
 }
 
 ##
@@ -241,9 +237,9 @@ body contain jail(owner, jail_root, dir)
 # @param dir directory to change to before running command (must be within 'jail_root')
 {
   exec_owner => "$(owner)";
-  useshell => "true";
 
   # canonical "useshell" but this is backwards-compatible
+  useshell => "true";
   chdir => "$(dir)";
   chroot => "$(jail_root)";
 }

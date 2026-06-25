@@ -15,9 +15,9 @@ bundle agent windows_unattended_upgrade
     windows::
       "_schedule_upgrade_script"
         string => "$(const.dirsep)schedule_unattended_upgrade.ps1",
+        # TODO examine and fix/document specific issue(s)
         comment => "sys.bindir has issues when used as execution path";
 
-      # TODO examine and fix/document specific issue(s)
       "_upgrade_script_name" string => "unattended-upgrade.bat";
 
       "_upgrade_script"
