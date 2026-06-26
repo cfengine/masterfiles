@@ -1,97 +1,119 @@
 bundle common test_meta
 {
   vars:
-      "description" string => "Test that package inventory is generated properly using package managers";
-      "story_id" string => "5513";
-      "covers" string => "operational_repaired";
+    "description"
+      string => "Test that package inventory is generated properly using package managers";
+
+    "story_id" string => "5513";
+    "covers" string => "operational_repaired";
 }
 
 body common control
 {
-    inputs => { "../../../dcs.sub.cf",
-                "../../../../../$(sys.local_libdir)/stdlib.cf",
-                "../../../../../$(sys.local_libdir)/packages.cf",
-                "../../../../../inventory/any.cf",
-                "../../packages-info.cf.sub",
-                "../../meta_skip.cf.sub",
-              };
-    bundlesequence => { default($(this.promise_files)) };
+  inputs => {
+    "../../../dcs.sub.cf",
+    "../../../../../$(sys.local_libdir)/stdlib.cf",
+    "../../../../../$(sys.local_libdir)/packages.cf",
+    "../../../../../inventory/any.cf",
+    "../../packages-info.cf.sub",
+    "../../meta_skip.cf.sub",
+  };
+  bundlesequence => { default($(this.promise_files)) };
 }
 
 bundle agent init
 {
   meta:
-      # Available patches is an Enterprise feature.
-      "test_skip_unsupported" string => "!enterprise";
+    # Available patches is an Enterprise feature.
+    "test_skip_unsupported" string => "!enterprise";
 
   methods:
-      "any" usebundle => clear_packages("dummy");
-      "any" usebundle => install_package("$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy");
-      "any" usebundle => install_package("$(p.name[3])", "$(p.version[$(p.latest_version)])", "$(p.arch)", "dummy");
+    "any" usebundle => clear_packages("dummy");
+
+    "any"
+      usebundle => install_package(
+        "$(p.name[1])", "$(p.version[1])", "$(p.arch)", "dummy"
+      );
+
+    "any"
+      usebundle => install_package(
+        "$(p.name[3])",
+        "$(p.version[$(p.latest_version)])",
+        "$(p.arch)",
+        "dummy"
+      );
 }
 
 bundle agent test
 {
   vars:
+    # if we have the patches, 7 days; otherwise keep trying
+    "refresh" string => ifelse("have_inventory", "10080", "0");
 
-      # if we have the patches, 7 days; otherwise keep trying
-      "refresh" string => ifelse("have_inventory", "10080",
-                                 "0");
   classes:
-      "have_patches" or => { "community_edition", # not in Community
-                             fileexists("$(sys.workdir)/state/software_patches_avail.csv") };
+    "have_patches"
+      or => {
+        "community_edition",
+        # not in Community
+        fileexists("$(sys.workdir)/state/software_patches_avail.csv"),
+      };
 
-      "have_inventory" and => { "have_patches",
-                                fileexists("$(sys.workdir)/state/software_packages.csv"),
+    "have_inventory"
+      and => {
+        "have_patches",
+        fileexists("$(sys.workdir)/state/software_packages.csv"),
       };
 
   packages:
     # Old way of forcing package updates, for the legacy packages promise.
     debian::
       "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => inventory_apt_get($(refresh)),
-      action => if_elapsed_day;
+        package_policy => "add",
+        package_method => inventory_apt_get($(refresh)),
+        action => if_elapsed_day;
 
     redhat::
       "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => inventory_yum_rpm($(refresh)),
-      action => if_elapsed_day;
+        package_policy => "add",
+        package_method => inventory_yum_rpm($(refresh)),
+        action => if_elapsed_day;
 
   methods:
-      # Previous way, when the legacy package promise was the default.
-      #"any" usebundle => inventory_autorun;
+
+  # Previous way, when the legacy package promise was the default.
+  #"any" usebundle => inventory_autorun;
 }
 
 bundle agent check
 {
   vars:
-      "inst" string => "$(sys.workdir)/state/software_packages.csv";
-      "inst_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
-      "inst_matches" int => countlinesmatching("$(inst_expr)", "$(inst)");
-
-      "upd" string => "$(sys.workdir)/state/software_patches_avail.csv";
-      "upd_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
-      "upd_matches" int => countlinesmatching("$(upd_expr)", "$(upd)");
+    "inst" string => "$(sys.workdir)/state/software_packages.csv";
+    "inst_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
+    "inst_matches" int => countlinesmatching("$(inst_expr)", "$(inst)");
+    "upd" string => "$(sys.workdir)/state/software_patches_avail.csv";
+    "upd_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
+    "upd_matches" int => countlinesmatching("$(upd_expr)", "$(upd)");
 
   classes:
-      # Should match all packages except the second one.
-      "inst_ok" expression => strcmp("$(inst_matches)", "2");
-      # Should only match the first package.
-      "upd_ok" expression => strcmp("$(upd_matches)", "1");
+    # Should match all packages except the second one.
+    "inst_ok" expression => strcmp("$(inst_matches)", "2");
 
-      "ok" and => { "inst_ok", "upd_ok" };
+    # Should only match the first package.
+    "upd_ok" expression => strcmp("$(upd_matches)", "1");
+    "ok" and => { "inst_ok", "upd_ok" };
 
   reports:
     DEBUG::
       "Install matches: $(inst_matches)";
       "Update matches: $(upd_matches)";
+
     ok::
       "$(this.promise_filename) Pass";
+
     !ok::
       "$(this.promise_filename) FAIL";
 }
+
 body package_method inventory_apt_get(update_interval)
 # @depends debian_knowledge
 # @brief APT installation package method for inventory purposes only
@@ -105,32 +127,33 @@ body package_method inventory_apt_get(update_interval)
 # exactly like the `apt_get` package method and *may* use the network
 # to install packages, as APT may decide.
 {
-      package_changes => "bulk";
-      package_list_command => "$(debian_knowledge.call_dpkg) -l";
-      package_list_name_regex => "$(debian_knowledge.list_name_regex)";
-      package_list_version_regex => "$(debian_knowledge.list_version_regex)";
-      package_installed_regex => ".i.*"; # packages that have been uninstalled may be listed
-      package_name_convention => "$(name)=$(version)";
+  package_changes => "bulk";
+  package_list_command => "$(debian_knowledge.call_dpkg) -l";
+  package_list_name_regex => "$(debian_knowledge.list_name_regex)";
+  package_list_version_regex => "$(debian_knowledge.list_version_regex)";
+  package_installed_regex => ".i.*";
 
-      # set it to "0" to avoid caching of list during upgrade
-      package_list_update_ifelapsed => $(update_interval);
+  # packages that have been uninstalled may be listed
+  package_name_convention => "$(name)=$(version)";
 
-      # Target a specific release, such as backports
-      package_add_command => "$(debian_knowledge.call_apt_get) --help >/dev/null 2>&1 ; /bin/true";
-      package_list_update_command => "$(debian_knowledge.call_apt_get) update";
-      package_delete_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes -q remove";
-      package_update_command =>  "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
-      package_patch_command =>  "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
-      package_verify_command => "$(debian_knowledge.call_dpkg) -s";
-      package_noverify_returncode => "1";
+  # set it to "0" to avoid caching of list during upgrade
+  package_list_update_ifelapsed => $(update_interval);
 
-      package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
-      package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
-      package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
+  # Target a specific release, such as backports
+  package_add_command => "$(debian_knowledge.call_apt_get) --help >/dev/null 2>&1 ; /bin/true";
+  package_list_update_command => "$(debian_knowledge.call_apt_get) update";
+  package_delete_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes -q remove";
+  package_update_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
+  package_patch_command => "$(debian_knowledge.call_apt_get) $(debian_knowledge.dpkg_options) --yes install";
+  package_verify_command => "$(debian_knowledge.call_dpkg) -s";
+  package_noverify_returncode => "1";
+  package_patch_list_command => "$(debian_knowledge.call_apt_get) --just-print dist-upgrade";
+  package_patch_name_regex => "$(debian_knowledge.patch_name_regex)";
+  package_patch_version_regex => "$(debian_knowledge.patch_version_regex)";
 
-      # make correct version comparisons
-      package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
-      package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
+  # make correct version comparisons
+  package_version_less_command => "$(debian_knowledge.dpkg_compare_less)";
+  package_version_equal_command => "$(debian_knowledge.dpkg_compare_equal)";
 }
 
 body package_method inventory_yum_rpm(update_interval)
@@ -145,31 +168,27 @@ body package_method inventory_yum_rpm(update_interval)
 # `yum_rpm()` package method and *may* use the network to install
 # packages, as Yum may decide.
 {
-      package_changes => "bulk";
-      package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
-      package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
+  package_changes => "bulk";
+  package_list_command => "$(rpm_knowledge.call_rpm) -qa --qf '$(rpm_knowledge.rpm3_output_format)'";
+  package_patch_list_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_offline_options) check-update $(redhat_knowledge.check_update_postproc)";
+  package_list_name_regex => "$(rpm_knowledge.rpm3_name_regex)";
+  package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
+  package_list_arch_regex => "$(rpm_knowledge.rpm3_arch_regex)";
+  package_installed_regex => ".*";
+  package_name_convention => "$(name)-$(version).$(arch)";
 
-      package_list_name_regex    => "$(rpm_knowledge.rpm3_name_regex)";
-      package_list_version_regex => "$(rpm_knowledge.rpm3_version_regex)";
-      package_list_arch_regex    => "$(rpm_knowledge.rpm3_arch_regex)";
+  # just give the package name to rpm to delete, otherwise it gets "name.*" (from package_name_convention above)
+  package_delete_convention => "$(name)";
 
-      package_installed_regex => ".*";
-      package_name_convention => "$(name)-$(version).$(arch)";
-
-      # just give the package name to rpm to delete, otherwise it gets "name.*" (from package_name_convention above)
-      package_delete_convention => "$(name)";
-
-      # set it to "0" to avoid caching of list during upgrade
-      package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
-      package_list_update_ifelapsed => $(update_interval);
-
-      package_patch_name_regex    => "$(redhat_knowledge.patch_name_regex)";
-      package_patch_version_regex => "$(redhat_knowledge.patch_version_regex)";
-      package_patch_arch_regex    => "$(redhat_knowledge.patch_arch_regex)";
-
-      package_add_command    => "$(redhat_knowledge.call_yum) --help >/dev/null 2>&1 ; /bin/true";
-      package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
-      package_patch_command  => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
-      package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps";
-      package_verify_command => "$(rpm_knowledge.call_rpm) -V";
+  # set it to "0" to avoid caching of list during upgrade
+  package_list_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) check-update $(redhat_knowledge.check_update_postproc)";
+  package_list_update_ifelapsed => $(update_interval);
+  package_patch_name_regex => "$(redhat_knowledge.patch_name_regex)";
+  package_patch_version_regex => "$(redhat_knowledge.patch_version_regex)";
+  package_patch_arch_regex => "$(redhat_knowledge.patch_arch_regex)";
+  package_add_command => "$(redhat_knowledge.call_yum) --help >/dev/null 2>&1 ; /bin/true";
+  package_update_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+  package_patch_command => "$(redhat_knowledge.call_yum) $(redhat_knowledge.yum_options) -y update";
+  package_delete_command => "$(rpm_knowledge.call_rpm) -e --nodeps";
+  package_verify_command => "$(rpm_knowledge.call_rpm) -V";
 }
