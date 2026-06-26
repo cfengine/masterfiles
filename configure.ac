@@ -235,6 +235,9 @@ do
     done
 done
 
+dnl leech2 reporting drop-in directory (ENT-14205)
+MASTERFILES_INSTALL_TARGETS="$MASTERFILES_INSTALL_TARGETS $srcdir/leech2/README.txt"
+
 
 AC_SUBST(MASTERFILES_INSTALL_TARGETS)
 
