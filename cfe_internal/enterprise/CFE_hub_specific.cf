@@ -13,7 +13,6 @@
 #  - define a default location of Mission Portal WebGUI
 #
 ##################################################################
-
 @if minimum_version(3.12.0)
 bundle common cfe_hub_specific_file_control
 {
@@ -23,41 +22,49 @@ bundle common cfe_hub_specific_file_control
 
 body file control
 {
-        inputs => { @(cfe_hub_specific_file_control.inputs) };
+  inputs => { @(cfe_hub_specific_file_control.inputs) };
 }
 @endif
-
 bundle common cfe_internal_hub_vars
 # @brief Set hub specific variables
 {
   classes:
-
-      "cfe_enterprise_have_SSLCACertificateFile_defined" -> { "ENT-11421" }
-        scope => "namespace",
-        expression => isvariable( "SSLCACertificateFile" );
+    "cfe_enterprise_have_SSLCACertificateFile_defined" -> { "ENT-11421" }
+      scope => "namespace",
+      expression => isvariable("SSLCACertificateFile");
 
   vars:
-
     policy_server::
-
       "http_port" -> { "ENT-12151" }
-        string => ifelse( isvariable("cfe_internal_hub_vars.http_port"), "$(cfe_internal_hub_vars.http_port)", "80" ),
+        string => ifelse(
+          isvariable("cfe_internal_hub_vars.http_port"),
+          "$(cfe_internal_hub_vars.http_port)",
+          "80"
+        ),
         comment => "Mission portal's webserver HTTP port. Default 80";
 
       "https_port" -> { "ENT-12151" }
-        string => ifelse( isvariable("cfe_internal_hub_vars.https_port"), "$(cfe_internal_hub_vars.https_port)", "443" ),
+        string => ifelse(
+          isvariable("cfe_internal_hub_vars.https_port"),
+          "$(cfe_internal_hub_vars.https_port)",
+          "443"
+        ),
         comment => "Mission portal's webserver HTTPS port. Default 443";
 
-      "docroot" string => "$(sys.workdir)/httpd/htdocs",
+      "docroot"
+        string => "$(sys.workdir)/httpd/htdocs",
         comment => "Root directory of Enterprise Web interface",
         handle => "cfe_internal_hub_vars_docroot";
 
-      "public_docroot" string => ifelse( isdir("$(cfe_internal_hub_vars.docroot)/public"), "$(cfe_internal_hub_vars.docroot)/public",
-                                                $(cfe_internal_hub_vars.docroot)),
+      "public_docroot"
+        string => ifelse(
+          isdir("$(cfe_internal_hub_vars.docroot)/public"),
+          "$(cfe_internal_hub_vars.docroot)/public",
+          $(cfe_internal_hub_vars.docroot)
+        ),
         comment => "Public root directory of Enterprise Web interface";
 
       # TODO Consider tagging these files for file integrity monitoring.
-
       "SSLCertificateFile"
         string => "$(sys.workdir)/httpd/ssl/certs/$(sys.fqhost).cert";
 
@@ -70,13 +77,10 @@ bundle common cfe_internal_hub_vars
       "SSLCertificateSigningRequest"
         string => "$(sys.workdir)/httpd/ssl/private/$(sys.fqhost).csr";
 
-      "SSLCnf"
-        string => "$(sys.workdir)/ssl/openssl.cnf";
-
+      "SSLCnf" string => "$(sys.workdir)/ssl/openssl.cnf";
       "access_log" string => "$(sys.workdir)/httpd/logs/access_log";
-      "error_log"  string => "$(sys.workdir)/httpd/logs/error_log";
+      "error_log" string => "$(sys.workdir)/httpd/logs/error_log";
       "ssl_request_log" string => "$(sys.workdir)/httpd/logs/ssl_request_log";
-
       "SSLCertificateKeySize" string => "4096";
       "SSLCertificateDaysValid" string => "3650";
 
@@ -84,22 +88,25 @@ bundle common cfe_internal_hub_vars
       # TODO Drop this after 3.18 is no longer supported. It's used for Mission Portals httpd configuration.
       # ENT-11440 enabled http/2 which switched from libphp.so apache module to php-fpm.
       # httpd.conf doesn't use php_version when http/2 is enabled.
-
       "php_version" -> { "ENT-7039" }
         string => ifelse(
-                          fileexists( "$(sys.workdir)/httpd/php/sbin/php-fpm" ), "", # ENT-11440, http/2 in httpd.conf doesn't need php_version
-                          fileexists( "$(sys.workdir)/httpd/modules/libphp.so" ), "", # ENT-7039 php 8+
-                          fileexists( "$(sys.workdir)/httpd/modules/libphp7.so" ), "7",
-                          fileexists( "$(sys.workdir)/httpd/modules/libphp5.so" ), "5",
-                          "UNKNOWN" );
+          fileexists("$(sys.workdir)/httpd/php/sbin/php-fpm"),
+          "",
+          # ENT-11440, http/2 in httpd.conf doesn't need php_version
+          fileexists("$(sys.workdir)/httpd/modules/libphp.so"),
+          "",
+          # ENT-7039 php 8+
+          fileexists("$(sys.workdir)/httpd/modules/libphp7.so"),
+          "7",
+          fileexists("$(sys.workdir)/httpd/modules/libphp5.so"),
+          "5",
+          "UNKNOWN"
+        );
 
   reports:
-
     policy_server::
-
       "ERROR: $(this.bundle): Unable to determine correct PHP version."
-        if => strcmp( $(php_version), "UNKNOWN" );
-
+        if => strcmp($(php_version), "UNKNOWN");
 }
 
 ##################################################################
@@ -113,36 +120,52 @@ bundle agent update_cli_rest_server_url_config
 {
   vars:
     # Both share and live versions must be changed at once since httpd will be restarted later in the same agent run.
-    "mp_config_files" slist => {
-      "application/config/config.php"
-    };
-    "api_config_files" slist => {
-      "api/config/config.php",
-      "api/modules/inventory/config/config.php"
-    };
+    "mp_config_files" slist => { "application/config/config.php" };
+
+    "api_config_files"
+      slist => {
+        "api/config/config.php", "api/modules/inventory/config/config.php"
+      };
 
     "share" string => "$(sys.workdir)/share/GUI";
     "docroot" string => "$(cfe_internal_hub_vars.docroot)";
 
-    "mp_test_pattern" string => ".*localhost:$(cfe_internal_hub_vars.https_port).*";
-    "api_test_pattern" string => ".*127\.0\.0\.1:$(cfe_internal_hub_vars.https_port).*";
+    "mp_test_pattern"
+      string => ".*localhost:$(cfe_internal_hub_vars.https_port).*";
+
+    "api_test_pattern"
+      string => ".*127\.0\.0\.1:$(cfe_internal_hub_vars.https_port).*";
 
   files:
     mpf_enable_mission_portal_docroot_sync_from_share_gui::
       "$(share)/$(mp_config_files)"
-        handle => canonify(concat("cfe_internal_edit_share_", "$(mp_config_files)")),
+        handle => canonify(
+          concat("cfe_internal_edit_share_", "$(mp_config_files)")
+        ),
         edit_line => change_mp_server_url_port,
         if => and(
-                   fileexists("$(share)/$(mp_config_files)"),
-                   islessthan(countlinesmatching("$(mp_test_pattern)", "$(share)/$(mp_config_files)"), 1)
+          fileexists("$(share)/$(mp_config_files)"),
+          islessthan(
+            countlinesmatching(
+              "$(mp_test_pattern)", "$(share)/$(mp_config_files)"
+            ),
+            1
+          )
         );
 
       "$(share)/$(api_config_files)"
-        handle => canonify(concat("cfe_internal_edit_share_", "$(api_config_files)")),
+        handle => canonify(
+          concat("cfe_internal_edit_share_", "$(api_config_files)")
+        ),
         edit_line => change_api_server_url_port,
         if => and(
-                   fileexists("$(share)/$(api_config_files)"),
-                   islessthan(countlinesmatching("$(api_test_pattern)", "$(share)/$(api_config_files)"), 1)
+          fileexists("$(share)/$(api_config_files)"),
+          islessthan(
+            countlinesmatching(
+              "$(api_test_pattern)", "$(share)/$(api_config_files)"
+            ),
+            1
+          )
         );
 
     any::
@@ -151,30 +174,45 @@ bundle agent update_cli_rest_server_url_config
         edit_line => change_mp_server_url_port,
         if => and(
           fileexists("$(docroot)/$(mp_config_files)"),
-          islessthan(countlinesmatching("$(mp_test_pattern)", "$(docroot)/$(mp_config_files)"), 1)
-          );
+          islessthan(
+            countlinesmatching(
+              "$(mp_test_pattern)", "$(docroot)/$(mp_config_files)"
+            ),
+            1
+          )
+        );
 
       "$(docroot)/$(api_config_files)"
         handle => canonify(concat("cfe_internal_edit_", "$(api_config_files)")),
         edit_line => change_api_server_url_port,
         if => and(
           fileexists("$(docroot)/$(api_config_files)"),
-          islessthan(countlinesmatching("$(api_test_pattern)", "$(docroot)/$(api_config_files)"), 1)
+          islessthan(
+            countlinesmatching(
+              "$(api_test_pattern)", "$(docroot)/$(api_config_files)"
+            ),
+            1
+          )
         );
 }
 
 bundle edit_line change_mp_server_url_port
 {
   replace_patterns:
-  "^\s*\$config\['cli_rest_server_url'\]\s*=\s*\"https:\/\/localhost(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?\/api\/\";\s*$"
-      replace_with => value("    $config['cli_rest_server_url'] = \"https://localhost:$(cfe_internal_hub_vars.https_port)/api/\";"),
+    "^\s*\$config\['cli_rest_server_url'\]\s*=\s*\"https:\/\/localhost(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?\/api\/\";\s*$"
+      replace_with => value(
+        "    $config['cli_rest_server_url'] = \"https://localhost:$(cfe_internal_hub_vars.https_port)/api/\";"
+      ),
       comment => "Change port MP REST server URL port";
 }
+
 bundle edit_line change_api_server_url_port
 {
   replace_patterns:
-  "https:\/\/127\.0\.0\.1(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?\/"
-      replace_with => value("https://127.0.0.1:$(cfe_internal_hub_vars.https_port)/"),
+    "https:\/\/127\.0\.0\.1(?::(?!$(cfe_internal_hub_vars.https_port))\d{1,5})?\/"
+      replace_with => value(
+        "https://127.0.0.1:$(cfe_internal_hub_vars.https_port)/"
+      ),
       comment => "Change port API REST server URL port";
 }
 
@@ -184,80 +222,75 @@ bundle edit_line change_api_server_url_port
 #  - create temp directories to make CFE silent (self-upgrading)
 #
 ##################################################################
-
 bundle agent cfe_internal_update_folders
 # @brief Ensure that the directory structure exists on the hub for storing packages used in self upgrade
 {
   vars:
-
-      "dirs" slist => {
-                        "aix_5_powerpc",
-                        "aix_6_powerpc",
-                        "aix_6.1_powerpc",
-                        "aix_7_powerpc",
-                        "ubuntu_8_i686",
-                        "ubuntu_8_x86_64",
-                        "ubuntu_10_i686",
-                        "ubuntu_10_x86_64",
-                        "ubuntu_11_i686",
-                        "ubuntu_11_x86_64",
-                        "ubuntu_12_i686",
-                        "ubuntu_12_x86_64",
-                        "ubuntu_13_i686",
-                        "ubuntu_13_x86_64",
-                        "ubuntu_14_i686",
-                        "ubuntu_14_x86_64",
-                        "ubuntu_16_i686",
-                        "ubuntu_16_x86_64",
-                        "centos_5_i686",
-                        "centos_5_x86_64",
-                        "centos_6_i686",
-                        "centos_6_x86_64",
-                        "centos_7_i686",
-                        "centos_7_x86_64",
-                        "redhat_4_i686",
-                        "redhat_4_x86_64",
-                        "redhat_5_i686",
-                        "redhat_5_x86_64",
-                        "redhat_6_i686",
-                        "redhat_6_x86_64",
-                        "redhat_7_i686",
-                        "redhat_7_x86_64",
-                        "SuSE_10_i686",
-                        "SuSE_10_x86_64",
-                        "SuSE_11_i686",
-                        "SuSE_11_x86_64",
-                        "debian_5_i686",
-                        "debian_5_x86_64",
-                        "debian_6_i686",
-                        "debian_6_x86_64",
-                        "debian_7_i686",
-                        "debian_7_x86_64",
-                        "debian_8_i686",
-                        "debian_8_x86_64",
-                        "windows_i686",
-                        "windows_x86_64",
-                        "sunos_5.8_sun4u",
-                        "sunos_5.8_sun4v",
-                        "sunos_5.9_sun4u",
-                        "sunos_5.9_sun4v",
-                        "sunos_5.10_sun4u",
-                        "sunos_5.10_sun4v",
-                        "sunos_5.10_i86pc",
-                        "hpux_ia64",
+    "dirs"
+      slist => {
+        "aix_5_powerpc",
+        "aix_6_powerpc",
+        "aix_6.1_powerpc",
+        "aix_7_powerpc",
+        "ubuntu_8_i686",
+        "ubuntu_8_x86_64",
+        "ubuntu_10_i686",
+        "ubuntu_10_x86_64",
+        "ubuntu_11_i686",
+        "ubuntu_11_x86_64",
+        "ubuntu_12_i686",
+        "ubuntu_12_x86_64",
+        "ubuntu_13_i686",
+        "ubuntu_13_x86_64",
+        "ubuntu_14_i686",
+        "ubuntu_14_x86_64",
+        "ubuntu_16_i686",
+        "ubuntu_16_x86_64",
+        "centos_5_i686",
+        "centos_5_x86_64",
+        "centos_6_i686",
+        "centos_6_x86_64",
+        "centos_7_i686",
+        "centos_7_x86_64",
+        "redhat_4_i686",
+        "redhat_4_x86_64",
+        "redhat_5_i686",
+        "redhat_5_x86_64",
+        "redhat_6_i686",
+        "redhat_6_x86_64",
+        "redhat_7_i686",
+        "redhat_7_x86_64",
+        "SuSE_10_i686",
+        "SuSE_10_x86_64",
+        "SuSE_11_i686",
+        "SuSE_11_x86_64",
+        "debian_5_i686",
+        "debian_5_x86_64",
+        "debian_6_i686",
+        "debian_6_x86_64",
+        "debian_7_i686",
+        "debian_7_x86_64",
+        "debian_8_i686",
+        "debian_8_x86_64",
+        "windows_i686",
+        "windows_x86_64",
+        "sunos_5.8_sun4u",
+        "sunos_5.8_sun4v",
+        "sunos_5.9_sun4u",
+        "sunos_5.9_sun4v",
+        "sunos_5.10_sun4u",
+        "sunos_5.10_sun4v",
+        "sunos_5.10_i86pc",
+        "hpux_ia64",
       },
       comment => "Define a list for $(sys.flavour)_$(sys.arch) directories",
       handle => "cfe_internal_update_folders_vars_dirs";
 
-      #
-
   files:
-
-      "$(sys.workdir)/master_software_updates/$(dirs)/."
+    "$(sys.workdir)/master_software_updates/$(dirs)/."
       comment => "Prepare binary upgrade folders for all distributions in our environment",
       handle => "cfe_internal_update_folders_files_create_dirs",
       create => "true";
-
 }
 
 bundle agent cfe_internal_php_runalerts
@@ -267,70 +300,70 @@ bundle agent cfe_internal_php_runalerts
 #   small script which runs in a loop.
 {
   vars:
-
     any::
-
       "runalerts_types"
         comment => "Runalerts is run for different types of alerts",
         slist => { "all" };
 
-      "runalerts_script" string => "$(sys.bindir)/runalerts.php",
-      comment => "location of php runalerts script",
-      handle => "cfe_internal_php_runalerts_vars_runalerts_script";
+      "runalerts_script"
+        string => "$(sys.bindir)/runalerts.php",
+        comment => "location of php runalerts script",
+        handle => "cfe_internal_php_runalerts_vars_runalerts_script";
 
       # TODO Move runalerts stamp files into $(sys.statedir)
       "runalerts_stampfiles_dir"
-      string => "$(sys.workdir)/httpd/php/runalerts-stamp",
-      comment => "location of runalerts stamp file directory",
-      handle => "cfe_internal_php_runalerts_var_runalerts_stampfiles_dir";
+        string => "$(sys.workdir)/httpd/php/runalerts-stamp",
+        comment => "location of runalerts stamp file directory",
+        handle => "cfe_internal_php_runalerts_var_runalerts_stampfiles_dir";
 
-      "sleep_time" string => "60",
-      comment => "how often that php_runalerts will run in every seconds",
-      handle => "cfe_internal_php_runalerts_vars_sleep_time";
+      "sleep_time"
+        string => "60",
+        comment => "how often that php_runalerts will run in every seconds",
+        handle => "cfe_internal_php_runalerts_vars_sleep_time";
 
-      "stale_time" string => "10",
-      comment => "if script does not function in minutes, restart the script",
-      handle => "cfe_internal_php_runalerts_vars_stale_time";
+      "stale_time"
+        string => "10",
+        comment => "if script does not function in minutes, restart the script",
+        handle => "cfe_internal_php_runalerts_vars_stale_time";
 
-      "all[name]"        string => "all",
-      comment => "name of query type - all",
+      "all[name]"
+        string => "all",
+        comment => "name of query type - all",
+        handle => "cfe_internal_php_runalerts_vars_all_name";
 
-      handle => "cfe_internal_php_runalerts_vars_all_name";
-      "all[limit]"       string => "300",
-      comment => "query limit of sql",
-      handle => "cfe_internal_php_runalerts_vars_all_limit";
+      "all[limit]"
+        string => "300",
+        comment => "query limit of sql",
+        handle => "cfe_internal_php_runalerts_vars_all_limit";
 
-      "all[running]"     string => "20",
-      comment => "how many query at a time of sql",
-      handle => "cfe_internal_php_runalerts_vars_all_running";
+      "all[running]"
+        string => "20",
+        comment => "how many query at a time of sql",
+        handle => "cfe_internal_php_runalerts_vars_all_running";
 
   classes:
-
-      "systemd_supervised"
-        scope => "bundle",
-        expression => "systemd",
-        comment => "As of 3.10 the runalerts service is supervised by systemd
+    "systemd_supervised"
+      scope => "bundle",
+      expression => "systemd",
+      comment => "As of 3.10 the runalerts service is supervised by systemd
                     when available. Prior to 3.10 the service is supervised
                     directly by CFEngine policy.";
 
   files:
-
     any::
-
       "$(runalerts_script)"
-      comment => "The runalerts script is necessary for the proper functioning
+        comment => "The runalerts script is necessary for the proper functioning
                   of the CFEngine Enterprise alerts.",
-      handle => "cfe_internal_php_runalerts_files_php_runalerts_script",
-      create => "true",
-      perms => mog("0755","root","root"),
-      edit_template => "$(this.promise_dirname)/templates/runalerts.php.mustache",
-      classes => results( "bundle", "runalerts_script" ),
-      template_method => "mustache";
-
+        handle => "cfe_internal_php_runalerts_files_php_runalerts_script",
+        create => "true",
+        perms => mog("0755", "root", "root"),
+        edit_template => "$(this.promise_dirname)/templates/runalerts.php.mustache",
+        classes => results("bundle", "runalerts_script"),
+        template_method => "mustache";
 
       "$(runalerts_stampfiles_dir)/."
-      create => "true",
-      comment => "We provide a single directory where the runalerts process
+        create => "true",
+        comment => "We provide a single directory where the runalerts process
                   should maintain its timestamp tracking.";
 
       # This promise uses the side effect of cleaning up the timestamp files to
@@ -338,26 +371,24 @@ bundle agent cfe_internal_php_runalerts
       # to make sure that runalerts can write to the state files, we will also
       # make sure they exist with specific perms. This extra churn is probably
       # unnecessary.
-
       "$(runalerts_stampfiles_dir)/runalerts_.*"
-      comment => "The runalerts process updates a timestamp for each type of
+        comment => "The runalerts process updates a timestamp for each type of
                   alert each time alerts are checked. Here we check for the
                   state files not being updated and kill off the runalerts
                   process so that it can be refreshed. ",
-      handle => "cfe_internal_php_runalerts_files_status_check",
-      delete => tidy,
-      file_select => mins_old("$(stale_time)"),
-      classes => results("bundle", "stale_runalerts_timestamp");
+        handle => "cfe_internal_php_runalerts_files_status_check",
+        delete => tidy,
+        file_select => mins_old("$(stale_time)"),
+        classes => results("bundle", "stale_runalerts_timestamp");
 
       "$(runalerts_stampfiles_dir)/runalerts_$(runalerts_types)"
-      create => "true",
-      handle => "cfe_internal_php_runalerts_state_file_perms",
-      comment => "The runalerts timestamp files need to be owned by the apache
+        create => "true",
+        handle => "cfe_internal_php_runalerts_state_file_perms",
+        comment => "The runalerts timestamp files need to be owned by the apache
                     user or we won't be able to update the timestamps from the
                     runalerts service which is expected to be running as
                     $(def.cf_apache_user)",
-      perms => mog( "600", $(def.cf_apache_user), $(def.cf_apache_group) );
-
+        perms => mog("600", $(def.cf_apache_user), $(def.cf_apache_group));
 
       # Cleanup old runalerts script if it's still present
       "$(sys.bindir)/runalerts.sh"
@@ -366,17 +397,14 @@ bundle agent cfe_internal_php_runalerts
                     systemd service Type=simple.";
 
   processes:
-
-      "$(sys.bindir)/runalerts.sh"
-        comment => "The old runalerts process should be killed if it's running
+    "$(sys.bindir)/runalerts.sh"
+      comment => "The old runalerts process should be killed if it's running
                     and replaced with the php version of the loop.",
-        signals => { "kill" };
+      signals => { "kill" };
 
     # Make sure to kill script on non active hub(s), when the tracking timestamp
     # is stale, or when the script has been repaired.
-
     stale_runalerts_timestamp_repaired|passive_ha_hub|runalerts_script_repaired::
-
       "$(runalerts_script)"
         comment => "The runalerts process should be killed if it has failed to
                     update the timestamp files in $(stale_time) minutes or if it
@@ -385,56 +413,48 @@ bundle agent cfe_internal_php_runalerts
         signals => { "term" },
         classes => if_repaired("run_script");
 
-
     # We don't try to supervise the runalerts process on systemd hosts because
     # there is a unit for that.
     !systemd_supervised.active_hub::
-
       "$(runalerts_script)"
-      comment => "When the runalerts service is not supervised by systemd we
+        comment => "When the runalerts service is not supervised by systemd we
                   need to check to see if the service is running so that we can
                   restart it when necessary.",
-      handle => "cfe_internal_php_runalerts_process_check_php_runalerts_script",
-      restart_class => "runalerts_process_not_running";
+        handle => "cfe_internal_php_runalerts_process_check_php_runalerts_script",
+        restart_class => "runalerts_process_not_running";
 
   commands:
-
     # Don't run the script on systemd hosts
     !systemd_supervised.runalerts_process_not_running.active_hub::
-
       "$(runalerts_script) > /dev/null < /dev/null 2>&1 &"
-      comment => "Runalerts is needed for proper functioning of Enterprise
+        comment => "Runalerts is needed for proper functioning of Enterprise
                   dashboard alerts. It should only be run on the active hub to
                   avoid duplicate alerts. On systemd hosts the service is
                   supervised by it's own unit and the CFEngine policy does not
                   need to ensure it is running.",
-      handle => "cfe_internal_php_runalerts_commands_run_php_runalerts_script",
-      classes => kept_successful_command,
-      contain => run_as_cfapache,
-      action => cfe_internal_bg;
+        handle => "cfe_internal_php_runalerts_commands_run_php_runalerts_script",
+        classes => kept_successful_command,
+        contain => run_as_cfapache,
+        action => cfe_internal_bg;
 }
 
 body contain run_as_cfapache
 {
-  useshell   => "true";
+  useshell => "true";
   exec_owner => "$(def.cf_apache_user)";
   exec_group => "$(def.cf_apache_group)";
 }
 
-      #
-
 body action cfe_internal_bg
 {
- background => "true";
+  background => "true";
 }
-
-      #
 
 body file_select mins_old(mins)
 # @brief Select files that are older than `mins` minutes old
 {
- mtime       => irange(0,ago(0,0,0,0,"$(mins)",0));
- file_result => "mtime";
+  mtime => irange(0, ago(0, 0, 0, 0, "$(mins)", 0));
+  file_result => "mtime";
 }
 
 bundle agent cfe_internal_truncate_events
@@ -443,116 +463,133 @@ bundle agent cfe_internal_truncate_events
   commands:
     Hr05.Min00_05::
       "$(sys.workdir)/httpd/php/bin/php $(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks truncate_events"
-      contain => silent,
-      comment => "Truncate all the pending notifications if there is any",
-      handle  => "cfe_internal_truncate_event_mp";
+        contain => silent,
+        comment => "Truncate all the pending notifications if there is any",
+        handle => "cfe_internal_truncate_event_mp";
 }
 
 bundle agent cfe_internal_purge_scheduled_reports_older_than_days(days)
 # @brief Clean up scheduled reports older than `days` days old
 {
   vars:
-    "tmp_directories_list" slist => {"$(cfe_internal_hub_vars.public_docroot)/tmp/.", "$(cfe_internal_hub_vars.docroot)/static/."};
+    "tmp_directories_list"
+      slist => {
+        "$(cfe_internal_hub_vars.public_docroot)/tmp/.",
+        "$(cfe_internal_hub_vars.docroot)/static/.",
+      };
+
   files:
     "$(tmp_directories_list)"
       handle => "cfe_internal_purge_scheduled_reports_files_docroot_tmp",
       delete => tidy,
       depth_search => recurse("inf"),
-      file_select => filetype_older_than("plain", $(days) ),
-      if => isdir( $(tmp_directories_list) ),
+      file_select => filetype_older_than("plain", $(days)),
+      if => isdir($(tmp_directories_list)),
       comment => "Mission Portals scheduled reports are written here. They need
                   to be purged after some time so that they do not fill the disk.";
 
-      "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "ENT-3558" }
-        handle => "cfe_internal_purge_scheduled_reports_files_docroot_api_static",
-        delete => tidy,
-        depth_search => recurse("inf"),
-        file_select => filetype_older_than("plain", $(days) ),
-        comment => "In some versions of Enterprise the async query api and
+    "$(cfe_internal_hub_vars.docroot)/api/static/." -> { "ENT-3558" }
+      handle => "cfe_internal_purge_scheduled_reports_files_docroot_api_static",
+      delete => tidy,
+      depth_search => recurse("inf"),
+      file_select => filetype_older_than("plain", $(days)),
+      comment => "In some versions of Enterprise the async query api and
                     scheduled reports assets are deposited in this directory.
                     They need to be cleaned up as to not fill the disk.";
-
 }
+
 bundle agent inventory_cfengine_enterprise_license_utilization
 # @brief Inventory CFEngine Enterprise License Utilization
 {
-
 @if minimum_version(3.15.0)
   classes:
-
     enterprise_edition::
-    "have_cf_hub" expression => fileexists( $(cf_hub) );
+      "have_cf_hub" expression => fileexists($(cf_hub));
 
   vars:
-      "cf_hub" string => "/var/cfengine/bin/cf-hub";
+    "cf_hub" string => "/var/cfengine/bin/cf-hub";
 
-   have_cf_hub::
-      "cf_hub_show_license_output" string => '$(sys.statedir)/cf-hub-show-license.txt';
+    have_cf_hub::
+      "cf_hub_show_license_output"
+        string => '$(sys.statedir)/cf-hub-show-license.txt';
 
       "parsed_license"
-        data => data_readstringarray( $(cf_hub_show_license_output),
-                                      "",
-                                      ":\s+",
-                                      10,
-                                      500),
-        if => fileexists( $(cf_hub_show_license_output) );
+        data => data_readstringarray(
+          $(cf_hub_show_license_output), "", ":\s+", 10, 500
+        ),
+        if => fileexists($(cf_hub_show_license_output));
 
       "license_file"
         string => "$(parsed_license[License file])",
-        meta => { "inventory", "attribute_name=CFEngine Enterprise license file" };
+        meta => {
+          "inventory", "attribute_name=CFEngine Enterprise license file"
+        };
 
       "license_owner" -> { "ENT-5337" }
         string => "$(with)",
-        meta => { "inventory", "attribute_name=CFEngine Enterprise license owner" },
-        with => nth( string_split( "$(parsed_license[Company name])", "\W", inf ), 0),
-        if => isvariable( "parsed_license[Company Name]" );
+        meta => {
+          "inventory", "attribute_name=CFEngine Enterprise license owner"
+        },
+        with => nth(
+          string_split("$(parsed_license[Company name])", "\W", inf), 0
+        ),
+        if => isvariable("parsed_license[Company Name]");
 
       "license_utilization"
         string => "$(with)",
-        meta => { "inventory", "attribute_name=CFEngine Enterprise license utilization" },
-        with => nth( string_split( "$(parsed_license[Utilization])", "\W", inf ), 0),
-        if => isvariable( "parsed_license[Utilization]" );
+        meta => {
+          "inventory", "attribute_name=CFEngine Enterprise license utilization"
+        },
+        with => nth(
+          string_split("$(parsed_license[Utilization])", "\W", inf), 0
+        ),
+        if => isvariable("parsed_license[Utilization]");
 
       "license_expiration"
         string => "$(parsed_license[Expiration date])",
-        meta => { "inventory", "attribute_name=CFEngine Enterprise license expiration date" },
-        if => isvariable( "parsed_license[Expiration date]" );
+        meta => {
+          "inventory",
+          "attribute_name=CFEngine Enterprise license expiration date",
+        },
+        if => isvariable("parsed_license[Expiration date]");
 
       "license_count"
         string => "$(with)",
-        with => nth( string_split( "$(parsed_license[Utilization])", "\W", inf ), 1),
-        meta => { "inventory", "attribute_name=CFEngine Enterprise licenses allocated" },
-        if => isvariable( "parsed_license[Utilization]" );
+        with => nth(
+          string_split("$(parsed_license[Utilization])", "\W", inf), 1
+        ),
+        meta => {
+          "inventory", "attribute_name=CFEngine Enterprise licenses allocated"
+        },
+        if => isvariable("parsed_license[Utilization]");
 
       "license_status"
         string => "$(parsed_license[License status])",
-        meta => { "inventory", "attribute_name=CFEngine Enterprise license status" },
-        if => isvariable( "parsed_license[License status]" );
+        meta => {
+          "inventory", "attribute_name=CFEngine Enterprise license status"
+        },
+        if => isvariable("parsed_license[License status]");
 
   commands:
-
-   have_cf_hub::
-
+    have_cf_hub::
       "$(sys.cf_hub) --show-license"
-        arglist => { ">",  $(cf_hub_show_license_output) },
+        arglist => { ">", $(cf_hub_show_license_output) },
         handle => "enterprise_hub_license_info_cache",
         contain => in_shell,
         inform => "false",
         classes => ENT_5279;
-
 @endif
 }
 
 body classes ENT_5279
 # @brief Work around ENT-5279, cf-hub --show-license returns 1 when no license is installed
 {
-        kept_returncodes => { "0" };
+  kept_returncodes => { "0" };
 
-      # TODO: Redact when 3.15.x is no longer supported
-      # considered kept on affected versions.
-
-    cfengine_3_15_0::
-        kept_returncodes => { "0", "1" };
+  # TODO: Redact when 3.15.x is no longer supported
+  # considered kept on affected versions.
+  cfengine_3_15_0::
+    kept_returncodes => { "0", "1" };
 }
 
 bundle agent log_cfengine_enterprise_license_utilization
@@ -563,24 +600,18 @@ bundle agent log_cfengine_enterprise_license_utilization
 # `enable_log_cfengine_enterprise_license_utilization` is defined.
 {
   reports:
-
     policy_server.enterprise_edition.DEBUG_log_cfengine_enterprise_license_utilization::
-
       "Hosts reported: $(count_reporting)";
 
   vars:
-
     policy_server.enterprise_edition::
-
       "log_dir" string => "$(sys.workdir)/log";
 
     policy_server.enterprise_edition.enable_log_cfengine_enterprise_license_utilization.(DEBUG_log_cfengine_enterprise_license_utilization|!cfe_internal_logged_utilization)::
-
       "log_frequency" int => "720";
 
       # Using address for reporting hosts because hostseen() will incur
       # undesirable reverse dns lookups if name is used
-
       # The cfengine class is always reported, and a reliable way to find hosts
       # that have reported.
       "hosts_reporting" slist => hostswithclass("cfengine", "address");
@@ -591,58 +622,50 @@ bundle agent log_cfengine_enterprise_license_utilization
       "count_seen" int => length(hosts_seen);
 
   files:
-
     policy_server.enterprise_edition::
       "$(log_dir)/."
         create => "true",
         comment => "The log dir must exist in order to write to a file.";
 
   reports:
-
     policy_server.enterprise_edition.!cfe_internal_logged_utilization::
-
       "$(sys.date), hosts_reporting=$(count_reporting), hosts_seen=$(count_seen)"
         report_to_file => "$(sys.workdir)/log/license_utilization.log",
         classes => cfe_internal_log_utilization($(log_frequency));
-
 }
 
 bundle agent cfe_internal_enterprise_ha_classes
 {
   classes:
-      # NOTE The `hub_active` class is a hard class defined by the ha_plugin in
-      # the enterprise agent.
-      "active_hub"
-        expression => "policy_server.(!enable_cfengine_enterprise_hub_ha|(enable_cfengine_enterprise_hub_ha.hub_active))",
-        scope => "namespace",
-        comment => "This means this is a hub that is not in an HA setup or the active one in a HA setup";
+    # NOTE The `hub_active` class is a hard class defined by the ha_plugin in
+    # the enterprise agent.
+    "active_hub"
+      expression => "policy_server.(!enable_cfengine_enterprise_hub_ha|(enable_cfengine_enterprise_hub_ha.hub_active))",
+      scope => "namespace",
+      comment => "This means this is a hub that is not in an HA setup or the active one in a HA setup";
 
-      # TODO Consider using `hub_passive` instead of `!hub_active`
-      "passive_ha_hub"
-        expression => "policy_server.(enable_cfengine_enterprise_hub_ha.!hub_active)",
-        scope => "namespace",
-        comment => "This means this is a passive hub in an HA setup";
+    # TODO Consider using `hub_passive` instead of `!hub_active`
+    "passive_ha_hub"
+      expression => "policy_server.(enable_cfengine_enterprise_hub_ha.!hub_active)",
+      scope => "namespace",
+      comment => "This means this is a passive hub in an HA setup";
 }
 
 bundle agent cfe_internal_enterprise_maintenance
 # @brief Actuate bundles tagged with `enterprise_maintenance` in lexically sorted order
 {
   vars:
-
     enterprise_edition::
-
       "enterprise_maintenance_bundles_unsorted"
         slist => bundlesmatching(".*", "enterprise_maintenance");
 
       "enterprise_maintenance_bundles"
-        slist => sort( enterprise_maintenance_bundles_unsorted,
-                       lex);
+        slist => sort(enterprise_maintenance_bundles_unsorted, lex);
 
       "enterprise_maintenance_bundle_count"
-        int => length( enterprise_maintenance_bundles );
+        int => length(enterprise_maintenance_bundles);
 
   methods:
-
     enterprise_edition::
       "HA classes"
         usebundle => "cfe_internal_enterprise_ha_classes",
@@ -650,17 +673,15 @@ bundle agent cfe_internal_enterprise_maintenance
 
       "Enterprise Maintenance"
         usebundle => $(enterprise_maintenance_bundles),
-        if => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+        if => isgreaterthan($(enterprise_maintenance_bundle_count), 0);
 
   reports:
-
     "DEBUG|DEBUG_$(this.bundle)"::
-
       "DEBUG $(this.bundle): $(enterprise_maintenance_bundle_count) CFEngine Enterprise Maintenance Bundles"
-        if => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+        if => isgreaterthan($(enterprise_maintenance_bundle_count), 0);
 
       "DEBUG $(this.bundle): $(enterprise_maintenance_bundles) CFEngine Enterprise Maintenance Bundles"
-        if => isgreaterthan( $(enterprise_maintenance_bundle_count), 0 );
+        if => isgreaterthan($(enterprise_maintenance_bundle_count), 0);
 }
 
 bundle agent cfe_internal_exported_report_location
@@ -671,17 +692,13 @@ bundle agent cfe_internal_exported_report_location
       "tags" slist => { "enterprise_maintenance" };
 
   files:
-
     am_policy_hub.enterprise_edition::
-
       "$(cfe_internal_hub_vars.public_docroot)/tmp/." -> { "ENT-7465" }
-        depth_search => recurse( inf ),
-        file_select => by_name( '.*\.(csv|pdf)' ),
+        depth_search => recurse(inf),
+        file_select => by_name('.*\.(csv|pdf)'),
         transformer => "/bin/mv $(this.promiser) $(cfe_internal_hub_vars.docroot)/static/",
-        if => isdir( "$(cfe_internal_hub_vars.docroot)/static/." ),
+        if => isdir("$(cfe_internal_hub_vars.docroot)/static/."),
         comment => "Generated reports (CSV and PDF) should be in the static directory if it exists.";
-
-
 }
 
 bundle agent cfe_internal_refresh_inventory_view
@@ -690,22 +707,18 @@ bundle agent cfe_internal_refresh_inventory_view
 {
 @if before_version(3.24.0)
   meta:
-
     (policy_server|am_policy_hub).enterprise_edition::
-
       "tags" slist => { "enterprise_maintenance" };
 
   commands:
-
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
-
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks inventory_refresh",
         contain => silent,
         inform => "false",
         comment => "This refreshes the variables shown in the Mission Portal Inventory.",
-        handle  => "mpf_fresh_inventory_view",
-        if => isdir( "$(cfe_internal_hub_vars.docroot)/api/modules/inventory" );
+        handle => "mpf_fresh_inventory_view",
+        if => isdir("$(cfe_internal_hub_vars.docroot)/api/modules/inventory");
 @endif
 }
 
@@ -713,15 +726,11 @@ bundle agent cfe_internal_refresh_hosts_view
 # @brief Refresh hosts materialized view every 5 minutes
 {
   meta:
-
     (policy_server|am_policy_hub).enterprise_edition::
-
       "tags" slist => { "enterprise_maintenance" };
 
   commands:
-
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
-
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3482" }
         args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks materialized_hosts_view_refresh",
         contain => silent,
@@ -729,9 +738,14 @@ bundle agent cfe_internal_refresh_hosts_view
         inform => "false",
 @endif
         comment => "This refreshes the hosts view. If the hosts view is not refreshed then it will contain stale data.",
-        handle  => "mpf_fresh_hosts_view",
-        if => isgreaterthan(countlinesmatching(".*materialized_hosts_view_refresh.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
-
+        handle => "mpf_fresh_hosts_view",
+        if => isgreaterthan(
+          countlinesmatching(
+            ".*materialized_hosts_view_refresh.*",
+            "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"
+          ),
+          0
+        );
 }
 
 bundle agent cfe_internal_clear_last_seen_hosts_logs
@@ -745,37 +759,34 @@ bundle agent cfe_internal_clear_last_seen_hosts_logs
 # continue to function as expected.
 {
   meta:
-
     (policy_server|am_policy_hub).enterprise_edition::
-
       "tags" slist => { "enterprise_maintenance" };
 
   commands:
-
     (policy_server|am_policy_hub).enterprise_edition.active_hub.(cfengine_3_12|cfengine_3_13|cfengine_3_14)::
-
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-3550" }
         args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks clearLastSeenHostsLogs",
         contain => silent,
         comment => "This clears the __lastseenhostslogs table. If the __lastseenhostslogs table is not cleared then it will contain unnecessary data.",
-        handle  => "mpf_clear_lastseenhostslogs",
-        if => isgreaterthan(countlinesmatching(".*clearLastSeenHostsLogs.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
-
+        handle => "mpf_clear_lastseenhostslogs",
+        if => isgreaterthan(
+          countlinesmatching(
+            ".*clearLastSeenHostsLogs.*",
+            "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"
+          ),
+          0
+        );
 }
 
 bundle agent cfe_internal_refresh_events_table
 # @brief Refresh materialized view every 5 minutes
 {
   meta:
-
     (policy_server|am_policy_hub).enterprise_edition::
-
       "tags" slist => { "enterprise_maintenance" };
 
   commands:
-
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
-
       "$(sys.workdir)/httpd/php/bin/php"
         args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks process_api_events",
         contain => silent,
@@ -783,8 +794,10 @@ bundle agent cfe_internal_refresh_events_table
         inform => "false",
 @endif
         comment => "This refreshes the events table. If the events table is not refreshed then it will contain stale data.",
-        handle  => "mpf_fresh_events_table",
-        if => fileexists( "$(cfe_internal_hub_vars.docroot)/api/resource-v1/Event.php" );
+        handle => "mpf_fresh_events_table",
+        if => fileexists(
+          "$(cfe_internal_hub_vars.docroot)/api/resource-v1/Event.php"
+        );
 }
 
 bundle agent cfe_internal_update_health_failures
@@ -794,16 +807,11 @@ bundle agent cfe_internal_update_health_failures
   # The update_health_failures CLI task is moved to cf-reactor.
   # Remove this bundle once CFEngine 3.28 is end-of-life.
   meta:
-
     (policy_server|am_policy_hub).enterprise_edition::
-
       "tags" slist => { "enterprise_maintenance" };
 @endif
-
   commands:
-
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
-
       "$(sys.workdir)/httpd/php/bin/php" -> { "ENT-6228" }
         args => "$(cfe_internal_hub_vars.public_docroot)/index.php cli_tasks update_health_failures",
         contain => silent,
@@ -811,105 +819,110 @@ bundle agent cfe_internal_update_health_failures
         inform => "false",
 @endif
         comment => "This updates health diagnostics failures table. If the table is not updated then it will contain stale data.",
-        handle  => "mpf_update_health_failures",
-        if => isgreaterthan(countlinesmatching(".*update_health_failures.*", "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"), 0);
-
+        handle => "mpf_update_health_failures",
+        if => isgreaterthan(
+          countlinesmatching(
+            ".*update_health_failures.*",
+            "$(cfe_internal_hub_vars.docroot)/application/controllers/Cli_tasks.php"
+          ),
+          0
+        );
 }
 
 body classes cfe_internal_log_utilization(time)
 # @brief Define persistent class for period of time to control log volume
 {
-        promise_repaired => { "cfe_internal_logged_utilization" };
-        promise_kept => { "cfe_internal_logged_utilization" };
-
-        scope => "namespace";
-        persist_time => "$(time)";
+  promise_repaired => { "cfe_internal_logged_utilization" };
+  promise_kept => { "cfe_internal_logged_utilization" };
+  scope => "namespace";
+  persist_time => "$(time)";
 }
 
 bundle agent cfe_internal_enterprise_policy_analyzer
 # @brief Ensure published policy is available for use with policy analyzer
 # @description This bundle runs as part of the enterprise_maintenance bundles. When `analyzer_flagfile` exists, this bundle ensures policy from `analyzer_source` is kept in sync with `analyzer_dir`.
 {
-    meta:
-
+  meta:
     (policy_server|am_policy_hub).enterprise_edition::
-
       "tags" -> { "ENT-4192" }
         slist => { "enterprise_maintenance" };
 
   vars:
-
     enterprise_edition.policy_server::
+      "analyzer_flagfile"
+        string => "$(cfe_internal_hub_vars.docroot)/analyzer/pa.enabled";
 
-      "analyzer_flagfile" string => "$(cfe_internal_hub_vars.docroot)/analyzer/pa.enabled";
       "analyzer_base" string => "/opt/cfengine/analyzer";
       "analyzer_dir" string => "$(analyzer_base)/policy/masterfiles";
       "analyzer_source" string => "$(sys.masterdir)";
 
       "exclude_files" -> { "ENT-7684" }
         slist => { "" },
-        unless => isvariable( "def.cfengine_enterprise_policy_analyzer_exclude_files" ),
-        comment => concat( "By default policy analyzer will get access to all files, ",
-                           "that are part of the policy." );
+        unless => isvariable(
+          "def.cfengine_enterprise_policy_analyzer_exclude_files"
+        ),
+        comment => concat(
+          "By default policy analyzer will get access to all files, ",
+          "that are part of the policy."
+        );
 
       "exclude_files" -> { "ENT-7684" }
         slist => { "@(def.cfengine_enterprise_policy_analyzer_exclude_files)" },
-        if => isvariable( "def.cfengine_enterprise_policy_analyzer_exclude_files" ),
-        comment => concat( "A list of regular expressions matching file leaf names ",
-                           "that should not be copied for access by policy analyzer." );
+        if => isvariable(
+          "def.cfengine_enterprise_policy_analyzer_exclude_files"
+        ),
+        comment => concat(
+          "A list of regular expressions matching file leaf names ",
+          "that should not be copied for access by policy analyzer."
+        );
 
   classes:
-
     enterprise_edition.policy_server::
-
-      "policy_analyzer_enabled" expression => fileexists( $(analyzer_flagfile) );
+      "policy_analyzer_enabled" expression => fileexists($(analyzer_flagfile));
 
   files:
-
     enterprise_edition.policy_server::
-
       "$(cfe_internal_hub_vars.docroot)/analyzer/." -> { "CFE-951" }
         create => "true",
         handle => "cfe_internal_setup_knowledge_docroot_analyzer_dir",
-        perms => mog( "0470", "root", $(def.cf_apache_group) ),
-        comment => concat( "This directory holds the policy analyzer flag file ",
-                           "that is written by Mission Portal when someone ",
-                           "clicks to enable the feature. Thus, it needs to be ",
-                           "readable, writeable and executable for the web ",
-                           "server.");
-
+        perms => mog("0470", "root", $(def.cf_apache_group)),
+        comment => concat(
+          "This directory holds the policy analyzer flag file ",
+          "that is written by Mission Portal when someone ",
+          "clicks to enable the feature. Thus, it needs to be ",
+          "readable, writeable and executable for the web ",
+          "server."
+        );
 
     policy_analyzer_enabled::
-
-       "$(analyzer_dir)/."
-         create => "true",
-         handle => "policy_analyzer_sync_analyzer_source",
-         copy_from => analyzer_sync( $(analyzer_source) ),
-         depth_search => recurse_with_base( inf ),
-         file_select => default:ex_list( @(exclude_files) );
+      "$(analyzer_dir)/."
+        create => "true",
+        handle => "policy_analyzer_sync_analyzer_source",
+        copy_from => analyzer_sync($(analyzer_source)),
+        depth_search => recurse_with_base(inf),
+        file_select => default:ex_list(@(exclude_files));
 
       "$(analyzer_base)/." -> { "CFE-951" }
         file_select => default:dirs,
-        depth_search => recurse_with_base( inf ),
-        perms => mog( "0450", "root", $(def.cf_apache_group) );
+        depth_search => recurse_with_base(inf),
+        perms => mog("0450", "root", $(def.cf_apache_group));
 
       "$(analyzer_dir)/." -> { "CFE-951" }
         file_select => default:not_dir,
-        depth_search => recurse_with_base( inf ),
-        perms => mog( "0450", "root", $(def.cf_apache_group) );
-
+        depth_search => recurse_with_base(inf),
+        perms => mog("0450", "root", $(def.cf_apache_group));
 
   reports:
-      DEBUG|DEBUG_cfe_internal_enterprise_policy_analyzer::
-        "DEBUG Mission Portal Policy Analyzer enabled. Keeping '$(analyzer_dir)' in sync with '$(analyzer_source)'"
-          if => "policy_analyzer_enabled";
-
+    DEBUG|DEBUG_cfe_internal_enterprise_policy_analyzer::
+      "DEBUG Mission Portal Policy Analyzer enabled. Keeping '$(analyzer_dir)' in sync with '$(analyzer_source)'"
+        if => "policy_analyzer_enabled";
 }
+
 body copy_from analyzer_sync(path)
 # @brief Keep promised files in sync with local `path`
 {
-        source   => "$(path)";
-        purge    => "true";
-        preserve => "false";
-        compare  => "digest";
+  source => "$(path)";
+  purge => "true";
+  preserve => "false";
+  compare => "digest";
 }

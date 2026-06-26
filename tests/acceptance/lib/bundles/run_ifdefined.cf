@@ -3,24 +3,22 @@
 # Test bundle run_ifdefined
 #
 #######################################################
-
 body common control
 {
-      inputs => { '../../default.sub.cf' };
-      bundlesequence  => { default("$(this.promise_filename)") };
+  inputs => { '../../default.sub.cf' };
+  bundlesequence => { default("$(this.promise_filename)") };
 }
 
 #######################################################
-
 bundle agent check
 {
   methods:
-      "any" usebundle => run_ifdefined($(this.namespace), no_such_check_tester);
-      "any" usebundle => run_ifdefined($(this.namespace), check_tester);
+    "any" usebundle => run_ifdefined($(this.namespace), no_such_check_tester);
+    "any" usebundle => run_ifdefined($(this.namespace), check_tester);
 }
 
 bundle agent check_tester
 {
   methods:
-      "any" usebundle => dcs_pass($(this.promise_filename));
+    "any" usebundle => dcs_pass($(this.promise_filename));
 }

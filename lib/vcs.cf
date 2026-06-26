@@ -1,18 +1,20 @@
 # VCS Bundles
-
 bundle common vcs_common
 # @brief Enumerate policy files used by this policy file for inclusion to inputs
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/common.cf",
-                          "$(this.promise_dirname)/paths.cf",
-                          "$(this.promise_dirname)/commands.cf" };
+    "inputs"
+      slist => {
+        "$(this.promise_dirname)/common.cf",
+        "$(this.promise_dirname)/paths.cf",
+        "$(this.promise_dirname)/commands.cf",
+      };
 }
 
 body file control
 # @brief Include policy files used by this policy file as part of inputs
 {
-      inputs => { @(vcs_common.inputs) };
+  inputs => { @(vcs_common.inputs) };
 }
 
 bundle agent git_init(repo_path)
@@ -43,7 +45,7 @@ bundle agent git_init(repo_path)
 
   methods:
     ok_norepo::
-      "git_init"  usebundle => git("$(repo_path)", "init", "");
+      "git_init" usebundle => git("$(repo_path)", "init", "");
 }
 
 bundle agent git_add(repo_path, file)
@@ -132,7 +134,8 @@ bundle agent git_checkout_new_branch(repo_path, new_branch)
 
   methods:
     ok_repo::
-      "git_checkout" usebundle => git("$(repo_path)", "checkout -b", "$(branch)");
+      "git_checkout"
+        usebundle => git("$(repo_path)", "checkout -b", "$(branch)");
 }
 
 bundle agent git_clean(repo_path)
@@ -149,7 +152,8 @@ bundle agent git_clean(repo_path)
 # ```
 {
   methods:
-      "" usebundle => git("$(repo_path)", "clean", ' --force -d'),
+    ""
+      usebundle => git("$(repo_path)", "clean", ' --force -d'),
       comment => "To have a clean clone we must remove any untracked files and
                   directories. These should have all been stashed, but in case
                   of error we go ahead and clean anyway.";
@@ -172,19 +176,27 @@ bundle agent git_stash(repo_path, stash_name)
   classes:
     _stdlib_path_exists_git::
       "_git_stash_supports_including_untracked_files" -> { "CFE-3383" }
-        expression => regcmp( ".*--include-untracked.*",
-                              execresult( "$(paths.git) stash --help", noshell ) );
+        expression => regcmp(
+          ".*--include-untracked.*",
+          execresult("$(paths.git) stash --help", noshell)
+        );
 
   vars:
-      "_stash_options"
-        string => concat( "save ",
-                          "--quiet ",
-                          ifelse( "_git_stash_supports_including_untracked_files",
-                                  "--include-untracked", ""),
-                          "$(stash_name)");
+    "_stash_options"
+      string => concat(
+        "save ",
+        "--quiet ",
+        ifelse(
+          "_git_stash_supports_including_untracked_files",
+          "--include-untracked",
+          ""
+        ),
+        "$(stash_name)"
+      );
 
   methods:
-      "" usebundle => git($(repo_path), "stash", $(_stash_options)),
+    ""
+      usebundle => git($(repo_path), "stash", $(_stash_options)),
       comment => "So that we don't lose any trail of what happened and so that
                     we don't accidentally delete something important we stash any
                     changes.
@@ -210,10 +222,11 @@ bundle agent git_stash_and_clean(repo_path)
 # ```
 {
   vars:
-      "stash" string => "CFEngine AUTOSTASH: $(sys.date)";
+    "stash" string => "CFEngine AUTOSTASH: $(sys.date)";
 
   methods:
-      "" usebundle => git_stash($(repo_path), $(stash)),
+    ""
+      usebundle => git_stash($(repo_path), $(stash)),
       classes => scoped_classes_generic("bundle", "git_stash");
 
     git_stash_ok::
@@ -249,7 +262,8 @@ bundle agent git_commit(repo_path, message)
 
   methods:
     ok_repo::
-      "git_commit" usebundle => git("$(repo_path)", "commit", '-m "$(message)"');
+      "git_commit"
+        usebundle => git("$(repo_path)", "commit", '-m "$(message)"');
 }
 
 bundle agent git(repo_path, subcmd, args)
@@ -278,34 +292,33 @@ bundle agent git(repo_path, subcmd, args)
 # ```
 {
   vars:
-      "oneliner" string => "$(paths.path[git])";
+    "oneliner" string => "$(paths.path[git])";
 
-      "repo_uid"
-      string  => filestat($(repo_path), "uid"),
+    "repo_uid"
+      string => filestat($(repo_path), "uid"),
       comment => "So that we don't mess up permissions, we will just execute
                     all commands as the current owner of .git";
 
-      "repo_gid"
-      string  => filestat($(repo_path), "gid"),
+    "repo_gid"
+      string => filestat($(repo_path), "gid"),
       comment => "So that we don't mess up permissions, we will just execute
                     all commands as the current group of .git";
 
-      # Data container with user info
-      # {"description":"Luke Skywalker","gid":1000,"home_dir":"/home/luke","shell":"/bin/bash","uid":1000,"username":"luke"}
-      "repo_userinfo"
-        data => getuserinfo( "$(repo_uid)" );
+    # Data container with user info
+    # {"description":"Luke Skywalker","gid":1000,"home_dir":"/home/luke","shell":"/bin/bash","uid":1000,"username":"luke"}
+    "repo_userinfo" data => getuserinfo("$(repo_uid)");
 
   classes:
-      "am_root" expression => strcmp($(this.promiser_uid), "0");
+    "am_root" expression => strcmp($(this.promiser_uid), "0");
 
-      # $(repo_uid) must be defined before we try to test this or we will end up
-      # having at least one pass during evaluation the agent will not know it
-      # needs to drop privileges, leading to some files like .git/index being
-      # created with elevated privileges, and subsequently causing the agent to
-      # not be able to commit as a normal user.
-      "need_to_drop"
-        not => strcmp($(this.promiser_uid), $(repo_uid)),
-        if => isvariable( repo_uid );
+    # $(repo_uid) must be defined before we try to test this or we will end up
+    # having at least one pass during evaluation the agent will not know it
+    # needs to drop privileges, leading to some files like .git/index being
+    # created with elevated privileges, and subsequently causing the agent to
+    # not be able to commit as a normal user.
+    "need_to_drop"
+      not => strcmp($(this.promiser_uid), $(repo_uid)),
+      if => isvariable(repo_uid);
 
   commands:
     am_root.need_to_drop::
@@ -317,13 +330,13 @@ bundle agent git(repo_path, subcmd, args)
       "$(paths.env) HOME=$(repo_userinfo[home_dir]) $(oneliner)"
         args => "$(subcmd) $(args)",
         classes => kept_successful_command,
-        contain => setuidgid_dir( $(repo_uid), $(repo_gid), $(repo_path) );
+        contain => setuidgid_dir($(repo_uid), $(repo_gid), $(repo_path));
 
     !am_root|!need_to_drop::
       "$(oneliner)"
-      args => "$(subcmd) $(args)",
-      classes => kept_successful_command,
-      contain => in_dir( $(repo_path) );
+        args => "$(subcmd) $(args)",
+        classes => kept_successful_command,
+        contain => in_dir($(repo_path));
 
   reports:
     "DEBUG|DEBUG_$(this.bundle).am_root.need_to_drop"::

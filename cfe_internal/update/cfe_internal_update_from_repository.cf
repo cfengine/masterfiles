@@ -2,13 +2,13 @@ bundle common cfe_internal_update_from_repository_file_control
 # @brief Define inputs needed for updating *masterfiles*, the default policy distribution point with content from an upstream VCS
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/lib.cf" };
+    "inputs" slist => { "$(this.promise_dirname)/lib.cf" };
 }
 
 body file control
 # @brief Include policy needed for updating *masterfiles*, the default policy distribution point with content from an upstream VCS
 {
-      inputs => { @(cfe_internal_update_from_repository_file_control.inputs) };
+  inputs => { @(cfe_internal_update_from_repository_file_control.inputs) };
 }
 
 bundle agent cfe_internal_update_from_repository
@@ -21,18 +21,18 @@ bundle agent cfe_internal_update_from_repository
         handle => "cfe_internal_update_from_repository_methods_masterfiles_fetch",
         action => u_immediate,
         comment => "Grab the latest updates from upstream VCS repo before deploying masterfiles";
-
 }
 
 bundle agent cfe_internal_masterfiles_stage
 # @brief Run masterfiles-stage.sh to update the default distribution of masterfiles
 {
-
   commands:
-      "$(update_def.dc_scripts)/masterfiles-stage.sh"
-        classes => u_kept_successful_command_results("bundle", "masterfiles_deploy"),
-        handle => "masterfiles_update_stage",
-        action => u_immediate;
+    "$(update_def.dc_scripts)/masterfiles-stage.sh"
+      classes => u_kept_successful_command_results(
+        "bundle", "masterfiles_deploy"
+      ),
+      handle => "masterfiles_update_stage",
+      action => u_immediate;
 
   reports:
     masterfiles_deploy_not_kept::

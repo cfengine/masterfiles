@@ -8,7 +8,6 @@ bundle agent cfe_internal_systemd_unit_files
 # to not be running.
 {
   vars:
-
     systemd::
       "systemctl" string => "/bin/systemctl";
 
@@ -28,21 +27,19 @@ bundle agent cfe_internal_systemd_unit_files
         comment => "These are the services which should have systemd units on all systems.";
 
   files:
-
     systemd::
-
       "$(unit_dir)/$(service_units).service"
         create => "true",
         edit_template => "$(unit_template_dir)/$(service_units).service.mustache",
         template_method => "mustache",
-        classes => u_results( "bundle", "cfe_systemd_service_unit_$(service_units)" ),
+        classes => u_results(
+          "bundle", "cfe_systemd_service_unit_$(service_units)"
+        ),
         perms => u_mog("644", "root", "root"),
         comment => "We need to make each service units content is correct.";
 
   commands:
-
     systemd::
-
       "$(systemctl)"
         args => "daemon-reload --no-ask-password",
         handle => "cfe_internal_systemd_unit_files_reload_when_changed",
@@ -53,12 +50,15 @@ bundle agent cfe_internal_systemd_unit_files
       "$(systemctl)"
         args => "restart $(service_units).service --no-ask-password",
         handle => "cfe_internal_systemd_unit_restart_when_changed",
-        if => and(classify("cfe_systemd_service_unit_$(service_units)_repaired"),
-                  returnszero("$(systemctl) --quiet is-active $(service_units)", noshell)),
+        if => and(
+          classify("cfe_systemd_service_unit_$(service_units)_repaired"),
+          returnszero(
+            "$(systemctl) --quiet is-active $(service_units)", noshell
+          )
+        ),
         comment => "We need to restart any units which have been changed in
                     order for the new configuration to be in effect. But we only
                     want to restart them if they are currently running.";
-
 }
 
 bundle agent cfe_internal_systemd_service_unit_state
@@ -69,17 +69,13 @@ bundle agent cfe_internal_systemd_service_unit_state
 # should be running or not.
 {
   vars:
+    "enabled"
+      slist => { @(cfe_internal_update_processes.agents_to_be_enabled) };
 
-      "enabled" slist => { @(cfe_internal_update_processes.agents_to_be_enabled) };
-
-      "disabled"
-        slist => { @(cfe_internal_update_processes.agents_to_be_disabled) };
-
+    "disabled"
+      slist => { @(cfe_internal_update_processes.agents_to_be_disabled) };
 
   methods:
-      "Disabled Components"
-        usebundle => u_systemd_services( $(disabled), "stop");
-
-      "Enabled Components"
-        usebundle => u_systemd_services( $(enabled), "start" );
+    "Disabled Components" usebundle => u_systemd_services($(disabled), "stop");
+    "Enabled Components" usebundle => u_systemd_services($(enabled), "start");
 }
