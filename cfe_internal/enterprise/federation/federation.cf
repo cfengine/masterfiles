@@ -1208,6 +1208,9 @@ bundle agent setup_status
       );
 
   classes:
+    "ssh_server_fingerprint_collected"
+      expression => not(strcmp("$(ssh_server_fingerprint)", ""));
+
     "superhub_setup_status_complete"
       expression => "any",
       depends_on => {
@@ -1219,7 +1222,12 @@ bundle agent setup_status
       };
 
   files:
-    superhub_setup_status_complete::
+    # An empty fingerprint (ssh-keyscan returned nothing, e.g. sshd not yet
+    # reachable on localhost) must not be advertised: a superhub would render
+    # an empty known_hosts entry for this host and its rsync pull would later
+    # fail with "Host key verification failed". Skip the status update until
+    # the fingerprint is collected; the next agent run will retry.
+    superhub_setup_status_complete.ssh_server_fingerprint_collected::
       "$(cfengine_enterprise_federation:config.path_setup_status)"
         create => "true",
         perms => default:mog("600", "cfapache", "root"),
@@ -1233,6 +1241,10 @@ bundle agent setup_status
           "transport_ssh_server_fingerprint": "$(ssh_server_fingerprint)",
         }',
         if => isvariable(ssh_pub_key);
+
+  reports:
+    superhub_setup_status_complete.!ssh_server_fingerprint_collected::
+      "warning: 'ssh-keyscan localhost' returned no SSH host key; federation setup status not written yet. Will retry next run.";
 }
 
 bundle agent distributed_cleanup_setup
