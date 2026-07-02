@@ -1,3 +1,31 @@
+## 3.28.0
+- Added 2FA support and configurable admin username for distributed cleanup setup
+  (ENT-12129)
+- Added dnf package module (ENT-11784)
+- Added inputs/leech2/ drop-in directory for extending leech2 reporting
+  (ENT-14205)
+- Added workaround for set_variable_values_ini with missing sections
+  (CFE-3866)
+- Changed distributed_cleanup.py to issue a real DELETE FROM __hosts instead of soft deletion via INSERT with a deleted timestamp
+  (ENT-12129)
+- Check 'systemctl cat' instead of 'is-active' for cf-apache
+  (ENT-11189)
+- Fixed bad regex in packages promise method for pip (ENT-13667)
+- Fixed maximum recursion errors in modules_presence for CFEngine versions unaffected by
+  (CFE-2852, CFE-4623)
+- Masterfiles builds are now reproducible (ENT-14061)
+- Moved update_health_failures CLI task from policy to cf-reactor
+  (ENT-7923)
+- Raised cf-apache.service start timeout to avoid PID-file race
+  (ENT-11189)
+- Refactored cfe_autorun_inventory_packages to dynamically identify use of package_module inventory
+  (ENT-13525)
+- Reset cf-apache failed state before restarting it (ENT-11189)
+- psql commands are now retried on transient errors in federated reporting
+  (ENT-14140)
+- standard_services bundle now invokes systemctl without --global
+  (CFE-4639)
+
 ## 3.27.0
 - Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
 - Added $(paths.dmidecode) for Red Hat (ENT-12988)
