@@ -331,7 +331,7 @@
   (ENT-8283)
 - Adjusted MPF to handle `rxdirs` default from true to false (CFE-951)
 - `755` perms on hub `htdocs` dir are now enforced (ENT-8212)
-- Proper owner and perms on docroot are now enforced(ENT-8280)
+- Proper owner and perms on docroot are now enforced (ENT-8280)
 - Prevented `def.dir_masterfiles/.no-distrib` from being copied
   (ENT-8079)
 - Cleaned up policy related to versions prior to 3.12 (CFE-3920)
@@ -413,7 +413,7 @@
 - Fixup `zypper` package module script to work properly with `interpreter` attribute
   (ENT-7442)
 - Gave `cfapache` group full access to docroot (ENT-8065)
-- Insured exported reports from Mission Portal are in the correct location
+- Ensured exported reports from Mission Portal are in the correct location
   (ENT-7465)
 - Made apache restart more robust (ENT-8045)
 - Moved `httpd.pid` to root of httpd workdir (ENT-7966)
@@ -866,7 +866,7 @@
 - Removed unnecessary support for including 3.6 controls
 - Fixed `systemctl` path detection
 - Policy Release Id is now inventoried by default (CFE-2097)
-- Fixed to frequent logging of enterprise license utilization (ENT-3390)
+- Fixed too frequent logging of enterprise license utilization (ENT-3390)
 - Maintain access to exported CSV reports in older versions (ENT-3572)
 - `cf-execd` service override template now only kills `cf-execd` on stop
   (ENT-3395)
@@ -912,17 +912,17 @@
   specified depth older than a specified number of days
 - Do not symlink agents to `/usr/local/bin` on CoreOS (ENT-3047)
 - Added: Ability to set `default_repository` via augments
-- Enabled settig `def.max_client_history_size` via augments (CFE-2560)
+- Enabled setting `def.max_client_history_size` via augments (CFE-2560)
 - Changed self upgrade now uses standalone policy (ENT-3155)
 - Fixed `apt_get` package module incorrectly using interactive mode
-- Added ability to append to bundlesequnece with `def.json` (CFE-2460)
+- Added ability to append to bundlesequence with `def.json` (CFE-2460)
 - Enabled paths to POSIX tools by default instead of native tools
 - Removed `bundle agent cfe_internal_bins` (CFE-2636)
 - Include `previous_state` and `untracked` reports when client clear a buildup of unreported data
   (ENT-3161)
 - Fixed command to restart apache on config change (ENT-3134)
 - `cf-serverd` listens on ipv4 and ipv6 by default (CFE-528)
-- FixesMake `apt_get` module compatible with Ubuntu 16.04 (CFE-2445)
+- Fixed: Make `apt_get` module compatible with Ubuntu 16.04 (CFE-2445)
 - Fixed rare bug that would sometimes prevent `redis-server` from launching
 - Added `oslevel` to well known paths (ENT-3121)
 - Added policy to track CFEngine Enterprise license utilization
@@ -947,13 +947,13 @@
   (CFE-2468)
 - Changed: Enable agent component management policy on systemd hosts
   (CFE-2429)
-- Added: Enterprise appliaction log dir to rotation
+- Added: Enterprise application log dir to rotation
 - Changed: re-enable hub process maintenance
 - Added: `edit_line` `contains_literal_string` to stdlib
 - Fixed: Services starting or stopping unnecessarily (CFE-2421)
 - Allowed specifying agent `maxconnections` via `def.json` (CFE-2461)
 - Changed: Disabled http `TRACE` method
-- Changed: Reduced Enteprise webserver info
+- Changed: Reduced Enterprise webserver info
 - Changed: `cronjob` bundle now tolerates different spacing
 - Fixed: CFEngine choking on standard services (CFE-2806)
 - Changed `select_region` `INI_section` to match end of section or end of file
@@ -961,7 +961,7 @@
 - Fixed ability to manage INI sections with metachars for
   `manage_variable_values_ini` and `set_variable_values_ini` (CFE-2519)
 - Fixed `apt_get` package module incorrectly using interactive mode.
-- Added ability to append to bundlesequnece with `def.json` (CFE-2460)
+- Added ability to append to bundlesequence with `def.json` (CFE-2460)
 - Behaviour changed: when used with CFEngine 3.10.0 or greater,
   bundles `set_config_values()` and `set_line_based()` are appending a
   trailing space when inserting a configuration option with empty value.
@@ -988,7 +988,7 @@
   be modified
 - `services/autorun.cf` moved to `lib/VER/` as it is not generally intended to be
   modified
-- To improve predictibility autorun bundles are activated in lexicographical
+- To improve predictability autorun bundles are activated in lexicographical
   order
 - Relocated `services/file_change.cf` to `cfe_internal/enterprise`. This policy is
   most useful for a good OOTB experience with CFEngine Enterprise Mission
