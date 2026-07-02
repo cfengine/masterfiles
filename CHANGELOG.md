@@ -1,4 +1,34 @@
+## 3.28.0
+
+- Added 2FA support and configurable admin username for distributed cleanup setup
+  (ENT-12129)
+- Added dnf package module (ENT-11784)
+- Added inputs/leech2/ drop-in directory for extending leech2 reporting
+  (ENT-14205)
+- Added workaround for set_variable_values_ini with missing sections
+  (CFE-3866)
+- Changed distributed_cleanup.py to issue a real DELETE FROM __hosts instead of soft deletion via INSERT with a deleted timestamp
+  (ENT-12129)
+- Check 'systemctl cat' instead of 'is-active' for cf-apache
+  (ENT-11189)
+- Fixed bad regex in packages promise method for pip (ENT-13667)
+- Fixed maximum recursion errors in modules_presence for CFEngine versions unaffected by
+  (CFE-2852, CFE-4623)
+- Masterfiles builds are now reproducible (ENT-14061)
+- Moved update_health_failures CLI task from policy to cf-reactor
+  (ENT-7923)
+- Raised cf-apache.service start timeout to avoid PID-file race
+  (ENT-11189)
+- Refactored cfe_autorun_inventory_packages to dynamically identify use of package_module inventory
+  (ENT-13525)
+- Reset cf-apache failed state before restarting it (ENT-11189)
+- psql commands are now retried on transient errors in federated reporting
+  (ENT-14140)
+- standard_services bundle now invokes systemctl without --global
+  (CFE-4639)
+
 ## 3.27.0
+
 - Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
 - Added $(paths.dmidecode) for Red Hat (ENT-12988)
 - Added fsattrs bodies to manage the immutable bit (CFE-4582)
@@ -40,6 +70,7 @@
   (ENT-13173)
 
 ## 3.26.0
+
 - Inhibited management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
   (ENT-12658)
 - Switched to using current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
@@ -51,6 +82,7 @@
   (ENT-11440)
 
 ## 3.25.0
+
 - Data dumping on Federated Reporting feeders no longer uses an AWK filter to merge INSERT
   lines in the dumps
 - Made system_log_level configurable via Augments (CFE-4452)
@@ -68,6 +100,7 @@
 - Fixed issues with loading images from raw.github.com inside CFEngine Build application in Mission Portal (ENT-12531)
 
 ## 3.24.0
+
 - AIX watchdog now handles stale PIDs (CFE-4335)
 - Aligned ownership and permission expectations between Mission Portal and MPF
   (ENT-11941)
@@ -120,6 +153,7 @@
   (ENT-10962)
 
 ## 3.23.0
+
 - Added ability to disable plain http for CFEngine Enterprise Mission Portal
   (ENT-10411)
 - Added ability to enable backup archives during policy update
@@ -167,6 +201,7 @@
   (ENT-10951)
 
 ## 3.22.0
+
 - Added inventory for policy version (ENT-9806)
 - Added condition to runalerts service to require stamp directory
   (ENT-9711)
@@ -222,15 +257,15 @@
   - body package_method pacman
   - body package_method zypper
   - body package_method generic
-  Additionally note that the package related bundles use the package_method bodies
-  mentioned above and are similarly influenced.
+    Additionally note that the package related bundles use the package_method bodies
+    mentioned above and are similarly influenced.
   - bundle agent package_present(package)
   - bundle agent package_latest(package)
   - bundle agent package_specific_present(packageorfile, package_version, package_arch)
   - bundle agent package_specific_absent(packageorfile, package_version, package_arch)
   - bundle agent package_specific_latest(packageorfile, package_version, package_arch),
   - bundle agent package_specific(package_name, desired, package_version, package_arch)
-  (CFE-4178)
+    (CFE-4178)
 - Prevented management of runagent socket users when no users are listed
   (ENT-9535)
 - Removed specific old CFEngine version package module handling for windows
@@ -239,6 +274,7 @@
   (ENT-8338)
 
 ## 3.21.0
+
 - Added inventory for Raspberry Pi and DeviceTree devices (ENT-8628)
 - Added policy to enforce proper permissions on Mission Portal ldap directory (ENT-9693)
 - Added check to make sure cf-execd is running after attempting self upgrade on Windows
@@ -280,6 +316,7 @@
 - Ensured manual edits to httpd.conf are reverted (ENT-9686)
 
 ## 3.20.0
+
 - Renamed bundle agent main to bundle agent mpf_main (CFE-3947)
 - Added prelink to paths.cf
 - Added Enterprise Hub postgresql.conf to files monitored for diffs by default
@@ -332,6 +369,7 @@
 - Now clean_when_off FR bundle is only run when needed (ENT-8294)
 
 ## 3.19.0
+
 - Added interpreter attribute to standalone self upgrade package_module bodies
   (CFE-3703, ENT-5752)
 - Added almalinux as a know derivative of rhel (ENT-7644)
@@ -352,7 +390,7 @@
   This change adds the classes services_autorun_inputs and
   services_autorun_bundles for independently enabling addition of .cf files in
   services/autorun and automatic execution of bundles tagged with autorun
-  respectively.  (CFE-3715)
+  respectively. (CFE-3715)
 - Added support for downloading community packages on hub in preparation for binary upgrades
 - Added variable for excluding files from Policy Analyzer (ENT-7684)
 - Adjusted badges for 3.18.0 release (ENT-6713)
@@ -363,11 +401,11 @@
   effect of this is that agent runs that happen close together would skip running
   bundles run within the last minute. Now autorun bundles no longer wait for a
   lock to expire, they will be actuated each agent execution. Note, promises
-  within those bundles have their own locks which still apply.  (CFE-3795)
+  within those bundles have their own locks which still apply. (CFE-3795)
 - Dropped un-necessary local variable
   The use of this local variable triggers a bug that prevents datastate() from
   printing. Since the variable is un-necessary, it's been removed and the
-  parameter is used directly.  (CFE-3776)
+  parameter is used directly. (CFE-3776)
 - Enforced permissions for Postgres log (ENT-7961)
 - Fixed package module augments settings usage for pre 3.15.3 binaries
   (ENT-7356, ENT-7358)
@@ -385,7 +423,7 @@
   (ENT-7714)
 - Promised permissions for Mission Portal application and Apache log files
   This change ensures that both Mission Portal and Apache log files have
-  restrictive permissions. Previously this was un-managed.  (ENT-7730)
+  restrictive permissions. Previously this was un-managed. (ENT-7730)
 - Reduced scope of report informing of missing systemd service
   (CFE-290, ENT-7360)
 - Removed build dir from install/dist targets (ENT-7359)
@@ -399,7 +437,7 @@
   permissions (600). The previous explicit permissions (755) are un-necessary as
   modules are not executed from within the inputs directory and have resulted in
   permission flip-flopping in some environments. Permissions on modules in the
-  modules dir (sys.workdir)/modules are still enforced.  (ENT-7733)
+  modules dir (sys.workdir)/modules are still enforced. (ENT-7733)
 - Switched from using package_method generic to default package_module
   for windows software inventory (ENT-2589)
 - Improved the reliability when detecting a Red Hat system.
@@ -418,6 +456,7 @@
   (ENT-7967)
 
 ## 3.18.0
+
 - Added .ps1 to list of file patterns considered during policy update
   (ENT-4094)
 - Added ability to specify additional directories to add autorun policy from
@@ -486,6 +525,7 @@
 - Guard again enforcing root ownership for CFEngine files on Windows (ENT-4628)
 
 ## 3.17.0
+
 - Added .csv to the list of file extensions considered by default during
   policy update (CFE-3425)
 - Added ability to extend known paths without modifying vendored policy
@@ -522,6 +562,7 @@
 - Replaced @ignore with useful doc strings (CFE-3378)
 
 ## 3.16.0
+
 - /var/cfengine/bin/python symlink creation on SLES was fixed
 - Added `data` shortcut to cf-serverd, defaults to sys.workdir/data
 - Added inventory for CFEngine Enterprise License information
@@ -548,13 +589,13 @@
   log tables (ENT-5170)
 - Fixed dmi inventory to prefer sysfs to dmidecode for most variables
   for improved performance and to handle CoreOS hosts that don't
-  have dmidecode.  (CFE-3249)
+  have dmidecode. (CFE-3249)
 - Fixed permission flipping when policy analyzer is enabled (ENT-5235)
 - Fixed runalerts processes promise on non-systemd systems (ENT-5432)
 - Fixed selection of standard_services when used from non-default
   namespace (ENT-5406)
 - Fixed system UUID inventory for certain VMWare VMs where dmidecode
-  gives UUID bytes in wrong order.  (CFE-3249)
+  gives UUID bytes in wrong order. (CFE-3249)
 - Fixed typo preventing recommendation bundles from running (CFE-3305)
 - HA setups no longer have flipping permissions on
   /opt/cfengine/notification_scripts
@@ -585,6 +626,7 @@
 - apt_get package module now checks package state (CFE-3233)
 
 ## 3.15.0
+
 - Added package_module for snap (CFE-2811)
 - Fixed pkgsrc in case where multiple Prefix paths are returned for pkg_install (CFE-3152)
 - Fixed pkgsrc module on Solaris/NetBSD (CFE-3151)
@@ -622,9 +664,10 @@
 - Fixed re-spawning of cf-execd or cf-monitord after remediating duplicate concurrent processes
   (CFE-3150)
 - Replaced /var/cfengine with proper $(sys.*) vars (ENT-4800)
-    - Fixed selection of standard_services when used from non-default namespace (ENT-5406)
+  - Fixed selection of standard_services when used from non-default namespace (ENT-5406)
 
 ## 3.15.0b1
+
 - Added continual checking for policy_server state (CFE-3073)
 - Added monitoring for PostgreSQL lock acquisition times (ENT-4753)
 - Added support for `awk` filters in the FR dump-import process (ENT-4839)
@@ -654,6 +697,7 @@
   cache fails (CFE-3094)
 
 ## 3.14.0
+
 - Fixed isvariable syntax error in update_def.cf (CFE-2953)
 - Added path support for setfacl, timedatectl and journalctl (CFE-3013)
 - Added trailing slash to access promises expecting directories
@@ -701,6 +745,7 @@
 - redhat_pure is no longer defined on Fedora hosts (CFE-3022)
 
 ## 3.13.0
+
 - Added Debian 9 to the self upgrade package map (ENT-4255)
 - Added `system-uuid` to default dmidecode inventory (CFE-2925)
 - Added inventory of AWS EC2 linux instances (CFE-2924)
@@ -761,6 +806,7 @@
   (CFE-2855)
 
 ## 3.12.0b1
+
 - Avoided executing self upgrade policy unnecessarily (ENT-3592)
 - Added amazon_linux class to yum package module
 - Introduce ability to set policy update bundle via augments (CFE-2687)
@@ -834,6 +880,7 @@
   (CFE-2714)
 
 ## 3.11.0
+
 - Renamed enable_client_initiated_reporting to client_initiated_reporting_enabled
 - Directories for ubuntu 16 and centos 7 should exist in master_software_updates
   (ENT-3136)
@@ -885,6 +932,7 @@
 - Ensure MP SSL Cert is readable (ENT-3050)
 
 ## 3.10.0
+
 - Added: Classes body tailored for use with diff
 - Changed: Session Cookies use HTTPOnly and secure attributes (ENT-2781)
 - Changed: Verify transferred files during policy update
@@ -922,6 +970,7 @@
   (CFE-2466)
 
 ## 3.7.0
+
 - Support for user specified overriding of framework defaults without modifying
   policy supplied by the framework itself (see example_def.json)
 - Support for def.json class augmentation in update policy
