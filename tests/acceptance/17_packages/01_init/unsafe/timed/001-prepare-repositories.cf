@@ -134,8 +134,9 @@ bundle agent signing_keys
        rm /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo2/dists/package2/Release.gpg && \
        $(gpg) --detach-sign --armor --output /test-repos/deb_repo1/dists/package1/Release.gpg /test-repos/deb_repo1/dists/package1/Release && \
        $(gpg) --detach-sign --armor --output /test-repos/deb_repo2/dists/package2/Release.gpg /test-repos/deb_repo2/dists/package2/Release && \
-       rm -rf .gnupg-temp && \
-       apt-key add $(p.resources)/gpg/pubring.gpg"
+       $(gpg) --export --output /etc/apt/trusted.gpg.d/cfengine-test-repo.gpg && \
+       chmod 0644 /etc/apt/trusted.gpg.d/cfengine-test-repo.gpg && \
+       rm -rf .gnupg-temp"
         contain => useshell,
         classes => if_successful("signing_keys_ok");
 }
@@ -143,15 +144,15 @@ bundle agent signing_keys
 bundle agent apt_config
 {
   classes:
-    !(ubuntu_10|debian_6|ubuntu_24)::
+    !(ubuntu_10|debian_6|ubuntu_24|ubuntu_26)::
       "apt_config_ok"
         expression => "any",
         scope => "namespace";
 
   files:
-    ubuntu_24::
+    ubuntu_24|ubuntu_26::
       "/etc/apt/apt.conf.d/accept-older-pubkeys"
-        comment => "key in 17_packages/resources/gpg use rsa1024 which is not supported on Ubuntu-24.",
+        comment => "key in 17_packages/resources/gpg use rsa1024 which is not supported on Ubuntu-24 and later.",
         create => "true",
         content => 'APT::Key::Assert-Pubkey-Algo ">=rsa1024";',
         classes => if_successful("apt_config_ok");
