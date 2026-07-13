@@ -1,0 +1,85 @@
+# Tests that default:def.control_common_evaluation_order set via augments
+# changes the promise evaluation order for all components (ENT-13495).
+#
+# Here only the common control augment is set (not the agent one), so cf-agent
+# must inherit "top_down" from body common control. The eo_discriminator bundle
+# (appended to the bundlesequence via control_common_bundlesequence_end) prints
+# EARLY before LATE in classic (Normal) order, and LATE before EARLY in top_down
+# order, so the order of the reports reveals the evaluation order in effect.
+body common control
+{
+  inputs => { "../../default.sub.cf" };
+  bundlesequence => { default("$(this.promise_filename)") };
+  version => "1.0";
+}
+
+#######################################################
+bundle agent test
+{
+  vars:
+    "files_to_copy"
+      slist => {
+        "cfe_internal",
+        "controls",
+        "inventory",
+        "lib",
+        "promises.cf",
+        "services",
+      };
+
+  files:
+    "$(sys.inputdir)/." create => "true";
+
+    "$(sys.inputdir)/$(files_to_copy)"
+      copy_from => dcs_sync(
+        "$(this.promise_dirname)/../../../../$(files_to_copy)"
+      ),
+      perms => m(600),
+      depth_search => recurse("inf");
+
+  methods:
+    ""
+      usebundle => file_make(
+        "$(sys.inputdir)/secondary.cf",
+        '
+bundle agent eo_discriminator
+{
+  reports:
+    eo_marker::
+      "ENT13495_EO_EARLY";
+
+  classes:
+    "eo_marker" expression => "any";
+
+  reports:
+    any::
+      "ENT13495_EO_LATE";
+}
+'
+      );
+
+    ""
+      usebundle => file_copy(
+        "$(this.promise_filename).json", "$(sys.inputdir)/def.json"
+      );
+}
+
+#######################################################
+bundle agent check
+{
+  vars:
+    # Only keep the discriminator's reports so the order check is not defeated
+    # by the (large) rest of the policy output.
+    "command"
+      string => "$(sys.cf_agent) -Kf $(sys.inputdir)/promises.cf 2>/dev/null | grep ENT13495_EO";
+
+  methods:
+    # In top_down order LATE is reported before EARLY.
+    ""
+      usebundle => dcs_passif_output(
+        "(?s).*ENT13495_EO_LATE.*ENT13495_EO_EARLY.*",
+        "",
+        $(command),
+        $(this.promise_filename)
+      );
+}

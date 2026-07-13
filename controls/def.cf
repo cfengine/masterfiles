@@ -275,17 +275,6 @@ bundle common def
         if => and("enterprise_edition", "am_policy_hub");
 
       # Agent Controls
-      "control_agent_evaluation_order" -> { "ENT-13495" }
-        string => ifelse(
-          isvariable($(this.promiser)),
-          "$(default:def.control_agent_evaluation_order)",
-          "classic"
-        ),
-        comment => concat(
-          'We default to the classic "Normal Order"',
-          ' for cf-agent if not otherwise specified'
-        );
-
       "control_agent_update_evaluation_order" -> { "ENT-13495" }
         string => ifelse(
           isvariable($(this.promiser)),
@@ -449,6 +438,15 @@ bundle common def
         "If default:def.control_agent_agentfacility is a",
         " valid setting, we want to use it in body agent",
         " control for setting agentfacility"
+      );
+
+    "control_agent_evaluation_order_configured" -> { "ENT-13495" }
+      expression => isvariable("default:def.control_agent_evaluation_order"),
+      comment => concat(
+        "cf-agent overrides body common control's promise evaluation order",
+        " only when default:def.control_agent_evaluation_order is set via",
+        " augments. Otherwise cf-agent inherits the evaluation order from body",
+        " common control"
       );
 
     "_control_agent_environment_vars_validated" -> { "CFE-3927" }
