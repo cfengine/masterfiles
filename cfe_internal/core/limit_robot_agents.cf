@@ -4,62 +4,53 @@
 #  - Kill and restart CFE processes for a given component if there are too many
 #
 ###############################################################################
-
 bundle agent cfe_internal_limit_robot_agents
 # @brief Remediate pathological case of duplicate cfengine daemons running concurrently
 {
   methods:
     any::
-      "Ensure there are not more than expected cfengine daemons" -> { "CFE-3150" }
+      "Ensure there are not more than expected cfengine daemons" -> {
+          "CFE-3150"
+        }
         usebundle => "cfe_internal_limit_robot_agents_reap";
 
     more_cf_execd_processes_than_expected|more_cf_monitord_process_than_expected::
-
       # We only look to re-launch daemons if we found a pathological case. It's
       # important that these promises are in a separate bundle as we want to
       # refresh our observation of the process table to ensure they are indeed
       # not running.
-
       "Ensure expected cfengine daemons are running" -> { "CFE-3150" }
         usebundle => "cfe_internal_limit_robot_agents_spawn";
-
 }
+
 bundle agent cfe_internal_limit_robot_agents_reap
 # @brief Ensure that there are not more cfengine daemons running than there should be
 {
   processes:
-
     !windows::
       "bin/cf-monitord"
-      process_count => check_monitord("1"),
-      comment => "Check cf-monitord process if exceed the number",
-      handle => "cfe_internal_limit_robot_agents_processes_check_cf_monitord";
+        process_count => check_monitord("1"),
+        comment => "Check cf-monitord process if exceed the number",
+        handle => "cfe_internal_limit_robot_agents_processes_check_cf_monitord";
 
-      # Do not do this for cf-execd because it forks child processes to handle requests.
-      # Do not do this for cf-hub because cf-hub may have unlimited processes
-      # Do not do this for cf-agent because it is not unexpected to have
-      # concurrent agent runs, and the lifetime of an individual agent run can be controlled with
-      # [agent_expireafter][cf-execd#agent_expireafter] as defined in body executor control
-      #
-
+    # Do not do this for cf-execd because it forks child processes to handle requests.
+    # Do not do this for cf-hub because cf-hub may have unlimited processes
+    # Do not do this for cf-agent because it is not unexpected to have
+    # concurrent agent runs, and the lifetime of an individual agent run can be controlled with
+    # [agent_expireafter][cf-execd#agent_expireafter] as defined in body executor control
     more_cf_monitord_processes_than_expected::
-
       "bin/cf-monitord"
         signals => { "term", "kill" },
         comment => "When cf-monitord comes undone then kill all matching
                     process",
         handle => "cfe_internal_limit_robot_agents_processes_kill_cf_monitord";
-
 }
 
 bundle agent cfe_internal_limit_robot_agents_spawn
 # @brief Ensure that daemons are running after we have possibly reaped a pathological condition where more than the expected number of cfengine daemons was running
 {
-
   processes:
-
     !windows::
-
       "bin/cf-execd" -> { "CFE-2974" }
         restart_class => "cf_execd_not_running",
         comment => "If cf-execd isn't running, define a class so that it will be started",
@@ -73,31 +64,29 @@ bundle agent cfe_internal_limit_robot_agents_spawn
                     promise to terminate misbehaving daemons";
 
   commands:
-
     cf_execd_not_running::
-
       "$(sys.cf_execd)"
         comment => "Restart cf-execd process",
         handle => "cfe_internal_limit_robot_agents_commands_restart_cf_execd";
 
     cf_monitord_not_running::
-
       "$(sys.cf_monitord)"
         comment => "Restart cf-monitord process",
         handle => "cfe_internal_limit_robot_agents_commands_restart_cf_monitord";
-
 }
 
 body process_count check_execd(n)
 {
-      match_range => "0,$(n)";
-      # Note this class is namespace scoped. Other bundles do use it
-      out_of_range_define => {"more_cf_execd_processes_than_expected"};
+  match_range => "0,$(n)";
+
+  # Note this class is namespace scoped. Other bundles do use it
+  out_of_range_define => { "more_cf_execd_processes_than_expected" };
 }
 
 body process_count check_monitord(n)
 {
-      match_range => "0,$(n)";
-      # Note this class is namespace scoped. Other bundles do use it
-      out_of_range_define => {"more_cf_monitord_processes_than_expected"};
+  match_range => "0,$(n)";
+
+  # Note this class is namespace scoped. Other bundles do use it
+  out_of_range_define => { "more_cf_monitord_processes_than_expected" };
 }

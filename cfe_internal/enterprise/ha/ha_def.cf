@@ -1,42 +1,36 @@
 bundle common ha_def
 {
- vars:
-  enable_cfengine_enterprise_hub_ha::
-   "master_hub_location" string => "$(sys.statedir)/master_hub.dat";
-   "hubs_keys_location" string => "$(sys.workdir)/ppkeys_hubs";
-   "ppkeys_staging" string => "$(sys.workdir)/ppkeys_staging";
+  vars:
+    enable_cfengine_enterprise_hub_ha::
+      "master_hub_location" string => "$(sys.statedir)/master_hub.dat";
+      "hubs_keys_location" string => "$(sys.workdir)/ppkeys_hubs";
+      "ppkeys_staging" string => "$(sys.workdir)/ppkeys_staging";
 
-   #The location of the config file can not be changed!
-   "config_file" string => "$(this.promise_dirname)/ha_info.json";
+      #The location of the config file can not be changed!
+      "config_file" string => "$(this.promise_dirname)/ha_info.json";
+      "config" data => readjson("$(config_file)", "4k");
+      "ips" slist => getindices("config");
 
-   "config" data => readjson("$(config_file)", "4k");
-
-   "ips" slist => getindices("config");
-
-   "hub_sha[$(ips)]"
-      string => escape("root-SHA=$(config[$(ips)][sha]).pub"),
-      comment => "We need to construct an intermediary array so that we can
+      "hub_sha[$(ips)]"
+        string => escape("root-SHA=$(config[$(ips)][sha]).pub"),
+        comment => "We need to construct an intermediary array so that we can
                   extract a combined list of all hub keys.";
 
-   "hub_shas"
-     slist => getvalues("hub_sha"),
-     comment => "We use the list of hub key files for restricting clients access only to those";
+      "hub_shas"
+        slist => getvalues("hub_sha"),
+        comment => "We use the list of hub key files for restricting clients access only to those";
 
+      "replication_only_node[$(ips)]"
+        string => "dummy",
+        if => strcmp("$(config[$(ips)][is_in_cluster])", "false");
 
-   "replication_only_node[$(ips)]"
-      string => "dummy", if => strcmp("$(config[$(ips)][is_in_cluster])", "false");
-
-   "replication_only_nodes"
-      slist => getindices("replication_only_node");
-
+      "replication_only_nodes" slist => getindices("replication_only_node");
 
   classes:
-      "ha_replication_only_node" expression => some($(sys.policy_hub), replication_only_nodes);
-
+    "ha_replication_only_node"
+      expression => some($(sys.policy_hub), replication_only_nodes);
 
   reports:
     verbose_mode::
       "HA hub $(ips) $(config[$(ips)][sha])";
 }
-
-

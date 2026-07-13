@@ -12,17 +12,15 @@
 # update_processes
 #  - To enable/disable CFEngine based processes, use the slists below.
 ################################################################################
-
 bundle common cfe_internal_process_knowledge
 # @brief Variables related to CFEngine's own processes used in other bundles
 # TODO Redact use of this bundle. It's no longer useful now that bindir variable exists. Not clear why its unset on windows.
 {
   vars:
-
     !windows::
-
-      "bindir"      string => "$(sys.bindir)",
-      comment => "Use a system variable";
+      "bindir"
+        string => "$(sys.bindir)",
+        comment => "Use a system variable";
 }
 
 bundle agent cfe_internal_update_processes
@@ -42,36 +40,32 @@ bundle agent cfe_internal_update_processes
 #    `mpf_enable_cfengine_systemd_component_management`.
 {
   classes:
-      "systemd_supervised"
-        scope => "bundle",
-        expression => "systemd";
+    "systemd_supervised"
+      scope => "bundle",
+      expression => "systemd";
 
   reports:
-      inform.systemd_supervised.!mpf_enable_cfengine_systemd_component_management::
+    inform.systemd_supervised.!mpf_enable_cfengine_systemd_component_management::
       "NOTE: You have defined a class to persistently disable a cfengine
              component on a systemd managed host, but you have not defined
              mpf_enable_cfengine_systemd_component_management in order to enable
              management"
-        if => classmatch( "persistent_disable_cf_.*" );
+        if => classmatch("persistent_disable_cf_.*");
 
       "NOTE: You have explicitly listed components that should be disabled in def.agents_to_be_disabled.
              This host is managed by systemd and requires the class
              mpf_enable_cfengine_systemd_component_management in order to enable
              active management"
-        if => some( ".*", @(def.agents_to_be_disabled) );
+        if => some(".*", @(def.agents_to_be_disabled));
 
   vars:
-
     any::
-
       # By default the core components are expected to be running in all cases.
-
       "agent[cf_execd]" string => "cf-execd";
       "agent[cf_serverd]" string => "cf-serverd";
       "agent[cf_monitord]" string => "cf-monitord";
 
     policy_server.enterprise_edition::
-
       "agent[cf_hub]"
         string => "cf-hub",
         comment => "cf-hub is only relevant on Enterprise hubs";
@@ -81,71 +75,63 @@ bundle agent cfe_internal_update_processes
         comment => "cf-reactor is only provided on Enterprise hubs";
 
     systemd::
-
       # On systemd hosts the cfengine3 service acts as an umbrella for other
       # services.
-
       "agent[cfengine3]"
         string => "cfengine3",
         comment => "systemd hosts use the cfengine3 service as an umbrella.
                     systemd_supervised hosts additionally have individual units
                     for each managed service.";
 
-
     systemd_supervised.enterprise_edition.policy_server::
-
       # Only enterprise systemd supervised hosts these additional service
       # definitions for each component.
-
       "agent[cf_postgres]" string => "cf-postgres";
-      "agent[cf_php_fpm]"  string => "cf-php-fpm";
-      "agent[cf_apache]"   string => "cf-apache";
+      "agent[cf_php_fpm]" string => "cf-php-fpm";
+      "agent[cf_apache]" string => "cf-apache";
 
     any::
       # We get a consolidated list of all agents for the executing host.
-      "all_agents" slist => getvalues( agent );
+      "all_agents" slist => getvalues(agent);
 
       # We use def.agents_to_be_disabled if it exists, otherwise we default to
       # no agents being disabled.
-
       "agents_to_be_disabled"
         comment => "CFE processes that should not be enabled",
         handle => "cfe_internal_update_processes_vars_agents_to_be_disabled",
         slist => { @(def.agents_to_be_disabled) },
-        if => isvariable( "def.agents_to_be_disabled" );
+        if => isvariable("def.agents_to_be_disabled");
 
       "agents_to_be_disabled"
         comment => "The default agents that should not be enabled.",
         handle => "cfe_internal_update_processes_vars_default_agents_to_be_disabled",
-        slist => { },
-        if => not( isvariable("def.agents_to_be_disabled") );
+        slist => {},
+        if => not(isvariable("def.agents_to_be_disabled"));
 
       # An agent is disabled if there is a persistently defined disablement
       # class OR if the agent is found in a list of agents to be specifically
       # disabled.
-
       "disabled[$(all_agents)]"
         string => "$(all_agents)",
-        if => or( canonify( "persistent_disable_$(all_agents)" ),
-                          some( "$(all_agents)", agents_to_be_disabled ));
+        if => or(
+          canonify("persistent_disable_$(all_agents)"),
+          some("$(all_agents)", agents_to_be_disabled)
+        );
 
     systemd_supervised.policy_server.enterprise.hub_passive|(ha_replication_only_node.!failover_to_repliacation_node_enabled)::
-
       # We want the enterprise component cf-hub to be disabled if running on a
       # passive hub or replication only hub.
-
       "disabled[cf_hub]" string => "cf-hub";
 
     any::
-
       # First we get the consolidated list of agents to be disabled.
-      "agents_to_be_disabled" slist => getvalues( disabled );
+      "agents_to_be_disabled" slist => getvalues(disabled);
 
       # Any agent that is not explicitly disabled should be enabled.
-      "agents_to_be_enabled"  slist => difference( all_agents, agents_to_be_disabled );
+      "agents_to_be_enabled"
+        slist => difference(all_agents, agents_to_be_disabled);
 
   methods:
-
     systemd.!systemd_supervised::
       # TODO Remove from policy.
       # This makes sure the cfengine3 (umbrella) unit is active. It does not
@@ -153,14 +139,12 @@ bundle agent cfe_internal_update_processes
       # commit 6a7fe6b3fa466e55b29eca75cd53ff8b2883ff0e (introduced in 3.14)
       # this policy won't be run because systemd_supervised is defined any time
       # systemd is defined.
-
       "CFENGINE systemd service"
-      usebundle => maintain_cfe_systemd,
-      comment => "Call a bundle to maintain CFEngine with systemd",
-      handle => "cfe_internal_update_processes_methods_maintain_systemd";
+        usebundle => maintain_cfe_systemd,
+        comment => "Call a bundle to maintain CFEngine with systemd",
+        handle => "cfe_internal_update_processes_methods_maintain_systemd";
 
     systemd_supervised.mpf_enable_cfengine_systemd_component_management::
-
       "CFEngine systemd Unit Definitions"
         usebundle => cfe_internal_systemd_unit_files;
 
@@ -168,306 +152,252 @@ bundle agent cfe_internal_update_processes
         usebundle => cfe_internal_systemd_service_unit_state;
 
     am_policy_hub.enterprise.!systemd_supervised::
-
       "TAKING CARE CFE HUB PROCESSES"
-      usebundle => maintain_cfe_hub_process,
-      comment => "Call a bundle to maintian HUB processes",
-      handle => "cfe_internal_update_processes_methods_maintain_hub";
+        usebundle => maintain_cfe_hub_process,
+        comment => "Call a bundle to maintian HUB processes",
+        handle => "cfe_internal_update_processes_methods_maintain_hub";
 
     !windows.!systemd_supervised::
-
       "DISABLING CFE AGENTS"
-      usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
-      comment => "Call a bundle to disable CFEngine given processes",
-      handle => "cfe_internal_update_processes_methods_disabling_cfe_agents";
+        usebundle => disable_cfengine_agents("$(agents_to_be_disabled)"),
+        comment => "Call a bundle to disable CFEngine given processes",
+        handle => "cfe_internal_update_processes_methods_disabling_cfe_agents";
 
       "CHECKING FOR PERSISTENTLY DISABLED CFE AGENTS"
-      usebundle => disable_cfengine_agents($(all_agents)),
-      if => canonify("persistent_disable_$(all_agents)"),
-      comment => "Call a bundle to disable CFEngine given processes if persistent_disable_x is set",
-      handle => "cfe_internal_update_processes_methods_maybe_disabling_cfe_agents";
+        usebundle => disable_cfengine_agents($(all_agents)),
+        if => canonify("persistent_disable_$(all_agents)"),
+        comment => "Call a bundle to disable CFEngine given processes if persistent_disable_x is set",
+        handle => "cfe_internal_update_processes_methods_maybe_disabling_cfe_agents";
 
       "ENABLING CFE AGENTS"
-      usebundle => enable_cfengine_agents("$(agents_to_be_enabled)"),
-      comment => "Call a bundle to enable CFEngine given processes",
-      handle => "cfe_internal_update_processes_methods_enabling_cfe_agents";
+        usebundle => enable_cfengine_agents("$(agents_to_be_enabled)"),
+        comment => "Call a bundle to enable CFEngine given processes",
+        handle => "cfe_internal_update_processes_methods_enabling_cfe_agents";
 
     windows::
-
       "CFENGINE on Windows"
-      usebundle => maintain_cfe_windows,
-      comment => "Call a bundle to maintain CFEngine on Windows",
-      handle => "cfe_internal_update_processes_methods_maintain_windows";
-
+        usebundle => maintain_cfe_windows,
+        comment => "Call a bundle to maintain CFEngine on Windows",
+        handle => "cfe_internal_update_processes_methods_maintain_windows";
 }
 
-#
 ###############################################################################
-#
-
 bundle agent maintain_cfe_hub_process
 # @brief Ensure the proper processes are running on Enterprise hubs.
 {
   vars:
-
     am_policy_hub::
-
-      "file_check"  string => translatepath("$(cfe_internal_update_policy_cpv.inputs_dir)/promises.cf"),
-      comment => "Path to a policy file",
-      handle => "cfe_internal_maintain_cfe_hub_process_vars_file_check";
-
-      #
+      "file_check"
+        string => translatepath(
+          "$(cfe_internal_update_policy_cpv.inputs_dir)/promises.cf"
+        ),
+        comment => "Path to a policy file",
+        handle => "cfe_internal_maintain_cfe_hub_process_vars_file_check";
 
   classes:
-
     am_policy_hub::
-
-      "files_ok" expression => fileexists("$(file_check)"),
-      comment => "Check for $(sys.workdir)/inputs/promises.cf",
-      handle => "cfe_internal_maintain_cfe_hub_process_classes_files_ok";
+      "files_ok"
+        expression => fileexists("$(file_check)"),
+        comment => "Check for $(sys.workdir)/inputs/promises.cf",
+        handle => "cfe_internal_maintain_cfe_hub_process_classes_files_ok";
 
     am_policy_hub.enable_cfengine_enterprise_hub_ha::
       "ha_run_hub_process"
-        or => { "!ha_replication_only_node",
-                "ha_replication_only_node.failover_to_replication_node_enabled" };
+        or => {
+          "!ha_replication_only_node",
+          "ha_replication_only_node.failover_to_replication_node_enabled",
+        };
 
       "ha_kill_hub_process"
-        or => { "ha_replication_only_node.!failover_to_replication_node_enabled" };
-
-      #
+        or => {
+          "ha_replication_only_node.!failover_to_replication_node_enabled"
+        };
 
   processes:
-
     am_policy_hub::
-
       "$(cfe_internal_process_knowledge.bindir)/vacuumdb"
-      restart_class => "no_vacuumdb",
-      comment => "Monitor vacuumdb process",
-      handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
-      if => "nova|enterprise";
+        restart_class => "no_vacuumdb",
+        comment => "Monitor vacuumdb process",
+        handle => "cfe_internal_maintain_cfe_hub_process_processes_check_vacuumdb",
+        if => "nova|enterprise";
 
-   am_policy_hub.!enable_cfengine_enterprise_hub_ha::
+    am_policy_hub.!enable_cfengine_enterprise_hub_ha::
       "$(cfe_internal_process_knowledge.bindir)/postgres"
-      restart_class => "start_postgres_server",
-      comment => "Monitor postgres process",
-      handle => "cfe_internal_maintain_cfe_hub_process_processes_postgres",
-      if => "nova|enterprise";
+        restart_class => "start_postgres_server",
+        comment => "Monitor postgres process",
+        handle => "cfe_internal_maintain_cfe_hub_process_processes_postgres",
+        if => "nova|enterprise";
 
     am_policy_hub.!enable_cfengine_enterprise_hub_ha.files_ok.!windows|ha_run_hub_process::
-      "cf-hub"      restart_class => "start_hub",
-      comment => "Monitor cf-hub process",
-      handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
-      if => and( "(nova|enterprise).no_vacuumdb",
-                         "!persistent_disable_cf_hub" ); # Don't start it if it's persistently disabled
-
+      "cf-hub"
+        restart_class => "start_hub",
+        comment => "Monitor cf-hub process",
+        handle => "cfe_internal_maintain_cfe_hub_process_processes_cf_hub",
+        if => and(
+          "(nova|enterprise).no_vacuumdb", "!persistent_disable_cf_hub"
+        ); # Don't start it if it's persistently disabled
     am_policy_hub.ha_kill_hub_process::
-      "cf-hub"      signals => { "term" },
-      comment => "Terminate cf-hub on backup HA node outside cluster",
-      handle => "cfe_internal_kill_hub_process_on_inactive_ha_node";
-
-      #
+      "cf-hub"
+        signals => { "term" },
+        comment => "Terminate cf-hub on backup HA node outside cluster",
+        handle => "cfe_internal_kill_hub_process_on_inactive_ha_node";
 
   files:
-
-      "/var/log/postgresql.log"
+    "/var/log/postgresql.log"
       comment => "Ensure postgres.log file is there with right permissions",
       handle => "cfe_internal_maintain_cfe_hub_process_files_create_postgresql_log",
       create => "true",
-      perms => u_mo("0600","cfpostgres");
-
-      #
+      perms => u_mo("0600", "cfpostgres");
 
   commands:
-
     !windows.am_policy_hub.!enable_cfengine_enterprise_hub_ha.start_postgres_server::
-     "$(cfe_internal_process_knowledge.bindir)/pg_ctl -D $(cfe_internal_update_policy_cpv.postgresdb_dir) -l $(cfe_internal_update_policy_cpv.postgresdb_log) start"
-      contain => u_postgres,
-      comment => "Start postgres process",
-      classes => u_kept_successful_command,
-      handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
+      "$(cfe_internal_process_knowledge.bindir)/pg_ctl -D $(cfe_internal_update_policy_cpv.postgresdb_dir) -l $(cfe_internal_update_policy_cpv.postgresdb_log) start"
+        contain => u_postgres,
+        comment => "Start postgres process",
+        classes => u_kept_successful_command,
+        handle => "cfe_internal_maintain_cfe_hub_process_commands_start_postgres";
 
     !windows.am_policy_hub.start_hub::
       "$(sys.cf_hub)"
-      comment => "Start cf-hub process",
-      classes => u_kept_successful_command,
-      handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf_hub";
-
+        comment => "Start cf-hub process",
+        classes => u_kept_successful_command,
+        handle => "cfe_internal_maintain_cfe_hub_process_commands_start_cf_hub";
 }
 
-#
 ###############################################################################
-#
-
 bundle agent disable_cfengine_agents(process)
 # @brief Ensure cfengine component is not running
 # @param process The name of the cfengine component binary to ensure not running. [cf-agent, cf-serverd, cf-monitord, cf-hub]
 {
   vars:
-
     !windows::
-
-      "cprocess"    string => canonify("$(process)"),
-      comment => "Canonify a given process",
-      handle => "cfe_internal_disable_cfengine_agents_vars_cprocess";
-
-      #
+      "cprocess"
+        string => canonify("$(process)"),
+        comment => "Canonify a given process",
+        handle => "cfe_internal_disable_cfengine_agents_vars_cprocess";
 
   classes:
-
     !windows::
-
-      "disable_$(cprocess)" expression => strcmp("$(process)","$(process)"),
-      comment => "Create a class to disable a given process",
-      handle => "cfe_internal_disable_cfengine_agents_classes_disable_process";
-
-      #
+      "disable_$(cprocess)"
+        expression => strcmp("$(process)", "$(process)"),
+        comment => "Create a class to disable a given process",
+        handle => "cfe_internal_disable_cfengine_agents_classes_disable_process";
 
   processes:
-
     !windows::
-
       "$(cfe_internal_process_knowledge.bindir)/$(process)"
-      signals => { "term" },
-      comment => "Terminate $(process)",
-      handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
-      if => "disable_$(cprocess)";
-
+        signals => { "term" },
+        comment => "Terminate $(process)",
+        handle => "cfe_internal_disable_cfengine_agents_processes_terminate_process",
+        if => "disable_$(cprocess)";
 }
 
-#
 ###############################################################################
-#
 bundle agent enable_cfengine_agents(process)
 # @brief Ensure cfengine component is running
 # @param process The name of the cfengine component binary to ensure running. [cf-agent, cf-serverd, cf-monitord, cf-hub]
 {
   vars:
-
     !windows::
-
-      "cprocess"  string => canonify("$(process)"),
-      comment => "Canonify a given process",
-      handle => "cfe_internal_enable_cfengine_agents_vars_cprocess";
+      "cprocess"
+        string => canonify("$(process)"),
+        comment => "Canonify a given process",
+        handle => "cfe_internal_enable_cfengine_agents_vars_cprocess";
 
   classes:
-
     !windows::
-
-      "enable_$(cprocess)" expression => "!persistent_disable_$(cprocess)",
-      comment => "Create a class to enable a given process",
-      handle => "cfe_internal_enable_cfengine_agents_classes_enable_process";
-
-      #
+      "enable_$(cprocess)"
+        expression => "!persistent_disable_$(cprocess)",
+        comment => "Create a class to enable a given process",
+        handle => "cfe_internal_enable_cfengine_agents_classes_enable_process";
 
   processes:
-
     !windows::
-
       "$(cfe_internal_process_knowledge.bindir)/$(process)"
-      restart_class => "restart_$(cprocess)",
-      comment => "Create a class to restart a process",
-      handle => "cfe_internal_enable_cfengine_agents_processes_restart_process",
-      if => "enable_$(cprocess)";
-
-      #
+        restart_class => "restart_$(cprocess)",
+        comment => "Create a class to restart a process",
+        handle => "cfe_internal_enable_cfengine_agents_processes_restart_process",
+        if => "enable_$(cprocess)";
 
   commands:
-
     !windows::
-
       "$(sys.$(cprocess))"
-      comment => "Restart a process",
-      handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
-      classes => u_kept_successful_command,
-      if => and( "restart_$(cprocess)",
-                         isvariable( "sys.$(cprocess)" ) );
+        comment => "Restart a process",
+        handle => "cfe_internal_enable_cfengine_agents_commands_restart_process",
+        classes => u_kept_successful_command,
+        if => and("restart_$(cprocess)", isvariable("sys.$(cprocess)"));
 
   reports:
-      "The process $(process) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."
-      if => and( "persistent_disable_$(cprocess)",
-                         isvariable( "sys.$(cprocess)" ));
+    "The process $(process) is persistently disabled.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."
+      if => and(
+        "persistent_disable_$(cprocess)", isvariable("sys.$(cprocess)")
+      );
 
-      "The process $(process) has been re-enabled.  Run with '-Dset_persistent_disable_$(cprocess)' to disable it persistently again."
-      if => and( "clear_persistent_disable_$(cprocess)",
-                         isvariable( "sys.$(cprocess)" )),
+    "The process $(process) has been re-enabled.  Run with '-Dset_persistent_disable_$(cprocess)' to disable it persistently again."
+      if => and(
+        "clear_persistent_disable_$(cprocess)", isvariable("sys.$(cprocess)")
+      ),
       classes => u_clear_always("persistent_disable_$(cprocess)");
 
-      "The process $(process) has been disabled persistently.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."
+    "The process $(process) has been disabled persistently.  Run with '-Dclear_persistent_disable_$(cprocess)' to re-enable it."
       if => "set_persistent_disable_$(cprocess)",
       classes => u_always_forever("persistent_disable_$(cprocess)");
 }
 
-#
 ###############################################################################
-#
-
 bundle agent maintain_cfe_windows
 # @brief Ensure cfengine components are running
 {
   vars:
-
     windows::
-
-      "file_check"  string => translatepath("$(cfe_internal_update_policy_cpv.inputs_dir)/promises.cf"),
-      comment => "Path to a policy file",
-      handle => "cfe_internal_maintain_cfe_windows_vars_file_check";
-
-      #
+      "file_check"
+        string => translatepath(
+          "$(cfe_internal_update_policy_cpv.inputs_dir)/promises.cf"
+        ),
+        comment => "Path to a policy file",
+        handle => "cfe_internal_maintain_cfe_windows_vars_file_check";
 
   classes:
-
     windows::
-
-      "files_ok" expression => fileexists("$(file_check)"),
-      comment => "Check for /var/cfengine/masterfiles/promises.cf",
-      handle => "cfe_internal_maintain_cfe_windows_classes_files_ok";
-
-      #
+      "files_ok"
+        expression => fileexists("$(file_check)"),
+        comment => "Check for /var/cfengine/masterfiles/promises.cf",
+        handle => "cfe_internal_maintain_cfe_windows_classes_files_ok";
 
   processes:
-
     files_ok::
+      "cf-serverd"
+        restart_class => "start_server",
+        comment => "Monitor cf-serverd process",
+        handle => "cfe_internal_maintain_cfe_windows_processes_cf_serverd";
 
-      "cf-serverd"  restart_class => "start_server",
-      comment => "Monitor cf-serverd process",
-      handle => "cfe_internal_maintain_cfe_windows_processes_cf_serverd";
-
-      "cf-monitord" restart_class => "start_monitor",
-      comment => "Monitor cf-monitord process",
-      handle => "cfe_internal_maintain_cfe_windows_processes_cf_monitord";
-
-      #
+      "cf-monitord"
+        restart_class => "start_monitor",
+        comment => "Monitor cf-monitord process",
+        handle => "cfe_internal_maintain_cfe_windows_processes_cf_monitord";
 
   services:
-
     files_ok.windows::
-
       "CfengineNovaExec"
-      service_policy => "start",
-      service_method => u_bootstart,
-      comment => "Start the executor windows service now and at boot time",
-      handle => "cfe_internal_maintain_cfe_windows_services_windows_executor";
-
-      #
+        service_policy => "start",
+        service_method => u_bootstart,
+        comment => "Start the executor windows service now and at boot time",
+        handle => "cfe_internal_maintain_cfe_windows_services_windows_executor";
 
   commands:
-
     start_server::
-
       "$(sys.cf_serverd)"
-      action => u_ifwin_bg,
-      comment => "Start cf-serverd process",
-      classes => u_kept_successful_command,
-      handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_serverd";
+        action => u_ifwin_bg,
+        comment => "Start cf-serverd process",
+        classes => u_kept_successful_command,
+        handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_serverd";
 
     start_monitor|restart_monitor::
-
       "$(sys.cf_monitord)"
-      action => u_ifwin_bg,
-      comment => "Start cf-monitord process",
-      classes => u_kept_successful_command,
-      handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_monitord";
-
+        action => u_ifwin_bg,
+        comment => "Start cf-monitord process",
+        classes => u_kept_successful_command,
+        handle => "cfe_internal_maintain_cfe_windows_commands_start_cf_monitord";
 }
 
 bundle agent maintain_cfe_systemd
@@ -476,33 +406,33 @@ bundle agent maintain_cfe_systemd
   classes:
     systemd::
       "restart_cfe"
-      not => returnszero("/bin/systemctl -q is-active cfengine3", "noshell"),
-      comment => "Check running status of CFEngine using systemd",
-      handle => "cfe_internal_maintain_cfe_systemd_classes_restart_cfe";
+        not => returnszero("/bin/systemctl -q is-active cfengine3", "noshell"),
+        comment => "Check running status of CFEngine using systemd",
+        handle => "cfe_internal_maintain_cfe_systemd_classes_restart_cfe";
 
   commands:
     restart_cfe::
       "/bin/systemctl -q start cfengine3"
-      comment => "Start CFEngine using systemd",
-      handle => "cfe_internal_maintain_cfe_systemd_commands_start_cfe";
+        comment => "Start CFEngine using systemd",
+        handle => "cfe_internal_maintain_cfe_systemd_commands_start_cfe";
 }
 
 body classes u_clear_always(theclass)
 # @brief Undefine, `theclass` for as a result of the promise actuation, no matter the outcome (kept, notkept, repaired)
 {
-      cancel_kept => { $(theclass) };
-      cancel_notkept => { $(theclass) };
-      cancel_repaired => { $(theclass) };
+  cancel_kept => { $(theclass) };
+  cancel_notkept => { $(theclass) };
+  cancel_repaired => { $(theclass) };
 }
 
 body classes u_always_forever(theclass)
 # @brief Define `theclass` for 999999999 minutes (1902 years) as a result of the promise actuation, no matter the outcome (kept, notkept, repaired)
 {
-      promise_kept => { $(theclass) };
-      promise_repaired => { $(theclass) };
-      repair_failed => { $(theclass) };
-      repair_denied => { $(theclass) };
-      repair_timeout => { $(theclass) };
-      persist_time => 999999999;
-      scope => "namespace";
+  promise_kept => { $(theclass) };
+  promise_repaired => { $(theclass) };
+  repair_failed => { $(theclass) };
+  repair_denied => { $(theclass) };
+  repair_timeout => { $(theclass) };
+  persist_time => 999999999;
+  scope => "namespace";
 }
