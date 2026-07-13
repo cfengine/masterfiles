@@ -1,7 +1,5 @@
 # Event handling bundles and bodies
-
 @if minimum_version(3.9)
-
 bundle agent event_register(prefix, type, name, persistence, metadata)
 # @brief Register a `event_$(prefix)_$(type)_$(name)` class with meta=`metadata`
 # @param prefix The prefix (usually the issuing bundle name)
@@ -16,13 +14,20 @@ bundle agent event_register(prefix, type, name, persistence, metadata)
 # **See also:** `event_handle`
 {
   vars:
-      "e" string => "event_$(prefix)_$(type)_$(name)";
-      "metadata_string" string => format("%S", metadata);
+    "e" string => "event_$(prefix)_$(type)_$(name)";
+    "metadata_string" string => format("%S", metadata);
 
   classes:
-      "$(e)" scope => "namespace",
-        persistence => $(persistence),
-        meta => { "event", "prefix=$(prefix)", "type=$(type)", "name=$(name)", @(metadata) };
+    "$(e)"
+      scope => "namespace",
+      persistence => $(persistence),
+      meta => {
+        "event",
+        "prefix=$(prefix)",
+        "type=$(type)",
+        "name=$(name)",
+        @(metadata),
+      };
 
   reports:
     inform_mode::
@@ -33,9 +38,9 @@ body classes event_cancel_events(events)
 # @brief Cancel any `events`
 # @param events A slist of events to cancel
 {
-        cancel_notkept => { @(events) };
-        cancel_kept => { @(events) };
-        cancel_repaired => { @(events) };
+  cancel_notkept => { @(events) };
+  cancel_kept => { @(events) };
+  cancel_repaired => { @(events) };
 }
 
 bundle agent event_handle(prefix, type)
@@ -50,19 +55,28 @@ bundle agent event_handle(prefix, type)
 # **See also:** `event_register`
 {
   vars:
-      "events_prefix" slist => classesmatching("event_.*", "prefix=$(prefix)");
-      "events_type" slist => classesmatching("event_.*", "type=$(type)");
-      "events" slist => intersection(events_prefix, events_type);
-      "events_string" string => format("%S", events);
+    "events_prefix" slist => classesmatching("event_.*", "prefix=$(prefix)");
+    "events_type" slist => classesmatching("event_.*", "type=$(type)");
+    "events" slist => intersection(events_prefix, events_type);
+    "events_string" string => format("%S", events);
 
-      "handlers_prefix" slist => bundlesmatching("default:event_.*", format("event_prefix=(%s|ALL)", escape($(prefix))));
-      "handlers_type" slist => bundlesmatching("default:event_.*", format("event_type=(%s|ALL)", escape($(type))));
-      "handlers" slist => intersection(handlers_prefix, handlers_type);
-      "handlers_string" string => format("%S", handlers);
+    "handlers_prefix"
+      slist => bundlesmatching(
+        "default:event_.*", format("event_prefix=(%s|ALL)", escape($(prefix)))
+      );
+
+    "handlers_type"
+      slist => bundlesmatching(
+        "default:event_.*", format("event_type=(%s|ALL)", escape($(type)))
+      );
+
+    "handlers" slist => intersection(handlers_prefix, handlers_type);
+    "handlers_string" string => format("%S", handlers);
 
   methods:
-      "" usebundle => $(handlers)(@(events)),
-        classes => event_cancel_events(@(events));
+    ""
+      usebundle => $(handlers)(@(events)),
+      classes => event_cancel_events(@(events));
 
   reports:
     inform_mode::
@@ -80,11 +94,11 @@ bundle agent event_debug_handler(events)
 # **See also:** `event_handle`, `event_register`
 {
   meta:
-      "tags" slist => { "event_handler", "event_prefix=.*", "event_type=.*" };
+    "tags" slist => { "event_handler", "event_prefix=.*", "event_type=.*" };
 
   vars:
-      "events_string" string => format("%S", events);
-      "tags_string" string => format("%S", "$(this.bundle)_meta.tags");
+    "events_string" string => format("%S", events);
+    "tags_string" string => format("%S", "$(this.bundle)_meta.tags");
 
   reports:
     inform_mode::
@@ -105,11 +119,12 @@ bundle agent event_install_handler(events)
 # **See also:** `event_handle`, `event_register`
 {
   meta:
-      "tags" slist => { "event_handler", "event_prefix=ALL", "event_type=install" };
+    "tags"
+      slist => { "event_handler", "event_prefix=ALL", "event_type=install" };
 
   vars:
-      "events_string" string => format("%S", events);
-      "tags_string" string => format("%S", "$(this.bundle)_meta.tags");
+    "events_string" string => format("%S", events);
+    "tags_string" string => format("%S", "$(this.bundle)_meta.tags");
 
   reports:
     inform_mode::
@@ -138,21 +153,26 @@ bundle agent event_usage_example
 # ```
 {
   vars:
-      "empty" slist => {};
+    "empty" slist => {};
 
   methods:
-      # register a restart event named "apache" with persistence = 1 day
-      "" usebundle => event_register($(this.bundle), "restart", "apache", 1440, @(empty)); # 1 day
-      # register an install event named "php" with persistence = 2 days
-      "" usebundle => event_register($(this.bundle), "install", "php", 2880, @(empty));
+    # register a restart event named "apache" with persistence = 1 day
+    ""
+      usebundle => event_register(
+        $(this.bundle), "restart", "apache", 1440, @(empty)
+      ); # 1 day
+    # register an install event named "php" with persistence = 2 days
+    ""
+      usebundle => event_register(
+        $(this.bundle), "install", "php", 2880, @(empty)
+      );
 
-      # the following can be run immediately, or up to 2 days later to collect
-      # the install event above
-      "" usebundle => event_handle($(this.bundle), "install");
+    # the following can be run immediately, or up to 2 days later to collect
+    # the install event above
+    "" usebundle => event_handle($(this.bundle), "install");
 
-      # the following can be run immediately, or up to 1 day later to collect
-      # the restart event above
-      "" usebundle => event_handle(".*", ".*");
+    # the following can be run immediately, or up to 1 day later to collect
+    # the restart event above
+    "" usebundle => event_handle(".*", ".*");
 }
-
 @endif

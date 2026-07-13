@@ -1,5 +1,4 @@
 # edit_xml bundles
-
 bundle edit_xml xml_insert_tree_nopath(treestring)
 # @brief Insert XML tree with no path
 #
@@ -16,7 +15,7 @@ bundle edit_xml xml_insert_tree_nopath(treestring)
 # ```
 {
   insert_tree:
-      '$(treestring)';
+    '$(treestring)';
 }
 
 bundle edit_xml xml_insert_tree(treestring, xpath)
@@ -36,7 +35,7 @@ bundle edit_xml xml_insert_tree(treestring, xpath)
 # ```
 {
   insert_tree:
-      '$(treestring)' select_xpath => "$(xpath)";
+    '$(treestring)' select_xpath => "$(xpath)";
 }
 
 bundle edit_xml xml_set_value(value, xpath)
@@ -56,8 +55,7 @@ bundle edit_xml xml_set_value(value, xpath)
 # ```
 {
   set_text:
-      "$(value)"
-      select_xpath => "$(xpath)";
+    "$(value)" select_xpath => "$(xpath)";
 }
 
 bundle edit_xml xml_set_attribute(attr, value, xpath)
@@ -78,8 +76,7 @@ bundle edit_xml xml_set_attribute(attr, value, xpath)
 # ```
 {
   set_attribute:
-      "$(attr)"
+    "$(attr)"
       attribute_value => "$(value)",
       select_xpath => "$(xpath)";
-
 }

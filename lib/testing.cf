@@ -1,10 +1,7 @@
 # Test reporting bodies
-
 # TAP specification at
 # http://testanything.org/tap-specification.html
-
 @if minimum_version(3.9)
-
 bundle agent testing_ok_if(classname, message, error, trace, format)
 # @brief Report outcome for test on `classname` in format `format` with optional `error` and `trace`
 # @param classname The class name
@@ -16,13 +13,38 @@ bundle agent testing_ok_if(classname, message, error, trace, format)
 # **See also:** `testing_junit_report`, `testing_tap_report`, `testing_ok`, `testing_todo`, and `testing_skip`
 {
   vars:
-      "next_testing_$(classname)" int => length(classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)"));
-      "next_testing_$(classname)_failed" int => length(classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)"));
+    "next_testing_$(classname)"
+      int => length(
+        classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)")
+      );
+
+    "next_testing_$(classname)_failed"
+      int => length(
+        classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)")
+      );
 
   classes:
-      "tap" expression => strcmp('tap', string_downcase($(format)));
-      "testing_$(classname)" expression => $(classname), scope => "namespace", meta => { "testing_passed", "error=$(error)", "trace=$(trace)", "message=$(message)" };
-      "testing_$(classname)_failed" not => $(classname), scope => "namespace", meta => { "testing_failed", "error=$(error)", "trace=$(trace)", "message=$(message)" };
+    "tap" expression => strcmp('tap', string_downcase($(format)));
+
+    "testing_$(classname)"
+      expression => $(classname),
+      scope => "namespace",
+      meta => {
+        "testing_passed",
+        "error=$(error)",
+        "trace=$(trace)",
+        "message=$(message)",
+      };
+
+    "testing_$(classname)_failed"
+      not => $(classname),
+      scope => "namespace",
+      meta => {
+        "testing_failed",
+        "error=$(error)",
+        "trace=$(trace)",
+        "message=$(message)",
+      };
 
   reports:
     inform_mode::
@@ -30,6 +52,7 @@ bundle agent testing_ok_if(classname, message, error, trace, format)
 
     "tap.testing_$(classname)"::
       "$(const.n)ok $(message)";
+
     "tap.testing_$(classname)_failed"::
       "$(const.n)not ok $(message)";
 }
@@ -46,7 +69,14 @@ bundle agent testing_ok(classname, message, format)
 # **See also:** `testing_junit_report`, `testing_tap_report`, `testing_ok_if`, `testing_todo`, and `testing_skip`
 {
   methods:
-      "" usebundle => testing_ok_if($(classname), $(message), "unexpected error for $(classname)", "no error trace available", $(format));
+    ""
+      usebundle => testing_ok_if(
+        $(classname),
+        $(message),
+        "unexpected error for $(classname)",
+        "no error trace available",
+        $(format)
+      );
 }
 
 bundle agent testing_skip(classname, message, format)
@@ -61,15 +91,22 @@ bundle agent testing_skip(classname, message, format)
 # **See also:** `testing_junit_report`, `testing_tap_report`, `testing_ok_if`, `testing_todo`, and `testing_ok`
 {
   vars:
-      "next_testing_$(classname)" int => length(classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)"));
+    "next_testing_$(classname)"
+      int => length(
+        classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)")
+      );
 
   classes:
-      "tap" expression => strcmp('tap', string_downcase($(format)));
-      "testing_$(classname)" scope => "namespace", meta => { "testing_skipped", "message=$(message)" };
+    "tap" expression => strcmp('tap', string_downcase($(format)));
+
+    "testing_$(classname)"
+      scope => "namespace",
+      meta => { "testing_skipped", "message=$(message)" };
 
   reports:
     inform_mode::
       "$(this.bundle): adding testing skip report for class $(classname) at position $(next_testing_$(classname))";
+
     tap::
       "$(const.n)ok # SKIP $(message)";
 }
@@ -86,15 +123,22 @@ bundle agent testing_todo(classname, message, format)
 # **See also:** `testing_junit_report`, `testing_tap_report`, `testing_ok_if`, `testing_skip`, and `testing_ok`
 {
   vars:
-      "next_testing_$(classname)" int => length(classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)"));
+    "next_testing_$(classname)"
+      int => length(
+        classesmatching("testing_.*", "testing_(passed|failed|skipped|todo)")
+      );
 
   classes:
-      "tap" expression => strcmp('tap', string_downcase($(format)));
-      "testing_$(classname)" scope => "namespace", meta => { "testing_todo", "message=$(message)" };
+    "tap" expression => strcmp('tap', string_downcase($(format)));
+
+    "testing_$(classname)"
+      scope => "namespace",
+      meta => { "testing_todo", "message=$(message)" };
 
   reports:
     inform_mode::
       "$(this.bundle): adding testing TODO report for class $(classname) at position $(next_testing_$(classname))";
+
     tap::
       "$(const.n)ok # TODO $(message)";
 }
@@ -108,7 +152,7 @@ bundle agent testing_tap_report(outfile)
 # **See also:** `testing_junit_report`, `testing_tap_report`, `testing_ok_if`, `testing_todo`, `testing_skip`, `testing_tap_bailout`, and `testing_ok`
 {
   methods:
-      "" usebundle => testing_generic_report('TAP', $(outfile));
+    "" usebundle => testing_generic_report('TAP', $(outfile));
 }
 
 bundle agent testing_junit_report(outfile)
@@ -118,7 +162,7 @@ bundle agent testing_junit_report(outfile)
 # **See also:** `testing_tap_report`, `testing_ok_if`, `testing_todo`, `testing_skip`, and `testing_ok`
 {
   methods:
-      "" usebundle => testing_generic_report('jUnit', $(outfile));
+    "" usebundle => testing_generic_report('jUnit', $(outfile));
 }
 
 bundle agent testing_generic_report(format, outfile)
@@ -132,88 +176,190 @@ bundle agent testing_generic_report(format, outfile)
 # **See also:** `testing_tap_report`, `testing_ok_if`, `testing_todo`, `testing_skip`, and `testing_ok`
 {
   classes:
-      "junit" expression => strcmp('junit', string_downcase($(format)));
-      "tap" expression => strcmp('tap', string_downcase($(format)));
-      "stdout" expression => strcmp('', $(outfile));
-      "tofile" not => strcmp('', $(outfile));
+    "junit" expression => strcmp('junit', string_downcase($(format)));
+    "tap" expression => strcmp('tap', string_downcase($(format)));
+    "stdout" expression => strcmp('', $(outfile));
+    "tofile" not => strcmp('', $(outfile));
 
   vars:
-      "failed" slist => classesmatching("testing_.*", testing_failed);
-      "passed" slist => classesmatching("testing_.*", testing_passed);
-      "skipped" slist => classesmatching("testing_.*", testing_skipped);
-      "todo" slist => classesmatching("testing_.*", testing_todo);
+    "failed" slist => classesmatching("testing_.*", testing_failed);
+    "passed" slist => classesmatching("testing_.*", testing_passed);
+    "skipped" slist => classesmatching("testing_.*", testing_skipped);
+    "todo" slist => classesmatching("testing_.*", testing_todo);
+    "count_passed" int => length(passed);
+    "count_skipped" int => length(skipped);
+    "count_todo" int => length(todo);
+    "count_failed" int => length(failed);
 
-      "count_passed" int => length(passed);
-      "count_skipped" int => length(skipped);
-      "count_todo" int => length(todo);
-      "count_failed" int => length(failed);
-      "count_total" string => format("%d", sum('[$(count_failed), $(count_passed), $(count_skipped), $(count_todo)]'));
+    "count_total"
+      string => format(
+        "%d",
+        sum(
+          '[$(count_failed), $(count_passed), $(count_skipped), $(count_todo)]'
+        )
+      );
 
-      "timestamp" string => strftime("localtime", "%FT%T", now());
+    "timestamp" string => strftime("localtime", "%FT%T", now());
+    "tests_passed" data => '[]';
 
-      "tests_passed" data => '[]';
-      "tests_passed"
-        data => mergedata(tests_passed,
-                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s" }]',
-                                regex_replace($(passed), "^testing_", "", "T"),
-                                "$(testing_ok_if.next_$(passed))",
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(passed)))), "^message=", "", "T"),
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(passed)))), "^message=", "", "T")));
+    "tests_passed"
+      data => mergedata(
+        tests_passed,
+        format(
+          '[{ "testcase": "%s", "test_offset": %d, "test_message": "%s" }]',
+          regex_replace($(passed), "^testing_", "", "T"),
+          "$(testing_ok_if.next_$(passed))",
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(passed)))),
+            "^message=",
+            "",
+            "T"
+          ),
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(passed)))),
+            "^message=",
+            "",
+            "T"
+          )
+        )
+      );
 
-      "tests_failed" data => '[]';
-      "tests_failed"
-        data => mergedata(tests_failed,
-                         format('[{ "testcase": "%s", "failure": true, "fail_message": "%s", "trace_message": "%s", "test_offset": %d, "test_message": "%s" }]',
-                                regex_replace($(failed), "^testing_", "", "T"),
-                                regex_replace(join(",", grep("^error=.*", getclassmetatags($(failed)))), "^error=", "", "T"),
-                                regex_replace(join(",", grep("^trace=.*", getclassmetatags($(failed)))), "^trace=", "", "T"),
-                                "$(testing_ok_if.next_$(failed))",
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(failed)))), "^message=", "", "T"),
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(failed)))), "^message=", "", "T")));
+    "tests_failed" data => '[]';
 
-      "tests_skipped" data => '[]';
-      "tests_skipped"
-        data => mergedata(tests_skipped,
-                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "skip": true }]',
-                                regex_replace($(skipped), "^testing_", "", "T"),
-                                "$(testing_skip.next_$(skipped))",
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(skipped)))), "^message=", "", "T"),
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(skipped)))), "^message=", "", "T")));
+    "tests_failed"
+      data => mergedata(
+        tests_failed,
+        format(
+          '[{ "testcase": "%s", "failure": true, "fail_message": "%s", "trace_message": "%s", "test_offset": %d, "test_message": "%s" }]',
+          regex_replace($(failed), "^testing_", "", "T"),
+          regex_replace(
+            join(",", grep("^error=.*", getclassmetatags($(failed)))),
+            "^error=",
+            "",
+            "T"
+          ),
+          regex_replace(
+            join(",", grep("^trace=.*", getclassmetatags($(failed)))),
+            "^trace=",
+            "",
+            "T"
+          ),
+          "$(testing_ok_if.next_$(failed))",
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(failed)))),
+            "^message=",
+            "",
+            "T"
+          ),
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(failed)))),
+            "^message=",
+            "",
+            "T"
+          )
+        )
+      );
 
-      "tests_todo" data => '[]';
-      "tests_todo"
-        data => mergedata(tests_todo,
-                         format('[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "todo": true }]',
-                                regex_replace($(todo), "^testing_", "", "T"),
-                                "$(testing_todo.next_$(todo))",
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(todo)))), "^message=", "", "T"),
-                                regex_replace(join(",", grep("^message=.*", getclassmetatags($(todo)))), "^message=", "", "T")));
+    "tests_skipped" data => '[]';
+
+    "tests_skipped"
+      data => mergedata(
+        tests_skipped,
+        format(
+          '[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "skip": true }]',
+          regex_replace($(skipped), "^testing_", "", "T"),
+          "$(testing_skip.next_$(skipped))",
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(skipped)))),
+            "^message=",
+            "",
+            "T"
+          ),
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(skipped)))),
+            "^message=",
+            "",
+            "T"
+          )
+        )
+      );
+
+    "tests_todo" data => '[]';
+
+    "tests_todo"
+      data => mergedata(
+        tests_todo,
+        format(
+          '[{ "testcase": "%s", "test_offset": %d, "test_message": "%s", "todo": true }]',
+          regex_replace($(todo), "^testing_", "", "T"),
+          "$(testing_todo.next_$(todo))",
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(todo)))),
+            "^message=",
+            "",
+            "T"
+          ),
+          regex_replace(
+            join(",", grep("^message=.*", getclassmetatags($(todo)))),
+            "^message=",
+            "",
+            "T"
+          )
+        )
+      );
 
     inform_mode::
-      "out" string => format("counts = %d/%d/%d/%d/%d failed = %S, passed = %S, skipped = %S, todo = %S, failed = %S; tests = %S+%S+%S+%S", $(count_total), $(count_passed), $(count_skipped), $(count_todo), $(count_failed), failed, passed, skipped, todo, failed, tests_passed, tests_skipped, tests_todo, tests_failed);
+      "out"
+        string => format(
+          "counts = %d/%d/%d/%d/%d failed = %S, passed = %S, skipped = %S, todo = %S, failed = %S; tests = %S+%S+%S+%S",
+          $(count_total),
+          $(count_passed),
+          $(count_skipped),
+          $(count_todo),
+          $(count_failed),
+          failed,
+          passed,
+          skipped,
+          todo,
+          failed,
+          tests_passed,
+          tests_skipped,
+          tests_todo,
+          tests_failed
+        );
 
     junit.stdout::
-      "junit_out" string => string_mustache(readfile("$(this.promise_dirname)/templates/junit.mustache", 4k), bundlestate("testing_generic_report"));
+      "junit_out"
+        string => string_mustache(
+          readfile("$(this.promise_dirname)/templates/junit.mustache", 4k),
+          bundlestate("testing_generic_report")
+        );
 
     tap::
-      "tap_tests" data => mergedata(tests_passed, tests_failed, tests_skipped, tests_todo);
+      "tap_tests"
+        data => mergedata(
+          tests_passed, tests_failed, tests_skipped, tests_todo
+        );
 
-      "tap_json" string => string_mustache(
-        concat(
-          '[ ',
-          '{{#-top-}}',
-          '"',
-          '{{#failure}}not ok {{/failure}}',
-          '{{^failure}}ok {{/failure}}',
-          '{{test_offset}} {{test_message}}',
-          '{{#skip}} # SKIP {{/skip}}',
-          '{{#todo}} # TODO {{/todo}}',
-          '", ',
-          '{{/-top-}}',
-          ' ]'),
-        tap_tests);
-    "tap_results" data => parsejson("${tap_json}");
+      "tap_json"
+        string => string_mustache(
+          concat(
+            '[ ',
+            '{{#-top-}}',
+            '"',
+            '{{#failure}}not ok {{/failure}}',
+            '{{^failure}}ok {{/failure}}',
+            '{{test_offset}} {{test_message}}',
+            '{{#skip}} # SKIP {{/skip}}',
+            '{{#todo}} # TODO {{/todo}}',
+            '", ',
+            '{{/-top-}}',
+            ' ]'
+          ),
+          tap_tests
+        );
 
+      "tap_results" data => parsejson("${tap_json}");
 
     tap.inform_mode::
       "tap_tests_info" string => format("%S", tap_tests);
@@ -239,10 +385,11 @@ bundle agent testing_generic_report(format, outfile)
       "$(const.n)$(junit_out)";
 
     tap.stdout::
-      "$(const.n)1..$(count_total)" ;
+      "$(const.n)1..$(count_total)";
 
     inform_mode::
       "$(this.bundle): report summary: $(out)";
+
     tap.inform_mode::
       "$(this.bundle): TAP report summary: $(tap_tests_info)";
       "$(this.bundle): TAP report results summary: $(tap_results_info)";
@@ -255,7 +402,7 @@ bundle agent testing_tap_bailout(reason)
 # **See also:** `testing_tap_report`, `testing_ok_if`, `testing_todo`, `testing_skip`, and `testing_ok`
 {
   reports:
-      "$(const.n)Bail out! $(reason)";
+    "$(const.n)Bail out! $(reason)";
 }
 
 bundle agent testing_usage_example
@@ -276,23 +423,29 @@ bundle agent testing_usage_example
 # * format=jUnit, then testing_jUnit_report(MYFILE): all jUnit to MYFILE, output at end
 {
   classes:
-      "reported_class" scope => "namespace";
+    "reported_class" scope => "namespace";
 
   methods:
-      "" usebundle => testing_ok("reported_class", "ok message", "TAP");
-      "" usebundle => testing_ok_if("missing_class", "missing message", "error1", "error trace 1", "TAP");
-      "" usebundle => testing_ok_if("missing_class2", "missing message2", "error2", "error trace 2", "TAP");
-      "" usebundle => testing_skip("skipped_class", "we skipped this", "TAP");
-      "" usebundle => testing_todo("todo_class", "we need to do this", "TAP");
+    "" usebundle => testing_ok("reported_class", "ok message", "TAP");
 
-      # output the reports to some files
-      # "" usebundle => testing_junit_report("/var/cfengine/outputs/junit.xml");
-      # "" usebundle => testing_tap_report("/var/cfengine/outputs/tap.txt");
+    ""
+      usebundle => testing_ok_if(
+        "missing_class", "missing message", "error1", "error trace 1", "TAP"
+      );
 
-      # output the reports to STDOUT
-      "" usebundle => testing_junit_report('');
-      "" usebundle => testing_tap_report('');
+    ""
+      usebundle => testing_ok_if(
+        "missing_class2", "missing message2", "error2", "error trace 2", "TAP"
+      );
+
+    "" usebundle => testing_skip("skipped_class", "we skipped this", "TAP");
+    "" usebundle => testing_todo("todo_class", "we need to do this", "TAP");
+
+    # output the reports to some files
+    # "" usebundle => testing_junit_report("/var/cfengine/outputs/junit.xml");
+    # "" usebundle => testing_tap_report("/var/cfengine/outputs/tap.txt");
+    # output the reports to STDOUT
+    "" usebundle => testing_junit_report('');
+    "" usebundle => testing_tap_report('');
 }
-#
 @endif
-#
