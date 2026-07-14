@@ -53,6 +53,7 @@ bundle edit_line enable_autorun
   insert_lines:
     'bundle common __autorun_enable { classes: "services_autorun" expression => "any"; }';
 }
+
 #######################################################
 bundle agent check
 {

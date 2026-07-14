@@ -1,39 +1,23 @@
 #################################################
 # CFEngine Enterprise Hub HA policy inclusion
 #################################################
-
 bundle common cfengine_enterprise_hub_ha
 # @brief Inputs specific to CFEngine Enterprise High Availability
 {
   vars:
     enable_cfengine_enterprise_hub_ha::
-
-      "input[ha_main]"
-        string => "cfe_internal/enterprise/ha/ha.cf";
-
-      "input[ha_def]"
-        string => "cfe_internal/enterprise/ha/ha_def.cf";
-
-      "classification_bundles"
-        slist => { "ha_def" };
-
-      "management_bundles"
-        slist => { "ha_main" };
-
+      "input[ha_main]" string => "cfe_internal/enterprise/ha/ha.cf";
+      "input[ha_def]" string => "cfe_internal/enterprise/ha/ha_def.cf";
+      "classification_bundles" slist => { "ha_def" };
+      "management_bundles" slist => { "ha_main" };
       "inputs" slist => getvalues(input);
 
     !enable_cfengine_enterprise_hub_ha::
-
-      "classification_bundles"
-        slist => { "$(this.bundle)" };
-
-      "management_bundles"
-        slist => { "$(this.bundle)" };
-
-      "inputs"
-        slist => { };
-
+      "classification_bundles" slist => { "$(this.bundle)" };
+      "management_bundles" slist => { "$(this.bundle)" };
+      "inputs" slist => {};
 }
+
 body file control
 # @brief Include policy specific to CFEngine Enterprise High Availability
 {

@@ -3,48 +3,52 @@ bundle agent cfe_internal_enterprise_main
 {
   methods:
     any::
-
       "security" -> { InfoSec }
         usebundle => change_management,
         comment => "Basic change management",
         handle => "cfe_internal_enterprise_main_change_management";
 
     enterprise_edition.(policy_server|am_policy_hub)::
+      "hub"
+        usebundle => update_cli_rest_server_url_config,
+        handle => "update_cli_rest_server_url_config",
+        comment => "Update https port in php config files from cfe_internal_hub_vars.https_port";
 
-      "hub" usebundle => update_cli_rest_server_url_config,
-            handle => "update_cli_rest_server_url_config",
-            comment => "Update https port in php config files from cfe_internal_hub_vars.https_port";
-
-      "hub" usebundle => cfe_internal_update_folders,
-      handle => "cfe_internal_management_update_folders",
-      comment => "Create empty directories for CFE self-upgrade";
+      "hub"
+        usebundle => cfe_internal_update_folders,
+        handle => "cfe_internal_management_update_folders",
+        comment => "Create empty directories for CFE self-upgrade";
 
       "hub" -> { "Mission Portal", "CFEngine Enterprise" }
-        usebundle => cfe_internal_purge_scheduled_reports_older_than_days( $(def.purge_scheduled_reports_older_than_days) ),
-        handle    => "cfe_internal_management_purge_scheduled_reports_older_than_days",
-        comment   => "So that we do not fill up the disk we need to purge scheduled
+        usebundle => cfe_internal_purge_scheduled_reports_older_than_days(
+          $(def.purge_scheduled_reports_older_than_days)
+        ),
+        handle => "cfe_internal_management_purge_scheduled_reports_older_than_days",
+        comment => "So that we do not fill up the disk we need to purge scheduled
                       reports after some time.";
 
-      "hub" usebundle => cfe_internal_setup_knowledge,
-      handle => "cfe_internal_management_setup_knowledge",
-      comment => "Manage CFE Knowledge Map";
+      "hub"
+        usebundle => cfe_internal_setup_knowledge,
+        handle => "cfe_internal_management_setup_knowledge",
+        comment => "Manage CFE Knowledge Map";
 
-      "Enterprise Maintenance"
-        usebundle => cfe_internal_enterprise_maintenance;
+      "Enterprise Maintenance" usebundle => cfe_internal_enterprise_maintenance;
 
-      "hub" usebundle => cfe_internal_php_runalerts,
-      handle => "cfe_internal_management_php_runalerts",
-      comment => concat("To run PHP runalerts to check bundle status on SQL and Sketch.",
-                        " ENT-5432: must run after cfe_internal_enterprise_maintenance bundle",
-                        " so that active_hub class is determined. Since version 3.24.0 running",
-                        " alerts is part of cf-reactor"),
-      if => cf_version_before("3.24");
+      "hub"
+        usebundle => cfe_internal_php_runalerts,
+        handle => "cfe_internal_management_php_runalerts",
+        comment => concat(
+          "To run PHP runalerts to check bundle status on SQL and Sketch.",
+          " ENT-5432: must run after cfe_internal_enterprise_maintenance bundle",
+          " so that active_hub class is determined. Since version 3.24.0 running",
+          " alerts is part of cf-reactor"
+        ),
+        if => cf_version_before("3.24");
 
       "Inventory Enterprise License Utilization" -> { "ENT-5089" }
         usebundle => inventory_cfengine_enterprise_license_utilization;
 
     enterprise_edition.(policy_server|am_policy_hub).enable_log_cfengine_enterprise_license_utilization::
-
       "hub" -> { "ENT-3186" }
         usebundle => log_cfengine_enterprise_license_utilization,
         handle => "log_cfengine_enterprise_license_utilization",
@@ -53,37 +57,42 @@ bundle agent cfe_internal_enterprise_main
     # As passive hub is supposed to run read-only PostgreSQL instance
     # doing maintenance makes no sense and is not possible at all.
     (enterprise_edition.(policy_server|am_policy_hub).!enable_cfengine_enterprise_hub_ha)||(enable_cfengine_enterprise_hub_ha.hub_active)::
+      "hub"
+        usebundle => cfe_internal_hub_maintain,
+        handle => "cfe_internal_management_hub_maintain",
+        comment => "Start the hub maintenance process";
 
-      "hub" usebundle => cfe_internal_hub_maintain,
-      handle => "cfe_internal_management_hub_maintain",
-      comment => "Start the hub maintenance process";
-
-      "hub" usebundle => cfe_internal_truncate_events,
-      handle => "cfe_internal_truncate_events",
-      comment => "To run CFE truncate to pending";
+      "hub"
+        usebundle => cfe_internal_truncate_events,
+        handle => "cfe_internal_truncate_events",
+        comment => "To run CFE truncate to pending";
 
     postgresql_full_maintenance|postgresql_monitoring_maintenance::
-
-      "hub" usebundle => cfe_internal_postgresql_maintenance,
-      handle => "cfe_internal_management_postgresql_maintenance",
-      action => measure_promise_time("cfe_internal_management_postgresql_maintenance"),
-      comment => "Run clean up on PostgreSQL database";
+      "hub"
+        usebundle => cfe_internal_postgresql_maintenance,
+        handle => "cfe_internal_management_postgresql_maintenance",
+        action => measure_promise_time(
+          "cfe_internal_management_postgresql_maintenance"
+        ),
+        comment => "Run clean up on PostgreSQL database";
 
     postgresql_vacuum::
-
-      "hub" usebundle => cfe_internal_postgresql_vacuum,
-      handle => "cfe_internal_management_postgresql_vacuum",
-      action => measure_promise_time("cfe_internal_management_postgresql_vacuum"),
-      comment => "Maintain PostgreSQL by executing vacuum";
+      "hub"
+        usebundle => cfe_internal_postgresql_vacuum,
+        handle => "cfe_internal_management_postgresql_vacuum",
+        action => measure_promise_time(
+          "cfe_internal_management_postgresql_vacuum"
+        ),
+        comment => "Maintain PostgreSQL by executing vacuum";
 
     enable_cfe_internal_cleanup_agent_reports::
-      "any" usebundle => cfe_internal_cleanup_agent_reports,
-      handle => "cfe_internal_management_cleanup_agent_reports",
-      comment => "Remove accumulated reports if they grow too large in size";
+      "any"
+        usebundle => cfe_internal_cleanup_agent_reports,
+        handle => "cfe_internal_management_cleanup_agent_reports",
+        comment => "Remove accumulated reports if they grow too large in size";
 
     !windows::
       "Permissions and Ownership"
         usebundle => cfe_internal_permissions,
         comment => "Specific expectations for permissions and ownership for cfengine itself";
-
 }

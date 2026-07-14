@@ -6,71 +6,56 @@
 # by cf-agent
 #
 ###############################################################################
-
 body agent control
-
 {
-      # Global default for time that must elapse before promise will be rechecked.
-      # Don't keep any promises.
-
-    any::
-
+  # Global default for time that must elapse before promise will be rechecked.
+  # Don't keep any promises.
+  any::
 @if minimum_version(3.27.0)
-      # The order in which promises are evaluated (top_down|classic)
-        evaluation_order => "$(default:def.control_agent_evaluation_order)";
+    # The order in which promises are evaluated (top_down|classic)
+    evaluation_order => "$(default:def.control_agent_evaluation_order)";
 @endif
+    # Minimum time (in minutes) which should have passed since the last time
+    # the promise was verified before it is checked again.
+    ifelapsed => "1";
 
-      # Minimum time (in minutes) which should have passed since the last time
-      # the promise was verified before it is checked again.
+    # Do not send IP/name during server connection if address resolution is broken.
+    # Comment it out if you do NOT have a problem with DNS
+    skipidentify => "true";
 
-      ifelapsed => "1";
+    # explicitly not supported (but they should break long before)
+    abortclasses => {
+      "cfengine_3_3", "cfengine_3_4", @(def.control_agent_abortclasses)
+    };
 
-      # Do not send IP/name during server connection if address resolution is broken.
-      # Comment it out if you do NOT have a problem with DNS
+    # The abortbundleclasses slist contains regular expressions that match
+    # classes which if defined lead to termination of current bundle.
+    abortbundleclasses => { @(def.control_agent_abortbundleclasses) };
 
-        skipidentify => "true";
+    # Maximum number of outgoing connections to a remote cf-serverd.
+    maxconnections => "$(def.control_agent_maxconnections)";
 
-      # explicitly not supported (but they should break long before)
-        abortclasses => { "cfengine_3_3", "cfengine_3_4", @(def.control_agent_abortclasses) };
-
-      # The abortbundleclasses slist contains regular expressions that match
-      # classes which if defined lead to termination of current bundle.
-      abortbundleclasses => { @(def.control_agent_abortbundleclasses) };
-
-      # Maximum number of outgoing connections to a remote cf-serverd.
-      maxconnections => "$(def.control_agent_maxconnections)";
-
-      # Environment variables of the agent process.
-      # The values of environment variables are inherited by child commands
-      # EMPTY list is not valid for environment attribute Ref: CFE-3927. So, we
-      # do some validation on it so we can apply it selectively.
-
+    # Environment variables of the agent process.
+    # The values of environment variables are inherited by child commands
+    # EMPTY list is not valid for environment attribute Ref: CFE-3927. So, we
+    # do some validation on it so we can apply it selectively.
 @if minimum_version(3.27.0)
-      default_directory_create_mode => "$(def.control_agent_default_directory_create_mode)";
+    default_directory_create_mode => "$(def.control_agent_default_directory_create_mode)";
 @endif
+  _control_agent_environment_vars_validated::
+    environment => { @(def.control_agent_environment_vars) };
 
-   _control_agent_environment_vars_validated::
+  _have_control_agent_files_single_copy::
+    # CFE-3622
+    # File patterns which allow a file to be copied over only a single time
+    # per agent run.
+    files_single_copy => { @(def.control_agent_files_single_copy) };
 
-      environment => { @(def.control_agent_environment_vars) };
+  mpf_control_agent_default_repository::
+    # Location to backup files before they are edited by cfengine
+    default_repository => "$(def.control_agent_default_repository)";
 
-    _have_control_agent_files_single_copy::
-      # CFE-3622
-
-      # File patterns which allow a file to be copied over only a single time
-      # per agent run.
-
-      files_single_copy => { @(def.control_agent_files_single_copy) };
-
-    mpf_control_agent_default_repository::
-
-      # Location to backup files before they are edited by cfengine
-
-      default_repository => "$(def.control_agent_default_repository)";
-
-      # Environment variables based on Distro
-
-    control_agent_agentfacility_configured::
-
-      agentfacility => "$(default:def.control_agent_agentfacility)";
-
+  # Environment variables based on Distro
+  control_agent_agentfacility_configured::
+    agentfacility => "$(default:def.control_agent_agentfacility)";
 }

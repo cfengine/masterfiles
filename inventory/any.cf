@@ -4,28 +4,30 @@ bundle common inventory_any
 # This common bundle is for any OS work not handled by specific
 # bundles.
 {
-
   vars:
-      "release_data" string => "$(this.promise_dirname)/../cf_promises_release_id";
+    "release_data"
+      string => "$(this.promise_dirname)/../cf_promises_release_id";
 
-      "data"
-        data => readjson( $(release_data), inf ),
-        if => fileexists( $(release_data) );
+    "data"
+      data => readjson($(release_data), inf),
+      if => fileexists($(release_data));
 
-      "id"
-        string => "$(data[releaseId])",
-        meta => { "inventory", "attribute_name=Policy Release Id" };
+    "id"
+      string => "$(data[releaseId])",
+      meta => { "inventory", "attribute_name=Policy Release Id" };
 
-      "policy_version" -> { "ENT-9806" }
-        string => "$(default:control_common.version)",
-        meta => { "inventory", "attribute_name=CFEngine policy version" },
-        if => not(isvariable("sys.policy_version")),
-        comment => concat( "Don't inventory the policy version from policy when it's available",
-                    " as a sys var to avoid duplicate values being inventoried.");
+    "policy_version" -> { "ENT-9806" }
+      string => "$(default:control_common.version)",
+      meta => { "inventory", "attribute_name=CFEngine policy version" },
+      if => not(isvariable("sys.policy_version")),
+      comment => concat(
+        "Don't inventory the policy version from policy when it's available",
+        " as a sys var to avoid duplicate values being inventoried."
+      );
 
   reports:
-      "DEBUG|DEBUG_$(this.bundle)"::
-        "DEBUG $(this.bundle): Inventory Policy Release Id=$(id)";
+    "DEBUG|DEBUG_$(this.bundle)"::
+      "DEBUG $(this.bundle): Inventory Policy Release Id=$(id)";
 }
 
 bundle agent inventory_autorun
@@ -37,12 +39,14 @@ bundle agent inventory_autorun
 {
   methods:
     !disable_inventory_LLDP::
-      "LLDP" usebundle => cfe_autorun_inventory_lldp(),
-      handle => "cfe_internal_autorun_inventory_LLDP";
+      "LLDP"
+        usebundle => cfe_autorun_inventory_lldp(),
+        handle => "cfe_internal_autorun_inventory_LLDP";
 
     !disable_inventory_package_refresh::
-      "packages_refresh" usebundle => cfe_autorun_inventory_packages(),
-      handle => "cfe_internal_autorun_inventory_packages";
+      "packages_refresh"
+        usebundle => cfe_autorun_inventory_packages(),
+        handle => "cfe_internal_autorun_inventory_packages";
 
     !disable_inventory_policy_servers::
       "Inventory Policy Servers"
@@ -50,19 +54,23 @@ bundle agent inventory_autorun
         usebundle => cfe_autorun_inventory_policy_servers;
 
     !disable_inventory_proc::
-      "proc" usebundle => cfe_autorun_inventory_proc(),
-      handle => "cfe_internal_autorun_inventory_proc";
+      "proc"
+        usebundle => cfe_autorun_inventory_proc(),
+        handle => "cfe_internal_autorun_inventory_proc";
 
-      "proc_cpuinfo" usebundle => cfe_autorun_inventory_proc_cpuinfo(),
-      handle => "cfe_internal_autorun_inventory_proc_cpuinfo";
+      "proc_cpuinfo"
+        usebundle => cfe_autorun_inventory_proc_cpuinfo(),
+        handle => "cfe_internal_autorun_inventory_proc_cpuinfo";
 
     !disable_inventory_cpuinfo::
-      "cpuinfo" usebundle => cfe_autorun_inventory_cpuinfo(),
-      handle => "cfe_internal_autorun_inventory_cpuinfo";
+      "cpuinfo"
+        usebundle => cfe_autorun_inventory_cpuinfo(),
+        handle => "cfe_internal_autorun_inventory_cpuinfo";
 
     !disable_inventory_fstab::
-      "fstab" usebundle => cfe_autorun_inventory_fstab(),
-      handle => "cfe_internal_autorun_inventory_fstab";
+      "fstab"
+        usebundle => cfe_autorun_inventory_fstab(),
+        handle => "cfe_internal_autorun_inventory_fstab";
 
     !disable_inventory_mtab::
       "mtab" -> { "ENT-8338" }
@@ -71,15 +79,18 @@ bundle agent inventory_autorun
         action => default:immediate;
 
     !disable_inventory_dmidecode::
-      "dmidecode" usebundle => cfe_autorun_inventory_dmidecode(),
-      handle => "cfe_internal_autorun_inventory_dmidecode";
+      "dmidecode"
+        usebundle => cfe_autorun_inventory_dmidecode(),
+        handle => "cfe_internal_autorun_inventory_dmidecode";
 
     !disable_inventory_aws::
-      "aws" usebundle => cfe_autorun_inventory_aws(),
+      "aws"
+        usebundle => cfe_autorun_inventory_aws(),
         handle => "cfe_internal_autorun_inventory_aws";
 
     !disable_inventory_aws|disable_inventory_aws_ec2_metadata::
-      "aws" usebundle => cfe_autorun_inventory_aws_ec2_metadata(),
+      "aws"
+        usebundle => cfe_autorun_inventory_aws_ec2_metadata(),
         handle => "cfe_internal_autorun_inventory_ec2_metadata";
 
     !disable_inventory_setuid::
@@ -88,17 +99,21 @@ bundle agent inventory_autorun
         handle => "cfe_internal_autorun_inventory_setuid";
 
     any::
-      "listening ports" usebundle => cfe_autorun_inventory_listening_ports(),
-      handle => "cfe_internal_autorun_listening_ports";
+      "listening ports"
+        usebundle => cfe_autorun_inventory_listening_ports(),
+        handle => "cfe_internal_autorun_listening_ports";
 
-      "disk" usebundle => cfe_autorun_inventory_disk(),
-      handle => "cfe_internal_autorun_disk";
+      "disk"
+        usebundle => cfe_autorun_inventory_disk(),
+        handle => "cfe_internal_autorun_disk";
 
-      "memory" usebundle => cfe_autorun_inventory_memory(),
-      handle => "cfe_internal_autorun_memory";
+      "memory"
+        usebundle => cfe_autorun_inventory_memory(),
+        handle => "cfe_internal_autorun_memory";
 
-      "loadaverage" usebundle => cfe_autorun_inventory_loadaverage(),
-      handle => "cfe_internal_autorun_loadaverage";
+      "loadaverage"
+        usebundle => cfe_autorun_inventory_loadaverage(),
+        handle => "cfe_internal_autorun_loadaverage";
 
       "IP addresses" -> { "ENT-2552", "ENT-4987" }
         usebundle => cfe_autorun_inventory_ip_addresses,
@@ -112,11 +127,11 @@ bundle agent cfe_autorun_inventory_listening_ports
 # default, as it runs instantly and has no side effects.
 {
   vars:
-      "ports" -> { "ENT-150" }
-        slist => sort( "mon.listening_ports", "int"),
-        meta => { "inventory", "attribute_name=Ports listening" },
-        if => some("[0-9]+", "mon.listening_ports"),
-        comment => "We only want to inventory the listening ports if we have
+    "ports" -> { "ENT-150" }
+      slist => sort("mon.listening_ports", "int"),
+      meta => { "inventory", "attribute_name=Ports listening" },
+      if => some("[0-9]+", "mon.listening_ports"),
+      comment => "We only want to inventory the listening ports if we have
                     values that make sense.";
 }
 
@@ -125,49 +140,68 @@ bundle agent cfe_autorun_inventory_ip_addresses
 # This will filter the ipv4 and ipv4 loopback address (127.0.0.1, ::as it is likely not very interesting)
 {
   vars:
-      "ipv4_regex" -> { "ENT-4987" }
-        string => "\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b";
+    "ipv4_regex" -> { "ENT-4987" }
+      string => "\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b";
 
-      "ipv4_loopback_regex" -> { "ENT-2552" }
-        string => "127\.0\.0\.1",
-        comment => "Addresses that match this regular expression will be filtered
+    "ipv4_loopback_regex" -> { "ENT-2552" }
+      string => "127\.0\.0\.1",
+      comment => "Addresses that match this regular expression will be filtered
                     from the inventory for ipv4 addresses";
 
-      "ipv6_loopback_regex" -> { "ENT-4987" }
-        string => "::1",
-        comment => "Addresses that match this regular expression will be filtered
+    "ipv6_loopback_regex" -> { "ENT-4987" }
+      string => "::1",
+      comment => "Addresses that match this regular expression will be filtered
                     from the inventory for ipv4 addresses";
 
     # Strings are displayed more beautifully in Mission Portal than lists, so
     # we first generate the list of addresses to be inventoried and then do
     # inventory using an array.
-      "ipv4_addresses"
-        slist => sort( filter( $(ipv4_regex), "sys.ip_addresses", "true", "false", inf), lex ),
-        if => not( isvariable( $(this.promiser) ));
+    "ipv4_addresses"
+      slist => sort(
+        filter($(ipv4_regex), "sys.ip_addresses", "true", "false", inf), lex
+      ),
+      if => not(isvariable($(this.promiser)));
 
-      "ipv4_addresses_non_loopback" -> { "ENT-2552" }
-        slist => sort( filter( $(ipv4_loopback_regex), "$(this.bundle).ipv4_addresses", "true", "true", inf)),
-        if => not( isvariable( $(this.promiser) ));
+    "ipv4_addresses_non_loopback" -> { "ENT-2552" }
+      slist => sort(
+        filter(
+          $(ipv4_loopback_regex),
+          "$(this.bundle).ipv4_addresses",
+          "true",
+          "true",
+          inf
+        )
+      ),
+      if => not(isvariable($(this.promiser)));
 
-      "ipv4[$(ipv4_addresses_non_loopback)]" -> { "ENT-2552" }
-        string => "$(ipv4_addresses_non_loopback)",
-        meta => { "inventory", "attribute_name=IPv4 addresses" };
+    "ipv4[$(ipv4_addresses_non_loopback)]" -> { "ENT-2552" }
+      string => "$(ipv4_addresses_non_loopback)",
+      meta => { "inventory", "attribute_name=IPv4 addresses" };
 
-      # sys.ip_addresses contains ipv4 and (as of 3.15.0) ipv6 addresses. We get
-      # the ipv6 addresses indirectly, based on excluding the ipv4 addresses
-      # (which we identify using a regular expression)
+    # sys.ip_addresses contains ipv4 and (as of 3.15.0) ipv6 addresses. We get
+    # the ipv6 addresses indirectly, based on excluding the ipv4 addresses
+    # (which we identify using a regular expression)
+    "ipv6_addresses" -> { "ENT-4987" }
+      slist => sort(
+        difference("sys.ip_addresses", "$(this.bundle).ipv4_addresses"), lex
+      ),
+      if => not(isvariable($(this.promiser)));
 
-      "ipv6_addresses" -> { "ENT-4987" }
-        slist => sort( difference( "sys.ip_addresses", "$(this.bundle).ipv4_addresses" ), lex),
-        if => not( isvariable( $(this.promiser) ));
+    "ipv4_addresses_non_loopback" -> { "ENT-4987" }
+      slist => sort(
+        filter(
+          $(ipv6_loopback_regex),
+          "$(this.bundle).ipv4_addresses",
+          "true",
+          "true",
+          inf
+        )
+      ),
+      if => not(isvariable($(this.promiser)));
 
-      "ipv4_addresses_non_loopback" -> { "ENT-4987" }
-        slist => sort( filter( $(ipv6_loopback_regex), "$(this.bundle).ipv4_addresses", "true", "true", inf)),
-        if => not( isvariable( $(this.promiser) ));
-
-      "ipv6[$(ipv6_addresses_non_loopback)]" -> { "ENT-4987" }
-        string => "$(ipv6_addresses_non_loopback)",
-        meta => { "inventory", "attribute_name=IPv6 addresses" };
+    "ipv6[$(ipv6_addresses_non_loopback)]" -> { "ENT-4987" }
+      string => "$(ipv6_addresses_non_loopback)",
+      meta => { "inventory", "attribute_name=IPv6 addresses" };
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_ipv4_addresses::
@@ -184,7 +218,7 @@ bundle agent cfe_autorun_inventory_disk
       "free" -> { "ENT-5190" }
         string => "$(mon.value_diskfree)",
         meta => { "inventory", "attribute_name=Disk free (%)" },
-        if => isvariable( "mon.value_diskfree" );
+        if => isvariable("mon.value_diskfree");
 }
 
 bundle agent cfe_autorun_inventory_memory
@@ -192,55 +226,82 @@ bundle agent cfe_autorun_inventory_memory
 {
   vars:
 @if minimum_version(3.11)
-      # The `with` attribute is necessary for this to work in a single promise.
-
+    # The `with` attribute is necessary for this to work in a single promise.
     enterprise_edition.windows::
-
       # wmic returns "TotalVisibleMemorySize=10760224" so split on = and take
       # the second item (0-based with nth())
-
       "total" -> { "ENT-4188" }
         meta => { "inventory", "attribute_name=Memory size (MB)" },
-        string => format( "%d", eval("$(with)/1024", "math", "infix" )),
-        if => not( isvariable( "total" ) ),
-        with => nth( string_split( execresult("wmic OS get TotalVisibleMemorySize /format:list", useshell ),
-                                   "=", 2), 1);
+        string => format("%d", eval("$(with)/1024", "math", "infix")),
+        if => not(isvariable("total")),
+        with => nth(
+          string_split(
+            execresult(
+              "wmic OS get TotalVisibleMemorySize /format:list", useshell
+            ),
+            "=",
+            2
+          ),
+          1
+        );
 
       "totalPhysical" -> { "CFE-2896" }
         meta => { "inventory", "attribute_name=Physical memory (MB)" },
-        string => format( "%d", eval("$(with)/1024", "math", "infix" )),
-        if => not( isvariable( "total" ) ),
-        with => nth( string_split( execresult("wmic ComputerSystem get TotalPhysicalMemory /format:list", useshell ),
-                                   "=", 2), 1);
+        string => format("%d", eval("$(with)/1024", "math", "infix")),
+        if => not(isvariable("total")),
+        with => nth(
+          string_split(
+            execresult(
+              "wmic ComputerSystem get TotalPhysicalMemory /format:list",
+              useshell
+            ),
+            "=",
+            2
+          ),
+          1
+        );
 
       # This is a volatile metric, perhaps  not well suited for inventory
       "free"
         meta => { "report" },
-        string => format( "%d", eval("$(with)/1024", "math", "infix" )),
-        if => not( isvariable( "free" ) ),
-        with => nth( string_split( execresult("wmic OS get FreePhysicalMemory /format:list", useshell ),
-                                   "=", 2), 1);
+        string => format("%d", eval("$(with)/1024", "math", "infix")),
+        if => not(isvariable("free")),
+        with => nth(
+          string_split(
+            execresult(
+              "wmic OS get FreePhysicalMemory /format:list", useshell
+            ),
+            "=",
+            2
+          ),
+          1
+        );
 @endif
     enterprise_edition.aix::
       "total" -> { "CFE-2797", "CFE-2803" }
-        string => execresult("/usr/bin/lparstat -i | awk '/Online Memory/ { print $4 }'", "useshell"),
+        string => execresult(
+          "/usr/bin/lparstat -i | awk '/Online Memory/ { print $4 }'",
+          "useshell"
+        ),
         meta => { "inventory", "attribute_name=Memory size (MB)" };
 
     enterprise_edition.hpux::
-       "total" -> { "ENT-4188" }
-         string => execresult( "machinfo | awk '/^Memory =/ {print $3}'", useshell ),
-         meta => { "inventory", "attribute_name=Memory size (MB)" };
+      "total" -> { "ENT-4188" }
+        string => execresult(
+          "machinfo | awk '/^Memory =/ {print $3}'", useshell
+        ),
+        meta => { "inventory", "attribute_name=Memory size (MB)" };
 
     enterprise_edition.!(aix|windows|hpux)::
-      "total" string => "$(mon.value_mem_total)",
+      "total"
+        string => "$(mon.value_mem_total)",
         meta => { "inventory", "attribute_name=Memory size (MB)" },
-        if => isvariable( "mon.value_mem_total" );
+        if => isvariable("mon.value_mem_total");
 
-      "free" string => "$(mon.value_mem_free)",
-        if => and( not( isvariable( "free" ) ),
-                   isvariable( "mon.value_mem_free" )),
+      "free"
+        string => "$(mon.value_mem_free)",
+        if => and(not(isvariable("free")), isvariable("mon.value_mem_free")),
         meta => { "report" };
-
 }
 
 bundle agent cfe_autorun_inventory_setuid
@@ -252,8 +313,7 @@ bundle agent cfe_autorun_inventory_setuid
 {
   vars:
     !disable_inventory_setuid::
-      "candidates" slist => lsdir( "$(sys.workdir)", "cfagent\..*\.log", true );
-
+      "candidates" slist => lsdir("$(sys.workdir)", "cfagent\..*\.log", true);
       "_reg_setuid_filestat_modeoct" string => "10(4|5|6|7)\d+";
       "_reg_setgid_filestat_modeoct" string => "10(2|3|6|7)\d+";
 
@@ -261,88 +321,108 @@ bundle agent cfe_autorun_inventory_setuid
         comment => "We select the file that matches the downcased version of the
                     hostname since sys.fqhost always returns lower case",
         string => "$(candidates)",
-        if => strcmp( "$(sys.workdir)/cfagent.$(sys.fqhost).log",
-                      string_downcase($(candidates)));
+        if => strcmp(
+          "$(sys.workdir)/cfagent.$(sys.fqhost).log",
+          string_downcase($(candidates))
+        );
 
-      "files" slist => readstringlist( $(setuid_log_path), "", "$(const.n)", inf, inf);
+      "files"
+        slist => readstringlist($(setuid_log_path), "", "$(const.n)", inf, inf);
 
       "setuid[$(files)]"
         string => "$(files)",
         meta => { "inventory", "attribute_name=Setuid files" },
-        if => regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) );
+        if => regcmp(
+          $(_reg_setuid_filestat_modeoct), filestat($(files), modeoct)
+        );
 
       "rootsetuid[$(files)]"
         string => "$(files)",
         meta => { "inventory", "attribute_name=Root owned setuid files" },
-        if => and( regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) ),
-                   regcmp( "0", filestat( $(files), uid ) ));
+        if => and(
+          regcmp($(_reg_setuid_filestat_modeoct), filestat($(files), modeoct)),
+          regcmp("0", filestat($(files), uid))
+        );
 
       "setgid[$(files)]" -> { "ENT-6793" }
         string => "$(files)",
         meta => { "inventory", "attribute_name=Setgid files" },
-        if => regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) );
+        if => regcmp(
+          $(_reg_setuid_filestat_modeoct), filestat($(files), modeoct)
+        );
 
       "rootsetgid[$(files)]" -> { "ENT-6793" }
         string => "$(files)",
         meta => { "inventory", "attribute_name=Root owned setgid files" },
-        if => and( regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) ),
-                   regcmp( "0", filestat( $(files), gid ) ));
+        if => and(
+          regcmp($(_reg_setuid_filestat_modeoct), filestat($(files), modeoct)),
+          regcmp("0", filestat($(files), gid))
+        );
 
-    files:
+  files:
     !disable_inventory_setuid::
       "$(setuid_log_path)"
-        comment => concat( "If the logged file is not currently setuid|setgid then we can",
-                           "safely purge it from the list to avoid unnecessary work."),
-        edit_line => delete_lines_matching( escape( $(files) ) ),
-        if => not( regcmp( "($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))",
-                           filestat( $(files), modeoct ) ) );
+        comment => concat(
+          "If the logged file is not currently setuid|setgid then we can",
+          "safely purge it from the list to avoid unnecessary work."
+        ),
+        edit_line => delete_lines_matching(escape($(files))),
+        if => not(
+          regcmp(
+            "($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))",
+            filestat($(files), modeoct)
+          )
+        );
 
   reports:
     !disable_inventory_setuid.(DEBUG|DEBUG_cfe_autorun_inventory_setuid)::
-      "$(setuid_log_path) present"
-        if =>  fileexists( $(setuid_log_path) );
-
+      "$(setuid_log_path) present" if => fileexists($(setuid_log_path));
 @if minimum_version(3.11)
-
       "Previously logged (setuid|setgid) file: $(files) modeoct=$(with)"
-        with => filestat( $(files), modeoct );
+        with => filestat($(files), modeoct);
 
       "Should remove '$(files)' from '$(setuid_log_path)' because `filestat ($(files), modeoct )` returns '$(with)' which does not match '($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))' (setgid|setuid)"
-        comment => concat( "If the logged file is not currently set(uid&|gid) then we can",
-                           "safely purge it from the list to avoid unnecessary work."),
-
-        with => filestat( $(files), modeoct ),
-        if => not( regcmp( "($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))",
-                           filestat( $(files), modeoct ) ) );
+        comment => concat(
+          "If the logged file is not currently set(uid&|gid) then we can",
+          "safely purge it from the list to avoid unnecessary work."
+        ),
+        with => filestat($(files), modeoct),
+        if => not(
+          regcmp(
+            "($(_reg_setuid_filestat_modeoct))|($(_reg_setgid_filestat_modeoct))",
+            filestat($(files), modeoct)
+          )
+        );
 
       # The `with` attribute was introduced in 3.11
       "Inventory: setuid Files: $(files) modeoct=$(with)"
-        with => filestat( $(files), modeoct ),
-        if => regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) );
+        with => filestat($(files), modeoct),
+        if => regcmp(
+          $(_reg_setuid_filestat_modeoct), filestat($(files), modeoct)
+        );
 
       "Inventory: root owned setuid Files: $(files) modeoct=$(with)"
-        with => filestat( $(files), modeoct ),
-        if => and( regcmp( $(_reg_setuid_filestat_modeoct), filestat( $(files), modeoct ) ),
-                   regcmp( "0", filestat( $(files), uid ) ));
-
+        with => filestat($(files), modeoct),
+        if => and(
+          regcmp($(_reg_setuid_filestat_modeoct), filestat($(files), modeoct)),
+          regcmp("0", filestat($(files), uid))
+        );
 @endif
-
 }
 
 bundle agent cfe_autorun_inventory_timezone
 # @brief Inventory timezone and GMT offset
 {
   vars:
-      "_now" int => now();
+    "_now" int => now();
 
-      "timezone" -> { "ENT-6161" }
-        string => strftime( localtime, "%Z", $(_now) ),
-        meta => { "inventory", "attribute_name=Timezone" };
+    "timezone" -> { "ENT-6161" }
+      string => strftime(localtime, "%Z", $(_now)),
+      meta => { "inventory", "attribute_name=Timezone" };
 
-      "gmt_offset" -> { "ENT-6161" }
-        string => strftime( localtime, "%z", $(_now) ),
-        meta => { "inventory", "attribute_name=Timezone GMT Offset" };
-
+    "gmt_offset" -> { "ENT-6161" }
+      string => strftime(localtime, "%z", $(_now)),
+      meta => { "inventory", "attribute_name=Timezone GMT Offset" };
 }
 
 bundle agent cfe_autorun_inventory_loadaverage
@@ -353,7 +433,7 @@ bundle agent cfe_autorun_inventory_loadaverage
       "value" -> { "ENT-5190" }
         string => "$(mon.value_loadavg)",
         meta => { "report" },
-        if => isvariable( "mon.value_loadavg" );
+        if => isvariable("mon.value_loadavg");
 }
 
 bundle agent cfe_autorun_inventory_proc
@@ -370,98 +450,109 @@ bundle agent cfe_autorun_inventory_proc
 # `ifconfig`.
 {
   vars:
-      # To override this set of base files, define default:cfe_autorun_inventory_proc.basefiles via augments.
-      # {
-      #   "variables": {
-      #                  "default:cfe_autorun_inventory_proc.basefiles" : {
-      #                          "value": [ "consoles", "cpuinfo", "version" ],
-      #                          "comment": "We do not need the extra variables this produces since we get the info differently",
-      #                          "tags": [ "inventory", "attribute_name=My Inventory" ]
-      #                  }
-      #   }
-      # }
+    # To override this set of base files, define default:cfe_autorun_inventory_proc.basefiles via augments.
+    # {
+    #   "variables": {
+    #                  "default:cfe_autorun_inventory_proc.basefiles" : {
+    #                          "value": [ "consoles", "cpuinfo", "version" ],
+    #                          "comment": "We do not need the extra variables this produces since we get the info differently",
+    #                          "tags": [ "inventory", "attribute_name=My Inventory" ]
+    #                  }
+    #   }
+    # }
+    "basefiles" -> { "CFE-4056" }
+      slist => { "consoles", "cpuinfo", "modules", "partitions", "version" },
+      unless => isvariable("$(this.namespace):$(this.bundle).basefiles");
 
-      "basefiles" -> { "CFE-4056" }
-        slist => { "consoles", "cpuinfo", "modules", "partitions", "version" },
-        unless => isvariable( "$(this.namespace):$(this.bundle).basefiles" );
-
-      "files[$(basefiles)]" string => "$(inventory_control.proc)/$(basefiles)";
+    "files[$(basefiles)]" string => "$(inventory_control.proc)/$(basefiles)";
 
     _have_proc_consoles::
-      "console_count" int =>  readstringarrayidx("consoles",
-                                                 "$(files[consoles])",
-                                                 "\s*#[^\n]*",
-                                                 "\s+",
-                                                 500,
-                                                 50000);
+      "console_count"
+        int => readstringarrayidx(
+          "consoles", "$(files[consoles])", "\s*#[^\n]*", "\s+", 500, 50000
+        );
 
       "console_idx" slist => getindices("consoles");
 
     _have_proc_modules::
-      "module_count" int =>  readstringarrayidx("modules",
-                                                "$(files[modules])",
-                                                "\s*#[^\n]*",
-                                                "\s+",
-                                                2500,
-                                                250000);
+      "module_count"
+        int => readstringarrayidx(
+          "modules", "$(files[modules])", "\s*#[^\n]*", "\s+", 2500, 250000
+        );
 
       "module_idx" slist => getindices("modules");
 
     _have_proc_cpuinfo::
       # this will extract all the keys in one bunch, so you won't get
       # detailed info for processor 0 for example
-      "cpuinfo_count" int =>  readstringarrayidx("cpuinfo_array",
-                                                 "$(files[cpuinfo])",
-                                                 "\s*#[^\n]*",
-                                                 "\s*:\s*",
-                                                 500,
-                                                 50000);
+      "cpuinfo_count"
+        int => readstringarrayidx(
+          "cpuinfo_array",
+          "$(files[cpuinfo])",
+          "\s*#[^\n]*",
+          "\s*:\s*",
+          500,
+          50000
+        );
 
       "cpuinfo_idx" slist => getindices("cpuinfo_array");
-      "cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])]" string => "$(cpuinfo_array[$(cpuinfo_idx)][1])";
+
+      "cpuinfo[$(cpuinfo_array[$(cpuinfo_idx)][0])]"
+        string => "$(cpuinfo_array[$(cpuinfo_idx)][1])";
+
       "cpuinfo_keys" slist => getindices("cpuinfo");
 
     _have_proc_partitions::
-      "partitions_count" int =>  readstringarrayidx("partitions_array",
-                                                    "$(files[partitions])",
-                                                    "major[^\n]*",
-                                                    "\s+",
-                                                    500,
-                                                    50000);
+      "partitions_count"
+        int => readstringarrayidx(
+          "partitions_array",
+          "$(files[partitions])",
+          "major[^\n]*",
+          "\s+",
+          500,
+          50000
+        );
 
       "partitions_idx" slist => getindices("partitions_array");
-      "partitions[$(partitions_array[$(partitions_idx)][4])]" string => "$(partitions_array[$(partitions_idx)][3])";
+
+      "partitions[$(partitions_array[$(partitions_idx)][4])]"
+        string => "$(partitions_array[$(partitions_idx)][3])";
+
       "partitions_keys" slist => getindices("partitions");
 
     _have_proc_version::
       "version" string => readfile("$(files[version])", 2048);
 
   classes:
-      "have_proc" expression => isdir($(inventory_control.proc));
+    "have_proc" expression => isdir($(inventory_control.proc));
 
     have_proc::
       "_have_proc_$(basefiles)"
-      expression => fileexists("$(files[$(basefiles)])");
+        expression => fileexists("$(files[$(basefiles)])");
 
     _have_proc_consoles::
       "have_console_$(consoles[$(console_idx)][0])"
-      expression => "any",
-      scope => "namespace";
+        expression => "any",
+        scope => "namespace";
 
     _have_proc_modules::
       "have_module_$(modules[$(module_idx)][0])"
-      expression => "any",
-      scope => "namespace";
+        expression => "any",
+        scope => "namespace";
 
   reports:
     _have_proc_consoles.verbose_mode::
       "$(this.bundle): we have console $(consoles[$(console_idx)][0])";
+
     _have_proc_modules.verbose_mode::
       "$(this.bundle): we have module $(modules[$(module_idx)][0])";
+
     _have_proc_cpuinfo.verbose_mode::
       "$(this.bundle): we have cpuinfo $(cpuinfo_keys) = $(cpuinfo[$(cpuinfo_keys)])";
+
     _have_proc_partitions.verbose_mode::
       "$(this.bundle): we have partitions $(partitions_keys) with $(partitions[$(partitions_keys)]) blocks";
+
     _have_proc_version.verbose_mode::
       "$(this.bundle): we have kernel version '$(version)'";
 }
@@ -470,16 +561,38 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
 # @brief Inventory cpu information from proc
 {
   classes:
-    "_have_cpuinfo" expression => isvariable("default:cfe_autorun_inventory_proc.cpuinfo_idx");
+    "_have_cpuinfo"
+      expression => isvariable(
+        "default:cfe_autorun_inventory_proc.cpuinfo_idx"
+      );
 
-      # So that we don't inventory non dereferenced variables we check to see
-      # if we have the info first This is only necessary because its currently
-      # invalid to do isvariable on an array key that contains a space
-      # Ref: redmine#7088 https://dev.cfengine.com/issues/7088
-      "have_cpuinfo_cpu_cores" expression => strcmp("cpu cores", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
-      "have_cpuinfo_model_name" expression => strcmp("model name", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
-      "have_cpuinfo_hardware" expression => strcmp("Hardware", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
-      "have_cpuinfo_revision" expression => strcmp("Revision", "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])");
+    # So that we don't inventory non dereferenced variables we check to see
+    # if we have the info first This is only necessary because its currently
+    # invalid to do isvariable on an array key that contains a space
+    # Ref: redmine#7088 https://dev.cfengine.com/issues/7088
+    "have_cpuinfo_cpu_cores"
+      expression => strcmp(
+        "cpu cores",
+        "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])"
+      );
+
+    "have_cpuinfo_model_name"
+      expression => strcmp(
+        "model name",
+        "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])"
+      );
+
+    "have_cpuinfo_hardware"
+      expression => strcmp(
+        "Hardware",
+        "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])"
+      );
+
+    "have_cpuinfo_revision"
+      expression => strcmp(
+        "Revision",
+        "$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])"
+      );
 
   vars:
     _have_cpuinfo::
@@ -499,22 +612,23 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
         string => "$(default:cfe_autorun_inventory_proc.cpuinfo[Revision])",
         if => "have_cpuinfo_revision";
 
-    # We need to be able to count the number of unique physical id lines in
-    # /proc/cpu in order to get a physical processor count.
-      "cpuinfo_lines" slist => readstringlist(
-                                                 "$(default:cfe_autorun_inventory_proc.files[cpuinfo])",
-                                                 "\s*#[^\n]*",
-                                                 "\n",
-                                                 500,
-                                                 50000);
+      # We need to be able to count the number of unique physical id lines in
+      # /proc/cpu in order to get a physical processor count.
+      "cpuinfo_lines"
+        slist => readstringlist(
+          "$(default:cfe_autorun_inventory_proc.files[cpuinfo])",
+          "\s*#[^\n]*",
+          "\n",
+          500,
+          50000
+        );
 
       "cpuinfo_processor_lines"
         slist => grep("processor\s+:\s\d+", "cpuinfo_lines"),
         comment => "The number of processor entries in $(default:cfe_autorun_inventory_proc.files[cpuinfo]). If no
                     'physical id' entries are found this is the processor count";
 
-      "cpuinfo_processor_lines_count"
-        int => length("cpuinfo_processor_lines");
+      "cpuinfo_processor_lines_count" int => length("cpuinfo_processor_lines");
 
       "cpuinfo_physical_id_lines"
         slist => grep("physical id.*", "cpuinfo_lines"),
@@ -529,65 +643,109 @@ bundle agent cfe_autorun_inventory_proc_cpuinfo
       "cpuinfo_physical_id_lines_unique_count"
         int => length("cpuinfo_physical_id_lines_unique");
 
-
       # If we have physical id lines in cpu info use that for socket inventory,
       # else we should use the number of processor lines. physical id lines
       # seem to only be present when multiple cores are active.
       "cpuinfo_physical_socket_inventory"
-        string => ifelse(isgreaterthan( length("cpuinfo_physical_id_lines"), 0 ), "$(cpuinfo_physical_id_lines_unique_count)",
-                      "$(cpuinfo_processor_lines_count)"),
+        string => ifelse(
+          isgreaterthan(length("cpuinfo_physical_id_lines"), 0),
+          "$(cpuinfo_physical_id_lines_unique_count)",
+          "$(cpuinfo_processor_lines_count)"
+        ),
         meta => { "inventory", "attribute_name=CPU sockets" };
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_proc::
-     "DEBUG $(this.bundle)";
-     "$(const.t)cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])] = $(default:cfe_autorun_inventory_proc.cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])])";
-     "$(const.t)CPU physical cores: '$(cpuinfo_physical_cores)'"
+      "DEBUG $(this.bundle)";
+      "$(const.t)cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])] = $(default:cfe_autorun_inventory_proc.cpuinfo[$(default:cfe_autorun_inventory_proc.cpuinfo_array[$(default:cfe_autorun_inventory_proc.cpuinfo_idx)][0])])";
+
+      "$(const.t)CPU physical cores: '$(cpuinfo_physical_cores)'"
         if => "have_cpuinfo_cpu_cores";
-     "$(const.t)CPU model name: '$(cpuinfo_cpu_model_name)'"
+
+      "$(const.t)CPU model name: '$(cpuinfo_cpu_model_name)'"
         if => "have_cpuinfo_model_name";
-     "$(const.t)CPU Physical Sockets: '$(cpuinfo_physical_socket_inventory)'";
+
+      "$(const.t)CPU Physical Sockets: '$(cpuinfo_physical_socket_inventory)'";
 }
 
 bundle agent cfe_autorun_inventory_cpuinfo
 # @brief Inventory cpu information
 {
   classes:
-    "_have_proc_cpu_model_name" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_cpu_model_name");
-    "_have_proc_hardware" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_hardware");
-    "_have_proc_revision" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_revision");
-    "_have_proc_cpu_physical_cores" expression => isvariable("default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_physical_cores");
+    "_have_proc_cpu_model_name"
+      expression => isvariable(
+        "default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_cpu_model_name"
+      );
+
+    "_have_proc_hardware"
+      expression => isvariable(
+        "default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_hardware"
+      );
+
+    "_have_proc_revision"
+      expression => isvariable(
+        "default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_revision"
+      );
+
+    "_have_proc_cpu_physical_cores"
+      expression => isvariable(
+        "default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_physical_cores"
+      );
 
     # We only accept dmidecode values that don't look like cfengine variables,
     # (starting with dollar), or that have an apparent empty value.
     "_have_dmidecode_cpu_model_name"
-      not => regcmp("($(const.dollar)\(.*\)|^$)", "$(default:cfe_autorun_inventory_dmidecode.dmi[processor-version])");
+      not => regcmp(
+        "($(const.dollar)\(.*\)|^$)",
+        "$(default:cfe_autorun_inventory_dmidecode.dmi[processor-version])"
+      );
 
   vars:
     _have_proc_cpu_physical_cores::
       "cpuinfo_physical_cores"
         string => "$(default:cfe_autorun_inventory_proc.cpuinfo[cpu cores])",
         #if => "have_cpuinfo_cpu_cores",
-        meta => { "inventory", "attribute_name=CPU physical cores", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
+        meta => {
+          "inventory",
+          "attribute_name=CPU physical cores",
+          "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])",
+        };
 
     _have_proc_cpu_model_name::
       "cpu_model"
         string => "$(default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_cpu_model_name)",
-        meta => { "inventory", "attribute_name=CPU model", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
+        meta => {
+          "inventory",
+          "attribute_name=CPU model",
+          "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])",
+        };
 
     _have_proc_hardware::
       "cpu_model"
         string => "$(default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_hardware)",
-        meta => { "inventory", "attribute_name=CPU model", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
+        meta => {
+          "inventory",
+          "attribute_name=CPU model",
+          "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])",
+        };
+
     _have_proc_revision::
       "system_product_name"
         string => "$(default:cfe_autorun_inventory_proc_cpuinfo.cpuinfo_revision)",
-        meta => { "inventory", "attribute_name=System product name", "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])" };
+        meta => {
+          "inventory",
+          "attribute_name=System product name",
+          "derived-from=$(default:cfe_autorun_inventory_proc.files[cpuinfo])",
+        };
 
     _have_dmidecode_cpu_model_name.!_have_proc_cpu_model_name::
       "cpu_model"
         string => "$(default:cfe_autorun_inventory_dmidecode.dmi[processor-version])",
-        meta => { "inventory", "attribute_name=CPU model", "derived-from=$(inventory_control.dmidecoder) -s processor-version" };
+        meta => {
+          "inventory",
+          "attribute_name=CPU model",
+          "derived-from=$(inventory_control.dmidecoder) -s processor-version",
+        };
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_cpuinfo::
@@ -607,39 +765,45 @@ bundle common cfe_autorun_inventory_aws
       "ec2_instance" -> { "CFE-2924" }
         comment => "See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html",
         scope => "namespace",
-        expression => regcmp("^[eE][cC]2.*", "$(cfe_autorun_inventory_dmidecode.dmi[system-uuid])"),
+        expression => regcmp(
+          "^[eE][cC]2.*", "$(cfe_autorun_inventory_dmidecode.dmi[system-uuid])"
+        ),
         if => isvariable("cfe_autorun_inventory_dmidecode.dmi[system-uuid]");
 
       "ec2_instance" -> { "CFE-2924" }
-        expression => regcmp(".*[aA]mazon.*", "$(cfe_autorun_inventory_dmidecode.dmi[bios-version])"),
+        expression => regcmp(
+          ".*[aA]mazon.*",
+          "$(cfe_autorun_inventory_dmidecode.dmi[bios-version])"
+        ),
         scope => "namespace",
         if => isvariable("cfe_autorun_inventory_dmidecode.dmi[bios-version]");
 
       "ec2_instance" -> { "CFE-2924" }
-        expression => regcmp(".*[aA]mazon.*", "$(cfe_autorun_inventory_dmidecode.dmi[bios-vendor])"),
+        expression => regcmp(
+          ".*[aA]mazon.*",
+          "$(cfe_autorun_inventory_dmidecode.dmi[bios-vendor])"
+        ),
         scope => "namespace",
         if => isvariable("cfe_autorun_inventory_dmidecode.dmi[bios-vendor]");
-
 @if minimum_version(3.22.0)
       "sys_hypervisor_uuid_readable" -> { "ENT-9931" }
         expression => isreadable("/sys/hypervisor/uuid", 1);
 @else
       "sys_hypervisor_uuid_readable" -> { "ENT-9931" }
-        expression => returnszero("${paths.cat} /sys/hypervisor/uuid >/dev/null 2>&1", "useshell");
+        expression => returnszero(
+          "${paths.cat} /sys/hypervisor/uuid >/dev/null 2>&1", "useshell"
+        );
 @endif
-
     !disable_inventory_aws.sys_hypervisor_uuid_readable::
       "ec2_instance" -> { "CFE-2924" }
-        expression => regline( "^ec2.*", "/sys/hypervisor/uuid" ),
+        expression => regline("^ec2.*", "/sys/hypervisor/uuid"),
         scope => "namespace",
         if => fileexists("/sys/hypervisor/uuid");
 
   reports:
     (DEBUG|DEBUG_inventory_aws)::
       "DEBUG $(this.bundle)";
-
-      "$(const.t)+ec2_instance"
-        if => "ec2_instance";
+      "$(const.t)+ec2_instance" if => "ec2_instance";
 }
 
 bundle agent cfe_autorun_inventory_aws_ec2_metadata
@@ -660,23 +824,31 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_data
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
       "base_url" string => "http://169.254.169.254/latest";
 
-      "imdsv2_token_cmd"  string => '$(paths.curl) -s -X PUT "$(base_url)/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"';
+      "imdsv2_token_cmd"
+        string => '$(paths.curl) -s -X PUT "$(base_url)/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"';
 
       # Store the token for imdsv2 query, and it's result just once.
       "imdsv2_token"
         string => execresult("$(imdsv2_token_cmd)", noshell, stdout),
-        if => not( isvariable( imdsv2_token ) );
-      "imdsv2_cmd" string => '$(paths.curl) -s -H "X-aws-ec2-metadata-token: $(imdsv2_token)" $(base_url)/dynamic/instance-identity/document';
+        if => not(isvariable(imdsv2_token));
+
+      "imdsv2_cmd"
+        string => '$(paths.curl) -s -H "X-aws-ec2-metadata-token: $(imdsv2_token)" $(base_url)/dynamic/instance-identity/document';
+
       "imdsv2_cmd_result"
-        string => execresult( "$(imdsv2_cmd)", noshell ),
-        if => not( isvariable( imdsv2_cmd_result ) );
+        string => execresult("$(imdsv2_cmd)", noshell),
+        if => not(isvariable(imdsv2_cmd_result));
 
       # Store the result of the imdsv1 query, just once (if it's not alredy been defined) only if imdsv2 result is not valid
-      "imdsv1_cmd" string => "$(paths.curl) -s $(base_url)/dynamic/instance-identity/document";
+      "imdsv1_cmd"
+        string => "$(paths.curl) -s $(base_url)/dynamic/instance-identity/document";
+
       "imdsv1_cmd_result"
-        string => execresult( "$(imdsv1_cmd)", noshell ),
-        if => and( not( isvariable( imdsv1_cmd_result ) ),
-                   not( validjson( "$(imdsv2_cmd_result)" ) ) );
+        string => execresult("$(imdsv1_cmd)", noshell),
+        if => and(
+          not(isvariable(imdsv1_cmd_result)),
+          not(validjson("$(imdsv2_cmd_result)"))
+        );
 }
 
 bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
@@ -685,11 +857,18 @@ bundle agent cfe_autorun_inventory_aws_ec2_metadata_cache
 # Provides cache of ec2 instance metadata for inventory
 {
   vars:
-      "cache"     string => "$(sys.statedir)/aws_ec2_metadata";
+    "cache" string => "$(sys.statedir)/aws_ec2_metadata";
 
   classes:
-      "imdsv1_result_valid" expression => validjson( "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv1_cmd_result)" );
-      "imdsv2_result_valid" expression => validjson( "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv2_cmd_result)" );
+    "imdsv1_result_valid"
+      expression => validjson(
+        "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv1_cmd_result)"
+      );
+
+    "imdsv2_result_valid"
+      expression => validjson(
+        "$(cfe_autorun_inventory_aws_ec2_metadata_data.imdsv2_cmd_result)"
+      );
 
   files:
     imdsv1_result_valid.!imdsv2_result_valid::
@@ -708,26 +887,40 @@ bundle agent cfe_aws_ec2_metadata_from_cache
 # Image ID, and EC2 Availability Zone
 {
   classes:
-
     ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
-
       "have_cached_instance_identity"
-        expression => fileexists( $(cfe_autorun_inventory_aws_ec2_metadata_cache.cache) );
+        expression => fileexists(
+          $(cfe_autorun_inventory_aws_ec2_metadata_cache.cache)
+        );
 
   vars:
-
     have_cached_instance_identity.ec2_instance.!(disable_inventory_aws|disable_inventory_aws_ec2_metadata)::
+      "data"
+        data => readjson(
+          $(cfe_autorun_inventory_aws_ec2_metadata_cache.cache), 100K
+        );
 
-      "data" data => readjson( $(cfe_autorun_inventory_aws_ec2_metadata_cache.cache), 100K);
+      "region"
+        string => "$(data[region])",
+        meta => { "inventory", "attribute_name=EC2 Region" };
 
-      "region" string => "$(data[region])", meta => { "inventory", "attribute_name=EC2 Region" };
-      "instanceId" string => "$(data[instanceId])", meta => { "inventory", "attribute_name=EC2 Instance ID" };
-      "instanceType" string => "$(data[instanceType])", meta => { "inventory", "attribute_name=EC2 Instance Type" };
-      "imageId" string => "$(data[imageId])", meta => { "inventory", "attribute_name=EC2 Image ID" };
-      "availabilityZone" string => "$(data[availabilityZone])", meta => { "inventory", "attribute_name=EC2 Availability Zone" };
+      "instanceId"
+        string => "$(data[instanceId])",
+        meta => { "inventory", "attribute_name=EC2 Instance ID" };
+
+      "instanceType"
+        string => "$(data[instanceType])",
+        meta => { "inventory", "attribute_name=EC2 Instance Type" };
+
+      "imageId"
+        string => "$(data[imageId])",
+        meta => { "inventory", "attribute_name=EC2 Image ID" };
+
+      "availabilityZone"
+        string => "$(data[availabilityZone])",
+        meta => { "inventory", "attribute_name=EC2 Availability Zone" };
 
   reports:
-
     DEBUG|DEBUG_inventory_ec2_metadata|DEBUG_inventory_ec2_metadata_from_cache::
       "DEBUG $(this.bundle):";
       "$(const.t)Inventory 'EC2 Region' = '$(region)'";
@@ -755,15 +948,11 @@ bundle agent cfe_autorun_inventory_mtab
     have_mtab::
       "mounts"
         meta => { "noreport" },
-        data => data_readstringarrayidx( $(inventory_control.mtab),
-                                         "\s*#[^\n]*",
-                                         "\s+",
-                                         inf,
-                                         inf);
+        data => data_readstringarrayidx(
+          $(inventory_control.mtab), "\s*#[^\n]*", "\s+", inf, inf
+        );
 
-      "mount_count"
-        int => length( mounts );
-
+      "mount_count" int => length(mounts);
       "idx" slist => getindices("mounts");
 
       "inventory_mount_point[$(idx)]" -> { "ENT-8338" }
@@ -775,22 +964,22 @@ bundle agent cfe_autorun_inventory_mtab
         meta => { "noreport" };
 
       "slist_unique_fs_types"
-        slist => unique( sort( getvalues( inventory_mounted_fs ), lex ) );
+        slist => unique(sort(getvalues(inventory_mounted_fs), lex));
 
       "inventory_fs[$(slist_unique_fs_types)]" -> { "ENT-8338" }
         string => "$(slist_unique_fs_types)",
         meta => { "inventory", "attribute_name=File system" };
 
   classes:
-      "have_mtab" expression => fileexists($(inventory_control.mtab));
+    "have_mtab" expression => fileexists($(inventory_control.mtab));
 
-      # define classes like have_mount_ext4__var for a ext4 /var mount
-      "have_mount_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
+    # define classes like have_mount_ext4__var for a ext4 /var mount
+    "have_mount_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
       expression => "any",
       scope => "namespace";
 
-      # define classes like have_mount_ext4 if there is a ext4 mount
-      "have_mount_$(mounts[$(idx)][2])"
+    # define classes like have_mount_ext4 if there is a ext4 mount
+    "have_mount_$(mounts[$(idx)][2])"
       expression => "any",
       scope => "namespace";
 
@@ -812,30 +1001,28 @@ bundle agent cfe_autorun_inventory_fstab
 {
   vars:
     have_fstab::
-      "mount_count" int =>  readstringarrayidx("mounts",
-                                               $(sys.fstab),
-                                               "\s*#[^\n]*",
-                                               "\s+",
-                                               500,
-                                               50000);
+      "mount_count"
+        int => readstringarrayidx(
+          "mounts", $(sys.fstab), "\s*#[^\n]*", "\s+", 500, 50000
+        );
 
       "idx" slist => getindices("mounts");
 
   classes:
-      "have_fstab" expression => fileexists($(sys.fstab));
+    "have_fstab" expression => fileexists($(sys.fstab));
 
-      # define classes like have_fs_ext4__var for a ext4 /var entry
-      "have_fs_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
+    # define classes like have_fs_ext4__var for a ext4 /var entry
+    "have_fs_$(mounts[$(idx)][2])_$(mounts[$(idx)][1])"
       expression => "any",
       scope => "namespace";
 
-      # define classes like have__var for a /var entry
-      "have_fs_$(mounts[$(idx)][1])"
+    # define classes like have__var for a /var entry
+    "have_fs_$(mounts[$(idx)][1])"
       expression => "any",
       scope => "namespace";
 
-      # define classes like have_fs_ext4 if there is a ext4 entry
-      "have_fs_$(mounts[$(idx)][2])"
+    # define classes like have_fs_ext4 if there is a ext4 entry
+    "have_fs_$(mounts[$(idx)][2])"
       expression => "any",
       scope => "namespace";
 
@@ -870,7 +1057,6 @@ bundle agent cfe_autorun_inventory_dmidecode
 # - System serial number
 # - System manufacturer
 {
-
   vars:
     any::
       "sysfs_name_for"
@@ -884,7 +1070,8 @@ bundle agent cfe_autorun_inventory_dmidecode
         # Items after the line break aren't currently collected, but mapping is provided
         # in case someone adds them to a custom dmidefs (so that they could be gotten
         # from sysfs in that case).
-        data => parsejson('
+        data => parsejson(
+          '
           {
             "bios-vendor": "bios_vendor",
             "bios-version": "bios_version",
@@ -899,13 +1086,16 @@ bundle agent cfe_autorun_inventory_dmidecode
             "baseboard-version": "board_version",
             "bios-release-date": "bios_date",
             "chassis-manufacturer": "chassis_vendor",
-          }');
+          }'
+        );
 
   vars:
     any::
       # The dmidefs variable controls which values are collected
       # (and what are their inventory tags)
-      "dmidefs" data => parsejson('
+      "dmidefs"
+        data => parsejson(
+          '
 {
   "bios-vendor": "BIOS vendor",
   "bios-version": "BIOS version",
@@ -914,13 +1104,13 @@ bundle agent cfe_autorun_inventory_dmidecode
   "system-version": "System version",
   "system-product-name": "System product name",
   "system-uuid": "System UUID",
-}');
+}'
+        );
 
       # We override dmidefs from augments when we can.
-
       "dmidefs" -> { "CFE-2927" }
-        data => mergedata( "def.cfe_autorun_inventory_dmidecode[dmidefs]" ),
-        if => isvariable( "def.cfe_autorun_inventory_dmidecode[dmidefs]");
+        data => mergedata("def.cfe_autorun_inventory_dmidecode[dmidefs]"),
+        if => isvariable("def.cfe_autorun_inventory_dmidecode[dmidefs]");
 
       # other dmidecode variables you may want:
       # baseboard-asset-tag
@@ -938,7 +1128,6 @@ bundle agent cfe_autorun_inventory_dmidecode
       # processor-frequency
       # processor-manufacturer
       #"processor-version": "CPU model" <- Collected by default, but not by iterating over the list
-
       "dmivars" slist => getindices(dmidefs);
 
     have_dmidecode::
@@ -966,49 +1155,57 @@ bundle agent cfe_autorun_inventory_dmidecode
               /, DMI type 1,/ { in1 = 1 }
               /Header and Data:/ { if (in1 != 0) { hd = 1 } }
             '",
-          "useshell" ),
+          "useshell"
+        ),
         if => isvariable("dmidefs[system-uuid]"), # Only run this if system-uuid is marked for collection in dmidefs
         meta => { "inventory", "attribute_name=$(dmidefs[system-uuid])" };
 
     !disable_inventory_dmidecode.!windows::
-    # The reason disable_inventory_dmidecode is referenced here but not in the other context lines
-    # is because those vars depend on have_dmidecode which won't be set during pre-eval (and won't
-    # be set at all if this bundle isn't called).  Without this guard here, we would attempt to
-    # read sysfs even if dmi inventory were turned off on the host via disable_inventory_dmidecode,
-    # which would be undesirable.
+      # The reason disable_inventory_dmidecode is referenced here but not in the other context lines
+      # is because those vars depend on have_dmidecode which won't be set during pre-eval (and won't
+      # be set at all if this bundle isn't called).  Without this guard here, we would attempt to
+      # read sysfs even if dmi inventory were turned off on the host via disable_inventory_dmidecode,
+      # which would be undesirable.
       "dmi[$(dmivars)]"
         unless => isvariable("dmi[$(dmivars)]"), # This is just for system-uuid really, which we get from the awk script above by preference.
-        if =>   fileexists("/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])"),
-        string => readfile("/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])", 0),
+        if => fileexists(
+          "/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])"
+        ),
+        string => readfile(
+          "/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])", 0
+        ),
         meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
 
     # Redhat 4 can support the -s option to dmidecode if
     # kernel-utils-2.4-15.el4 or greater is installed.
     have_dmidecode.!(redhat_4|redhat_3).!have_proc_device_tree::
-      "dmi[$(dmivars)]" string => execresult("$(decoder) -s $(dmivars)",
-                                             "useshell"),
-      unless => isvariable("dmi[$(dmivars)]"), # If already defined from sysfs, don't run dmidecode
-      meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
+      "dmi[$(dmivars)]"
+        string => execresult("$(decoder) -s $(dmivars)", "useshell"),
+        unless => isvariable("dmi[$(dmivars)]"), # If already defined from sysfs, don't run dmidecode
+        meta => { "inventory", "attribute_name=$(dmidefs[$(dmivars)])" };
 
       # We do not want to inventory the model name from here, as inventory for
       # CPU info has been abstracted away from DMI so we just collect it
       # manually.
-
-      "dmi[processor-version]" string => execresult("$(decoder) -s processor-version",
-                                             "useshell");
+      "dmi[processor-version]"
+        string => execresult("$(decoder) -s processor-version", "useshell");
 
     windows.powershell::
-      "dmi[bios-vendor]" string => $(bios_array[1]),
-      meta => { "inventory", "attribute_name=BIOS vendor" };
+      "dmi[bios-vendor]"
+        string => $(bios_array[1]),
+        meta => { "inventory", "attribute_name=BIOS vendor" };
 
-      "dmi[system-serial-number]" string => $(bios_array[2]),
-      meta => { "inventory", "attribute_name=System serial number" };
+      "dmi[system-serial-number]"
+        string => $(bios_array[2]),
+        meta => { "inventory", "attribute_name=System serial number" };
 
-      "dmi[bios-version]" string => $(bios_array[3]),
-      meta => { "inventory", "attribute_name=BIOS version" };
+      "dmi[bios-version]"
+        string => $(bios_array[3]),
+        meta => { "inventory", "attribute_name=BIOS version" };
 
-      "dmi[system-version]" string => $(bios_array[4]),
-      meta => { "inventory", "attribute_name=System version" };
+      "dmi[system-version]"
+        string => $(bios_array[4]),
+        meta => { "inventory", "attribute_name=System version" };
 
       "dmi[processor-version]" string => $(processor_array[1]);
 
@@ -1016,50 +1213,76 @@ bundle agent cfe_autorun_inventory_dmidecode
         slist => string_split($(system_array[1]), "PSComputerName\s.*", 2),
         comment => "Work around weird appearance of PSComputerName into System manufacturer";
 
-      "dmi[system-manufacturer]" string => nth(split_pscomputername, 0),
-      meta => { "inventory", "attribute_name=System manufacturer" };
+      "dmi[system-manufacturer]"
+        string => nth(split_pscomputername, 0),
+        meta => { "inventory", "attribute_name=System manufacturer" };
 
   classes:
-      "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
+    "have_dmidecode" expression => fileexists($(inventory_control.dmidecoder));
 
     windows.powershell::
-      "bios_match" expression => regextract(".*Manufacturer\s+:\s([a-zA-Z0-9 ]+)\n.*SerialNumber\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+).*Version\W+([a-zA-Z0-9 -]+)",
-                                            execresult("gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer, SerialNumber, Version FROM WIN32_BIOS'", "powershell"),
-                                            "bios_array");
+      "bios_match"
+        expression => regextract(
+          ".*Manufacturer\s+:\s([a-zA-Z0-9 ]+)\n.*SerialNumber\W+([a-zA-Z0-9 ]+).*SMBIOSBIOSVersion\W+([a-zA-Z0-9 ]+).*Version\W+([a-zA-Z0-9 -]+)",
+          execresult(
+            "gwmi -query 'SELECT SMBIOSBIOSVersion, Manufacturer, SerialNumber, Version FROM WIN32_BIOS'",
+            "powershell"
+          ),
+          "bios_array"
+        );
 
-      "processor_match" expression => regextract(".*Name\W+(.*)",
-                                                 execresult("gwmi -query 'SELECT Name FROM WIN32_PROCESSOR'", "powershell"),
-                                                 "processor_array");
+      "processor_match"
+        expression => regextract(
+          ".*Name\W+(.*)",
+          execresult(
+            "gwmi -query 'SELECT Name FROM WIN32_PROCESSOR'", "powershell"
+          ),
+          "processor_array"
+        );
 
-      "system_match" expression => regextract(".*Manufacturer\W+(.*)",
-                                              execresult("gwmi -query 'SELECT Manufacturer FROM WIN32_COMPUTERSYSTEM'", "powershell"),
-                                              "system_array");
+      "system_match"
+        expression => regextract(
+          ".*Manufacturer\W+(.*)",
+          execresult(
+            "gwmi -query 'SELECT Manufacturer FROM WIN32_COMPUTERSYSTEM'",
+            "powershell"
+          ),
+          "system_array"
+        );
 
   # BEGIN Inventory Total Physical Memory MB
   vars:
-
-      "total_physical_memory_MB" -> { "CFE-2896" }
-        string => readfile( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt", 100),
-        meta => { "inventory", "attribute_name=Physical memory (MB)" },
-        if => fileexists( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt" );
+    "total_physical_memory_MB" -> { "CFE-2896" }
+      string => readfile(
+        "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt",
+        100
+      ),
+      meta => { "inventory", "attribute_name=Physical memory (MB)" },
+      if => fileexists(
+        "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt"
+      );
 
   commands:
-
     have_dmidecode::
-
-      "$(decoder) -t 17 | $(paths.awk) '/^\tSize:.*MB/ {a+=$2} /^\tSize:.*GB/ {b+=$2*1024} END {print a+b}' > '$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt'" -> { "CFE-2896", "ENT-7714" }
+      "$(decoder) -t 17 | $(paths.awk) '/^\tSize:.*MB/ {a+=$2} /^\tSize:.*GB/ {b+=$2*1024} END {print a+b}' > '$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt'" -> {
+          "CFE-2896", "ENT-7714"
+        }
         contain => in_shell,
-        if => not( fileexists( "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt") );
+        if => not(
+          fileexists(
+            "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt"
+          )
+        );
 
   files:
-
-      "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt" -> { "CFE-2896" }
-        delete => tidy,
-        file_select => older_than(0, 0, 1, 0, 0, 0),
-        comment => "Clear the cached value for total physical memory MB once a day.";
+    "$(sys.statedir)/inventory-$(this.bundle)-total-physical-memory-MB.txt" -> {
+        "CFE-2896"
+      }
+      delete => tidy,
+      file_select => older_than(0, 0, 1, 0, 0, 0),
+      comment => "Clear the cached value for total physical memory MB once a day.";
 
   # END Inventory Total Physical Memory MB
-
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_dmidecode::
       "DEBUG $(this.bundle): Obtained $(dmidefs[$(dmivars)]) = '$(dmi[$(dmivars)])'";
@@ -1074,20 +1297,27 @@ bundle agent cfe_autorun_inventory_lldp
 # testing, and your Friendly Network Admin may be of help too.
 {
   classes:
-      "lldpctl_exec_exists" expression => fileexists($(inventory_control.lldpctl_exec));
+    "lldpctl_exec_exists"
+      expression => fileexists($(inventory_control.lldpctl_exec));
 
   vars:
     !disable_inventory_LLDP.lldpctl_exec_exists::
       # TODO When CFE-3108 is DONE, migrate to capturing only stdout
       "info" -> { "CFE-3109", "CFE-3108" }
-        data => parsejson(execresult("$(inventory_control.lldpctl_json) 2>/dev/null", "useshell")),
+        data => parsejson(
+          execresult(
+            "$(inventory_control.lldpctl_json) 2>/dev/null", "useshell"
+          )
+        ),
         if => not(isvariable("def.lldpctl_json")),
         comment => "Not all versions of lldpctl support json, and because an
         absent lldpd will result in an error on stderr resulting noisy logs and
         failure to parse the json we redirect to dev null";
 
       "info" -> { "CFE-3109" }
-        data => parsejson(execresult($(inventory_control.lldpctl_json), "noshell")),
+        data => parsejson(
+          execresult($(inventory_control.lldpctl_json), "noshell")
+        ),
         if => isvariable("def.lldpctl_json"),
         comment => "For safety, we do not run lldpctl in a shell if the path to
         lldpctl is customized via augments";
@@ -1100,54 +1330,61 @@ bundle agent cfe_autorun_inventory_packages
 # startup, unless disabled.  Other package methods can be added below.
 {
   classes:
-      "have_patches" or => { "community_edition", # not in Community
-                             fileexists("$(sys.workdir)/state/software_patches_avail.csv") };
-
-      "have_inventory" and => { "have_patches",
-                                fileexists("$(sys.workdir)/state/software_packages.csv"),
+    "have_patches"
+      or => {
+        "community_edition", # not in Community
+        fileexists("$(sys.workdir)/state/software_patches_avail.csv"),
       };
 
-      "use_package_module_for_inventory" or => { "redhat", "debian", "suse", "sles", "alpinelinux", "windows" };
-      "use_package_method_for_inventory" or => { "gentoo", "aix" };
-      "use_package_method_generic_for_inventory"
-        not => "use_package_module_for_inventory|use_package_method_for_inventory";
+    "have_inventory"
+      and => {
+        "have_patches",
+        fileexists("$(sys.workdir)/state/software_packages.csv"),
+      };
+
+    "use_package_module_for_inventory"
+      or => { "redhat", "debian", "suse", "sles", "alpinelinux", "windows" };
+
+    "use_package_method_for_inventory" or => { "gentoo", "aix" };
+
+    "use_package_method_generic_for_inventory"
+      not => "use_package_module_for_inventory|use_package_method_for_inventory";
 
   vars:
-      # if we have the patches, 7 days; otherwise keep trying
-      "refresh" string => ifelse("have_inventory", "10080",
-                                 "0");
+    # if we have the patches, 7 days; otherwise keep trying
+    "refresh" string => ifelse("have_inventory", "10080", "0");
 
   packages:
-
     # The legacy implementation (package_method) of the packages type promise
     # requires a packages promise to be triggered in order to generate package
     # inventory. The following promises ensure that package inventory data
     # exists. As package modules become available the package_methods should be
     # removed.
-
     aix::
       "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => inventory_lslpp($(refresh)),
-      action => if_elapsed_day;
+        package_policy => "add",
+        package_method => inventory_lslpp($(refresh)),
+        action => if_elapsed_day;
 
     gentoo::
       "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => emerge,
-      action => if_elapsed_day;
+        package_policy => "add",
+        package_method => emerge,
+        action => if_elapsed_day;
 
     use_package_method_generic_for_inventory::
       "cfe_internal_non_existing_package"
-      package_policy => "add",
-      package_method => generic,
-      action => if_elapsed_day;
+        package_policy => "add",
+        package_method => generic,
+        action => if_elapsed_day;
 
   reports:
     DEBUG|DEBUG_cfe_autorun_inventory_packages::
       "DEBUG $(this.bundle): refresh interval is $(refresh)";
+
       "DEBUG $(this.bundle): we have the inventory files."
         if => "have_inventory";
+
       "DEBUG $(this.bundle): we don't have the inventory files."
         if => "!have_inventory";
 }
@@ -1156,42 +1393,37 @@ bundle agent cfe_autorun_inventory_policy_servers
 # @brief Inventory policy servers
 {
   vars:
-
     !disable_inventory_policy_servers::
-
       "_primary_policy_server" -> { "ENT-6212" }
         string => "$(sys.policy_hub)",
         meta => { "inventory", "attribute_name=Primary Policy Server" };
 
       "_policy_servers" -> { "ENT-6212" }
         slist => { @(def.policy_servers) },
-        if => isgreaterthan( length( "def.policy_servers"), 0),
+        if => isgreaterthan(length("def.policy_servers"), 0),
         meta => { "inventory", "attribute_name=Policy Servers" };
-
 }
+
 body package_method inventory_lslpp(update_interval)
 # @brief AIX lslpp installation method for inventory purposes only
 # @param update_interval how often to update the package and patch list
 {
-      package_changes => "individual";
+  package_changes => "individual";
+  package_list_update_command => "/usr/bin/true";
+  package_list_update_ifelapsed => $(update_interval);
+  package_list_command => "/usr/bin/lslpp -Lqc"; # list RPMs too
+  package_list_version_regex => "[^:]+:[^:]+:([^:]+):.*";
 
-      package_list_update_command => "/usr/bin/true";
-      package_list_update_ifelapsed => $(update_interval);
-
-      package_list_command       => "/usr/bin/lslpp -Lqc"; # list RPMs too
-      package_list_version_regex => "[^:]+:[^:]+:([^:]+):.*";
-      # Make sure version is not included in the name, that indicates RPM
-      # packages, which we should ignore.
-      package_list_name_regex    => "[^:]+:(([^-:]|-[^0-9])+):.*";
-      package_installed_regex    => "[^:]+:(([^-:]|-[^0-9])+):[^:]+:[^:]+:.*";
-
-      package_name_convention    => "$(name)-$(version).+";
-
-      package_add_command    => "/usr/bin/true";
-      package_update_command => "/usr/bin/true";
-      package_patch_command  => "/usr/bin/true";
-      package_delete_command => "/usr/bin/true";
-      package_verify_command => "/usr/bin/true";
+  # Make sure version is not included in the name, that indicates RPM
+  # packages, which we should ignore.
+  package_list_name_regex => "[^:]+:(([^-:]|-[^0-9])+):.*";
+  package_installed_regex => "[^:]+:(([^-:]|-[^0-9])+):[^:]+:[^:]+:.*";
+  package_name_convention => "$(name)-$(version).+";
+  package_add_command => "/usr/bin/true";
+  package_update_command => "/usr/bin/true";
+  package_patch_command => "/usr/bin/true";
+  package_delete_command => "/usr/bin/true";
+  package_verify_command => "/usr/bin/true";
 }
 
 body classes inventory_scoped_classes_generic(scope, x)
@@ -1203,12 +1435,41 @@ body classes inventory_scoped_classes_generic(scope, x)
 #
 # Copy of `scoped_classes_generic`, which see.
 {
-      scope => "$(scope)";
-      promise_repaired => { "promise_repaired_$(x)", "$(x)_repaired", "$(x)_ok", "$(x)_reached" };
-      repair_failed => { "repair_failed_$(x)", "$(x)_failed", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
-      repair_denied => { "repair_denied_$(x)", "$(x)_denied", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
-      repair_timeout => { "repair_timeout_$(x)", "$(x)_timeout", "$(x)_not_ok", "$(x)_not_kept", "$(x)_not_repaired", "$(x)_reached" };
-      promise_kept => { "promise_kept_$(x)", "$(x)_kept", "$(x)_ok", "$(x)_not_repaired", "$(x)_reached" };
+  scope => "$(scope)";
+  promise_repaired => {
+    "promise_repaired_$(x)", "$(x)_repaired", "$(x)_ok", "$(x)_reached"
+  };
+  repair_failed => {
+    "repair_failed_$(x)",
+    "$(x)_failed",
+    "$(x)_not_ok",
+    "$(x)_not_kept",
+    "$(x)_not_repaired",
+    "$(x)_reached",
+  };
+  repair_denied => {
+    "repair_denied_$(x)",
+    "$(x)_denied",
+    "$(x)_not_ok",
+    "$(x)_not_kept",
+    "$(x)_not_repaired",
+    "$(x)_reached",
+  };
+  repair_timeout => {
+    "repair_timeout_$(x)",
+    "$(x)_timeout",
+    "$(x)_not_ok",
+    "$(x)_not_kept",
+    "$(x)_not_repaired",
+    "$(x)_reached",
+  };
+  promise_kept => {
+    "promise_kept_$(x)",
+    "$(x)_kept",
+    "$(x)_ok",
+    "$(x)_not_repaired",
+    "$(x)_reached",
+  };
 }
 
 body contain inventory_in_shell
@@ -1216,5 +1477,5 @@ body contain inventory_in_shell
 #
 # Copy of `in_shell`, which see.
 {
-      useshell => "true"; # canonical "useshell" but this is backwards-compatible
+  useshell => "true"; # canonical "useshell" but this is backwards-compatible
 }

@@ -1,4 +1,4 @@
 body file control
 {
-      inputs => { @(def.augments_inputs) };
+  inputs => { @(def.augments_inputs) };
 }

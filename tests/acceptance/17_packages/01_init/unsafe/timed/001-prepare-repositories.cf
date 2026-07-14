@@ -6,30 +6,32 @@
 # It MUST run before the other tests in the unsafe packages directory.
 #
 ########################################################################
-
 body common control
 {
-  inputs => { "../../../../dcs.sub.cf",
-              "../../../../../../$(sys.local_libdir)/files.cf",
-              "../../../../../../$(sys.local_libdir)/commands.cf",
-              "../../../packages-info.cf.sub",
-              "../../../meta_skip.cf.sub",
-            };
+  inputs => {
+    "../../../../dcs.sub.cf",
+    "../../../../../../$(sys.local_libdir)/files.cf",
+    "../../../../../../$(sys.local_libdir)/commands.cf",
+    "../../../packages-info.cf.sub",
+    "../../../meta_skip.cf.sub",
+  };
   bundlesequence => { default("$(this.promise_filename)") };
 }
 
 bundle agent test
 {
   vars:
-      "bundles" slist => { "repositories",
-                           "signing_keys",
-                           "apt_config",
-                           "dpkg_multiarch",
-                           "update"
-                         };
+    "bundles"
+      slist => {
+        "repositories",
+        "signing_keys",
+        "apt_config",
+        "dpkg_multiarch",
+        "update",
+      };
 
   methods:
-      "any" usebundle => "$(bundles)";
+    "any" usebundle => "$(bundles)";
 }
 
 body contain useshell
@@ -43,28 +45,30 @@ bundle agent repositories
     suse|sles::
       "repo_file" string => "/etc/zypp/repos.d/test-repository.repo";
       "repos" slist => { "rpm_repo" };
+
     redhat::
       "repo_file" string => "/etc/yum.repos.d/test-repository.repo";
       "repos" slist => { "rpm_repo" };
+
     debian::
       "repo_file" string => "/etc/apt/sources.list.d/testdebian.list";
       "repos" slist => { "deb_repo1", "deb_repo2" };
 
   files:
-      "/test-repos/$(repos)"
-        copy_from => local_cp("$(p.resources)/$(repos)"),
-        depth_search => recurse("inf");
+    "/test-repos/$(repos)"
+      copy_from => local_cp("$(p.resources)/$(repos)"),
+      depth_search => recurse("inf");
 
-      "$(repo_file)"
-        create => "true",
-        edit_line => repository,
-        edit_defaults => edit_defaults,
-        classes => if_successful("repo_ok");
+    "$(repo_file)"
+      create => "true",
+      edit_line => repository,
+      edit_defaults => edit_defaults,
+      classes => if_successful("repo_ok");
 
     # Remove original sources so that we don't hammer the distro servers.
     debian::
-      "/etc/apt/sources.list"
-        delete => tidy;
+      "/etc/apt/sources.list" delete => tidy;
+
       "/etc/apt/sources.list.d"
         delete => tidy,
         depth_search => recurse("inf"),
@@ -98,6 +102,7 @@ bundle edit_line repository
       "baseurl=file:///test-repos/rpm_repo";
       "enabled=1";
       "gpgcheck=0";
+
     debian::
       "deb file:///test-repos/deb_repo1 package1 main";
       "deb file:///test-repos/deb_repo2 package2 main";
@@ -139,7 +144,8 @@ bundle agent apt_config
 {
   classes:
     !(ubuntu_10|debian_6|ubuntu_24)::
-      "apt_config_ok" expression => "any",
+      "apt_config_ok"
+        expression => "any",
         scope => "namespace";
 
   files:
@@ -164,7 +170,10 @@ bundle agent dpkg_multiarch
 {
   vars:
     debian.64_bit::
-      "foreign_archs" string => execresult("/usr/bin/dpkg --print-foreign-architectures", "noshell");
+      "foreign_archs"
+        string => execresult(
+          "/usr/bin/dpkg --print-foreign-architectures", "noshell"
+        );
 
   classes:
     debian.64_bit::
@@ -182,10 +191,12 @@ bundle agent update
       "zypper ref"
         contain => useshell,
         classes => if_successful("update_ok");
+
     redhat::
       "yum makecache"
         contain => useshell,
         classes => if_successful("update_ok");
+
     debian::
       "apt-get update"
         contain => useshell,
@@ -195,21 +206,19 @@ bundle agent update
 body classes if_successful(x)
 {
   promise_repaired => { "$(x)" };
-  promise_kept     => { "$(x)" };
+  promise_kept => { "$(x)" };
 }
 
 bundle agent check
 {
   classes:
-    "everything_ok" and => { "repo_ok",
-                             "signing_keys_ok",
-                             "apt_config_ok",
-                             "update_ok"
-                           };
+    "everything_ok"
+      and => { "repo_ok", "signing_keys_ok", "apt_config_ok", "update_ok" };
 
   reports:
     everything_ok::
       "$(this.promise_filename) Pass";
+
     !everything_ok::
       "$(this.promise_filename) FAIL";
 }

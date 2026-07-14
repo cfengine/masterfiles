@@ -1,18 +1,20 @@
 bundle agent ha_main
 {
- classes:
-   enable_cfengine_enterprise_hub_ha::
-    "have_ha_hub_active_ip" expression => isvariable("sys.hub_active_ip");
+  classes:
+    enable_cfengine_enterprise_hub_ha::
+      "have_ha_hub_active_ip" expression => isvariable("sys.hub_active_ip");
 
- methods:
-  policy_server.enterprise::
-    "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_mp_status_file;
+  methods:
+    policy_server.enterprise::
+      "manage_mp_enable_cfengine_enterprise_hub_ha_file"
+        usebundle => ha_manage_mp_status_file;
 
-  policy_server.enable_cfengine_enterprise_hub_ha.hub_active::
-    "manage_mp_enable_cfengine_enterprise_hub_ha_file" usebundle => ha_manage_notification_scripts_dir;
+    policy_server.enable_cfengine_enterprise_hub_ha.hub_active::
+      "manage_mp_enable_cfengine_enterprise_hub_ha_file"
+        usebundle => ha_manage_notification_scripts_dir;
 
-  policy_server.!hub_active.have_ha_hub_active_ip::
-    "sync_config_data" usebundle => ha_hub_sync_config_data;
+    policy_server.!hub_active.have_ha_hub_active_ip::
+      "sync_config_data" usebundle => ha_hub_sync_config_data;
 }
 
 # enable_cfengine_enterprise_hub_ha file is used by MP as a first test to figure out if
@@ -20,31 +22,33 @@ bundle agent ha_main
 # file further actions are performed.
 bundle agent ha_manage_mp_status_file
 {
- files:
-  policy_server.!enable_cfengine_enterprise_hub_ha::
-    "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal" }
-      delete => tidy,
-      handle => "cfengine_enterprise_ha_enabled_semaphore_absent",
-      comment => "If this file is present when HA is not enabled
+  files:
+    policy_server.!enable_cfengine_enterprise_hub_ha::
+      "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal" }
+        delete => tidy,
+        handle => "cfengine_enterprise_ha_enabled_semaphore_absent",
+        comment => "If this file is present when HA is not enabled
                   Mission Portal will incorrectly report HA status.";
 
-  policy_server.enable_cfengine_enterprise_hub_ha::
-    "$(sys.workdir)/httpd/htdocs/ha_enabled" -> { "Mission Portal", "ENT-4751" }
-     create => "true",
-     handle => "cfengine_enterprise_ha_enabled_semaphore_present",
-     perms => mog("0440",$(def.cf_apache_user),$(def.cf_apache_group)),
-     comment => "This file is read by mission portal to know that HA
+    policy_server.enable_cfengine_enterprise_hub_ha::
+      "$(sys.workdir)/httpd/htdocs/ha_enabled" -> {
+          "Mission Portal", "ENT-4751"
+        }
+        create => "true",
+        handle => "cfengine_enterprise_ha_enabled_semaphore_present",
+        perms => mog("0440", $(def.cf_apache_user), $(def.cf_apache_group)),
+        comment => "This file is read by mission portal to know that HA
                  is enabled. Without it the UI will not report the
                  correct HA status.";
 }
 
 bundle agent ha_manage_notification_scripts_dir
 {
- files:
+  files:
     "/opt/cfengine/notification_scripts/." -> { "Mission Portal" }
-     create => "true",
-     perms => mog("770", "root", $(def.cf_apache_group)),
-     comment => "This directory is used by Mission Portal to store custom
+      create => "true",
+      perms => mog("770", "root", $(def.cf_apache_group)),
+      comment => "This directory is used by Mission Portal to store custom
                  user-defined scripts. Having HA set up we need to synchronize
                  content of this directory between active and passive hubs.
                  In case of no user-scripts being defined directory may not
@@ -57,55 +61,58 @@ bundle agent ha_hub_sync_config_data
 # @brief Keep passive hub configuration in sync with active hub
 {
   vars:
+    "htdocs" string => "$(sys.workdir)/httpd/htdocs/";
+    "application_config_path" string => "$(htdocs)/application/config/";
 
-      "htdocs" string => "$(sys.workdir)/httpd/htdocs/";
-      "application_config_path" string => "$(htdocs)/application/config/";
-      "application_config_files"
-        comment => "These files are from application/config and if not in sync
+    "application_config_files"
+      comment => "These files are from application/config and if not in sync
         will cause various authentication errors",
-        slist => {
-                   "cf_robot.php",
-                   "appsettings.php",
-                   "config.php", # ENT-4944
-        };
+      slist => {
+        "cf_robot.php",
+        "appsettings.php",
+        "config.php", # ENT-4944
+      };
 
   files:
-      "$(application_config_path)/$(application_config_files)"
-        copy_from => ha_no_backup_scp("$(application_config_path)/$(application_config_files)",
-                                      $(sys.hub_active_ip)),
-        comment => "Ensure application configuration files are in sync to avoid authentication issues",
-        handle => "ha_sync_application_config";
+    "$(application_config_path)/$(application_config_files)"
+      copy_from => ha_no_backup_scp(
+        "$(application_config_path)/$(application_config_files)",
+        $(sys.hub_active_ip)
+      ),
+      comment => "Ensure application configuration files are in sync to avoid authentication issues",
+      handle => "ha_sync_application_config";
 
-      "/opt/cfengine/notification_scripts"
-        copy_from => ha_no_backup_scp("/opt/cfengine/notification_scripts",
-                                      $(sys.hub_active_ip)),
-        comment => "Copy MP notification scripts",
-        handle => "ha_copy_notification_scripts",
-        depth_search => recurse("1");
-
+    "/opt/cfengine/notification_scripts"
+      copy_from => ha_no_backup_scp(
+        "/opt/cfengine/notification_scripts", $(sys.hub_active_ip)
+      ),
+      comment => "Copy MP notification scripts",
+      handle => "ha_copy_notification_scripts",
+      depth_search => recurse("1");
 @if minimum_version(3.11)
-      # These configuration settings were introduced in CFEngine non-LTS 3.11
-      # Used macro as there is no class based way to do version X and greater
-      "$(htdocs)/ldap/config/settings.php" -> { "ENT-4944" }
-        copy_from => ha_no_backup_scp("$(htdocs)/ldap/config/settings.php",
-                                      $(sys.hub_active_ip)),
-        comment => "Ensure LDAP configuration files are in sync to avoid authentication issues",
-        handle => "ha_sync_ldap_config";
+    # These configuration settings were introduced in CFEngine non-LTS 3.11
+    # Used macro as there is no class based way to do version X and greater
+    "$(htdocs)/ldap/config/settings.php" -> { "ENT-4944" }
+      copy_from => ha_no_backup_scp(
+        "$(htdocs)/ldap/config/settings.php", $(sys.hub_active_ip)
+      ),
+      comment => "Ensure LDAP configuration files are in sync to avoid authentication issues",
+      handle => "ha_sync_ldap_config";
 
-      "$(htdocs)/api/config/config.php" -> { "ENT-4944" }
-        copy_from => ha_no_backup_scp("$(htdocs)/api/config/config.php",
-                                      $(sys.hub_active_ip)),
-        comment => "Ensure LDAP configuration files are in sync to avoid authentication issues",
-        handle => "ha_sync_api_config";
+    "$(htdocs)/api/config/config.php" -> { "ENT-4944" }
+      copy_from => ha_no_backup_scp(
+        "$(htdocs)/api/config/config.php", $(sys.hub_active_ip)
+      ),
+      comment => "Ensure LDAP configuration files are in sync to avoid authentication issues",
+      handle => "ha_sync_api_config";
 @endif
 }
 
-body copy_from ha_no_backup_scp(from,server)
+body copy_from ha_no_backup_scp(from, server)
 {
- servers     => { "$(server)" };
- source      => "$(from)";
- compare     => "digest";
- copy_backup => "false";
- encrypt     => "true";
+  servers => { "$(server)" };
+  source => "$(from)";
+  compare => "digest";
+  copy_backup => "false";
+  encrypt => "true";
 }
-

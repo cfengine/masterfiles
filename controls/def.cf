@@ -8,11 +8,10 @@ bundle common def
 # @brief Common settings for the Masterfiles Policy Framework
 {
   vars:
-
     any::
       "augments_inputs"
         slist => {},
-        if => not( isvariable( "augments_inputs" ) ),
+        if => not(isvariable("augments_inputs")),
         comment => "It's important that we define this list, even if it's empty
                     or we get errors about the list being unresolved.";
 
@@ -39,40 +38,35 @@ bundle common def
 
       "control_executor_mailmaxlines" -> { "ENT-9614" }
         int => "30",
-        if => not( isvariable( "control_executor_mailmaxlines" ));
+        if => not(isvariable("control_executor_mailmaxlines"));
 
       "control_executor_mailsubject" -> { "ENT-10210" }
         string => "",
-        if => not( isvariable( "control_executor_mailsubject" ) );
+        if => not(isvariable("control_executor_mailsubject"));
 
       "control_executor_mailfilter_exclude" -> { "ENT-10210" }
         slist => {},
-        if => not( isvariable( "control_executor_mailfilter_exclude" ) );
+        if => not(isvariable("control_executor_mailfilter_exclude"));
 
       "control_executor_mailfilter_include" -> { "ENT-10210" }
         slist => {},
-        if => not( isvariable( "control_executor_mailfilter_include" ) );
+        if => not(isvariable("control_executor_mailfilter_include"));
 
       # List here the IP masks that we grant access to on the server
-
       "acl"
         slist => {
-                   # Allow everything in my own domain.
-
-                   # Note that this:
-                   # 1. requires def.domain to be correctly set
-                   # 2. will cause a DNS lookup for every access
-                   # ".*$(def.domain)",
-
-                   # Assume /16 LAN clients to start with
-                   "$(sys.policy_hub)/16",
-
-                   # Uncomment below if HA is used
-                   #"@(def.policy_servers)"
-
-                   #  "2001:700:700:3.*",
-                   #  "217.77.34.18",
-                   #  "217.77.34.19",
+          # Allow everything in my own domain.
+          # Note that this:
+          # 1. requires def.domain to be correctly set
+          # 2. will cause a DNS lookup for every access
+          # ".*$(def.domain)",
+          # Assume /16 LAN clients to start with
+          "$(sys.policy_hub)/16",
+          # Uncomment below if HA is used
+          #"@(def.policy_servers)"
+          #  "2001:700:700:3.*",
+          #  "217.77.34.18",
+          #  "217.77.34.19",
         },
         comment => "Define an acl for the machines to be granted accesses",
         handle => "common_def_vars_acl",
@@ -81,97 +75,103 @@ bundle common def
 
     !disable_always_accept_policy_server_acl::
       "acl_derived" -> { "ENT-10951" }
-        slist => {
-                   @(def.acl),
-                   "$(sys.policy_hub)"
-        },
+        slist => { @(def.acl), "$(sys.policy_hub)" },
         comment => "Define an acl for the machines to be granted accesses";
 
     disable_always_accept_policy_server_acl::
       "acl_derived" -> { "ENT-10951" }
-        slist => {
-                   @(def.acl)
-        },
+        slist => { @(def.acl) },
         comment => "Define an acl for the machines to be granted accesses";
 
     any::
-
       "control_server_allowconnects" -> { "ENT-10212" }
-        slist => { "127.0.0.1" , "::1", @(def.acl) },
-        if => not( isvariable( "control_server_allowconnects" ) ),
-        comment => concat( "We want to define the default setting for",
-                           " allowconnects in body server control if not",
-                           " already specified" );
+        slist => { "127.0.0.1", "::1", @(def.acl) },
+        if => not(isvariable("control_server_allowconnects")),
+        comment => concat(
+          "We want to define the default setting for",
+          " allowconnects in body server control if not",
+          " already specified"
+        );
 
     !disable_always_accept_policy_server_allowconnects::
       "control_server_allowconnects_derived" -> { "ENT-10951" }
         slist => { "$(sys.policy_hub)", @(def.control_server_allowconnects) },
-        comment => concat( "We want to define the default setting for",
-                           " allowconnects in body server control if not",
-                           " already specified. Since not explicitly excluded",
-                           " we want the policy server itself to be allowed." );
+        comment => concat(
+          "We want to define the default setting for",
+          " allowconnects in body server control if not",
+          " already specified. Since not explicitly excluded",
+          " we want the policy server itself to be allowed."
+        );
 
     disable_always_accept_policy_server_allowconnects::
       "control_server_allowconnects_derived" -> { "ENT-10951" }
         slist => { @(def.control_server_allowconnects) },
-        comment => concat( "We want to define the default setting for",
-                           " allowconnects in body server control if not",
-                           " already specified. Since explicitly excluded",
-                           " we don't automatically include the policy server itself." );
+        comment => concat(
+          "We want to define the default setting for",
+          " allowconnects in body server control if not",
+          " already specified. Since explicitly excluded",
+          " we don't automatically include the policy server itself."
+        );
 
     any::
-
       "control_server_allowallconnects" -> { "ENT-10212" }
-        slist => { "127.0.0.1" , "::1", @(def.acl) },
-        if => not( isvariable( "control_server_allowallconnects" ) ),
-        comment => concat( "We want to define the default setting for",
-                           " allowallconnects in body server control if not",
-                           " already specified" );
+        slist => { "127.0.0.1", "::1", @(def.acl) },
+        if => not(isvariable("control_server_allowallconnects")),
+        comment => concat(
+          "We want to define the default setting for",
+          " allowallconnects in body server control if not",
+          " already specified"
+        );
 
     !disable_always_accept_policy_server_allowallconnects::
       "control_server_allowallconnects_derived" -> { "ENT-10951" }
-        slist => { @(def.control_server_allowallconnects), "$(sys.policy_hub)" },
-        comment => concat( "We want to define the default setting for",
-                           " allowallconnects in body server control if not",
-                           " already specified" );
+        slist => {
+          @(def.control_server_allowallconnects), "$(sys.policy_hub)"
+        },
+        comment => concat(
+          "We want to define the default setting for",
+          " allowallconnects in body server control if not",
+          " already specified"
+        );
 
     disable_always_accept_policy_server_allowallconnects::
       "control_server_allowallconnects_derived" -> { "ENT-10951" }
         slist => { @(def.control_server_allowallconnects) },
-        comment => concat( "We want to define the default setting for",
-                           " allowallconnects in body server control if not",
-                           " already specified" );
+        comment => concat(
+          "We want to define the default setting for",
+          " allowallconnects in body server control if not",
+          " already specified"
+        );
 
     any::
-
       # Out of the hosts in allowconnects, trust new keys only from the
       # following ones.  This is open by default for bootstrapping.
-
       "trustkeysfrom"
         slist => {
-                   # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
-                   "0.0.0.0/0", # allow any IP
+          # COMMENT THE NEXT LINE OUT AFTER ALL MACHINES HAVE BEEN BOOTSTRAPPED.
+          "0.0.0.0/0", # allow any IP
         },
         comment => "Define from which machines keys can be trusted",
-        if => and(not(isvariable("override_data_trustkeysfrom")),
-                          not(isvariable("trustkeysfrom"))),
+        if => and(
+          not(isvariable("override_data_trustkeysfrom")),
+          not(isvariable("trustkeysfrom"))
+        ),
         meta => { "defvar" };
 
       ## List of the hosts not using the latest protocol that we'll accept connections from
       ## (absence of this option or empty list means allow none)
       "control_server_allowlegacyconnects"
         slist => {},
-        if => not( isvariable( "control_server_allowlegacyconnects" ) );
-
+        if => not(isvariable("control_server_allowlegacyconnects"));
 
       # Users authorized to request executions via cf-runagent
       "control_server_allowusers_non_policy_server"
         slist => { "root" },
-        if => not( isvariable( "control_server_allowusers_non_policy_server" ) );
+        if => not(isvariable("control_server_allowusers_non_policy_server"));
 
       "control_server_allowusers_policy_server"
         slist => {},
-        if => not( isvariable( "control_server_allowusers_policy_server" ) );
+        if => not(isvariable("control_server_allowusers_policy_server"));
 
     policy_server::
       "control_server_allowusers" -> { "CFE-3544", "ENT-6666" }
@@ -191,26 +191,37 @@ bundle common def
     any::
       "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673", "ENT-6666" }
         handle => "mpf_admit_cf_runagent_shell_default",
-        if => not( isvariable( "mpf_admit_cf_runagent_shell" )),
+        if => not(isvariable("mpf_admit_cf_runagent_shell")),
         slist => { @(def.policy_servers) },
-        meta => { "inventory", "attribute_name=Allowed hosts for cf-runagent", "derived-from=def.policy_servers" },
-        comment => concat( "By default we admit our policy servers to initiate",
-                           "agent runs via cf-runagent");
+        meta => {
+          "inventory",
+          "attribute_name=Allowed hosts for cf-runagent",
+          "derived-from=def.policy_servers",
+        },
+        comment => concat(
+          "By default we admit our policy servers to initiate",
+          "agent runs via cf-runagent"
+        );
 
       "mpf_admit_cf_runagent_shell_selected" -> { "ENT-6673", "ENT-6666" }
         handle => "mpf_admit_cf_runagent_shell_augments",
-        if => isvariable( "mpf_admit_cf_runagent_shell" ),
+        if => isvariable("mpf_admit_cf_runagent_shell"),
         slist => { @(def.mpf_admit_cf_runagent_shell) },
-        meta => { "inventory", "attribute_name=Allowed hosts for cf-runagent", "derived-from=def.mpf_admit_cf_runagent_shell" },
-        comment => concat( "Users can override the default set of hosts that ",
-                           "can initiate agent runs via cf-runagent.");
+        meta => {
+          "inventory",
+          "attribute_name=Allowed hosts for cf-runagent",
+          "derived-from=def.mpf_admit_cf_runagent_shell",
+        },
+        comment => concat(
+          "Users can override the default set of hosts that ",
+          "can initiate agent runs via cf-runagent."
+        );
 
       # Executor Controls
-
       ## Default splaytime to 4 unless it's already defined (via augments)
       "control_executor_splaytime"
         string => "4",
-        if => not( isvariable( "control_executor_splaytime" ) ),
+        if => not(isvariable("control_executor_splaytime")),
         comment => "Splaytime controls the number of minutes hosts execution
                     should be splayed over. This value should be less than the
                     number of minutes between scheduled executions";
@@ -218,7 +229,7 @@ bundle common def
       ## Default agent_expireafter to 120 unless it's already defined (via augments)
       "control_executor_agent_expireafter" -> { "ENT-4208" }
         string => "120",
-        if => not( isvariable( "control_executor_agent_expireafter" ) ),
+        if => not(isvariable("control_executor_agent_expireafter")),
         comment => "This controls the number of minutes after no data has been
                     recieved by cf-execd from a cf-agent process before that
                     cf-agent process is killed.";
@@ -226,11 +237,20 @@ bundle common def
       ## Default schedule unless it's already defined (via augments)
       "control_executor_schedule_value"
         slist => {
-                   "Min00", "Min05", "Min10", "Min15",
-                   "Min20", "Min25", "Min30", "Min35",
-                   "Min40", "Min45", "Min50", "Min55",
-                 },
-        if => not( isvariable( control_executor_schedule) ),
+          "Min00",
+          "Min05",
+          "Min10",
+          "Min15",
+          "Min20",
+          "Min25",
+          "Min30",
+          "Min35",
+          "Min40",
+          "Min45",
+          "Min50",
+          "Min55",
+        },
+        if => not(isvariable(control_executor_schedule)),
         comment => "This variable defines the list of classes that should
                     trigger exec_command if any of them are defined.";
 
@@ -238,7 +258,7 @@ bundle common def
       # intermediary variable to convert it to list
       "control_executor_schedule_value"
         slist => getvalues(control_executor_schedule),
-        if =>  not( isvariable( control_executor_schedule_value) ),
+        if => not(isvariable(control_executor_schedule_value)),
         comment => "This variable defines the list of classes that should
                     trigger exec_command if any of them are defined.";
 
@@ -246,289 +266,343 @@ bundle common def
       # Set the users allowed by default, if not already set (e.g. via augments)
       "control_executor_runagent_socket_allow_users"
         slist => { "cfapache" },
-        unless => isvariable( $(this.promiser) ),
-        if => and( "enterprise_edition", "am_policy_hub");
+        unless => isvariable($(this.promiser)),
+        if => and("enterprise_edition", "am_policy_hub");
 
       # Agent Controls
-
       "control_agent_evaluation_order" -> { "ENT-13495" }
-        string => ifelse( isvariable( $(this.promiser) ),
-                          "$(default:def.control_agent_evaluation_order)",
-                          "classic"),
-        comment => concat( 'We default to the classic "Normal Order"',
-                           ' for cf-agent if not otherwise specified' );
+        string => ifelse(
+          isvariable($(this.promiser)),
+          "$(default:def.control_agent_evaluation_order)",
+          "classic"
+        ),
+        comment => concat(
+          'We default to the classic "Normal Order"',
+          ' for cf-agent if not otherwise specified'
+        );
 
       "control_agent_update_evaluation_order" -> { "ENT-13495" }
-        string => ifelse( isvariable( $(this.promiser) ),
-                          "$(default:def.control_agent_update_evaluation_order)",
-                          "classic"),
-        comment => concat( 'We default to the classic "Normal Order"',
-                           ' for cf-agent when running update.cf if not otherwise specified' );
+        string => ifelse(
+          isvariable($(this.promiser)),
+          "$(default:def.control_agent_update_evaluation_order)",
+          "classic"
+        ),
+        comment => concat(
+          'We default to the classic "Normal Order"',
+          ' for cf-agent when running update.cf if not otherwise specified'
+        );
 
       "control_agent_abortclasses" -> { "ENT-4823" }
-        slist => { },
+        slist => {},
         comment => "The control body has a variable, so a valid list must be defined or the agent will error",
-        if => not( isvariable( $(this.promiser) ));
+        if => not(isvariable($(this.promiser)));
 
       "control_agent_agentfacility" -> { "ENT-10209" }
         string => "",
-        if => not( isvariable ( $(this.promiser) ));
+        if => not(isvariable($(this.promiser)));
 
       "control_agent_abortbundleclasses" -> { "ENT-4823" }
         slist => { "abortbundle" },
         comment => "The control body has a variable, so a valid list must be defined or the agent will error",
-        if => not( isvariable( $(this.promiser) ));
+        if => not(isvariable($(this.promiser)));
 
       "control_agent_default_repository"
-        string => ifelse( isvariable( "control_agent_default_repository"),
-                          $(control_agent_default_repository),
-                          "$(sys.workdir)/backups"),
+        string => ifelse(
+          isvariable("control_agent_default_repository"),
+          $(control_agent_default_repository),
+          "$(sys.workdir)/backups"
+        ),
         if => "mpf_control_agent_default_repository";
 
       "control_agent_maxconnections"
         int => "30",
-        if => not( isvariable( "control_agent_maxconnections" ) );
+        if => not(isvariable("control_agent_maxconnections"));
 
       # Common Controls
-
       # Because in some versions of cfengine bundlesequence in body common
       # control does not support iteration over data containers we must first
       # pick out the bundles into a shallow container that we can then get a
       # regular list from using getvalues().
-
       "control_common_evaluation_order" -> { "ENT-13495" }
-        string => ifelse( isvariable( $(this.promiser) ),
-                          "$(default:def.control_common_evaluation_order)",
-                          "classic"),
-        comment => concat( 'We default to the classic "Normal Order"',
-                           ' for all components if not otherwise specified.' );
+        string => ifelse(
+          isvariable($(this.promiser)),
+          "$(default:def.control_common_evaluation_order)",
+          "classic"
+        ),
+        comment => concat(
+          'We default to the classic "Normal Order"',
+          ' for all components if not otherwise specified.'
+        );
 
       "bundlesequence_end" -> { "CFE-4855" }
-        slist => { },
-        if => not( isvariable( "def.control_common_bundlesequence_end") ),
-        comment => concat( "We define an empty list so that the agent will not",
-                           " error about undefined variable when ",
-                           " def.bundlesequence_end is not defined." );
+        slist => {},
+        if => not(isvariable("def.control_common_bundlesequence_end")),
+        comment => concat(
+          "We define an empty list so that the agent will not",
+          " error about undefined variable when ",
+          " def.bundlesequence_end is not defined."
+        );
+
       "bundlesequence_end" -> { "CFE-4855" }
-        slist => getvalues( mergedata( "def.control_common_bundlesequence_end" ) ),
-        comment => concat( "We define bundlesequence_end from Augments if it's",
-                           "  available. This allows for customization without",
-                           " modifying the vendored policy." );
+        slist => getvalues(mergedata("def.control_common_bundlesequence_end")),
+        comment => concat(
+          "We define bundlesequence_end from Augments if it's",
+          "  available. This allows for customization without",
+          " modifying the vendored policy."
+        );
 
       "bundlesequence_classification" -> { "CFE-4855" }
-        slist => { },
-        if => not( isvariable( "def.control_common_bundlesequence_classification") ),
-        comment => concat( "We define an empty list so that the agent will not",
-                           " error about undefined variable when ",
-                           " def.bundlesequence_classification is not defined." );
+        slist => {},
+        if => not(
+          isvariable("def.control_common_bundlesequence_classification")
+        ),
+        comment => concat(
+          "We define an empty list so that the agent will not",
+          " error about undefined variable when ",
+          " def.bundlesequence_classification is not defined."
+        );
+
       "bundlesequence_classification" -> { "CFE-4855" }
-        slist => getvalues( mergedata( "def.control_common_bundlesequence_classification" ) ),
-        comment => concat( "We define bundlesequence_classification from Augments if it's",
-                           " available. This allows for customization without",
-                           " modifying the vendored policy." );
+        slist => getvalues(
+          mergedata("def.control_common_bundlesequence_classification")
+        ),
+        comment => concat(
+          "We define bundlesequence_classification from Augments if it's",
+          " available. This allows for customization without",
+          " modifying the vendored policy."
+        );
 
       "control_common_ignore_missing_bundles" -> { "CFE-2773" }
-        string => ifelse( strcmp( $(control_common_ignore_missing_bundles), "true" ),
-                          "true",
-                          "false");
+        string => ifelse(
+          strcmp($(control_common_ignore_missing_bundles), "true"),
+          "true",
+          "false"
+        );
 
       "control_common_ignore_missing_inputs" -> { "CFE-2773" }
-        string => ifelse( strcmp( $(control_common_ignore_missing_inputs), "true" ),
-                          "true",
-                          "false");
+        string => ifelse(
+          strcmp($(control_common_ignore_missing_inputs), "true"),
+          "true",
+          "false"
+        );
 
       "control_common_lastseenexpireafter" -> { "ENT-10414" }
         string => "10080", # 10080 minutes is 1 week
-        if => not( isvariable( "default:def.control_common_lastseenexpireafter") ),
-        comment => concat( "Since lastseenexpireafter is not defined, we default to",
-                           " the binary default of 10080 minutes (1 week)" );
+        if => not(isvariable("default:def.control_common_lastseenexpireafter")),
+        comment => concat(
+          "Since lastseenexpireafter is not defined, we default to",
+          " the binary default of 10080 minutes (1 week)"
+        );
 
       # Agent controls
-
       "control_agent_default_directory_create_mode" -> { "CFE-4590" }
-        string => ifelse( isvariable("control_agent_default_directory_create_mode"),
-                          "$(control_agent_default_directory_create_mode)",
-                          "700");
-
+        string => ifelse(
+          isvariable("control_agent_default_directory_create_mode"),
+          "$(control_agent_default_directory_create_mode)",
+          "700"
+        );
 @if minimum_version(3.18.0)
       # TODO When 3.18 is the oldest supported LTS, redact this macro and associated protections
       "control_agent_files_single_copy" -> { "CFE-3622" }
-        slist => { },
-        if => not( isvariable( "control_agent_files_single_copy" ) ),
+        slist => {},
+        if => not(isvariable("control_agent_files_single_copy")),
         comment => "Default files_single_copy to an empty list if it is not
                     defined. It is expected that users can override the default
                     by setting this value from the augments file (def.json).";
 @endif
-
       "control_server_maxconnections"
         int => "200",
-        if => not( isvariable( "control_server_maxconnections" ) );
+        if => not(isvariable("control_server_maxconnections"));
 
-      #+begin_src def.control_agent_environment_vars
-      # This configures environment_vars in body agent control
-
-      # It's configurable without having to modify policy, so the default values
-      # are only applied if the variable is not already defined (via augments).
-
-      # Platform defaults are set first, and the global default is set last so
-      # that global default does not override a platform specific setting since
-      # the promises are only applied if the variable is not already defined
-      # which is reverse of what you might normally do in CFEngine since
-      # typically the last promise wins.
-
+  #+begin_src def.control_agent_environment_vars
+  # This configures environment_vars in body agent control
+  # It's configurable without having to modify policy, so the default values
+  # are only applied if the variable is not already defined (via augments).
+  # Platform defaults are set first, and the global default is set last so
+  # that global default does not override a platform specific setting since
+  # the promises are only applied if the variable is not already defined
+  # which is reverse of what you might normally do in CFEngine since
+  # typically the last promise wins.
   classes:
+    "disable_always_accept_policy_server_acl" -> { "ENT-10951" }
+      expression => "disable_always_accept_policy_server";
 
-      "disable_always_accept_policy_server_acl"  -> { "ENT-10951" }
-        expression => "disable_always_accept_policy_server";
+    "disable_always_accept_policy_server_allowconnects" -> { "ENT-10951" }
+      expression => "disable_always_accept_policy_server";
 
-      "disable_always_accept_policy_server_allowconnects" -> { "ENT-10951" }
-        expression => "disable_always_accept_policy_server";
+    "disable_always_accept_policy_server_allowallconnects" -> { "ENT-10951" }
+      expression => "disable_always_accept_policy_server";
 
-      "disable_always_accept_policy_server_allowallconnects" -> { "ENT-10951" }
-        expression => "disable_always_accept_policy_server";
+    "control_agent_agentfacility_configured" -> { "ENT-10209" }
+      expression => regcmp(
+        "LOG_(USER|DAEMON|LOCAL[0-7])", $(control_agent_agentfacility)
+      ),
+      comment => concat(
+        "If default:def.control_agent_agentfacility is a",
+        " valid setting, we want to use it in body agent",
+        " control for setting agentfacility"
+      );
 
-      "control_agent_agentfacility_configured" -> { "ENT-10209" }
-        expression => regcmp( "LOG_(USER|DAEMON|LOCAL[0-7])",
-                              $(control_agent_agentfacility) ),
-        comment => concat( "If default:def.control_agent_agentfacility is a",
-                           " valid setting, we want to use it in body agent",
-                           " control for setting agentfacility" );
-
-      "_control_agent_environment_vars_validated" -> { "CFE-3927" }
-        and => {
-                 # The variable must be defined
-                 isvariable( "default:def.control_agent_environment_vars" ),
-                 # The length of the variable must be greater than 0 (can't be an empty list)
-                 isgreaterthan( length( "default:def.control_agent_environment_vars" ), 0),
-                 # Each element of the list must be of the form KEY=VALUE
-                 every( ".+=.+", "default:def.control_agent_environment_vars"),
-                 # In 3.18 and greater we can validate the type of variable in use
+    "_control_agent_environment_vars_validated" -> { "CFE-3927" }
+      and => {
+        # The variable must be defined
+        isvariable("default:def.control_agent_environment_vars"),
+        # The length of the variable must be greater than 0 (can't be an empty list)
+        isgreaterthan(length("default:def.control_agent_environment_vars"), 0),
+        # Each element of the list must be of the form KEY=VALUE
+        every(".+=.+", "default:def.control_agent_environment_vars"),
+        # In 3.18 and greater we can validate the type of variable in use
 @if minimum_version(3.18.0)
-                 regcmp( "(policy slist|data array)", type( "default:def.control_agent_environment_vars", "true" ) ),
+        regcmp(
+          "(policy slist|data array)",
+          type("default:def.control_agent_environment_vars", "true")
+        ),
 @endif
-                 };
+      };
 
-      "control_executor_mailsubject_configured" -> { "ENT-10210" }
-        expression => regcmp( ".+", "$(control_executor_mailsubject)"),
-        comment => concat( "If default:def.control_executor_mailsubject is not",
-                           " an empty string, we want to use it's value for",
-                           " emails sent by cf-execd.");
+    "control_executor_mailsubject_configured" -> { "ENT-10210" }
+      expression => regcmp(".+", "$(control_executor_mailsubject)"),
+      comment => concat(
+        "If default:def.control_executor_mailsubject is not",
+        " an empty string, we want to use it's value for",
+        " emails sent by cf-execd."
+      );
 
-      "control_executor_mailfilter_exclude_configured" -> { "ENT-10210" }
-        expression => isgreaterthan( length( "control_executor_mailfilter_exclude" ), 0 ),
-        comment => concat( "If default:def.control_executor_mailfilter_exclude is not",
-                           " an empty list, we want to use it's value for",
-                           " stripping lines from emails sent by cf-execd.");
+    "control_executor_mailfilter_exclude_configured" -> { "ENT-10210" }
+      expression => isgreaterthan(
+        length("control_executor_mailfilter_exclude"), 0
+      ),
+      comment => concat(
+        "If default:def.control_executor_mailfilter_exclude is not",
+        " an empty list, we want to use it's value for",
+        " stripping lines from emails sent by cf-execd."
+      );
 
-      "control_executor_mailfilter_include_configured" -> { "ENT-10210" }
-        expression => isgreaterthan( length( "control_executor_mailfilter_include" ), 0 ),
-        comment => concat( "If default:def.control_executor_mailfilter_include is not",
-                           " an empty list, we want to use it's value for",
-                           " including lines from emails sent by cf-execd.");
+    "control_executor_mailfilter_include_configured" -> { "ENT-10210" }
+      expression => isgreaterthan(
+        length("control_executor_mailfilter_include"), 0
+      ),
+      comment => concat(
+        "If default:def.control_executor_mailfilter_include is not",
+        " an empty list, we want to use it's value for",
+        " including lines from emails sent by cf-execd."
+      );
 
+    "control_server_allowciphers_defined" -> { "ENT-10182" }
+      expression => isvariable("default:def.control_server_allowciphers"),
+      comment => concat(
+        "If default:def.control_server_allowciphers is defined then",
+        " it's value will be used for allowciphers in body server",
+        " control. Else the binary default will be used."
+      );
 
-      "control_server_allowciphers_defined" -> { "ENT-10182" }
-        expression => isvariable( "default:def.control_server_allowciphers"),
-        comment => concat( "If default:def.control_server_allowciphers is defined then",
-                           " it's value will be used for allowciphers in body server",
-                           " control. Else the binary default will be used.");
+    "control_server_allowtlsversion_defined" -> { "ENT-10182" }
+      expression => isvariable("default:def.control_server_allowtlsversion"),
+      comment => concat(
+        "If default:def.control_server_allowtlsversion is defined then",
+        " it's value will be used for allowtlsversion in body server",
+        " control. Else the binary default will be used."
+      );
 
-      "control_server_allowtlsversion_defined" -> { "ENT-10182" }
-        expression => isvariable( "default:def.control_server_allowtlsversion"),
-        comment => concat( "If default:def.control_server_allowtlsversion is defined then",
-                           " it's value will be used for allowtlsversion in body server",
-                           " control. Else the binary default will be used.");
+    "control_common_system_log_level_defined" -> { "CFE-4452" }
+      expression => isvariable("default:def.control_common_system_log_level"),
+      comment => concat(
+        "The minimum log level required for log messages to go to the",
+        " system log (e.g. syslog or Windows Event Log).",
+        " (critical|error|warning|notice|info)"
+      );
 
-      "control_common_system_log_level_defined" -> { "CFE-4452" }
-        expression => isvariable( "default:def.control_common_system_log_level" ),
-        comment => concat( "The minimum log level required for log messages to go to the",
-                           " system log (e.g. syslog or Windows Event Log).",
-                           " (critical|error|warning|notice|info)" );
+    "control_common_protocol_version_defined" -> { "CFE-4543" }
+      expression => isvariable("default:def.control_common_protocol_version"),
+      comment => concat(
+        "Defines the protocol version to use for all outgoing",
+        " connections.",
+        # It's challenging to keep this aligned with the core agent code
+        # cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
+        " (1|classic|2|tls|3|cookie|4|filestream|latest)"
+      );
 
-      "control_common_protocol_version_defined" -> { "CFE-4543" }
-        expression => isvariable( "default:def.control_common_protocol_version" ),
-        comment => concat( "Defines the protocol version to use for all outgoing",
-                           " connections.",
-                           # It's challenging to keep this aligned with the core agent code
-                           # cf-promises --syntax-description=json | jq -r '.bodyTypes.common.attributes.protocol_version.range'
-                           " (1|classic|2|tls|3|cookie|4|filestream|latest)" );
   vars:
-
     debian::
-
-      "control_agent_environment_vars_default" ->  { "CFE-3925" }
+      "control_agent_environment_vars_default" -> { "CFE-3925" }
         handle => "common_def_vars_debian_control_agent_environment_vars_default",
-        if => not( isvariable( "control_agent_environment_vars_default" ) ),
+        if => not(isvariable("control_agent_environment_vars_default")),
         comment => "Set default environment variables for using Debian non-interactively",
         slist => {
-                   "DEBIAN_FRONTEND=noninteractive",
-                  # "APT_LISTBUGS_FRONTEND=none",
-                  # "APT_LISTCHANGES_FRONTEND=none",
-                 };
-
-  any::
-
-      # Resolve the final state for environment vars if there is a default var
-      # or if there is a user extra and merge the defined entities
-      "control_agent_environment_vars" ->  { "CFE-3925" }
-        slist => { @(def.control_agent_environment_vars_default),
-                   @(def.control_agent_environment_vars_extra) },
-        policy => "ifdefined",
-        if => or( isvariable( "def.control_agent_environment_vars_default" ), # Protect against defining
-                  isvariable( "def.control_agent_environment_vars_extra" ));  # an empty variable
-
-      #+end_src Agent Environment Variables
+          "DEBIAN_FRONTEND=noninteractive",
+          # "APT_LISTBUGS_FRONTEND=none",
+          # "APT_LISTCHANGES_FRONTEND=none",
+        };
 
     any::
-      "dir_masterfiles" string => translatepath("$(sys.masterdir)"),
-      comment => "Define masterfiles path",
-      handle => "common_def_vars_dir_masterfiles";
+      # Resolve the final state for environment vars if there is a default var
+      # or if there is a user extra and merge the defined entities
+      "control_agent_environment_vars" -> { "CFE-3925" }
+        slist => {
+          @(def.control_agent_environment_vars_default),
+          @(def.control_agent_environment_vars_extra),
+        },
+        policy => "ifdefined",
+        if => or(
+          isvariable("def.control_agent_environment_vars_default"), # Protect against defining
+          isvariable("def.control_agent_environment_vars_extra")
+        ); # an empty variable
+    #+end_src Agent Environment Variables
+    any::
+      "dir_masterfiles"
+        string => translatepath("$(sys.masterdir)"),
+        comment => "Define masterfiles path",
+        handle => "common_def_vars_dir_masterfiles";
 
-      "dir_reports"     string => translatepath("$(sys.workdir)/reports"),
-      comment => "Define reports path",
-      handle => "common_def_vars_dir_reports";
+      "dir_reports"
+        string => translatepath("$(sys.workdir)/reports"),
+        comment => "Define reports path",
+        handle => "common_def_vars_dir_reports";
 
-      "dir_bin"         string => translatepath("$(sys.bindir)"),
-      comment => "Define binary path",
-      handle => "common_def_vars_dir_bin";
+      "dir_bin"
+        string => translatepath("$(sys.bindir)"),
+        comment => "Define binary path",
+        handle => "common_def_vars_dir_bin";
 
       "dir_data"
-        string => ifelse( isvariable( "def.dir_data"),
-                          $(def.dir_data),
-                          "$(sys.workdir)/data"),
-      comment => "Define data path",
-      handle => "common_def_vars_dir_data";
+        string => ifelse(
+          isvariable("def.dir_data"), $(def.dir_data), "$(sys.workdir)/data"
+        ),
+        comment => "Define data path",
+        handle => "common_def_vars_dir_data";
 
-      "dir_modules"     string => translatepath("$(sys.workdir)/modules"),
-      comment => "Define modules path",
-      handle => "common_def_vars_dir_modules";
+      "dir_modules"
+        string => translatepath("$(sys.workdir)/modules"),
+        comment => "Define modules path",
+        handle => "common_def_vars_dir_modules";
 
       # TODO: Remove after 3.15 is no longer supported (December 18th 2022)
       "dir_plugins" -> { "CFE-3618" }
-      string => translatepath("$(sys.workdir)/plugins"),
-      comment => "Define plugins path",
-      handle => "common_def_vars_dir_plugins";
+        string => translatepath("$(sys.workdir)/plugins"),
+        comment => "Define plugins path",
+        handle => "common_def_vars_dir_plugins";
 
       "dir_templates"
-        string => ifelse( isvariable( "def.dir_templates"),
-                          $(def.dir_templates),
-                          "$(sys.workdir)/templates"),
-      comment => "Define templates path",
-      handle => "common_def_vars_dir_templates";
+        string => ifelse(
+          isvariable("def.dir_templates"),
+          $(def.dir_templates),
+          "$(sys.workdir)/templates"
+        ),
+        comment => "Define templates path",
+        handle => "common_def_vars_dir_templates";
 
+      "cf_apache_user"
+        string => "cfapache",
+        comment => "User that CFEngine Enterprise webserver runs as",
+        handle => "common_def_vars_cf_cfapache_user";
 
-      "cf_apache_user" string => "cfapache",
-      comment => "User that CFEngine Enterprise webserver runs as",
-      handle => "common_def_vars_cf_cfapache_user";
-
-      "cf_apache_group" string => "cfapache",
-      comment => "Group that CFEngine Enterprise webserver runs as",
-      handle => "common_def_vars_cf_cfapache_group";
+      "cf_apache_group"
+        string => "cfapache",
+        comment => "Group that CFEngine Enterprise webserver runs as",
+        handle => "common_def_vars_cf_cfapache_group";
 
     policy_server|am_policy_hub::
-
       # Only hubs serve software updates
-
       "dir_master_software_updates" -> { "ENT-4953" }
         string => "$(sys.workdir)/master_software_updates",
         handle => "common_def_vars_dir_serve_master_software_updates",
@@ -536,64 +610,71 @@ bundle common def
         This variable is overridable via augments as
         vars.dir_master_software_updates. All remote agents request this path
         via the master_software_updates shortcut.",
-        if => not( isvariable( "def.dir_master_software_updates" ));
+        if => not(isvariable("def.dir_master_software_updates"));
 
     enterprise_edition.(policy_server|am_policy_hub)::
       # Only enterprise hubs have Mission Portal
-
       "cfe_enterprise_mission_portal_apache_sslprotocol" -> { "ENT-10412" }
         string => "all -SSLv2 -SSLv3 -TLSv1", # We disable some versions of SSL
-                                              # as they are known to be insecure
-        if => not( isvariable( "default:def.cfe_enterprise_mission_portal_apache_sslprotocol" ) ),
+        # as they are known to be insecure
+        if => not(
+          isvariable(
+            "default:def.cfe_enterprise_mission_portal_apache_sslprotocol"
+          )
+        ),
         comment => "The SSL protocol versions that are allowed by Apache for Mission Portal";
 
       "cfe_enterprise_mission_portal_apache_sslciphersuite" -> { "ENT-11393" }
         string => "HIGH",
-        if => not( isvariable( "default:def.cfe_enterprise_mission_portal_apache_sslciphersuite" ) ),
+        if => not(
+          isvariable(
+            "default:def.cfe_enterprise_mission_portal_apache_sslciphersuite"
+          )
+        ),
         comment => "The SSL cipher suites that are allowed by Apache for Mission Portal";
 
     solaris::
       "cf_runagent_shell"
-        string  => "/usr/bin/sh",
+        string => "/usr/bin/sh",
         comment => "Define path to shell used by cf-runagent",
-        handle  => "common_def_vars_solaris_cf_runagent_shell";
+        handle => "common_def_vars_solaris_cf_runagent_shell";
 
     windows::
       "cf_runagent_shell"
-        string  => "${sys.winsysdir}${const.dirsep}cmd.exe",
+        string => "${sys.winsysdir}${const.dirsep}cmd.exe",
         comment => "Define path to shell used by cf-runagent",
-        handle  => "common_def_vars_windows_cf_runagent_shell";
+        handle => "common_def_vars_windows_cf_runagent_shell";
 
     !(windows|solaris)::
       "cf_runagent_shell"
-        string  => "/bin/sh",
+        string => "/bin/sh",
         comment => "Define path to shell used by cf-runagent",
-        handle  => "common_def_vars_cf_runagent_shell";
+        handle => "common_def_vars_cf_runagent_shell";
 
     any::
-      "base_log_files" slist =>
-      {
-        "$(sys.workdir)/cf3.$(sys.uqhost).runlog",
-        "$(sys.workdir)/promise_summary.log",
-      };
+      "base_log_files"
+        slist => {
+          "$(sys.workdir)/cf3.$(sys.uqhost).runlog",
+          "$(sys.workdir)/promise_summary.log",
+        };
 
-      "enterprise_log_files" slist =>
-      {
-        "$(sys.workdir)/cf_notkept.log",
-        "$(sys.workdir)/cf_repair.log",
-        "$(sys.workdir)/state/cf_value.log",
-        "$(sys.workdir)/outputs/dc-scripts.log",
-        "$(sys.workdir)/state/promise_log.jsonl",
-        "$(sys.workdir)/state/classes.jsonl",
-      };
+      "enterprise_log_files"
+        slist => {
+          "$(sys.workdir)/cf_notkept.log",
+          "$(sys.workdir)/cf_repair.log",
+          "$(sys.workdir)/state/cf_value.log",
+          "$(sys.workdir)/outputs/dc-scripts.log",
+          "$(sys.workdir)/state/promise_log.jsonl",
+          "$(sys.workdir)/state/classes.jsonl",
+        };
 
-      "hub_log_files" slist =>
-      {
-        "$(cfe_internal_hub_vars.access_log)",      # Mission Portal
-        "$(cfe_internal_hub_vars.error_log)",       # Mission Portal
-        "$(cfe_internal_hub_vars.ssl_request_log)", # Mission Portal
-        "/var/log/postgresql.log",                  # PostgreSQL
-      };
+      "hub_log_files"
+        slist => {
+          "$(cfe_internal_hub_vars.access_log)", # Mission Portal
+          "$(cfe_internal_hub_vars.error_log)", # Mission Portal
+          "$(cfe_internal_hub_vars.ssl_request_log)", # Mission Portal
+          "/var/log/postgresql.log", # PostgreSQL
+        };
 
       "max_client_history_size" -> { "cf-hub", "CFEngine Enterprise" }
         int => "50M",
@@ -607,14 +688,16 @@ bundle common def
 
     enterprise.am_policy_hub::
       # CFEngine's own log files
-      "cfe_log_files" slist => { @(base_log_files), @(enterprise_log_files), @(hub_log_files) };
+      "cfe_log_files"
+        slist => {
+          @(base_log_files), @(enterprise_log_files), @(hub_log_files)
+        };
 
     !enterprise::
       # CFEngine's own log files
       "cfe_log_files" slist => { @(base_log_files) };
 
-  # Directories where logs are rotated and old files need to be purged.
-
+    # Directories where logs are rotated and old files need to be purged.
     any::
       "log_dir[outputs]" string => "$(sys.workdir)/outputs";
       "log_dir[reports]" string => "$(sys.workdir)/reports";
@@ -628,48 +711,48 @@ bundle common def
       "log_dir[application]" string => "$(sys.workdir)/httpd/logs/application";
 
     any::
-      "cfe_log_dirs" slist => getvalues( log_dir );
+      "cfe_log_dirs" slist => getvalues(log_dir);
 
-  # MPF controls
-
+      # MPF controls
       "mpf_log_dir_retention"
         string => "30",
-        if => not( isvariable ( mpf_log_dir_retention ) ),
+        if => not(isvariable(mpf_log_dir_retention)),
         comment => "The default log file retention in cfe_log_dirs is 30 days
                     unless it's already been defined (augments).";
 
       "mpf_log_file_retention"
         string => "10",
-        if => not( isvariable( mpf_log_file_retention) ),
+        if => not(isvariable(mpf_log_file_retention)),
         comment => "This is the number of rotated versions of mpf log files to
                     save";
 
       "mpf_log_file_max_size"
         string => "1M",
-        if => not( isvariable( mpf_log_file_max_size) ),
+        if => not(isvariable(mpf_log_file_max_size)),
         comment => "When individual mpf log files reach this size they should be
                     rotated so that we don't fill up the disk";
 
       "purge_scheduled_reports_older_than_days" -> { "ENT-4404" }
         string => "30",
-        if => not( isvariable( purge_scheduled_reports_older_than_days ) ),
+        if => not(isvariable(purge_scheduled_reports_older_than_days)),
         comment => "This controls the maximum age of artifacts generated by the
                     asynchronous query API and scheduled reports.";
 
       "mpf_extra_autorun_inputs" -> { "CFE-3524" }
         slist => {},
-        unless => isvariable( $(this.promiser) );
+        unless => isvariable($(this.promiser));
 
-  # Enterprise HA Related configuration
-  # enable_cfengine_enterprise_hub_ha is defined below
-  # Disabled by default
-
+    # Enterprise HA Related configuration
+    # enable_cfengine_enterprise_hub_ha is defined below
+    # Disabled by default
     enable_cfengine_enterprise_hub_ha::
-      "standby_servers" slist => filter("$(sys.policy_hub)", "ha_def.ips", false, true, 10);
+      "standby_servers"
+        slist => filter("$(sys.policy_hub)", "ha_def.ips", false, true, 10);
+
       "policy_servers" slist => { "$(sys.policy_hub)", "@(standby_servers)" };
 
     !enable_cfengine_enterprise_hub_ha::
-      "policy_servers" slist => {"$(sys.policy_hub)"};
+      "policy_servers" slist => { "$(sys.policy_hub)" };
 
     enterprise_edition.policy_server::
       "control_hub_exclude_hosts"
@@ -678,9 +761,20 @@ bundle common def
 
       "control_hub_hub_schedule"
         comment => "By default Enterprise hubs initiate pull collection once every 5 minutes.",
-        slist  => { "Min00", "Min05", "Min10", "Min15", "Min20",
-                    "Min25", "Min30", "Min35", "Min40", "Min45",
-                    "Min50", "Min55" },
+        slist => {
+          "Min00",
+          "Min05",
+          "Min10",
+          "Min15",
+          "Min20",
+          "Min25",
+          "Min30",
+          "Min35",
+          "Min40",
+          "Min45",
+          "Min50",
+          "Min55",
+        },
         unless => isvariable(control_hub_hub_schedule);
 
       "control_hub_query_timeout"
@@ -701,7 +795,6 @@ bundle common def
         string => "6",
         unless => isvariable(control_hub_port);
 
-
       "mpf_access_rules_collect_calls_admit_ips"
         slist => { @(def.acl_derived) },
         unless => isvariable(mpf_access_rules_collect_calls_admit_ips);
@@ -718,30 +811,31 @@ bundle common def
     enterprise_edition.policy_server::
       "default_data_select_host_monitoring_include"
         comment => "Most people have monitoring systems, so instead of collecting data people won't use we save the work unless its requested.",
-        slist => { },
-        unless => isvariable( default_data_select_host_monitoring_include );
+        slist => {},
+        unless => isvariable(default_data_select_host_monitoring_include);
 
       "default_data_select_policy_hub_monitoring_include"
         comment => "Collect all the monitoring data from the hub itself. It can be useful in diagnostics.",
         slist => { ".*" },
-        unless => isvariable( default_data_select_policy_hub_monitoring_include );
+        unless => isvariable(default_data_select_policy_hub_monitoring_include);
 
   classes:
+    "_have_control_agent_files_single_copy" -> { "CFE-3622" }
+      expression => isvariable("def.control_agent_files_single_copy");
 
-      "_have_control_agent_files_single_copy" -> { "CFE-3622"}
-        expression => isvariable( "def.control_agent_files_single_copy" );
-      "_have_control_executor_runagent_socket_allow_users"
-        expression => some( ".+", "def.control_executor_runagent_socket_allow_users" );
+    "_have_control_executor_runagent_socket_allow_users"
+      expression => some(
+        ".+", "def.control_executor_runagent_socket_allow_users"
+      );
 
-      "cfengine_recommendations_enabled"
-        expression => "!cfengine_recommendations_disabled";
+    "cfengine_recommendations_enabled"
+      expression => "!cfengine_recommendations_disabled";
 
-      ### Enable special features policies. Set to "any" to enable.
-
-      # Auto-load files in "services/autorun" and run bundles tagged "autorun".
-      # Disabled by default!
-      "services_autorun" -> { "jira:CFE-2135" }
-        comment => "This class enables the automatic parsing running of bundles
+    ### Enable special features policies. Set to "any" to enable.
+    # Auto-load files in "services/autorun" and run bundles tagged "autorun".
+    # Disabled by default!
+    "services_autorun" -> { "jira:CFE-2135" }
+      comment => "This class enables the automatic parsing running of bundles
                     tagged with 'autorun'. Evaluation limitations require that
                     this class is set at the beginning of the agent run, so it
                     must be defined in the augments file (def.json), or as an
@@ -749,78 +843,73 @@ bundle common def
                     expression here will *NOT* work correctly. Setting the class
                     here will result in an error due to the autorun bundle not
                     being found.",
-        expression => "!any";
+      expression => "!any";
 
-      # Internal CFEngine log files rotation
-      "cfengine_internal_rotate_logs" expression => "any";
+    # Internal CFEngine log files rotation
+    "cfengine_internal_rotate_logs" expression => "any";
 
-      # Enable or disable agent email output (also see mailto, mailfrom and
-      # smtpserver)
-      "cfengine_internal_agent_email" expression => "any";
-      "cfengine_internal_disable_agent_email" expression => "!any";
+    # Enable or disable agent email output (also see mailto, mailfrom and
+    # smtpserver)
+    "cfengine_internal_agent_email" expression => "any";
+    "cfengine_internal_disable_agent_email" expression => "!any";
 
+    # Enable or disable external watchdog to ensure cf-execd is running
+    "cfe_internal_core_watchdog_enabled" expression => "!any";
+    "cfe_internal_core_watchdog_disabled" expression => "!any";
 
+    # Transfer policies and binaries with encryption
+    # you can also request it from the command line with
+    # -Dcfengine_internal_encrypt_transfers
+    # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+    "cfengine_internal_encrypt_transfers" expression => "!any";
 
-      # Enable or disable external watchdog to ensure cf-execd is running
-      "cfe_internal_core_watchdog_enabled" expression => "!any";
-      "cfe_internal_core_watchdog_disabled" expression => "!any";
+    # Do not purge policies that don't exist on the server side.
+    # you can also request it from the command line with
+    # -Dcfengine_internal_purge_policies_disabled
+    # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+    "cfengine_internal_purge_policies_disabled" expression => "!any";
 
-      # Transfer policies and binaries with encryption
-      # you can also request it from the command line with
-      # -Dcfengine_internal_encrypt_transfers
+    # Preserve permissions of the policy server's masterfiles.
+    # you can also request it from the command line with
+    # -Dcfengine_internal_preserve_permissions
+    # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+    "cfengine_internal_preserve_permissions" expression => "!any";
 
-      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+    # Class defining which versions of cfengine are (not) supported
+    # by this policy version.
+    # Also note that this policy will only be run on enterprise policy_server
+    "postgresql_maintenance_supported"
+      expression => "(policy_server.enterprise.!enable_cfengine_enterprise_hub_ha)|(policy_server.enterprise.enable_cfengine_enterprise_hub_ha.hub_active)";
 
-      "cfengine_internal_encrypt_transfers" expression => "!any";
+    # This class is for PosgreSQL maintenance
+    # pre-defined to every Sunday at 2 a.m.
+    # This can be changed later on.
+    "postgresql_full_maintenance"
+      expression => "postgresql_maintenance_supported.Sunday.Hr02.Min00_05";
 
-      # Do not purge policies that don't exist on the server side.
-      # you can also request it from the command line with
-      # -Dcfengine_internal_purge_policies_disabled
+    # Run vacuum job on database
+    # pre-defined to every night except Sunday when full cleanup is executed.
+    "postgresql_vacuum"
+      expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
 
-      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
+    # Enable CFEngine Enterprise HA Policy
+    "enable_cfengine_enterprise_hub_ha" expression => "!any";
 
-      "cfengine_internal_purge_policies_disabled" expression => "!any";
-
-      # Preserve permissions of the policy server's masterfiles.
-      # you can also request it from the command line with
-      # -Dcfengine_internal_preserve_permissions
-
-      # NOTE THAT THIS CLASS ALSO NEEDS TO BE SET IN update.cf
-
-      "cfengine_internal_preserve_permissions" expression => "!any";
-
-      # Class defining which versions of cfengine are (not) supported
-      # by this policy version.
-      # Also note that this policy will only be run on enterprise policy_server
-      "postgresql_maintenance_supported"
-        expression => "(policy_server.enterprise.!enable_cfengine_enterprise_hub_ha)|(policy_server.enterprise.enable_cfengine_enterprise_hub_ha.hub_active)";
-
-      # This class is for PosgreSQL maintenance
-      # pre-defined to every Sunday at 2 a.m.
-      # This can be changed later on.
-      "postgresql_full_maintenance" expression => "postgresql_maintenance_supported.Sunday.Hr02.Min00_05";
-
-      # Run vacuum job on database
-      # pre-defined to every night except Sunday when full cleanup is executed.
-      "postgresql_vacuum" expression => "postgresql_maintenance_supported.!Sunday.Hr02.Min00_05";
-
-      # Enable CFEngine Enterprise HA Policy
-      "enable_cfengine_enterprise_hub_ha" expression => "!any";
-      #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
-
-      # Enable failover to node which is outside cluster
-      #"failover_to_replication_node_enabled" expression => "enterprise_edition";
-
-      # Enable cleanup of agent report diffs when they exceed
-      # `def.max_client_history_size`
-      "enable_cfe_internal_cleanup_agent_reports" -> { "cf-hub", "CFEngine Enterprise" }
-        expression => "enterprise_edition",
-        comment => "If reports are not collected for an extended period of time
+    #"enable_cfengine_enterprise_hub_ha" expression => "enterprise_edition";
+    # Enable failover to node which is outside cluster
+    #"failover_to_replication_node_enabled" expression => "enterprise_edition";
+    # Enable cleanup of agent report diffs when they exceed
+    # `def.max_client_history_size`
+    "enable_cfe_internal_cleanup_agent_reports" -> {
+        "cf-hub", "CFEngine Enterprise"
+      }
+      expression => "enterprise_edition",
+      comment => "If reports are not collected for an extended period of time
                     the disk may fill up or cause additional collection
                     issues.";
 
-      # Enable paths to POSIX tools instead of native tools when possible.
-      "mpf_stdlib_use_posix_utils" expression => "any";
+    # Enable paths to POSIX tools instead of native tools when possible.
+    "mpf_stdlib_use_posix_utils" expression => "any";
 
     enterprise_edition.(policy_server|am_policy_hub)::
       "cfe_enterprise_disable_http_redirect_to_https"
@@ -832,11 +921,11 @@ bundle common def
         comment => "If plain http is disabled, it makes no sense to redirect to it, so we disable that as well.";
 
   reports:
-      "Warning: the 'cfe_cfengine_enterprise_enable_plain_http' class has been deprecated in favor of 'cfe_enterprise_disable_http_redirect_to_https', please adjust accordingly. The  'cfe_enterprise_disable_http_redirect_to_https' class has been set automatically."
-        if => "cfe_enterprise_disable_http_redirect_to_https.cfe_cfengine_enterprise_enable_plain_http";
-      "Warning: the 'cfe_cfengine_enterprise_enable_plain_http' class has been deprecated in favor of 'cfe_enterprise_disable_http_redirect_to_https', please adjust accordingly."
-        if => "cfe_cfengine_enterprise_enable_plain_http.!cfe_enterprise_disable_http_redirect_to_https";
+    "Warning: the 'cfe_cfengine_enterprise_enable_plain_http' class has been deprecated in favor of 'cfe_enterprise_disable_http_redirect_to_https', please adjust accordingly. The  'cfe_enterprise_disable_http_redirect_to_https' class has been set automatically."
+      if => "cfe_enterprise_disable_http_redirect_to_https.cfe_cfengine_enterprise_enable_plain_http";
 
+    "Warning: the 'cfe_cfengine_enterprise_enable_plain_http' class has been deprecated in favor of 'cfe_enterprise_disable_http_redirect_to_https', please adjust accordingly."
+      if => "cfe_cfengine_enterprise_enable_plain_http.!cfe_enterprise_disable_http_redirect_to_https";
 }
 
 bundle common inventory_control
@@ -846,101 +935,111 @@ bundle common inventory_control
 # are disabled.
 {
   vars:
-      "lldpctl_exec" string => ifelse(fileexists("/usr/sbin/lldpctl"), "/usr/sbin/lldpctl",
-                                     fileexists("/usr/local/bin/lldpctl"), "/usr/local/bin/lldpctl",
-                                     "/usr/sbin/lldpctl");
+    "lldpctl_exec"
+      string => ifelse(
+        fileexists("/usr/sbin/lldpctl"),
+        "/usr/sbin/lldpctl",
+        fileexists("/usr/local/bin/lldpctl"),
+        "/usr/local/bin/lldpctl",
+        "/usr/sbin/lldpctl"
+      );
 
-      "lldpctl_json" string => "$(lldpctl_exec) -f json",
-        unless => isvariable("def.lldpctl_json");
-      "lldpctl_json" string => "$(def.lldpctl_json)",
-        if => isvariable("def.lldpctl_json");
+    "lldpctl_json"
+      string => "$(lldpctl_exec) -f json",
+      unless => isvariable("def.lldpctl_json");
 
-      "lsb_exec" string => "/usr/bin/lsb_release";
-      "mtab" string => "/etc/mtab";
-      "proc" string => "/proc";
+    "lldpctl_json"
+      string => "$(def.lldpctl_json)",
+      if => isvariable("def.lldpctl_json");
+
+    "lsb_exec" string => "/usr/bin/lsb_release";
+    "mtab" string => "/etc/mtab";
+    "proc" string => "/proc";
 
   vars:
-
     freebsd::
-
       "dmidecoder" string => "/usr/local/sbin/dmidecode";
 
     !freebsd::
-
       "dmidecoder" string => "/usr/sbin/dmidecode";
       "proc_device_tree" string => "/proc/device-tree";
 
   classes:
-      # setting this disables all the inventory modules except package_refresh
-      "disable_inventory" expression => "!any";
+    # setting this disables all the inventory modules except package_refresh
+    "disable_inventory" expression => "!any";
 
-      # disable specific inventory modules below
+    # disable specific inventory modules below
+    # by default disable the LSB inventory if the general inventory
+    # is disabled or the binary is missing.  Note that the LSB
+    # binary is typically not very fast.
+    "disable_inventory_lsb" expression => "disable_inventory";
+    "disable_inventory_lsb" not => fileexists($(lsb_exec));
 
-      # by default disable the LSB inventory if the general inventory
-      # is disabled or the binary is missing.  Note that the LSB
-      # binary is typically not very fast.
-      "disable_inventory_lsb" expression => "disable_inventory";
-      "disable_inventory_lsb" not => fileexists($(lsb_exec));
+    # If we have /proc/device-tree we should likely disable dmi completely
+    # as of 2022 systems with dmi dont have device-tree and vice versa.
+    "have_proc_device_tree" expression => fileexists($(proc_device_tree));
 
-      # If we have /proc/device-tree we should likely disable dmi completely
-      # as of 2022 systems with dmi dont have device-tree and vice versa.
-      "have_proc_device_tree" expression => fileexists($(proc_device_tree));
+    # by default disable the dmidecode inventory if the general
+    # inventory is disabled or the binary does not exist.  Note that
+    # typically this is a very fast binary.
+    "disable_inventory_dmidecode" expression => "disable_inventory";
+    "disable_inventory_dmidecode" expression => "have_proc_device_tree";
+    "disable_inventory_dmidecode" not => fileexists($(dmidecoder));
 
-      # by default disable the dmidecode inventory if the general
-      # inventory is disabled or the binary does not exist.  Note that
-      # typically this is a very fast binary.
-      "disable_inventory_dmidecode" expression => "disable_inventory";
-      "disable_inventory_dmidecode" expression => "have_proc_device_tree";
-      "disable_inventory_dmidecode" not => fileexists($(dmidecoder));
+    # by default disable the LLDP inventory if the general inventory
+    # is disabled or the binary does not exist.  Note that typically
+    # this is a reasonably fast binary but still may require network
+    # I/O.
+    "disable_inventory_LLDP" expression => "disable_inventory";
+    "disable_inventory_LLDP" not => fileexists($(lldpctl_exec));
 
-      # by default disable the LLDP inventory if the general inventory
-      # is disabled or the binary does not exist.  Note that typically
-      # this is a reasonably fast binary but still may require network
-      # I/O.
-      "disable_inventory_LLDP" expression => "disable_inventory";
-      "disable_inventory_LLDP" not => fileexists($(lldpctl_exec));
+    # by default run the package inventory refresh every time, even
+    # if disable_inventory is set
+    "disable_inventory_package_refresh" expression => "!any";
 
-      # by default run the package inventory refresh every time, even
-      # if disable_inventory is set
-      "disable_inventory_package_refresh" expression => "!any";
+    # by default disable the mtab inventory if the general inventory
+    # is disabled or $(mtab) is missing.  Note that this is very
+    # fast.
+    "disable_inventory_mtab" expression => "disable_inventory";
+    "disable_inventory_mtab" not => fileexists($(mtab));
 
-      # by default disable the mtab inventory if the general inventory
-      # is disabled or $(mtab) is missing.  Note that this is very
-      # fast.
-      "disable_inventory_mtab" expression => "disable_inventory";
-      "disable_inventory_mtab" not => fileexists($(mtab));
+    # by default disable the fstab inventory if the general
+    # inventory is disabled or $(sys.fstab) is missing.  Note that
+    # this is very fast.
+    "disable_inventory_fstab" expression => "disable_inventory";
+    "disable_inventory_fstab" not => fileexists($(sys.fstab));
 
-      # by default disable the fstab inventory if the general
-      # inventory is disabled or $(sys.fstab) is missing.  Note that
-      # this is very fast.
-      "disable_inventory_fstab" expression => "disable_inventory";
-      "disable_inventory_fstab" not => fileexists($(sys.fstab));
-
-      # by default disable the proc inventory if the general
-      # inventory is disabled or /proc is missing.  Note that
-      # this is typically fast.
-      "disable_inventory_proc" expression => "disable_inventory|freebsd";
-      "disable_inventory_proc" not => isdir($(proc));
+    # by default disable the proc inventory if the general
+    # inventory is disabled or /proc is missing.  Note that
+    # this is typically fast.
+    "disable_inventory_proc" expression => "disable_inventory|freebsd";
+    "disable_inventory_proc" not => isdir($(proc));
 
   reports:
     verbose_mode.disable_inventory::
       "$(this.bundle): All inventory modules disabled";
+
     verbose_mode.!disable_inventory_lsb::
       "$(this.bundle): LSB module enabled";
+
     verbose_mode.!disable_inventory_dmidecode::
       "$(this.bundle): dmidecode module enabled";
+
     verbose_mode.!disable_inventory_LLDP::
       "$(this.bundle): LLDP module enabled";
+
     verbose_mode.!disable_inventory_mtab::
       "$(this.bundle): mtab module enabled";
+
     verbose_mode.!disable_inventory_fstab::
       "$(this.bundle): fstab module enabled";
+
     verbose_mode.!disable_inventory_proc::
       "$(this.bundle): proc module enabled";
+
     verbose_mode.!disable_inventory_package_refresh::
       "$(this.bundle): package_refresh module enabled";
 
     DEBUG|DEBUG_def::
-
       "Executor Schedule: $(def.control_executor_schedule_value)";
 }

@@ -1,25 +1,26 @@
 # Bundles
-
 bundle common bundles_common
 # @brief Enumerate policy files used by this policy file for inclusion to inputs
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/paths.cf",
-                          "$(this.promise_dirname)/files.cf",
-                          "$(this.promise_dirname)/commands.cf" };
+    "inputs"
+      slist => {
+        "$(this.promise_dirname)/paths.cf",
+        "$(this.promise_dirname)/files.cf",
+        "$(this.promise_dirname)/commands.cf",
+      };
 }
 
 body file control
 # @brief Include policy files used by this policy file as part of inputs
 {
-      inputs => { @(bundles_common.inputs) };
+  inputs => { @(bundles_common.inputs) };
 }
 
 ###################################################
 # agent bundles
 ###################################################
-
-bundle agent cronjob(commands,user,hours,mins)
+bundle agent cronjob(commands, user, hours, mins)
 # @brief Defines a cron job for `user`
 #
 # Adds a line to crontab, if necessary.
@@ -39,10 +40,13 @@ bundle agent cronjob(commands,user,hours,mins)
   vars:
     suse|sles::
       "crontab" string => "/var/spool/cron/tabs";
+
     redhat|fedora::
       "crontab" string => "/var/spool/cron";
+
     freebsd::
       "crontab" string => "/var/cron/tabs";
+
     !(suse|sles|redhat|fedora|freebsd)::
       "crontab" string => "/var/spool/cron/crontabs";
 
@@ -55,32 +59,29 @@ bundle agent cronjob(commands,user,hours,mins)
 
   classes:
     !windows::
-
       # We tolerate existing entries that differ only in whitespace and avoid
       # entering duplicate entries.
-
       "present_with_potentially_different_spacing"
-        expression => regline( "^$(e_mins)\s+$(e_hours)\s+\*\s+\*\s+\*\s+$(e_commands)", "$(crontab)/$(user)"),
-        if => fileexists( "$(crontab)/$(user)" );
+        expression => regline(
+          "^$(e_mins)\s+$(e_hours)\s+\*\s+\*\s+\*\s+$(e_commands)",
+          "$(crontab)/$(user)"
+        ),
+        if => fileexists("$(crontab)/$(user)");
 
   files:
-
     !windows.!present_with_potentially_different_spacing::
       "$(crontab)/$(user)"
-
-      comment => "A user's regular batch jobs are added to this file",
-      create => "true",
-      edit_line => append_if_no_line("$(mins) $(hours) * * * $(commands)"),
-      perms => mo("600","$(user)"),
-      classes => if_repaired("changed_crontab");
+        comment => "A user's regular batch jobs are added to this file",
+        create => "true",
+        edit_line => append_if_no_line("$(mins) $(hours) * * * $(commands)"),
+        perms => mo("600", "$(user)"),
+        classes => if_repaired("changed_crontab");
 
   processes:
-
     changed_crontab::
       "cron"
-      comment => "Most crons need to be huped after file changes",
-      signals => { "hup" };
-
+        comment => "Most crons need to be huped after file changes",
+        signals => { "hup" };
 }
 
 bundle agent rm_rf(name)
@@ -98,11 +99,10 @@ bundle agent rm_rf(name)
 # ```
 {
   methods:
-      "rm" usebundle => rm_rf_depth($(name),"inf");
-
+    "rm" usebundle => rm_rf_depth($(name), "inf");
 }
 
-bundle agent rm_rf_depth(name,depth)
+bundle agent rm_rf_depth(name, depth)
 # @brief recursively remove `name` to depth `depth`, including base
 # @depends recurse_with_base tidy all
 # @param name the file or directory name
@@ -118,16 +118,16 @@ bundle agent rm_rf_depth(name,depth)
 # ```
 {
   classes:
-      "isdir" expression => isdir($(name));
+    "isdir" expression => isdir($(name));
+
   files:
     isdir::
       "$(name)"
-      file_select => all,
-      depth_search => recurse_with_base($(depth)),
-      delete => tidy;
-
-      "$(name)/."
+        file_select => all,
+        depth_search => recurse_with_base($(depth)),
         delete => tidy;
+
+      "$(name)/." delete => tidy;
 
     !isdir::
       "$(name)" delete => tidy;
@@ -156,8 +156,6 @@ bundle agent fileinfo(f)
 #       create => "true",
 #       classes => if_ok("verbose_mode"),
 #       comment => "verbose_mode is defined because the fileinfo bundle restricts the report of the file info to verbose mode";
-#
-#
 #   methods:
 #     "fileinfo" usebundle => fileinfo( @(files) );
 #     "fileinfo" usebundle => fileinfo( "/tmp/example3" );
@@ -186,9 +184,14 @@ bundle agent fileinfo(f)
 # ```
 {
   vars:
-      "fields" slist => splitstring("size,gid,uid,ino,nlink,ctime,atime,mtime,mode,modeoct,permstr,permoct,type,devno,dev_minor,dev_major,basename,dirname,linktarget,linktarget_shallow", ",", 999);
+    "fields"
+      slist => splitstring(
+        "size,gid,uid,ino,nlink,ctime,atime,mtime,mode,modeoct,permstr,permoct,type,devno,dev_minor,dev_major,basename,dirname,linktarget,linktarget_shallow",
+        ",",
+        999
+      );
 
-      "stat[$(f)][$(fields)]" string => filestat($(f), $(fields));
+    "stat[$(f)][$(fields)]" string => filestat($(f), $(fields));
 
   reports:
     verbose_mode::
@@ -220,11 +223,11 @@ bundle agent logrotate(log_files, max_size, rotate_levels)
 # ```
 {
   files:
-      "$(log_files)"
-      comment     => "Rotate file if above specified size",
-      rename      => rotate("$(rotate_levels)"),
+    "$(log_files)"
+      comment => "Rotate file if above specified size",
+      rename => rotate("$(rotate_levels)"),
       file_select => bigger_than("$(max_size)"),
-      if => fileexists( $(log_files) );
+      if => fileexists($(log_files));
 }
 
 bundle agent prunedir(dir, max_days)
@@ -249,11 +252,11 @@ bundle agent prunedir(dir, max_days)
 # ```
 {
   files:
-      "$(dir)"
-      comment       => "Delete plain files inside directory older than max_days",
-      delete        => tidy,
-      file_select   => filetype_older_than("plain", "$(max_days)"),
-      depth_search  => recurse("1");
+    "$(dir)"
+      comment => "Delete plain files inside directory older than max_days",
+      delete => tidy,
+      file_select => filetype_older_than("plain", "$(max_days)"),
+      depth_search => recurse("1");
 }
 
 bundle agent prunetree(dir, depth, max_days)
@@ -279,14 +282,12 @@ bundle agent prunetree(dir, depth, max_days)
 # ```
 {
   files:
-      "$(dir)"
+    "$(dir)"
       comment => "Delete files and directories under $(dir) up to $(depth)
                     depth older than $(max_days)",
-
-      delete        => tidy,
-      file_select   => days_old( $(max_days) ),
-      depth_search  => recurse_with_base( $(depth) );
-
+      delete => tidy,
+      file_select => days_old($(max_days)),
+      depth_search => recurse_with_base($(depth));
 }
 
 bundle agent url_ping(host, method, port, uri)
@@ -315,30 +316,32 @@ bundle agent url_ping(host, method, port, uri)
 # ```
 {
   vars:
-      "url_check" string => readtcp($(host),
-                                    $(port),
-                                    "$(method) $(uri) HTTP/1.1$(const.r)$(const.n)Host:$(host)$(const.r)$(const.n)$(const.r)$(const.n)",
-                                    20);
+    "url_check"
+      string => readtcp(
+        $(host),
+        $(port),
+        "$(method) $(uri) HTTP/1.1$(const.r)$(const.n)Host:$(host)$(const.r)$(const.n)$(const.r)$(const.n)",
+        20
+      );
 
-      "chost" string => canonify($(host));
+    "chost" string => canonify($(host));
 
   classes:
-      "url_ok_$(chost)"
+    "url_ok_$(chost)"
       scope => "namespace",
-      expression => regcmp("[^\n]*200 OK.*\n.*",
-                           $(url_check));
+      expression => regcmp("[^\n]*200 OK.*\n.*", $(url_check));
 
-      "url_not_ok_$(chost)"
+    "url_not_ok_$(chost)"
       scope => "namespace",
-      not => regcmp("[^\n]*200 OK.*\n.*",
-                           $(url_check));
+      not => regcmp("[^\n]*200 OK.*\n.*", $(url_check));
 
   reports:
     verbose_mode::
       "$(this.bundle): $(method) $(host):$(port)/$(uri) got 200 OK"
-      if => "url_ok_$(chost)";
+        if => "url_ok_$(chost)";
+
       "$(this.bundle): $(method) $(host):$(port)/$(uri) did *not* get 200 OK"
-      if => "url_not_ok_$(chost)";
+        if => "url_not_ok_$(chost)";
 }
 
 bundle agent cmerge(name, varlist)
@@ -381,9 +384,16 @@ bundle agent cmerge(name, varlist)
 # ```
 {
   vars:
-      "$(name)" data => parsejson('[]'),            policy => "free";
-      "$(name)" data => mergedata($(name), $(varlist)), policy => "free"; # iterates!
-      "$(name)_str" string => format("%S", $(name)),    policy => "free";
+    "$(name)"
+      data => parsejson('[]'),
+      policy => "free";
+
+    "$(name)"
+      data => mergedata($(name), $(varlist)),
+      policy => "free"; # iterates!
+    "$(name)_str"
+      string => format("%S", $(name)),
+      policy => "free";
 }
 
 bundle agent collect_vars(name, tag, flatten)
@@ -435,12 +445,12 @@ bundle agent collect_vars(name, tag, flatten)
 # ```
 {
   classes:
-      "flatten" expression => strcmp($(flatten), "any");
-      "flatten" expression => strcmp($(flatten), "1");
-      "flatten" expression => strcmp($(flatten), "true");
+    "flatten" expression => strcmp($(flatten), "any");
+    "flatten" expression => strcmp($(flatten), "1");
+    "flatten" expression => strcmp($(flatten), "true");
 
   vars:
-      "todo_$(name)"    slist => variablesmatching(".*", $(tag));
+    "todo_$(name)" slist => variablesmatching(".*", $(tag));
 
     !flatten::
       "$(name)"
@@ -487,13 +497,13 @@ bundle agent run_ifdefined(namespace, mybundle)
 # ```
 {
   vars:
-      "bundlesfound" slist => bundlesmatching("^$(namespace):$(mybundle)$");
-      "count" int => length(bundlesfound);
+    "bundlesfound" slist => bundlesmatching("^$(namespace):$(mybundle)$");
+    "count" int => length(bundlesfound);
 
   methods:
-      "any"
+    "any"
       usebundle => $(bundlesfound),
-      if        => strcmp(1, $(count));
+      if => strcmp(1, $(count));
 
   reports:
     verbose_mode::
