@@ -1337,6 +1337,12 @@ bundle agent cfe_autorun_inventory_packages
         fileexists("$(sys.workdir)/state/software_patches_avail.csv"),
       };
 
+    "have_inventory"
+      and => {
+        "have_patches",
+        fileexists("$(sys.workdir)/state/software_packages.csv"),
+      };
+
     "use_package_module_for_inventory"
       or => { "redhat", "debian", "suse", "sles", "alpinelinux", "windows" };
 
