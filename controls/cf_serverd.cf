@@ -5,83 +5,77 @@
 #  i.e. access to the server itself.
 # Access to specific files must be granted in addition.
 ###############################################################################
-
 body server control
 # @brief Control attributes for cf-serverd
 {
-      # List of hosts that may connect (change the ACL in def.cf)
-      allowconnects         => { @(default:def.control_server_allowconnects_derived) };
+  # List of hosts that may connect (change the ACL in def.cf)
+  allowconnects => { @(default:def.control_server_allowconnects_derived) };
 
-      # Out of them, which ones should be allowed to have more than one
-      # connection established at the same time?
-      allowallconnects      => { @(default:def.control_server_allowallconnects_derived) };
+  # Out of them, which ones should be allowed to have more than one
+  # connection established at the same time?
+  allowallconnects => {
+    @(default:def.control_server_allowallconnects_derived)
+  };
 
-      # Out of the hosts in allowconnects, trust new keys only from the
-      # following ones.  SEE COMMENTS IN def.cf
-      trustkeysfrom         => { @(def.trustkeysfrom) };
+  # Out of the hosts in allowconnects, trust new keys only from the
+  # following ones.  SEE COMMENTS IN def.cf
+  trustkeysfrom => { @(def.trustkeysfrom) };
 
-      ## List of the hosts not using the latest protocol that we'll accept connections from
-      ## (absence of this option or empty list means allow none)
-      allowlegacyconnects   => { @(def.control_server_allowlegacyconnects) };
+  ## List of the hosts not using the latest protocol that we'll accept connections from
+  ## (absence of this option or empty list means allow none)
+  allowlegacyconnects => { @(def.control_server_allowlegacyconnects) };
 
-      # Maximum number of concurrent connections.
-      # Suggested value >= total number of hosts
-      maxconnections        => "$(def.control_server_maxconnections)";
+  # Maximum number of concurrent connections.
+  # Suggested value >= total number of hosts
+  maxconnections => "$(def.control_server_maxconnections)";
 
-      # Allow connections from nodes which are out-of-sync
-      denybadclocks         => "false";
+  # Allow connections from nodes which are out-of-sync
+  denybadclocks => "false";
 
-    control_server_allowtlsversion_defined::
+  control_server_allowtlsversion_defined::
+    # Minimum required version of TLS. Set to "1.0" if you need clients
+    # running CFEngine in a version lower than 3.7.0 to connect.
+    #
+    # Example:
+    # allowtlsversion => "1.0";
+    # See also: tls_min_version in body common control
+    allowtlsversion => "$(default:def.control_server_allowtlsversion)";
 
-      # Minimum required version of TLS. Set to "1.0" if you need clients
-      # running CFEngine in a version lower than 3.7.0 to connect.
-      #
-      # Example:
-      # allowtlsversion => "1.0";
+  control_server_allowciphers_defined::
+    # List of ciphers the server accepts. For Syntax help see man page for
+    # "openssl-ciphers" (man:openssl-ciphers(1ssl)). The 'TLS_'-prefixed
+    # ciphers are for TLS 1.3 and later.
+    #
+    # Example setting:
+    # allowciphers          => "AES256-GCM-SHA384:AES256-SHA:TLS_AES_256_GCM_SHA384";
+    # See also: tls_ciphers in body common control
+    allowciphers => "$(default:def.control_server_allowciphers)";
 
-      allowtlsversion => "$(default:def.control_server_allowtlsversion)"; # See also: tls_min_version in body common control
+  enterprise_edition.client_initiated_reporting_enabled::
+    # How often cf-serverd should try to establish a reverse tunnel for report
+    # collection
+    call_collect_interval => "$(def.control_server_call_collect_interval)";
 
-    control_server_allowciphers_defined::
-      # List of ciphers the server accepts. For Syntax help see man page for
-      # "openssl-ciphers" (man:openssl-ciphers(1ssl)). The 'TLS_'-prefixed
-      # ciphers are for TLS 1.3 and later.
-      #
-      # Example setting:
-      # allowciphers          => "AES256-GCM-SHA384:AES256-SHA:TLS_AES_256_GCM_SHA384";
+    # The time in seconds that a collect-call tunnel will remain open for hub
+    # to complete report transfer.
+    collect_window => "$(def.control_server_collect_window)";
 
-      allowciphers          => "$(default:def.control_server_allowciphers)"; # See also: tls_ciphers in body common control
+  any::
+    # The remote user accounts which are allowed to initiate cf-agent via
+    # cf-runagent.
+    allowusers => { @(def.control_server_allowusers) };
 
-    enterprise_edition.client_initiated_reporting_enabled::
-
-      # How often cf-serverd should try to establish a reverse tunnel for report
-      # collection
-
-      call_collect_interval => "$(def.control_server_call_collect_interval)";
-
-      # The time in seconds that a collect-call tunnel will remain open for hub
-      # to complete report transfer.
-        collect_window => "$(def.control_server_collect_window)";
-
-    any::
-      # The remote user accounts which are allowed to initiate cf-agent via
-      # cf-runagent.
-
-      allowusers => { @(def.control_server_allowusers) };
-
-    # In 3.10 the quotation is properly closed when EOF is reached. It is left
-    # open so that arguments (like -K and --remote-bundles) can be appended.
-    # 3.10.x does not automatically append -I -Dcfruncommand
-
-    windows::
-
-        # /s removes the first and last quote characters and aids in specifying paths with surrounding quotes
-        cfruncommand => "$(def.cf_runagent_shell) /s /c \"
+  # In 3.10 the quotation is properly closed when EOF is reached. It is left
+  # open so that arguments (like -K and --remote-bundles) can be appended.
+  # 3.10.x does not automatically append -I -Dcfruncommand
+  windows::
+    # /s removes the first and last quote characters and aids in specifying paths with surrounding quotes
+    cfruncommand => "$(def.cf_runagent_shell) /s /c \"
                            $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  &
                            $(sys.cf_agent) -I -D cf_runagent_initiated";
 
-    !windows::
-
-        cfruncommand => "$(def.cf_runagent_shell) -c \'
+  !windows::
+    cfruncommand => "$(def.cf_runagent_shell) -c \'
                            $(sys.cf_agent) -I -D cf_runagent_initiated -f $(sys.update_policy_path)  ;
                            $(sys.cf_agent) -I -D cf_runagent_initiated";
 
@@ -93,81 +87,80 @@ body server control
 }
 
 ###############################################################################
-
 bundle server mpf_default_access_rules()
 # @brief Defines access to common resources
 {
   vars:
     # TODO: Remove this once sys.keydir is always available (3.26+ only)
     "keydir" -> { "CFE-2822" }
-      string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
+      string => ifelse(
+        isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys"
+      );
 
   access:
-
     any::
-
       "$(def.dir_masterfiles)/"
-      handle => "server_access_grant_access_policy",
-      shortcut => "masterfiles",
-      comment => "Grant access to the policy updates",
-      if => isdir( "$(def.dir_masterfiles)/" ),
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_policy",
+        shortcut => "masterfiles",
+        comment => "Grant access to the policy updates",
+        if => isdir("$(def.dir_masterfiles)/"),
+        admit => { @(def.acl_derived) };
 
       "$(def.dir_masterfiles)/.no-distrib/" -> { "ENT-8079" }
-      handle => "prevent_distribution_of_top_level_dot_no_distrib",
-      deny => { "0.0.0.0/0" };
+        handle => "prevent_distribution_of_top_level_dot_no_distrib",
+        deny => { "0.0.0.0/0" };
 
       "$(def.dir_bin)/"
-      handle => "server_access_grant_access_binary",
-      comment => "Grant access to binary for cf-runagent",
-      if => isdir( "$(def.dir_bin)/" ),
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_binary",
+        comment => "Grant access to binary for cf-runagent",
+        if => isdir("$(def.dir_bin)/"),
+        admit => { @(def.acl_derived) };
 
       "$(def.dir_data)/"
-      handle => "server_access_grant_access_data",
-      shortcut => "data",
-      comment => "Grant access to data directory",
-      if => isdir( "$(def.dir_data)/" ),
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_data",
+        shortcut => "data",
+        comment => "Grant access to data directory",
+        if => isdir("$(def.dir_data)/"),
+        admit => { @(def.acl_derived) };
 
       "$(def.dir_modules)/"
-      handle => "server_access_grant_access_modules",
-      shortcut => "modules",
-      comment => "Grant access to modules directory",
-      if => isdir( "$(def.dir_modules)/" ),
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_modules",
+        shortcut => "modules",
+        comment => "Grant access to modules directory",
+        if => isdir("$(def.dir_modules)/"),
+        admit => { @(def.acl_derived) };
 
       # TODO: Remove after 3.15 is no longer supported (December 18th 2022)
       "$(def.dir_plugins)/" -> { "CFE-3618" }
-      handle => "server_access_grant_access_plugins",
-      comment => "Grant access to plugins directory",
-      if => isdir( "$(def.dir_plugins)/" ),
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_plugins",
+        comment => "Grant access to plugins directory",
+        if => isdir("$(def.dir_plugins)/"),
+        admit => { @(def.acl_derived) };
 
       "$(def.dir_templates)/"
-      handle => "server_access_grant_access_templates",
-      shortcut => "templates",
-      comment => "Grant access to templates directory",
-      if => isdir( "$(def.dir_templates)/" ),
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_templates",
+        shortcut => "templates",
+        comment => "Grant access to templates directory",
+        if => isdir("$(def.dir_templates)/"),
+        admit => { @(def.acl_derived) };
 
     policy_server|am_policy_hub::
-
       "$(def.dir_master_software_updates)/" -> { "ENT-4953" }
         handle => "server_access_grant_access_master_software_updates",
         shortcut => "master_software_updates",
         comment => "Grant access for hosts to download cfengine packages for self upgrade",
-        if => isdir( "$(sys.workdir)/master_software_updates" ),
+        if => isdir("$(sys.workdir)/master_software_updates"),
         admit => { @(def.acl_derived) };
 
       "$(sys.statedir)/cf_version.txt" -> { "ENT-10664" }
         handle => "server_access_grant_access_state_cf_version",
         shortcut => "hub-cf_version",
-        comment => concat( "We want remote hosts to default their target binary",
-                           " version to that of the hubs binary version, so we",
-                           " need to share this state with remote clients." ),
+        comment => concat(
+          "We want remote hosts to default their target binary",
+          " version to that of the hubs binary version, so we",
+          " need to share this state with remote clients."
+        ),
         admit => { @(def.acl_derived) };
-
 
     enterprise_edition.policy_server::
       "collect_calls"
@@ -182,85 +175,82 @@ bundle server mpf_default_access_rules()
 
     any::
       "$(def.cf_runagent_shell)" -> { "ENT-6673" }
-      handle => "server_access_grant_access_shell_cmd",
-      comment => "Grant access to shell for cfruncommand",
-      admit => { @(def.mpf_admit_cf_runagent_shell_selected) };
+        handle => "server_access_grant_access_shell_cmd",
+        comment => "Grant access to shell for cfruncommand",
+        admit => { @(def.mpf_admit_cf_runagent_shell_selected) };
 
     policy_server.enable_cfengine_enterprise_hub_ha::
       "$(keydir)/"
-      handle => "server_access_grant_access_ppkeys_hubs",
-      comment => "Grant access to ppkeys for HA hubs",
-      if => isdir( "$(keydir)/" ),
-      admit => { @(def.policy_servers) };
+        handle => "server_access_grant_access_ppkeys_hubs",
+        comment => "Grant access to ppkeys for HA hubs",
+        if => isdir("$(keydir)/"),
+        admit => { @(def.policy_servers) };
 
       # Allow slave hub to synchronize cf_robot and appsettings, application
       # config config, ldap config settings, and ldap api config settings.
       # Files are containing configuration that must be the same on all hubs.
       "$(sys.workdir)/httpd/htdocs/application/config/cf_robot.php"
-      handle => "server_access_grant_access_cf_robot",
-      comment => "Grant access to cf_robot file for HA hubs",
-      admit => { @(def.policy_servers) };
+        handle => "server_access_grant_access_cf_robot",
+        comment => "Grant access to cf_robot file for HA hubs",
+        admit => { @(def.policy_servers) };
 
       "$(sys.workdir)/httpd/htdocs/application/config/appsettings.php"
-      handle => "server_access_grant_access_appsettings",
-      comment => "Grant access to appsettings for HA hubs",
-      admit => { @(def.policy_servers) };
+        handle => "server_access_grant_access_appsettings",
+        comment => "Grant access to appsettings for HA hubs",
+        admit => { @(def.policy_servers) };
 
-      "$(sys.workdir)/httpd/htdocs/application/config/config.php" -> { "ENT-4944" }
-      handle => "server_access_grant_access_application_config_config_php",
-      comment => "Grant access to application config for HA hubs",
-      admit => { @(def.policy_servers) };
-
+      "$(sys.workdir)/httpd/htdocs/application/config/config.php" -> {
+          "ENT-4944"
+        }
+        handle => "server_access_grant_access_application_config_config_php",
+        comment => "Grant access to application config for HA hubs",
+        admit => { @(def.policy_servers) };
 
       "$(sys.workdir)/httpd/htdocs/ldap/config/settings.php" -> { "ENT-4944" }
-      handle => "server_access_grant_access_ldap_config_settings_php",
-      comment => "Grant access to ldap config settings for HA hubs",
-      admit => { @(def.policy_servers) };
-
+        handle => "server_access_grant_access_ldap_config_settings_php",
+        comment => "Grant access to ldap config settings for HA hubs",
+        admit => { @(def.policy_servers) };
 
       "$(sys.workdir)/httpd/htdocs/api/config/config.php" -> { "ENT-4944" }
-      handle => "server_access_grant_access_api_config_settings_php",
-      comment => "Grant access to LDAP api config for HA hubs",
-      admit => { @(def.policy_servers) };
+        handle => "server_access_grant_access_api_config_settings_php",
+        comment => "Grant access to LDAP api config for HA hubs",
+        admit => { @(def.policy_servers) };
 
       # Allow access to notification_scripts directory so passive hub
       # will be able to synchronize its content. Once passive hub will
       # be promoted to act as a master all the custom scripts will be
       # accessible.
       "/opt/cfengine/notification_scripts/"
-      handle => "server_access_grant_access_notification scripts",
-      comment => "Grant access to notification scripts",
-      if => isdir( "/opt/cfengine/notification_scripts/" ),
-      admit => { @(def.policy_servers) };
+        handle => "server_access_grant_access_notification scripts",
+        comment => "Grant access to notification scripts",
+        if => isdir("/opt/cfengine/notification_scripts/"),
+        admit => { @(def.policy_servers) };
 
       # When HA is enabled clients are updating active hub IP address
       # using data stored in master_hub.dat file.
       "$(ha_def.master_hub_location)"
-      handle => "server_access_grant_access_policy_server_dat",
-      comment => "Grant access to policy_server.dat",
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_policy_server_dat",
+        comment => "Grant access to policy_server.dat",
+        admit => { @(def.acl_derived) };
 
       # Hubs keys working in HA configuration are stored in ppkeys_hubs directory.
       # In order to perform failover while active hub is down clients needs to
       # have all hubs keys. This gives ability to connect to slave hub promoted to active role
       # once active is down.
       "$(ha_def.hubs_keys_location)/"
-      handle => "server_access_grant_access_to_clients",
-      comment => "Grant access to hubs' keys to clients",
-      if => isdir("$(ha_def.hubs_keys_location)/"),
-      admit => { @(def.acl_derived) };
+        handle => "server_access_grant_access_to_clients",
+        comment => "Grant access to hubs' keys to clients",
+        if => isdir("$(ha_def.hubs_keys_location)/"),
+        admit => { @(def.acl_derived) };
 
     windows::
       "c:\program files\cfengine\bin\cf-agent.exe"
-      handle => "server_access_grant_access_agent",
-      comment => "Grant access to the agent (for cf-runagent)",
-      admit   => { @(def.policy_servers) };
+        handle => "server_access_grant_access_agent",
+        comment => "Grant access to the agent (for cf-runagent)",
+        admit => { @(def.policy_servers) };
 
   roles:
-
-      # Use roles to allow specific remote cf-runagent users to
-      # define certain soft-classes when running cf-agent on this host
-
-      ".*" authorize => { "root" };
-
+    # Use roles to allow specific remote cf-runagent users to
+    # define certain soft-classes when running cf-agent on this host
+    ".*" authorize => { "root" };
 }

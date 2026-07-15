@@ -1,4 +1,3 @@
-#
 # CFEngine Community Open Promise-Body Library
 #
 # This initiative started by CFEngine promotes a
@@ -11,7 +10,6 @@
 #
 # Names should be intuitive and parameters should be
 # minimal to assist readability and comprehensibility.
-
 # Contributions to this file are voluntarily given to
 # the cfengine community, and are moderated by CFEngine.
 # No liability or warranty for misuse is implied.
@@ -21,39 +19,46 @@
 # after the bundle/body statement are retained in
 # the online docs
 # Main COPBL include file
-
 ###################################################
 # If you find CFEngine useful, please consider    #
 # purchasing a commercial version of the software.#
 ###################################################
-
 bundle common stdlib_common
 # @brief Select which parts of the stdlib should be added to inputs
 {
   vars:
+    "input[paths]" string => "$(this.promise_dirname)/paths.cf";
+    "input[common]" string => "$(this.promise_dirname)/common.cf";
+    "input[commands]" string => "$(this.promise_dirname)/commands.cf";
+    "input[packages]" string => "$(this.promise_dirname)/packages.cf";
+    "input[files]" string => "$(this.promise_dirname)/files.cf";
+    "input[edit_xml]" string => "$(this.promise_dirname)/edit_xml.cf";
+    "input[services]" string => "$(this.promise_dirname)/services.cf";
 
-      "input[paths]"                      string => "$(this.promise_dirname)/paths.cf";
-      "input[common]"                     string => "$(this.promise_dirname)/common.cf";
-      "input[commands]"                   string => "$(this.promise_dirname)/commands.cf";
-      "input[packages]"                   string => "$(this.promise_dirname)/packages.cf";
-      "input[files]"                      string => "$(this.promise_dirname)/files.cf";
-      "input[edit_xml]"                   string => "$(this.promise_dirname)/edit_xml.cf";
-      "input[services]"                   string => "$(this.promise_dirname)/services.cf";
-      "input[service_config]"             string => "$(this.promise_dirname)/service_config.cf";
-      "input[processes]"                  string => "$(this.promise_dirname)/processes.cf";
-      "input[storage]"                    string => "$(this.promise_dirname)/storage.cf";
-      "input[databases]"                  string => "$(this.promise_dirname)/databases.cf";
-      "input[users]"                      string => "$(this.promise_dirname)/users.cf";
-      "input[monitor]"                    string => "$(this.promise_dirname)/monitor.cf";
-      "input[guest_environments]"         string => "$(this.promise_dirname)/guest_environments.cf";
-      "input[bundles]"                    string => "$(this.promise_dirname)/bundles.cf";
-      "input[reports]"                    string => "$(this.promise_dirname)/reports.cf";
-      "input[cfe_internal]"               string => "$(this.promise_dirname)/cfe_internal.cf";
-      "input[cfe_internal_hub]"           string => "$(this.promise_dirname)/cfe_internal_hub.cf";
-      "input[cfengine_enterprise_hub_ha]" string => "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf";
+    "input[service_config]"
+      string => "$(this.promise_dirname)/service_config.cf";
 
-      # jUnit and TAP reports
-      "input[testing]"                      string => "$(this.promise_dirname)/testing.cf";
+    "input[processes]" string => "$(this.promise_dirname)/processes.cf";
+    "input[storage]" string => "$(this.promise_dirname)/storage.cf";
+    "input[databases]" string => "$(this.promise_dirname)/databases.cf";
+    "input[users]" string => "$(this.promise_dirname)/users.cf";
+    "input[monitor]" string => "$(this.promise_dirname)/monitor.cf";
+
+    "input[guest_environments]"
+      string => "$(this.promise_dirname)/guest_environments.cf";
+
+    "input[bundles]" string => "$(this.promise_dirname)/bundles.cf";
+    "input[reports]" string => "$(this.promise_dirname)/reports.cf";
+    "input[cfe_internal]" string => "$(this.promise_dirname)/cfe_internal.cf";
+
+    "input[cfe_internal_hub]"
+      string => "$(this.promise_dirname)/cfe_internal_hub.cf";
+
+    "input[cfengine_enterprise_hub_ha]"
+      string => "$(this.promise_dirname)/cfengine_enterprise_hub_ha.cf";
+
+    # jUnit and TAP reports
+    "input[testing]" string => "$(this.promise_dirname)/testing.cf";
 
     any::
       "inputs" slist => getvalues(input);
@@ -66,5 +71,5 @@ bundle common stdlib_common
 body file control
 # @brief Include the standard library files selected to inputs
 {
-      inputs => { @(stdlib_common.inputs) };
+  inputs => { @(stdlib_common.inputs) };
 }

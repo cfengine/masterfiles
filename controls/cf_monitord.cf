@@ -8,16 +8,13 @@
 # the integrated monitoring capabilities of CFEngine.
 #
 ###############################################################################
-
 body monitor control
 # @brief Attributes controlling cf-monitord
 {
+  any::
+    forgetrate => "0.7";
+    histograms => "true";
 
-    any::
-
-      forgetrate => "0.7";
-      histograms => "true";
-      #  tcpdump => "false";
-      #  tcpdumpcommand => "/usr/sbin/tcpdump -t -n -v";
-
+    #  tcpdump => "false";
+    #  tcpdumpcommand => "/usr/sbin/tcpdump -t -n -v";
 }

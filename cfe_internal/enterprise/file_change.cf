@@ -6,20 +6,17 @@
 #         Large amounts can cause resource hogs and long-running agents.
 #
 #########################################################################
-
 bundle agent change_management
 {
   vars:
-
     linux::
-
       "watch_files_report_diffs"
-        slist =>  {
-                   "/etc/passwd",
-                   "/etc/group",
-                   "/etc/services",
-                   "$(sys.statedir)/pg/data/postgresql.conf",
-                  },
+        slist => {
+          "/etc/passwd",
+          "/etc/group",
+          "/etc/services",
+          "$(sys.statedir)/pg/data/postgresql.conf",
+        },
         comment => "These files will be watched for change, and diffs will be
                     reported back to mission portal if you are running CFEngine
                     Enterprise.";
@@ -31,31 +28,26 @@ bundle agent change_management
                     change.";
 
   files:
-
     linux::
-
       "$(watch_files_report_diffs)" -> { "InfoSec" }
         changes => diff,
         handle => "change_management_files_watch_files_report_diffs",
-        if => fileexists( $(watch_files_report_diffs) ),
+        if => fileexists($(watch_files_report_diffs)),
         comment => "Unplanned changes of these files may indicate a security
                     breach.";
 
       "$(watch_files_report_change)" -> { "InfoSec" }
         changes => detect_content_using("sha256"),
-        if => fileexists( $(watch_files_report_change) ),
+        if => fileexists($(watch_files_report_change)),
         comment => "Unplanned changes of these files may indicate a security
                     breach. (Diffs are not reported in case those with access
                     to this report should not have access to shadow entries.)";
 
-      #######################################################################
-      # Redundant cross monitoring for strong `tripwire' ...............
-      #######################################################################
-
-      #  "$(sys.workdir)/nw/$(neighbours)_checksum_digests.db"
-
-      #     comment => "Watching our peers remote hash tables for changes - cross check",
-      #   copy_from => remote_cp("$(sys.workdir)/checksum_digests.db","$(neighbours)"),
-      #      action => neighbourwatch("File hash changes observed on $(neighbours) (neighbourhood watch)");
-
+        #######################################################################
+        # Redundant cross monitoring for strong `tripwire' ...............
+        #######################################################################
+        #  "$(sys.workdir)/nw/$(neighbours)_checksum_digests.db"
+        #     comment => "Watching our peers remote hash tables for changes - cross check",
+        #   copy_from => remote_cp("$(sys.workdir)/checksum_digests.db","$(neighbours)"),
+        #      action => neighbourwatch("File hash changes observed on $(neighbours) (neighbourhood watch)");
 }

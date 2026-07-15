@@ -2,14 +2,17 @@ bundle common cfe_internal_hub_common
 # @brief Enumerate policy files used by this policy file for inclusion to inputs
 {
   vars:
-      "inputs" slist => { "$(this.promise_dirname)/common.cf",
-                          "$(this.promise_dirname)/commands.cf"};
+    "inputs"
+      slist => {
+        "$(this.promise_dirname)/common.cf",
+        "$(this.promise_dirname)/commands.cf",
+      };
 }
 
 body file control
 # @brief Include policy files used by this policy file as part of inputs
 {
-      inputs => { @(cfe_internal_hub_common.inputs) };
+  inputs => { @(cfe_internal_hub_common.inputs) };
 }
 
 bundle agent cfe_internal_hub_maintain
@@ -23,8 +26,9 @@ bundle agent cfe_internal_hub_maintain
 # as maintenance process could take a considerable time
 {
   vars:
-      "report_settings"
-        data => parsejson('[
+    "report_settings"
+      data => parsejson(
+        '[
   {
     "report": "contexts",
     "table": "__ContextsLog",
@@ -61,10 +65,12 @@ bundle agent cfe_internal_hub_maintain
     "history_length_days": 1,
     "time_key": "CheckTimeStamp"
   }
-]');
+]'
+      );
 
-      "diagnostics_settings"
-        data => parsejson('[
+    "diagnostics_settings"
+      data => parsejson(
+        '[
   {
     "report": "hub_connection_errors",
     "table": "__HubConnectionErrors",
@@ -77,50 +83,57 @@ bundle agent cfe_internal_hub_maintain
     "history_length_days": 1,
     "time_key": "TimeStamp"
   }
-]');
+]'
+      );
 
   classes:
-      "enable_cfe_internal_reporting_database_purge_old_history" -> { "postgres", "CFEngine Enterprise" }
-        expression => "enterprise_edition.Hr00";
+    "enable_cfe_internal_reporting_database_purge_old_history" -> {
+        "postgres", "CFEngine Enterprise"
+      }
+      expression => "enterprise_edition.Hr00";
 
-      "enable_cfe_internal_parition_creation_job" -> { "postgres", "CFEngine Enterprise" }
-        expression => "enterprise_edition.Hr00";
+    "enable_cfe_internal_parition_creation_job" -> {
+        "postgres", "CFEngine Enterprise"
+      }
+      expression => "enterprise_edition.Hr00";
 
   methods:
     enable_cfe_internal_reporting_database_purge_old_history::
       "Remove old report history"
-      usebundle => cfe_internal_database_cleanup_reports(@(report_settings)),
-      action => if_elapsed_day;
+        usebundle => cfe_internal_database_cleanup_reports(@(report_settings)),
+        action => if_elapsed_day;
 
       "Remove cf-hub status history"
-      usebundle => cfe_internal_database_cleanup_cf_hub_status("3"),
-      action => if_elapsed_day;
+        usebundle => cfe_internal_database_cleanup_cf_hub_status("3"),
+        action => if_elapsed_day;
 
       "Remove diagnostics history"
-      usebundle => cfe_internal_database_cleanup_diagnostics(@(diagnostics_settings)),
-      action => if_elapsed_day;
+        usebundle => cfe_internal_database_cleanup_diagnostics(
+          @(diagnostics_settings)
+        ),
+        action => if_elapsed_day;
 
       "Remove promise log history"
-      usebundle => cfe_internal_database_cleanup_promise_log("7"),
-      action => if_elapsed_day;
+        usebundle => cfe_internal_database_cleanup_promise_log("7"),
+        action => if_elapsed_day;
 
     enable_cfe_internal_parition_creation_job::
       "Create new partitions for partitioned tables"
-      usebundle => cfe_internal_database_partitioning(),
-      action => if_elapsed_day;
+        usebundle => cfe_internal_database_partitioning(),
+        action => if_elapsed_day;
 }
 
-bundle agent cfe_internal_database_cleanup_reports (settings)
+bundle agent cfe_internal_database_cleanup_reports(settings)
 # @brief clean up the reporting tables
 {
   vars:
-      "index" slist => getindices(settings);
+    "index" slist => getindices(settings);
 
-      "remove_query_$(settings[$(index)][report])"
-        comment => "This query will delete rows that have a changetimestamp
+    "remove_query_$(settings[$(index)][report])"
+      comment => "This query will delete rows that have a changetimestamp
                     $(settings[$(index)][history_length_days]) older than the
                     hosts most recent changetimestamp in the table.",
-        string => "WITH z AS
+      string => "WITH z AS
 (
          SELECT   hostkey,
                   Max($(settings[$(index)][time_key])) AS latest
@@ -133,43 +146,42 @@ WHERE  z.hostkey = t.hostkey
 AND    t.$(settings[$(index)][time_key]) <= (z.latest - '$(settings[$(index)][history_length_days]) day'::interval);";
 
   commands:
-      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
+    "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
 @if minimum_version(3.15.0)
-        inform => "false",
+      inform => "false",
 @endif
-        contain => default:silent,
-        handle => "cf_database_maintain_report_$(settings[$(index)][report])";
+      contain => default:silent,
+      handle => "cf_database_maintain_report_$(settings[$(index)][report])";
 }
 
-bundle agent cfe_internal_database_cleanup_cf_hub_status (row_count)
+bundle agent cfe_internal_database_cleanup_cf_hub_status(row_count)
 # @brief keep up to row_count entries in the database
 {
-
   classes:
+    # We probe the database to see if the function is defined
+    "has_sql_function_cleanup_historical_data"
+      expression => returnszero(
+        "$(sys.bindir)/psql cfdb -c \"SELECT 'cleanup_historical_data'::regproc;\" > /dev/null 2>&1",
+        useshell
+      ),
+      if => isexecutable("$(sys.bindir)/psql");
 
-      # We probe the database to see if the function is defined
-
-      "has_sql_function_cleanup_historical_data"
-        expression => returnszero( "$(sys.bindir)/psql cfdb -c \"SELECT 'cleanup_historical_data'::regproc;\" > /dev/null 2>&1", useshell ),
-        if => isexecutable( "$(sys.bindir)/psql" );
-
-      "has_sql_table___status" -> { "ENT-4331" }
-        expression => returnszero( "$(sys.bindir)/psql cfdb -c \"SELECT 'public.__status'::regclass;\" > /dev/null 2>&1", useshell ),
-        if => isexecutable( "$(sys.bindir)/psql" );
+    "has_sql_table___status" -> { "ENT-4331" }
+      expression => returnszero(
+        "$(sys.bindir)/psql cfdb -c \"SELECT 'public.__status'::regclass;\" > /dev/null 2>&1",
+        useshell
+      ),
+      if => isexecutable("$(sys.bindir)/psql");
 
   vars:
-
     any::
-
       # TODO Redact after 3.15.x is no longer under standard support. Since this
       # is used in 3.12.x and 3.12.x was supported at the time 3.15.0 was
       # released we need to maintain the path for people upgrading from 3.12.x
-
       # The status table changed it's name for 3.12.2 and 3.10.6, this handles
       # using the proper table name in the cleanup query
-
       "status_table_name" -> { "ENT-4331" }
-        string => ifelse( "has_sql_table___status", "__status", "status");
+        string => ifelse("has_sql_table___status", "__status", "status");
 
     any::
       # This is the fallback query to use in case the cleanup_historical_data
@@ -177,131 +189,125 @@ bundle agent cfe_internal_database_cleanup_cf_hub_status (row_count)
       "remove_query" -> { "ENT-4365" }
         string => "DELETE FROM $(status_table_name) WHERE ts IN (SELECT ts FROM $(status_table_name) ORDER BY ts DESC OFFSET 50000);";
 
-
       "delete_future_ts_query" -> { "ENT-4362", "ENT-4992" }
         string => "DELETE FROM $(status_table_name) WHERE to_timestamp(ts::bigint) > (now() + interval '2 days')::timestamp;";
 
     has_sql_function_cleanup_historical_data::
-
       "remove_query"
         string => "SELECT * FROM cleanup_historical_data('$(status_table_name)', 'ts', $(row_count), 'host');";
 
   commands:
-      "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
+    "$(sys.bindir)/psql cfdb -c \"$(remove_query)\""
 @if minimum_version(3.15.0)
-        inform => "false",
+      inform => "false",
 @endif
-        contain => default:silent,
-        handle => "cf_database_maintain_consumer_status";
+      contain => default:silent,
+      handle => "cf_database_maintain_consumer_status";
 
-      "$(sys.bindir)/psql cfdb -c \"$(delete_future_ts_query)\"" -> { "ENT-4362" }
+    "$(sys.bindir)/psql cfdb -c \"$(delete_future_ts_query)\"" -> { "ENT-4362" }
 @if minimum_version(3.15.0)
-        inform => "false",
+      inform => "false",
 @endif
-        contain => default:silent,
-        handle => "cf_database_maintain_consumer_status_no_future_timestamps";
-
+      contain => default:silent,
+      handle => "cf_database_maintain_consumer_status_no_future_timestamps";
 }
 
-bundle agent cfe_internal_database_cleanup_diagnostics (settings)
+bundle agent cfe_internal_database_cleanup_diagnostics(settings)
 {
   vars:
-      "index" slist => getindices("settings");
+    "index" slist => getindices("settings");
 
-      "remove_query_$(settings[$(index)][report])"
+    "remove_query_$(settings[$(index)][report])"
       string => "DELETE FROM $(settings[$(index)][table]) WHERE $(settings[$(index)][time_key]) < (CURRENT_TIMESTAMP - INTERVAL '$(settings[$(index)][history_length_days]) day');";
 
   commands:
-      "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
+    "$(sys.bindir)/psql cfdb -c \"$(remove_query_$(settings[$(index)][report]))\""
 @if minimum_version(3.15.0)
-        inform => "false",
+      inform => "false",
 @endif
-        contain => default:silent,
-        handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
+      contain => default:silent,
+      handle => "cf_database_maintain_diagnostics_$(settings[$(index)][report])";
 }
 
-bundle agent cfe_internal_database_cleanup_promise_log (history_length_days)
+bundle agent cfe_internal_database_cleanup_promise_log(history_length_days)
 # @brief clean up promise log files older than `history_length_days`
 # @param history_length_days Number of days after which promise logs should be deleted
 {
   vars:
     "cleanup_query_repaired"
-    string => "SELECT promise_log_partition_cleanup('REPAIRED', '$(history_length_days) day');";
+      string => "SELECT promise_log_partition_cleanup('REPAIRED', '$(history_length_days) day');";
 
     "cleanup_query_notkept"
-    string => "SELECT promise_log_partition_cleanup('NOTKEPT', '$(history_length_days) day');";
+      string => "SELECT promise_log_partition_cleanup('NOTKEPT', '$(history_length_days) day');";
 
   commands:
-      "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
+    "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_repaired)\""
 @if minimum_version(3.15.0)
-        inform => "false",
+      inform => "false",
 @endif
-        contain => default:silent,
-        handle => "cf_database_maintain_promise_log_repaired";
+      contain => default:silent,
+      handle => "cf_database_maintain_promise_log_repaired";
 
-      "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_notkept)\""
+    "$(sys.bindir)/psql cfdb -c \"$(cleanup_query_notkept)\""
 @if minimum_version(3.15.0)
-        inform => "false",
+      inform => "false",
 @endif
-        contain => default:silent,
-        handle => "cf_database_maintain_promise_log_notkept";
+      contain => default:silent,
+      handle => "cf_database_maintain_promise_log_notkept";
 }
 
 bundle agent cfe_internal_database_partitioning()
 # @brief create any nesesary table partitions for database
 {
   vars:
-    "promise_outcome"
-    slist => {"REPAIRED", "NOTKEPT"};
+    "promise_outcome" slist => { "REPAIRED", "NOTKEPT" };
 
     "query_create_promise_log_$(promise_outcome)"
-    string => "SELECT promise_log_partition_create(NOW() - INTERVAL '7 day', 7 + 3, '$(promise_outcome)');";
+      string => "SELECT promise_log_partition_create(NOW() - INTERVAL '7 day', 7 + 3, '$(promise_outcome)');";
 
   commands:
-      "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
+    "$(sys.bindir)/psql cfdb -c \"$(query_create_promise_log_$(promise_outcome))\""
 @if minimum_version(3.15.0)
-        inform => "false",
+      inform => "false",
 @endif
-        contain => default:silent,
-        handle => "cf_database_create_partition_promise_log_$(promise_outcome)";
+      contain => default:silent,
+      handle => "cf_database_create_partition_promise_log_$(promise_outcome)";
 }
 
 bundle agent cfe_internal_postgresql_maintenance
 #@brief Vacuum Full PostgreSQL for maintenance
 {
   vars:
-      "vacuum_cfdb_cmd" string => "$(sys.bindir)/vacuumdb --full --dbname=cfdb",
+    "vacuum_cfdb_cmd"
+      string => "$(sys.bindir)/vacuumdb --full --dbname=cfdb",
       comment => "Vacuum Full PostgreSQL (database: cfdb)",
       handle => "cfe_internal_postgresql_maintenance_vacuum_full";
 
   processes:
-
     any::
-
-      "cf-hub"      signals => { "term" },
-      comment => "Terminate cf-hub while doing PostgreSQL maintenance",
-      handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
+      "cf-hub"
+        signals => { "term" },
+        comment => "Terminate cf-hub while doing PostgreSQL maintenance",
+        handle => "cfe_internal_postgresql_maintenance_processes_term_cf_hub";
 
   commands:
-
     any::
-
       "$(vacuum_cfdb_cmd)"
-      comment => "Run vacuum db full command (database: cfdb)",
-      classes => kept_successful_command,
-      handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_full";
+        comment => "Run vacuum db full command (database: cfdb)",
+        classes => kept_successful_command,
+        handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb_cmd_full";
 }
 
 bundle agent cfe_internal_postgresql_vacuum
 #@brief Vacuum (with analyze) over cfdb database.
 {
   vars:
-      "vacuum_cfdb_cmd"
+    "vacuum_cfdb_cmd"
       string => "$(sys.bindir)/vacuumdb --analyze --quiet --dbname=cfdb",
       comment => "Vacuum command with update statistics enabled";
 
   commands:
-      "$(vacuum_cfdb_cmd)"
+    "$(vacuum_cfdb_cmd)"
       comment => "Run vacuum db command (database: cfdb)",
       handle => "cfe_internal_postgresql_maintenance_commands_run_vacuumdb";
 }
@@ -310,12 +316,10 @@ bundle monitor measure_psql
 {
   measurements:
     policy_server|am_policy_hub::
-
       # We average the time for all entries in /var/log/postgresql.log that
       # PostgreSQL waited before acquiring a lock and measure that over time.
-
       "/var/log/postgresql.log"
-        if => fileexists( "/var/log/postgresql.log"),
+        if => fileexists("/var/log/postgresql.log"),
         handle => "psql_lock_wait_before_acquisition",
         stream_type => "file",
         data_type => "real",
@@ -329,7 +333,6 @@ body match_value acquired_lock
 {
   # Example log line
   # 2019-06-11 18:49:39 GMT LOG: process 10427 acquired AccessShareLock on relation 17949 of database 16384 after 1122
-
   select_line_matching => ".*acquired.*Lock.*";
   extraction_regex => ".*after (\d+)";
   track_growing_file => "true";

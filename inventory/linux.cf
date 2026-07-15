@@ -9,74 +9,91 @@ bundle common inventory_linux
   vars:
     have_proc_device_tree::
       "_model_path" string => "/proc/device-tree/model";
-      "proc_device_tree_model" string => readfile("$(_model_path)"),
+
+      "proc_device_tree_model"
+        string => readfile("$(_model_path)"),
         if => fileexists("$(_model_path)"),
         comment => "Read model from $(_model_path) because it's not available from DMI",
         meta => { "inventory", "attribute_name=System version" };
 
       "_serial_number_path" string => "/proc/device-tree/serial-number";
-      "proc_device_tree_serial_number" string => readfile("$(_serial_number_path)"),
+
+      "proc_device_tree_serial_number"
+        string => readfile("$(_serial_number_path)"),
         if => fileexists("$(_serial_number_path)"),
         comment => "Read serial number from $(_serial_number_path) because it's not available from DMI",
         meta => { "inventory", "attribute_name=System serial number" };
 
-
     has_proc_1_cmdline::
-      "proc_1_cmdline_split" slist => string_split(readfile("/proc/1/cmdline", "512"), " ", "2"),
-      comment => "Read /proc/1/cmdline and split off arguments";
+      "proc_1_cmdline_split"
+        slist => string_split(readfile("/proc/1/cmdline", "512"), " ", "2"),
+        comment => "Read /proc/1/cmdline and split off arguments";
 
-      "proc_1_cmdline" string => nth("proc_1_cmdline_split", 0),
-      comment => "Get argv[0] of /proc/1/cmdline";
+      "proc_1_cmdline"
+        string => nth("proc_1_cmdline_split", 0),
+        comment => "Get argv[0] of /proc/1/cmdline";
 
       # this is the same as the original file for non-links
       "proc_1_process" string => filestat($(proc_1_cmdline), "linktarget");
 
     any::
-      "proc_routes" data => data_readstringarrayidx("/proc/$(this.promiser_pid)/net/route",
-                                                    "#[^\n]*","\s+",40,4k),
+      "proc_routes"
+        data => data_readstringarrayidx(
+          "/proc/$(this.promiser_pid)/net/route", "#[^\n]*", "\s+", 40, 4k
+        ),
         if => fileexists("/proc/$(this.promiser_pid)/net/route");
+
       "routeidx" slist => getindices("proc_routes");
-      "dgw_ipv4_iface" string => "$(proc_routes[$(routeidx)][0])",
+
+      "dgw_ipv4_iface"
+        string => "$(proc_routes[$(routeidx)][0])",
         comment => "Name of the interface where default gateway is routed",
         if => strcmp("$(proc_routes[$(routeidx)][1])", "00000000");
 
     linux::
-
       "mounts" string => "/proc/$(this.promiser_pid)/mounts";
 
       "nfs_mounts"
-        slist => grep( ".* nfs .*",
-                       readstringlist("$(mounts)", "", "\n", inf, inf) ),
-        if => and( not( isvariable( "$(this.promiser)" ) ),
-                   fileexists( "$(mounts)" ) );
+        slist => grep(
+          ".* nfs .*", readstringlist("$(mounts)", "", "\n", inf, inf)
+        ),
+        if => and(not(isvariable("$(this.promiser)")), fileexists("$(mounts)"));
 
       "nfs_server[$(with)]" -> { "CFE-3259", "ENT-13210", "ENT-13223" }
-        with => regex_replace( "$(nfs_mounts)", ":.*", "", "g" ),
+        with => regex_replace("$(nfs_mounts)", ":.*", "", "g"),
         handle => "cfe_internal_inventory_mounted_nfs_server",
         string => "$(with)",
         meta => { "inventory", "attribute_name=NFS Server" },
-        if => not( isvariable( "$(this.promiser)" ) );
+        if => not(isvariable("$(this.promiser)"));
 
   classes:
-
     any::
-      "has_proc_1_cmdline" expression => fileexists("/proc/1/cmdline"),
-      comment => "Check if we can read /proc/1/cmdline";
+      "has_proc_1_cmdline"
+        expression => fileexists("/proc/1/cmdline"),
+        comment => "Check if we can read /proc/1/cmdline";
 
-      "inventory_have_python_symlink" expression => fileexists("$(sys.bindir)/cfengine-selected-python");
+      "inventory_have_python_symlink"
+        expression => fileexists("$(sys.bindir)/cfengine-selected-python");
 
     has_proc_1_cmdline::
-      "systemd" expression => strcmp(lastnode($(proc_1_process), "/"), "systemd"),
-      comment => "Check if (the link target of) /proc/1/cmdline is systemd";
+      "systemd"
+        expression => strcmp(lastnode($(proc_1_process), "/"), "systemd"),
+        comment => "Check if (the link target of) /proc/1/cmdline is systemd";
 
     inventory_have_python_symlink::
-      "cfe_python_for_package_modules_supported" -> { "CFE-2602", "CFE-3512", "ENT-10248" }
-        comment => concat( "Here we see if the version of python found is",
-                           " acceptable ( 3.x or 2.4 or greater ) for package",
-                           " modules. We use this guard to prevent errors",
-                           " related to missing python modules."),
-        expression => returnszero("$(sys.bindir)/cfengine-selected-python -c 'import sys; exit(sys.version_info < (2, 4))'",
-                                  noshell);
+      "cfe_python_for_package_modules_supported" -> {
+          "CFE-2602", "CFE-3512", "ENT-10248"
+        }
+        comment => concat(
+          "Here we see if the version of python found is",
+          " acceptable ( 3.x or 2.4 or greater ) for package",
+          " modules. We use this guard to prevent errors",
+          " related to missing python modules."
+        ),
+        expression => returnszero(
+          "$(sys.bindir)/cfengine-selected-python -c 'import sys; exit(sys.version_info < (2, 4))'",
+          noshell
+        );
 }
 
 bundle monitor measure_entropy_available
@@ -86,7 +103,7 @@ bundle monitor measure_entropy_available
     linux::
       # A lack of entropy can cause agents to hang
       "/proc/sys/kernel/random/entropy_avail" -> { "ENT-6495", "ENT-6494" }
-        if => fileexists( "/proc/sys/kernel/random/entropy_avail" ),
+        if => fileexists("/proc/sys/kernel/random/entropy_avail"),
         handle => "entropy_avail",
         stream_type => "file",
         data_type => "int",

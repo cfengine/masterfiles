@@ -8,5 +8,6 @@ bundle agent mpf_main
 # User Defined Service Catalogue
 {
   methods:
+
   # Activate your custom policies here
 }

@@ -1,7 +1,7 @@
 body file control
 {
-    services_autorun|services_autorun_inputs::
-      inputs => { @(services_autorun.found_inputs) };
+  services_autorun|services_autorun_inputs::
+    inputs => { @(services_autorun.found_inputs) };
 }
 
 bundle agent autorun
@@ -9,7 +9,7 @@ bundle agent autorun
   vars:
     services_autorun|services_autorun_bundles::
       "sorted_bundles"
-        slist => sort( bundlesmatching(".*", "autorun"), "lex"),
+        slist => sort(bundlesmatching(".*", "autorun"), "lex"),
         comment => "Lexicographically sorted bundles for predictable order";
 
   methods:

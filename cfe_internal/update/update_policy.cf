@@ -13,53 +13,41 @@
 # - Cfengine policy update (masterfiles -> inputs)
 #
 #########################################################
-
 bundle agent cfe_internal_update_policy
 # @brief This bundle is responsible for activating the policy to update inputs.
 # @description Users may define `def.mpf_update_policy_bundle` to override the
 #              default policy update bundle.
 {
   classes:
+    # Define classes if we see a user is requesting a custom policy update bundle
+    "have_user_specified_update_bundle"
+      expression => isvariable("def.mpf_update_policy_bundle");
 
-      # Define classes if we see a user is requesting a custom policy update bundle
+    # Define classes if we are able to find the specific bundle they requested
+    # (otherwise we may get an error about undefined bundle)
+    "have_found_user_specified_update_bundle"
+      expression => some(".*", "found_matching_user_specified_bundle");
 
-      "have_user_specified_update_bundle"
-        expression => isvariable( "def.mpf_update_policy_bundle" );
-
-      # Define classes if we are able to find the specific bundle they requested
-      # (otherwise we may get an error about undefined bundle)
-
-      "have_found_user_specified_update_bundle"
-        expression  => some(".*", "found_matching_user_specified_bundle");
-
-      "missing_user_specified_update_bundle"
-       not  => some(".*", "found_matching_user_specified_bundle");
-
-
+    "missing_user_specified_update_bundle"
+      not => some(".*", "found_matching_user_specified_bundle");
 
   vars:
-      "default_policy_update_bundle" string => "cfe_internal_update_policy_cpv";
+    "default_policy_update_bundle" string => "cfe_internal_update_policy_cpv";
 
-      # Look for a bundle that matches what the user wants
-      "found_matching_user_specified_bundle"
-        slist => bundlesmatching( "^$(def.mpf_update_policy_bundle)$" );
+    # Look for a bundle that matches what the user wants
+    "found_matching_user_specified_bundle"
+      slist => bundlesmatching("^$(def.mpf_update_policy_bundle)$");
 
   methods:
-
     # Use the user specified bundle when it's found
     have_found_user_specified_update_bundle::
-
-        "User specified policy update bundle"
-          usebundle => $(found_matching_user_specified_bundle);
-
+      "User specified policy update bundle"
+        usebundle => $(found_matching_user_specified_bundle);
 
     # Fall back to stock policy update bundle if we have not found one
     # specified by user
-
     !have_found_user_specified_update_bundle::
-
-      "Stock policy update"
-        usebundle => cfe_internal_update_policy_cpv;
+      "Stock policy update" usebundle => cfe_internal_update_policy_cpv;
 
     any::
       "CMDB data update" -> { "ENT-6788", "ENT-8847" }
@@ -67,82 +55,102 @@ bundle agent cfe_internal_update_policy
         action => u_immediate;
 
   reports:
-
     inform_mode|verbose_mode|DEBUG|DEBUG_cfe_internal_update_policy::
       # Report a human readable way to understand the policy behavior
-
       "User specified update bundle: $(def.mpf_update_policy_bundle)"
         if => "have_user_specified_update_bundle";
 
       "User specified update bundle MISSING! Falling back to $(default_policy_update_bundle)."
-        if => and( "have_user_specified_update_bundle",
-                   "missing_user_specified_update_bundle" );
+        if => and(
+          "have_user_specified_update_bundle",
+          "missing_user_specified_update_bundle"
+        );
+
     any::
       "WARNING User specified update bundle '$(def.mpf_update_policy_bundle)' does not specify a namespace. Please specify a namespace, e.g. 'default:$(def.mpf_update_policy_bundle)'."
-        if => and( not(regcmp( ".*:.*", $(def.mpf_update_policy_bundle) ) ),
-                   "have_user_specified_update_bundle" );
+        if => and(
+          not(regcmp(".*:.*", $(def.mpf_update_policy_bundle))),
+          "have_user_specified_update_bundle"
+        );
 }
 
 bundle agent cfe_internal_setup_python_symlink(symlink_path)
 # @brief Create the /var/cfengine/bin/python symlink pointing to some installed python (if any)
 {
   vars:
-      "path" string => getenv("PATH", 1024);
-      "path_folders" slist => splitstring("$(path)", ":", 128);
+    "path" string => getenv("PATH", 1024);
+    "path_folders" slist => splitstring("$(path)", ":", 128);
 
     windows::
-      "abs_path_folders" -> {"CFE-2309"}
+      "abs_path_folders" -> { "CFE-2309" }
         slist => filter("([A-Z]|//):.*", path_folders, "true", "false", 128),
         comment => "findfiles() complains about relative directories";
 
     !windows::
-      "abs_path_folders" -> {"CFE-2309"}
+      "abs_path_folders" -> { "CFE-2309" }
         slist => filter("/.*", path_folders, "true", "false", 128),
         comment => "findfiles() complains about relative directories";
 
     any::
-      "exact_version_globs" slist => maplist("$(this)/python[23]", @(abs_path_folders)),
+      "exact_version_globs"
+        slist => maplist("$(this)/python[23]", @(abs_path_folders)),
         comment => "Looking for Python 2 and/or Python 3 in the $PATH folders";
 
-      "generic_python_globs" slist => maplist("$(this)/python", @(abs_path_folders)),
+      "generic_python_globs"
+        slist => maplist("$(this)/python", @(abs_path_folders)),
         comment => "Looking for the 'python' symlink/executable which can be any
                     version of Python (usually Python 2 for backwards compatibility)";
 
-      "python_exact[$(exact_version_globs)]" slist => findfiles("$(exact_version_globs)");
-      "python_generic[$(generic_python_globs)]" slist => findfiles("$(generic_python_globs)");
+      "python_exact[$(exact_version_globs)]"
+        slist => findfiles("$(exact_version_globs)");
+
+      "python_generic[$(generic_python_globs)]"
+        slist => findfiles("$(generic_python_globs)");
+
       "python_platform_fallback[/usr/libexec/platform-python]" -> { "CFE-3291" }
         slist => { "/usr/libexec/platform-python" };
 
-      "python_exact_sorted" slist => reverse(sort(getvalues(@(python_exact)), "lex")),
+      "python_exact_sorted"
+        slist => reverse(sort(getvalues(@(python_exact)), "lex")),
         comment => "Prefer higher major versions of Python";
 
-      "pythons" slist => getvalues(mergedata(@(python_exact_sorted),
-                                             getvalues(@(python_generic)),
-                                             getvalues(@(python_platform_fallback)))),
+      "pythons"
+        slist => getvalues(
+          mergedata(
+            @(python_exact_sorted),
+            getvalues(@(python_generic)),
+            getvalues(@(python_platform_fallback))
+          )
+        ),
         comment => "Prefer exact versions over unknown";
 
-      "python" string => nth(@(pythons), 0),
+      "python"
+        string => nth(@(pythons), 0),
         if => isgreaterthan(length(@(pythons)), 0),
         comment => "Taking the first item from the list (sorted by preference)";
 
   files:
-      "$(symlink_path)"
-        delete => u_tidy,
-        if => not(isvariable("python"));
+    "$(symlink_path)"
+      delete => u_tidy,
+      if => not(isvariable("python"));
 
-      "$(symlink_path)"
-        link_from => u_ln_s("$(python)"),
-        move_obstructions => "true",
-        if => isvariable("python");
+    "$(symlink_path)"
+      link_from => u_ln_s("$(python)"),
+      move_obstructions => "true",
+      if => isvariable("python");
 
-      "$(sys.bindir)/python" -> { "CFE-3512", "CFE-4146" }
-        delete => u_tidy,
-        if => and( islink( "$(sys.bindir)/python" ),
-                   strcmp( "$(sys.bindir)", "/var/cfengine/bin")),
-        comment => concat( "We don't want to leave a python that is potentially in $PATH ",
-                           "after having re-named our python symlink that is used for various ",
-                           "modules. Additionally we want to be cautious that we don't delete ",
-                           "system python symlinks in the event the binary was built for FHS.");
+    "$(sys.bindir)/python" -> { "CFE-3512", "CFE-4146" }
+      delete => u_tidy,
+      if => and(
+        islink("$(sys.bindir)/python"),
+        strcmp("$(sys.bindir)", "/var/cfengine/bin")
+      ),
+      comment => concat(
+        "We don't want to leave a python that is potentially in $PATH ",
+        "after having re-named our python symlink that is used for various ",
+        "modules. Additionally we want to be cautious that we don't delete ",
+        "system python symlinks in the event the binary was built for FHS."
+      );
 }
 
 bundle agent cfe_internal_update_policy_cpv
@@ -158,47 +166,53 @@ bundle agent cfe_internal_update_policy_cpv
 #   scanned for update.
 {
   vars:
-      # TODO: Remove this once sys.keydir is always available (3.26+ only)
-      "keydir" -> { "CFE-2822" }
-        string => ifelse(isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys");
+    # TODO: Remove this once sys.keydir is always available (3.26+ only)
+    "keydir" -> { "CFE-2822" }
+      string => ifelse(
+        isvariable("sys.keydir"), "$(sys.keydir)", "$(sys.workdir)/ppkeys"
+      );
 
-      "inputs_dir"         string => translatepath("$(sys.inputdir)"),
+    "inputs_dir"
+      string => translatepath("$(sys.inputdir)"),
       comment => "Directory containing CFEngine policies",
       handle => "cfe_internal_update_policy_vars_inputs_dir";
 
-      "master_location" -> { "ENT-3692" }
-        string => "$(update_def.mpf_update_policy_master_location)",
-        comment => "The path to request updates from the policy server.",
-        handle => "cfe_internal_update_policy_vars_master_location";
+    "master_location" -> { "ENT-3692" }
+      string => "$(update_def.mpf_update_policy_master_location)",
+      comment => "The path to request updates from the policy server.",
+      handle => "cfe_internal_update_policy_vars_master_location";
 
     windows::
-
-      "modules_dir_source"        string => "/var/cfengine/masterfiles/modules",
-      comment => "Directory containing CFEngine modules",
-      handle => "cfe_internal_update_policy_vars_modules_dir_windows";
+      "modules_dir_source"
+        string => "/var/cfengine/masterfiles/modules",
+        comment => "Directory containing CFEngine modules",
+        handle => "cfe_internal_update_policy_vars_modules_dir_windows";
 
     !windows::
-
-      "modules_dir_source"        string => translatepath("$(master_location)/modules"),
-      comment => "Directory containing CFEngine modules",
-      handle => "cfe_internal_update_policy_vars_modules_dir";
+      "modules_dir_source"
+        string => translatepath("$(master_location)/modules"),
+        comment => "Directory containing CFEngine modules",
+        handle => "cfe_internal_update_policy_vars_modules_dir";
 
     any::
+      "file_check"
+        string => translatepath("$(inputs_dir)/promises.cf"),
+        comment => "Path to a policy file",
+        handle => "cfe_internal_update_vars_file_check";
 
-      "file_check"         string => translatepath("$(inputs_dir)/promises.cf"),
-      comment => "Path to a policy file",
-      handle => "cfe_internal_update_vars_file_check";
+      "ppkeys_file"
+        string => translatepath("$(keydir)/localhost.pub"),
+        comment => "Path to public key file",
+        handle => "cfe_internal_update_policy_vars_ppkeys_file";
 
-      "ppkeys_file"        string => translatepath("$(keydir)/localhost.pub"),
-      comment => "Path to public key file",
-      handle => "cfe_internal_update_policy_vars_ppkeys_file";
+      "postgresdb_dir"
+        string => "$(sys.workdir)/state/pg/data",
+        comment => "Directory where Postgres database files will be stored on hub -",
+        handle => "cfe_internal_update_policy_postgresdb_dir";
 
-      "postgresdb_dir"        string => "$(sys.workdir)/state/pg/data",
-      comment => "Directory where Postgres database files will be stored on hub -",
-      handle => "cfe_internal_update_policy_postgresdb_dir";
-
-      "postgresdb_log"        string => "/var/log/postgresql.log",
-      comment => "File where Postgres database files will be logging -",
+      "postgresdb_log"
+        string => "/var/log/postgresql.log",
+        comment => "File where Postgres database files will be logging -",
         handle => "cfe_internal_update_policy_postgresdb_log_file";
 
       "python_symlink" -> { "CFE-2602", "CFE-3512" }
@@ -207,56 +221,57 @@ bundle agent cfe_internal_update_policy_cpv
         handle => "cfe_internal_update_policy_python_symlink";
 
   classes:
-
-      "validated_updates_ready"
-        expression => "cfengine_internal_disable_cf_promises_validated",
-        comment => "If cf_promises_validated is disabled, then updates are
+    "validated_updates_ready"
+      expression => "cfengine_internal_disable_cf_promises_validated",
+      comment => "If cf_promises_validated is disabled, then updates are
                     always considered validated.";
 
     any::
-
-      "local_files_ok" expression => fileexists("$(file_check)"),
-      comment => "Check for $(sys.masterdir)/promises.cf",
-      handle => "cfe_internal_update_classes_files_ok";
+      "local_files_ok"
+        expression => fileexists("$(file_check)"),
+        comment => "Check for $(sys.masterdir)/promises.cf",
+        handle => "cfe_internal_update_classes_files_ok";
 
       # create a global files_ok class
-      "cfe_internal_trigger" expression => "local_files_ok",
-      classes => u_if_else("files_ok", "files_ok");
+      "cfe_internal_trigger"
+        expression => "local_files_ok",
+        classes => u_if_else("files_ok", "files_ok");
 
   files:
-
-    !am_policy_hub::  # policy hub should not alter inputs/ uneccessary
-
+    !am_policy_hub:: # policy hub should not alter inputs/ uneccessary
       "$(inputs_dir)/cf_promises_validated"
-      comment => "Check whether a validation stamp is available for a new policy update to reduce the distributed load",
-      handle => "cfe_internal_update_policy_check_valid_update",
-      copy_from => u_rcp("$(master_location)/cf_promises_validated", @(update_def.policy_servers)),
-      action => u_immediate,
-      classes => u_if_repaired("validated_updates_ready");
+        comment => "Check whether a validation stamp is available for a new policy update to reduce the distributed load",
+        handle => "cfe_internal_update_policy_check_valid_update",
+        copy_from => u_rcp(
+          "$(master_location)/cf_promises_validated",
+          @(update_def.policy_servers)
+        ),
+        action => u_immediate,
+        classes => u_if_repaired("validated_updates_ready");
 
-    am_policy_hub|validated_updates_ready::  # policy hub should always put masterfiles in inputs in order to check new policy
-
+    am_policy_hub|validated_updates_ready:: # policy hub should always put masterfiles in inputs in order to check new policy
       "$(inputs_dir)"
-      comment => "Copy policy updates from master source on policy server if a new validation was acquired",
-      handle => "cfe_internal_update_policy_files_inputs_dir",
-      copy_from => u_rcp("$(master_location)", @(update_def.policy_servers)),
-      depth_search => u_infinite_client_policy,
-      file_select  => u_input_files,
-      action => u_immediate,
-      classes => u_results("bundle", "update_inputs"),
-      move_obstructions => "true";
+        comment => "Copy policy updates from master source on policy server if a new validation was acquired",
+        handle => "cfe_internal_update_policy_files_inputs_dir",
+        copy_from => u_rcp("$(master_location)", @(update_def.policy_servers)),
+        depth_search => u_infinite_client_policy,
+        file_select => u_input_files,
+        action => u_immediate,
+        classes => u_results("bundle", "update_inputs"),
+        move_obstructions => "true";
 
       # Note that here we do not filter with `update_def.input_name_patterns` so
       # that we copy any and all modules scripts.
       "$(inputs_dir)/modules"
-      comment => "Copy any files in modules from master source on policy server if a new validation was acquired",
-      handle => "cfe_internal_update_policy_files_modules_dir",
-      copy_from => u_rcp("$(modules_dir_source)", @(update_def.policy_servers)),
-      depth_search => u_recurse("inf"),
-      action => u_immediate;
+        comment => "Copy any files in modules from master source on policy server if a new validation was acquired",
+        handle => "cfe_internal_update_policy_files_modules_dir",
+        copy_from => u_rcp(
+          "$(modules_dir_source)", @(update_def.policy_servers)
+        ),
+        depth_search => u_recurse("inf"),
+        action => u_immediate;
 
     update_inputs_not_kept::
-
       "$(inputs_dir)/cf_promises_validated" -> { "CFE-2587" }
         delete => u_tidy,
         comment => "If there is any problem copying to $(inputs_dir) then purge
@@ -265,14 +280,14 @@ bundle agent cfe_internal_update_policy_cpv
 
     !policy_server.enable_cfengine_enterprise_hub_ha::
       "$(sys.workdir)/policy_server.dat"
-      comment => "Copy policy_server.dat file from server",
-      handle => "cfe_internal_update_ha_policy_server",
-      copy_from => u_rcp("$(sys.workdir)/state/master_hub.dat", @(update_def.policy_servers)),
-      action => u_immediate,
-      classes => u_if_repaired("replica_failover");  # not needed ?
-
+        comment => "Copy policy_server.dat file from server",
+        handle => "cfe_internal_update_ha_policy_server",
+        copy_from => u_rcp(
+          "$(sys.workdir)/state/master_hub.dat", @(update_def.policy_servers)
+        ),
+        action => u_immediate,
+        classes => u_if_repaired("replica_failover"); # not needed ?
     am_policy_hub::
-
       "$(master_location)/." -> { "CFE-951" }
         comment => "Make sure masterfiles folder has right file permissions",
         handle => "cfe_internal_update_policy_files_sys_workdir_masterfiles_dirs",
@@ -289,7 +304,6 @@ bundle agent cfe_internal_update_policy_cpv
         depth_search => u_recurse_basedir("inf"),
         action => u_immediate;
 
-
   methods:
     debian|redhat|amazon_linux|suse|sles|opensuse::
       # Only needed on distros with Python-based package modules
@@ -305,19 +319,16 @@ bundle agent cfe_internal_update_cmdb
 # @brief Ensure local cache of CMDB data is up to date
 {
   classes:
-      "have_cf_reactor" expression => fileexists("$(sys.bindir)/cf-reactor");
+    "have_cf_reactor" expression => fileexists("$(sys.bindir)/cf-reactor");
 
   methods:
-
     policy_server.enterprise_edition.(!have_cf_reactor|cmdb_data_files_updates_done_in_policy)::
       "cfe_internal_update_cmdb_data_distribution";
-
 @if feature(host_specific_data_load)
-      # Only hosts with this feature, introduced in 3.18.0 can use the data.
-
-      # Don't pull CMDB data on policy_hub self bootstrap because
-      # there will be no cf-serverd listening to serve files yet.
-    enterprise_edition.!(bootstrap_mode)::  # ENT-6840
+    # Only hosts with this feature, introduced in 3.18.0 can use the data.
+    # Don't pull CMDB data on policy_hub self bootstrap because
+    # there will be no cf-serverd listening to serve files yet.
+    enterprise_edition.!(bootstrap_mode):: # ENT-6840
       "cfe_internal_update_cmdb_data_consumption" -> { "ENT-8847" }
         action => u_immediate;
 @endif
@@ -327,13 +338,11 @@ bundle agent cfe_internal_update_cmdb_data_distribution
 # @brief Ensure data is ready for agents to download
 {
   classes:
-
-      "_have_cmdb_next_request_state_file" -> { "ENT-9933" }
-        expression => fileexists( "$(_cmdb_next_request_state_file)" );
+    "_have_cmdb_next_request_state_file" -> { "ENT-9933" }
+      expression => fileexists("$(_cmdb_next_request_state_file)");
 
   vars:
     !bootstrap_mode.(policy_server.enterprise_edition)::
-
       # The API response for host specific data from cmdb tells us the timestamp of the last data change
       # We store this timestamp and use it for the next request.
       "_cmdb_next_request_state_file"
@@ -342,113 +351,120 @@ bundle agent cfe_internal_update_cmdb_data_distribution
     !bootstrap_mode.(policy_server.enterprise_edition._have_cmdb_next_request_state_file)::
       # If we have the timestamp from a previous response we use it, else we start from 0
       "_cmdb_previous_next_request_from"
-        string => readfile( $(_cmdb_next_request_state_file), inf ),
-        if => regline( "^\d+$", $(_cmdb_next_request_state_file) );
+        string => readfile($(_cmdb_next_request_state_file), inf),
+        if => regline("^\d+$", $(_cmdb_next_request_state_file));
 
       "_cmdb_previous_next_request_from"
         string => "0",
-        unless => regline( "^\d+$", $(_cmdb_next_request_state_file) );
+        unless => regline("^\d+$", $(_cmdb_next_request_state_file));
 
     !bootstrap_mode.(policy_server.enterprise_edition)::
       # We need a script to call that should return the API response
-      "_get_cmdb_data_bin" string => "$(sys.workdir)/httpd/htdocs/scripts/get_cmdb.php";
-      "_get_cmdb_data_cmd" string => "/var/cfengine/httpd/php/bin/php $(_get_cmdb_data_bin) $(_cmdb_previous_next_request_from)";
+      "_get_cmdb_data_bin"
+        string => "$(sys.workdir)/httpd/htdocs/scripts/get_cmdb.php";
+
+      "_get_cmdb_data_cmd"
+        string => "/var/cfengine/httpd/php/bin/php $(_get_cmdb_data_bin) $(_cmdb_previous_next_request_from)";
 
       # We call the script and we pass it the timestamp from the prior call
       "_get_cmdb_data_response"
-        string => execresult( $(_get_cmdb_data_cmd), useshell ),
-        if => fileexists( $(_get_cmdb_data_bin) );
+        string => execresult($(_get_cmdb_data_cmd), useshell),
+        if => fileexists($(_get_cmdb_data_bin));
 
       "_get_cmdb_data_response_d"
         data => parsejson('$(_get_cmdb_data_response)'),
-        if => validjson( '$(_get_cmdb_data_response)' );
+        if => validjson('$(_get_cmdb_data_response)');
 
       # So that we can write a JSON file for each host we get the indicies of data in the response
-      "_i" slist => getindices( "_get_cmdb_data_response_d[data]");
+      "_i" slist => getindices("_get_cmdb_data_response_d[data]");
 
       # We need to store the timestamp from the most recent change so that we can use that as a starting point for future requests.
       "_next_request_from"
         string => "$(_get_cmdb_data_response_d[meta][cmdb_epoch])";
 
   files:
-      # "$(_get_cmdb_data_cmd)" perms => m( 700 );
-
+    # "$(_get_cmdb_data_cmd)" perms => m( 700 );
 @if minimum_version(3.18)
     !bootstrap_mode.(policy_server.enterprise_edition)::
       # This functionality is only present on 3.18.0+ Enterprise hubs, and this
       # promise uses the /content/ attribute which was first introduced in
       # 3.16.0.
-
       # If the next request state file doesn't exist, we seed one with 0, the
       # lowest epoch value possible. because we populate variables from this
       # file content.
       "$(_cmdb_next_request_state_file)"
         content => "0$(const.n)",
         handle => "cmdb_data_change_next_seed",
-        if => and( not(fileexists("$(_cmdb_next_request_state_file)" )),
-                   isvariable( "_cmdb_next_request_state_file" ));
+        if => and(
+          not(fileexists("$(_cmdb_next_request_state_file)")),
+          isvariable("_cmdb_next_request_state_file")
+        );
 @endif
-
       # Write out the data for each host that had a data change
       "$(sys.workdir)/cmdb/$(_i)/host_specific.json"
         create => "true", # CFE-2329, ENT-4792
-        template_data => mergedata("_get_cmdb_data_response_d[data][$(_i)]" ), # mergedata() is necessary in order to pick out a substructure, parsejson() is insufficient because expanding a key results in iteration of /values/ under that key
+        template_data => mergedata("_get_cmdb_data_response_d[data][$(_i)]"), # mergedata() is necessary in order to pick out a substructure, parsejson() is insufficient because expanding a key results in iteration of /values/ under that key
         template_method => "inline_mustache",
-        edit_template_string => string_mustache( "{{$-top-}}", "_get_cmdb_data_response_d[data][$(_i)]" ),
-        if => isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) );
-
+        edit_template_string => string_mustache(
+          "{{$-top-}}", "_get_cmdb_data_response_d[data][$(_i)]"
+        ),
+        if => isgreaterthan(
+          $(_next_request_from), $(_cmdb_previous_next_request_from)
+        );
 @if minimum_version(3.18)
       # This functionality is only present on 3.18.0+ Enterprise hubs, and this
       # promise uses the /content/ attribute which was first introduced in
       # 3.16.0.
-
       # Write out the last data change timestamp so we can use it as a startring point
       "$(_cmdb_next_request_state_file)"
         handle => "cmdb_data_change_next_update",
         content => "$(_next_request_from)$(const.n)",
-        unless => strcmp( $(_next_request_from), $(_cmdb_previous_next_request_from) );
+        unless => strcmp(
+          $(_next_request_from), $(_cmdb_previous_next_request_from)
+        );
 @endif
-
   reports:
     DEBUG|DEBUG_cfe_internal_update_cmdb_data_distribution::
       "'$(_get_cmdb_data_cmd)' response indicates '$(sys.workdir)/cmdb/$(_i)/host_specific.json' needs refreshed"
-        if => and( isvariable( "_i" ),
-                   isgreaterthan( $(_next_request_from), $(_cmdb_previous_next_request_from) ));
-
+        if => and(
+          isvariable("_i"),
+          isgreaterthan(
+            $(_next_request_from), $(_cmdb_previous_next_request_from)
+          )
+        );
 }
 
 bundle agent cfe_internal_update_cmdb_data_consumption
 # @brief Ensure data to load is up to date
 {
   files:
-      "$(sys.workdir)/data/."
-        create => "true",
-        comment => "If a host is to load data from the CMDB, it needs to have a directory where said data is cached.";
+    "$(sys.workdir)/data/."
+      create => "true",
+      comment => "If a host is to load data from the CMDB, it needs to have a directory where said data is cached.";
 
-      "$(sys.workdir)/data/." -> { "ENT-6788", "ENT-8847" }
-        depth_search => u_recurse( inf ),
-        file_select => u_all,
-        copy_from => u_cmdb_data,
-        comment => "So that hosts have access to the most recent CMDB data, we make sure that it's up to date.",
-        action => u_immediate;
-
+    "$(sys.workdir)/data/." -> { "ENT-6788", "ENT-8847" }
+      depth_search => u_recurse(inf),
+      file_select => u_all,
+      copy_from => u_cmdb_data,
+      comment => "So that hosts have access to the most recent CMDB data, we make sure that it's up to date.",
+      action => u_immediate;
 }
+
 #########################################################
 # Self-contained bodies from the lib to avoid dependencies
 #########################################################
-
 body copy_from u_cmdb_data
 # @brief Sync CMDB data from policy server
 # Note: Not all hosts necessarily have CMDB data
 {
-        copy_backup => "false";
-        trustkey => "false";
-        compare => "digest";
-        source  => "hub_cmdb";
-        servers => { "$(sys.policy_hub)" };
-        purge => "true";
+  copy_backup => "false";
+  trustkey => "false";
+  compare => "digest";
+  source => "hub_cmdb";
+  servers => { "$(sys.policy_hub)" };
+  purge => "true";
 @if minimum_version(3.12)
-        missing_ok => "true";
+  missing_ok => "true";
 @endif
 }
 
@@ -456,144 +472,135 @@ body perms u_m(p)
 # @brief Ensure file mode is `p`
 # @param p Desired file mode
 {
-      mode  => "$(p)";
+  mode => "$(p)";
 
-#+begin_ENT-951
-# Remove after 3.20 is not supported
-        rxdirs => "true";
+  #+begin_ENT-951
+  # Remove after 3.20 is not supported
+  rxdirs => "true";
 @if minimum_version(3.20)
-        rxdirs => "false";
+  rxdirs => "false";
 @endif
-#+end
+  #+end
 }
 
 #########################################################
-
-body perms u_mo(p,o)
+body perms u_mo(p, o)
 # @brief Ensure file mode is `p` and owner is `o`
 # @param p Desired file mode
 # @param p Desired file owner (username or uid)
 {
-      mode   => "$(p)";
+  mode => "$(p)";
 
-#+begin_ENT-951
-# Remove after 3.20 is not supported
-        rxdirs => "true";
+  #+begin_ENT-951
+  # Remove after 3.20 is not supported
+  rxdirs => "true";
 @if minimum_version(3.20)
-        rxdirs => "false";
+  rxdirs => "false";
 @endif
-#+end
-
-      !(windows|termux)::
-        owners => {"$(o)"};
+  #+end
+  !(windows|termux)::
+    owners => { "$(o)" };
 }
 
 #########################################################
-
 body perms u_shared_lib_perms
 # @brief Shared library permissions
 {
-#+begin_ENT-951
-# Remove after 3.20 is not supported
-        rxdirs => "true";
+  #+begin_ENT-951
+  # Remove after 3.20 is not supported
+  rxdirs => "true";
 @if minimum_version(3.20)
-        rxdirs => "false";
+  rxdirs => "false";
 @endif
-#+end
+  #+end
+  !hpux::
+    mode => "0644";
 
-    !hpux::
-      mode => "0644";
-    hpux::
-      mode => "0755"; # Mantis 1114, Redmine 1179
+  hpux::
+    mode => "0755"; # Mantis 1114, Redmine 1179
 }
 
 #########################################################
-
 body file_select u_all
 # @brief Select all file system entries
 {
-        leaf_name => { ".*" };
-        file_result => "leaf_name";
+  leaf_name => { ".*" };
+  file_result => "leaf_name";
 }
 
 body file_select u_cf3_files
 # @brief Select files starting with `cf-` (cfengine binaries)
 {
-      leaf_name => { "cf-.*" };
-      file_result => "leaf_name";
+  leaf_name => { "cf-.*" };
+  file_result => "leaf_name";
 }
 
 #########################################################
-
 body file_select u_input_files
 # @brief Select files by extension that we should include when updating inputs
 {
-      leaf_name => { @(update_def.input_name_patterns),
-                     @(update_def.input_name_patterns_extra) };
-      file_result => "leaf_name";
+  leaf_name => {
+    @(update_def.input_name_patterns), @(update_def.input_name_patterns_extra)
+  };
+  file_result => "leaf_name";
 }
 
 #########################################################
-
-body copy_from u_rcp(from,server)
+body copy_from u_rcp(from, server)
 # @brief Ensure file is a copy of `from` on `server` using digest comparison
 # @param from The path to copy from
 # @param server The remote host to copy from
 {
-      source      => "$(from)";
-      compare     => "digest";
-      trustkey    => "false";
-      purge => "true"; # CFE-3662
+  source => "$(from)";
+  compare => "digest";
+  trustkey => "false";
+  purge => "true"; # CFE-3662
+  # CFE-2932 For testing, we want to be able to avoid this local copy optimiztion
+  !am_policy_hub|mpf_skip_local_copy_optimizaton::
+    servers => { "$(server)" };
 
-      # CFE-2932 For testing, we want to be able to avoid this local copy optimiztion
-    !am_policy_hub|mpf_skip_local_copy_optimizaton::
-      servers => { "$(server)" };
+  !am_policy_hub.(sys_policy_hub_port_exists|mpf_skip_local_copy_optimization)::
+    portnumber => "$(sys.policy_hub_port)";
 
-    !am_policy_hub.(sys_policy_hub_port_exists|mpf_skip_local_copy_optimization)::
-      portnumber => "$(sys.policy_hub_port)";
+  cfengine_internal_encrypt_transfers::
+    encrypt => "true";
 
-    cfengine_internal_encrypt_transfers::
-      encrypt => "true";
+  cfengine_internal_purge_policies_disabled::
+    purge => "false";
 
-    cfengine_internal_purge_policies_disabled::
-      purge => "false";
+  cfengine_internal_preserve_permissions::
+    preserve => "true";
 
-    cfengine_internal_preserve_permissions::
-      preserve => "true";
-
-    cfengine_internal_verify_update_transfers::
-      verify      => "true";
+  cfengine_internal_verify_update_transfers::
+    verify => "true";
 }
 
 #########################################################
-
 body copy_from u_cp(from)
 # @brief Ensure file is a copy from `from` on the local server based on digest comparison
 {
-      source  => "$(from)";
-      compare => "digest";
+  source => "$(from)";
+  compare => "digest";
 }
 
 #########################################################
-
 body copy_from u_cp_nobck(from)
 # @brief copy from `from` locally with digest comparison and making no backups
 {
-      source      => "$(from)";
-      compare     => "digest";
-      copy_backup => "false";
+  source => "$(from)";
+  compare => "digest";
+  copy_backup => "false";
 }
 
 #########################################################
-
 body copy_from u_cp_missing_ok(from)
 # @brief same as u_cp but allow from to be missing
 {
-      inherit_from => u_cp($(from));
-      missing_ok => "true";
+  inherit_from => u_cp($(from));
+  missing_ok => "true";
 }
 
-body copy_from u_remote_dcp_missing_ok(from,server)
+body copy_from u_remote_dcp_missing_ok(from, server)
 # @brief Download a file from a remote server if available and if differs from the local copy.
 #
 # @param from The location of the file on the remote server
@@ -601,149 +608,136 @@ body copy_from u_remote_dcp_missing_ok(from,server)
 #
 # **See Also:** `remote_dcp()`
 {
-        servers     => { "$(server)" };
-        source      => "$(from)";
-        compare     => "digest";
-        missing_ok => "true";
+  servers => { "$(server)" };
+  source => "$(from)";
+  compare => "digest";
+  missing_ok => "true";
 }
-#########################################################
 
+#########################################################
 body action u_immediate
 # @brief Actuate the promise immediately, ignoring locks
 {
-      ifelapsed => "0";
+  ifelapsed => "0";
 }
 
 #########################################################
-
 body depth_search u_recurse(d)
 # @brief Search recursively for files up to `d` levels excluding common version control data
 # @param d Maximum depth to search recursively
 {
-      depth => "$(d)";
-      exclude_dirs => { "\.svn", "\.git", "git-core" };
+  depth => "$(d)";
+  exclude_dirs => { "\.svn", "\.git", "git-core" };
 }
 
 #########################################################
-
 body depth_search u_infinite_client_policy
 # @brief Search recursively for files excluding vcs related files and .no-distrib directories
 # @param d Maximum depth to search recursively
 # Duplicated in embedded bootstrap/failsafe
 {
-        depth => "inf";
-        exclude_dirs => { "\.svn", "\.git", "git-core", "\.no-distrib" };
+  depth => "inf";
+  exclude_dirs => { "\.svn", "\.git", "git-core", "\.no-distrib" };
 }
-#########################################################
 
+#########################################################
 body depth_search u_recurse_basedir(d)
 # @brief Search recursively for files up to `d` levels excluding common version control data and including the base directory
 # @param d Maximum depth to search recursively
 {
-      include_basedir => "true";
-      depth => "$(d)";
-      exclude_dirs => { "\.svn", "\.git", "git-core" };
+  include_basedir => "true";
+  depth => "$(d)";
+  exclude_dirs => { "\.svn", "\.git", "git-core" };
 }
 
 #########################################################
-
 body classes u_if_repaired(x)
 # @brief Define `x` if the promise is repaired
 # @param x Class to define if promise repaired
 {
-      promise_repaired => { "$(x)" };
+  promise_repaired => { "$(x)" };
 }
 
 #########################################################
-
 body classes u_if_repaired_then_cancel(y)
 # @brief Cancel class `x` if the promise is repaired
 # @param x Class to undefine if promise repaired
 {
-      cancel_repaired => { "$(y)" };
+  cancel_repaired => { "$(y)" };
 }
 
 #########################################################
-
-body classes u_if_else(yes,no)
+body classes u_if_else(yes, no)
 # @brief define `yes` if the promise is repaired, and `no` if the promise fails to repair (notkept)
 # @param yes Class to define if promise repaired
 # @param no Class to undefine if promise notkept
 {
-#      promise_kept     => { "$(yes)" };
-      promise_repaired => { "$(yes)" };
-      repair_failed    => { "$(no)" };
-      repair_denied    => { "$(no)" };
-      repair_timeout   => { "$(no)" };
+  # promise_kept     => { "$(yes)" };
+  promise_repaired => { "$(yes)" };
+  repair_failed => { "$(no)" };
+  repair_denied => { "$(no)" };
+  repair_timeout => { "$(no)" };
 }
 
 #########################################################
-
 body contain u_in_shell
 # @brief Run command within shell environment
 {
-      useshell => "true";
+  useshell => "true";
 }
 
 #########################################################
-
 body contain u_in_shell_and_silent
 # @brief Run command within shell environment suppressing output
 {
-      useshell => "true";
-      no_output => "true";
+  useshell => "true";
+  no_output => "true";
 }
 
 ########################################################""
-
 body contain u_postgres
 # @brief Run command within postgres users shell environment
 {
-  useshell   => "useshell";
+  useshell => "useshell";
   exec_owner => "cfpostgres";
   exec_group => "cfpostgres";
-  chdir      => "/tmp";
-  no_output  => "true";
+  chdir => "/tmp";
+  no_output => "true";
 }
 
 #########################################################
-
 body action u_ifwin_bg
 # @brief Run command in the background if windows is defined
 {
-    windows::
-      background => "true";
+  windows::
+    background => "true";
 }
 
 #########################################################
-
 body service_method u_bootstart
 # @brief Attributes for u_bootstart service method
 {
-      service_autostart_policy => "boot_time";
+  service_autostart_policy => "boot_time";
 }
 
 #########################################################
-
 body contain u_in_dir(s)
 # @brief Run command from within `s`
 # @param s Path to change into before running command
 {
-      chdir => "$(s)";
+  chdir => "$(s)";
 }
 
 #########################################################
-
 body contain u_silent_in_dir(s)
 # @brief Run command from within `s` and suppress output
 # @param s Path to change into before running command
 {
-      chdir => "$(s)";
-      no_output => "true";
+  chdir => "$(s)";
+  no_output => "true";
 }
 
 #########################################################
-
 body link_from u_ln_s(x)
 # @brief Symlink to `x`, even if it does not exist
 # @param x Path to symlink
@@ -758,13 +752,12 @@ body link_from u_ln_s(x)
 #@ }
 #@ ```
 {
-      link_type => "symlink";
-      source => "$(x)";
-      when_no_source => "force";
+  link_type => "symlink";
+  source => "$(x)";
+  when_no_source => "force";
 }
 
 #########################################################
-
 body delete u_tidy
 # @brief Delete directories and symlinks
 #@ **Example:**
@@ -777,8 +770,8 @@ body delete u_tidy
 #@ }
 #@ ```
 {
-      dirlinks => "delete";
-      rmdirs   => "true";
+  dirlinks => "delete";
+  rmdirs => "true";
 }
 
 bundle agent modules_presence
@@ -796,48 +789,127 @@ bundle agent modules_presence
 #              Any other files in the modules directory will be promised to
 #              be updated in moduledir (/var/cfengine/modules), including any sub-directories.
 {
-
   vars:
     # TODO: Remove this once sys.moduledir is always available (3.26+ only)
-    "moduledir" string => ifelse(isvariable("sys.moduledir"), "$(sys.moduledir)", "$(sys.workdir)/modules");
-    "_vendored_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)vendored$(const.dirsep)";
-    "_vendored_dir_filter" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)vendored";
-    "_override_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)";
-    "_custom_template_dir" string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)mustache$(const.dirsep)";
+    "moduledir"
+      string => ifelse(
+        isvariable("sys.moduledir"),
+        "$(sys.moduledir)",
+        "$(sys.workdir)/modules"
+      );
+
+    "_vendored_dir"
+      string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)vendored$(const.dirsep)";
+
+    "_vendored_dir_filter"
+      string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)vendored";
+
+    "_override_dir"
+      string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)";
+
+    "_custom_template_dir"
+      string => "$(this.promise_dirname)$(const.dirsep)..$(const.dirsep)..$(const.dirsep)modules$(const.dirsep)mustache$(const.dirsep)";
+
     "_vendored_paths" slist => findfiles("$(_vendored_dir)*.mustache");
-    "_custom_template_paths" slist => findfiles("$(_custom_template_dir)*.mustache"), if => isdir( "$(_custom_template_dir)" );
+
+    "_custom_template_paths"
+      slist => findfiles("$(_custom_template_dir)*.mustache"),
+      if => isdir("$(_custom_template_dir)");
+
     "_package_paths"
-        with => ifelse( or( cf_version_between( "3.24.0", "3.24.3"),
-                            cf_version_at("3.26.0"),
-                            cf_version_at("3.27.0")), "$(const.dirsep)",
-                        ""),
-        slist => filter("$(_override_dir)vendored$(with)", _package_paths_tmp, "false", "true", 999);
+      with => ifelse(
+        or(
+          cf_version_between("3.24.0", "3.24.3"),
+          cf_version_at("3.26.0"),
+          cf_version_at("3.27.0")
+        ),
+        "$(const.dirsep)",
+        ""
+      ),
+      slist => filter(
+        "$(_override_dir)vendored$(with)",
+        _package_paths_tmp,
+        "false",
+        "true",
+        999
+      );
 
     windows::
-      "_package_paths" slist => filter("\Q${_vendored_dir_filter}\E.*", _package_paths_tmp, "true", "true", 999),
+      "_package_paths"
+        slist => filter(
+          "\Q${_vendored_dir_filter}\E.*",
+          _package_paths_tmp,
+          "true",
+          "true",
+          999
+        ),
         comment => "The list will include the vendored sub-directory that we don't want so remove it.";
-      "_vendored_modules" slist => maplist(regex_replace("$(this)", "\Q$(_vendored_dir)\E(.*).mustache", "$1", "g"), @(_vendored_paths));
-      "_override_modules" slist => maplist(regex_replace("$(this)", "\Q$(_override_dir)\E(.*)", "$1", "g"), @(_package_paths));
+
+      "_vendored_modules"
+        slist => maplist(
+          regex_replace(
+            "$(this)", "\Q$(_vendored_dir)\E(.*).mustache", "$1", "g"
+          ),
+          @(_vendored_paths)
+        );
+
+      "_override_modules"
+        slist => maplist(
+          regex_replace("$(this)", "\Q$(_override_dir)\E(.*)", "$1", "g"),
+          @(_package_paths)
+        );
+
       # replace single backslashes in a windows path with double-backslashes
       # to avoid problems with things like `C:\Program Files` and `\promises`
       # causing PCRE to try and interpret special escape sequences.
-      "_not_vendored_modules_pathname_regex" string => regex_replace("$(sys.inputdir)$(const.dirsep)modules$(const.dirsep)(?!packages$(const.dirsep)vendored).*","\\\\","\\\\\\\\","g");
+      "_not_vendored_modules_pathname_regex"
+        string => regex_replace(
+          "$(sys.inputdir)$(const.dirsep)modules$(const.dirsep)(?!packages$(const.dirsep)vendored).*",
+          "\\\\",
+          "\\\\\\\\",
+          "g"
+        );
+
     !windows::
-      "_package_paths" slist => filter("${_vendored_dir_filter}.*", _package_paths_tmp, "true", "true", 999),
+      "_package_paths"
+        slist => filter(
+          "${_vendored_dir_filter}.*", _package_paths_tmp, "true", "true", 999
+        ),
         comment => "The list will include the vendored sub-directory that we don't want so remove it.";
-      "_vendored_modules" slist => maplist(regex_replace("$(this)", "$(_vendored_dir)(.*).mustache", "$1", "g"), @(_vendored_paths));
-      "_override_modules" slist => maplist(regex_replace("$(this)", "$(_override_dir)(.*)", "$1", "g"), @(_package_paths));
-      "_custom_template_modules" slist => maplist(regex_replace("$(this)", "$(_custom_template_dir)(.*).mustache", "$1", "g"), @(_custom_template_paths));
-      "_not_vendored_modules_pathname_regex" string => "$(sys.inputdir)/modules/(?!(packages/vendored|mustache/)).*";
+
+      "_vendored_modules"
+        slist => maplist(
+          regex_replace("$(this)", "$(_vendored_dir)(.*).mustache", "$1", "g"),
+          @(_vendored_paths)
+        );
+
+      "_override_modules"
+        slist => maplist(
+          regex_replace("$(this)", "$(_override_dir)(.*)", "$1", "g"),
+          @(_package_paths)
+        );
+
+      "_custom_template_modules"
+        slist => maplist(
+          regex_replace(
+            "$(this)", "$(_custom_template_dir)(.*).mustache", "$1", "g"
+          ),
+          @(_custom_template_paths)
+        );
+
+      "_not_vendored_modules_pathname_regex"
+        string => "$(sys.inputdir)/modules/(?!(packages/vendored|mustache/)).*";
 
   classes:
-    "override_vendored_module_$(_vendored_modules)" expression => fileexists("$(_override_dir)$(_vendored_modules)");
-    "override_module_$(_override_modules)" expression => fileexists("$(_override_dir)$(_override_modules)");
+    "override_vendored_module_$(_vendored_modules)"
+      expression => fileexists("$(_override_dir)$(_vendored_modules)");
 
-# NOTE: here we are using the .mustache extension only to
-# ensure that the modules scripts are copied as part of
-# update (see controls/update_def.cf input_name_patterns var.
+    "override_module_$(_override_modules)"
+      expression => fileexists("$(_override_dir)$(_override_modules)");
 
+  # NOTE: here we are using the .mustache extension only to
+  # ensure that the modules scripts are copied as part of
+  # update (see controls/update_def.cf input_name_patterns var.
   files:
     "$(moduledir)/packages/$(_vendored_modules)"
       create => "true",
@@ -849,17 +921,20 @@ bundle agent modules_presence
     "$(moduledir)/packages/$(_override_modules)"
       copy_from => u_cp_missing_ok("$(_override_dir)$(_override_modules)"),
       perms => u_mo("755", "root"),
-      if => or (
+      if => or(
         canonify("override_vendored_module_$(_override_modules)"),
-        canonify("override_module_$(_override_modules)"));
+        canonify("override_module_$(_override_modules)")
+      );
 
     "$(moduledir)/$(_custom_template_modules)" -> { "ENT-10793" }
-        comment => "We want to render mustache templated modules",
-        handle => "cfe_internal_update_policy_files_custom_template_modules",
-        template_method => "mustache",
-        edit_template => "$(_custom_template_dir)$(_custom_template_modules).mustache",
-        perms => u_mo("500", "root"),
-        if => fileexists("$(_custom_template_dir)$(_custom_template_modules).mustache");
+      comment => "We want to render mustache templated modules",
+      handle => "cfe_internal_update_policy_files_custom_template_modules",
+      template_method => "mustache",
+      edit_template => "$(_custom_template_dir)$(_custom_template_modules).mustache",
+      perms => u_mo("500", "root"),
+      if => fileexists(
+        "$(_custom_template_dir)$(_custom_template_modules).mustache"
+      );
 
     "$(moduledir)"
       comment => "Copy any non-packages modules",
@@ -869,8 +944,9 @@ bundle agent modules_presence
       depth_search => u_recurse("inf"),
       perms => u_mo("755", "root"),
       action => u_immediate,
-      file_select => not_vendored_modules("$(_not_vendored_modules_pathname_regex)");
-
+      file_select => not_vendored_modules(
+        "$(_not_vendored_modules_pathname_regex)"
+      );
 
   reports:
     DEBUG::
@@ -882,11 +958,15 @@ bundle agent modules_presence
       "_vendored_dir: $(_vendored_dir)";
       "_vendored_paths: $(_vendored_paths)";
       "_override_dir: $(_override_dir)";
+
       "override_vendored_module_$(_vendored_modules)"
         if => "override_vendored_module_$(_vendored_modules)";
+
       "override_module_$(_override_modules)"
         if => "override_module_$(_override_modules)";
-      "canonified: $(with)" with => canonify("override_vendored_module_$(_vendored_modules)");
+
+      "canonified: $(with)"
+        with => canonify("override_vendored_module_$(_vendored_modules)");
 }
 
 body file_select not_vendored_modules(pathname)
@@ -894,18 +974,18 @@ body file_select not_vendored_modules(pathname)
   path_name => { "$(pathname)" };
   file_result => "path_name";
 }
+
 #########################################################
 body file_select u_dirs
 # @brief Select directories
 {
-        file_types  => { "dir" };
-        file_result => "file_types";
+  file_types => { "dir" };
+  file_result => "file_types";
 }
+
 body file_select u_not_dir
 # @brief Select all files that are not directories
 {
-        file_types => { "dir" };
-        file_result => "!file_types";
+  file_types => { "dir" };
+  file_result => "!file_types";
 }
-
-

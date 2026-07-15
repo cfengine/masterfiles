@@ -15,36 +15,45 @@ bundle agent feature
 # `cf-agent -I -f ./feature.cf -b feature -Dfeature_set_10_xyz,feature_set_100_qpr,feature_set_90m_ijk,feature_unset_abc`
 {
   classes:
-      "parsed_$(on)" expression => regextract("feature_set_([0-9]+[kmgKMG]?)_(.*)",
-                                              $(on),
-                                              "extract_$(on)");
+    "parsed_$(on)"
+      expression => regextract(
+        "feature_set_([0-9]+[kmgKMG]?)_(.*)", $(on), "extract_$(on)"
+      );
 
-      "parsed_$(off)" expression => regextract("feature_unset_(.*)",
-                                               $(off),
-                                               "extract_$(off)");
+    "parsed_$(off)"
+      expression => regextract("feature_unset_(.*)", $(off), "extract_$(off)");
 
-      "$(extract_$(on)[2])" expression => "parsed_$(on)",
+    "$(extract_$(on)[2])"
+      expression => "parsed_$(on)",
       persistence => "$(extract_$(on)[1])";
 
   vars:
-      "on" slist => classesmatching("feature_set_.*");
-      "off" slist => classesmatching("feature_unset_.*");
+    "on" slist => classesmatching("feature_set_.*");
+    "off" slist => classesmatching("feature_unset_.*");
 
-      "_$(off)" string => "off", classes => feature_cancel("$(extract_$(off)[1])");
+    "_$(off)"
+      string => "off",
+      classes => feature_cancel("$(extract_$(off)[1])");
 
   reports:
     "DEBUG|DEBUG_$(this.bundle)"::
       "DEBUG $(this.bundle): $(on) => SET class '$(extract_$(on)[2]) for '$(extract_$(on)[1])'"
-      if => "parsed_$(on)";
+        if => "parsed_$(on)";
 
       "DEBUG $(this.bundle): $(off) => UNSET class '$(extract_$(off)[1])'"
-      if => "parsed_$(off)";
+        if => "parsed_$(off)";
 
-      "DEBUG $(this.bundle): have $(extract_$(on)[2])" if => "$(extract_$(on)[2])";
-      "DEBUG $(this.bundle): have no $(extract_$(on)[2])" if => "!$(extract_$(on)[2])";
+      "DEBUG $(this.bundle): have $(extract_$(on)[2])"
+        if => "$(extract_$(on)[2])";
 
-      "DEBUG $(this.bundle): have $(extract_$(off)[1])" if => "$(extract_$(off)[1])";
-      "DEBUG $(this.bundle): have no $(extract_$(off)[1])" if => "!$(extract_$(off)[1])";
+      "DEBUG $(this.bundle): have no $(extract_$(on)[2])"
+        if => "!$(extract_$(on)[2])";
+
+      "DEBUG $(this.bundle): have $(extract_$(off)[1])"
+        if => "$(extract_$(off)[1])";
+
+      "DEBUG $(this.bundle): have no $(extract_$(off)[1])"
+        if => "!$(extract_$(off)[1])";
 }
 
 bundle agent feature_test
@@ -58,24 +67,25 @@ bundle agent feature_test
 # `cf-agent -I -f ./feature.cf -b feature_test -Dfeature_set_10_xyz,feature_set_100_qpr,feature_set_90m_ijk,feature_unset_abc`
 {
   classes:
-      "parsed_$(on)" expression => regextract("feature_set_([0-9]+[kmgKMG]?)_(.*)",
-                                              $(on),
-                                              "extract_$(on)");
+    "parsed_$(on)"
+      expression => regextract(
+        "feature_set_([0-9]+[kmgKMG]?)_(.*)", $(on), "extract_$(on)"
+      );
 
-      "parsed_$(off)" expression => regextract("feature_unset_(.*)",
-                                               $(off),
-                                               "extract_$(off)");
+    "parsed_$(off)"
+      expression => regextract("feature_unset_(.*)", $(off), "extract_$(off)");
 
   vars:
-      "on" slist => classesmatching("feature_set_.*");
-      "off" slist => classesmatching("feature_unset_.*");
+    "on" slist => classesmatching("feature_set_.*");
+    "off" slist => classesmatching("feature_unset_.*");
 
   reports:
-      "$(this.bundle): have $(extract_$(on)[2])" if => "$(extract_$(on)[2])";
-      "$(this.bundle): have no $(extract_$(on)[2])" if => "!$(extract_$(on)[2])";
+    "$(this.bundle): have $(extract_$(on)[2])" if => "$(extract_$(on)[2])";
+    "$(this.bundle): have no $(extract_$(on)[2])" if => "!$(extract_$(on)[2])";
+    "$(this.bundle): have $(extract_$(off)[1])" if => "$(extract_$(off)[1])";
 
-      "$(this.bundle): have $(extract_$(off)[1])" if => "$(extract_$(off)[1])";
-      "$(this.bundle): have no $(extract_$(off)[1])" if => "!$(extract_$(off)[1])";
+    "$(this.bundle): have no $(extract_$(off)[1])"
+      if => "!$(extract_$(off)[1])";
 }
 
 body classes feature_cancel(x)
@@ -83,6 +93,6 @@ body classes feature_cancel(x)
 #
 # Used internally by bundle `feature`
 {
-      cancel_kept => { "$(x)" };
-      cancel_repaired => { "$(x)" };
+  cancel_kept => { "$(x)" };
+  cancel_repaired => { "$(x)" };
 }

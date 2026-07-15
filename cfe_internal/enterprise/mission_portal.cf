@@ -1,86 +1,126 @@
 bundle agent cfe_internal_enterprise_mission_portal
 {
   meta:
-      "description" string => "Manage mission portal configuration";
+    "description" string => "Manage mission portal configuration";
 
-classes:
-      "mission_portal_http2_enabled"
-        expression => and(
-                          fileexists("$(sys.workdir)/httpd/php/sbin/php-fpm"),
-                          fileexists("$(sys.workdir)/httpd/modules/mod_http2.so")
-                      ),
-        scope => "namespace", # so it is visible in datastate() used in httpd.conf template rendering in bundle cfe_internal_enterprise_mission_portal_apache
-        comment => "If php-fpm and mod_http2.so are present then http2 is enabled
+  classes:
+    "mission_portal_http2_enabled"
+      expression => and(
+        fileexists("$(sys.workdir)/httpd/php/sbin/php-fpm"),
+        fileexists("$(sys.workdir)/httpd/modules/mod_http2.so")
+      ),
+      scope => "namespace", # so it is visible in datastate() used in httpd.conf template rendering in bundle cfe_internal_enterprise_mission_portal_apache
+      comment => "If php-fpm and mod_http2.so are present then http2 is enabled
                     and we use this class in httpd.conf to configure accordingly.";
+
   vars:
     policy_server.enterprise_edition.mission_portal_http2_enabled::
       "cpu_info_source" string => "/proc/cpuinfo";
+
       "cpu_cores_number"
-        int =>
-          int( execresult("grep -c ^processor $(cpu_info_source) 2>/dev/null", "useshell")),
-          if => fileexists( $(cpu_info_source) );
+        int => int(
+          execresult(
+            "grep -c ^processor $(cpu_info_source) 2>/dev/null", "useshell"
+          )
+        ),
+        if => fileexists($(cpu_info_source));
+
       "mem_info_source" string => "/proc/meminfo";
+
       "mem_total_kb"
-        int => int( execresult("grep ^MemTotal $(mem_info_source) | awk '{print $2}' 2>/dev/null", "useshell") ),
-        if => fileexists( $(mem_info_source) );
-      "php_fpm_www_pool_min_spare_servers_calculated" int => int(
-         ifelse(
-           isvariable("cpu_cores_number"),
-           eval("$(cpu_cores_number) * 2"), # min spare servers are cpu cores number * 2
-           "8" # fallback
-        ));
-      "php_fpm_www_pool_max_spare_servers_calculated" int => int(
-        ifelse(
-          isvariable("cpu_cores_number"),
-          eval("$(cpu_cores_number) * 4"), # max spare servers are cpu cores number * 4
-          "16" # fallback
-        ));
-      #start servers between min & max spare
-      "php_fpm_www_pool_start_servers_calculated" int => int(
-        eval(
-          "($(php_fpm_www_pool_min_spare_servers_calculated) + $(php_fpm_www_pool_max_spare_servers_calculated)) / 2")
+        int => int(
+          execresult(
+            "grep ^MemTotal $(mem_info_source) | awk '{print $2}' 2>/dev/null",
+            "useshell"
+          )
+        ),
+        if => fileexists($(mem_info_source));
+
+      "php_fpm_www_pool_min_spare_servers_calculated"
+        int => int(
+          ifelse(
+            isvariable("cpu_cores_number"),
+            eval("$(cpu_cores_number) * 2"), # min spare servers are cpu cores number * 2
+            "8" # fallback
+          )
         );
+
+      "php_fpm_www_pool_max_spare_servers_calculated"
+        int => int(
+          ifelse(
+            isvariable("cpu_cores_number"),
+            eval("$(cpu_cores_number) * 4"), # max spare servers are cpu cores number * 4
+            "16" # fallback
+          )
+        );
+
+      #start servers between min & max spare
+      "php_fpm_www_pool_start_servers_calculated"
+        int => int(
+          eval(
+            "($(php_fpm_www_pool_min_spare_servers_calculated) + $(php_fpm_www_pool_max_spare_servers_calculated)) / 2"
+          )
+        );
+
       "fpm_children_average_memory_kb" int => "25600"; # average memory taken by one fpm process 25MB * 1024
-      "php_fpm_www_pool_max_children_calculated" int => int(
-        ifelse(
-          isvariable("mem_total_kb"),
-          eval("$(mem_total_kb) * 0.6 / $(fpm_children_average_memory_kb)"), # get only 60% of total memory and devide by avarage memory taken by one fpm process
-          "60" # fallback
-        ));
+      "php_fpm_www_pool_max_children_calculated"
+        int => int(
+          ifelse(
+            isvariable("mem_total_kb"),
+            eval("$(mem_total_kb) * 0.6 / $(fpm_children_average_memory_kb)"), # get only 60% of total memory and devide by avarage memory taken by one fpm process
+            "60" # fallback
+          )
+        );
 
       "php_fpm_pid_file" string => "$(sys.workdir)/httpd/php-fpm.pid";
-      "php_fpm_www_pool_max_children" string => ifelse(
-        isvariable("default:def.php_fpm_www_pool_max_children"),
-        "$(default:def.php_fpm_www_pool_max_children)",
-        "${php_fpm_www_pool_max_children_calculated}");
-      "php_fpm_www_pool_start_servers" string => ifelse(
-        isvariable("default:def.php_fpm_www_pool_start_servers"),
-        "$(default:def.php_fpm_www_pool_start_servers)",
-        "$(php_fpm_www_pool_start_servers_calculated)");
-      "php_fpm_www_pool_min_spare_servers" string => ifelse(
-        isvariable("default:def.php_fpm_www_pool_min_spare_servers"),
-        "$(default:def.php_fpm_www_pool_min_spare_servers)",
-        "$(php_fpm_www_pool_min_spare_servers_calculated)");
-      "php_fpm_www_pool_max_spare_servers" string => ifelse(
-        isvariable("default:def.php_fpm_www_pool_max_spare_servers"),
-        "$(default:def.php_fpm_www_pool_max_spare_servers)",
-        "$(php_fpm_www_pool_max_spare_servers_calculated)");
-      "php_fpm_state" data => mergedata(
-        '{"vars": { "sys": { "workdir": "${default:sys.workdir}" } } }',
-        '{
+
+      "php_fpm_www_pool_max_children"
+        string => ifelse(
+          isvariable("default:def.php_fpm_www_pool_max_children"),
+          "$(default:def.php_fpm_www_pool_max_children)",
+          "${php_fpm_www_pool_max_children_calculated}"
+        );
+
+      "php_fpm_www_pool_start_servers"
+        string => ifelse(
+          isvariable("default:def.php_fpm_www_pool_start_servers"),
+          "$(default:def.php_fpm_www_pool_start_servers)",
+          "$(php_fpm_www_pool_start_servers_calculated)"
+        );
+
+      "php_fpm_www_pool_min_spare_servers"
+        string => ifelse(
+          isvariable("default:def.php_fpm_www_pool_min_spare_servers"),
+          "$(default:def.php_fpm_www_pool_min_spare_servers)",
+          "$(php_fpm_www_pool_min_spare_servers_calculated)"
+        );
+
+      "php_fpm_www_pool_max_spare_servers"
+        string => ifelse(
+          isvariable("default:def.php_fpm_www_pool_max_spare_servers"),
+          "$(default:def.php_fpm_www_pool_max_spare_servers)",
+          "$(php_fpm_www_pool_max_spare_servers_calculated)"
+        );
+
+      "php_fpm_state"
+        data => mergedata(
+          '{"vars": { "sys": { "workdir": "${default:sys.workdir}" } } }',
+          '{
           "max_children":"${php_fpm_www_pool_max_children}",
           "start_servers":"${php_fpm_www_pool_start_servers}",
           "min_spare_servers":"${php_fpm_www_pool_min_spare_servers}",
           "max_spare_servers":"${php_fpm_www_pool_max_spare_servers}"
-         }');
+         }'
+        );
 
   files:
-      # http -> https redirection moved from Apache to PHP
-      # Here the flag files are managed so that PHP will know what to do
+    # http -> https redirection moved from Apache to PHP
+    # Here the flag files are managed so that PHP will know what to do
     cfe_enterprise_disable_http_redirect_to_https::
       "/opt/cfengine/flags/."
         perms => mog("750", "root", "cfapache"),
         create => "true";
+
       "/opt/cfengine/flags/http_redirect_to_https.disabled" -> { "ENT-11481" }
         perms => mog("660", "root", "cfapache"),
         create => "true";
@@ -93,15 +133,17 @@ classes:
     DEBUG::
       "Using variable default:def.php_fpm_www_pool_max_children: ${default:def.php_fpm_www_pool_max_children} instead of built-in default"
         if => isvariable("default:def.php_fpm_www_pool_max_children");
+
       "Using variable default:def.php_fpm_www_pool_start_servers: ${default:def.php_fpm_www_pool_start_servers} instead of built-in default"
         if => isvariable("default:def.php_fpm_www_pool_start_servers");
+
       "Using variable default:def.php_fpm_www_pool_min_spare_servers: ${default:def.php_fpm_www_pool_min_spare_servers} instead of built-in default"
         if => isvariable("default:def.php_fpm_www_pool_min_spare_servers");
+
       "Using variable default:def.php_fpm_www_pool_max_spare_servers: ${default:def.php_fpm_www_pool_max_spare_servers} instead of built-in default"
         if => isvariable("default:def.php_fpm_www_pool_max_spare_servers");
 
   methods:
-
     policy_server::
       "Apache Configuration" -> { "CFEngine Enterprise", "Mission Portal" }
         usebundle => cfe_internal_enterprise_mission_portal_apache;
@@ -129,8 +171,7 @@ classes:
 
   services:
     policy_server.mission_portal_http2_enabled::
-      "cf-php-fpm"
-        service_policy => "start";
+      "cf-php-fpm" service_policy => "start";
 }
 
 bundle agent apachectl_patched_for_upgrade
@@ -156,18 +197,25 @@ bundle agent apachectl_patched_for_upgrade
 # When 3.15.0 (Currently oldest supported version) was released, 3.10.0 was supported.
 {
   vars:
-      "considered_versions"
-        slist => { "cfengine_3_10", "cfengine_3_11", "cfengine_3_12",
-                   "cfengine_3_13", "cfengine_3_14", "cfengine_3_15",
-                   "cfengine_3_16", "cfengine_3_17", "cfengine_3_18" };
+    "considered_versions"
+      slist => {
+        "cfengine_3_10",
+        "cfengine_3_11",
+        "cfengine_3_12",
+        "cfengine_3_13",
+        "cfengine_3_14",
+        "cfengine_3_15",
+        "cfengine_3_16",
+        "cfengine_3_17",
+        "cfengine_3_18",
+      };
 
   classes:
+    "_running_cfengine_version_where_templated_files_automatically_created"
+      or => { @(considered_versions) };
 
-      "_running_cfengine_version_where_templated_files_automatically_created"
-        or => { @(considered_versions) };
-
-      "_running_cfengine_version_where_templated_files_NOT_automatically_created"
-        not => or( @(considered_versions) );
+    "_running_cfengine_version_where_templated_files_NOT_automatically_created"
+      not => or(@(considered_versions));
 
   files:
     _running_cfengine_version_where_templated_files_automatically_created::
@@ -175,7 +223,9 @@ bundle agent apachectl_patched_for_upgrade
         edit_template => "$(this.promise_dirname)/templates/apachectl.mustache",
         handle => "apachectl_content_pre_create_default_templated_files",
         template_method => "mustache",
-        template_data => parsejson( '{ "cfengine_enterprise_mission_portal_httpd_dir": "$(sys.workdir)/httpd" }'),
+        template_data => parsejson(
+          '{ "cfengine_enterprise_mission_portal_httpd_dir": "$(sys.workdir)/httpd" }'
+        ),
         classes => results("bundle", "apachectl_file");
 
     _running_cfengine_version_where_templated_files_NOT_automatically_created::
@@ -184,69 +234,75 @@ bundle agent apachectl_patched_for_upgrade
         edit_template => "$(this.promise_dirname)/templates/apachectl.mustache",
         handle => "apachectl_content_post_create_default_templated_files",
         template_method => "mustache",
-        template_data => parsejson( '{ "cfengine_enterprise_mission_portal_httpd_dir": "$(sys.workdir)/httpd" }'),
+        template_data => parsejson(
+          '{ "cfengine_enterprise_mission_portal_httpd_dir": "$(sys.workdir)/httpd" }'
+        ),
         classes => results("bundle", "apachectl_file");
 
     cfengine::
       "$(sys.workdir)/httpd/bin/apachectl"
         handle => "apachectl_perms",
-        perms => mog( "0755", "root", "root" );
+        perms => mog("0755", "root", "root");
 
   commands:
-      # This only runs if apachectl touched (repaired) and restorecon path exists
-      apachectl_file_repaired.default:_stdlib_path_exists_restorecon::
-        "$(default:paths.restorecon) $(sys.workdir)/httpd/bin/apachectl"
-          comment => "Ensure the templated apachectl has the correct SELinux context.";
+    # This only runs if apachectl touched (repaired) and restorecon path exists
+    apachectl_file_repaired.default:_stdlib_path_exists_restorecon::
+      "$(default:paths.restorecon) $(sys.workdir)/httpd/bin/apachectl"
+        comment => "Ensure the templated apachectl has the correct SELinux context.";
 }
 
 bundle agent cfe_internal_enterprise_mission_portal_apache
 # @brief Manage Apache instance that runs Mission Portal
 {
   vars:
-
     policy_server.enterprise_edition::
-    "template"
-      string => "$(this.promise_dirname)/templates/httpd.conf.mustache",
-      comment => "The template used to render the apache config file.";
+      "template"
+        string => "$(this.promise_dirname)/templates/httpd.conf.mustache",
+        comment => "The template used to render the apache config file.";
 
-    "config"
-      string => "$(sys.workdir)/httpd/conf/httpd.conf",
-      comment => "This is the location of the apache config file.";
+      "config"
+        string => "$(sys.workdir)/httpd/conf/httpd.conf",
+        comment => "This is the location of the apache config file.";
 
-    "staged_config"
-      string => "$(config).staged",
-      comment => "This is the temporary file we will render the config and
+      "staged_config"
+        string => "$(config).staged",
+        comment => "This is the temporary file we will render the config and
 		  valid against before deploying to the final $(config)
                   location.";
 
-    # TODO: Consider collecting the classes and variables used based on a tag
-    # to prepare a smaller subset of data
-    "data"
-      data => datastate();
+      # TODO: Consider collecting the classes and variables used based on a tag
+      # to prepare a smaller subset of data
+      "data" data => datastate();
 
   methods:
+    "apachectl patched for resilient stop " -> { "ENT-8823" }
+      usebundle => apachectl_patched_for_upgrade;
 
-      "apachectl patched for resilient stop " -> { "ENT-8823" }
-        usebundle => apachectl_patched_for_upgrade;
-
-      "Stage Apache Config"
-        usebundle => file_make_mustache( $(staged_config), $(template), @(data) ),
-        comment => "We render the config to a staging location so that it can be
+    "Stage Apache Config"
+      usebundle => file_make_mustache($(staged_config), $(template), @(data)),
+      comment => "We render the config to a staging location so that it can be
                     validated before deploying the final apache config so that we
                     don't end up with a broken service.";
 
-      "Manage Final Apache Config"
-        usebundle => mission_portal_apache_from_stage( $(config), $(staged_config) );
+    "Manage Final Apache Config"
+      usebundle => mission_portal_apache_from_stage(
+        $(config), $(staged_config)
+      );
 
   reports:
     DEBUG|DEBUG_cfe_internal_enterprise_mission_portal_apache::
       "DEBUG $(this.bundle): Should stage '$(staged_config)' from '$(template)'.";
 
   classes:
-
     (policy_server|am_policy_hub).enterprise_edition::
       "mission_portal_index_php_redirect_enabled"
-        expression => isgreaterthan(countlinesmatching(".*config\['index_page'\] = \"\".*", "$(cfe_internal_hub_vars.docroot)/application/config/config.php"), 0),
+        expression => isgreaterthan(
+          countlinesmatching(
+            ".*config\['index_page'\] = \"\".*",
+            "$(cfe_internal_hub_vars.docroot)/application/config/config.php"
+          ),
+          0
+        ),
         comment => "We need to know if index_page config in Mission Portal
                     is empty to enable redirect from /index.php/path to /path
                     in httpd.conf";
@@ -283,88 +339,107 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 #```
 {
   meta:
-
-      "description"
-        string => "Configure apache based on successfully staged config";
+    "description"
+      string => "Configure apache based on successfully staged config";
 
   classes:
-      "systemd_supervised" -> { "ENT-11189" }
-        expression => returnszero("$(paths.systemctl) cat cf-apache > /dev/null 2>&1", "useshell"),
-        if => fileexists( $(paths.systemctl) ),
-        comment => "Set when cf-apache.service is a unit known to systemd";
+    "systemd_supervised" -> { "ENT-11189" }
+      expression => returnszero(
+        "$(paths.systemctl) cat cf-apache > /dev/null 2>&1", "useshell"
+      ),
+      if => fileexists($(paths.systemctl)),
+      comment => "Set when cf-apache.service is a unit known to systemd";
 
-      "httpd_config_validated"
-        expression => strcmp("$(validate_result[exit_code])", "0");
-      "httpd_config_error"
-        expression => not(strcmp("$(validate_result[exit_code])", "0"));
+    "httpd_config_validated"
+      expression => strcmp("$(validate_result[exit_code])", "0");
+
+    "httpd_config_error"
+      expression => not(strcmp("$(validate_result[exit_code])", "0"));
 
   vars:
+    "validate_config"
+      string => "$(sys.workdir)/httpd/bin/httpd -t -f $(staged_config)";
 
-      "validate_config"
-        string => "$(sys.workdir)/httpd/bin/httpd -t -f $(staged_config)";
+    "validate_result"
+      data => execresult_as_data("$(validate_config)", "useshell", "both");
 
-      "validate_result"
-        data => execresult_as_data("$(validate_config)", "useshell", "both");
-
-      # The location of the apache pid file moved from httpd/logs/httpd.pid to
-      # httpd/httpd.pid in 3.15.5, 3.18.1 and, 3.19.0
-
-      "httpd_pid_file" -> { "ENT-7966" }
-        string => ifelse( classmatch( "cfengine_3_1[0-4]" ), "$(sys.workdir)/httpd/logs/httpd.pid",
-                          classmatch( "cfengine_3_15_[0-4]" ), "$(sys.workdir)/httpd/logs/httpd.pid",
-                          "cfengine_3_18_0", "$(sys.workdir)/httpd/logs/httpd.pid",
-                          "$(sys.workdir)/httpd/httpd.pid" );
+    # The location of the apache pid file moved from httpd/logs/httpd.pid to
+    # httpd/httpd.pid in 3.15.5, 3.18.1 and, 3.19.0
+    "httpd_pid_file" -> { "ENT-7966" }
+      string => ifelse(
+        classmatch("cfengine_3_1[0-4]"),
+        "$(sys.workdir)/httpd/logs/httpd.pid",
+        classmatch("cfengine_3_15_[0-4]"),
+        "$(sys.workdir)/httpd/logs/httpd.pid",
+        "cfengine_3_18_0",
+        "$(sys.workdir)/httpd/logs/httpd.pid",
+        "$(sys.workdir)/httpd/httpd.pid"
+      );
 
   files:
-
     "$(config)"
       create => "true",
       comment => "Without an apache config, Mission Mortal and Enterprise API
                   services will not work";
 
-    "$(config)"  -> { "ENT-9686" }
-      copy_from => local_dcp( $(staged_config) ),
+    "$(config)" -> { "ENT-9686" }
+      copy_from => local_dcp($(staged_config)),
       handle => "cfapache_httpd_conf_from_staged",
-      if => and( or( "apache_stop_after_new_staged_config_repaired",
-                     not( fileexists( "$(httpd_pid_file)" ) ),
-                     isnewerthan( $(config), $(staged_config) ) ),
-                     "httpd_config_validated"),
+      if => and(
+        or(
+          "apache_stop_after_new_staged_config_repaired",
+          not(fileexists("$(httpd_pid_file)")),
+          isnewerthan($(config), $(staged_config))
+        ),
+        "httpd_config_validated"
+      ),
       classes => results("bundle", "mission_portal_apache_config"),
       comment => "We make sure that the deployed config is a copy of the staged
                   config if the staged config passes a syntax check. We redirect
                   the output to keep policy runs clean and not generate lots of
                   unnecessary email.";
 
-      # Note: RPM package spec must align or the file will come up in rpm verification
-      "$(config)"  -> { "ENT-11096" }
-        handle => "cfengine_mp_apache_config_ownership_perms",
-        perms => mog( "400", "root", "root");
+    # Note: RPM package spec must align or the file will come up in rpm verification
+    "$(config)" -> { "ENT-11096" }
+      handle => "cfengine_mp_apache_config_ownership_perms",
+      perms => mog("400", "root", "root");
 
   commands:
-
     !systemd_supervised::
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
         args => "stop",
-        if => and( "httpd_config_validated",
-                   isnewerthan( $(staged_config), $(config) ),
-                   fileexists( "$(httpd_pid_file)" ) ),
+        if => and(
+          "httpd_config_validated",
+          isnewerthan($(staged_config), $(config)),
+          fileexists("$(httpd_pid_file)")
+        ),
         contain => in_shell,
-        classes => results( "bundle", "apache_stop_after_new_staged_config" ),
-        comment => concat( "We have to stop apache before trying to start with a",
-                           "new config, or the new config could prevent apache from stopping.");
+        classes => results("bundle", "apache_stop_after_new_staged_config"),
+        comment => concat(
+          "We have to stop apache before trying to start with a",
+          "new config, or the new config could prevent apache from stopping."
+        );
 
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl"
         args => "start",
-        if => and( "mission_portal_apache_config_repaired",
-                   "apache_stop_after_new_staged_config_repaired"),
+        if => and(
+          "mission_portal_apache_config_repaired",
+          "apache_stop_after_new_staged_config_repaired"
+        ),
         contain => in_shell,
-        comment => concat( "We start apache after the new valid config is in ",
-                           "place only if we have stopped apache already.");
+        comment => concat(
+          "We start apache after the new valid config is in ",
+          "place only if we have stopped apache already."
+        );
 
-      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl" -> { "ENT-9686" }
+      "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl" -> {
+          "ENT-9686"
+        }
         args => "graceful",
-        if => and( "mission_portal_apache_config_repaired",
-                   not( "apache_stop_after_new_staged_config_repaired" ) ),
+        if => and(
+          "mission_portal_apache_config_repaired",
+          not("apache_stop_after_new_staged_config_repaired")
+        ),
         contain => in_shell,
         comment => "We restart apache after the new valid config is in place";
 
@@ -379,35 +454,44 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
     systemd_supervised::
       "cf-apache"
         service_policy => "stop",
-        if => and( "httpd_config_validated",
-
-                   isnewerthan( $(staged_config), $(config) ) ),
-        classes => results( "bundle", "apache_stop_after_new_staged_config" ),
-        comment => concat( "We have to stop apache before trying to start with a",
-                           "new config, or the new config could prevent apache from stopping.");
+        if => and(
+          "httpd_config_validated", isnewerthan($(staged_config), $(config))
+        ),
+        classes => results("bundle", "apache_stop_after_new_staged_config"),
+        comment => concat(
+          "We have to stop apache before trying to start with a",
+          "new config, or the new config could prevent apache from stopping."
+        );
 
       "cf-apache"
         service_policy => "start",
-        if => and( "mission_portal_apache_config_repaired",
-                   "apache_stop_after_new_staged_config_repaired"),
-        comment => concat( "We start apache after the new valid config is in ",
-                           "place only if we have stopped apache already.");
+        if => and(
+          "mission_portal_apache_config_repaired",
+          "apache_stop_after_new_staged_config_repaired"
+        ),
+        comment => concat(
+          "We start apache after the new valid config is in ",
+          "place only if we have stopped apache already."
+        );
 
       "cf-apache" -> { "ENT-9686" }
         service_policy => "restart",
-        if => and( "mission_portal_apache_config_repaired",
-                   not( "apache_stop_after_new_staged_config_repaired" ) ),
+        if => and(
+          "mission_portal_apache_config_repaired",
+          not("apache_stop_after_new_staged_config_repaired")
+        ),
         comment => "We restart apache after the new valid config is in place";
 
   reports:
     httpd_config_error::
       "'$(staged_config)' failed to validate: $(validate_result[output])";
+
     DEBUG|DEBUG_mission_portal_apache_from_stage::
       "DEBUG $(this.bundle): '$(config)' should be a copy of '$(staged_config)' because it validates with '$(validate_config)'"
-      if => "httpd_config_validated";
+        if => "httpd_config_validated";
 
       "DEBUG $(this.bundle): '$(config)' should *not* be a copy of '$(staged_config)' because it failed to validate with '$(validate_config)'"
-      if => not( "httpd_config_validated" );
+        if => not("httpd_config_validated");
 }
 
 ##################################################################
@@ -415,45 +499,36 @@ bundle agent mission_portal_apache_from_stage(config, staged_config)
 # cfe_internal_webserver(on/off)
 #
 ##################################################################
-
 bundle agent cfe_internal_webserver(state)
 {
   meta:
-      "description" string => "Manage the Mission Portal webserver state";
+    "description" string => "Manage the Mission Portal webserver state";
 
   classes:
-
-      "on"       expression => strcmp("$(state)","on"),
+    "on"
+      expression => strcmp("$(state)", "on"),
       comment => "Check if a keyword \"on\" is inputs",
       handle => "cfe_internal_webserver_classes_on";
 
-      "off"      expression => strcmp("$(state)","off"),
+    "off"
+      expression => strcmp("$(state)", "off"),
       comment => "Check if a keyword \"off\" is inputs",
       handle => "cfe_internal_webserver_classes_off";
 
-      #
-
   processes:
-
     am_policy_hub.on::
-
       ".*$(sys.workdir)/httpd/bin/httpd.*"
-      restart_class => "start_cfe_httpd",
-      comment => "Check if CFE httpd process exists or not",
-      handle => "cfe_internal_webserver_processes_start_cfe_httpd";
-
-      #
+        restart_class => "start_cfe_httpd",
+        comment => "Check if CFE httpd process exists or not",
+        handle => "cfe_internal_webserver_processes_start_cfe_httpd";
 
   commands:
-
     start_cfe_httpd::
-
       "LD_LIBRARY_PATH=$(sys.workdir)/lib:$LD_LIBRARY_PATH $(sys.workdir)/httpd/bin/apachectl start"
-      comment => "Start CFE httpd process if not exist",
-      classes => kept_successful_command,
-      handle => "cfe_internal_webserver_commands_start_cfe_httpd",
-      contain => in_shell;
-
+        comment => "Start CFE httpd process if not exist",
+        classes => kept_successful_command,
+        handle => "cfe_internal_webserver_commands_start_cfe_httpd",
+        contain => in_shell;
 }
 
 bundle agent cfe_enterprise_selfsigned_cert
@@ -463,46 +538,51 @@ bundle agent cfe_enterprise_selfsigned_cert
 # necessary files is missing. To force certificate regeneration run with the
 # class '_cfe_enterprise_selfsigned_cert_regenerate_certificate' defined.
 {
-
   meta:
-
-      "description"
-        string => "Generate a self signed SSL certificate for secure hub communications.";
+    "description"
+      string => "Generate a self signed SSL certificate for secure hub communications.";
 
   vars:
-
     policy_server::
+      "SSLCertificateFile"
+        string => "$(cfe_internal_hub_vars.SSLCertificateFile)";
 
-      "SSLCertificateFile"           string => "$(cfe_internal_hub_vars.SSLCertificateFile)";
-      "SSLCertificateKeyFile"        string => "$(cfe_internal_hub_vars.SSLCertificateKeyFile)";
-      "SSLCertificatePasswdKeyFile"  string => "$(cfe_internal_hub_vars.SSLCertificatePasswdKeyFile)";
-      "SSLCertificateKeySize"        string => "$(cfe_internal_hub_vars.SSLCertificateKeySize)";
-      "SSLCertificateSigningRequest" string => "$(cfe_internal_hub_vars.SSLCertificateSigningRequest)";
-      "SSLCnf"                       string => "$(cfe_internal_hub_vars.SSLCnf)";
-      "SSLCertificateDaysValid"      string => "$(cfe_internal_hub_vars.SSLCertificateDaysValid)";
-      "SSLCertificateFileSymlink"    string => "$(sys.workdir)/ssl/cert.pem";
+      "SSLCertificateKeyFile"
+        string => "$(cfe_internal_hub_vars.SSLCertificateKeyFile)";
 
-      "openssl"  string => "$(sys.workdir)/bin/openssl";
+      "SSLCertificatePasswdKeyFile"
+        string => "$(cfe_internal_hub_vars.SSLCertificatePasswdKeyFile)";
 
-      "_generated_files" slist => {
-                                    $(SSLCertificateFile),
-                                    $(SSLCertificateKeyFile),
-                                    $(SSLCertificatePasswdKeyFile),
-                                    $(SSLCertificateSigningRequest),
-                                  };
+      "SSLCertificateKeySize"
+        string => "$(cfe_internal_hub_vars.SSLCertificateKeySize)";
 
+      "SSLCertificateSigningRequest"
+        string => "$(cfe_internal_hub_vars.SSLCertificateSigningRequest)";
+
+      "SSLCnf" string => "$(cfe_internal_hub_vars.SSLCnf)";
+
+      "SSLCertificateDaysValid"
+        string => "$(cfe_internal_hub_vars.SSLCertificateDaysValid)";
+
+      "SSLCertificateFileSymlink" string => "$(sys.workdir)/ssl/cert.pem";
+      "openssl" string => "$(sys.workdir)/bin/openssl";
+
+      "_generated_files"
+        slist => {
+          $(SSLCertificateFile),
+          $(SSLCertificateKeyFile),
+          $(SSLCertificatePasswdKeyFile),
+          $(SSLCertificateSigningRequest),
+        };
 
   classes:
-
-      "_cfe_enterprise_selfsigned_cert_regenerate_certificate"
-        not => filesexist( @(_generated_files) ),
-	comment => "We only want to automatically regenerate the certificate if
+    "_cfe_enterprise_selfsigned_cert_regenerate_certificate"
+      not => filesexist(@(_generated_files)),
+      comment => "We only want to automatically regenerate the certificate if
                     one of the files does not exist.";
 
   commands:
-
     policy_server._cfe_enterprise_selfsigned_cert_regenerate_certificate::
-
       "$(openssl)"
         args => "genrsa -passout pass:x -out $(SSLCertificatePasswdKeyFile) $(SSLCertificateKeySize)";
 
@@ -533,15 +613,13 @@ bundle agent cfe_enterprise_selfsigned_cert
       comment => "The SSL Certificate Key should only be readable by root.";
 
     "$(SSLCertificateFileSymlink)" -> { "jira:ENT-760" }
-      link_from => ln_s( $(SSLCertificateFile) ),
+      link_from => ln_s($(SSLCertificateFile)),
       move_obstructions => "true",
       comment => "Mission Portal reads the certificate from this stable
                   location, so it must always point to the current certificate.";
 
   reports:
-
     DEBUG|DEBUG_cfe_enterprise_selfsigned_cert::
-
       "DEBUG $(this.bundle): Certificate Generation Requested"
         if => "_cfe_enterprise_selfsigned_cert_regenerate_certificate";
 
@@ -555,8 +633,8 @@ bundle agent cf_apache_reset_failed_state
 # (StartLimitBurst). Safe no-op when the unit is not in a failed state.
 {
   commands:
-      "$(paths.systemctl) reset-failed cf-apache" -> { "ENT-11189" }
-        contain => in_shell,
-        handle => "cf_apache_systemctl_reset_failed",
-        comment => "Reset latched failed state on cf-apache.service";
+    "$(paths.systemctl) reset-failed cf-apache" -> { "ENT-11189" }
+      contain => in_shell,
+      handle => "cf_apache_systemctl_reset_failed",
+      comment => "Reset latched failed state on cf-apache.service";
 }
