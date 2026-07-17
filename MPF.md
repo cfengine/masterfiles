@@ -727,9 +727,9 @@ Example Augments:
 
 **History:**
 
-- Introduced in 3.28.0.
+- Introduced in 3.29.0.
 
-**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure the evaluation order of cf-agent for main policy](#Configure the evaluation order of cf-agent for main policy), [`evaluation_order` in `body common control`][cf-agent#evaluation_order], [Policy style guide on promise ordering][Policy style guide#Promise ordering]
+**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure the evaluation order of cf-agent for main policy](#Configure the evaluation order of cf-agent for main policy), [`evaluation_order` in `body common control`][Components#evaluation_order], [Policy style guide on promise ordering][Policy style guide#Promise ordering]
 
 ### Configure the evaluation order of cf-agent for main policy
 
@@ -751,7 +751,7 @@ Example Augments:
 **History:**
 
 - Introduced in 3.27.0.
-- Since 3.28.0, `cf-agent` inherits the evaluation order from `body common control` when `default:def.control_agent_evaluation_order` is not set.
+- Since 3.29.0, `cf-agent` inherits the evaluation order from `body common control` when `default:def.control_agent_evaluation_order` is not set.
 
 **See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure the default promise evaluation order for all components](#Configure the default promise evaluation order for all components), [Configure cf-agent promise evaluation order for update policy](#Configure the evaluation order for cf-agent evaluated promises for update policy), [Policy style guide on promise ordering][Policy style guide#Promise ordering]
 
