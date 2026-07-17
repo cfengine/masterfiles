@@ -133,6 +133,15 @@ body common control
       # The number of minutes after which last-seen entries are purged from cf_lastseen.lmdb
         lastseenexpireafter => "$(def.control_common_lastseenexpireafter)";
 
+@if minimum_version(3.27.0)
+      # The order in which promises are evaluated (top_down|classic). Sets the
+      # default evaluation order for all components. Override it for a specific
+      # component (e.g. cf-agent in body agent control) or file (body file
+      # control). Defaults to the classic "Normal Order" unless
+      # default:def.control_common_evaluation_order is set via augments.
+        evaluation_order => "$(default:def.control_common_evaluation_order)";
+@endif
+
     control_common_tls_min_version_defined::
         tls_min_version => "$(default:def.control_common_tls_min_version)"; # See also: allowtlsversion in body server control
 

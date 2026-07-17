@@ -11,10 +11,6 @@ body agent control
   # Global default for time that must elapse before promise will be rechecked.
   # Don't keep any promises.
   any::
-@if minimum_version(3.27.0)
-    # The order in which promises are evaluated (top_down|classic)
-    evaluation_order => "$(default:def.control_agent_evaluation_order)";
-@endif
     # Minimum time (in minutes) which should have passed since the last time
     # the promise was verified before it is checked again.
     ifelapsed => "1";
@@ -58,4 +54,12 @@ body agent control
   # Environment variables based on Distro
   control_agent_agentfacility_configured::
     agentfacility => "$(default:def.control_agent_agentfacility)";
+@if minimum_version(3.27.0)
+  # Only override cf-agent's promise evaluation order when explicitly
+  # configured via augments; otherwise cf-agent inherits the order set in
+  # body common control. See ENT-13495.
+  control_agent_evaluation_order_configured::
+    # The order in which promises are evaluated (top_down|classic)
+    evaluation_order => "$(default:def.control_agent_evaluation_order)";
+@endif
 }

@@ -708,16 +708,39 @@ To override the default for **cf-agent** configure `default:update_def.control_a
 The following settings are defined in `controls/def.cf` can be set from an
 [augments file][Augments].
 
-### Configure the evaluation order of cf-agent for main policy
+### Configure the default promise evaluation order for all components
 
-By default CFEngine processes promises in "Normal Order". Configure `default:def.control_agent_evaluation_order` to control the default promise evaluation order for `cf-agent`. This variable is used to set `evaluation_order` in `body agent control` in `promises.cf`
+By default CFEngine processes promises in "Normal Order". Configure `default:def.control_common_evaluation_order` to control the default promise evaluation order for all components (`cf-agent`, `cf-serverd`, `cf-execd` and `cf-monitord`). This variable is used to set `evaluation_order` in `body common control` in `promises.cf`. Override it for a specific component (for example `cf-agent`, see below) or for a specific file (with `evaluation_order` in `body file control`).
 
 Example Augments:
 
 ```json
 {
   "variables": {
-    "default:def.control_agent_evalution_order": {
+    "default:def.control_common_evaluation_order": {
+      "value": "top_down",
+      "comment": "Our policy writers find it easier to understand policy that is evaluated in the order it is written."
+    }
+  }
+}
+```
+
+**History:**
+
+- Introduced in 3.28.0.
+
+**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure the evaluation order of cf-agent for main policy](#Configure the evaluation order of cf-agent for main policy), [`evaluation_order` in `body common control`][cf-agent#evaluation_order], [Policy style guide on promise ordering][Policy style guide#Promise ordering]
+
+### Configure the evaluation order of cf-agent for main policy
+
+By default `cf-agent` inherits the promise evaluation order from `body common control` (see [Configure the default promise evaluation order for all components](#Configure the default promise evaluation order for all components)). Configure `default:def.control_agent_evaluation_order` to control the promise evaluation order for `cf-agent` specifically, overriding `body common control`. This variable is used to set `evaluation_order` in `body agent control` in `promises.cf` and is only applied when set to a valid value (`classic` or `top_down`) via augments.
+
+Example Augments:
+
+```json
+{
+  "variables": {
+    "default:def.control_agent_evaluation_order": {
       "value": "top_down",
       "comment": "Our policy writers find it easier to understand policy that is evaluated in the order it is written."
     }
@@ -728,8 +751,9 @@ Example Augments:
 **History:**
 
 - Introduced in 3.27.0.
+- Since 3.28.0, `cf-agent` inherits the evaluation order from `body common control` when `default:def.control_agent_evaluation_order` is not set.
 
-**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure cf-agent promise evaluation order for update policy](#Configure the evaluation order for cf-agent evaluated promises for update policy), [Policy style guide on promise ordering][Policy style guide#Promise ordering]
+**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure the default promise evaluation order for all components](#Configure the default promise evaluation order for all components), [Configure cf-agent promise evaluation order for update policy](#Configure the evaluation order for cf-agent evaluated promises for update policy), [Policy style guide on promise ordering][Policy style guide#Promise ordering]
 
 ### Automatically migrate ignore_interfaces.rx to workdir
 
