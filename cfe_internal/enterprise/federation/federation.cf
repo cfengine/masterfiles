@@ -572,18 +572,6 @@ bundle agent clean_when_off
           "$(default:paths.semanage) fcontext -l | grep $(home)", "useshell"
         );
 
-      "remote_hubs_table_empty"
-        expression => returnszero(
-          `[ $(const.dollar)($(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM remote_hubs") -eq "0"]`,
-          "useshell"
-        );
-
-      "federated_reporting_settings_table_empty"
-        expression => returnszero(
-          `[ $(const.dollar)($(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings") -eq "0"]`,
-          "useshell"
-        );
-
   commands:
     # Oh, the humanity! Where for art thou databases: promises for psql!
     `$(sys.bindir)/psql cfsettings --quiet --command "TRUNCATE TABLE remote_hubs"` -> {
