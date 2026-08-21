@@ -194,6 +194,18 @@ bundle agent cfe_internal_update_policy_cpv
         comment => "Directory containing CFEngine modules",
         handle => "cfe_internal_update_policy_vars_modules_dir";
 
+    windows::
+      "cfbs_dir_source"
+        string => "/var/cfengine/masterfiles/services/cfbs",
+        comment => "Directory containing currently deployed cfbs-project",
+        handle => "cfe_internal_update_policy_vars_cfbs_dir_windows";
+
+    !windows::
+      "cfbs_dir_source"
+        string => translatepath("$(master_location)/services/cfbs"),
+        comment => "Directory containing currently deployed cfbs-project",
+        handle => "cfe_internal_update_policy_vars_cfbs_dir";
+
     any::
       "file_check"
         string => translatepath("$(inputs_dir)/promises.cf"),
@@ -270,6 +282,14 @@ bundle agent cfe_internal_update_policy_cpv
         copy_from => u_rcp(
           "$(modules_dir_source)", @(update_def.policy_servers)
         ),
+        depth_search => u_recurse("inf"),
+        action => u_immediate;
+
+      # Note: similarly for files inside a cfbs-project
+      "$(inputs_dir)/services/cfbs"
+        comment => "Copy any files from cfbs-project on policy server if a new validation was acquired",
+        handle => "cfe_internal_update_policy_files_cfbs_dir",
+        copy_from => u_rcp("$(cfbs_dir_source)", @(update_def.policy_servers)),
         depth_search => u_recurse("inf"),
         action => u_immediate;
 
