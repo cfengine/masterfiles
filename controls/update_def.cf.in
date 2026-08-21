@@ -93,6 +93,15 @@ bundle common update_def
         comment => "Additional filename patterns to copy during policy update.",
         if => not( isvariable( "input_name_patterns_extra" ) );
 
+      "input_paths_extra" -> { "CFE-4708" }
+        slist => {},
+        comment => concat("Additional literal file paths (relative to the",
+                    " policy set root) to copy during policy update,",
+                    " regardless of input_name_patterns[_extra]. Lets a",
+                    " specific file be included without widening the",
+                    " extension-based patterns for the whole policy set."),
+        if => not( isvariable( "input_paths_extra" ) );
+
       # the permissions for your masterfiles files (not dirs), which will propagate to inputs
       "masterfiles_perms_mode_not_dir" -> { "CFE-951" }
         string => "0600",

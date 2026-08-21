@@ -220,6 +220,14 @@ bundle agent cfe_internal_update_policy_cpv
         comment => "Symlink to Python we found (if any)",
         handle => "cfe_internal_update_policy_python_symlink";
 
+      "input_paths_extra_safe" -> { "CFE-4708" }
+        slist => filter(
+          "^.*\.\..*$", "update_def.input_paths_extra", "true", "true", 999
+        ),
+        comment => "input_paths_extra with any entries containing a '..'
+                    path-traversal segment dropped, since it's copied both
+                    from the policy server and to every client verbatim.";
+
   classes:
     "validated_updates_ready"
       expression => "cfengine_internal_disable_cf_promises_validated",
@@ -236,6 +244,14 @@ bundle agent cfe_internal_update_policy_cpv
       "cfe_internal_trigger"
         expression => "local_files_ok",
         classes => u_if_else("files_ok", "files_ok");
+
+      "have_input_paths_extra"
+        expression => some(".*", "input_paths_extra_safe"),
+        comment => concat(
+          "True if `input_paths_extra` (CFE-4708) has any entries",
+          " so the always-runs copy below can be skipped entirely",
+          " (no tree walk) when the feature isn't in use."
+        );
 
   files:
     !am_policy_hub::
@@ -271,6 +287,24 @@ bundle agent cfe_internal_update_policy_cpv
           "$(modules_dir_source)", @(update_def.policy_servers)
         ),
         depth_search => u_recurse("inf"),
+        action => u_immediate;
+
+    have_input_paths_extra::
+      # Copies each input_paths_extra entry individually and runs every time,
+      # unlike the promise above.
+      # The release ID gating `validated_updates_ready` only
+      # reopens on new hub-side changes, so a brand-new entry
+      # introduced in the same run that opens the gate isn't loaded
+      # into memory yet (it lands in def.json partway through that
+      # run?) and will be stuck until a second, unrelated
+      # run reopens the gate again.
+      "$(inputs_dir)/$(input_paths_extra_safe)"
+        comment => "Copy an explicitly listed extra file (input_paths_extra) from master source on every run, since it isn't covered by the release ID hash that gates the promise above.",
+        handle => "cfe_internal_update_policy_files_input_paths_extra",
+        copy_from => u_remote_dcp_missing_ok(
+          "$(master_location)/$(input_paths_extra_safe)",
+          @(update_def.policy_servers)
+        ),
         action => u_immediate;
 
     update_inputs_not_kept::
