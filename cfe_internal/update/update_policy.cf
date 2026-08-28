@@ -224,9 +224,11 @@ bundle agent cfe_internal_update_policy_cpv
         slist => filter(
           "^.*\.\..*$", "update_def.input_paths_extra", "true", "true", 999
         ),
-        comment => "input_paths_extra with any entries containing a '..'
-                    path-traversal segment dropped, since it's copied both
-                    from the policy server and to every client verbatim.";
+        comment => concat(
+          "input_paths_extra with any entries containing a '..'",
+          " path-traversal segment dropped, since it's copied both",
+          " from the policy server and to every client verbatim."
+        );
 
   classes:
     "validated_updates_ready"
@@ -248,9 +250,9 @@ bundle agent cfe_internal_update_policy_cpv
       "have_input_paths_extra"
         expression => some(".*", "input_paths_extra_safe"),
         comment => concat(
-          "True if `input_paths_extra` (CFE-4708) has any entries",
-          " so the always-runs copy below can be skipped entirely",
-          " (no tree walk) when the feature isn't in use."
+          "True if input_paths_extra (CFE-4708) has any entries",
+          " so the per-path copy can be skipped when the feature",
+          " is not in use."
         );
 
   files:
@@ -289,18 +291,14 @@ bundle agent cfe_internal_update_policy_cpv
         depth_search => u_recurse("inf"),
         action => u_immediate;
 
-    have_input_paths_extra::
-      # Copies each input_paths_extra entry individually and runs every time,
-      # unlike the promise above.
-      # The release ID gating `validated_updates_ready` only
-      # reopens on new hub-side changes, so a brand-new entry
-      # introduced in the same run that opens the gate isn't loaded
-      # into memory yet (it lands in def.json partway through that
-      # run?) and will be stuck until a second, unrelated
-      # run reopens the gate again.
       "$(inputs_dir)/$(input_paths_extra_safe)"
-        comment => "Copy an explicitly listed extra file (input_paths_extra) from master source on every run, since it isn't covered by the release ID hash that gates the promise above.",
+        comment => concat(
+          "Copy an explicitly listed extra file (input_paths_extra)",
+          " from the master source when a new policy validation is",
+          " acquired, for files not covered by input_name_patterns."
+        ),
         handle => "cfe_internal_update_policy_files_input_paths_extra",
+        if => "have_input_paths_extra",
         copy_from => u_remote_dcp_missing_ok(
           "$(master_location)/$(input_paths_extra_safe)",
           @(update_def.policy_servers)
