@@ -230,6 +230,11 @@ bundle agent cfe_internal_update_policy_cpv
           " from the policy server and to every client verbatim."
         );
 
+    def_json_upated::
+      # Need to readjson def.json, extract vars.default:update_def.input_paths_extra
+      "_def_json" data => readjson( "$(sys.inputdir)/def.json" );
+      "input_paths_extra" slist => getvalues( "_def_json[vars][default:update_def.input_paths_extra]");
+
   classes:
     "validated_updates_ready"
       expression => "cfengine_internal_disable_cf_promises_validated",
@@ -267,6 +272,20 @@ bundle agent cfe_internal_update_policy_cpv
         ),
         action => u_immediate,
         classes => u_if_repaired("validated_updates_ready");
+
+
+      # policy hub should not alter inputs/ uneccessary
+      "$(inputs_dir)/def.json"
+        comment => "Check whether a validation stamp is available for a new policy update to reduce the distributed load",
+        handle => "cfe_internal_update_policy_def_json",
+        copy_from => u_rcp(
+                            "$(master_location)/def.json",
+                            @(update_def.policy_servers)
+        ),
+        action => u_immediate,
+        classes => u_if_repaired("def_json_updated"),
+        if => "validated_updates_ready";
+
 
     am_policy_hub|validated_updates_ready::
       # policy hub should always put masterfiles in inputs in order to check new policy
