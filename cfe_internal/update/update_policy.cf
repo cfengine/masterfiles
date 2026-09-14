@@ -330,7 +330,7 @@ bundle agent cfe_internal_update_cmdb
       "$(sys.workdir)/cmdb_files/."
         create => "true",
         perms => u_mo("0750", "$(update_def.cf_apache_user)"),
-        comment => "Mission Portal (running as this user) stores files referenced
+        comment => "Mission Portal (running as update_def.cf_apache_user: $(update_def.cf_apache_user)) stores files referenced
                     by group module input here, for cf-reactor to place them into
                     each member host's cmdb directory.";
 
