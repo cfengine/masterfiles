@@ -220,6 +220,27 @@ bundle agent cfe_internal_update_policy_cpv
         comment => "Symlink to Python we found (if any)",
         handle => "cfe_internal_update_policy_python_symlink";
 
+      "input_paths_extra" -> { "CFE-4708" }
+        slist => { @(update_def.input_paths_extra) },
+        comment => concat(
+          "Default to whatever augments loaded at process start.",
+          " Correct as-is on the hub (its own masterfiles is",
+          " already on disk before this process starts) and on",
+          " a client with no pending change. Overridden below for",
+          " a client that just re-copied a newer def.json this run."
+        );
+
+    def_json_updated::
+      # Reread def.json directly rather than relying on the process-start
+      # augments load, which is stale until the *next* process, now that
+      # we know we just copied a fresher one down this run (CFE-4708).
+      "_def_json" data => readjson("$(sys.inputdir)/def.json");
+
+      "input_paths_extra"
+        slist => getvalues(
+          "_def_json[vars][default:update_def.input_paths_extra]"
+        );
+
   classes:
     "validated_updates_ready"
       expression => "cfengine_internal_disable_cf_promises_validated",
@@ -237,6 +258,14 @@ bundle agent cfe_internal_update_policy_cpv
         expression => "local_files_ok",
         classes => u_if_else("files_ok", "files_ok");
 
+      "have_input_paths_extra"
+        expression => some(".*", "input_paths_extra"),
+        comment => concat(
+          "True if input_paths_extra (CFE-4708) has any entries",
+          " so the per-path copy can be skipped when the feature",
+          " is not in use."
+        );
+
   files:
     !am_policy_hub::
       # policy hub should not alter inputs/ uneccessary
@@ -249,6 +278,17 @@ bundle agent cfe_internal_update_policy_cpv
         ),
         action => u_immediate,
         classes => u_if_repaired("validated_updates_ready");
+
+      # policy hub should not alter inputs/ uneccessary
+      "$(inputs_dir)/def.json"
+        comment => "Check whether a validation stamp is available for a new policy update to reduce the distributed load",
+        handle => "cfe_internal_update_policy_def_json",
+        copy_from => u_rcp(
+          "$(master_location)/def.json", @(update_def.policy_servers)
+        ),
+        action => u_immediate,
+        classes => u_if_repaired("def_json_updated"),
+        if => "validated_updates_ready";
 
     am_policy_hub|validated_updates_ready::
       # policy hub should always put masterfiles in inputs in order to check new policy
@@ -271,6 +311,20 @@ bundle agent cfe_internal_update_policy_cpv
           "$(modules_dir_source)", @(update_def.policy_servers)
         ),
         depth_search => u_recurse("inf"),
+        action => u_immediate;
+
+      "$(inputs_dir)/$(input_paths_extra)"
+        comment => concat(
+          "Copy an explicitly listed extra file (input_paths_extra)",
+          " from the master source when a new policy validation is",
+          " acquired, for files not covered by input_name_patterns."
+        ),
+        handle => "cfe_internal_update_policy_files_input_paths_extra",
+        if => "have_input_paths_extra",
+        copy_from => u_remote_dcp_missing_ok(
+          "$(master_location)/$(input_paths_extra)",
+          @(update_def.policy_servers)
+        ),
         action => u_immediate;
 
     update_inputs_not_kept::
