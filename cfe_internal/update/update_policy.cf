@@ -379,6 +379,15 @@ bundle agent cfe_internal_update_cmdb
   classes:
     "have_cf_reactor" expression => fileexists("$(sys.bindir)/cf-reactor");
 
+  files:
+    policy_server.enterprise_edition::
+      "$(sys.workdir)/cmdb_files/."
+        create => "true",
+        perms => u_mo("0750", "$(update_def.cf_apache_user)"),
+        comment => "Mission Portal (running as update_def.cf_apache_user: $(update_def.cf_apache_user)) stores files referenced
+                    by group module input here, for cf-reactor to place them into
+                    each member host's cmdb directory.";
+
   methods:
     policy_server.enterprise_edition.(!have_cf_reactor|cmdb_data_files_updates_done_in_policy)::
       "cfe_internal_update_cmdb_data_distribution";
