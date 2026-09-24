@@ -100,7 +100,7 @@ Example Augments:
 
 - Introduced in 3.27.0.
 
-**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure the evaluation order of cf-agent for main policy](#Configure the evaluation order of cf-agent for main policy), [`evaluation_order` in `body agent control`][cf-agent#evaluation_order], [Policy style guide on promise ordering][Policy style guide#Promise ordering]
+**See also:** [Policy evaluation ordering](/reference/language-concepts/policy-evaluation/), [Configure the evaluation order of cf-agent for main policy](#configure-the-evaluation-order-of-cf-agent-for-main-policy), [`evaluation_order` in `body agent control`][cf-agent#evaluation_order], [Policy style guide on promise ordering][Policy style guide#Promise ordering]
 
 ### Configure upstream masterfiles location for policy update
 
@@ -730,7 +730,7 @@ Example Augments:
 
 - Introduced in 3.27.0.
 
-**See also:** [Policy evaluation ordering](reference/language-concepts/policy-evaluation/), [Configure cf-agent promise evaluation order for update policy](#Configure the evaluation order for cf-agent evaluated promises for update policy), [Policy style guide on promise ordering][Policy style guide#Promise ordering]
+**See also:** [Policy evaluation ordering](/reference/language-concepts/policy-evaluation/), [Configure cf-agent promise evaluation order for update policy](#configure-the-evaluation-order-for-cf-agent-evaluated-promises-for-update-policy), [Policy style guide on promise ordering][Policy style guide#Promise ordering]
 
 ### Automatically migrate ignore_interfaces.rx to workdir
 
