@@ -1,130 +1,84 @@
 ## 3.24.5
-- Added 2FA support and configurable admin username for distributed cleanup setup
-  (ENT-12129)
-- Changed distributed_cleanup.py to issue a real DELETE FROM __hosts instead of soft deletion via INSERT with a deleted timestamp
-  (ENT-12129)
-- Check 'systemctl cat' instead of 'is-active' for cf-apache
-  (ENT-11189)
-- Don't advertise federation host with empty SSH fingerprint
-- Raised cf-apache.service start timeout to avoid PID-file race
-  (ENT-11189)
-- Reset cf-apache failed state before restarting it (ENT-11189)
-- psql commands are now retried on transient errors in federated reporting
-  (ENT-14140)
+
+- Added 2FA support and configurable admin username for distributed cleanup setup (ENT-12129)
+- Changed `distributed_cleanup.py` to issue a real `DELETE FROM __hosts` instead of soft deletion via `INSERT` with a `deleted` timestamp (ENT-12129)
+- Fixed issues during hub upgrade by checking `systemctl cat` instead of `is-active` for `cf-apache` (ENT-11189)
+- Stopped advertising federation host with empty SSH fingerprint
+- Raised `cf-apache.service` start timeout to avoid PID-file race (ENT-11189)
+- `cf-apache` failed state is now reset before restarting it (ENT-11189)
+- `psql` commands are now retried on transient errors in federated reporting (ENT-14140)
 
 ## 3.24.4:
 
-- Added dnf package module (ENT-11784)
-- Added workaround for set_variable_values_ini with missing sections
-  (CFE-3866)
-- Fixed bad regex in packages promise method for pip (ENT-13667)
-- Fixed incorrect previous fix for timeout for php processing to allow for longer running API requests (3.24)
-  (ENT-13291, ENT-13625)
-- Inhibit management of share config.php file when mpf_disable_mission_portal_docroot_sync_from_share_gui is defined
-  (ENT-12658)
-- Made system_log_level configurable via Augments (CFE-4452)
-- Fixed maximum recursion errors in modules_presence for CFEngine versions
-  unaffected by CFE-4623 (CFE-2852)
-- Added dnf_group package module for managing DNF package groups (CFE-2852)
-- standard_services bundle no longer invokes `systemctl` with `--global`
-  with is mutually exclusive from `--system` (CFE-4639)
+- Added `dnf` package module (ENT-11784)
+- Added workaround for `set_variable_values_ini` with missing sections (CFE-3866)
+- Fixed bad regex in `packages` promise method for `pip` (ENT-13667)
+- Fixed incorrect previous fix for timeout for php processing to allow for longer running API requests (ENT-13291, ENT-13625)
+- Inhibit management of share `config.php` file when `mpf_disable_mission_portal_docroot_sync_from_share_gui` is defined (ENT-12658)
+- Made system_log_level configurable via `def.json` (augments) (CFE-4452)
+- Fixed maximum recursion errors in `modules_presence` for CFEngine versions unaffected by CFE-4623 (CFE-2852)
+- Added `dnf_group` package module for managing DNF package groups (CFE-2852)
+- standard_services bundle no longer invokes `systemctl` with `--global` with is mutually exclusive from `--system` (CFE-4639)
 
 ## 3.24.3
 
-- Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
-- Added dmidecode to well known paths for Red Hat (ENT-12988)
-- Added recommendation about nfs server and consistent use of root dot
-  (ENT-13223)
-- Changed NFS Server inventory to report only unique servers
-  (ENT-13223)
-- Fixed duplicate bundlesequence_end when bundlesequence_classification not defined
-  (CFE-4588)
-- Fixed path to lsof on Red Hat 7 and greater (ENT-12987)
-- Increased timeout for php processing to allow for longer running API requests
-  (ENT-13291)
-- Made protocol_version configurable via Augments (CFE-4543)
-- Prevented nfs server inventory from doing unnecessary extra work
-  (ENT-13210)
-- Removed duplicate well known paths for ls and lsof on opensuse
-  (ENT-12990)
-- Switched to using current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
-  (CFE-3429)
+- Fixed `cfruncommand` for Windows causing "Too many arguments" error (ENT-13530)
+- Added `dmidecode` to well known paths for Red Hat (ENT-12988)
+- Added recommendation about NFS servers and consistent use of root dot (ENT-13223)
+- Changed NFS Server inventory to report only unique servers (ENT-13223)
+- Fixed duplicate `bundlesequence_end` when `bundlesequence_classification` not defined (CFE-4588)
+- Fixed path to `lsof` on Red Hat 7 and greater (ENT-12987)
+- Increased timeout for php processing to allow for longer running API requests (ENT-13291)
+- Made `protocol_version` configurable via Augments (CFE-4543)
+- Prevented NFS server inventory from doing unnecessary extra work (ENT-13210)
+- Removed duplicate well known paths for `ls` and `lsof` on opensuse (ENT-12990)
+- Switched to using current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks (CFE-3429)
 
 ## 3.24.2
 
-- Added paths for the dmsetup, fdisk, and lshw commands (ENT-12560)
-- Fixed issue loading images from raw.github.com in Mission Portal Build application(ENT-12531)
-- Fixed issue with yum package module regarding packages with epoch not
-  validating (ENT-12538)
-- Fixed location of Mission Portal application logs for log_dir cleanup
-  (ENT-12556)
+- Added paths for the `dmsetup`, `fdisk`, and `lshw` commands (ENT-12560)
+- Fixed issue loading images from `raw.github.com` in Mission Portal Build application (ENT-12531)
+- Fixed issue with yum package module regarding packages with epoch not validating (ENT-12538)
+- Fixed location of Mission Portal application logs for `log_dir` cleanup (ENT-12556)
 
 ## 3.24.1
 
-- Added inline docs showing valid values for method (field_operation) in body edit_field quoted_var
-  (CFE-4426)
-- Added support for AIX System Resource Controller services promises
-  (CFE-4447)
-- Added trailing /. to files promises targeting local_software_dir
-  (ENT-12116)
-- Adjusted CSP in httpd.conf to suit ACE javascript editor (ENT-12010)
-- Data dumping on Federated Reporting feeders no longer
-  uses an AWK filter to merge INSERT lines in the dumps
-- Fixed failed to open /dev/tty errors when using systemd unit management
-  (CFE-4445)
+- Added inline docs showing valid values for method `field_operation` in `body edit_field quoted_var` (CFE-4426)
+- Added support for AIX System Resource Controller services promises (CFE-4447)
+- Added trailing `/.` to files promises targeting local_software_dir (ENT-12116)
+- Adjusted CSP in `httpd.conf` to suit ACE JavaScript editor (ENT-12010)
+- Data dumping on Federated Reporting feeders no longer uses an AWK filter to merge `INSERT` lines in the dumps
+- Fixed failed to open `/dev/tty` errors when using systemd unit management (CFE-4445)
 
 ## 3.24.0
 
 - AIX watchdog now handles stale pids (CFE-4335)
-- Added ability to configure Mission Portal Apache SSLCACertificateFile via Augments
-  (ENT-11421)
-- Added ability to configure SSLCipherSuite via Augments (ENT-11393)
-- Added ability to influence default package manager and inventory via Augments
-  (CFE-3612)
-- Added freebsd package_module and package_inventory since we have pkg packages module available
-  (CFE-4345)
-- Added no_backup_cp_compare copy_from body to stdlib
-  Like the existing no_backup_cp this copy_from body is used to copy files locally
-  without making backups but with the additional ability to specify the comparison
-  used. (ENT-10962)
-- Added recommendation for installing gnu parallel on federated reporting superhubs
-  (ENT-8785)
-- Added set_escaped_user_field complementing set_user_field (CFE-4377)
-- Added setup-feeder option to distributed cleanup script (ENT-11844)
-- Aligned ownership and permission expectations between Mission Portal and MPF
-  (ENT-11941)
-- Changed mission-portal apache restart to graceful to minimize service interruptions
-  (ENT-11526)
-- Federated reporting policy now properly fixes SELinux context of the
-  ~cftransport/.ssh directory and its contents in a single agent
-  run. (ENT-11136)
-- Fixed comparison that caused `control_executor_mailfilter_*_configured` to never be set
-  (CFE-4374)
-- Fixed distributed_cleanup policy for feeders and rhel-8 superhubs
-  (ENT-10960)
-- Fixed restoration of Mission Portal application to packaged content when modified
-  (ENT-10962)
-- Freebsd service management now uses one prefixed service commands
-  (CFE-4323)
-- Improved federation policy handling of cftransport selinux configuration
-  (ENT-10959)
-- Improved instructions and added report to instruct users how to disable recommendations
-  (ENT-11523)
-- Inventory view is now refreshed in cf-reactor instead of through policy
-  (ENT-11763)
-- Made enterprise federated reporting dump interval configurable via Augments
-  (ENT-10900)
-- Policy now manages Mission Portals httpd.conf ownership and permissions
-  (ENT-11096)
-- Refactored AWS IMDS retrieval to support both IMDSv1 and IMDSv2
-  (ENT-10988)
-- Refactored extraction of home directory from parsing getent output to getuserinfo()
-  (CFE-4375)
-- Removed hour delay between CFEngine Enterprise PostgreSQL recommendation checks
-  (ENT-11480)
+- Added ability to configure Mission Portal Apache `SSLCACertificateFile` via `def.json` (augments) (ENT-11421)
+- Added ability to configure `SSLCipherSuite` via `def.json` (augments) (ENT-11393)
+- Added ability to influence default package manager and inventory via `def.json` (augments) (CFE-3612)
+- Added `freebsd` `package_module` and `package_inventory` since we have `pkg` packages module available (CFE-4345)
+- Added `no_backup_cp_compare` `copy_from` body to the standard library.
+  Like the existing `no_backup_cp` this `copy_from` body is used to copy files locally without making backups but with the additional ability to specify the comparison used. (ENT-10962)
+- Added recommendation for installing gnu parallel on federated reporting superhubs (ENT-8785)
+- Added `set_escaped_user_field` complementing `set_user_field` (CFE-4377)
+- Added `setup-feeder` option to distributed cleanup script (ENT-11844)
+- Aligned ownership and permission expectations between Mission Portal and MPF (ENT-11941)
+- Changed Mission Portal Apache restart to `graceful` to minimize service interruptions (ENT-11526)
+- Federated reporting policy now properly fixes SELinux context of the `~cftransport/.ssh` directory and its contents in a single agent run. (ENT-11136)
+- Fixed comparison that caused `control_executor_mailfilter_*_configured` to never be set (CFE-4374)
+- Fixed `distributed_cleanup` policy for feeders and RHEL 8 superhubs (ENT-10960)
+- Fixed restoration of Mission Portal application to packaged content when modified (ENT-10962)
+- Freebsd service management now uses one prefixed service commands (CFE-4323)
+- Improved federation policy handling of `cftransport` SELinux configuration (ENT-10959)
+- Improved instructions and added report to instruct users how to disable recommendations (ENT-11523)
+- Inventory view is now refreshed in `cf-reactor` instead of through policy (ENT-11763)
+- Made enterprise federated reporting dump interval configurable via `def.json` (augments) (ENT-10900)
+- Policy now manages Mission Portals `httpd.conf` ownership and permissions (ENT-11096)
+- Refactored AWS IMDS retrieval to support both IMDSv1 and IMDSv2 (ENT-10988)
+- Refactored extraction of home directory from parsing `getent` output to `getuserinfo()` (CFE-4375)
+- Removed hour delay between CFEngine Enterprise PostgreSQL recommendation checks (ENT-11480)
 - Squashed common error logged by Apache related to IPv6 (ENT-10646)
-- When failing to detect platform, inventory attribute "OS" now
-  defaults to PRETTY_NAME from os-release as a fallback (CFE-4342)
+- When failing to detect platform, inventory attribute "OS" now defaults to `PRETTY_NAME` from `os-release` as a fallback (CFE-4342)
 
 ## 3.23.0
 
