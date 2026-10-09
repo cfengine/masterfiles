@@ -1,3 +1,14 @@
+## 3.27.2
+- Check 'systemctl cat' instead of 'is-active' for cf-apache
+  (ENT-11189)
+- Don't advertise federation host with empty SSH fingerprint
+- Masterfiles builds are now reproducible (ENT-14061)
+- Raised cf-apache.service start timeout to avoid PID-file race
+  (ENT-11189)
+- Reset cf-apache failed state before restarting it (ENT-11189)
+- psql commands are now retried on transient errors in federated reporting
+  (ENT-14140)
+
 ## 3.27.1
 
 - Added 2FA support and configurable admin username for distributed cleanup setup
