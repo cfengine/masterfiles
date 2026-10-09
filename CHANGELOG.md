@@ -1,71 +1,48 @@
 ## 3.27.2
-- Check 'systemctl cat' instead of 'is-active' for cf-apache
-  (ENT-11189)
-- Don't advertise federation host with empty SSH fingerprint
+
+- Fixed issues during hub upgrade by checking `systemctl cat` instead of `is-active` for `cf-apache` (ENT-11189)
+- Stopped advertising federation host with empty SSH fingerprint
 - Masterfiles builds are now reproducible (ENT-14061)
-- Raised cf-apache.service start timeout to avoid PID-file race
-  (ENT-11189)
-- Reset cf-apache failed state before restarting it (ENT-11189)
-- psql commands are now retried on transient errors in federated reporting
-  (ENT-14140)
+- Raised `cf-apache.service` start timeout to avoid PID-file race (ENT-11189)
+- `cf-apache` failed state is now reset before restarting it (ENT-11189)
+- `psql` commands are now retried on transient errors in federated reporting (ENT-14140)
 
 ## 3.27.1
 
-- Added 2FA support and configurable admin username for distributed cleanup setup
-  (ENT-12129)
-- Added dnf package module (ENT-11784)
-- Added workaround for set_variable_values_ini with missing sections
-  (CFE-3866)
-- Changed distributed_cleanup.py to issue a real DELETE FROM `__hosts` instead of soft deletion via INSERT with a deleted timestamp
-  (ENT-12129)
-- Fixed bad regex in packages promise method for pip (ENT-13667)
-- Fixed maximum recursion errors in modules_presence for CFEngine versions
-  unaffected by CFE-4623 (CFE-2852)
-- Added dnf_group package module for managing DNF package groups (CFE-2852)
-- standard_services bundle no longer invokes `systemctl` with `--global`
-  with is mutually exclusive from `--system` (CFE-4639)
+- Added 2FA support and configurable admin username for distributed cleanup setup (ENT-12129)
+- Added `dnf` package module (ENT-11784)
+- Added workaround for `set_variable_values_ini` with missing sections (CFE-3866)
+- Changed `distributed_cleanup.py` to issue a real `DELETE FROM __hosts` instead of soft deletion via `INSERT` with a `deleted` timestamp (ENT-12129)
+- Fixed bad regex in `packages` promise method for `pip` (ENT-13667)
+- Fixed maximum recursion errors in `modules_presence` for CFEngine versions unaffected by CFE-4623 (CFE-2852)
+- Added `dnf_group` package module for managing DNF package groups (CFE-2852)
+- `standard_services` bundle no longer invokes `systemctl` with `--global` which is mutually exclusive from `--system` (CFE-4639)
 
 ## 3.27.0
 
-- Fixed cfruncommand for Windows causing "Too many arguments" error (ENT-13530)
-- Added $(paths.dmidecode) for Red Hat (ENT-12988)
-- Added fsattrs bodies to manage the immutable bit (CFE-4582)
-- Added recommendation about nfs server and consistent use of root dot
-  (ENT-13223)
-- Adjust nova API rest URL for custom https port (ENT-12653)
-- Adjusted mission portal httpd.conf validation to show errors when they occur
-  (ENT-12653)
-- Changed NFS Server inventory to report only unique servers
-  (ENT-13223)
-- Disabled policy version in masterfiles because it is now managed and inventoried by
-  default by the core agent inside sys.policy_version (ENT-4043)
-- Disabled sync of Mission Portal config from share/GUI unless explicitly enabled
-  (ENT-13175, ENT-13172, ENT-13173)
-- Fixed duplicate bundlesequence_end when bundlesequence_classification not defined
-  (CFE-4588)
-- Fixed path to lsof on Red Hat 7 and greater (ENT-12987)
-- Fixed issue with the "Run Agent" functionality by increasing timeout for php processing
-  (ENT-13291)
-- Made protocol_version configurable via Augments (CFE-4543)
-- Prevented nfs server inventory from doing unnecessary extra work
-  (ENT-13210)
-- Redirection from HTTP to HTTPS responsibility moved from Apache to PHP
-  (ENT-11481)
-- Removed duplicate $(paths.ls) and $(paths.lsof) for opensuse
-  (ENT-12990)
-- Stopped enforcing permission management of $(sys.workdir)/share/GUI
-  (ENT-13171)
+- Fixed `cfruncommand` for Windows causing "Too many arguments" error (ENT-13530)
+- Added `$(paths.dmidecode)` for Red Hat (ENT-12988)
+- Added `fsattrs` bodies to manage the immutable bit (CFE-4582)
+- Added recommendation about NFS servers and consistent use of root dot (ENT-13223)
+- Adjusted nova API rest URL for custom HTTPS port (ENT-12653)
+- Adjusted Mission Portal `httpd.conf` validation to show errors when they occur (ENT-12653)
+- Changed NFS server inventory to report only unique servers (ENT-13223)
+- Disabled policy version in masterfiles because it is now managed and reported by default in the core agent through `sys.policy_version` (ENT-4043)
+- Disabled sync of Mission Portal config from `share/GUI` unless explicitly enabled (ENT-13175, ENT-13172, ENT-13173)
+- Fixed duplicate `bundlesequence_end` when `bundlesequence_classification` not defined (CFE-4588)
+- Fixed path to `lsof` on Red Hat 7 and greater (ENT-12987)
+- Fixed issue with the "Run agent" functionality by increasing timeout for php processing (ENT-13291)
+- Made `protocol_version` configurable via `def.json` (augments) (CFE-4543)
+- Prevented NFS server inventory from doing unnecessary extra work (ENT-13210)
+- Redirection from HTTP to HTTPS responsibility moved from Apache to PHP (ENT-11481)
+- Removed duplicate `$(paths.ls)` and `$(paths.lsof)` for opensuse (ENT-12990)
+- Stopped enforcing permission management of `$(sys.workdir)/share/GUI` (ENT-13171)
 - Stopped enforcing permissions of public docroot scripts (ENT-13243)
-- Added needed custom port to API in the API itself (LDAP related)
-  (ENT-13612)
-- Made default_directory_create_mode configurable via Augments
-  (CFE-4590)
-- Made evaluation_order in body agent control configurable via Augments
-  (ENT-13495)
-- Stopped automatic mirroring of WORKDIR/share/GUI to Mission Portal docroot
-  (ENT-13172)
-- Stopped mirroring .htaccess from share/GUI to Mission Portal docroot
-  (ENT-13173)
+- Added needed custom port to API in the API itself (LDAP related) (ENT-13612)
+- Made `default_directory_create_mode` configurable via `def.json` (augments) (CFE-4590)
+- Made evaluation_order in body agent control configurable via `def.json` (augments) (ENT-13495)
+- Stopped automatic mirroring of `WORKDIR/share/GUI` to Mission Portal docroot (ENT-13172)
+- Stopped mirroring `.htaccess` from `share/GUI` to Mission Portal docroot (ENT-13173)
 
 ## 3.26.0
 
