@@ -1,3 +1,17 @@
+## 3.24.5
+- Added 2FA support and configurable admin username for distributed cleanup setup
+  (ENT-12129)
+- Changed distributed_cleanup.py to issue a real DELETE FROM __hosts instead of soft deletion via INSERT with a deleted timestamp
+  (ENT-12129)
+- Check 'systemctl cat' instead of 'is-active' for cf-apache
+  (ENT-11189)
+- Don't advertise federation host with empty SSH fingerprint
+- Raised cf-apache.service start timeout to avoid PID-file race
+  (ENT-11189)
+- Reset cf-apache failed state before restarting it (ENT-11189)
+- psql commands are now retried on transient errors in federated reporting
+  (ENT-14140)
+
 ## 3.24.4:
 
 - Added dnf package module (ENT-11784)
