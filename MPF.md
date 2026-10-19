@@ -623,7 +623,7 @@ When enabled, the policy will make sure that all units are enabled, unless they 
 
 **Description:** Disable a CFEngine Enterprise daemon component persistently.
 
-`DAEMON` can be one of `cf_execd`, `cf_monitord` or `cf_serverd`.
+`DAEMON` can be one of `cf_execd`, `cf_monitord`, `cf_reactor` or `cf_serverd`.
 
 This will stop the AGENT from starting automatically.
 
@@ -645,7 +645,7 @@ This [augments file][Augments] will ensure that `cf-monitord` is disabled on hos
 **Description:** Re-enable a previously disabled CFEngine Enterprise daemon
 component.
 
-`DAEMON` can be one of `cf_execd`, `cf_monitord` or `cf_serverd`.
+`DAEMON` can be one of `cf_execd`, `cf_monitord`, `cf_reactor` or `cf_serverd`.
 
 This [augments file][Augments] will ensure that `cf-monitord` is not disabled on `redhat`
 hosts.
