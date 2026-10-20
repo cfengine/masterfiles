@@ -559,8 +559,16 @@ bundle agent clean_when_off
         useshell
       );
 @endif
+  processes:
+    ".*"
+      process_select => by_owner("$(user)"),
+      signals => { "kill" },
+      handle => "transport_user_procs_killed";
+
   users:
-    "$(user)" policy => "absent";
+    "$(user)"
+      policy => "absent",
+      depends_on => { "transport_user_procs_killed" };
 
   files:
     "$(cfengine_enterprise_federation:config.path_setup_status)" -> {
