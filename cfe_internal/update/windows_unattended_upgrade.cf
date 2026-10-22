@@ -64,6 +64,7 @@ exit /B
 REM kill all cf procs first so that installed can run
 Taskkill /IM cf-execd.exe /F
 Taskkill /IM cf-monitord.exe /F
+Taskkill /IM cf-reactor.exe /F
 Taskkill /IM cf-serverd.exe /F
 Taskkill /IM cf-agent.exe /F
 set bat="$(sys.workdir)$(const.dirsep)modules$(const.dirsep)packages$(const.dirsep)msiexec.bat"

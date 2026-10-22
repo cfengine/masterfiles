@@ -28,8 +28,8 @@ bundle agent cfe_internal_update_processes
 # state should be.
 #
 # By default all the relevant services will run on each host. For example all
-# hosts will run cf-execd, cf-serverd, and cf-monitord. Individual services can
-# be disabled:
+# hosts will run cf-execd, cf-serverd, cf-monitord, and cf-reactor (when
+# installed). Individual services can be disabled:
 #
 # * If persistent_disable_COMPONENT ( persistent_disable_cf_serverd,
 #   persistent_disable_cf_monitord) is defined the service will be disabled.
@@ -65,14 +65,16 @@ bundle agent cfe_internal_update_processes
       "agent[cf_serverd]" string => "cf-serverd";
       "agent[cf_monitord]" string => "cf-monitord";
 
+      "agent[cf_reactor]"
+        string => "cf-reactor",
+        if => fileexists("$(sys.bindir)/cf-reactor"),
+        comment => "cf-reactor is installed on all hosts since 3.29.0, older
+                    clients may not have it";
+
     policy_server.enterprise_edition::
       "agent[cf_hub]"
         string => "cf-hub",
         comment => "cf-hub is only relevant on Enterprise hubs";
-
-      "agent[cf_reactor]"
-        string => "cf-reactor",
-        comment => "cf-reactor is only provided on Enterprise hubs";
 
     systemd::
       # On systemd hosts the cfengine3 service acts as an umbrella for other
@@ -269,7 +271,7 @@ bundle agent maintain_cfe_hub_process
 ###############################################################################
 bundle agent disable_cfengine_agents(process)
 # @brief Ensure cfengine component is not running
-# @param process The name of the cfengine component binary to ensure not running. [cf-agent, cf-serverd, cf-monitord, cf-hub]
+# @param process The name of the cfengine component binary to ensure not running. [cf-agent, cf-serverd, cf-monitord, cf-hub, cf-reactor]
 {
   vars:
     !windows::
@@ -297,7 +299,7 @@ bundle agent disable_cfengine_agents(process)
 ###############################################################################
 bundle agent enable_cfengine_agents(process)
 # @brief Ensure cfengine component is running
-# @param process The name of the cfengine component binary to ensure running. [cf-agent, cf-serverd, cf-monitord, cf-hub]
+# @param process The name of the cfengine component binary to ensure running. [cf-agent, cf-serverd, cf-monitord, cf-hub, cf-reactor]
 {
   vars:
     !windows::
