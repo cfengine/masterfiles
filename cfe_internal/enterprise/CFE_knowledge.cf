@@ -405,6 +405,10 @@ bundle agent cfe_internal_permissions
     # nonstandard directories in statedir
     "_statedir_standard_perm_exceptions" slist => { "pg", "cf-execd.sockets" };
 
+    # The hub package upgrade copies the old binaries here; they must stay
+    # executable for the database migration (ENT-12809)
+    "_pg_dir_perm_exceptions" slist => { "backup" };
+
     # Derive the users that should be able to access cf-execd sockets
     "_cf_execd_socket_allow_users"
       slist => { @(def.control_executor_runagent_socket_allow_users) };
@@ -471,13 +475,17 @@ bundle agent cfe_internal_permissions
 
       "$(sys.statedir)/pg/." -> { "CFE-951" }
         perms => mog("0600", "cfpostgres", "cfpostgres"),
-        depth_search => recurse_with_base(inf),
+        depth_search => recurse_with_base_except(
+          inf, @(_pg_dir_perm_exceptions)
+        ),
         file_select => not_dir,
         comment => "No one except for the database user needs to access where the db is installed.";
 
       "$(sys.statedir)/pg/." -> { "CFE-951" }
         perms => mog("0700", "cfpostgres", "cfpostgres"),
-        depth_search => recurse_with_base(inf),
+        depth_search => recurse_with_base_except(
+          inf, @(_pg_dir_perm_exceptions)
+        ),
         file_select => dirs,
         comment => "No one except for the database user needs to access where the db is installed.";
 
@@ -583,6 +591,18 @@ body acl cf_execd_socket_runagent_acl(aces)
 }
 
 #############################################################################
+body depth_search recurse_with_base_except(d, exceptions)
+# @brief Recurse `d` levels (including basedir, excluding directories on other
+# devices) excluding `exceptions`
+# @param `d` Levels to descend in recursion
+# @param `exceptions` List of directories to exclude from depth search
+{
+  depth => "$(d)";
+  xdev => "true";
+  include_basedir => "true";
+  exclude_dirs => { @(exceptions) };
+}
+
 body depth_search recurse_except(d, exceptions)
 # @breif Recurse (across device boundaires) `d` levels (excluding basedir) excluding `exceptions`
 # @param `d` Levels to decend in recursion
