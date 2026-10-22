@@ -1,3 +1,9 @@
+## 3.27.3
+
+- CFEngine 3.27.3 was released to address security vulnerabilities in PHP and does not have any other changes.
+  For more information, see:
+  https://cfengine.com/blog/2026/php-cves-cve-2026-109618-and-cve-2026-109619/
+
 ## 3.27.2
 
 - Fixed issues during hub upgrade by checking `systemctl cat` instead of `is-active` for `cf-apache` (ENT-11189)
