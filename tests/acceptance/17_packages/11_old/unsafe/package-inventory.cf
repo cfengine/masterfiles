@@ -75,10 +75,17 @@ bundle agent check
   vars:
     "inst" string => "$(sys.workdir)/state/software_packages.csv";
     "inst_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
-    "inst_matches" int => countlinesmatching("$(inst_expr)", "$(inst)");
+
+    "inst_matches"
+      int => countlinesmatching("$(inst_expr)", "$(inst)"),
+      if => fileexists("$(inst)");
+
     "upd" string => "$(sys.workdir)/state/software_patches_avail.csv";
     "upd_expr" string => "^($(p.name[1])|$(p.name[2])|$(p.name[3])),.*";
-    "upd_matches" int => countlinesmatching("$(upd_expr)", "$(upd)");
+
+    "upd_matches"
+      int => countlinesmatching("$(upd_expr)", "$(upd)"),
+      if => fileexists("$(upd)");
 
   classes:
     # Should match all packages except the second one.

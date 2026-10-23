@@ -78,7 +78,8 @@ bundle agent clear_packages(key)
 
   commands:
     redhat|suse|sles::
-      "$(paths.path[rpm]) -e --allmatches $(p.name[$(p.packages)]) $(output_sink)"
+      # Only remove installed packages, rpm -e fails on missing ones
+      "! $(paths.path[rpm]) -q $(p.name[$(p.packages)]) > $(G.dev_null) 2>&1 || $(paths.path[rpm]) -e --allmatches $(p.name[$(p.packages)]) $(output_sink)"
         contain => in_shell,
         comment => $(key);
     debian|sles::
