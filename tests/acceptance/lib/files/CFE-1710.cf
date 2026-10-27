@@ -25,13 +25,6 @@ bundle agent test
     "description" -> { "CFE-1710" }
       string => "Test that the last section can be managed";
 
-    # The test fails to insert proper lines into LAST section (even though
-    # select_end_match_eof="true" is defined for versions greater than 3.10.0)
-    # Additionally the test fails to insert key values in to the newly inserted section at the top of the file.
-    "test_soft_fail"
-      string => "any",
-      meta => { "CFE-1710" };
-
   # At test start:
   #
   # section exists with correct keys and bad values
