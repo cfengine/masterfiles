@@ -83,7 +83,9 @@ bundle agent check
     "expected"
       string => '{"example_body": {"alice": "1", "bob": "3", "charlie": "4"}}';
 
-    "found" string => readfile("$(G.testfile)");
+    "found"
+      string => readfile("$(G.testfile)"),
+      if => fileexists("$(G.testfile)");
 
   classes:
     "ok" expression => strcmp("$(expected)", "$(found)");
