@@ -146,7 +146,8 @@ def list_installed():
         # 'Status=install ok <state>' or 'Status=hold ok <state>'
         if line.startswith("Status=install") or line.startswith("Status=hold"):
             state = line.split()[2]
-            if state in [ "installed", "half-configured", "half-installed" ]:
+            if state in [ "installed", "half-configured", "half-installed",
+                          "unpacked", "triggers-awaited", "triggers-pending" ]:
                 installed_package = True
             else:
                 installed_package = False
