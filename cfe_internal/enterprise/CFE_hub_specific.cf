@@ -724,10 +724,16 @@ bundle agent cfe_internal_refresh_inventory_view
 
 bundle agent cfe_internal_refresh_hosts_view
 # @brief Refresh hosts materialized view every 5 minutes
+# @note The materialized_hosts_view_refresh CLI task was removed from Mission
+# Portal in 3.20.0 and backported to 3.18.2, so this bundle does nothing on
+# 3.18.2+ (3.18 series) and 3.20.0+.
 {
+  # The bundle is kept only so that policy calling it directly keeps working.
   meta:
     (policy_server|am_policy_hub).enterprise_edition::
-      "tags" slist => { "enterprise_maintenance" };
+      "tags"
+        slist => { "enterprise_maintenance" },
+        if => or(cf_version_before("3.18.2"), cf_version_at("3.19"));
 
   commands:
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
@@ -779,11 +785,16 @@ bundle agent cfe_internal_clear_last_seen_hosts_logs
 }
 
 bundle agent cfe_internal_refresh_events_table
-# @brief Refresh materialized view every 5 minutes
+# @brief Process API events every 5 minutes
+# @note Beginning with 3.29.0 the process_api_events CLI task is run by cf-reactor.
 {
+  # The process_api_events CLI task is moved to cf-reactor.
+  # Remove this bundle once CFEngine 3.28 is end-of-life.
   meta:
     (policy_server|am_policy_hub).enterprise_edition::
-      "tags" slist => { "enterprise_maintenance" };
+      "tags"
+        slist => { "enterprise_maintenance" },
+        if => cf_version_before("3.29.0");
 
   commands:
     (policy_server|am_policy_hub).enterprise_edition.active_hub::
