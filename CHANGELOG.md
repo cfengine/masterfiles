@@ -1,3 +1,20 @@
+## 3.29.0
+
+- Added `input_paths_extra` to allow specified files to ship
+  independent of what is specified in `input_name_patterns[_extra]`
+  (CFE-4708)
+- Fixed manage_variable_values_ini emptying a section it creates
+  (CFE-3898)
+- Made evaluation_order in body common control configurable via Augments
+  (ENT-13495)
+- Packages in the `unpacked` or `triggers-*` states are now listed as
+  installed by `apt_get` package module. As a result `cf-reactor` no
+  longer fires `package_uninstalled` followed by `package_installed`
+  during a package upgrade. (ENT-14921)
+- Stopped hub permissions policy from making old binaries in the PostgreSQL upgrade backup non-executable
+  (ENT-14899)
+- The source tarball is now reproducible
+
 ## 3.28.0
 
 - Masterfiles builds are now bit-for-bit reproducible (ENT-14061)
