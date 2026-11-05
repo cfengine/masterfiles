@@ -3,9 +3,9 @@
 - Added `input_paths_extra` to allow specified files to ship
   independent of what is specified in `input_name_patterns[_extra]`
   (CFE-4708)
-- Fixed manage_variable_values_ini emptying a section it creates
+- Fixed `manage_variable_values_ini` emptying a section it creates
   (CFE-3898)
-- Made evaluation_order in body common control configurable via Augments
+- Made `evaluation_order` in `body common control` configurable via Augments
   (ENT-13495)
 - Packages in the `unpacked` or `triggers-*` states are now listed as
   installed by `apt_get` package module. As a result `cf-reactor` no
