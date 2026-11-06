@@ -915,13 +915,37 @@ bundle agent setup_status
     "ssh_pub_key"
       string => readfile( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" ),
       if => fileexists( "$(cfengine_enterprise_federation:transport_user.ssh_pub_key)" );
-    "ssh_server_fingerprint"
-      # ssh-keyscan is used because it's more reliable/easy than trying to
-      # parse sshd config to find the file and then readfile():
-      string => execresult("ssh-keyscan localhost 2>/dev/null | sed 's/localhost //g' | sort", useshell);
+
+    # Get the ssh server fingerprints from hostkey entries from active sshd_config via sshd -T
+    "_sshd_config"
+      slist => string_split(
+        execresult("/usr/sbin/sshd -T", "noshell"), "$(const.n)", "inf"
+      );
+
+    "_hostkey_paths"
+      slist => maplist(
+        regex_replace($(this), "^hostkey\s+", "", ""),
+        grep("hostkey\s+.+", _sshd_config)
+      );
+
+    # Keep "<type> <key>" and drop the trailing comment
+    "_host_public_key[$(_hostkey_paths)]"
+      string => regex_replace(
+        readfile("$(_hostkey_paths).pub"), "^(\S+\s+\S+).*", "$1", "s"
+      ),
+      if => fileexists("$(_hostkey_paths).pub");
+
+    "_host_public_keys" slist => sort(getvalues(_host_public_key), "lex");
+
+    # Same format as ssh-keyscan output: "<type> <key>" per line, sorted
+    "ssh_server_fingerprint" string => join("$(const.n)", _host_public_keys);
+
   classes:
     "ssh_server_fingerprint_collected"
-      expression => not(strcmp("$(ssh_server_fingerprint)", ""));
+      expression => and(
+        isvariable("ssh_server_fingerprint"),
+        not(strcmp("$(ssh_server_fingerprint)", ""))
+      );
 
     "superhub_setup_status_complete"
       expression => "any",
@@ -933,11 +957,12 @@ bundle agent setup_status
       };
 
   files:
-    # An empty fingerprint (ssh-keyscan returned nothing, e.g. sshd not yet
-    # reachable on localhost) must not be advertised: a superhub would render
-    # an empty known_hosts entry for this host and its rsync pull would later
-    # fail with "Host key verification failed". Skip the status update until
-    # the fingerprint is collected; the next agent run will retry.
+    # An empty fingerprint (no readable host public keys, e.g. sshd not
+    # installed or host keys not yet generated) must not be advertised: a
+    # superhub would render an empty known_hosts entry for this host and its
+    # rsync pull would later fail with "Host key verification failed". Skip
+    # the status update until the fingerprint is collected; the next agent
+    # run will retry.
     superhub_setup_status_complete.ssh_server_fingerprint_collected::
       "$(cfengine_enterprise_federation:config.path_setup_status)"
         create => "true",
@@ -955,7 +980,7 @@ bundle agent setup_status
 
   reports:
     superhub_setup_status_complete.!ssh_server_fingerprint_collected::
-      "warning: 'ssh-keyscan localhost' returned no SSH host key; federation setup status not written yet. Will retry next run.";
+      "warning: Found no readable SSH host public keys (from 'sshd -T'); federation setup status not written yet. Will retry next run.";
 }
 
 bundle agent distributed_cleanup_setup
