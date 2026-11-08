@@ -62,4 +62,11 @@ body agent control
     # The order in which promises are evaluated (top_down|classic)
     evaluation_order => "$(default:def.control_agent_evaluation_order)";
 @endif
+@if minimum_version(3.30.0)
+  any::
+    # Metatags filter for classes reported to the hub. Keep in sync with
+    # metatags_include / metatags_exclude in controls/reports.cf.
+    report_metatags_include => { "inventory", "report" };
+    report_metatags_exclude => { "noreport" };
+@endif
 }
