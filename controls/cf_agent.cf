@@ -64,8 +64,8 @@ body agent control
 @endif
 @if minimum_version(3.30.0)
   any::
-    # Metatags filter for classes reported to the hub. Keep in sync with
-    # metatags_include / metatags_exclude in controls/reports.cf.
+    # Metatags filter for classes and variables reported to the hub. Keep in
+    # sync with metatags_include / metatags_exclude in controls/reports.cf.
     report_metatags_include => { "inventory", "report" };
     report_metatags_exclude => { "noreport" };
 @endif
