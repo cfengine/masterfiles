@@ -1165,9 +1165,17 @@ bundle agent cfe_autorun_inventory_dmidecode
       # which would be undesirable.
       "dmi[$(dmivars)]"
         unless => isvariable("dmi[$(dmivars)]"), # This is just for system-uuid really, which we get from the awk script above by preference.
+@if minimum_version(3.22.0)
+        # Some files (e.g. product_serial) are only readable by root.
+        # The isreadable() was introduced in CFEngine 3.22.
+        if => isreadable(
+          "/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])", 1
+        ),
+@else
         if => fileexists(
           "/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])"
         ),
+@endif
         string => readfile(
           "/sys/devices/virtual/dmi/id/$(sysfs_name_for[$(dmivars)])", 0
         ),
