@@ -35,8 +35,10 @@ bundle agent init
       # packages where earlier releases did not, so fails many tests.
       # RHEL 8 has broken DNF (upgrading a 32bit package also installs a 64bit
       # package)
+      # Limited to x86_64: other architectures are skipped (see meta_skip.cf.sub)
+      # and a skipped test must not also be marked as soft fail.
 
-      "test_soft_fail" string => "rhel_8|rhel_9",
+      "test_soft_fail" string => "(rhel_8|rhel_9).x86_64",
         meta  => {"CFE-rhbz", "CFE-4096", "ENT-13499" };
 
   # For setting up the cfengine-selected-python symlink we want to
