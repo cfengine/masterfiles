@@ -68,5 +68,9 @@ body agent control
     # sync with metatags_include / metatags_exclude in controls/reports.cf.
     report_metatags_include => { "inventory", "report" };
     report_metatags_exclude => { "noreport" };
+
+    # Promise handle filter for promise executions reported to the hub. Keep
+    # in sync with promise_handle_exclude in controls/reports.cf.
+    report_promise_handle_exclude => { "noreport_.*" };
 @endif
 }
