@@ -347,9 +347,71 @@ bundle agent semanage_installed
   reports:
     default:DEBUG|DEBUG_semanage_installed::
       "paths.semanage = $(default:paths.semanage)";
+}
 
-    !default:_stdlib_path_exists_semanage.!default:cfengine_mp_fr_dependencies_auto_install::
-      "semanage command is not available at $(default:paths.semanage). Will only install needed package if cfengine_mp_fr_dependencies_auto_install class is defined in augments(def.json) or with --define cf-agent option.";
+bundle agent dependencies
+# @brief Ensure software required by Federated Reporting is available before
+# any other Federated Reporting operation is performed
+#
+# Non-shipped dependencies are installed if the
+# `cfengine_mp_fr_dependencies_auto_install` class is defined. Otherwise, only
+# their presence is checked.
+#
+# All other Federated Reporting operations are guarded by the namespace scoped
+# `dependencies_satisfied` class defined by `dependencies_check`. If any of the
+# requirements is not met, nothing is changed. Otherwise, a hub could end up
+# partially configured, e.g. with the database schema migrated to the superhub
+# schema while setup can not be completed.
+{
+  methods:
+    selinux_enabled::
+      "semanage_installed"
+        usebundle => semanage_installed,
+        comment => "semanage is needed to manage the SELinux file context of the transport user's .ssh directory";
+
+    any::
+      "dependencies_check"
+        usebundle => dependencies_check,
+        comment => "Check after semanage_installed so that a package installed during this run is taken into account";
+}
+
+bundle agent dependencies_check
+# @brief Define the namespace scoped `dependencies_satisfied` class if all
+# software required by Federated Reporting is present, report what is missing
+# otherwise
+{
+  vars:
+    "semanage_package"
+      string => ifelse(
+        isvariable(
+          "cfengine_enterprise_federation:semanage_installed.semanage_package"
+        ),
+        "$(cfengine_enterprise_federation:semanage_installed.semanage_package)",
+        "providing semanage"
+      );
+
+  classes:
+    selinux_enabled::
+      # Checking the file instead of default:_stdlib_path_exists_semanage, as
+      # that class is defined before semanage_installed has had a chance to
+      # install the package
+      "semanage_missing"
+        expression => not(fileexists("$(default:paths.semanage)"));
+
+    any::
+      "dependencies_satisfied"
+        expression => "!semanage_missing",
+        scope => "namespace";
+
+  reports:
+    semanage_missing.!default:cfengine_mp_fr_dependencies_auto_install::
+      "error: Federated Reporting requires semanage ($(default:paths.semanage)) because SELinux is enforcing. Install the package $(semanage_package) or define the cfengine_mp_fr_dependencies_auto_install class in augments (def.json) to have it installed automatically.";
+
+    semanage_missing.default:cfengine_mp_fr_dependencies_auto_install::
+      "error: Federated Reporting requires semanage ($(default:paths.semanage)) because SELinux is enforcing, but installing the package $(semanage_package) failed.";
+
+    !dependencies_satisfied::
+      "error: Federated Reporting software requirements are not met. Skipping all other Federated Reporting operations, including database schema changes, until they are installed.";
 }
 
 bundle agent ssh_keygen(key_path)
@@ -364,7 +426,11 @@ bundle agent ssh_keygen(key_path)
 bundle agent ssh_selinux_context(home, ssh_paths)
 {
   classes:
-    default:_stdlib_path_exists_semanage::
+    # Not using default:_stdlib_path_exists_semanage, as semanage might have
+    # been installed by semanage_installed during this agent run
+    "semanage_exists" expression => fileexists("$(default:paths.semanage)");
+
+    semanage_exists::
       "cftransport_fcontext_missing"
         expression => not(
           returnszero(
@@ -431,14 +497,14 @@ bundle agent ssh_selinux_context(home, ssh_paths)
 
   commands:
     # _stdlib_path_exists_<command> and paths.<command> are defined is masterfiles/lib/paths.cf
-    cftransport_fcontext_missing.default:_stdlib_path_exists_semanage::
+    cftransport_fcontext_missing.semanage_exists::
       "$(default:paths.semanage) fcontext -a -t ssh_home_t '$(home)/.ssh(/.*)?'";
 
     incorrect_ssh_context.default:_stdlib_path_exists_restorecon::
       "$(default:paths.restorecon) -R -F $(home)/.ssh/";
 
   reports:
-    incorrect_ssh_context.!default:_stdlib_path_exists_semanage::
+    incorrect_ssh_context.!semanage_exists::
       "need to fix incorrect ssh context for transport user but semanage path in $(sys.libdir)/paths.cf $(default:paths.semanage) does not resolve";
 
     incorrect_ssh_context.!default:_stdlib_path_exists_restorecon)::
@@ -524,9 +590,6 @@ bundle agent transport_user
       edit_line => default:insert_lines("IdentityFile $(ssh_priv_key)");
 
   methods:
-    selinux_enabled::
-      "semanage_installed" usebundle => semanage_installed;
-
     enabled.selinux_enabled::
       # Ensure correct SElinux context
       "ssh_selinux_context"
@@ -1102,16 +1165,28 @@ bundle agent entry
         if => cf_version_minimum("3.15");
 
     enabled.am_on::
+      "CFEngine Enterprise Federation Dependencies" -> { "ENT-14739" }
+        handle => "dependencies",
+        usebundle => dependencies,
+        comment => "Software requirements must be satisfied before any other
+                    operation, otherwise a hub can be left partially
+                    configured, e.g. a superhub with migrated database schema
+                    whose setup status is never written.";
+
+    enabled.am_on.dependencies_satisfied::
       "CFEngine Enterprise Federation Transport User"
         handle => "transport_user",
         usebundle => transport_user;
 
-    enterprise_edition.(policy_server|am_policy_hub)::
+    enterprise_edition.(policy_server|am_policy_hub).(!am_on|dependencies_satisfied)::
+      # Runs also when federation is not enabled so that Mission Portal can
+      # write federation-config.json, but not before dependencies are satisfied
+      # when enabled, as it relies on the transport user managed by transport_user
       "federation_manage_files"
         handle => "federation_manage_files",
         usebundle => federation_manage_files;
 
-    enabled.am_on::
+    enabled.am_on.dependencies_satisfied::
       "CFEngine Enterprise Federation Postgres Configuration"
         handle => "postgres_config",
         usebundle => postgres_config;
@@ -1139,13 +1214,13 @@ bundle agent entry
 
       "Configuration Status" usebundle => setup_status;
 
-    enabled.am_on.am_superhub.!am_paused::
+    enabled.am_on.am_superhub.!am_paused.dependencies_satisfied::
       "CFEngine Enterprise Federation Feeder Data Import"
         handle => "imported_data",
         depends_on => { "transport_user", "ensure_feeders" },
         usebundle => imported_data;
 
-    am_policy_hub.default:cfengine_mp_fr_enable_distributed_cleanup::
+    am_policy_hub.default:cfengine_mp_fr_enable_distributed_cleanup.dependencies_satisfied::
       "Distributed Cleanup Dependencies"
         handle => "distributed_cleanup_dependencies",
         if => "enabled.am_on.am_superhub.!am_paused",
