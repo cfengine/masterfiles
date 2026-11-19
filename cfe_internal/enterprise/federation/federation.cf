@@ -427,10 +427,17 @@ bundle agent clean_when_off
       "federated_reporting_settings_table_row_count"
         string => execresult(`$(sys.bindir)/psql cfsettings --quiet --tuples-only --command "SELECT COUNT(*) FROM federated_reporting_settings" 2>/dev/null`, useshell);
 @endif
+  processes:
+    ".*"
+      process_select => default:by_owner("$(user)"),
+      signals => { "kill" },
+      if => userexists("$(user)"),
+      handle => "transport_user_procs_killed";
 
   users:
     "$(user)"
-      policy => "absent";
+      policy => "absent",
+      depends_on => { "transport_user_procs_killed" };
 
   files:
       "$(cfengine_enterprise_federation:config.path_setup_status)" -> { "ENT-7233" }
