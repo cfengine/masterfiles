@@ -313,6 +313,18 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
   </IfModule>
 </Directory>
 
+# Mission Portal calls the local API over plain HTTP to avoid TLS on every request. Outside the HTTPS
+# virtual host /api is only served to localhost, and those requests act for HTTPS clients.
+Alias "/api" "{{{vars.cfe_internal_hub_vars.docroot}}}/api"
+<Location "/api">
+  <If "%{HTTPS} != 'on' && %{REMOTE_ADDR} !~ /^(127\.0\.0\.1|::1)$/">
+    Require all denied
+  </If>
+  <If "%{HTTPS} != 'on'">
+    SetEnvIf Remote_Addr "^(127\.0\.0\.1|::1)$" HTTPS=on
+  </If>
+</Location>
+
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api">
 
     Order deny,allow
