@@ -324,6 +324,13 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ dispatch.php [QSA,L]
   </IfModule>
+{{#classes.mission_portal_http2_enabled}}
+
+  # Mission Portal requests wait on API requests, so the API gets its own php-fpm pool.
+  <FilesMatch \.php$>
+    SetHandler "proxy:unix:{{{vars.sys.workdir}}}/httpd/php-fpm-api.sock|fcgi://localhost"
+  </FilesMatch>
+{{/classes.mission_portal_http2_enabled}}
 </Directory>
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api/static">
