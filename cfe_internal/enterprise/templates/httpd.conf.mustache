@@ -257,6 +257,16 @@ LoadModule filter_module modules/mod_filter.so
 LoadModule deflate_module modules/mod_deflate.so
 AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
 
+<Directory "{{{vars.cfe_internal_hub_vars.public_docroot}}}">
+  # Carabiner bundles in tmp/ get a new name whenever a source file changes
+  <If "%{REQUEST_URI} =~ m#^/tmp/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+  <FilesMatch "\.(woff2?|ttf|eot|otf|png|jpe?g|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</Directory>
+
 {{#classes.mission_portal_http2_enabled}}
 # Use mod_http2
 LoadModule http2_module modules/mod_http2.so
