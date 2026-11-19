@@ -635,3 +635,18 @@ access.log = {{{vars.sys.workdir}}}/httpd/logs/www-pool.access.log
 ;php_admin_value[error_log] = /var/log/fpm-php.www.log
 ;php_admin_flag[log_errors] = on
 ;php_admin_value[memory_limit] = 32M
+
+; Mission Portal workers wait on loopback API requests. With one shared pool, all workers can end up
+; waiting for API requests that have no free worker left, so the API runs in its own pool.
+[api]
+user = cfapache
+group = cfapache
+listen = {{{vars.sys.workdir}}}/httpd/php-fpm-api.sock
+listen.owner = cfapache
+listen.group = cfapache
+listen.mode = 0660
+pm = dynamic
+pm.max_children = {{{max_children}}}
+pm.start_servers = {{{start_servers}}}
+pm.min_spare_servers = {{{min_spare_servers}}}
+pm.max_spare_servers = {{{max_spare_servers}}}
