@@ -179,7 +179,7 @@ group = cfapache
 ;                            (IPv6 and IPv4-mapped) on a specific port;
 ;   '/path/to/unix/socket' - to listen on a unix socket.
 ; Note: This value is mandatory.
-listen = 127.0.0.1:9000
+listen = {{{vars.sys.workdir}}}/httpd/php-fpm.sock
 
 ; Set listen(2) backlog.
 ; Default Value: 511 (-1 on Linux, FreeBSD and OpenBSD)
@@ -194,6 +194,9 @@ listen = 127.0.0.1:9000
 ;listen.owner = nobody
 ;listen.group = nobody
 ;listen.mode = 0660
+listen.owner = cfapache
+listen.group = cfapache
+listen.mode = 0660
 
 ; When POSIX Access Control Lists are supported you can set them using
 ; these options, value is a comma separated list of user/group names.
