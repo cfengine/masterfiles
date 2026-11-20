@@ -70,7 +70,7 @@ bundle agent cfe_internal_enterprise_mission_portal
       "fpm_children_average_memory_kb" int => "25600";
 
       # average memory taken by one fpm process 25MB * 1024
-      "php_fpm_www_pool_max_children_calculated"
+      "php_fpm_www_pool_max_children_by_memory"
         int => int(
           ifelse(
             isvariable("mem_total_kb"),
@@ -78,6 +78,28 @@ bundle agent cfe_internal_enterprise_mission_portal
             # get only 60% of total memory and devide by avarage memory taken by one fpm process
             "60"
             # fallback
+          )
+        );
+
+      # More workers than this per CPU core only add CPU contention and database connections.
+      "php_fpm_www_pool_max_children_by_cpu"
+        int => int(
+          ifelse(
+            isvariable("cpu_cores_number"),
+            eval("$(cpu_cores_number) * 12"),
+            "60"
+          )
+        );
+
+      "php_fpm_www_pool_max_children_calculated"
+        int => int(
+          ifelse(
+            isgreaterthan(
+              "$(php_fpm_www_pool_max_children_by_memory)",
+              "$(php_fpm_www_pool_max_children_by_cpu)"
+            ),
+            "$(php_fpm_www_pool_max_children_by_cpu)",
+            "$(php_fpm_www_pool_max_children_by_memory)"
           )
         );
 
