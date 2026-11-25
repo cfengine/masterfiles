@@ -252,6 +252,21 @@ LogLevel warn
 # Timeout defaults to 60 but that is too short for some operations on slower hub hardware
 Timeout 120
 
+# Compress text responses, Mission Portal loads several megabytes of JavaScript per page
+LoadModule filter_module modules/mod_filter.so
+LoadModule deflate_module modules/mod_deflate.so
+AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
+
+<Directory "{{{vars.cfe_internal_hub_vars.public_docroot}}}">
+  # Carabiner bundles in tmp/ get a new name whenever a source file changes
+  <If "%{REQUEST_URI} =~ m#^/tmp/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+  <FilesMatch "\.(woff2?|ttf|eot|otf|png|jpe?g|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</Directory>
+
 {{#classes.mission_portal_http2_enabled}}
 # Use mod_http2
 LoadModule http2_module modules/mod_http2.so
@@ -264,7 +279,7 @@ LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
 # Need to pass auth headers to fpm
 SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 <FilesMatch \.php$>
-SetHandler "proxy:fcgi://127.0.0.1:9000"
+SetHandler "proxy:unix:{{{vars.sys.workdir}}}/httpd/php-fpm.sock|fcgi://localhost"
 </FilesMatch>
 {{/classes.mission_portal_http2_enabled}}
 {{^classes.mission_portal_http2_enabled}}
@@ -298,6 +313,18 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
   </IfModule>
 </Directory>
 
+# Mission Portal calls the local API over plain HTTP to avoid TLS on every request. Outside the HTTPS
+# virtual host /api is only served to localhost, and those requests act for HTTPS clients.
+Alias "/api" "{{{vars.cfe_internal_hub_vars.docroot}}}/api"
+<Location "/api">
+  <If "%{HTTPS} != 'on' && %{REMOTE_ADDR} !~ /^(127\.0\.0\.1|::1)$/">
+    Require all denied
+  </If>
+  <If "%{HTTPS} != 'on'">
+    SetEnvIf Remote_Addr "^(127\.0\.0\.1|::1)$" HTTPS=on
+  </If>
+</Location>
+
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api">
 
     Order deny,allow
@@ -309,6 +336,13 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ dispatch.php [QSA,L]
   </IfModule>
+{{#classes.mission_portal_http2_enabled}}
+
+  # Mission Portal requests wait on API requests, so the API gets its own php-fpm pool.
+  <FilesMatch \.php$>
+    SetHandler "proxy:unix:{{{vars.sys.workdir}}}/httpd/php-fpm-api.sock|fcgi://localhost"
+  </FilesMatch>
+{{/classes.mission_portal_http2_enabled}}
 </Directory>
 
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api/static">
