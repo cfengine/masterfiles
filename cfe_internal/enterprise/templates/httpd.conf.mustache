@@ -298,6 +298,21 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
   </IfModule>
 </Directory>
 
+# These directories hold generated artifacts and uploads, never application
+# code, so their contents are served as plain files and not handed to PHP.
+<Directory "{{{vars.cfe_internal_hub_vars.public_docroot}}}/static">
+
+    Order deny,allow
+    AllowOverride None
+
+  <FilesMatch "\.php$">
+    SetHandler None
+  </FilesMatch>
+  <IfModule php{{{vars.cfe_internal_hub_vars.php_version}}}_module>
+    php_admin_flag engine off
+  </IfModule>
+</Directory>
+
 <Directory "{{{vars.cfe_internal_hub_vars.docroot}}}/api">
 
     Order deny,allow
@@ -321,6 +336,13 @@ AddType    application/x-httpd-php-source php{{{vars.cfe_internal_hub_vars.php_v
     AddType text/csv .csv
     AddType application/pdf .pdf
     AddType application/json .json
+  </IfModule>
+
+  <FilesMatch "\.php$">
+    SetHandler None
+  </FilesMatch>
+  <IfModule php{{{vars.cfe_internal_hub_vars.php_version}}}_module>
+    php_admin_flag engine off
   </IfModule>
 </Directory>
 
